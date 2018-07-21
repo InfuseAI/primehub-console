@@ -2,7 +2,14 @@
 import builder from 'canner-script';
 
 export default () => (
-  <array keyName="group" title="Group" ui="tableRoute">
+  <array keyName="group" title="Group" ui="tableRoute"
+    uiParams={{
+      columns: [{
+        title: 'Display Name',
+        dataIndex: 'displayName'
+      }]
+    }}
+  >
     <string keyName="name" title="Name" />
     <string keyName="displayName" title="DisplayName" />
     <boolean keyName="canUseGpu" title="CanUseGpu" />

@@ -2,7 +2,14 @@
 import builder from 'canner-script';
 
 export default () => (
-  <array keyName="user" title="User" ui="tableRoute">
+  <array keyName="user" title="User" ui="tableRoute"
+    uiParams={{
+      columns: [{
+        title: 'username',
+        dataIndex: 'username'
+      }]
+    }}
+  >
     <string keyName="username" title="Username" />
     <string keyName="email" title="Email" />
     <string keyName="thumbnail" title="Thumbnail" />

@@ -1,6 +1,9 @@
 /** @jsx builder */
-import builder from 'canner-script';
+import builder, {Block} from 'canner-script';
 // TODO: config should appear according to alias
+import Oidc from './oidcConfig.schema';
+import Saml from './samlConfig.schema';
+
 export default () => (
   <array keyName="idp" title="Identity Provider"
     ui="tableRoute"
@@ -41,5 +44,8 @@ export default () => (
         }]
       }}
     />
+    <Block keyName="SAML Config" title="SAML Config">
+      <Saml />
+    </Block>
   </array>
 )

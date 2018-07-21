@@ -2,7 +2,14 @@
 import builder from 'canner-script';
 
 export default () => (
-  <array keyName="env" title="Env" ui="tableRoute">
+  <array keyName="env" title="Env" ui="tableRoute"
+    uiParams={{
+      columns: [{
+        title: 'Name',
+        dataIndex: 'name'
+      }]
+    }}
+  >
     <string keyName="name" title="Name" />
     <string keyName="image" title="Image" />
     <boolean keyName="global" title="Global" />

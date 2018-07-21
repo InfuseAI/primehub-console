@@ -2,7 +2,14 @@
 import builder from 'canner-script';
 
 export default () => (
-  <array keyName="dataset" title="Dataset" ui="tableRoute">
+  <array keyName="dataset" title="Dataset" ui="tableRoute"
+    uiParams={{
+      columns: [{
+        title: 'Name',
+        dataIndex: 'name'
+      }]
+    }}
+  >
     <string keyName="name" title="Name" />
     <string keyName="description" title="Description" />
     <string keyName="access" title="Access" />
