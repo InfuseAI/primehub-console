@@ -61,20 +61,11 @@
   "scripts": {
     "lint": "eslint src test docs",
     "clean": "rimraf lib dist",
-    "build:es5": "./node_modules/.bin/babel src --out-dir lib",
-    "build": "npm run build:es5",
-    "prepublish": "npm run clean && npm run check:src && npm run build",
     "check:src": "npm run lint && npm run test",
     "test": "jest",
     "test:watch": "jest --watch",
     "start": "./node_modules/.bin/webpack-dev-server --config webpack.config.dev.js --mode development  --https",
-    "prod:clean": "rimraf dist",
-    "prod:build": "./node_modules/.bin/webpack --config webpack.config.prod.js --mode production",
-    "prod:publish": "NODE_ENV=production gulp && NODE_ENV=production gulp invalidate",
-    "staging:publish": "NODE_ENV=staging gulp && NODE_ENV=staging gulp invalidate",
-    "prod": "npm run prod:clean && npm run prod:build && npm run prod:publish",
-    "staging": "npm run prod:clean && npm run prod:build && npm run staging:publish",
-    "validate": "npm ls"
+    "build": "npm run clean && ./node_modules/.bin/webpack --config webpack.config.prod.js --mode production"
   },
   "pre-commit": [],
   "repository": "https://github.com/Canner/infuseai-canner.git",
