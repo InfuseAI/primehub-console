@@ -1,20 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Alert, Row, Col} from 'antd';
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 import CMSPage from './cms';
-import Login from './login';
+import schema from '../schema/index.schema.js';
+
+const firstKey = Object.keys(schema.schema)[0];
 
 ReactDOM.render(
   <Router>
     <React.Fragment>
       <Switch>
-        <Route path="/" exact component={() => (
-          <Redirect to={`/cms/`}/>
-        )}/>
         <Route path="/cms/:activeKey" component={CMSPage}/>
+        <Redirect to={`/cms/${firstKey}`}/>
       </Switch>
     </React.Fragment>
   </Router>
-, document.getElementById('main'));
+, document.getElementById('root'));
 

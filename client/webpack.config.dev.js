@@ -4,8 +4,7 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: {
-    index: './src/index.tsx',
-    script: './demo/script.js'
+    index: './src/index.tsx'
   },
   externals,
   output: {
@@ -15,9 +14,8 @@ module.exports = {
   },
   devServer: {
     port: "8090",
-    headers: {
-      "Access-Control-Allow-Origin": "https://localcms.host:3000"
-    }
+    contentBase: path.join(__dirname, 'docs'),
+    historyApiFallback: true
   },
   resolve: {
     extensions: ['.js', '.ts', '.tsx'],

@@ -11,6 +11,7 @@ import styled, {StyledComponentClass} from 'styled-components';
 import color from 'styledShare/color';
 import logo from 'images/logo-white-word-alpha.svg';
 import {RouteComponentProps} from 'react-router';
+import schema from '../schema/index.schema.js';
 
 const MenuItemGroup = Menu.ItemGroup;
 const {Content, Sider, Header} = Layout;
@@ -42,72 +43,6 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   cms: CMS
-
-  componentWillMount() {
-    const {history, location} = this.props;
-    const appId = window['cannerApp'].id;
-    const apiToken = localStorage.getItem("apiToken");
-
-    axios.default.post('/verify-cms-token', {
-      appId, apiToken
-    })
-    .catch(function (error) {
-      return history.push({
-        pathname: "/login",
-        state: { from: location }
-      })
-    });
-  }
-
-  async componentDidMount() {
-    const {schema} = window["cannerBundle"];
-    const appId = window['cannerApp'].id;
-    const apiToken = localStorage.getItem("apiToken");
-    const {connector, graphqlClient} = schema;
-    if (connector) {
-      if (isPlainObject(connector)) {
-        Object.keys(connector).forEach(async (connectorKey) => {
-          if (connector[connectorKey].prepare) {
-            await connector[connectorKey].prepare({
-              appId,
-              secret: apiToken,
-              schema: schema.schema
-            });
-          }
-        })
-      } else {
-        if (connector.prepare) {
-          await connector.prepare({
-            appId,
-            secret: apiToken,
-            schema: schema.schema
-          });
-        }
-      }
-    }
-    if (graphqlClient) {
-      if (isPlainObject(graphqlClient)) {
-        Object.keys(graphqlClient).forEach(async (graphqlClientKey) => {
-          if (graphqlClient[graphqlClientKey].prepare) {
-            await graphqlClient[graphqlClientKey].prepare({
-              appId,
-              secret: apiToken,
-              schema: schema.schema
-            });
-          }
-        })
-      } else {
-        if (graphqlClient.prepare) {
-          await graphqlClient.prepare({
-            appId,
-            secret: apiToken,
-            schema: schema.schema
-          });
-        }
-      }
-    }
-    this.setState({prepare: true});
-  }
 
   componentDidCatch(error, info) {
     // Display fallback UI
@@ -151,13 +86,9 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   siderMenuOnClick = (menuItem: {key: string}) => {
-    const appConfig = window['cannerApp'];
     const {history} = this.props;
     const {dataChanged} = this.state;
     const {key} = menuItem;
-    if (key === '__cnr_back') {
-      return window.location.href = `https://www.canner.io/home/apps/${appConfig.url}/overview`
-    }
 
     if (dataChanged && Object.keys(dataChanged).length > 0) {
       confirm({
@@ -186,20 +117,14 @@ export default class CMSPage extends React.Component<Props, State> {
     const {prepare, hasError, deploying, dataChanged} = this.state;
     const hasChanged = !!(dataChanged && Object.keys(dataChanged).length);
 
-    const {schema} = window["cannerBundle"];
-    const appConfig = window['cannerApp'];
-
     if (hasError) {
       return <Error/>;
     }
 
-    if (!prepare) {
-      return <Loading/>
-    }
     return (
       <Layout style={{minHeight: '100vh'}}>
         <Sider breakpoint="sm">
-          <Logo src={appConfig.cmsPage.topLeftLogo || logo}/>
+          <Logo src={logo}/>
           <Menu
             onClick={this.siderMenuOnClick}
             selectedKeys={[(match.params as any).activeKey]}
@@ -221,7 +146,7 @@ export default class CMSPage extends React.Component<Props, State> {
         <Content style={{padding: "0"}}>
           <Header style={{padding: "0px", zIndex: 1000}}>
             <ContentHeader
-              appUrl={appConfig.url}
+              appUrl={''}
               deploying={deploying}
               hasChanged={hasChanged}
               deploy={this.deploy}/>
