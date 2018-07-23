@@ -14,7 +14,8 @@ export default () => (
       }]
     }}
   >
-    <string keyName="alias" title="Alias"
+    <string keyName="alias" title="Alias" readOnly/>
+    <string keyName="providerId" title="providerId"
       ui="select"
       uiParams={{
         options: [{
@@ -27,7 +28,6 @@ export default () => (
       }}
     />
     <string keyName="internalId" title="InternalId" />
-    <string keyName="providerId" title="ProviderId" />
     <boolean keyName="enabled" title="Enabled" />
     <string keyName="updateProfileFirstLoginMode" title="Update Profile First Login Mode" />
     <boolean keyName="trustEmail" title="Trust Email" />
