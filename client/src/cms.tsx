@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import * as React from 'react';
 import {Layout, Menu, Icon, notification, Modal} from 'antd';
-import {CMS} from 'canner';
+import {CMS, ReactRouterProvider} from 'canner';
 import ContentHeader from 'components/header';
 import Loading from 'components/loading';
 import Error from 'components/error';
@@ -151,14 +151,17 @@ export default class CMSPage extends React.Component<Props, State> {
               hasChanged={hasChanged}
               deploy={this.deploy}/>
           </Header>
-          <CMS
-            history={history}
-            schema={schema}
+          <ReactRouterProvider
             baseUrl="/cms"
-            hideButtons={true}
-            dataDidChange={this.dataDidChange}
-            ref={cms => this.cms = cms}
+            history={history}
+          >
+            <CMS
+              schema={schema}
+              hideButtons={false}
+              dataDidChange={this.dataDidChange}
+              ref={cms => this.cms = cms}
             />
+          </ReactRouterProvider>
         </Content>
       </Layout>
     )
