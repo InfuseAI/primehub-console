@@ -17,7 +17,6 @@ export default class Options extends React.Component {
             <Item
               refId={refId}
               filter={node => {
-                console.log(node);
                 return matched.renderKeys.indexOf(node.keyName) !== -1
               }}
             />

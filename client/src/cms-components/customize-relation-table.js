@@ -52,23 +52,32 @@ export default class RelationTable extends PureComponent {
 
   render() {
     const { modalVisible } = this.state;
-    let { disabled, value, uiParams, refId, relation,
+    let { disabled, value, uiParams = {}, refId, relation,
       fetch, fetchRelation, updateQuery, subscribe,
-      schema, Toolbar, relationValue, goTo
+      schema, Toolbar, relationValue, goTo, rootValue, title
     } = this.props;
     value = value && value.toJS ? value.toJS() : [];
     const newColumnsRender = renderValue(uiParams.columns, schema[relation.to].items.items);
+    const recordValue = getRecordValue(rootValue, refId);
+    // hack
+    const isHidden = uiParams.isHidden ? uiParams.isHidden(recordValue.toJS()) : false;
+    if (isHidden) {
+      return null;
+    }
     return (
       <div>
+        <div style={{marginTop: 16, fontSize: 18}}>{title}</div>
         <Table
           dataSource={value}
           columns={newColumnsRender}
         />
-        <div>
-          <a href="javascript:;" onClick={this.showModal}>
-            <Icon type="link" style={{margin: '16px 8px'}}/>connect existed {relation.to}
-          </a>
-        </div>
+        {
+          !disabled && <div>
+            <a href="javascript:;" onClick={this.showModal}>
+              <Icon type="link" style={{margin: '16px 8px'}}/>connect existed {relation.to}
+            </a>
+          </div>
+        }
         {
           !disabled && <Picker
             title="選擇你要的物件"
@@ -93,24 +102,7 @@ export default class RelationTable extends PureComponent {
   }
 }
 
-function getTag(v, uiParams) {
-  // use value and uiParams to generateTagName
-  const {textCol, subtextCol, renderText} = uiParams;
-  let tag = '';
-  
-  if (renderText) {
-    // if there is renderText, textCol and subtextCol will be ignored;
-    const compiler = template(renderText);
-    try {
-      tag = compiler(v);
-    } catch (e) {
-      throw e;
-    }
-  } else {
-    const text = v[textCol];
-    const subtext = v[subtextCol];
-    tag = text + (subtext ? `(${subtext})` : '');
-  }
-
-  return tag;
+function getRecordValue(rootValue, refId) {
+  const targetRefId = refId.remove();
+  return rootValue.getIn(targetRefId.getPathArr());
 }

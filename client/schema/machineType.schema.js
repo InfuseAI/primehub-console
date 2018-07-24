@@ -20,9 +20,11 @@ export default () => (
     }}
   >
     <string keyName="name" title="Name" />
-    <string keyName="cpu" title="Cpu" />
-    <string keyName="gpu" title="Gpu" />
-    <number keyName="memory" title="Memory" />
+    <string keyName="cpuLimit" title="CPU Limit" />
+    <string keyName="memoryLimit" title="Memory Limit" />
+    <number keyName="gpuLimit" title="GPU Limit" />
+    <number keyName="cpuRequest" title="CPU Request" />
+    <string keyName="memoryRequest" title="Memory Request" />
     <boolean keyName="global" title="Global" />
     <relation keyName="groups" title="Groups"
       packageName='../src/cms-components/customize-relation-table'
@@ -30,7 +32,10 @@ export default () => (
         to: 'group',
         type: 'toMany'
       }}
+      hideTitle
       uiParams={{
+        // hack
+        isHidden: record => record.global,
         textCol: 'displayName',
         columns: [{
           title: 'Display Name',
