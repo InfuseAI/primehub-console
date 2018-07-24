@@ -6,9 +6,9 @@ export default () => (
     <Block title="System Settings">
       <object keyName="org">
         <string keyName="name" title="Name"/>
-        <string keyName="logo" title="Logo"/>
+        <image keyName="logo" title="Logo" disabled/>
       </object>
-      <number keyName="defaultUserDiskQuota" title="Default User Disk Quota"/>
+      <string keyName="defaultUserDiskQuota" title="Default User Disk Quota"/>
     </Block>
   </object>
 )

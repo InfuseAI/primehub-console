@@ -15,14 +15,14 @@ export default () => (
       <string keyName="username" title="Username" />
       <string keyName="email" title="Email" />
     </Default>
-    <string keyName="thumbnail" title="Thumbnail" />
+    <image keyName="thumbnail" title="Thumbnail" disabled />
     <string keyName="firstName" title="FirstName" />
     <string keyName="lastName" title="LastName" />
     <boolean keyName="totp" title="Totp" />
     <boolean keyName="isAdmin" title="IsAdmin" />
     <boolean keyName="enabled" title="Enabled" />
     <number keyName="createdTimestamp" title="CreatedTimestamp" />
-    <number keyName="personalDiskQuota" title="PersonalDiskQuota" />
+    <string keyName="personalDiskQuota" title="PersonalDiskQuota" />
     <relation keyName="groups" title="Groups"
       packageName='../src/cms-components/customize-relation-table'
       relation={{

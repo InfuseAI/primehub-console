@@ -37,7 +37,7 @@ export default () => (
     <string keyName="displayName" title="DisplayName" />
     <boolean keyName="canUseGpu" title="CanUseGpu" />
     <number keyName="gpuQuota" title="GpuQuota" />
-    <number keyName="diskQuota" title="DiskQuota" />
+    <string keyName="diskQuota" title="DiskQuota" />
     <relation keyName="users" title="Users"
       packageName='../src/cms-components/customize-relation-table'
       relation={{
