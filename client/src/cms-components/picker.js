@@ -22,48 +22,14 @@ export default class Picker extends PureComponent {
   }
   
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      selectedRowKeys: nextProps.pickedIds ? nextProps.pickedIds : []
-    });
+    const {relationValue} = nextProps;
+    this.updateData(relationValue);
   }
 
   componentDidMount() {
     const {relationValue} = this.props;
     this.updateData(relationValue);
   }
-
-  // nextPage = () => {
-  //   const {updateQuery, relation} = this.props;
-  //   const {hasNextPage, value} = this.state;
-  //   if (hasNextPage) {
-  //     updateQuery([relation.to], {
-  //       after: (value.last() || new Map()).get('id'),
-  //       first: 10
-  //     });
-  //     this.fetchData();
-  //   }
-  // }
-
-  // prevPage = () => {
-  //   const {updateQuery, relation} = this.props;
-  //   const {hasPreviousPage, value} = this.state;
-  //   if (hasPreviousPage) {
-  //     updateQuery([relation.to], {
-  //       before: (value.first() || new Map()).get('id'),
-  //       last: 10
-  //     });
-  //     this.fetchData();
-  //   }
-  // }
-
-  // fetchData = () => {
-  //   const {relation, fetch} = this.props;
-
-  //   return fetch(relation.to)
-  //     .then(data => {
-  //       this.updateData(data);
-  //     });
-  // }
 
   updateData = (data) => {
     let {totalValue} = this.state;
@@ -103,14 +69,15 @@ export default class Picker extends PureComponent {
   render() {
     const { visible, columns, pickOne = false, Toolbar } = this.props;
     const { value, selectedRowKeys, hasNextPage, hasPreviousPage } = this.state;
-
     return <Modal
+      width={800}
       onOk={this.handleOk}
       onCancel={this.handleCancel}
       visible={visible}
     >
       <Toolbar>
         <Table
+          style={{marginBottom: 16}}
           rowSelection={{
             type: (pickOne) ? "radio" : "checkbox",
             onChange: this.rowSelectOnChange,
@@ -123,18 +90,6 @@ export default class Picker extends PureComponent {
           pagination={false}
         />
       </Toolbar>
-      {/* <ButtonWrapper>
-        <ButtonGroup>
-          <Button disabled={!hasPreviousPage} onClick={this.prevPage}>
-            <Icon type="left" />
-            Previous Page
-          </Button>
-          <Button disabled={!hasNextPage} onClick={this.nextPage}>
-            Next Page
-            <Icon type="right" />
-          </Button>
-        </ButtonGroup>
-      </ButtonWrapper> */}
     </Modal>
   }
 }

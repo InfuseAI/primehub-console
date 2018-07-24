@@ -47,6 +47,13 @@ export default () => (
       }}
     >
       <toolbar>
+        {/* <filter
+          fields={[{
+            type: 'text',
+            label: 'Display Name',
+            key: 'displayName'
+          }]}
+        /> */}
         <pagination />
       </toolbar>
     </relation>

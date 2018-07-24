@@ -52,7 +52,10 @@ export default class RelationTable extends PureComponent {
 
   render() {
     const { modalVisible } = this.state;
-    let { disabled, value, uiParams, refId, relation, fetch, fetchRelation, updateQuery, subscribe, schema, Toolbar, relationValue } = this.props;
+    let { disabled, value, uiParams, refId, relation,
+      fetch, fetchRelation, updateQuery, subscribe,
+      schema, Toolbar, relationValue, goTo
+    } = this.props;
     value = value && value.toJS ? value.toJS() : [];
     const newColumnsRender = renderValue(uiParams.columns, schema[relation.to].items.items);
     return (

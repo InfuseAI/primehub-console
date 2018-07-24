@@ -11,7 +11,7 @@ export default () => (
     }}
   >
     <Block title="Console Display Name">
-      <string keyNmae="type"
+      <string keyName="type"
         ui="select"
         uiParams={{
           options: [{
@@ -22,8 +22,18 @@ export default () => (
       />
     </Block>
     <Block title="Config">
-      <object keyName="config">
-        <Tabs>
+    <object keyName="config" packageName='../src/cms-components/customize-object-options'
+      uiParams={{
+        selectedKey: 'type',
+        options: [{
+          key: 'ldap',
+          renderKeys: [
+            'ldap'
+          ]
+        }]
+      }}
+    >
+      <Tabs keyName="ldap">
         <Default keyName="requiredSettings" title="Required Settings">
           <boolean keyName="enabled" title="Enabled"  layout="horizontal"/>
           <number keyName="priority" title="Priority"  layout="horizontal"/>
