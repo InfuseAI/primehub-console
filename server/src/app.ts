@@ -27,7 +27,8 @@ const resolvers = {
     machineTypesConnection: machineType.connectionQuery
   },
   User: user.typeResolvers,
-  Group: group.typeResolvers
+  Group: group.typeResolvers,
+  MachineType: machineType.typeResolvers
 };
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {

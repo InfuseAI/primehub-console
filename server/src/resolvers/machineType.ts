@@ -44,3 +44,13 @@ export const queryOne = async (root, args, context: Context) => {
   const container = await context.crdClient.containers.get(id);
   return mapping(container);
 };
+
+export const typeResolvers = {
+  global: async (parent, args, context: Context) => {
+    // find in everyOne group
+    const roles = await context.kcAdminClient.groups.listRealmRoleMappings({
+      id: EVERYONE_GROUP_ID
+    });
+    return Boolean(find(roles, role => role.name.slice(3) === parent.name));
+  }
+};
