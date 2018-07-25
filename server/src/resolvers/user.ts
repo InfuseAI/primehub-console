@@ -1,7 +1,6 @@
 import KcAdminClient from 'keycloak-admin';
 import { toRelay } from './utils';
-import { mapValues, find } from 'lodash';
-import {unflatten} from 'flat';
+import { find } from 'lodash';
 import { EVERYONE_GROUP_ID } from './constant';
 
 interface Context {

@@ -1,4 +1,4 @@
-import { first, last } from 'lodash';
+import { first, last, isUndefined } from 'lodash';
 
 export const toRelay = (rows: any[]) => {
   return {
@@ -13,4 +13,9 @@ export const toRelay = (rows: any[]) => {
       endCursor: (last(rows) || {}).id
     }
   };
+};
+
+export const getFromAttr = (key: string, attributes: Record<string, any>, defaultValue: any, type: any = v => v) => {
+  const value = attributes && attributes[key] && attributes[key][0];
+  return isUndefined(value) ? defaultValue : type(value);
 };
