@@ -2,6 +2,8 @@ import Koa from 'koa';
 import { ApolloServer, gql } from 'apollo-server-koa';
 import { importSchema } from 'graphql-import';
 import path from 'path';
+import KcAdminClient from 'keycloak-admin';
+import { query as systemQuery } from './resolvers/system';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -9,14 +11,26 @@ const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graph
 // A map of functions which return data for the schema.
 const resolvers = {
   Query: {
-    hello: () => 'world'
+    system: systemQuery
   }
 };
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {
   const server = new ApolloServer({
     typeDefs,
-    // resolvers,
+    resolvers,
+    context: async () => {
+      const kcAdminClient = new KcAdminClient();
+      await kcAdminClient.auth({
+        username: 'wwwy3y3',
+        password: 'wwwy3y3',
+        grantType: 'password',
+        clientId: 'admin-cli'
+      });
+      return {
+        kcAdminClient
+      };
+    },
     mocks: true
   });
 
