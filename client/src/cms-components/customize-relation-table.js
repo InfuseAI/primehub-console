@@ -66,7 +66,9 @@ export default class RelationTable extends PureComponent {
     }
     return (
       <div>
-        <div style={{marginTop: 16, fontSize: 18}}>{title}</div>
+        {
+          uiParams.isHidden && <div style={{marginTop: 16, fontSize: 18}}>{title}</div>
+        }
         <Table
           dataSource={value}
           columns={newColumnsRender}
