@@ -66,4 +66,14 @@ export const typeResolvers = {
 
     return personalDiskQuota;
   },
+
+  groups: async (parent, args, context: Context) => {
+    try {
+      return context.kcAdminClient.users.listGroups({
+        id: parent.id
+      });
+    } catch (err) {
+      return [];
+    }
+  }
 };

@@ -1,4 +1,5 @@
 # import PageInfo from "common.graphql"
+# import User from "user.graphql"
 
 type Group {
   id: ID!
@@ -7,6 +8,7 @@ type Group {
   canUseGpu: Boolean
   gpuQuota: Float
   diskQuota: String
+  members: [User]
 }
 
 """An edge in a connection."""

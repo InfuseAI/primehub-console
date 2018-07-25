@@ -1,4 +1,5 @@
 # import PageInfo from "common.graphql"
+# import Group from "group.graphql"
 
 type User {
   id: ID!
@@ -12,6 +13,7 @@ type User {
 	enabled: Boolean
 	createdTimestamp: Int
 	personalDiskQuota: String
+  groups: [Group]
 }
 
 """An edge in a connection."""

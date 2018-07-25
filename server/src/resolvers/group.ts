@@ -48,5 +48,15 @@ export const typeResolvers = {
     getFromAttr('diskQuota', parent.attributes, '10GB'),
 
   displayName: async (parent, args, context: Context) =>
-    getFromAttr('displayName', parent.attributes, parent.name)
+    getFromAttr('displayName', parent.attributes, parent.name),
+
+  members: async (parent, args, context: Context) => {
+    try {
+      return await context.kcAdminClient.groups.listMembers({
+        id: parent.id
+      });
+    } catch (err) {
+      return [];
+    }
+  }
 };
