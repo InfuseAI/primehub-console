@@ -1,5 +1,6 @@
 # import PageInfo from "common.graphql"
 # import User from "user.graphql"
+# import MachineType from "machineType.graphql"
 
 type Group {
   id: ID!
@@ -9,6 +10,7 @@ type Group {
   gpuQuota: Float
   diskQuota: String
   members: [User]
+  machineTypes: [MachineType]
 }
 
 """An edge in a connection."""

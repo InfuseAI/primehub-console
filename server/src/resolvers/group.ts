@@ -1,12 +1,15 @@
 import KcAdminClient from 'keycloak-admin';
 import { toRelay, getFromAttr } from './utils';
+import CrdClient from '../crdClient/crdClientImpl';
 import { mapValues, find } from 'lodash';
 import {unflatten} from 'flat';
 import { EVERYONE_GROUP_ID } from './constant';
+import { mapping } from './machineType';
 
 interface Context {
   realm: string;
   kcAdminClient: KcAdminClient;
+  crdClient: CrdClient;
 }
 
 const listQuery = async (kcAdminClient: KcAdminClient) => {
@@ -58,5 +61,19 @@ export const typeResolvers = {
     } catch (err) {
       return [];
     }
+  },
+
+  machineTypes: async (parent, args, context: Context) => {
+    // get role-mappings prefixed with mt_
+    // map with all resource on crd
+    let roles = await context.kcAdminClient.groups.listRealmRoleMappings({
+      id: parent.id
+    });
+    roles = roles.filter(role => role.name.startsWith('mt_'));
+    const machineTypeNames = roles.map(role => role.name.slice(3));
+    const machineTypes = await Promise.all(machineTypeNames.map(name => {
+      return context.crdClient.containers.get(name);
+    }));
+    return machineTypes.map(mapping);
   }
 };

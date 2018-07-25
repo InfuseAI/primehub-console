@@ -3,9 +3,11 @@ import { ApolloServer, gql } from 'apollo-server-koa';
 import { importSchema } from 'graphql-import';
 import path from 'path';
 import KcAdminClient from 'keycloak-admin';
+import CrdClient from './crdClient/crdClientImpl';
 import { query as systemQuery } from './resolvers/system';
 import * as user from './resolvers/user';
 import * as group from './resolvers/group';
+import * as machineType from './resolvers/machineType';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -19,7 +21,10 @@ const resolvers = {
     usersConnection: user.connectionQuery,
     group: group.queryOne,
     groups: group.query,
-    groupsConnection: group.connectionQuery
+    groupsConnection: group.connectionQuery,
+    machineType: machineType.queryOne,
+    machineTypes: machineType.query,
+    machineTypesConnection: machineType.connectionQuery
   },
   User: user.typeResolvers,
   Group: group.typeResolvers
@@ -39,7 +44,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
       });
       return {
         realm: 'master',
-        kcAdminClient
+        kcAdminClient,
+        crdClient: new CrdClient()
       };
     },
     mocks: true
