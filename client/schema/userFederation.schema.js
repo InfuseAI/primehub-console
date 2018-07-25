@@ -67,7 +67,7 @@ export default () => (
           />
           <string keyName="bindDn" title="Bind DN"  layout="horizontal"/>
           <string keyName="bindCredential" title="Bind Credential"  layout="horizontal"/>
-          <number keyName="searchScope" title="Search Scope"  layout="horizontal"/>
+          <number keyName="searchScope" title="Search Scope"  layout="horizontal" uiParams={{min: 0}}/>
           <boolean keyName="validatePasswordPolicy" title="Validate Password Policy"  layout="horizontal"/>
           <string keyName="useTruststoreSpi" title="Use Truststore SPI"
             ui="select"
@@ -90,7 +90,7 @@ export default () => (
           <boolean keyName="useKerberosForPasswordAuthentication" title="Use Kerberos For Password Authentication" />
         </Default>
         <Default keyName="syncSetting" title="Sync Settings">
-          <number keyName="batchSizeForSync" title="Batch Size" />
+          <number keyName="batchSizeForSync" title="Batch Size" uiParams={{min: 0}} />
           <number keyName="fullSyncPeriod" title="Periodic Full Sync" />
           <number keyName="changedSyncPeriod" title="Periodic Changed Users Sync" />
         </Default>

@@ -22,8 +22,8 @@ export default () => (
     <string keyName="name" title="Name" />
     <string keyName="cpuLimit" title="CPU Limit" />
     <string keyName="memoryLimit" title="Memory Limit" />
-    <number keyName="gpuLimit" title="GPU Limit" />
-    <number keyName="cpuRequest" title="CPU Request" />
+    <number keyName="gpuLimit" title="GPU Limit" uiParams={{min: 0}}/>
+    <number keyName="cpuRequest" title="CPU Request" uiParams={{min: 0}}/>
     <string keyName="memoryRequest" title="Memory Request" />
     <boolean keyName="global" title="Global" />
     <relation keyName="groups" title="Groups"
