@@ -4,6 +4,7 @@ import { importSchema } from 'graphql-import';
 import path from 'path';
 import KcAdminClient from 'keycloak-admin';
 import { query as systemQuery } from './resolvers/system';
+import * as user from './resolvers/user';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -11,8 +12,12 @@ const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graph
 // A map of functions which return data for the schema.
 const resolvers = {
   Query: {
-    system: systemQuery
-  }
+    system: systemQuery,
+    user: user.queryOne,
+    users: user.query,
+    usersConnection: user.connectionQuery
+  },
+  User: user.typeResolvers
 };
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {
@@ -28,6 +33,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
         clientId: 'admin-cli'
       });
       return {
+        realm: 'master',
         kcAdminClient
       };
     },
