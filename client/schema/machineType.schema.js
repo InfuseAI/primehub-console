@@ -20,23 +20,48 @@ export default () => (
     }}
   >
     <string keyName="name" title="Name" />
-    <string keyName="cpu" title="Cpu" />
-    <string keyName="gpu" title="Gpu" />
-    <number keyName="memory" title="Memory" />
+    <string keyName="cpuLimit" title="CPU Limit" />
+    <string keyName="memoryLimit" title="Memory Limit" />
+    <number keyName="gpuLimit" title="GPU Limit" />
+    <number keyName="cpuRequest" title="CPU Request" />
+    <string keyName="memoryRequest" title="Memory Request" />
     <boolean keyName="global" title="Global" />
     <relation keyName="groups" title="Groups"
-      ui="multipleSelect"
+      packageName='../src/cms-components/customize-relation-table'
       relation={{
         to: 'group',
         type: 'toMany'
       }}
+      hideTitle
       uiParams={{
+        // hack
+        isHidden: record => record.global,
         textCol: 'displayName',
         columns: [{
           title: 'Display Name',
           dataIndex: 'displayName'
+        }, {
+          title: 'Can Use GPU',
+          dataIndex: 'canUseGpu'
+        }, {
+          title: 'GPU Quota',
+          dataIndex: 'gpuQuota'
+        }, {
+          title: 'Disk Quota',
+          dataIndex: 'diskQuota'
         }]
       }}
-    />
+    >
+      <toolbar>
+        {/* <filter
+          fields={[{
+            type: 'text',
+            label: 'Display Name',
+            key: 'displayName'
+          }]}
+        /> */}
+        <pagination />
+      </toolbar>
+    </relation>
   </array>
 )

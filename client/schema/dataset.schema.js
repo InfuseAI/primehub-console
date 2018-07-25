@@ -16,7 +16,7 @@ export default () => (
     <string keyName="type" title="Type" />
     <string keyName="url" title="Url" />
     <relation keyName="groups" title="Groups"
-      ui="multipleSelect"
+      packageName='../src/cms-components/customize-relation-table'
       relation={{
         to: 'group',
         type: 'toMany'
@@ -26,8 +26,28 @@ export default () => (
         columns: [{
           title: 'Display Name',
           dataIndex: 'displayName'
+        }, {
+          title: 'Can Use GPU',
+          dataIndex: 'canUseGpu'
+        }, {
+          title: 'GPU Quota',
+          dataIndex: 'gpuQuota'
+        }, {
+          title: 'Disk Quota',
+          dataIndex: 'diskQuota'
         }]
       }}
-    />
+    >
+      <toolbar>
+        {/* <filter
+          fields={[{
+            type: 'text',
+            label: 'Display Name',
+            key: 'displayName'
+          }]}
+        /> */}
+        <pagination />
+      </toolbar>
+    </relation>
   </array>
 )

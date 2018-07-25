@@ -1,5 +1,5 @@
 /** @jsx builder */
-import builder, {Block, Default} from 'canner-script';
+import builder, {Block, Default, Tabs} from 'canner-script';
 
 export default () => (
   <array keyName="userFederations" title="User Federations" ui="tableRoute"
@@ -10,23 +10,37 @@ export default () => (
       }]
     }}
   >
-    <string keyNmae="type" title="Console Display Name"
-      ui="select"
+    <Block title="Console Display Name">
+      <string keyName="type"
+        ui="select"
+        uiParams={{
+          options: [{
+            text: 'ldap',
+            value: 'ldap'
+          }]
+        }}
+      />
+    </Block>
+    <Block title="Config">
+    <object keyName="config" packageName='../src/cms-components/customize-object-options'
       uiParams={{
+        selectedKey: 'type',
         options: [{
-          text: 'ldap',
-          value: 'ldap'
+          key: 'ldap',
+          renderKeys: [
+            'ldap'
+          ]
         }]
       }}
-    />
-    <Default>
-      <object keyName="config">
-        <Block keyName="requiredSettings" title="Required Settings">
-          <boolean keyName="enabled" title="Enabled" />
-          <number keyName="priority" title="Priority" />
-          <boolean keyName="importEnabled" title="Import Users" />
-          <boolean keyName="syncRegistrations" title="Sync Registrations" />
+    >
+      <Tabs keyName="ldap">
+        <Default keyName="requiredSettings" title="Required Settings">
+          <boolean keyName="enabled" title="Enabled"  layout="horizontal"/>
+          <number keyName="priority" title="Priority"  layout="horizontal"/>
+          <boolean keyName="importEnabled" title="Import Users"  layout="horizontal"/>
+          <boolean keyName="syncRegistrations" title="Sync Registrations"  layout="horizontal"/>
           <string keyName="vendor" title="Vendor"
+            layout="horizontal"
             ui="select"
             uiParams={{
               options: [{
@@ -35,12 +49,12 @@ export default () => (
               }]
             }}
           />
-          <string keyName="usernameLDAPAttribute" title="Username LDAP attribute" />
-          <string keyName="rdnLDAPAttribute" title="RDN LDAP attribute" />
-          <string keyName="uuidLDAPAttribute" title="UUID LDAP attribute" />
-          <string keyName="userObjectClasses" title="User Object Classes" />
-          <string keyName="connectionUrl" title="Connection URL" />
-          <string keyName="usersDn" title="Users DN" />
+          <string keyName="usernameLDAPAttribute" title="Username LDAP attribute"  layout="horizontal"/>
+          <string keyName="rdnLDAPAttribute" title="RDN LDAP attribute"  layout="horizontal"/>
+          <string keyName="uuidLDAPAttribute" title="UUID LDAP attribute"  layout="horizontal"/>
+          <string keyName="userObjectClasses" title="User Object Classes"  layout="horizontal"/>
+          <string keyName="connectionUrl" title="Connection URL"  layout="horizontal"/>
+          <string keyName="usersDn" title="Users DN"  layout="horizontal"/>
           <string keyName="authType" title="Authentication Type"
             ui="select"
             uiParams={{
@@ -49,11 +63,12 @@ export default () => (
                 value: 'simple'
               }]
             }}
+            layout="horizontal"
           />
-          <string keyName="bindDn" title="Bind DN" />
-          <string keyName="bindCredential" title="Bind Credential" />
-          <number keyName="searchScope" title="Search Scope" />
-          <boolean keyName="validatePasswordPolicy" title="Validate Password Policy" />
+          <string keyName="bindDn" title="Bind DN"  layout="horizontal"/>
+          <string keyName="bindCredential" title="Bind Credential"  layout="horizontal"/>
+          <number keyName="searchScope" title="Search Scope"  layout="horizontal"/>
+          <boolean keyName="validatePasswordPolicy" title="Validate Password Policy"  layout="horizontal"/>
           <string keyName="useTruststoreSpi" title="Use Truststore SPI"
             ui="select"
             uiParams={{
@@ -62,23 +77,24 @@ export default () => (
                 value: 'ldapsOnly'
               }]
             }}
+            layout="horizontal"
           />
-          <boolean keyName="connectionPooling" title="Connection Pooling" />
+          <boolean keyName="connectionPooling" title="Connection Pooling"  layout="horizontal" description="dsa"/>
 
-          <number keyName="lastSync" title="LastSync" />
-          <boolean keyName="debug" title="Debug" />
-          <boolean keyName="pagination" title="Pagination" />
-        </Block>
-        <Block keyName="kerberosIntegration" title="Kerberos Integration">
-          <boolean keyName="allowKerberosAuthentication" title="Allow Kerberos Authentication" />
+          <number keyName="lastSync" title="LastSync"  layout="horizontal"/>
+          <boolean keyName="debug" title="Debug"  layout="horizontal"/>
+          <boolean keyName="pagination" title="Pagination"  layout="horizontal"/>
+        </Default>
+        <Default keyName="kerberosIntegration" title="Kerberos Integration">
+          <boolean keyName="allowKerberosAuthentication" title="Allow Kerberos Authentication"/>
           <boolean keyName="useKerberosForPasswordAuthentication" title="Use Kerberos For Password Authentication" />
-        </Block>
-        <Block keyName="syncSetting" title="Sync Settings">
+        </Default>
+        <Default keyName="syncSetting" title="Sync Settings">
           <number keyName="batchSizeForSync" title="Batch Size" />
           <number keyName="fullSyncPeriod" title="Periodic Full Sync" />
           <number keyName="changedSyncPeriod" title="Periodic Changed Users Sync" />
-        </Block>
-        <Block keyName="cacheSettings" title="Cachce Settings">
+        </Default>
+        <Default keyName="cacheSettings" title="Cachce Settings">
           <string keyName="cachePolicy" title="CachePolicy"
             ui="select"
             uiParams={{
@@ -88,8 +104,9 @@ export default () => (
               }]
             }}
           />
-        </Block>
+        </Default>
+        </Tabs>
       </object>
-    </Default>
+    </Block>
   </array>
 )
