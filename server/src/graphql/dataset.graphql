@@ -1,0 +1,35 @@
+# import PageInfo from "common.graphql"
+
+type Dataset {
+  id: ID!
+	name: String!
+  description: String
+  access: String
+  type: String
+  url: String
+}
+
+"""An edge in a connection."""
+type DatasetEdge {
+  """The item at the end of the edge."""
+  node: Dataset!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type DatasetConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [DatasetEdge]!
+}
+
+input DatasetWhereUniqueInput {
+  id: ID!
+}
+
+input DatasetWhereInput {
+  id: ID
+}

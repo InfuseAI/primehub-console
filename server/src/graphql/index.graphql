@@ -1,0 +1,96 @@
+# import System from "./system.graphql"
+# import User, UserConnection, UserWhereInput, UserWhereUniqueInput from "./user.graphql"
+# import Group, GroupConnection, GroupWhereInput, GroupWhereUniqueInput from "./group.graphql"
+# import MachineType, MachineTypeConnection, MachineTypeWhereInput, MachineTypeWhereUniqueInput from "./machineType.graphql"
+# import Env, EnvConnection, EnvWhereInput, EnvWhereUniqueInput from "./env.graphql"
+# import Dataset, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput from "./dataset.graphql"
+
+type Query {
+  """System"""
+  system: System!
+
+  """User"""
+  user(where: UserWhereUniqueInput!): User
+  users(
+    where: UserWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [User]!
+  usersConnection(
+    where: UserWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): UserConnection!
+
+  """Group"""
+  group(where: GroupWhereUniqueInput!): Group
+  groups(
+    where: GroupWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [Group]!
+  groupsConnection(
+    where: GroupWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): GroupConnection!
+
+  """MachineType"""
+  machineType(where: MachineTypeWhereUniqueInput!): MachineType
+  machineTypes(
+    where: MachineTypeWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [MachineType]!
+  machineTypesConnection(
+    where: MachineTypeWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): MachineTypeConnection!
+
+  """Env"""
+  env(where: EnvWhereUniqueInput!): Env
+  envs(
+    where: EnvWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [Env]!
+  envsConnection(
+    where: EnvWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): EnvConnection!
+
+  """Dataset"""
+  dataset(where: DatasetWhereUniqueInput!): Dataset
+  datasets(
+    where: DatasetWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [Dataset]!
+  datasetsConnection(
+    where: DatasetWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): DatasetConnection!
+}

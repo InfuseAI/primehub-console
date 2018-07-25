@@ -1,0 +1,35 @@
+# import PageInfo from "common.graphql"
+
+type Group {
+  id: ID!
+	name: String
+  displayName: String
+  canUseGpu: Boolean
+  gpuQuota: Float
+  diskQuota: String
+}
+
+"""An edge in a connection."""
+type GroupEdge {
+  """The item at the end of the edge."""
+  node: Group!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type GroupConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [GroupEdge]!
+}
+
+input GroupWhereUniqueInput {
+  id: ID!
+}
+
+input GroupWhereInput {
+  id: ID
+}

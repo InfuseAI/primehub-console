@@ -1,13 +1,10 @@
 import Koa from 'koa';
 import { ApolloServer, gql } from 'apollo-server-koa';
+import { importSchema } from 'graphql-import';
+import path from 'path';
 
 // The GraphQL schema
-const typeDefs = gql`
-  type Query {
-    "A simple type for getting started!"
-    hello: String
-  }
-`;
+const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
 
 // A map of functions which return data for the schema.
 const resolvers = {
@@ -19,7 +16,8 @@ const resolvers = {
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {
   const server = new ApolloServer({
     typeDefs,
-    resolvers,
+    // resolvers,
+    mocks: true
   });
 
   // koa

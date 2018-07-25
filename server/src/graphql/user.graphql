@@ -1,0 +1,40 @@
+# import PageInfo from "common.graphql"
+
+type User {
+  id: ID!
+	username: String!
+	email: String!
+	thumbnail: String
+	firstName: String
+	lastName: String
+	totp: Boolean
+	isAdmin: Boolean
+	enabled: Boolean
+	createdTimestamp: Int
+	personalDiskQuota: String
+}
+
+"""An edge in a connection."""
+type UserEdge {
+  """The item at the end of the edge."""
+  node: User!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type UserConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [UserEdge]!
+}
+
+input UserWhereUniqueInput {
+  id: ID!
+}
+
+input UserWhereInput {
+  id: ID
+}
