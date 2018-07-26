@@ -2,7 +2,7 @@
 import builder from 'canner-script';
 
 export default () => (
-  <array keyName="machineType" title="MachineType" ui="tableRoute"
+  <array keyName="instanceType" title="Instance Type" ui="tableRoute"
     uiParams={{
       columns: [{
         title: 'Name',

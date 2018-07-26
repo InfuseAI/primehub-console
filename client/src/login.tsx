@@ -2,10 +2,11 @@ import * as axios from 'axios';
 import * as React from 'react';
 import { RouteComponentProps, Redirect } from 'react-router';
 import { FormComponentProps } from 'antd/lib/form';
+import firebase from 'firebase';
 import {Row, Col, Form, Input, Icon, Button, notification} from 'antd';
 import {LoginContainer, LogoContainer, FooterContainer, BodyWrapper} from 'components/login'
 
-import logoWhite from 'images/logo-word.png';
+import logoWhite from 'images/logo-white-word.png';
 
 const FormItem = Form.Item;
 
@@ -20,40 +21,31 @@ export class CMSApp extends React.Component<Props> {
   handleSubmit = (e: any) => {
     e.preventDefault();
     const {form} = this.props;
-    form.validateFields((err: any, values: any) => {
+    this.props.form.validateFields((err: any, values: any) => {
       if (!err) {
-        axios.default.post('/login', {
-          appId: window['cannerApp'].id,
-          username: values.username,
-          password: values.password
-        })
-        .then((result) => {
-          localStorage.setItem("apiToken", result.data.apiToken);
-          localStorage.setItem("cannerUser", JSON.stringify({
-            username: result.data.username,
-            userId: result.data.userId,
-            thumb: result.data.thumb
-          }));
-          this.setState({redirectToReferrer: true})
-        })
-        .catch(function(error) {
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-
-          notification.error({
-            message: 'Login Error',
-            description: 'Please make sure your username and password is correct'
+        firebase.auth().signInWithEmailAndPassword(values.email, values.password)
+          .then((result) => {
+            this.setState({redirectToReferrer: true})
           })
-          form.resetFields();
-        });
+          .catch(function(error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+
+            notification.error({
+              message: errorCode,
+              description: errorMessage
+            })
+          });
       }
     });
   }
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { cmsPage } = window['cannerApp'];
+    const cmsPage = {
+
+    }
     const { redirectToReferrer } = this.state;
 
     if (redirectToReferrer) {
@@ -70,10 +62,10 @@ export class CMSApp extends React.Component<Props> {
             <LoginContainer>
               <Form onSubmit={this.handleSubmit}>
                 <FormItem>
-                  {getFieldDecorator('username', {
-                    rules: [{ required: true, message: 'Please input your username!' }],
+                  {getFieldDecorator('email', {
+                    rules: [{ required: true, message: 'Please input your email!' }],
                   })(
-                    <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />
+                    <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Email" />
                   )}
                 </FormItem>
                 <FormItem>

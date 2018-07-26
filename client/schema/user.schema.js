@@ -1,6 +1,8 @@
 /** @jsx builder */
 import builder, {Default} from 'canner-script';
 import RelationTable from '../src/cms-components/customize-relation-table';
+import {storage} from './utils';
+
 export default () => (
   <array keyName="user" title="User" ui="tableRoute"
     uiParams={{
@@ -10,18 +12,19 @@ export default () => (
       }],
       createKeys: ['createKeys']
     }}
+    storage={storage}
   >
     <Default keyName="createKeys">
       <string keyName="username" title="Username" />
       <string keyName="email" title="Email" />
     </Default>
-    <image keyName="thumbnail" title="Thumbnail" disabled />
+    {/* <image keyName="thumbnail" title="Thumbnail" disabled /> */}
     <string keyName="firstName" title="FirstName" />
     <string keyName="lastName" title="LastName" />
     <boolean keyName="totp" title="Totp" />
     <boolean keyName="isAdmin" title="IsAdmin" />
     <boolean keyName="enabled" title="Enabled" />
-    <number keyName="createdTimestamp" title="CreatedTimestamp" />
+    {/* <number keyName="createdTimestamp" title="CreatedTimestamp" /> */}
     <string keyName="personalDiskQuota" title="PersonalDiskQuota" />
     <relation keyName="groups" title="Groups"
       packageName='../src/cms-components/customize-relation-table'

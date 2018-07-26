@@ -2,7 +2,7 @@
 import builder from 'canner-script';
 
 export default () => (
-  <array keyName="env" title="Env" ui="tableRoute"
+  <array keyName="image" title="Image" ui="tableRoute"
     uiParams={{
       columns: [{
         title: 'Name',
@@ -11,7 +11,7 @@ export default () => (
     }}
   >
     <string keyName="name" title="Name" />
-    <string keyName="image" title="Image" />
+    <string keyName="url" title="Url" ui="link"/>
     <boolean keyName="global" title="Global" />
     <relation keyName="groups" title="Groups"
       packageName='../src/cms-components/customize-relation-table'
@@ -19,7 +19,9 @@ export default () => (
         to: 'group',
         type: 'toMany'
       }}
+      hideTitle
       uiParams={{
+        isHidden: record => record.global,
         textCol: 'displayName',
         columns: [{
           title: 'Display Name',

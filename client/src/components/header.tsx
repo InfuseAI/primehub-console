@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {Menu, Icon, Badge, Avatar} from 'antd';
 import styled from 'styled-components';
+import firebase from 'firebase';
 const SubMenu = Menu.SubMenu;
 
 const ItemContent = styled.div`
@@ -32,8 +33,7 @@ export default class HeaderContainer extends React.Component<Props, {}> {
 
   headerMenuOnClick = (menuItem: {key: string}) => {
     if(menuItem.key === 'logout') {
-      localStorage.clear();
-      window.location.replace('/')
+      firebase.auth().signOut();
     } else if (menuItem.key === 'deploy') {
       this.props.deploy();
     }
@@ -65,14 +65,14 @@ export default class HeaderContainer extends React.Component<Props, {}> {
               </ItemContent>
             </Menu.Item>
           </SubMenu>
-          <Menu.Item>
+          {/* <Menu.Item>
             <ItemContent>
               <a href={`https://www.canner.io/home/apps/${appUrl}/overview`}>
                 <Icon type="home" />
                 Dashboard
               </a>
             </ItemContent>
-          </Menu.Item>
+          </Menu.Item> */}
           {
             hasChanged ? 
             <Menu.Item key="deploy">

@@ -5,19 +5,20 @@ import Idp from './idp/identityProvider.schema';
 import UserFederation from './userFederation.schema';
 import User from './user.schema';
 import Group from './group.schema';
-import MachineType from './machineType.schema';
-import Env from './env.schema';
+import InstanceType from './instanceType.schema';
+import Image from './image.schema';
 import Dataset from './dataset.schema';
+import {connector, storage} from './utils';
 
 export default (
-  <root>
-    <System />
-    <Idp />
-    <UserFederation />
-    <User />
-    <Group />
-    <MachineType />
-    <Env />
-    <Dataset />    
+  <root connector={connector}>
+    <System storage={storage} />
+    <Idp storage={storage} />
+    <UserFederation storage={storage} />
+    <User storage={storage} />
+    <Group storage={storage} />
+    <InstanceType storage={storage} />
+    <Image storage={storage} />
+    <Dataset storage={storage} />    
   </root>
 )

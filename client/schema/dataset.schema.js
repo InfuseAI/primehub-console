@@ -12,16 +12,39 @@ export default () => (
   >
     <string keyName="name" title="Name" />
     <string keyName="description" title="Description" />
-    <string keyName="access" title="Access" />
-    <string keyName="type" title="Type" />
-    <string keyName="url" title="Url" />
+    <string keyName="access" title="Access" ui="select"
+      uiParams={{
+        options: [{
+          text: 'group',
+          value: 'group'
+        }, {
+          text: 'everyone',
+          value: 'everyone'
+        }, {
+          text: 'admin',
+          value: 'admin'
+        }]
+      }}
+    />
+    <string keyName="type" title="Type"
+      ui="select"
+      uiParams={{
+        options: [{
+          text: 'git',
+          value: 'git'
+        }]
+      }}
+    />
+    <string keyName="url" title="Url" ui="link"/>
     <relation keyName="groups" title="Groups"
       packageName='../src/cms-components/customize-relation-table'
       relation={{
         to: 'group',
         type: 'toMany'
       }}
+      hideTitle
       uiParams={{
+        isHidden: record => record.access !== 'group',
         textCol: 'displayName',
         columns: [{
           title: 'Display Name',

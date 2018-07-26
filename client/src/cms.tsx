@@ -6,6 +6,7 @@ import ContentHeader from 'components/header';
 import Loading from 'components/loading';
 import Error from 'components/error';
 import isPlainObject from 'lodash.isplainobject';
+import firebase from 'firebase';
 
 import styled, {StyledComponentClass} from 'styled-components';
 import color from 'styledShare/color';
@@ -43,6 +44,18 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   cms: CMS
+
+  componentWillMount() {
+    const {history, location} = this.props;
+    firebase.auth().onAuthStateChanged((user) => {
+      if (!user) {
+        history.push({
+          pathname: "/login",
+          state: { from: location }
+        })
+      }
+    })
+  }
 
   componentDidCatch(error, info) {
     // Display fallback UI
@@ -137,7 +150,7 @@ export default class CMSPage extends React.Component<Props, State> {
             {
               Object.keys(schema.schema).map(key => (
                 <Menu.Item key={key}>
-                  {key.toLocaleUpperCase()}
+                  {schema.schema[key].title}
                 </Menu.Item>
               ))
             }

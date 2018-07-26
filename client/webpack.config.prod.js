@@ -3,6 +3,7 @@ const {externals, resolve} = require('./webpack.settings');
 
 // plugins
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: 'production',
@@ -10,7 +11,8 @@ module.exports = {
   output: {
     path: path.join(__dirname, './dist'),
     filename: '[name].js',
-    chunkFilename: '[name].js'
+    chunkFilename: '[chunkhash].js',
+    publicPath: '/'
   },
   externals,
   resolve,
@@ -23,8 +25,28 @@ module.exports = {
       // both options are optional
       filename: '[name].css',
       chunkFilename: '[id].css',
+    }),
+    new HtmlWebpackPlugin({
+      template: 'docs/index.html'
     })
   ],
+  optimization: {
+    splitChunks: {
+      name: true,
+      cacheGroups: {
+        commons: {
+          chunks: 'initial',
+          minChunks: 2
+        },
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          chunks: 'all',
+          priority: -10
+        }
+      }
+    },
+    runtimeChunk: true
+  },
   module: {
     rules: [
       // .ts, .tsx
@@ -45,7 +67,14 @@ module.exports = {
             loader: 'canner-schema-loader',
           },
           {
-            loader: 'babel-loader'
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                require('@babel/preset-env'),
+                require('@babel/preset-react'),
+                require('@babel/preset-stage-0'),
+              ],
+            },
           }
         ],
       },
