@@ -62,12 +62,13 @@
   },
   "scripts": {
     "lint": "eslint src test docs",
-    "clean": "rimraf lib dist",
+    "clean": "rimraf dist",
     "check:src": "npm run lint && npm run test",
     "test": "jest",
     "test:watch": "jest --watch",
-    "start": "./node_modules/.bin/webpack-dev-server --config webpack.config.dev.js --mode development  --https",
-    "build": "npm run clean && ./node_modules/.bin/webpack --config webpack.config.prod.js --mode production",
+    "start": "npm run antd && ./node_modules/.bin/webpack-dev-server --config webpack.config.dev.js --mode development  --https",
+    "build": "npm run clean && npm run antd && ./node_modules/.bin/webpack --config webpack.config.prod.js --mode production",
+    "antd": "./node_modules/.bin/webpack --config webpack.config.antd.js --mode production",
     "validate": "npm ls"
   },
   "pre-commit": [],
@@ -94,7 +95,7 @@
   "dependencies": {
     "@canner/antd-components": "^0.3.0-beta.2",
     "@types/react-router-dom": "^4.2.6",
-    "antd": "^3.6.6",
+    "antd": "3.6.6",
     "axios": "^0.18.0",
     "canner": "^1.4.0-beta.1",
     "canner-helpers": "^0.1.16",
