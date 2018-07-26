@@ -36,6 +36,7 @@ export default () => (
     <string keyName="name" title="Name" />
     <string keyName="displayName" title="DisplayName" />
     <boolean keyName="canUseGpu" title="CanUseGpu" />
+    <number keyName="cpuQuota" title="CpuQuota" uiParams={{min: 0}} />
     <number keyName="gpuQuota" title="GpuQuota" uiParams={{min: 0}} />
     <string keyName="diskQuota" title="DiskQuota" />
     <relation keyName="users" title="Users"

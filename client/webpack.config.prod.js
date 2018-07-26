@@ -10,7 +10,7 @@ module.exports = {
   entry: './src/index.tsx',
   output: {
     path: path.join(__dirname, './dist'),
-    filename: '[name].js',
+    filename: '[name].[hash].js',
     chunkFilename: '[chunkhash].js',
     publicPath: '/'
   },

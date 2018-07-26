@@ -7,10 +7,14 @@ export default () => (
       columns: [{
         title: 'Name',
         dataIndex: 'name'
+      }, {
+        title: 'Description',
+        dataIndex: 'description'
       }]
     }}
   >
     <string keyName="name" title="Name" />
+    <string keyName="description" title="Description" />
     <string keyName="url" title="Url" ui="link"/>
     <boolean keyName="global" title="Global" />
     <relation keyName="groups" title="Groups"

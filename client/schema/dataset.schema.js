@@ -7,6 +7,9 @@ export default () => (
       columns: [{
         title: 'Name',
         dataIndex: 'name'
+      }, {
+        title: 'Description',
+        dataIndex: 'description'
       }]
     }}
   >

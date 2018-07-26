@@ -5,13 +5,17 @@ export default () => (
   <array keyName="userFederations" title="User Federations" ui="tableRoute"
     uiParams={{
       columns: [{
-        title: 'Display Name',
+        title: 'Name',
+        dataIndex: 'name'
+      }, {
+        title: 'Type',
         dataIndex: 'type'
       }]
     }}
   >
-    <Block title="Console Display Name">
+    <Block title="Basic Information">
       <string keyName="type"
+        title="Type"
         ui="select"
         uiParams={{
           options: [{
@@ -20,6 +24,7 @@ export default () => (
           }]
         }}
       />
+      <string title="Name" keyName="name"/>
     </Block>
     <Block title="Config">
     <object keyName="config" packageName='../src/cms-components/customize-object-options'
