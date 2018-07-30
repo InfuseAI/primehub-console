@@ -1,6 +1,6 @@
-import KcAdminClient from 'keycloak-admin';
+import KcAdminClient from 'keycloak-admin/lib';
 import { Item } from '../crdClient/customResource';
-import CrdClient, { ContainerSpec } from '../crdClient/crdClientImpl';
+import CrdClient, { InstanceTypeSpec } from '../crdClient/crdClientImpl';
 import { toRelay, getFromAttr } from './utils';
 import { mapValues, find } from 'lodash';
 import {unflatten} from 'flat';
@@ -12,7 +12,7 @@ interface Context {
   crdClient: CrdClient;
 }
 
-export const mapping = (item: Item<ContainerSpec>) => {
+export const mapping = (item: Item<InstanceTypeSpec>) => {
   return {
     id: item.metadata.name,
     name: item.metadata.name,
@@ -26,7 +26,7 @@ export const mapping = (item: Item<ContainerSpec>) => {
 };
 
 const listQuery = async (crdClient: CrdClient) => {
-  const containers = await crdClient.containers.list();
+  const containers = await crdClient.instanceTypes.list();
   return containers.map(mapping);
 };
 
@@ -41,7 +41,7 @@ export const connectionQuery = async (root, args, context: Context) => {
 
 export const queryOne = async (root, args, context: Context) => {
   const id = args.where.id;
-  const container = await context.crdClient.containers.get(id);
+  const container = await context.crdClient.instanceTypes.get(id);
   return mapping(container);
 };
 
