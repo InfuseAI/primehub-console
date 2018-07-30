@@ -1,6 +1,6 @@
 # import PageInfo from "common.graphql"
 
-type MachineType {
+type InstanceType {
   id: ID!
 	name: String!
   description: String
@@ -13,26 +13,26 @@ type MachineType {
 }
 
 """An edge in a connection."""
-type MachineTypeEdge {
+type InstanceTypeEdge {
   """The item at the end of the edge."""
-  node: MachineType!
+  node: InstanceType!
 
   """A cursor for use in pagination."""
   cursor: String!
 }
 
-type MachineTypeConnection {
+type InstanceTypeConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
   """A list of edges."""
-  edges: [MachineTypeEdge]!
+  edges: [InstanceTypeEdge]!
 }
 
-input MachineTypeWhereUniqueInput {
+input InstanceTypeWhereUniqueInput {
   id: ID!
 }
 
-input MachineTypeWhereInput {
+input InstanceTypeWhereInput {
   id: ID
 }

@@ -4,7 +4,7 @@ import CrdClient from '../crdClient/crdClientImpl';
 import { mapValues, find } from 'lodash';
 import {unflatten} from 'flat';
 import { EVERYONE_GROUP_ID } from './constant';
-import { mapping } from './machineType';
+import { mapping } from './instanceType';
 
 interface Context {
   realm: string;
@@ -63,7 +63,7 @@ export const typeResolvers = {
     }
   },
 
-  machineTypes: async (parent, args, context: Context) => {
+  instanceTypes: async (parent, args, context: Context) => {
     // get role-mappings prefixed with mt_
     // map with all resource on crd
     let roles = await context.kcAdminClient.groups.listRealmRoleMappings({
@@ -71,9 +71,9 @@ export const typeResolvers = {
     });
     roles = roles.filter(role => role.name.startsWith('mt_'));
     const machineTypeNames = roles.map(role => role.name.slice(3));
-    const machineTypes = await Promise.all(machineTypeNames.map(name => {
-      return context.crdClient.containers.get(name);
+    const instanceTypes = await Promise.all(machineTypeNames.map(name => {
+      return context.crdClient.instanceTypes.get(name);
     }));
-    return machineTypes.map(mapping);
+    return instanceTypes.map(mapping);
   }
 };

@@ -1,8 +1,8 @@
 # import System from "./system.graphql"
 # import User, UserConnection, UserWhereInput, UserWhereUniqueInput from "./user.graphql"
 # import Group, GroupConnection, GroupWhereInput, GroupWhereUniqueInput from "./group.graphql"
-# import MachineType, MachineTypeConnection, MachineTypeWhereInput, MachineTypeWhereUniqueInput from "./machineType.graphql"
-# import Env, EnvConnection, EnvWhereInput, EnvWhereUniqueInput from "./env.graphql"
+# import InstanceType, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput from "./instanceType.graphql"
+# import Image, ImageConnection, ImageWhereInput, ImageWhereUniqueInput from "./image.graphql"
 # import Dataset, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput from "./dataset.graphql"
 
 type Query {
@@ -43,39 +43,39 @@ type Query {
     last: Int
   ): GroupConnection!
 
-  """MachineType"""
-  machineType(where: MachineTypeWhereUniqueInput!): MachineType
-  machineTypes(
-    where: MachineTypeWhereInput
+  """InstanceType"""
+  instanceType(where: InstanceTypeWhereUniqueInput!): InstanceType
+  instanceTypes(
+    where: InstanceTypeWhereInput
     before: String
     after: String
     first: Int
     last: Int
-  ): [MachineType]!
-  machineTypesConnection(
-    where: MachineTypeWhereInput
+  ): [InstanceType]!
+  instanceTypesConnection(
+    where: InstanceTypeWhereInput
     before: String
     after: String
     first: Int
     last: Int
-  ): MachineTypeConnection!
+  ): InstanceTypeConnection!
 
-  """Env"""
-  env(where: EnvWhereUniqueInput!): Env
-  envs(
-    where: EnvWhereInput
+  """Image"""
+  image(where: ImageWhereUniqueInput!): Image
+  images(
+    where: ImageWhereInput
     before: String
     after: String
     first: Int
     last: Int
-  ): [Env]!
-  envsConnection(
-    where: EnvWhereInput
+  ): [Image]!
+  imagesConnection(
+    where: ImageWhereInput
     before: String
     after: String
     first: Int
     last: Int
-  ): EnvConnection!
+  ): ImageConnection!
 
   """Dataset"""
   dataset(where: DatasetWhereUniqueInput!): Dataset
