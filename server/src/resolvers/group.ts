@@ -4,7 +4,9 @@ import CrdClient from '../crdClient/crdClientImpl';
 import { mapValues, find } from 'lodash';
 import {unflatten} from 'flat';
 import { EVERYONE_GROUP_ID } from './constant';
-import { mapping } from './instanceType';
+import { crd as instanceTypeResolver } from './instanceType';
+import { crd as datasetResolver } from './dataset';
+import { crd as imageResolver } from './image';
 
 interface Context {
   realm: string;
@@ -63,17 +65,7 @@ export const typeResolvers = {
     }
   },
 
-  instanceTypes: async (parent, args, context: Context) => {
-    // get role-mappings prefixed with mt_
-    // map with all resource on crd
-    let roles = await context.kcAdminClient.groups.listRealmRoleMappings({
-      id: parent.id
-    });
-    roles = roles.filter(role => role.name.startsWith('mt_'));
-    const machineTypeNames = roles.map(role => role.name.slice(3));
-    const instanceTypes = await Promise.all(machineTypeNames.map(name => {
-      return context.crdClient.instanceTypes.get(name);
-    }));
-    return instanceTypes.map(mapping);
-  }
+  ...instanceTypeResolver.resolveInGroup(),
+  ...datasetResolver.resolveInGroup(),
+  ...imageResolver.resolveInGroup()
 };

@@ -1,6 +1,8 @@
 # import PageInfo from "common.graphql"
 # import User from "user.graphql"
 # import InstanceType from "instanceType.graphql"
+# import Image from "image.graphql"
+# import Dataset from "dataset.graphql"
 
 type Group {
   id: ID!
@@ -11,6 +13,8 @@ type Group {
   diskQuota: String
   members: [User]
   instanceTypes: [InstanceType]
+  images: [Image]
+  datasets: [Dataset]
 }
 
 """An edge in a connection."""

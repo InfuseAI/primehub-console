@@ -23,11 +23,9 @@ export interface InstanceTypeSpec {
 
 export interface ImageSpec {
   url?: string;
-  global?: boolean;
 }
 
 export interface DatasetSpec {
-  access?: string;
   type?: string;
   url?: string;
 }
@@ -49,7 +47,7 @@ export default class CrdClientImpl {
     loadCrd('dataset')
   );
 
-  public env = new CustomResource<ImageSpec>(
+  public images = new CustomResource<ImageSpec>(
     client,
     loadCrd('image')
   );

@@ -1,5 +1,6 @@
-import { first as _first, last as _last, isUndefined, isEmpty } from 'lodash';
+import { first as _first, last as _last, isUndefined, isEmpty, pick, find } from 'lodash';
 import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
+import KcAdminClient from 'keycloak-admin';
 
 export interface Pagination {
   last?: number;
@@ -70,7 +71,20 @@ export const toRelay = (rows: any[], pagination?: Pagination) => {
   };
 };
 
+export const extractPagination = (args: any): Pagination => {
+  return pick(args, ['last', 'first', 'before', 'after']);
+};
+
 export const getFromAttr = (key: string, attributes: Record<string, any>, defaultValue: any, type: any = v => v) => {
   const value = attributes && attributes[key] && attributes[key][0];
   return isUndefined(value) ? defaultValue : type(value);
+};
+
+export const findResourceInGroup = async ({
+  kcAdminClient, groupId, resourceName}:
+  {kcAdminClient: KcAdminClient, groupId: string, resourceName: string}): Promise<boolean> => {
+  const roles = await kcAdminClient.groups.listRealmRoleMappings({
+    id: groupId
+  });
+  return Boolean(find(roles, role => role.name.slice(3) === resourceName));
 };

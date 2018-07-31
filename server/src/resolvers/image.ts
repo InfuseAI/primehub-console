@@ -1,6 +1,6 @@
 import KcAdminClient from 'keycloak-admin';
 import { Item } from '../crdClient/customResource';
-import CrdClient, { InstanceTypeSpec } from '../crdClient/crdClientImpl';
+import CrdClient, { ImageSpec } from '../crdClient/crdClientImpl';
 import { findResourceInGroup } from './utils';
 import { EVERYONE_GROUP_ID } from './constant';
 import { Crd } from './crd';
@@ -11,16 +11,12 @@ interface Context {
   crdClient: CrdClient;
 }
 
-export const mapping = (item: Item<InstanceTypeSpec>) => {
+export const mapping = (item: Item<ImageSpec>) => {
   return {
     id: item.metadata.name,
     name: item.metadata.name,
     description: item.metadata.description,
-    cpuLimit: item.spec['limits.cpu'],
-    memoryLimit: item.spec['limits.memory'],
-    gpuLimit: item.spec['limits.nvidia.com/gpu'] || 0,
-    cpuRequest: item.spec['requests.cpu'],
-    memoryRequest: item.spec['requests.memory']
+    url: item.spec.url
   };
 };
 
@@ -36,10 +32,10 @@ export const resolveType = {
   }
 };
 
-export const crd = new Crd<InstanceTypeSpec>({
-  customResourceMethod: 'instanceTypes',
+export const crd = new Crd<ImageSpec>({
+  customResourceMethod: 'images',
   propMapping: mapping,
   resolveType,
-  prefixName: 'it',
-  resourceName: 'instanceType'
+  prefixName: 'img',
+  resourceName: 'image'
 });

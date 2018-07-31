@@ -7,7 +7,9 @@ import CrdClient from './crdClient/crdClientImpl';
 import { query as systemQuery } from './resolvers/system';
 import * as user from './resolvers/user';
 import * as group from './resolvers/group';
-import * as instanceType from './resolvers/instanceType';
+import { crd as instanceType} from './resolvers/instanceType';
+import { crd as dataset} from './resolvers/dataset';
+import { crd as image} from './resolvers/image';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -22,13 +24,15 @@ const resolvers = {
     group: group.queryOne,
     groups: group.query,
     groupsConnection: group.connectionQuery,
-    instanceType: instanceType.queryOne,
-    instanceTypes: instanceType.query,
-    instanceTypesConnection: instanceType.connectionQuery
+    ...instanceType.resolvers(),
+    ...dataset.resolvers(),
+    ...image.resolvers(),
   },
   User: user.typeResolvers,
   Group: group.typeResolvers,
-  InstanceType: instanceType.typeResolvers
+  ...instanceType.typeResolver(),
+  ...dataset.typeResolver(),
+  ...image.typeResolver(),
 };
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {
