@@ -12,6 +12,7 @@
     "build:prod": "npm run clean && echo Using TypeScript && tsc --version && tsc -p ./tsconfig.json --pretty && npm run copyviews",
     "copyviews": "cp -R src/views lib/views",
     "test": "mocha --compilers ts:ts-node/register --recursive \"test/**/*.spec.ts\"",
+    "test:grep": "mocha --compilers ts:ts-node/register --recursive",
     "coverage": "nyc npm run test",
     "watch": "npm run build -- --watch",
     "watch:test": "npm run test -- --watch"
@@ -45,6 +46,7 @@
     "@types/boom": "^7.2.0",
     "@types/chai": "^4.1.2",
     "@types/debug": "^0.0.30",
+    "@types/faker": "^4.1.2",
     "@types/flat": "^0.0.28",
     "@types/graphql": "^0.13.3",
     "@types/js-yaml": "^3.11.2",
@@ -59,6 +61,7 @@
     "@types/mocha": "^2.2.48",
     "@types/node": "9.4.6",
     "chai": "^4.1.2",
+    "faker": "^4.1.0",
     "mocha": "^5.2.0",
     "nyc": "^11.6.0",
     "rimraf": "^2.5.4",
