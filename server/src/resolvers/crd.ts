@@ -1,3 +1,4 @@
+import { Context } from './interface';
 import { toRelay, paginate, extractPagination, findResourceInGroup } from './utils';
 import CustomResource, { Item } from '../crdClient/customResource';
 import pluralize from 'pluralize';
@@ -71,26 +72,26 @@ export class Crd<SpecType> {
     return rows.map(this.propMapping);
   }
 
-  private query = async (root, args, context: any) => {
+  private query = async (root, args, context: Context) => {
     const customResource = context.crdClient[this.customResourceMethod];
     const rows = await this.listQuery(customResource);
     return paginate(rows, extractPagination(args));
   }
 
-  private connectionQuery = async (root, args, context: any) => {
+  private connectionQuery = async (root, args, context: Context) => {
     const customResource = context.crdClient[this.customResourceMethod];
     const rows = await this.listQuery(customResource);
     return toRelay(rows, extractPagination(args));
   }
 
-  private queryOne = async (root, args, context: any) => {
+  private queryOne = async (root, args, context: Context) => {
     const id = args.where.id;
     const customResource = context.crdClient[this.customResourceMethod];
     const row = await customResource.get(id);
     return this.propMapping(row);
   }
 
-  private queryByGroup = async (parent, args, context: any) => {
+  private queryByGroup = async (parent, args, context: Context) => {
     let roles = await context.kcAdminClient.groups.listRealmRoleMappings({
       id: parent.id
     });

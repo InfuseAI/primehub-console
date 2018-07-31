@@ -1,15 +1,9 @@
-import KcAdminClient from 'keycloak-admin';
+import { Context } from './interface';
 import { Item } from '../crdClient/customResource';
-import CrdClient, { ImageSpec } from '../crdClient/crdClientImpl';
+import { ImageSpec } from '../crdClient/crdClientImpl';
 import { findResourceInGroup } from './utils';
 import { EVERYONE_GROUP_ID } from './constant';
 import { Crd } from './crd';
-
-interface Context {
-  realm: string;
-  kcAdminClient: KcAdminClient;
-  crdClient: CrdClient;
-}
 
 export const mapping = (item: Item<ImageSpec>) => {
   return {

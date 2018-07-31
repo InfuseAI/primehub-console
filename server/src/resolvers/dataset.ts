@@ -1,13 +1,6 @@
-import KcAdminClient from 'keycloak-admin';
 import { Item } from '../crdClient/customResource';
-import CrdClient, { DatasetSpec } from '../crdClient/crdClientImpl';
+import { DatasetSpec } from '../crdClient/crdClientImpl';
 import { Crd } from './crd';
-
-interface Context {
-  realm: string;
-  kcAdminClient: KcAdminClient;
-  crdClient: CrdClient;
-}
 
 export const mapping = (item: Item<DatasetSpec>) => {
   return {
