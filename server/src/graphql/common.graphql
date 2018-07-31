@@ -5,6 +5,13 @@ type Image {
   url: String
 }
 
+input ImageInput {
+  contentType: String
+  name: String
+  size: Int
+  url: String
+}
+
 """Information about pagination in a connection."""
 type PageInfo {
   """When paginating forwards, are there more items?"""

@@ -1,4 +1,4 @@
-# import Image from "common.graphql"
+# import Image, ImageInput from "common.graphql"
 
 type Org {
   name: String
@@ -10,7 +10,12 @@ type System {
   defaultUserDiskQuota: String
 }
 
+input OrgUpdateInput {
+  name: String
+  logo: ImageInput
+}
+
 input SystemUpdateInput {
-  org: Org
+  org: OrgUpdateInput
   defaultUserDiskQuota: String
 }

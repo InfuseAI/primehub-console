@@ -51,6 +51,14 @@ input GroupCreateInput {
   diskQuota: String
 }
 
+input GroupUpdateInput {
+  name: String
+  displayName: String
+  canUseGpu: Boolean
+  gpuQuota: Float
+  diskQuota: String
+}
+
 """Relation input"""
 input GroupCreateManyInput {
   create: [GroupCreateInput!]
