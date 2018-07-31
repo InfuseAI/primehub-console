@@ -1,11 +1,10 @@
 # import PageInfo from "common.graphql"
-# import Group from "group.graphql"
+# import Group, GroupCreateManyInput, GroupUpdateManyInput from "group.graphql"
 
 type User {
   id: ID!
 	username: String!
 	email: String!
-	thumbnail: String
 	firstName: String
 	lastName: String
 	totp: Boolean
@@ -39,4 +38,29 @@ input UserWhereUniqueInput {
 
 input UserWhereInput {
   id: ID
+}
+
+"""Mutation input"""
+input UserCreateInput {
+	username: String!
+	email: String!
+	firstName: String
+	lastName: String
+	totp: Boolean
+	isAdmin: Boolean
+	enabled: Boolean
+	personalDiskQuota: String
+  groups: GroupCreateManyInput
+}
+
+input UserUpdateInput {
+  username: String
+	email: String
+	firstName: String
+	lastName: String
+	totp: Boolean
+	isAdmin: Boolean
+	enabled: Boolean
+	personalDiskQuota: String
+  groups: GroupUpdateManyInput
 }

@@ -3,6 +3,7 @@
 type Image {
   id: ID!
 	name: String!
+  displayName: String
   description: String
   image: String
   global: Boolean
@@ -31,4 +32,22 @@ input ImageWhereUniqueInput {
 
 input ImageWhereInput {
   id: ID
+}
+
+"""Mutation input"""
+input ImageCreateInput {
+  name: String!
+  displayName: String
+  description: String
+  image: String
+  global: Boolean
+  groups: GroupCreateManyInput
+}
+
+input ImageUpdateInput {
+  displayName: String
+  description: String
+  image: String
+  global: Boolean
+  groups: GroupUpdateManyInput
 }

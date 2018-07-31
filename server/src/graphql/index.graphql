@@ -1,9 +1,9 @@
-# import System from "./system.graphql"
-# import User, UserConnection, UserWhereInput, UserWhereUniqueInput from "./user.graphql"
-# import Group, GroupConnection, GroupWhereInput, GroupWhereUniqueInput from "./group.graphql"
-# import InstanceType, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput from "./instanceType.graphql"
-# import Image, ImageConnection, ImageWhereInput, ImageWhereUniqueInput from "./image.graphql"
-# import Dataset, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput from "./dataset.graphql"
+# import System, SystemUpdateInput from "./system.graphql"
+# import User, UserConnection, UserWhereInput, UserWhereUniqueInput, UserCreateInput, UserUpdateInput from "./user.graphql"
+# import Group, GroupConnection, GroupWhereInput, GroupWhereUniqueInput, GroupCreateInput, GroupUpdateInput from "./group.graphql"
+# import InstanceType, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput, InstanceTypeCreateInput, InstanceTypeUpdateInput from "./instanceType.graphql"
+# import Image, ImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput from "./image.graphql"
+# import Dataset, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 
 type Query {
   """System"""
@@ -93,4 +93,34 @@ type Query {
     first: Int
     last: Int
   ): DatasetConnection!
+}
+
+type Mutation {
+  """System"""
+  updateSystem(data: SystemUpdateInput!): System
+
+  """User"""
+  createUser(data: UserCreateInput!): User!
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  deleteUser(where: UserWhereUniqueInput!): User
+
+  """Group"""
+  createGroup(data: GroupCreateInput!): Group!
+  updateGroup(data: GroupUpdateInput!, where: GroupWhereUniqueInput!): Group
+  deleteGroup(where: GroupWhereUniqueInput!): Group
+
+  """InstanceType"""
+  createInstanceType(data: InstanceTypeCreateInput!): InstanceType!
+  updateInstanceType(data: InstanceTypeUpdateInput!, where: InstanceTypeWhereUniqueInput!): InstanceType
+  deleteInstanceType(where: InstanceTypeWhereUniqueInput!): InstanceType
+
+  """Image"""
+  createImage(data: ImageCreateInput!): Image!
+  updateImage(data: ImageUpdateInput!, where: ImageWhereUniqueInput!): Image
+  deleteImage(where: ImageWhereUniqueInput!): Image
+
+  """Dataset"""
+  createDataset(data: DatasetCreateInput!): Dataset!
+  updateDataset(data: DatasetUpdateInput!, where: DatasetWhereUniqueInput!): Dataset
+  deleteDataset(where: DatasetWhereUniqueInput!): Dataset
 }

@@ -20,7 +20,7 @@ export class Crd<SpecType> {
   }: {
     customResourceMethod: string,
     propMapping: (item: Item<SpecType>) => Record<string, any>,
-    resolveType: Record<string, any>,
+    resolveType?: Record<string, any>,
     prefixName: string,
     resourceName: string
   }) {

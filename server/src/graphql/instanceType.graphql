@@ -3,6 +3,7 @@
 type InstanceType {
   id: ID!
 	name: String!
+  displayName: String
   description: String
   cpuLimit: Float
   memoryLimit: String
@@ -35,4 +36,30 @@ input InstanceTypeWhereUniqueInput {
 
 input InstanceTypeWhereInput {
   id: ID
+}
+
+"""Mutation input"""
+input InstanceTypeCreateInput {
+  name: String!
+  displayName: String
+  description: String
+  cpuLimit: Float
+  memoryLimit: String
+  gpuLimit: Float
+  cpuRequest: Float
+  memoryRequest: String
+  global: Boolean
+  groups: GroupCreateManyInput
+}
+
+input InstanceTypeUpdateInput {
+  displayName: String
+  description: String
+  cpuLimit: Float
+  memoryLimit: String
+  gpuLimit: Float
+  cpuRequest: Float
+  memoryRequest: String
+  global: Boolean
+  groups: GroupUpdateManyInput
 }

@@ -6,7 +6,7 @@
 
 type Group {
   id: ID!
-	name: String
+	name: String!
   displayName: String
   canUseGpu: Boolean
   gpuQuota: Float
@@ -40,4 +40,26 @@ input GroupWhereUniqueInput {
 
 input GroupWhereInput {
   id: ID
+}
+
+"""Mutation input"""
+input GroupCreateInput {
+  name: String!
+  displayName: String
+  canUseGpu: Boolean
+  gpuQuota: Float
+  diskQuota: String
+}
+
+"""Relation input"""
+input GroupCreateManyInput {
+  create: [GroupCreateInput!]
+  connect: [GroupWhereUniqueInput!]
+}
+
+input GroupUpdateManyInput {
+  create: [GroupCreateInput!]
+  connect: [GroupWhereUniqueInput!]
+  disconnect: [GroupWhereUniqueInput!]
+  delete: [GroupWhereUniqueInput!]
 }

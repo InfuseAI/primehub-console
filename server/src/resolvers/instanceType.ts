@@ -16,6 +16,7 @@ export const mapping = (item: Item<InstanceTypeSpec>) => {
     id: item.metadata.name,
     name: item.metadata.name,
     description: item.metadata.description,
+    displayName: item.spec.displayName,
     cpuLimit: item.spec['limits.cpu'],
     memoryLimit: item.spec['limits.memory'],
     gpuLimit: item.spec['limits.nvidia.com/gpu'] || 0,

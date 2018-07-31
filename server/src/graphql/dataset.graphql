@@ -1,8 +1,10 @@
 # import PageInfo from "common.graphql"
+# import GroupCreateManyInput, GroupUpdateManyInput from "group.graphql"
 
 type Dataset {
   id: ID!
 	name: String!
+  displayName: String
   description: String
   access: String
   type: String
@@ -32,4 +34,24 @@ input DatasetWhereUniqueInput {
 
 input DatasetWhereInput {
   id: ID
+}
+
+"""Mutation input"""
+input DatasetCreateInput {
+  name: String!
+  displayName: String
+  description: String
+  access: String
+  type: String
+  url: String
+  groups: GroupCreateManyInput
+}
+
+input DatasetUpdateInput {
+  displayName: String
+  description: String
+  access: String
+  type: String
+  url: String
+  groups: GroupUpdateManyInput
 }

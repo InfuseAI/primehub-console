@@ -15,6 +15,7 @@ export const mapping = (item: Item<ImageSpec>) => {
   return {
     id: item.metadata.name,
     name: item.metadata.name,
+    displayName: item.spec.displayName,
     description: item.metadata.description,
     url: item.spec.url
   };

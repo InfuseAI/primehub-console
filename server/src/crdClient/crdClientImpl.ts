@@ -14,6 +14,7 @@ const client = new Client({ config: config.fromKubeconfig(), version: '1.10' });
  */
 
 export interface InstanceTypeSpec {
+  displayName?: string;
   'limits.cpu'?: number;
   'limits.memory'?: string;
   'requests.cpu'?: number;
@@ -22,10 +23,13 @@ export interface InstanceTypeSpec {
 }
 
 export interface ImageSpec {
+  displayName?: string;
   url?: string;
 }
 
 export interface DatasetSpec {
+  displayName?: string;
+  access?: string;
   type?: string;
   url?: string;
 }
