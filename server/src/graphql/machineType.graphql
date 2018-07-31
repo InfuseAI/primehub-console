@@ -1,0 +1,38 @@
+# import PageInfo from "common.graphql"
+
+type MachineType {
+  id: ID!
+	name: String!
+  description: String
+  cpuLimit: Float
+  memoryLimit: String
+  gpuLimit: Float
+  cpuRequest: Float
+  memoryRequest: String
+  global: Boolean
+}
+
+"""An edge in a connection."""
+type MachineTypeEdge {
+  """The item at the end of the edge."""
+  node: MachineType!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type MachineTypeConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [MachineTypeEdge]!
+}
+
+input MachineTypeWhereUniqueInput {
+  id: ID!
+}
+
+input MachineTypeWhereInput {
+  id: ID
+}
