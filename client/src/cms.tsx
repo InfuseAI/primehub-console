@@ -182,7 +182,7 @@ export default class CMSPage extends React.Component<Props, State> {
           >
             <CMS
               schema={schema}
-              hideButtons={true}
+              // hideButtons={true}
               dataDidChange={this.dataDidChange}
               ref={cms => this.cms = cms}
             />
