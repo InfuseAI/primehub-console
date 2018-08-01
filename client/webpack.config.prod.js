@@ -7,10 +7,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: 'production',
-  entry: './src/index.tsx',
+  entry: {
+    index: './src/index.tsx'
+  },
   output: {
     path: path.join(__dirname, './dist'),
-    filename: '[name].[hash].js',
+    filename: '[name].js',
     chunkFilename: '[chunkhash].js',
     publicPath: '/'
   },
@@ -25,28 +27,24 @@ module.exports = {
       // both options are optional
       filename: '[name].css',
       chunkFilename: '[id].css',
-    }),
-    new HtmlWebpackPlugin({
-      template: 'docs/index.html'
     })
   ],
-  optimization: {
-    splitChunks: {
-      name: true,
-      cacheGroups: {
-        commons: {
-          chunks: 'initial',
-          minChunks: 2
-        },
-        vendors: {
-          test: /[\\/]node_modules[\\/]/,
-          chunks: 'all',
-          priority: -10
-        }
-      }
-    },
-    runtimeChunk: true
-  },
+  // optimization: {
+  //   splitChunks: {
+  //     name: true,
+  //     cacheGroups: {
+  //       commons: {
+  //         chunks: 'initial',
+  //         minChunks: 2
+  //       },
+  //       vendors: {
+  //         test: /[\\/]node_modules[\\/]/,
+  //         chunks: 'all',
+  //         priority: -10
+  //       }
+  //     }
+  //   }
+  // },
   module: {
     rules: [
       // .ts, .tsx

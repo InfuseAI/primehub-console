@@ -10,7 +10,7 @@ ReactDOM.render(
   <Router>
     <React.Fragment>
       <Switch>
-        <Route path="/login" component={Login} />
+        {/* <Route path="/login" component={Login} /> */}
         <Route path="/cms/:activeKey" component={CMSPage}/>
         <Redirect to={`/cms/${firstKey}`}/>
       </Switch>

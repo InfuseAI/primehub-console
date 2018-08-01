@@ -30,7 +30,7 @@ const storage = new FirebaseClientService({
 
 exports.firebaseConfig = firebaseConfig;
 exports.connector = connector;
-exports.storage = storage;
+exports.storage = {};
 exports.renderRelationField = function(text, record) {
   return <span>
     {text.length}

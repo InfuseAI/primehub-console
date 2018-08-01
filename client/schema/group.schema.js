@@ -33,7 +33,10 @@ export default () => (
       /> */}
       <pagination />
     </toolbar>
-    <string keyName="name" title="Name" />
+    <string keyName="name" title="Name"
+      validation={{pattern: '^[a-z0-9_]+$'}}
+      required
+    />
     <string keyName="displayName" title="DisplayName" />
     <boolean keyName="canUseGpu" title="CanUseGpu" />
     <number keyName="cpuQuota" title="CpuQuota" uiParams={{min: 0}} />
