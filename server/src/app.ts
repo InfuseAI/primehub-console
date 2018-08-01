@@ -32,7 +32,10 @@ const resolvers = {
     updateSystem: system.update,
     createUser: user.create,
     updateUser: user.update,
-    deleteUser: user.destroy
+    deleteUser: user.destroy,
+    createGroup: group.create,
+    updateGroup: group.update,
+    deleteGroup: group.destroy
   },
   User: user.typeResolvers,
   Group: group.typeResolvers,

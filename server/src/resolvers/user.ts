@@ -1,6 +1,6 @@
 import KcAdminClient from 'keycloak-admin';
 import { pick, omit, find, isUndefined, first } from 'lodash';
-import { toRelay, toAttr, mutateGroup } from './utils';
+import { toRelay, toAttr, mutateRelation } from './utils';
 import { EVERYONE_GROUP_ID, detaultSystemSettings } from './constant';
 import { Attributes, FieldType } from './attr';
 import { Context } from './interface';
@@ -142,8 +142,8 @@ export const create = async (root, args, context: Context) => {
 
   // connect to groups
   try {
-    await mutateGroup({
-      groups: payload.groups,
+    await mutateRelation({
+      resource: payload.groups,
       connect: async where => {
         // add user to group
         await kcAdminClient.users.addToGroup({
@@ -221,8 +221,8 @@ export const update = async (root, args, context: Context) => {
 
   // connect to groups
   try {
-    await mutateGroup({
-      groups: payload.groups,
+    await mutateRelation({
+      resource: payload.groups,
       connect: async where => {
         // add user to group
         await kcAdminClient.users.addToGroup({

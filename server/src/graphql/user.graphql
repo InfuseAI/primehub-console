@@ -66,3 +66,16 @@ input UserUpdateInput {
 	personalDiskQuota: String
   groups: GroupUpdateManyInput
 }
+
+"""Relation input"""
+input UserCreateManyInput {
+  create: [UserCreateInput!]
+  connect: [UserWhereUniqueInput!]
+}
+
+input UserUpdateManyInput {
+  create: [UserCreateInput!]
+  connect: [UserWhereUniqueInput!]
+  disconnect: [UserWhereUniqueInput!]
+  delete: [UserWhereUniqueInput!]
+}

@@ -1,5 +1,5 @@
 # import PageInfo from "common.graphql"
-# import User from "user.graphql"
+# import User, UserCreateManyInput, UserUpdateManyInput from "user.graphql"
 # import InstanceType from "instanceType.graphql"
 # import Image from "image.graphql"
 # import Dataset from "dataset.graphql"
@@ -11,7 +11,7 @@ type Group {
   canUseGpu: Boolean
   gpuQuota: Float
   diskQuota: String
-  members: [User]
+  users: [User]
   instanceTypes: [InstanceType]
   images: [Image]
   datasets: [Dataset]
@@ -49,6 +49,7 @@ input GroupCreateInput {
   canUseGpu: Boolean
   gpuQuota: Float
   diskQuota: String
+  users: UserCreateManyInput
 }
 
 input GroupUpdateInput {
@@ -57,6 +58,7 @@ input GroupUpdateInput {
   canUseGpu: Boolean
   gpuQuota: Float
   diskQuota: String
+  users: UserUpdateManyInput
 }
 
 """Relation input"""

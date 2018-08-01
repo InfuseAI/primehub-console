@@ -127,24 +127,24 @@ export const findResourceInGroup = async ({
   return Boolean(find(roles, role => role.name.slice(3) === resourceName));
 };
 
-export const mutateGroup = async ({
-  groups,
+export const mutateRelation = async ({
+  resource,
   connect,
   disconnect
 }: {
-  groups: any,
+  resource: any,
   connect?: (where: {id: string}) => Promise<any>,
   disconnect?: (where: {id: string}) => Promise<any>
 }) => {
-  if (isEmpty(groups)) {
+  if (isEmpty(resource)) {
     return;
   }
 
-  if (!isEmpty(groups.connect) && isArray(groups.connect) && connect) {
-    await Promise.all(groups.connect.map(connect));
+  if (!isEmpty(resource.connect) && isArray(resource.connect) && connect) {
+    await Promise.all(resource.connect.map(connect));
   }
 
-  if (!isEmpty(groups.disconnect) && isArray(groups.disconnect) && disconnect) {
-    await Promise.all(groups.disconnect.map(disconnect));
+  if (!isEmpty(resource.disconnect) && isArray(resource.disconnect) && disconnect) {
+    await Promise.all(resource.disconnect.map(disconnect));
   }
 };
