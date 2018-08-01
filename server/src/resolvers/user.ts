@@ -79,15 +79,21 @@ const deassignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdm
  * Query
  */
 
+const listQuery = async (kcAdminClient: KcAdminClient, where: any) => {
+  let users = await kcAdminClient.users.find();
+  if (where && where.id) {
+    users = users.filter(user => user.id === where.id);
+  }
+  return users;
+};
+
 export const query = async (root, args, context: Context) => {
-  const kcAdminClient = context.kcAdminClient;
-  const users = await kcAdminClient.users.find();
+  const users = await listQuery(context.kcAdminClient, args && args.where);
   return users;
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
-  const kcAdminClient = context.kcAdminClient;
-  const users = await kcAdminClient.users.find();
+  const users = await listQuery(context.kcAdminClient, args && args.where);
   return toRelay(users);
 };
 

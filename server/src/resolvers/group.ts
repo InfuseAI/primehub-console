@@ -125,24 +125,24 @@ export const destroy = async (root, args, context: Context) => {
  * Query
  */
 
-const listQuery = async (kcAdminClient: KcAdminClient) => {
+const listQuery = async (kcAdminClient: KcAdminClient, where: any) => {
   let groups = await kcAdminClient.groups.find();
   // filter out everyone
   groups = groups.filter(group => group.id !== EVERYONE_GROUP_ID);
+  if (where && where.id) {
+    groups = groups.filter(group => group.id === where.id);
+  }
   // inject more fields from single query
   const fetchedGroups = await Promise.all(groups.map(group => kcAdminClient.groups.findOne({id: group.id})));
   return fetchedGroups;
 };
 
 export const query = async (root, args, context: Context) => {
-  return listQuery(context.kcAdminClient);
+  return listQuery(context.kcAdminClient, args && args.where);
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
-  const kcAdminClient = context.kcAdminClient;
-  let groups = await kcAdminClient.groups.find();
-  // filter out everyone
-  groups = groups.filter(group => group.id !== EVERYONE_GROUP_ID);
+  const groups = await listQuery(context.kcAdminClient, args && args.where);
   return toRelay(groups);
 };
 
