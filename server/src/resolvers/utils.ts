@@ -91,6 +91,11 @@ export const getFromAttr = (key: string, attributes: Record<string, any>, defaul
   return isUndefined(value) ? defaultValue : type(value);
 };
 
+export const parseFromAttr = (key: string, attributes: Record<string, any>, type: any = v => v) => {
+  const value = attributes && attributes[key] && attributes[key][0];
+  return isUndefined(value) ? value : type(value);
+};
+
 export const mapFromAttr = (attributes: Record<string, any>) => {
   if (isEmpty(attributes)) {
     return {};

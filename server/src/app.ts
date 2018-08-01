@@ -4,7 +4,7 @@ import { importSchema } from 'graphql-import';
 import path from 'path';
 import KcAdminClient from 'keycloak-admin/lib';
 import CrdClient from './crdClient/crdClientImpl';
-import { query as systemQuery } from './resolvers/system';
+import * as system from './resolvers/system';
 import * as user from './resolvers/user';
 import * as group from './resolvers/group';
 import { crd as instanceType} from './resolvers/instanceType';
@@ -17,7 +17,7 @@ const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graph
 // A map of functions which return data for the schema.
 const resolvers = {
   Query: {
-    system: systemQuery,
+    system: system.query,
     user: user.queryOne,
     users: user.query,
     usersConnection: user.connectionQuery,
@@ -29,6 +29,7 @@ const resolvers = {
     ...image.resolvers(),
   },
   Mutation: {
+    updateSystem: system.update,
     createUser: user.create,
     updateUser: user.update,
     deleteUser: user.destroy
