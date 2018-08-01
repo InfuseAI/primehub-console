@@ -6,11 +6,14 @@ import KcAdminClient from 'keycloak-admin';
 import views from 'koa-views';
 import serve from 'koa-static';
 import Router from 'koa-router';
+
 import CrdClient from './crdClient/crdClientImpl';
-import { query as systemQuery } from './resolvers/system';
+import * as system from './resolvers/system';
 import * as user from './resolvers/user';
 import * as group from './resolvers/group';
-import * as machineType from './resolvers/machineType';
+import { crd as instanceType} from './resolvers/instanceType';
+import { crd as dataset} from './resolvers/dataset';
+import { crd as image} from './resolvers/image';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -18,20 +21,31 @@ const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graph
 // A map of functions which return data for the schema.
 const resolvers = {
   Query: {
-    system: systemQuery,
+    system: system.query,
     user: user.queryOne,
     users: user.query,
     usersConnection: user.connectionQuery,
     group: group.queryOne,
     groups: group.query,
     groupsConnection: group.connectionQuery,
-    machineType: machineType.queryOne,
-    machineTypes: machineType.query,
-    machineTypesConnection: machineType.connectionQuery
+    ...instanceType.resolvers(),
+    ...dataset.resolvers(),
+    ...image.resolvers(),
+  },
+  Mutation: {
+    updateSystem: system.update,
+    createUser: user.create,
+    updateUser: user.update,
+    deleteUser: user.destroy,
+    createGroup: group.create,
+    updateGroup: group.update,
+    deleteGroup: group.destroy
   },
   User: user.typeResolvers,
   Group: group.typeResolvers,
-  MachineType: machineType.typeResolvers
+  ...instanceType.typeResolver(),
+  ...dataset.typeResolver(),
+  ...image.typeResolver(),
 };
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {
@@ -52,7 +66,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
         crdClient: new CrdClient()
       };
     },
-    mocks: true
+    // mocks: true
   });
 
   // koa

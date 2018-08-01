@@ -1,12 +1,83 @@
 import KcAdminClient from 'keycloak-admin';
-import { toRelay } from './utils';
-import { find } from 'lodash';
-import { EVERYONE_GROUP_ID } from './constant';
+import { pick, omit, find, isUndefined, first } from 'lodash';
+import { toRelay, toAttr, mutateRelation } from './utils';
+import { EVERYONE_GROUP_ID, detaultSystemSettings } from './constant';
+import { Attributes, FieldType } from './attr';
+import { Context } from './interface';
 
-interface Context {
-  realm: string;
-  kcAdminClient: KcAdminClient;
-}
+/**
+ * utils
+ */
+
+const assignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdminClient) => {
+  if (realm === 'master') {
+    // add admin role to user
+    const role = await kcAdminClient.roles.findOneByName({
+      name: 'admin'
+    });
+    await kcAdminClient.users.addRealmRoleMappings({
+      id: userId,
+      roles: [{
+        id: role.id,
+        name: role.name
+      }]
+    });
+  } else {
+    // if realm is not master
+    // add client role-mappings: realm-management/realm-admin
+    const clients = await kcAdminClient.clients.find();
+    const realmManagementClient = clients.find(client => client.name === 'realm-management');
+    const role = await kcAdminClient.clients.findRole({
+      id: realmManagementClient.id,
+      roleName: 'realm-admin'
+    });
+    await kcAdminClient.users.addClientRoleMappings({
+      id: userId,
+      clientUniqueId: realmManagementClient.id,
+      roles: [{
+        id: role.id,
+        name: role.name
+      }]
+    });
+  }
+};
+
+const deassignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdminClient) => {
+  if (realm === 'master') {
+    // add admin role to user
+    const role = await kcAdminClient.roles.findOneByName({
+      name: 'admin'
+    });
+    await kcAdminClient.users.delRealmRoleMappings({
+      id: userId,
+      roles: [{
+        id: role.id,
+        name: role.name
+      }]
+    });
+  } else {
+    // if realm is not master
+    // add client role-mappings: realm-management/realm-admin
+    const clients = await kcAdminClient.clients.find();
+    const realmManagementClient = clients.find(client => client.name === 'realm-management');
+    const role = await kcAdminClient.clients.findRole({
+      id: realmManagementClient.id,
+      roleName: 'realm-admin'
+    });
+    await kcAdminClient.users.delClientRoleMappings({
+      id: userId,
+      clientUniqueId: realmManagementClient.id,
+      roles: [{
+        id: role.id,
+        name: role.name
+      }]
+    });
+  }
+};
+
+/**
+ * Query
+ */
 
 export const query = async (root, args, context: Context) => {
   const kcAdminClient = context.kcAdminClient;
@@ -26,6 +97,170 @@ export const queryOne = async (root, args, context: Context) => {
   const user = await kcAdminClient.users.findOne({id: userId});
   return user;
 };
+
+/**
+ * Mutation
+ */
+
+export const create = async (root, args, context: Context) => {
+  const kcAdminClient = context.kcAdminClient;
+
+  // create resource
+  // totp, createdTimestamp will be ignored
+  // isAdmin, groups will be handled later
+  const payload = args.data;
+  const attrs = new Attributes({
+    data: {
+      personalDiskQuota: payload.personalDiskQuota
+    }
+  });
+
+  await kcAdminClient.users.create({
+    username: payload.username,
+    email: payload.email,
+    firstName: payload.firstName,
+    lastName: payload.lastName,
+    enabled: isUndefined(payload.enabled) ? true : payload.enabled,
+    attributes: attrs.toKeycloakAttrs()
+  });
+
+  // find the user
+  const users = await kcAdminClient.users.find({
+    username: payload.username
+  });
+  const user = first(users);
+
+  // set admin
+  if (payload.isAdmin) {
+    try {
+      await assignAdmin(user.id, context.realm, kcAdminClient);
+    } catch (e) {
+      // tslint:disable-next-line:no-console
+      console.log(e);
+    }
+  }
+
+  // connect to groups
+  try {
+    await mutateRelation({
+      resource: payload.groups,
+      connect: async where => {
+        // add user to group
+        await kcAdminClient.users.addToGroup({
+          id: user.id,
+          groupId: where.id
+        });
+      }
+    });
+  } catch (e) {
+    // tslint:disable-next-line:no-console
+    console.log(e);
+  }
+
+  return user;
+};
+
+export const update = async (root, args, context: Context) => {
+  const userId = args.where.id;
+  const kcAdminClient = context.kcAdminClient;
+
+  // update resource
+  const payload = args.data;
+  // createdTimestamp will be ignored
+  // isAdmin, totp, groups will be handled later
+  const user = await kcAdminClient.users.findOne({
+    id: userId
+  });
+
+  // merge attrs
+  const attrs = new Attributes({
+    keycloakAttr: user.attributes,
+    schema: {
+      personalDiskQuota: {type: FieldType.string}
+    }
+  });
+  attrs.mergeWithData({
+    personalDiskQuota: payload.personalDiskQuota
+  });
+
+  // update
+  await kcAdminClient.users.update({id: userId}, {
+    username: payload.username,
+    email: payload.email,
+    firstName: payload.firstName,
+    lastName: payload.lastName,
+    enabled: isUndefined(payload.enabled) ? true : payload.enabled,
+    attributes: attrs.toKeycloakAttrs()
+  });
+
+  // set admin
+  if (!isUndefined(payload.isAdmin)) {
+    try {
+      if (payload.isAdmin) {
+        await assignAdmin(user.id, context.realm, kcAdminClient);
+      } else {
+        await deassignAdmin(user.id, context.realm, kcAdminClient);
+      }
+    } catch (e) {
+      // tslint:disable-next-line:no-console
+      console.log(e);
+    }
+  }
+
+  // disable totp
+  if (!isUndefined(payload.totp) && payload.totp === false) {
+    try {
+      await kcAdminClient.users.removeTotp({
+        id: userId
+      });
+    } catch (e) {
+      // tslint:disable-next-line:no-console
+      console.log(e);
+    }
+  }
+
+  // connect to groups
+  try {
+    await mutateRelation({
+      resource: payload.groups,
+      connect: async where => {
+        // add user to group
+        await kcAdminClient.users.addToGroup({
+          id: user.id,
+          groupId: where.id
+        });
+      },
+      disconnect: async where => {
+        // remove user from group
+        await kcAdminClient.users.delFromGroup({
+          id: user.id,
+          groupId: where.id
+        });
+      }
+    });
+  } catch (e) {
+    // tslint:disable-next-line:no-console
+    console.log(e);
+  }
+
+  return user;
+};
+
+export const destroy = async (root, args, context: Context) => {
+  const userId = args.where.id;
+  const kcAdminClient = context.kcAdminClient;
+  const user = await kcAdminClient.users.findOne({
+    id: userId
+  });
+  await kcAdminClient.users.del({
+    id: userId
+  });
+  return user;
+};
+
+/**
+ * Type
+ */
 
 export const typeResolvers = {
   isAdmin: async (parent, args, context: Context) => {
@@ -61,7 +296,7 @@ export const typeResolvers = {
       const {attributes} = await context.kcAdminClient.groups.findOne({id: EVERYONE_GROUP_ID});
       const defaultUserDiskQuota =
         attributes && attributes.defaultUserDiskQuota && attributes.defaultUserDiskQuota[0];
-      return defaultUserDiskQuota;
+      return defaultUserDiskQuota || detaultSystemSettings.defaultUserDiskQuota;
     }
 
     return personalDiskQuota;

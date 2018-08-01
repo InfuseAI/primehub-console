@@ -1,8 +1,8 @@
-# import Image from "common.graphql"
+# import CannerImage, CannerImageInput from "common.graphql"
 
 type Org {
   name: String
-  logo: Image
+  logo: CannerImage
 }
 
 type System {
@@ -10,7 +10,12 @@ type System {
   defaultUserDiskQuota: String
 }
 
+input OrgUpdateInput {
+  name: String
+  logo: CannerImageInput
+}
+
 input SystemUpdateInput {
-  org: Org
+  org: OrgUpdateInput
   defaultUserDiskQuota: String
 }

@@ -1,9 +1,9 @@
-# import System from "./system.graphql"
-# import User, UserConnection, UserWhereInput, UserWhereUniqueInput from "./user.graphql"
-# import Group, GroupConnection, GroupWhereInput, GroupWhereUniqueInput from "./group.graphql"
-# import MachineType, MachineTypeConnection, MachineTypeWhereInput, MachineTypeWhereUniqueInput from "./machineType.graphql"
-# import Env, EnvConnection, EnvWhereInput, EnvWhereUniqueInput from "./env.graphql"
-# import Dataset, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput from "./dataset.graphql"
+# import System, SystemUpdateInput from "./system.graphql"
+# import User, UserConnection, UserWhereInput, UserWhereUniqueInput, UserCreateInput, UserUpdateInput from "./user.graphql"
+# import Group, GroupConnection, GroupWhereInput, GroupWhereUniqueInput, GroupCreateInput, GroupUpdateInput from "./group.graphql"
+# import InstanceType, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput, InstanceTypeCreateInput, InstanceTypeUpdateInput from "./instanceType.graphql"
+# import Image, ImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput from "./image.graphql"
+# import Dataset, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 
 type Query {
   """System"""
@@ -43,39 +43,39 @@ type Query {
     last: Int
   ): GroupConnection!
 
-  """MachineType"""
-  machineType(where: MachineTypeWhereUniqueInput!): MachineType
-  machineTypes(
-    where: MachineTypeWhereInput
+  """InstanceType"""
+  instanceType(where: InstanceTypeWhereUniqueInput!): InstanceType
+  instanceTypes(
+    where: InstanceTypeWhereInput
     before: String
     after: String
     first: Int
     last: Int
-  ): [MachineType]!
-  machineTypesConnection(
-    where: MachineTypeWhereInput
+  ): [InstanceType]!
+  instanceTypesConnection(
+    where: InstanceTypeWhereInput
     before: String
     after: String
     first: Int
     last: Int
-  ): MachineTypeConnection!
+  ): InstanceTypeConnection!
 
-  """Env"""
-  env(where: EnvWhereUniqueInput!): Env
-  envs(
-    where: EnvWhereInput
+  """Image"""
+  image(where: ImageWhereUniqueInput!): Image
+  images(
+    where: ImageWhereInput
     before: String
     after: String
     first: Int
     last: Int
-  ): [Env]!
-  envsConnection(
-    where: EnvWhereInput
+  ): [Image]!
+  imagesConnection(
+    where: ImageWhereInput
     before: String
     after: String
     first: Int
     last: Int
-  ): EnvConnection!
+  ): ImageConnection!
 
   """Dataset"""
   dataset(where: DatasetWhereUniqueInput!): Dataset
@@ -93,4 +93,34 @@ type Query {
     first: Int
     last: Int
   ): DatasetConnection!
+}
+
+type Mutation {
+  """System"""
+  updateSystem(data: SystemUpdateInput!): System
+
+  """User"""
+  createUser(data: UserCreateInput!): User!
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  deleteUser(where: UserWhereUniqueInput!): User
+
+  """Group"""
+  createGroup(data: GroupCreateInput!): Group!
+  updateGroup(data: GroupUpdateInput!, where: GroupWhereUniqueInput!): Group
+  deleteGroup(where: GroupWhereUniqueInput!): Group
+
+  """InstanceType"""
+  createInstanceType(data: InstanceTypeCreateInput!): InstanceType!
+  updateInstanceType(data: InstanceTypeUpdateInput!, where: InstanceTypeWhereUniqueInput!): InstanceType
+  deleteInstanceType(where: InstanceTypeWhereUniqueInput!): InstanceType
+
+  """Image"""
+  createImage(data: ImageCreateInput!): Image!
+  updateImage(data: ImageUpdateInput!, where: ImageWhereUniqueInput!): Image
+  deleteImage(where: ImageWhereUniqueInput!): Image
+
+  """Dataset"""
+  createDataset(data: DatasetCreateInput!): Dataset!
+  updateDataset(data: DatasetUpdateInput!, where: DatasetWhereUniqueInput!): Dataset
+  deleteDataset(where: DatasetWhereUniqueInput!): Dataset
 }

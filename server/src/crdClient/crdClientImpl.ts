@@ -13,7 +13,8 @@ const client = new Client({ config: config.fromKubeconfig(), version: '1.10' });
  * Spec interface
  */
 
-export interface ContainerSpec {
+export interface InstanceTypeSpec {
+  displayName?: string;
   'limits.cpu'?: number;
   'limits.memory'?: string;
   'requests.cpu'?: number;
@@ -21,12 +22,13 @@ export interface ContainerSpec {
   'limits.nvidia.com/gpu'?: number;
 }
 
-export interface EnvSpec {
-  image?: string;
-  global?: boolean;
+export interface ImageSpec {
+  displayName?: string;
+  url?: string;
 }
 
 export interface DatasetSpec {
+  displayName?: string;
   access?: string;
   type?: string;
   url?: string;
@@ -39,9 +41,9 @@ const loadCrd = (filename: string) =>
   yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, `../../crd/${filename}.yaml`), 'utf8'));
 
 export default class CrdClientImpl {
-  public containers = new CustomResource<ContainerSpec>(
+  public instanceTypes = new CustomResource<InstanceTypeSpec>(
     client,
-    loadCrd('container')
+    loadCrd('instance-type')
   );
 
   public datasets = new CustomResource<DatasetSpec>(
@@ -49,8 +51,8 @@ export default class CrdClientImpl {
     loadCrd('dataset')
   );
 
-  public env = new CustomResource<EnvSpec>(
+  public images = new CustomResource<ImageSpec>(
     client,
-    loadCrd('env')
+    loadCrd('image')
   );
 }
