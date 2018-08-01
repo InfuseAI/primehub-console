@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig",
+  "compilerOptions": {
+    "target": "es2017",
+    "rootDir": "src",
+    "outDir": "lib"
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "test/*"
+  ]
+}
