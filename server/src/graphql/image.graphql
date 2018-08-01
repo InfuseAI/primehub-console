@@ -1,12 +1,14 @@
 # import PageInfo from "common.graphql"
+# import Group, GroupCreateManyInput, GroupUpdateManyInput from "group.graphql"
 
 type Image {
   id: ID!
 	name: String!
   displayName: String
   description: String
-  image: String
+  url: String
   global: Boolean
+  groups: [Group]
 }
 
 """An edge in a connection."""
@@ -39,15 +41,16 @@ input ImageCreateInput {
   name: String!
   displayName: String
   description: String
-  image: String
+  url: String
   global: Boolean
   groups: GroupCreateManyInput
 }
 
 input ImageUpdateInput {
+  name: String
   displayName: String
   description: String
-  image: String
+  url: String
   global: Boolean
   groups: GroupUpdateManyInput
 }

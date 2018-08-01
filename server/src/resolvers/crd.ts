@@ -2,34 +2,47 @@ import { Context } from './interface';
 import { toRelay, paginate, extractPagination, findResourceInGroup } from './utils';
 import CustomResource, { Item } from '../crdClient/customResource';
 import pluralize from 'pluralize';
-import { isEmpty } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
+import { EVERYONE_GROUP_ID } from './constant';
 
 export class Crd<SpecType> {
   private customResourceMethod: string;
   private propMapping: (item: Item<SpecType>) => Record<string, any>;
+  private mutationMapping: (data: any) => any;
   private resolveType?: Record<string, any>;
   private prefixName: string;
   private resourceName: string;
+  private onCreate?: (data: any) => Promise<any>;
+  private onUpdate?: (data: any) => Promise<any>;
 
   constructor({
     customResourceMethod,
     propMapping,
+    mutationMapping,
     resolveType,
     prefixName,
-    resourceName
+    resourceName,
+    onCreate,
+    onUpdate
   }: {
     customResourceMethod: string,
     propMapping: (item: Item<SpecType>) => Record<string, any>,
+    mutationMapping: (data: any) => any,
     resolveType?: Record<string, any>,
     prefixName: string,
-    resourceName: string
+    resourceName: string,
+    onCreate?: (data: any) => Promise<any>,
+    onUpdate?: (data: any) => Promise<any>
   }) {
     this.customResourceMethod = customResourceMethod;
     this.propMapping = propMapping;
+    this.mutationMapping = mutationMapping;
     this.resolveType = resolveType;
     this.prefixName = prefixName;
     this.resourceName = resourceName;
+    this.onCreate = onCreate;
+    this.onUpdate = onUpdate;
   }
 
   /**
@@ -47,12 +60,36 @@ export class Crd<SpecType> {
 
   public typeResolver = () => {
     const typename = capitalizeFirstLetter(this.resourceName);
+    const defaultType = {
+      groups: async (parent, args, context: Context) => {
+        const resourceId = parent.id;
+        // find all groups
+        const groups = await context.kcAdminClient.groups.find();
+        // find each role-mappings
+        const groupsWithRole = await Promise.all(
+          groups
+          .filter(group => group.id !== EVERYONE_GROUP_ID)
+          .map(async group => {
+            const roles = await context.kcAdminClient.groups.listRealmRoleMappings({
+              id: group.id
+            });
+            const findRole = roles.find(role => role.name === `${this.getPrefix()}${resourceId}`);
+            return findRole
+              ? context.kcAdminClient.groups.findOne({id: group.id})
+              : null;
+          })
+        );
+        // filter out
+        return groupsWithRole.filter(v => v);
+      }
+    };
+
     if (isEmpty(this.resolveType)) {
-      return {};
+      return {[typename]: defaultType};
     }
 
     return {
-      [typename]: this.resolveType
+      [typename]: {...this.resolveType, ...defaultType}
     };
   }
 
@@ -63,24 +100,37 @@ export class Crd<SpecType> {
     };
   }
 
+  public resolveInMutation = () => {
+    const typename = capitalizeFirstLetter(this.resourceName);
+    return {
+      [`create${typename}`]: this.create,
+      [`update${typename}`]: this.update,
+      [`delete${typename}`]: this.destroy
+    };
+  }
+
   /**
    * query methods
    */
 
-  private listQuery = async (customResource: CustomResource<SpecType>) => {
+  private listQuery = async (customResource: CustomResource<SpecType>, where: any) => {
     const rows = await customResource.list();
-    return rows.map(this.propMapping);
+    let mappedRows = rows.map(this.propMapping);
+    if (where && where.id) {
+      mappedRows = mappedRows.filter(row => row.id === where.id);
+    }
+    return mappedRows;
   }
 
   private query = async (root, args, context: Context) => {
     const customResource = context.crdClient[this.customResourceMethod];
-    const rows = await this.listQuery(customResource);
+    const rows = await this.listQuery(customResource, args && args.where);
     return paginate(rows, extractPagination(args));
   }
 
   private connectionQuery = async (root, args, context: Context) => {
     const customResource = context.crdClient[this.customResourceMethod];
-    const rows = await this.listQuery(customResource);
+    const rows = await this.listQuery(customResource, args && args.where);
     return toRelay(rows, extractPagination(args));
   }
 
@@ -102,6 +152,62 @@ export class Crd<SpecType> {
       return context.crdClient[this.customResourceMethod].get(name);
     }));
     return rows.map(this.propMapping);
+  }
+
+  /**
+   * Mutations
+   */
+
+  private create = async (root, args, context: Context) => {
+    const {name} = args.data;
+    const {kcAdminClient, crdClient} = context;
+    const customResource = crdClient[this.customResourceMethod];
+    // create role on keycloak
+    const roleName = `${this.getPrefix()}${name}`;
+    await kcAdminClient.roles.create({
+      name: roleName
+    });
+    const role = await kcAdminClient.roles.findOneByName({name: roleName});
+
+    // create crd on k8s
+    const {metadata, spec} = this.mutationMapping(args.data);
+    const res = await customResource.create(metadata, spec);
+    if (this.onCreate) {
+      await this.onCreate({role, resource: res, data: args.data, context});
+    }
+    return this.propMapping(res);
+  }
+
+  private update = async (root, args, context: Context) => {
+    const name = args.where.id;
+    const {kcAdminClient, crdClient} = context;
+    const customResource = crdClient[this.customResourceMethod];
+    const roleName = `${this.getPrefix()}${name}`;
+    const role = await kcAdminClient.roles.findOneByName({name: roleName});
+
+    // update crd on k8s
+    const {metadata, spec} = this.mutationMapping(args.data);
+    const res = await customResource.patch(name, {
+      metadata: omit(metadata, 'name'),
+      spec
+    });
+    if (this.onUpdate) {
+      await this.onUpdate({role, resource: res, data: args.data, context});
+    }
+    return this.propMapping(res);
+  }
+
+  private destroy = async (root, args, context: Context) => {
+    const name = args.where.id;
+    const {kcAdminClient, crdClient} = context;
+    const customResource = crdClient[this.customResourceMethod];
+    const roleName = `${this.getPrefix()}${name}`;
+    const role = await kcAdminClient.roles.delByName({name: roleName});
+
+    // delete crd on k8s
+    const crd = await customResource.get(name);
+    await customResource.del(name);
+    return this.propMapping(crd);
   }
 
   private getPrefix() {
