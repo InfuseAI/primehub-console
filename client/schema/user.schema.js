@@ -1,9 +1,10 @@
 /** @jsx builder */
-import builder, {Default, Tabs, Layout, configure} from 'canner-script';
+import builder, {Default, Tabs, Layout, configure, Block} from 'canner-script';
 import RelationTable from '../src/cms-components/customize-relation-table';
 import {storage} from './utils';
 import HideInCreate from '../src/cms-layouts/hideInCreate';
 import Tab from '../src/cms-layouts/tab';
+import CustomizeBlock from '../src/cms-layouts/block';
 import ResetPassword from '../src/cms-components/customize-object-password_form';
 import SendEmail from '../src/cms-components/customize-object-email_form';
 import Layouts from 'canner-layouts';
@@ -20,7 +21,7 @@ configure({
             keyName: '__1',
             childrenName: [],
             title: 'Send Email',
-            component: Layouts.default,
+            component: Layouts.block,
             children: [{
               type: 'object',
               nodeType: 'plugins.object',
@@ -36,7 +37,7 @@ configure({
             name: '__2',
             keyName: '__2',
             childrenName: [],
-            component: Layouts.default,
+            component: Layouts.block,
             title: 'Reset Password',
             children: [{
               type: 'object',
@@ -67,14 +68,14 @@ export default () => (
     storage={storage}
   >
     
-    <Layout component={Tab} disabledKeysInCreate={['__1', '__2']}>
+    <Layout component={CustomizeBlock} disabledKeysInCreate={['__1', '__2']}>
     {/* <image keyName="thumbnail" title="Thumbnail" disabled /> */}
-    <Default title="Basic Info">
+    <Block title="Basic Info">
       <string keyName="username" title="Username"
         validation={{pattern: '^[a-z0-9_]+$'}}
         required
       />
-      <string keyName="email" title="Email" validation={{format: 'email'}}/>
+      <string keyName="email" title="Email" required validation={{format: 'email'}}/>
       <Layout component={HideInCreate}>
         <string keyName="firstName" title="FirstName" />
         <string keyName="lastName" title="LastName" />
@@ -118,7 +119,7 @@ export default () => (
           </toolbar>
         </relation>
       </Layout>
-    </Default>
+    </Block>
     {/* <Layout component={HideInCreate} keyName="__1" title="Send Email">
       <object packageName="../src/cms-components/customize-object-email_form"/>
     </Layout>
