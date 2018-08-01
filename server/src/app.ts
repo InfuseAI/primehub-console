@@ -6,7 +6,7 @@ import KcAdminClient from 'keycloak-admin';
 import views from 'koa-views';
 import serve from 'koa-static';
 import Router from 'koa-router';
-// import CrdClient from './crdClient/crdClientImpl';
+import CrdClient from './crdClient/crdClientImpl';
 import { query as systemQuery } from './resolvers/system';
 import * as user from './resolvers/user';
 import * as group from './resolvers/group';
@@ -49,7 +49,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
       return {
         realm: 'master',
         kcAdminClient,
-        // crdClient: new CrdClient()
+        crdClient: new CrdClient()
       };
     },
     mocks: true
