@@ -1,11 +1,11 @@
-type Image {
+type CannerImage {
   contentType: String
   name: String
   size: Int
   url: String
 }
 
-input ImageInput {
+input CannerImageInput {
   contentType: String
   name: String
   size: Int

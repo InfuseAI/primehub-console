@@ -1,4 +1,15 @@
-import { first as _first, last as _last, isUndefined, isEmpty, pick, find } from 'lodash';
+import {
+  first as _first,
+  last as _last,
+  isUndefined,
+  isEmpty,
+  isNull,
+  pick,
+  find,
+  reduce,
+  isArray,
+  mapValues
+} from 'lodash';
 import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
 import KcAdminClient from 'keycloak-admin';
 
@@ -80,6 +91,28 @@ export const getFromAttr = (key: string, attributes: Record<string, any>, defaul
   return isUndefined(value) ? defaultValue : type(value);
 };
 
+export const mapFromAttr = (attributes: Record<string, any>) => {
+  if (isEmpty(attributes)) {
+    return {};
+  }
+
+  return mapValues(attributes, val => {
+    return (val && val[0]) || null;
+  });
+};
+
+export const toAttr = (attributes: Record<string, any>) => {
+  const attrs = reduce(attributes, (result, value, key) => {
+    if (isUndefined(value) || isNull(value)) {
+      return result;
+    }
+    result[key] = [value];
+    return result;
+  }, {});
+
+  return isEmpty(attrs) ? undefined : attrs;
+};
+
 export const findResourceInGroup = async ({
   kcAdminClient, groupId, resourceName}:
   {kcAdminClient: KcAdminClient, groupId: string, resourceName: string}): Promise<boolean> => {
@@ -87,4 +120,26 @@ export const findResourceInGroup = async ({
     id: groupId
   });
   return Boolean(find(roles, role => role.name.slice(3) === resourceName));
+};
+
+export const mutateGroup = async ({
+  groups,
+  connect,
+  disconnect
+}: {
+  groups: any,
+  connect?: (where: {id: string}) => Promise<any>,
+  disconnect?: (where: {id: string}) => Promise<any>
+}) => {
+  if (isEmpty(groups)) {
+    return;
+  }
+
+  if (!isEmpty(groups.connect) && isArray(groups.connect) && connect) {
+    await Promise.all(groups.connect.map(connect));
+  }
+
+  if (!isEmpty(groups.disconnect) && isArray(groups.disconnect) && disconnect) {
+    await Promise.all(groups.disconnect.map(disconnect));
+  }
 };

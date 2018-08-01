@@ -28,6 +28,11 @@ const resolvers = {
     ...dataset.resolvers(),
     ...image.resolvers(),
   },
+  Mutation: {
+    createUser: user.create,
+    updateUser: user.update,
+    deleteUser: user.destroy
+  },
   User: user.typeResolvers,
   Group: group.typeResolvers,
   ...instanceType.typeResolver(),
@@ -53,7 +58,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
         crdClient: new CrdClient()
       };
     },
-    mocks: true
+    // mocks: true
   });
 
   // koa

@@ -1,8 +1,8 @@
-# import Image, ImageInput from "common.graphql"
+# import CannerImage, CannerImageInput from "common.graphql"
 
 type Org {
   name: String
-  logo: Image
+  logo: CannerImage
 }
 
 type System {
@@ -12,7 +12,7 @@ type System {
 
 input OrgUpdateInput {
   name: String
-  logo: ImageInput
+  logo: CannerImageInput
 }
 
 input SystemUpdateInput {
