@@ -1,9 +1,60 @@
 /** @jsx builder */
-import builder, {Default, Tabs, Layout} from 'canner-script';
+import builder, {Default, Tabs, Layout, configure} from 'canner-script';
 import RelationTable from '../src/cms-components/customize-relation-table';
 import {storage} from './utils';
 import HideInCreate from '../src/cms-layouts/hideInCreate';
 import Tab from '../src/cms-layouts/tab';
+import ResetPassword from '../src/cms-components/customize-object-password_form';
+import SendEmail from '../src/cms-components/customize-object-email_form';
+import Layouts from 'canner-layouts';
+
+configure({
+  visitorManager: {
+    visitors: [{
+      'plugins.array': path => {
+        if (path.node.keyName === 'user') {
+          const {children} = path.node;
+          const layouts = [{
+            nodeType: 'layout',
+            name: '__1',
+            keyName: '__1',
+            childrenName: [],
+            title: 'Send Email',
+            component: Layouts.default,
+            children: [{
+              type: 'object',
+              nodeType: 'plugins.object',
+              keyName: '__1',
+              path: 'user/__1',
+              pattern: 'array.object',
+              loader: import('../src/cms-components/customize-object-email_form')
+            }],
+            hocs: ['containerRouter'],
+            __CANNER_KEY__: children[0].__CANNER_KEY__.slice(-1)
+          }, {
+            nodeType: 'layout',
+            name: '__2',
+            keyName: '__2',
+            childrenName: [],
+            component: Layouts.default,
+            title: 'Reset Password',
+            children: [{
+              type: 'object',
+              nodeType: 'plugins.object',
+              keyName: '__2',
+              path: 'user/__2',
+              pattern: 'array.object',
+              loader: import('../src/cms-components/customize-object-password_form')
+            }],
+            hocs: ['containerRouter'],
+            __CANNER_KEY__: children[0].__CANNER_KEY__.slice(-1)
+          }];
+          path.tree.setChildren(path.route, [...children, ...layouts]);
+        }
+      }
+    }]
+  }
+})
 
 export default () => (
   <array keyName="user" title="User" ui="tableRoute"
@@ -68,12 +119,12 @@ export default () => (
         </relation>
       </Layout>
     </Default>
-    <Layout component={HideInCreate} keyName="__1" title="Send Email">
-      <object keyName="__1"  packageName="../src/cms-components/customize-object-email_form"/>
+    {/* <Layout component={HideInCreate} keyName="__1" title="Send Email">
+      <object packageName="../src/cms-components/customize-object-email_form"/>
     </Layout>
     <Layout component={HideInCreate} keyName="__2"  title="Reset Password">
-      <object keyName="__2"  packageName="../src/cms-components/customize-object-password_form"/>
-    </Layout>
+      <object packageName="../src/cms-components/customize-object-password_form"/>
+    </Layout> */}
 
     </Layout>
   </array>
