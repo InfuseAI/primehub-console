@@ -30,7 +30,7 @@ const resolvers = {
     groupsConnection: group.connectionQuery,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
-    ...image.resolvers(),
+    ...image.resolvers()
   },
   Mutation: {
     updateSystem: system.update,
@@ -39,7 +39,10 @@ const resolvers = {
     deleteUser: user.destroy,
     createGroup: group.create,
     updateGroup: group.update,
-    deleteGroup: group.destroy
+    deleteGroup: group.destroy,
+    ...instanceType.resolveInMutation(),
+    ...dataset.resolveInMutation(),
+    ...image.resolveInMutation()
   },
   User: user.typeResolvers,
   Group: group.typeResolvers,

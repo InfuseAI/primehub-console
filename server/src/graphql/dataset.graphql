@@ -1,5 +1,5 @@
 # import PageInfo from "common.graphql"
-# import GroupCreateManyInput, GroupUpdateManyInput from "group.graphql"
+# import Group, GroupCreateManyInput, GroupUpdateManyInput from "group.graphql"
 
 type Dataset {
   id: ID!
@@ -9,6 +9,7 @@ type Dataset {
   access: String
   type: String
   url: String
+  groups: [Group]
 }
 
 """An edge in a connection."""
@@ -48,6 +49,7 @@ input DatasetCreateInput {
 }
 
 input DatasetUpdateInput {
+  name: String
   displayName: String
   description: String
   access: String
