@@ -17,7 +17,7 @@ const graphqlClient = new GraphqlClient({
 });
 const storage = {};
 export default (
-  <root graphqlClient={graphqlClient}>
+  <root graphqlClient={process.env.NODE_ENV === 'production' ? graphqlClient : undefined}>
     <System storage={storage} />
     <Idp storage={storage} />
     <UserFederation storage={storage} />
