@@ -9,6 +9,7 @@ type Group {
 	name: String!
   displayName: String
   canUseGpu: Boolean
+  cpuQuota: Float
   gpuQuota: Float
   diskQuota: String
   users: [User]
@@ -47,6 +48,7 @@ input GroupCreateInput {
   name: String!
   displayName: String
   canUseGpu: Boolean
+  cpuQuota: Float
   gpuQuota: Float
   diskQuota: String
   users: UserCreateManyInput
@@ -56,6 +58,7 @@ input GroupUpdateInput {
   name: String
   displayName: String
   canUseGpu: Boolean
+  cpuQuota: Float
   gpuQuota: Float
   diskQuota: String
   users: UserUpdateManyInput
