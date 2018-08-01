@@ -8,10 +8,16 @@ import Group from './group.schema';
 import InstanceType from './instanceType.schema';
 import Image from './image.schema';
 import Dataset from './dataset.schema';
-import {connector, storage} from './utils';
+// import {connector, storage} from './utils';
+import {GraphqlClient} from "canner-graphql-interface";
 
+// contruct graphQL client
+const graphqlClient = new GraphqlClient({
+  uri: "http://localhost:3000/graphql"
+});
+const storage = {};
 export default (
-  <root connector={connector}>
+  <root graphqlClient={graphqlClient}>
     <System storage={storage} />
     <Idp storage={storage} />
     <UserFederation storage={storage} />

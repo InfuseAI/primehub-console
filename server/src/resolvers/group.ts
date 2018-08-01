@@ -21,7 +21,7 @@ export const create = async (root, args, context: Context) => {
   // displayName, canUseGpu, gpuQuota, diskQuota in attributes
   const payload = args.data;
   const attrs = new Attributes({
-    data: pick(payload, ['displayName', 'canUseGpu', 'gpuQuota', 'diskQuota'])
+    data: pick(payload, ['displayName', 'canUseGpu', 'gpuQuota', 'cpuQuota', 'diskQuota'])
   });
 
   await kcAdminClient.groups.create({
@@ -74,7 +74,7 @@ export const update = async (root, args, context: Context) => {
       diskQuota: {type: FieldType.string}
     }
   });
-  attrs.mergeWithData(pick(payload, ['displayName', 'canUseGpu', 'gpuQuota', 'diskQuota']));
+  attrs.mergeWithData(pick(payload, ['displayName', 'canUseGpu', 'gpuQuota', 'cpuQuota', 'diskQuota']));
 
   // update
   await kcAdminClient.groups.update({id: groupId}, {
@@ -159,6 +159,9 @@ export const typeResolvers = {
 
   gpuQuota: async (parent, args, context: Context) =>
     getFromAttr('gpuQuota', parent.attributes, 0, parseFloat),
+
+  cpuQuota: async (parent, args, context: Context) =>
+    getFromAttr('cpuQuota', parent.attributes, 0, parseFloat),
 
   diskQuota: async (parent, args, context: Context) =>
     getFromAttr('diskQuota', parent.attributes, '10GB'),
