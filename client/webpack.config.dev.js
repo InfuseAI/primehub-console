@@ -1,6 +1,18 @@
 const path = require('path');
 const {externals} = require('./webpack.settings');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+// const AntDesignThemePlugin = require('antd-theme-webpack-plugin');
+// const options = {
+//   antDir: path.join(__dirname, './node_modules/antd'),
+//   stylesDir: path.join(__dirname, './src/styles'),
+//   varFile: path.join(__dirname, './src/styles/variables.less'),
+//   mainLessFile: path.join(__dirname, './src/styles/index.less'),
+//   themeVariables: ['@primary-color'],
+//   indexFileName: 'index.html'
+// }
+ 
+// const themePlugin = new AntDesignThemePlugin(options);
 
 module.exports = {
   entry: {
@@ -10,11 +22,11 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'dist'),
     filename: '[name].js',
-    publicPath: 'https://localhost:8090/docs/static/'
+    publicPath: 'https://localhost:8090/'
   },
   devServer: {
     port: "8090",
-    contentBase: path.join(__dirname, 'docs'),
+    contentBase: path.join(__dirname, 'dist'),
     historyApiFallback: true
   },
   resolve: {
@@ -31,6 +43,9 @@ module.exports = {
     moduleExtensions: ['-loader']
   },
   plugins: [
+    new HtmlWebpackPlugin({
+      template: 'docs/index.html'
+    })
   ],
   module: {
     rules: [

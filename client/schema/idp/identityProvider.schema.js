@@ -18,7 +18,7 @@ export default () => (
   >
     <Tabs>
     <Default keyName="idp" title="Identity Provider">
-      <string keyName="alias" title="Alias" disabled layout="horizontal"/>
+      <string keyName="alias" title="Alias" layout="horizontal"/>
       <string keyName="providerId" title="providerId"
         ui="select"
         uiParams={{
@@ -31,9 +31,9 @@ export default () => (
           }]
         }}
       layout="horizontal"/>
-      <string keyName="internalId" title="InternalId" layout="horizontal"/>
+      {/* <string keyName="internalId" title="InternalId" layout="horizontal"/> */}
       <boolean keyName="enabled" title="Enabled" layout="horizontal"/>
-      <string keyName="updateProfileFirstLoginMode" title="Update Profile First Login Mode" layout="horizontal"/>
+      <boolean keyName="updateProfileFirstLoginMode" title="Update Profile First Login Mode" layout="horizontal"/>
       <boolean keyName="trustEmail" title="Trust Email" layout="horizontal"/>
       <boolean keyName="storeToken" title="Store Token" layout="horizontal"/>
       <boolean keyName="addReadTokenRoleOnCreate" title="Add Read Token Role on Create" layout="horizontal"/>

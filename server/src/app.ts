@@ -2,7 +2,11 @@ import Koa from 'koa';
 import { ApolloServer, gql } from 'apollo-server-koa';
 import { importSchema } from 'graphql-import';
 import path from 'path';
-import KcAdminClient from 'keycloak-admin/lib';
+import KcAdminClient from 'keycloak-admin';
+import views from 'koa-views';
+import serve from 'koa-static';
+import Router from 'koa-router';
+
 import CrdClient from './crdClient/crdClientImpl';
 import * as system from './resolvers/system';
 import * as user from './resolvers/user';
@@ -67,6 +71,21 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
 
   // koa
   const app = new Koa() as any;
+  app.use(views(path.join(__dirname, './views'), {
+    extension: 'pug'
+  }));
+  app.use(serve(path.resolve(__dirname, '../../client/dist')));
+
+  // router
+  const rootRouter = new Router();
+  rootRouter.get('/cms', async ctx => {
+    await ctx.render('cms');
+  });
+  rootRouter.get('/cms/*', async ctx => {
+    await ctx.render('cms');
+  });
+
+  app.use(rootRouter.routes());
   server.applyMiddleware({ app });
   return {app, server};
 };

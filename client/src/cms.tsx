@@ -6,6 +6,7 @@ import ContentHeader from 'components/header';
 import Loading from 'components/loading';
 import Error from 'components/error';
 import isPlainObject from 'lodash.isplainobject';
+import firebase from 'firebase';
 
 import styled, {StyledComponentClass} from 'styled-components';
 import color from 'styledShare/color';
@@ -44,6 +45,18 @@ export default class CMSPage extends React.Component<Props, State> {
 
   cms: CMS
 
+  // componentWillMount() {
+  //   const {history, location} = this.props;
+  //   firebase.auth().onAuthStateChanged((user) => {
+  //     if (!user) {
+  //       history.push({
+  //         pathname: "/login",
+  //         state: { from: location }
+  //       })
+  //     }
+  //   })
+  // }
+
   componentDidCatch(error, info) {
     // Display fallback UI
     this.setState({ hasError: true });
@@ -58,11 +71,13 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   deploy = () => {
+    const {match} = this.props;
+    const {activeKey} = match && match.params as any;
     if (this.cms) {
       this.setState({
         deploying: true
       });
-      return this.cms.deploy()
+      return this.cms.deploy(activeKey)
         .then(() => {
           setTimeout(() => {
             this.setState({
@@ -74,6 +89,16 @@ export default class CMSPage extends React.Component<Props, State> {
               placement: 'bottomRight'
             });
           }, 1000)
+        })
+        .catch(() => {
+          this.setState({
+            deploying: false
+          });
+          notification.error({
+            message: 'Something Error!',
+            description: 'Your changes have NOT been saved.',
+            placement: 'bottomRight'
+          });
         });
     }
   }
@@ -130,14 +155,14 @@ export default class CMSPage extends React.Component<Props, State> {
             selectedKeys={[(match.params as any).activeKey]}
             theme="dark"
             mode="inline">
-            <Menu.Item key="__cnr_back">
+            {/* <Menu.Item key="__cnr_back">
               <Icon type="left" />
               Back to dashboard
-            </Menu.Item>
+            </Menu.Item> */}
             {
               Object.keys(schema.schema).map(key => (
                 <Menu.Item key={key}>
-                  {key.toLocaleUpperCase()}
+                  {schema.schema[key].title}
                 </Menu.Item>
               ))
             }
@@ -157,7 +182,7 @@ export default class CMSPage extends React.Component<Props, State> {
           >
             <CMS
               schema={schema}
-              hideButtons={false}
+              hideButtons={true}
               dataDidChange={this.dataDidChange}
               ref={cms => this.cms = cms}
             />

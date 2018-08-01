@@ -2,28 +2,32 @@
 import builder from 'canner-script';
 
 export default () => (
-  <array keyName="machineType" title="MachineType" ui="tableRoute"
+  <array keyName="instanceType" title="Instance Type" ui="tableRoute"
     uiParams={{
       columns: [{
         title: 'Name',
         dataIndex: 'name'
       }, {
-        title: 'Cpu',
-        dataIndex: 'cpu'
+        title: 'Description',
+        dataIndex: 'description'
       }, {
-        title: 'Gpu',
-        dataIndex: 'gpu'
+        title: 'CPU Limit',
+        dataIndex: 'cpuLimit'
       }, {
-        title: 'Memory',
-        dataIndex: 'memory'
+        title: 'GPU Limit',
+        dataIndex: 'gpuLimit'
+      }, {
+        title: 'Memory Limit',
+        dataIndex: 'memoryLimit'
       }]
     }}
   >
     <string keyName="name" title="Name" />
-    <string keyName="cpuLimit" title="CPU Limit" />
+    <string keyName="description" title="Description" />
+    <number keyName="cpuLimit" title="CPU Limit" uiParams={{min: 0}}/>
     <string keyName="memoryLimit" title="Memory Limit" />
-    <number keyName="gpuLimit" title="GPU Limit" />
-    <number keyName="cpuRequest" title="CPU Request" />
+    <number keyName="gpuLimit" title="GPU Limit" uiParams={{min: 0}}/>
+    <number keyName="cpuRequest" title="CPU Request" uiParams={{min: 0}}/>
     <string keyName="memoryRequest" title="Memory Request" />
     <boolean keyName="global" title="Global" />
     <relation keyName="groups" title="Groups"
