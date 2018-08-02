@@ -4,10 +4,15 @@ import fs from 'fs';
 import path from 'path';
 import CustomResource from './customResource';
 
+const inCluster = (process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT);
+
 // initialize k8s client
 const Client = (kubeClient as any).Client;
 const config = (kubeClient as any).config;
-const client = new Client({ config: config.fromKubeconfig(), version: '1.10' });
+const client = new Client({
+  config: inCluster ? config.getInCluster() : config.fromKubeconfig(),
+  version: '1.10'
+});
 
 /**
  * Spec interface
