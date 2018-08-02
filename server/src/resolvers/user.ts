@@ -1,7 +1,7 @@
 import KcAdminClient from 'keycloak-admin';
 import { pick, omit, find, isUndefined, first } from 'lodash';
 import { toRelay, toAttr, mutateRelation } from './utils';
-import { EVERYONE_GROUP_ID, detaultSystemSettings } from './constant';
+import { detaultSystemSettings } from './constant';
 import { Attributes, FieldType } from './attr';
 import { Context } from './interface';
 
@@ -26,7 +26,10 @@ const assignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdmin
     // if realm is not master
     // add client role-mappings: realm-management/realm-admin
     const clients = await kcAdminClient.clients.find();
-    const realmManagementClient = clients.find(client => client.name === 'realm-management');
+    const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
+    if (!realmManagementClient) {
+      return;
+    }
     const role = await kcAdminClient.clients.findRole({
       id: realmManagementClient.id,
       roleName: 'realm-admin'
@@ -59,7 +62,10 @@ const deassignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdm
     // if realm is not master
     // add client role-mappings: realm-management/realm-admin
     const clients = await kcAdminClient.clients.find();
-    const realmManagementClient = clients.find(client => client.name === 'realm-management');
+    const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
+    if (!realmManagementClient) {
+      return;
+    }
     const role = await kcAdminClient.clients.findRole({
       id: realmManagementClient.id,
       roleName: 'realm-admin'
@@ -284,7 +290,12 @@ export const typeResolvers = {
       // if realm is not master
       // check if user has client role-mappings: realm-management/realm-admin
       const clients = await kcAdminClient.clients.find();
-      const realmManagementClient = clients.find(client => client.name === 'realm-management');
+      const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
+
+      if (!realmManagementClient) {
+        return false;
+      }
+
       const clientRoles = await kcAdminClient.users.listClientRoleMappings({
         id: userId,
         clientUniqueId: realmManagementClient.id
@@ -294,12 +305,13 @@ export const typeResolvers = {
   },
 
   personalDiskQuota: async (parent, args, context: Context) => {
+    const everyoneGroupId = context.everyoneGroupId;
     const personalDiskQuota =
       parent.attributes && parent.attributes.personalDiskQuota && parent.attributes.personalDiskQuota[0];
 
     // get defaultUserDiskQuota from system
     if (!personalDiskQuota) {
-      const {attributes} = await context.kcAdminClient.groups.findOne({id: EVERYONE_GROUP_ID});
+      const {attributes} = await context.kcAdminClient.groups.findOne({id: everyoneGroupId});
       const defaultUserDiskQuota =
         attributes && attributes.defaultUserDiskQuota && attributes.defaultUserDiskQuota[0];
       return defaultUserDiskQuota || detaultSystemSettings.defaultUserDiskQuota;

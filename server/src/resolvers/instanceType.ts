@@ -2,7 +2,6 @@ import { Context } from './interface';
 import { Item } from '../crdClient/customResource';
 import { InstanceTypeSpec } from '../crdClient/crdClientImpl';
 import { findResourceInGroup, mutateRelation } from './utils';
-import { EVERYONE_GROUP_ID } from './constant';
 import { Crd } from './crd';
 import { isUndefined } from 'lodash';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
@@ -23,10 +22,11 @@ export const mapping = (item: Item<InstanceTypeSpec>) => {
 
 export const resolveType = {
   global: async (parent, args, context: Context) => {
+    const everyoneGroupId = context.everyoneGroupId;
     // find in everyOne group
     return findResourceInGroup({
       kcAdminClient: context.kcAdminClient,
-      groupId: EVERYONE_GROUP_ID,
+      groupId: everyoneGroupId,
       // id should be same with name
       resourceName: parent.id
     });
@@ -53,10 +53,11 @@ export const mutationMapping = (data: any) => {
 export const onCreate = async (
   {role, resource, data, context}:
   {role: RoleRepresentation, resource: any, data: any, context: Context}) => {
+  const everyoneGroupId = context.everyoneGroupId;
   if (data && data.global) {
     // assign role to everyone
     await context.kcAdminClient.groups.addRealmRoleMappings({
-      id: EVERYONE_GROUP_ID,
+      id: everyoneGroupId,
       roles: [{
         id: role.id,
         name: role.name
@@ -84,12 +85,12 @@ export const onCreate = async (
 export const onUpdate = async (
   {role, resource, data, context}:
   {role: RoleRepresentation, resource: any, data: any, context: Context}) => {
-
+  const everyoneGroupId = context.everyoneGroupId;
   if (data && !isUndefined(data.global)) {
     if (data.global) {
       // assign role to everyone
       await context.kcAdminClient.groups.addRealmRoleMappings({
-        id: EVERYONE_GROUP_ID,
+        id: everyoneGroupId,
         roles: [{
           id: role.id,
           name: role.name
@@ -97,7 +98,7 @@ export const onUpdate = async (
       });
     } else {
       await context.kcAdminClient.groups.delRealmRoleMappings({
-        id: EVERYONE_GROUP_ID,
+        id: everyoneGroupId,
         roles: [{
           id: role.id,
           name: role.name

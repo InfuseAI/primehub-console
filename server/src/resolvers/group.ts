@@ -3,7 +3,6 @@ import { toRelay, getFromAttr, mutateRelation } from './utils';
 import CrdClient from '../crdClient/crdClientImpl';
 import { mapValues, find, pick, first } from 'lodash';
 import { unflatten } from 'flat';
-import { EVERYONE_GROUP_ID } from './constant';
 import { crd as instanceTypeResolver } from './instanceType';
 import { crd as datasetResolver } from './dataset';
 import { crd as imageResolver } from './image';
@@ -125,10 +124,11 @@ export const destroy = async (root, args, context: Context) => {
  * Query
  */
 
-const listQuery = async (kcAdminClient: KcAdminClient, where: any) => {
+const listQuery = async (kcAdminClient: KcAdminClient, where: any, context: Context) => {
   let groups = await kcAdminClient.groups.find();
+  const everyoneGroupId = context.everyoneGroupId;
   // filter out everyone
-  groups = groups.filter(group => group.id !== EVERYONE_GROUP_ID);
+  groups = groups.filter(group => group.id !== everyoneGroupId);
   if (where && where.id) {
     groups = groups.filter(group => group.id === where.id);
   }
@@ -138,11 +138,11 @@ const listQuery = async (kcAdminClient: KcAdminClient, where: any) => {
 };
 
 export const query = async (root, args, context: Context) => {
-  return listQuery(context.kcAdminClient, args && args.where);
+  return listQuery(context.kcAdminClient, args && args.where, context);
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
-  const groups = await listQuery(context.kcAdminClient, args && args.where);
+  const groups = await listQuery(context.kcAdminClient, args && args.where, context);
   return toRelay(groups);
 };
 

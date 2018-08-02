@@ -15,6 +15,9 @@ import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
 
+// config
+import config from './config';
+
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
 
@@ -56,15 +59,19 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
     typeDefs,
     resolvers,
     context: async () => {
-      const kcAdminClient = new KcAdminClient();
+      const kcAdminClient = new KcAdminClient({
+        baseUrl: config.keycloakBaseUrl,
+        realmName: config.keycloakRealmName
+      });
       await kcAdminClient.auth({
-        username: 'wwwy3y3',
-        password: 'wwwy3y3',
+        username: config.keycloakUsername,
+        password: config.keycloakPassword,
+        clientId: config.keycloakClientId,
         grantType: 'password',
-        clientId: 'admin-cli'
       });
       return {
-        realm: 'master',
+        realm: config.keycloakRealmName,
+        everyoneGroupId: config.keycloakEveryoneGroupId,
         kcAdminClient,
         crdClient: new CrdClient()
       };

@@ -1,14 +1,15 @@
 import KcAdminClient from 'keycloak-admin';
 import { mapValues, isEmpty, get } from 'lodash';
 import { unflatten, flatten } from 'flat';
-import { EVERYONE_GROUP_ID, detaultSystemSettings } from './constant';
+import { detaultSystemSettings } from './constant';
 import { Context } from './interface';
 import { parseFromAttr, toAttr } from './utils';
 import { Attributes, FieldType } from './attr';
 
 export const query = async (root, args, context: Context) => {
+  const everyoneGroupId = context.everyoneGroupId;
   const kcAdminClient: KcAdminClient = context.kcAdminClient;
-  const {attributes} = await kcAdminClient.groups.findOne({id: EVERYONE_GROUP_ID});
+  const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});
   if (isEmpty(attributes)) {
     return detaultSystemSettings;
   }
@@ -32,8 +33,9 @@ export const query = async (root, args, context: Context) => {
 };
 
 export const update = async (root, args, context) => {
+  const everyoneGroupId = context.everyoneGroupId;
   const kcAdminClient: KcAdminClient = context.kcAdminClient;
-  const {attributes} = await kcAdminClient.groups.findOne({id: EVERYONE_GROUP_ID});
+  const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});
   const orgName = parseFromAttr('org.name', attributes);
   const orgLogoContentType = parseFromAttr('org.logo.contentType', attributes);
   const orgLogoName = parseFromAttr('org.logo.name', attributes);
@@ -64,7 +66,7 @@ export const update = async (root, args, context) => {
 
   const flatData = flatten(mergedData);
   const attrs = toAttr(flatData);
-  await kcAdminClient.groups.update({id: EVERYONE_GROUP_ID}, {
+  await kcAdminClient.groups.update({id: everyoneGroupId}, {
     attributes: attrs
   });
 
