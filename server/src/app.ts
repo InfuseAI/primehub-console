@@ -68,8 +68,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
         kcAdminClient,
         crdClient: new CrdClient()
       };
-    },
-    // mocks: true
+    }
   });
 
   // koa

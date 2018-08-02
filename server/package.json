@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "NODE_ENV=development ts-node src/bin/www.ts",
-    "start:prod": "node lib/bin/www",
+    "start:lib": "NODE_ENV=development node lib/bin/www",
+    "start:prod": "NODE_ENV=production node lib/bin/www",
     "clean": "rimraf lib",
     "lint": "tslint --force --format verbose \"src/**/*.ts\" \"test/*\"",
     "build": "npm run clean && npm run lint && echo Using TypeScript && tsc --version && tsc -p ./tsconfig.json --pretty",
