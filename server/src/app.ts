@@ -63,12 +63,14 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
         baseUrl: config.keycloakBaseUrl,
         realmName: config.keycloakRealmName
       });
+
       await kcAdminClient.auth({
         username: config.keycloakUsername,
         password: config.keycloakPassword,
         clientId: config.keycloakClientId,
         grantType: 'password',
       });
+
       return {
         realm: config.keycloakRealmName,
         everyoneGroupId: config.keycloakEveryoneGroupId,

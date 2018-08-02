@@ -2229,9 +2229,9 @@ jws@^3.1.5:
     jwa "^1.1.5"
     safe-buffer "^5.0.1"
 
-keycloak-admin@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/keycloak-admin/-/keycloak-admin-1.1.0.tgz#624e8918a0da3ca1900b9b9618f54d251a7695f4"
+keycloak-admin@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/keycloak-admin/-/keycloak-admin-1.2.0.tgz#6e495930860e91e269f434237642059ab9891564"
   dependencies:
     "@types/debug" "^0.0.30"
     axios "^0.18.0"
