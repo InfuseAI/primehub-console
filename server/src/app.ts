@@ -2,7 +2,7 @@ import Koa from 'koa';
 import { ApolloServer, gql } from 'apollo-server-koa';
 import { importSchema } from 'graphql-import';
 import path from 'path';
-import KcAdminClient from 'keycloak-admin';
+import KcAdminClient from 'keycloak-admin/lib';
 import views from 'koa-views';
 import serve from 'koa-static';
 import Router from 'koa-router';
@@ -16,7 +16,7 @@ import { crd as dataset} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
 
 // config
-import config from './config';
+import getConfig from './config';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -55,6 +55,7 @@ const resolvers = {
 };
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {
+  const config = getConfig();
   const server = new ApolloServer({
     typeDefs,
     resolvers,

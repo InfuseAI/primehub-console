@@ -10,15 +10,6 @@ export interface Config {
   keycloakClientId: string;
 }
 
-const envConfigs = pickBy({
-  keycloakBaseUrl: process.env.KC_BASEURL,
-  keycloakRealmName: process.env.KC_REALM,
-  keycloakUsername: process.env.KC_USERNAME,
-  keycloakPassword: process.env.KC_PWD,
-  keycloakEveryoneGroupId: process.env.KC_EVERYONE_GROUP_ID,
-  keycloakClientId: process.env.KC_CLIENT_ID
-});
-
 const defaultConfigs = {
   env: 'development',
   keycloakBaseUrl: 'http://127.0.0.1:8080/auth',
@@ -33,7 +24,16 @@ const prodConfigs = {
   env: 'production'
 };
 
-const getConfig = (): Config => {
+export default (): Config => {
+  const envConfigs = pickBy({
+    keycloakBaseUrl: process.env.KC_BASEURL,
+    keycloakRealmName: process.env.KC_REALM,
+    keycloakUsername: process.env.KC_USERNAME,
+    keycloakPassword: process.env.KC_PWD,
+    keycloakEveryoneGroupId: process.env.KC_EVERYONE_GROUP_ID,
+    keycloakClientId: process.env.KC_CLIENT_ID
+  });
+
   const env = process.env.NODE_ENV || 'development';
   switch (env) {
     case 'production':
@@ -42,5 +42,3 @@ const getConfig = (): Config => {
       return {...defaultConfigs, ...envConfigs};
   }
 };
-
-export default getConfig();

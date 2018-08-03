@@ -1,4 +1,4 @@
-import KcAdminClient from 'keycloak-admin';
+import KcAdminClient from 'keycloak-admin/lib';
 import { pick, omit, find, isUndefined, first } from 'lodash';
 import { toRelay, toAttr, mutateRelation } from './utils';
 import { detaultSystemSettings } from './constant';
@@ -9,7 +9,7 @@ import { Context } from './interface';
  * utils
  */
 
-const assignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdminClient) => {
+export const assignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdminClient) => {
   if (realm === 'master') {
     // add admin role to user
     const role = await kcAdminClient.roles.findOneByName({

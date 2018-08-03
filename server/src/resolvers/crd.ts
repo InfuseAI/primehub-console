@@ -4,7 +4,6 @@ import CustomResource, { Item } from '../crdClient/customResource';
 import pluralize from 'pluralize';
 import { isEmpty, omit } from 'lodash';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
-import config from '../config';
 
 export class Crd<SpecType> {
   private customResourceMethod: string;
@@ -68,7 +67,7 @@ export class Crd<SpecType> {
         // find each role-mappings
         const groupsWithRole = await Promise.all(
           groups
-          .filter(group => group.id !== config.keycloakEveryoneGroupId)
+          .filter(group => group.id !== context.everyoneGroupId)
           .map(async group => {
             const roles = await context.kcAdminClient.groups.listRealmRoleMappings({
               id: group.id
