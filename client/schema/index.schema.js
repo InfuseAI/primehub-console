@@ -8,12 +8,8 @@ import Group from './group.schema';
 import InstanceType from './instanceType.schema';
 import Image from './image.schema';
 import Dataset from './dataset.schema';
-import {GraphqlClient} from "canner-graphql-interface";
+import {graphqlClient} from './utils';
 
-// contruct graphQL client
-const graphqlClient = new GraphqlClient({
-  uri: "/graphql"
-});
 export default (
   <root graphqlClient={process.env.NODE_ENV === 'production' ? graphqlClient : undefined}>
     <System/>

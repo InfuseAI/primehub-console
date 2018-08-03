@@ -26,6 +26,7 @@ export interface Props {
   deploying: boolean;
   hasChanged: boolean;
   deploy: Function;
+  subMenuTitle: any;
 }
 
 export default class HeaderContainer extends React.Component<Props, {}> {
@@ -43,10 +44,10 @@ export default class HeaderContainer extends React.Component<Props, {}> {
     const {
       appUrl,
       deploying,
-      hasChanged
+      hasChanged,
+      subMenuTitle
     } = this.props;
 
-    const user = JSON.parse(localStorage.getItem("cannerUser")) || {};
     const spinIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
     
     return (
@@ -58,7 +59,7 @@ export default class HeaderContainer extends React.Component<Props, {}> {
           onClick={this.headerMenuOnClick}
           selectedKeys={[]}
           >
-          <SubMenu title={<span><Avatar src={user.thumb} style={{marginRight: '10px'}}/>Hi, {user.username}</span>}>
+          <SubMenu title={subMenuTitle}>
             <Menu.Item theme="light" key="logout">
               <ItemContent>
                 <Icon type="poweroff" /> Logout
