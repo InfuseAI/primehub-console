@@ -12,7 +12,7 @@ import {GraphqlClient} from "canner-graphql-interface";
 
 // contruct graphQL client
 const graphqlClient = new GraphqlClient({
-  uri: "http://localhost:3000/graphql"
+  uri: "/graphql"
 });
 export default (
   <root graphqlClient={process.env.NODE_ENV === 'production' ? graphqlClient : undefined}>
