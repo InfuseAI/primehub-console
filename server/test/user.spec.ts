@@ -173,6 +173,20 @@ describe('user graphql', function() {
     expect(data.user).to.deep.include(user);
   });
 
+  it('should query users with where', async () => {
+    const user = this.currentUser;
+    const data = await this.graphqlRequest(`
+    query ($where: UserWhereInput!){
+      users(where: $where) { ${userFields} }
+    }`, {
+      where: {
+        id: user.id
+      }
+    });
+
+    expect(data.users[0]).to.deep.include(user);
+  });
+
   it('should update an user', async () => {
     const user = this.currentUser;
     const updateData = {
