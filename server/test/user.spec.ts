@@ -206,6 +206,96 @@ describe('user graphql', function() {
     expect(query.user).to.deep.include(updateData);
   });
 
+  it('should update an user with isAdmin', async () => {
+    const user = this.currentUser;
+    await this.graphqlRequest(`
+    mutation ($where: UserWhereUniqueInput!, $data: UserUpdateInput!){
+      updateUser(where: $where, data: $data) { ${userFields} }
+    }`, {
+      where: {
+        id: user.id
+      },
+      data: {isAdmin: true}
+    });
+    // query
+    const query = await this.graphqlRequest(`
+    query ($where: UserWhereUniqueInput!){
+      user(where: $where) { ${userFields} }
+    }`, {
+      where: {
+        id: user.id
+      }
+    });
+
+    expect(query.user.isAdmin).to.be.equals(true);
+
+    // update back to false
+    await this.graphqlRequest(`
+    mutation ($where: UserWhereUniqueInput!, $data: UserUpdateInput!){
+      updateUser(where: $where, data: $data) { ${userFields} }
+    }`, {
+      where: {
+        id: user.id
+      },
+      data: {isAdmin: false}
+    });
+    const backQuery = await this.graphqlRequest(`
+    query ($where: UserWhereUniqueInput!){
+      user(where: $where) { ${userFields} }
+    }`, {
+      where: {
+        id: user.id
+      }
+    });
+
+    expect(backQuery.user.isAdmin).to.be.equals(false);
+  });
+
+  it('should update an user with personalDiskQuota', async () => {
+    const user = this.currentUser;
+    await this.graphqlRequest(`
+    mutation ($where: UserWhereUniqueInput!, $data: UserUpdateInput!){
+      updateUser(where: $where, data: $data) { ${userFields} }
+    }`, {
+      where: {
+        id: user.id
+      },
+      data: {personalDiskQuota: '30G'}
+    });
+    // query
+    const query = await this.graphqlRequest(`
+    query ($where: UserWhereUniqueInput!){
+      user(where: $where) { ${userFields} }
+    }`, {
+      where: {
+        id: user.id
+      }
+    });
+
+    expect(query.user.personalDiskQuota).to.be.equals('30G');
+
+    // update back to false
+    await this.graphqlRequest(`
+    mutation ($where: UserWhereUniqueInput!, $data: UserUpdateInput!){
+      updateUser(where: $where, data: $data) { ${userFields} }
+    }`, {
+      where: {
+        id: user.id
+      },
+      data: {personalDiskQuota: '50G'}
+    });
+    const backQuery = await this.graphqlRequest(`
+    query ($where: UserWhereUniqueInput!){
+      user(where: $where) { ${userFields} }
+    }`, {
+      where: {
+        id: user.id
+      }
+    });
+
+    expect(backQuery.user.personalDiskQuota).to.be.equals('50G');
+  });
+
   it('should delete an user', async () => {
     const user = this.currentUser;
     await this.graphqlRequest(`
