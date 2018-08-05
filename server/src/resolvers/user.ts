@@ -106,8 +106,12 @@ export const connectionQuery = async (root, args, context: Context) => {
 export const queryOne = async (root, args, context: Context) => {
   const userId = args.where.id;
   const kcAdminClient = context.kcAdminClient;
-  const user = await kcAdminClient.users.findOne({id: userId});
-  return user;
+  try {
+    const user = await kcAdminClient.users.findOne({id: userId});
+    return user;
+  } catch (e) {
+    return null;
+  }
 };
 
 /**
