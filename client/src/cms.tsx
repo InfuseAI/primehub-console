@@ -1,6 +1,6 @@
 import * as axios from 'axios';
 import * as React from 'react';
-import {Layout, Menu, Icon, notification, Modal} from 'antd';
+import {Layout, Menu, Icon, notification, Modal, Avatar} from 'antd';
 import {CMS, ReactRouterProvider} from 'canner';
 import ContentHeader from 'components/header';
 import Loading from 'components/loading';
@@ -10,7 +10,7 @@ import firebase from 'firebase';
 
 import styled, {StyledComponentClass} from 'styled-components';
 import color from 'styledShare/color';
-import logo from 'images/logo-white-word-alpha.svg';
+import logo from 'images/primehub-logo-w.png';
 import {RouteComponentProps} from 'react-router';
 import schema from '../schema/index.schema.js';
 
@@ -174,7 +174,9 @@ export default class CMSPage extends React.Component<Props, State> {
               appUrl={''}
               deploying={deploying}
               hasChanged={hasChanged}
-              deploy={this.deploy}/>
+              deploy={this.deploy}
+              subMenuTitle={<span><Avatar icon="user" style={{marginRight: '10px'}}/>Hi, </span>}
+            />
           </Header>
           <ReactRouterProvider
             baseUrl="/cms"
