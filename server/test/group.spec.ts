@@ -126,7 +126,18 @@ describe('group graphql', function() {
     expect(data.group).to.be.deep.include(this.currentGroup);
   });
 
-  it('should update a group', async () => {
+  it('should create with name-only and update a group', async () => {
+    const create = await this.graphqlRequest(`
+    mutation($data: GroupCreateInput!){
+      createGroup (data: $data) { ${groupFields} }
+    }`, {
+      data: {
+        name: faker.internet.userName().toLowerCase()
+      }
+    });
+    const groupId = create.createGroup.id;
+
+    // update
     const updated = {
       name: faker.internet.userName().toLowerCase(),
       displayName: faker.internet.userName(),
@@ -139,7 +150,7 @@ describe('group graphql', function() {
     mutation($where: GroupWhereUniqueInput!, $data: GroupUpdateInput!){
       updateGroup (where: $where, data: $data) { ${groupFields} }
     }`, {
-      where: {id: this.currentGroup.id},
+      where: {id: groupId},
       data: updated
     });
 
@@ -148,7 +159,51 @@ describe('group graphql', function() {
     query ($where: GroupWhereUniqueInput!) {
       group (where: $where) { ${groupFields} }
     }`, {
-      where: {id: this.currentGroup.id}
+      where: {id: groupId}
+    });
+
+    expect(data.group).to.be.deep.include(updated);
+  });
+
+  it('should create with all props and update a group', async () => {
+    const create = await this.graphqlRequest(`
+    mutation($data: GroupCreateInput!){
+      createGroup (data: $data) { ${groupFields} }
+    }`, {
+      data: {
+        name: faker.internet.userName().toLowerCase(),
+        displayName: faker.internet.userName(),
+        canUseGpu: true,
+        cpuQuota: 10,
+        gpuQuota: 10,
+        diskQuota: '20GB'
+      }
+    });
+    const groupId = create.createGroup.id;
+
+    // update
+    const updated = {
+      name: faker.internet.userName().toLowerCase(),
+      displayName: faker.internet.userName(),
+      canUseGpu: false,
+      cpuQuota: 20,
+      gpuQuota: 20,
+      diskQuota: '30GB'
+    };
+    await this.graphqlRequest(`
+    mutation($where: GroupWhereUniqueInput!, $data: GroupUpdateInput!){
+      updateGroup (where: $where, data: $data) { ${groupFields} }
+    }`, {
+      where: {id: groupId},
+      data: updated
+    });
+
+    // query
+    const data = await this.graphqlRequest(`
+    query ($where: GroupWhereUniqueInput!) {
+      group (where: $where) { ${groupFields} }
+    }`, {
+      where: {id: groupId}
     });
 
     expect(data.group).to.be.deep.include(updated);
