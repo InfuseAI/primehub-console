@@ -136,8 +136,13 @@ export class Crd<SpecType> {
   private queryOne = async (root, args, context: Context) => {
     const id = args.where.id;
     const customResource = context.crdClient[this.customResourceMethod];
-    const row = await customResource.get(id);
-    return this.propMapping(row);
+    try {
+      const row = await customResource.get(id);
+      return this.propMapping(row);
+    } catch (e) {
+      // if http 404 error
+      return null;
+    }
   }
 
   private queryByGroup = async (parent, args, context: Context) => {
