@@ -22,7 +22,6 @@ export const create = async (root, args, context: Context) => {
   const attrs = new Attributes({
     data: pick(payload, ['displayName', 'canUseGpu', 'gpuQuota', 'cpuQuota', 'diskQuota'])
   });
-
   await kcAdminClient.groups.create({
     name: payload.name,
     attributes: attrs.toKeycloakAttrs()
@@ -30,7 +29,9 @@ export const create = async (root, args, context: Context) => {
 
   // find the group
   const groups = await kcAdminClient.groups.find({search: payload.name});
-  const group = first(groups);
+  const group = await kcAdminClient.groups.findOne({
+    id: first(groups).id
+  });
 
   // add users
   try {
