@@ -2,8 +2,21 @@
  * create new realm
  * with everyGroup and assign to env
  */
-import KcAdminClient from 'keycloak-admin/lib';
+import KcAdminClient from 'keycloak-admin';
+import kubeClient from 'kubernetes-client';
 import faker from 'faker';
+import yaml from 'js-yaml';
+import fs from 'fs';
+import path from 'path';
+import CrdClient from '../src/crdClient/crdClientImpl';
+const crdClient = new CrdClient();
+
+const loadCrd = (name: string) =>
+  yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, `../crd/${name}.spec.yaml`), 'utf8'));
+
+const datasetCrd = loadCrd('dataset');
+const instanceTypeCrd = loadCrd('instance-type');
+const imageCrd = loadCrd('image');
 
 const masterRealmCred = {
   username: 'wwwy3y3',
@@ -11,6 +24,16 @@ const masterRealmCred = {
   grantType: 'password',
   clientId: 'admin-cli'
 };
+
+const inCluster = (process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT);
+
+// initialize k8s client
+const Client = (kubeClient as any).Client;
+const config = (kubeClient as any).config;
+const k8sClient = new Client({
+  config: inCluster ? config.getInCluster() : config.fromKubeconfig(),
+  version: '1.10'
+});
 
 const assignAdmin = async (kcAdminClient: KcAdminClient, realm: string, userId: string) => {
   const clients = await kcAdminClient.clients.find({realm});
@@ -38,6 +61,16 @@ const assignAdmin = async (kcAdminClient: KcAdminClient, realm: string, userId: 
 };
 
 export const createSandbox = async () => {
+  /**
+   * k8s
+   */
+  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: datasetCrd });
+  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: instanceTypeCrd });
+  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: imageCrd });
+
+  /**
+   * Keycloak
+   */
   const client = new KcAdminClient();
 
   // authorize with username/passowrd
@@ -91,6 +124,28 @@ export const createSandbox = async () => {
 };
 
 export const destroySandbox = async () => {
+  /**
+   * k8s
+   */
+  const datasets = await crdClient.datasets.list();
+  await Promise.all(datasets.map(async dataset => {
+    await crdClient.datasets.del(dataset.metadata.name);
+  }));
+  const instanceTypes = await crdClient.instanceTypes.list();
+  await Promise.all(instanceTypes.map(async instanceType => {
+    await crdClient.instanceTypes.del(instanceType.metadata.name);
+  }));
+  const images = await crdClient.images.list();
+  await Promise.all(images.map(async image => {
+    await crdClient.images.del(image.metadata.name);
+  }));
+  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(datasetCrd.metadata.name);
+  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(instanceTypeCrd.metadata.name);
+  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(imageCrd.metadata.name);
+
+  /**
+   * Keycloak
+   */
   const client = new KcAdminClient();
 
   // authorize with username/passowrd

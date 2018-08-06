@@ -10,7 +10,7 @@ export const mapping = (item: Item<DatasetSpec>) => {
     id: item.metadata.name,
     name: item.metadata.name,
     description: item.metadata.description,
-    displayName: item.spec.displayName,
+    displayName: item.spec.displayName || item.metadata.name,
     access: item.spec.access,
     type: item.spec.type,
     url: item.spec.url

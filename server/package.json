@@ -13,8 +13,8 @@
     "build:prod": "npm run clean && echo Using TypeScript && tsc --version && tsc -p ./tsconfig.release.json --pretty && npm run copy:views && npm run copy:graphql",
     "copy:views": "cp -R src/views lib/views",
     "copy:graphql": "cp -R src/graphql lib/graphql",
-    "test": "mocha --compilers ts:ts-node/register --exit --file \"test/setup.ts\"  --recursive \"test/**/*.spec.ts\"",
-    "test:grep": "mocha --compilers ts:ts-node/register --exit --file \"test/setup.ts\" --recursive",
+    "test": "TEST=true mocha --compilers ts:ts-node/register --exit --timeout 10000 --file \"test/setup.ts\"  --recursive \"test/**/*.spec.ts\"",
+    "test:grep": "TEST=true mocha --compilers ts:ts-node/register --exit --timeout 10000 --file \"test/setup.ts\" --recursive",
     "coverage": "nyc npm run test",
     "watch": "npm run build -- --watch",
     "watch:test": "npm run test -- --watch"

@@ -9,7 +9,7 @@ const inCluster = (process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES
 // initialize k8s client
 const Client = (kubeClient as any).Client;
 const config = (kubeClient as any).config;
-const client = new Client({
+export const client = new Client({
   config: inCluster ? config.getInCluster() : config.fromKubeconfig(),
   version: '1.10'
 });
@@ -42,8 +42,9 @@ export interface DatasetSpec {
 /**
  * CRD
  */
+const inTest = process.env.TEST;
 const loadCrd = (filename: string) =>
-  yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, `../../crd/${filename}.yaml`), 'utf8'));
+  yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, `../../crd/${filename}${inTest ? '.spec' : ''}.yaml`), 'utf8'));
 
 export default class CrdClientImpl {
   public instanceTypes = new CustomResource<InstanceTypeSpec>(
