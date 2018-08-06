@@ -118,15 +118,6 @@ export const toAttr = (attributes: Record<string, any>) => {
   return isEmpty(attrs) ? undefined : attrs;
 };
 
-export const findResourceInGroup = async ({
-  kcAdminClient, groupId, resourceName}:
-  {kcAdminClient: KcAdminClient, groupId: string, resourceName: string}): Promise<boolean> => {
-  const roles = await kcAdminClient.groups.listRealmRoleMappings({
-    id: groupId
-  });
-  return Boolean(find(roles, role => role.name.slice(3) === resourceName));
-};
-
 export const mutateRelation = async ({
   resource,
   connect,

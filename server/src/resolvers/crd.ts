@@ -1,8 +1,9 @@
 import { Context } from './interface';
-import { toRelay, paginate, extractPagination, findResourceInGroup } from './utils';
+import { toRelay, paginate, extractPagination } from './utils';
 import CustomResource, { Item } from '../crdClient/customResource';
 import pluralize from 'pluralize';
-import { isEmpty, omit } from 'lodash';
+import { isEmpty, omit, mapValues, find } from 'lodash';
+import KeycloakAdminClient from 'keycloak-admin';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
 
 export class Crd<SpecType> {
@@ -87,6 +88,8 @@ export class Crd<SpecType> {
       return {[typename]: defaultType};
     }
 
+    this.resolveType = mapValues(this.resolveType, resolver => resolver.bind(this));
+
     return {
       [typename]: {...this.resolveType, ...defaultType}
     };
@@ -106,6 +109,13 @@ export class Crd<SpecType> {
       [`update${typename}`]: this.update,
       [`delete${typename}`]: this.destroy
     };
+  }
+
+  public findInGroup = async (groupId: string, resource: string, kcAdminClient: KeycloakAdminClient) => {
+    const roles = await kcAdminClient.groups.listRealmRoleMappings({
+      id: groupId
+    });
+    return Boolean(find(roles, role => role.name.slice(this.getPrefix().length) === resource));
   }
 
   /**

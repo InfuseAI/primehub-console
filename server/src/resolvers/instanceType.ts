@@ -1,7 +1,7 @@
 import { Context } from './interface';
 import { Item } from '../crdClient/customResource';
 import { InstanceTypeSpec } from '../crdClient/crdClientImpl';
-import { findResourceInGroup, mutateRelation } from './utils';
+import { mutateRelation } from './utils';
 import { Crd } from './crd';
 import { isUndefined } from 'lodash';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
@@ -21,15 +21,10 @@ export const mapping = (item: Item<InstanceTypeSpec>) => {
 };
 
 export const resolveType = {
-  global: async (parent, args, context: Context) => {
-    const everyoneGroupId = context.everyoneGroupId;
+  async global(parent, args, context: Context) {
+    const {kcAdminClient, everyoneGroupId} = context;
     // find in everyOne group
-    return findResourceInGroup({
-      kcAdminClient: context.kcAdminClient,
-      groupId: everyoneGroupId,
-      // id should be same with name
-      resourceName: parent.id
-    });
+    return this.findInGroup(everyoneGroupId, parent.id, kcAdminClient);
   }
 };
 
