@@ -2,6 +2,7 @@
 import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
+import KeycloakAdminClient from 'keycloak-admin';
 
 chai.use(chaiHttp);
 
@@ -35,6 +36,7 @@ declare module 'mocha' {
   // tslint:disable-next-line:interface-name
   interface ISuiteCallbackContext {
     graphqlRequest?: (query: string, variables?: any) => Promise<any>;
+    kcAdminClient: KeycloakAdminClient;
     currentUser?: any;
   }
 }
@@ -43,24 +45,15 @@ describe('user graphql', function() {
   this.timeout(5000);
   before(() => {
     this.graphqlRequest = (global as any).graphqlRequest;
+    this.kcAdminClient = (global as any).kcAdminClient;
   });
 
-  it('should expect one admin user when query users', async () => {
+  it('should expect users when query users', async () => {
     const data = await this.graphqlRequest(`{
       users {${userFields}}
     }`);
 
-    const username = process.env.KC_USERNAME;
-    expect(data.users.length).to.be.eql(1);
-    expect(data.users[0]).to.deep.include({
-      username,
-      firstName: null,
-      lastName: null,
-      totp: false,
-      isAdmin: true,
-      enabled: true,
-      groups: []
-    });
+    expect(data.users.length).to.be.least(1);
   });
 
   it('should add an user', async () => {
@@ -82,6 +75,7 @@ describe('user graphql', function() {
       totp: false,
       isAdmin: false,
       enabled: true,
+      personalDiskQuota: 20,
       groups: []
     });
     this.currentUser = data.createUser;
@@ -92,7 +86,7 @@ describe('user graphql', function() {
       username: faker.internet.userName().toLowerCase(),
       firstName: faker.name.firstName(),
       email: faker.internet.email().toLowerCase(),
-      personalDiskQuota: '50G'
+      personalDiskQuota: 50
     };
     const data = await this.graphqlRequest(`
     mutation($data: UserCreateInput!){
@@ -107,7 +101,7 @@ describe('user graphql', function() {
       totp: false,
       isAdmin: false,
       enabled: true,
-      personalDiskQuota: '50G',
+      personalDiskQuota: 50,
       groups: []
     });
 
@@ -122,6 +116,10 @@ describe('user graphql', function() {
     });
 
     expect(query.user).to.deep.include(userData);
+
+    // check in keycloak
+    const user = await this.kcAdminClient.users.findOne({realm: process.env.KC_REALM, id: data.createUser.id});
+    expect(user.attributes.personalDiskQuota[0]).to.be.equals(`${userData.personalDiskQuota}G`);
   });
 
   it('should add an user with isAdmin = true', async () => {
@@ -191,7 +189,8 @@ describe('user graphql', function() {
     const user = this.currentUser;
     const updateData = {
       firstName: faker.name.firstName(),
-      lastName: faker.name.lastName()
+      lastName: faker.name.lastName(),
+      personalDiskQuota: 100
     };
     await this.graphqlRequest(`
     mutation ($where: UserWhereUniqueInput!, $data: UserUpdateInput!){
@@ -218,6 +217,10 @@ describe('user graphql', function() {
     });
 
     expect(query.user).to.deep.include(updateData);
+
+    // check in keycloak
+    const kcUser = await this.kcAdminClient.users.findOne({realm: process.env.KC_REALM, id: user.id});
+    expect(kcUser.attributes.personalDiskQuota[0]).to.be.equals(`${updateData.personalDiskQuota}G`);
   });
 
   it('should update an user with isAdmin', async () => {
@@ -274,7 +277,7 @@ describe('user graphql', function() {
       where: {
         id: user.id
       },
-      data: {personalDiskQuota: '30G'}
+      data: {personalDiskQuota: 30}
     });
     // query
     const query = await this.graphqlRequest(`
@@ -286,7 +289,7 @@ describe('user graphql', function() {
       }
     });
 
-    expect(query.user.personalDiskQuota).to.be.equals('30G');
+    expect(query.user.personalDiskQuota).to.be.equals(30);
 
     // update back to false
     await this.graphqlRequest(`
@@ -296,7 +299,7 @@ describe('user graphql', function() {
       where: {
         id: user.id
       },
-      data: {personalDiskQuota: '50G'}
+      data: {personalDiskQuota: 50}
     });
     const backQuery = await this.graphqlRequest(`
     query ($where: UserWhereUniqueInput!){
@@ -307,7 +310,11 @@ describe('user graphql', function() {
       }
     });
 
-    expect(backQuery.user.personalDiskQuota).to.be.equals('50G');
+    expect(backQuery.user.personalDiskQuota).to.be.equals(50);
+
+    // check in keycloak
+    const kcUser = await this.kcAdminClient.users.findOne({realm: process.env.KC_REALM, id: user.id});
+    expect(kcUser.attributes.personalDiskQuota[0]).to.be.equals('50G');
   });
 
   /**

@@ -1,5 +1,5 @@
 import KcAdminClient from 'keycloak-admin';
-import { toRelay, getFromAttr, mutateRelation } from './utils';
+import { toRelay, getFromAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota } from './utils';
 import CrdClient from '../crdClient/crdClientImpl';
 import { mapValues, find, pick, first } from 'lodash';
 import { unflatten } from 'flat';
@@ -20,7 +20,13 @@ export const create = async (root, args, context: Context) => {
   // displayName, canUseGpu, gpuQuota, diskQuota in attributes
   const payload = args.data;
   const attrs = new Attributes({
-    data: pick(payload, ['displayName', 'canUseGpu', 'gpuQuota', 'cpuQuota', 'diskQuota'])
+    data: pick(payload, ['displayName', 'canUseGpu', 'gpuQuota', 'cpuQuota', 'diskQuota']),
+    schema: {
+      displayName: {type: FieldType.string},
+      canUseGpu: {type: FieldType.boolean},
+      gpuQuota: {type: FieldType.float},
+      diskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
+    }
   });
   await kcAdminClient.groups.create({
     name: payload.name,
@@ -71,7 +77,7 @@ export const update = async (root, args, context: Context) => {
       displayName: {type: FieldType.string},
       canUseGpu: {type: FieldType.boolean},
       gpuQuota: {type: FieldType.float},
-      diskQuota: {type: FieldType.string}
+      diskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
     }
   });
   attrs.mergeWithData(pick(payload, ['displayName', 'canUseGpu', 'gpuQuota', 'cpuQuota', 'diskQuota']));
@@ -165,7 +171,7 @@ export const typeResolvers = {
     getFromAttr('cpuQuota', parent.attributes, 0, parseFloat),
 
   diskQuota: async (parent, args, context: Context) =>
-    getFromAttr('diskQuota', parent.attributes, '10GB'),
+    getFromAttr('diskQuota', parent.attributes, 10, parseDiskQuota),
 
   displayName: async (parent, args, context: Context) =>
     getFromAttr('displayName', parent.attributes, parent.name),

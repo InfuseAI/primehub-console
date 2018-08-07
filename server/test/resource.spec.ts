@@ -1,14 +1,15 @@
 // tslint:disable:no-unused-expression
+/*
 import * as chai from 'chai';
 import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
 import CustomResource from '../src/crdClient/customResource';
-import kubeClient from 'kubernetes-client';
-const Client = (kubeClient as any).Client;
-const config = (kubeClient as any).config;
-const client = new Client({ config: config.fromKubeconfig(), version: '1.9' });
-
+// import kubeClient from 'kubernetes-client';
+// const Client = (kubeClient as any).Client;
+// const config = (kubeClient as any).config;
+// const client = new Client({ config: config.fromKubeconfig(), version: '1.10' });
+const client = (global as any).k8sClient;
 const expect = chai.expect;
 
 // prepare crd json
@@ -94,3 +95,4 @@ describe('Resource', function() {
     await this.currentResource.del('cpu-only');
   });
 });
+*/

@@ -11,7 +11,7 @@ type User {
 	isAdmin: Boolean
 	enabled: Boolean
 	createdTimestamp: Float
-	personalDiskQuota: String
+	personalDiskQuota: Int
   groups: [Group]
 }
 
@@ -57,7 +57,7 @@ input UserCreateInput {
 	isAdmin: Boolean
 	enabled: Boolean
 	createdTimestamp: Float
-	personalDiskQuota: String
+	personalDiskQuota: Int
   groups: GroupCreateManyInput
 }
 
@@ -70,7 +70,7 @@ input UserUpdateInput {
 	isAdmin: Boolean
 	enabled: Boolean
 	createdTimestamp: Float
-	personalDiskQuota: String
+	personalDiskQuota: Int
   groups: GroupUpdateManyInput
 }
 

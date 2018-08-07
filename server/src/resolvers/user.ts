@@ -1,6 +1,6 @@
 import KcAdminClient from 'keycloak-admin';
 import { pick, omit, find, isUndefined, first } from 'lodash';
-import { toRelay, toAttr, mutateRelation } from './utils';
+import { toRelay, toAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota } from './utils';
 import { detaultSystemSettings } from './constant';
 import { Attributes, FieldType } from './attr';
 import { Context } from './interface';
@@ -127,7 +127,7 @@ export const create = async (root, args, context: Context) => {
   const payload = args.data;
   const attrs = new Attributes({
     data: {
-      personalDiskQuota: payload.personalDiskQuota
+      personalDiskQuota: payload.personalDiskQuota ? stringifyDiskQuota(payload.personalDiskQuota) : undefined
     }
   });
 
@@ -192,7 +192,7 @@ export const update = async (root, args, context: Context) => {
   const attrs = new Attributes({
     keycloakAttr: user.attributes,
     schema: {
-      personalDiskQuota: {type: FieldType.string}
+      personalDiskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
     }
   });
   attrs.mergeWithData({
@@ -345,10 +345,10 @@ export const typeResolvers = {
       const {attributes} = await context.kcAdminClient.groups.findOne({id: everyoneGroupId});
       const defaultUserDiskQuota =
         attributes && attributes.defaultUserDiskQuota && attributes.defaultUserDiskQuota[0];
-      return defaultUserDiskQuota || detaultSystemSettings.defaultUserDiskQuota;
+      return parseDiskQuota(defaultUserDiskQuota || detaultSystemSettings.defaultUserDiskQuota);
     }
 
-    return personalDiskQuota;
+    return parseDiskQuota(personalDiskQuota);
   },
 
   groups: async (parent, args, context: Context) => {

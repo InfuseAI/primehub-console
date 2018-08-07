@@ -2,6 +2,8 @@
 import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
+import CrdClient from '../src/crdClient/crdClientImpl';
+import { cleanupInstanceTypes } from './sandbox';
 
 chai.use(chaiHttp);
 
@@ -33,6 +35,7 @@ declare module 'mocha' {
   // tslint:disable-next-line:interface-name
   interface ISuiteCallbackContext {
     graphqlRequest?: (query: string, variables?: any) => Promise<any>;
+    crdClient: CrdClient;
     currentInstanceType?: any;
   }
 }
@@ -40,6 +43,11 @@ declare module 'mocha' {
 describe('instanceType graphql', function() {
   before(() => {
     this.graphqlRequest = (global as any).graphqlRequest;
+    this.crdClient = (global as any).crdClient;
+  });
+
+  after(async () => {
+    await cleanupInstanceTypes();
   });
 
   it('query instanceTypes', async () => {
@@ -104,7 +112,7 @@ describe('instanceType graphql', function() {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
       cpuLimit: 2,
-      memoryLimit: '25M',
+      memoryLimit: 25,
       global: false
     };
     const mutation = await this.graphqlRequest(`
@@ -133,6 +141,10 @@ describe('instanceType graphql', function() {
       groups: [],
       ...data
     });
+
+    // check in k8s
+    const instanceType = await this.crdClient.instanceTypes.get(data.name);
+    expect(instanceType.spec['limits.memory']).to.be.equals('25M');
   });
 
   it('create a instanceType with props and global = true', async () => {
@@ -141,7 +153,7 @@ describe('instanceType graphql', function() {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
       cpuLimit: 2,
-      memoryLimit: '25M',
+      memoryLimit: 25,
       global: true
     };
     const mutation = await this.graphqlRequest(`
@@ -170,6 +182,10 @@ describe('instanceType graphql', function() {
       groups: [],
       ...data
     });
+
+    // check in k8s
+    const instanceType = await this.crdClient.instanceTypes.get(data.name);
+    expect(instanceType.spec['limits.memory']).to.be.equals('25M');
   });
 
   it('should query with where', async () => {
@@ -199,7 +215,7 @@ describe('instanceType graphql', function() {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
       cpuLimit: 2,
-      memoryLimit: '25M'
+      memoryLimit: 25
     };
     const mutation = await this.graphqlRequest(`
     mutation($where: InstanceTypeWhereUniqueInput!, $data: InstanceTypeUpdateInput!){
@@ -220,6 +236,10 @@ describe('instanceType graphql', function() {
     });
 
     expect(queryOne.instanceType).to.deep.include(data);
+
+    // check in k8s
+    const instance = await this.crdClient.instanceTypes.get(instanceType.id);
+    expect(instance.spec['limits.memory']).to.be.equals('25M');
   });
 
   it('should create with props and update', async () => {
@@ -232,7 +252,7 @@ describe('instanceType graphql', function() {
         displayName: faker.internet.userName(),
         description: faker.lorem.sentence(),
         cpuLimit: 2,
-        memoryLimit: '25M'
+        memoryLimit: 25
       }
     });
 
@@ -242,7 +262,7 @@ describe('instanceType graphql', function() {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
       cpuLimit: 5,
-      memoryLimit: '50M'
+      memoryLimit: 50
     };
     const mutation = await this.graphqlRequest(`
     mutation($where: InstanceTypeWhereUniqueInput!, $data: InstanceTypeUpdateInput!){
@@ -263,6 +283,9 @@ describe('instanceType graphql', function() {
     });
 
     expect(queryOne.instanceType).to.deep.include(data);
+    // check in k8s
+    const instance = await this.crdClient.instanceTypes.get(instanceType.id);
+    expect(instance.spec['limits.memory']).to.be.equals('50M');
   });
 
   it('should create with name-only and update global twice', async () => {

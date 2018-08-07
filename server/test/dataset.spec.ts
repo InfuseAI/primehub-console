@@ -2,6 +2,7 @@
 import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
+import { cleanupDatasets } from './sandbox';
 
 chai.use(chaiHttp);
 
@@ -37,6 +38,10 @@ declare module 'mocha' {
 describe('dataset graphql', function() {
   before(() => {
     this.graphqlRequest = (global as any).graphqlRequest;
+  });
+
+  after(async () => {
+    await cleanupDatasets();
   });
 
   it('query datasets', async () => {

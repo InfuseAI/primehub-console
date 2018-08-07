@@ -3,15 +3,14 @@ import { mapValues, isEmpty, get } from 'lodash';
 import { unflatten, flatten } from 'flat';
 import { detaultSystemSettings } from './constant';
 import { Context } from './interface';
-import { parseFromAttr, toAttr } from './utils';
-import { Attributes, FieldType } from './attr';
+import { parseFromAttr, toAttr, parseDiskQuota, stringifyDiskQuota } from './utils';
 
 export const query = async (root, args, context: Context) => {
   const everyoneGroupId = context.everyoneGroupId;
   const kcAdminClient: KcAdminClient = context.kcAdminClient;
   const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});
   if (isEmpty(attributes)) {
-    return detaultSystemSettings;
+    return {...detaultSystemSettings, defaultUserDiskQuota: parseDiskQuota(detaultSystemSettings.defaultUserDiskQuota)};
   }
 
   const flatData = mapValues(attributes, value => {
@@ -28,7 +27,7 @@ export const query = async (root, args, context: Context) => {
         url: get(fetchedData, 'org.logo.url')
       } : detaultSystemSettings.org.logo
     },
-    defaultUserDiskQuota: fetchedData.defaultUserDiskQuota || detaultSystemSettings.defaultUserDiskQuota
+    defaultUserDiskQuota: parseDiskQuota(fetchedData.defaultUserDiskQuota || detaultSystemSettings.defaultUserDiskQuota)
   };
 };
 
@@ -41,7 +40,7 @@ export const update = async (root, args, context) => {
   const orgLogoName = parseFromAttr('org.logo.name', attributes);
   const orgLogoSize = parseFromAttr('org.logo.size', attributes, parseInt);
   const orgLogoUrl = parseFromAttr('org.logo.url', attributes);
-  const defaultUserDiskQuota = parseFromAttr('defaultUserDiskQuota', attributes);
+  const defaultUserDiskQuota = parseFromAttr('defaultUserDiskQuota', attributes, parseDiskQuota);
 
   // merge with payload
   const payload = args.data;
@@ -64,7 +63,13 @@ export const update = async (root, args, context) => {
     defaultUserDiskQuota: payload.defaultUserDiskQuota || defaultUserDiskQuota
   };
 
-  const flatData = flatten(mergedData);
+  const savedToDB = {
+    ...mergedData,
+    defaultUserDiskQuota: mergedData.defaultUserDiskQuota ?
+      stringifyDiskQuota(mergedData.defaultUserDiskQuota) : undefined
+  };
+
+  const flatData = flatten(savedToDB);
   const attrs = toAttr(flatData);
   await kcAdminClient.groups.update({id: everyoneGroupId}, {
     attributes: attrs

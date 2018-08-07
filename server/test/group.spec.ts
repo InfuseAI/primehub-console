@@ -2,6 +2,7 @@
 import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
+import KeycloakAdminClient from 'keycloak-admin';
 
 chai.use(chaiHttp);
 
@@ -35,6 +36,7 @@ declare module 'mocha' {
   // tslint:disable-next-line:interface-name
   interface ISuiteCallbackContext {
     graphqlRequest?: (query: string, variables?: any) => Promise<any>;
+    kcAdminClient: KeycloakAdminClient;
     currentGroup?: any;
   }
 }
@@ -43,6 +45,7 @@ describe('group graphql', function() {
   this.timeout(5000);
   before(() => {
     this.graphqlRequest = (global as any).graphqlRequest;
+    this.kcAdminClient = (global as any).kcAdminClient;
   });
 
   it('should expect empty groups when query', async () => {
@@ -70,7 +73,7 @@ describe('group graphql', function() {
       canUseGpu: false,
       cpuQuota: 0,
       gpuQuota: 0,
-      diskQuota: '10GB',
+      diskQuota: 10,
       users: []
     });
     this.currentGroup = data.createGroup;
@@ -83,7 +86,7 @@ describe('group graphql', function() {
       canUseGpu: true,
       cpuQuota: 10,
       gpuQuota: 10,
-      diskQuota: '20GB'
+      diskQuota: 20
     };
     const data = await this.graphqlRequest(`
     mutation($data: GroupCreateInput!){
@@ -93,6 +96,10 @@ describe('group graphql', function() {
     });
 
     expect(data.createGroup).to.be.deep.include(groupData);
+
+    // check diskQuota save as 20G in keycloak
+    const group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: data.createGroup.id});
+    expect(group.attributes.diskQuota[0]).to.be.equals('20G');
   });
 
   it('should list groups', async () => {
@@ -144,7 +151,7 @@ describe('group graphql', function() {
       canUseGpu: false,
       cpuQuota: 20,
       gpuQuota: 20,
-      diskQuota: '30GB'
+      diskQuota: 30
     };
     await this.graphqlRequest(`
     mutation($where: GroupWhereUniqueInput!, $data: GroupUpdateInput!){
@@ -163,6 +170,10 @@ describe('group graphql', function() {
     });
 
     expect(data.group).to.be.deep.include(updated);
+
+    // check diskQuota save as 30G in keycloak
+    const group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
+    expect(group.attributes.diskQuota[0]).to.be.equals('30G');
   });
 
   it('should create with all props and update a group', async () => {
@@ -176,7 +187,7 @@ describe('group graphql', function() {
         canUseGpu: true,
         cpuQuota: 10,
         gpuQuota: 10,
-        diskQuota: '20GB'
+        diskQuota: 20
       }
     });
     const groupId = create.createGroup.id;
@@ -188,7 +199,7 @@ describe('group graphql', function() {
       canUseGpu: false,
       cpuQuota: 20,
       gpuQuota: 20,
-      diskQuota: '30GB'
+      diskQuota: 30
     };
     await this.graphqlRequest(`
     mutation($where: GroupWhereUniqueInput!, $data: GroupUpdateInput!){
@@ -207,6 +218,10 @@ describe('group graphql', function() {
     });
 
     expect(data.group).to.be.deep.include(updated);
+
+    // check diskQuota save as 30G in keycloak
+    const group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
+    expect(group.attributes.diskQuota[0]).to.be.equals('30G');
   });
 
   it('should delete a group', async () => {

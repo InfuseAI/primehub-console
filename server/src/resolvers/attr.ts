@@ -18,7 +18,9 @@ const transforms = {
 
 export interface SchemaType {
   [key: string]: {
-    type: FieldType,
+    type?: FieldType,
+    serialize?: any,
+    deserialize?: any
   };
 }
 
@@ -70,6 +72,9 @@ export class Attributes {
       if (isUndefined(value) || isNull(value)) {
         return result;
       }
+      if (this.schema && this.schema[key] && this.schema[key].serialize) {
+        value = this.schema[key].serialize(value);
+      }
       result[key] = [value];
       return result;
     }, {});
@@ -83,8 +88,10 @@ export class Attributes {
     }
 
     return mapValues(keycloakAttr, (val, key) => {
-      const transform =
-        (this.schema && this.schema[key] && transforms[this.schema[key].type]) || noop;
+      const typeTransform =
+        (this.schema && this.schema[key] && transforms[this.schema[key].type]);
+      const customTransform = this.schema && this.schema[key] && this.schema[key].deserialize;
+      const transform = customTransform || typeTransform || noop;
       return transform(val[0]);
     });
   }

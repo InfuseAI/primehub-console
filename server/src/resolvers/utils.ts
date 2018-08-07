@@ -139,3 +139,8 @@ export const mutateRelation = async ({
     await Promise.all(resource.disconnect.map(disconnect));
   }
 };
+
+export const stringifyDiskQuota = (quota: number) => `${quota}G`;
+export const parseDiskQuota = (quotaWithUnit: string) => parseInt(quotaWithUnit.slice(0, -1), 10);
+export const stringifyMemory = (mem: number) => `${mem}M`;
+export const parseMemory = (memWithUnit: string) => parseInt(memWithUnit.slice(0, -1), 10);

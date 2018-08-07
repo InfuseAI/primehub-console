@@ -1,6 +1,7 @@
 // tslint:disable:no-unused-expression
 import chai from 'chai';
 import chaiHttp = require('chai-http');
+import KeycloakAdminClient from 'keycloak-admin';
 
 chai.use(chaiHttp);
 
@@ -10,12 +11,14 @@ declare module 'mocha' {
   // tslint:disable-next-line:interface-name
   interface ISuiteCallbackContext {
     graphqlRequest?: (query: string, variables?: any) => Promise<any>;
+    kcAdminClient: KeycloakAdminClient;
   }
 }
 
 describe('system graphql', function() {
   before(() => {
     this.graphqlRequest = (global as any).graphqlRequest;
+    this.kcAdminClient = (global as any).kcAdminClient;
   });
 
   it('should query', async () => {
@@ -40,9 +43,18 @@ describe('system graphql', function() {
           name: 'infuse ai',
           logo: null
         },
-        defaultUserDiskQuota: '20G'
+        defaultUserDiskQuota: 20
       }
     });
+  });
+
+  it('should get user personalDiskQuota from default value', async () => {
+    const query = await this.graphqlRequest(`
+    query {
+      users { id personalDiskQuota}
+    }`);
+
+    expect(query.users[0].personalDiskQuota).to.be.equals(20);
   });
 
   it('should mutate', async () => {
@@ -53,7 +65,7 @@ describe('system graphql', function() {
           url: 'test'
         }
       },
-      defaultUserDiskQuota: '30G'
+      defaultUserDiskQuota: 30
     };
     const data = await this.graphqlRequest(`
     mutation($data: SystemUpdateInput!){
@@ -103,6 +115,12 @@ describe('system graphql', function() {
         defaultUserDiskQuota: delta.defaultUserDiskQuota
       }
     });
+
+    // check in keycloak
+    const group = await this.kcAdminClient.groups.findOne({
+      realm: process.env.KC_REALM, id: process.env.KC_EVERYONE_GROUP_ID
+    });
+    expect(group.attributes.defaultUserDiskQuota[0]).to.be.equals(`${delta.defaultUserDiskQuota}G`);
   });
 
   it('should mutate again', async () => {
@@ -114,7 +132,7 @@ describe('system graphql', function() {
           contentType: 'test',
         }
       },
-      defaultUserDiskQuota: '20G'
+      defaultUserDiskQuota: 20
     };
     const data = await this.graphqlRequest(`
     mutation($data: SystemUpdateInput!){
@@ -165,5 +183,11 @@ describe('system graphql', function() {
         defaultUserDiskQuota: delta.defaultUserDiskQuota
       }
     });
+
+    // check in keycloak
+    const group = await this.kcAdminClient.groups.findOne({
+      realm: process.env.KC_REALM, id: process.env.KC_EVERYONE_GROUP_ID
+    });
+    expect(group.attributes.defaultUserDiskQuota[0]).to.be.equals(`${delta.defaultUserDiskQuota}G`);
   });
 });

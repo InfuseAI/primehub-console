@@ -2,6 +2,7 @@
 import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
+import { cleaupAllCrd } from './sandbox';
 
 chai.use(chaiHttp);
 
@@ -45,6 +46,10 @@ describe('group resource relation graphql', function() {
       });
       return data.createGroup;
     };
+  });
+
+  after(async () => {
+    await cleaupAllCrd();
   });
 
   resources.forEach(resource => {

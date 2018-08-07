@@ -2,6 +2,7 @@
 import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
+import { cleanupImages } from './sandbox';
 
 chai.use(chaiHttp);
 
@@ -36,6 +37,10 @@ declare module 'mocha' {
 describe('image graphql', function() {
   before(() => {
     this.graphqlRequest = (global as any).graphqlRequest;
+  });
+
+  after(async () => {
+    await cleanupImages();
   });
 
   it('query images', async () => {

@@ -1,7 +1,7 @@
 import { Context } from './interface';
 import { Item } from '../crdClient/customResource';
 import { InstanceTypeSpec } from '../crdClient/crdClientImpl';
-import { mutateRelation } from './utils';
+import { mutateRelation, parseMemory, stringifyMemory } from './utils';
 import { Crd } from './crd';
 import { isUndefined } from 'lodash';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
@@ -15,8 +15,8 @@ export const mapping = (item: Item<InstanceTypeSpec>) => {
     cpuLimit: item.spec['limits.cpu'] || 0,
     cpuRequest: item.spec['requests.cpu'] || 0,
     gpuLimit: item.spec['limits.nvidia.com/gpu'] || 0,
-    memoryLimit: item.spec['limits.memory'],
-    memoryRequest: item.spec['requests.memory']
+    memoryLimit: item.spec['limits.memory'] ? parseMemory(item.spec['limits.memory']) : null,
+    memoryRequest: item.spec['requests.memory'] ? parseMemory(item.spec['requests.memory']) : null
   };
 };
 
@@ -37,10 +37,10 @@ export const mutationMapping = (data: any) => {
     spec: {
       'displayName': data.displayName,
       'limits.cpu': data.cpuLimit,
-      'limits.memory': data.memoryLimit,
+      'limits.memory': data.memoryLimit ? stringifyMemory(data.memoryLimit) : undefined,
       'limits.nvidia.com/gpu': data.gpuLimit,
       'requests.cpu': data.cpuRequest,
-      'requests.memory': data.memoryRequest
+      'requests.memory': data.memoryRequest ? stringifyMemory(data.memoryRequest) : undefined
     }
   };
 };

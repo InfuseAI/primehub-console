@@ -9,9 +9,9 @@ type Group {
 	name: String!
   displayName: String
   canUseGpu: Boolean
-  cpuQuota: Float
+  cpuQuota: Int
   gpuQuota: Float
-  diskQuota: String
+  diskQuota: Int
   users: [User]
   instanceTypes: [InstanceType]
   images: [Image]

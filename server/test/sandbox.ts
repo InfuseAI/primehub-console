@@ -10,6 +10,7 @@ import fs from 'fs';
 import path from 'path';
 import CrdClient from '../src/crdClient/crdClientImpl';
 const crdClient = new CrdClient();
+(global as any).crdClient = crdClient;
 
 const loadCrd = (name: string) =>
   yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, `../crd/${name}.spec.yaml`), 'utf8'));
@@ -34,6 +35,7 @@ const k8sClient = new Client({
   config: inCluster ? config.getInCluster() : config.fromKubeconfig(),
   version: '1.10'
 });
+(global as any).k8sClient = k8sClient;
 
 const assignAdmin = async (kcAdminClient: KcAdminClient, realm: string, userId: string) => {
   const clients = await kcAdminClient.clients.find({realm});
@@ -60,6 +62,33 @@ const assignAdmin = async (kcAdminClient: KcAdminClient, realm: string, userId: 
   });
 };
 
+export const cleanupDatasets = async () => {
+  const datasets = await crdClient.datasets.list();
+  await Promise.all(datasets.map(async dataset => {
+    await crdClient.datasets.del(dataset.metadata.name);
+  }));
+};
+
+export const cleanupImages = async () => {
+  const images = await crdClient.images.list();
+  await Promise.all(images.map(async image => {
+    await crdClient.images.del(image.metadata.name);
+  }));
+};
+
+export const cleanupInstanceTypes = async () => {
+  const instanceTypes = await crdClient.instanceTypes.list();
+  await Promise.all(instanceTypes.map(async instanceType => {
+    await crdClient.instanceTypes.del(instanceType.metadata.name);
+  }));
+};
+
+export const cleaupAllCrd = async () => {
+  await cleanupDatasets();
+  await cleanupImages();
+  await cleanupInstanceTypes();
+};
+
 export const createSandbox = async () => {
   /**
    * k8s
@@ -72,6 +101,7 @@ export const createSandbox = async () => {
    * Keycloak
    */
   const client = new KcAdminClient();
+  (global as any).kcAdminClient = client;
 
   // authorize with username/passowrd
   await client.auth(masterRealmCred);
@@ -134,21 +164,16 @@ export const destroySandbox = async () => {
   /**
    * k8s
    */
-  const datasets = await crdClient.datasets.list();
-  await Promise.all(datasets.map(async dataset => {
-    await crdClient.datasets.del(dataset.metadata.name);
-  }));
-  const instanceTypes = await crdClient.instanceTypes.list();
-  await Promise.all(instanceTypes.map(async instanceType => {
-    await crdClient.instanceTypes.del(instanceType.metadata.name);
-  }));
-  const images = await crdClient.images.list();
-  await Promise.all(images.map(async image => {
-    await crdClient.images.del(image.metadata.name);
-  }));
-  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(datasetCrd.metadata.name);
-  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(instanceTypeCrd.metadata.name);
-  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(imageCrd.metadata.name);
+  await cleaupAllCrd();
+
+  try {
+    await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(datasetCrd.metadata.name);
+    await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(instanceTypeCrd.metadata.name);
+    await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(imageCrd.metadata.name);
+  } catch (e) {
+    // tslint:disable-next-line:no-console
+    console.log(e);
+  }
 
   /**
    * Keycloak

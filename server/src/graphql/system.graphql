@@ -7,7 +7,7 @@ type Org {
 
 type System {
   org: Org
-  defaultUserDiskQuota: String
+  defaultUserDiskQuota: Int
 }
 
 input OrgUpdateInput {
@@ -17,5 +17,5 @@ input OrgUpdateInput {
 
 input SystemUpdateInput {
   org: OrgUpdateInput
-  defaultUserDiskQuota: String
+  defaultUserDiskQuota: Int
 }
