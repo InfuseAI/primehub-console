@@ -8,6 +8,9 @@ export default () => (
         title: 'Name',
         dataIndex: 'name'
       }, {
+        title: 'Display Name',
+        dataIndex: 'displayName'
+      }, {
         title: 'Description',
         dataIndex: 'description'
       }, {
@@ -24,6 +27,7 @@ export default () => (
     }}
   >
     <string keyName="name" title="Name" />
+    <string keyName="displayName" title="Display Name" />
     <string keyName="description" title="Description" />
     <number keyName="cpuLimit" title="CPU Limit" uiParams={{min: 0, step: 1, precision: 0}}
       packageName="../src/cms-components/customize-number-precision.js"

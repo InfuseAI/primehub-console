@@ -2,7 +2,7 @@ import React, { PureComponent } from "react";
 import { Tag, Tooltip, Icon, Table } from "antd";
 import template from 'lodash/template';
 import difference from "lodash/difference";
-import Picker from './picker';
+import Picker from '@canner/antd-share-relation';
 import {renderValue} from '@canner/antd-locales';
 
 export default class RelationTable extends PureComponent {

@@ -5,6 +5,9 @@ export default () => (
   <array keyName="group" title="Group" ui="tableRoute"
     uiParams={{
       columns: [{
+        title: 'Name',
+        dataIndex: 'name'
+      }, {
         title: 'Display Name',
         dataIndex: 'displayName'
       }, {

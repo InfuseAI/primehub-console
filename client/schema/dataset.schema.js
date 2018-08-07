@@ -8,12 +8,16 @@ export default () => (
         title: 'Name',
         dataIndex: 'name'
       }, {
+        title: 'Display Name',
+        dataIndex: 'displayName'
+      }, {
         title: 'Description',
         dataIndex: 'description'
       }]
     }}
   >
     <string keyName="name" title="Name" />
+    <string keyName="displayName" title="Display Name" />
     <string keyName="description" title="Description" />
     <string keyName="access" title="Access" ui="select"
       uiParams={{
