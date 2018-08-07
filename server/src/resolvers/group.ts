@@ -178,7 +178,7 @@ export const typeResolvers = {
 
   users: async (parent, args, context: Context) => {
     try {
-      return await context.kcAdminClient.groups.listMembers({
+      return context.kcAdminClient.groups.listMembers({
         id: parent.id
       });
     } catch (err) {
