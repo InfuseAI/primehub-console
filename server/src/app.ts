@@ -93,10 +93,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
   // router
   const rootRouter = new Router();
   rootRouter.get('/cms', async ctx => {
-    await ctx.render('cms');
+    await ctx.render('cms', {title: 'PrimeHub'});
   });
   rootRouter.get('/cms/*', async ctx => {
-    await ctx.render('cms');
+    await ctx.render('cms', {title: 'PrimeHub'});
   });
 
   app.use(rootRouter.routes());

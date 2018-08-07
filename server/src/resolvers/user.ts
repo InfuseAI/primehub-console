@@ -136,7 +136,8 @@ export const create = async (root, args, context: Context) => {
     email: payload.email,
     firstName: payload.firstName,
     lastName: payload.lastName,
-    enabled: isUndefined(payload.enabled) ? true : payload.enabled,
+    // force enabled to true
+    enabled: true,
     attributes: attrs.toKeycloakAttrs()
   });
 
@@ -353,9 +354,12 @@ export const typeResolvers = {
 
   groups: async (parent, args, context: Context) => {
     try {
-      return context.kcAdminClient.users.listGroups({
+      const groups = await context.kcAdminClient.users.listGroups({
         id: parent.id
       });
+      return Promise.all(groups.map(async group => {
+        return context.kcAdminClient.groups.findOne({id: group.id});
+      }));
     } catch (err) {
       return [];
     }

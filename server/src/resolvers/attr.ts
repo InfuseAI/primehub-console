@@ -10,7 +10,7 @@ export enum FieldType {
 }
 
 const transforms = {
-  [FieldType.string]: toString,
+  [FieldType.string]: v => v.toString(),
   [FieldType.boolean]: v => v === 'true',
   [FieldType.float]: parseFloat,
   [FieldType.integer]: parseInt
