@@ -8,7 +8,10 @@ export default () => (
         <string keyName="name" title="Name"/>
         <image keyName="logo" title="Logo"/>
       </object>
-      <string keyName="defaultUserDiskQuota" title="Default User Disk Quota"/>
+      <number keyName="defaultUserDiskQuota" title="Default User Disk Quota"
+         uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
+         packageName="../src/cms-components/customize-number-precision"
+      />
     </Block>
   </object>
 )

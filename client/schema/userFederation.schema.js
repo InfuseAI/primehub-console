@@ -41,7 +41,9 @@ export default () => (
       <Tabs keyName="ldap">
         <Default keyName="requiredSettings" title="Required Settings">
           <boolean keyName="enabled" title="Enabled"  layout="horizontal"/>
-          <number keyName="priority" title="Priority"  layout="horizontal"/>
+          <number keyName="priority" title="Priority"  layout="horizontal" uiParams={{precision: 0, step: 1}}
+            packageName="../src/cms-components/customize-number-precision"
+          />
           <boolean keyName="importEnabled" title="Import Users"  layout="horizontal"/>
           <boolean keyName="syncRegistrations" title="Sync Registrations"  layout="horizontal"/>
           <string keyName="vendor" title="Vendor"

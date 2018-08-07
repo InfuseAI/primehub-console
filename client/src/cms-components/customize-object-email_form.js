@@ -8,7 +8,7 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 
 const SEND_EMAIL = gql`
-  mutation SendEmail($id: string, $resetActions: string, $expiresIn: number) {
+  mutation SendEmail($id: string, $resetActions: array, $expiresIn: number) {
     sendEmail(id: $id, resetActions: $resetActions, expiresIn: $expiresIn) {
       id
     }
@@ -59,7 +59,9 @@ export default class EmailForm extends React.Component {
                   required: true, message: 'Please select an action.'
                 }]
               })(
-                <Select>
+                <Select
+                  mode="multiple"
+                >
                   <Option value="VERIFY_EMAIL">Verify Email</Option>
                   <Option value="UPDATE_PROFILE">Update Profile</Option>
                   <Option value="CONFIGURE_TOTP">Configure OTP</Option>

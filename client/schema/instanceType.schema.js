@@ -18,17 +18,28 @@ export default () => (
         dataIndex: 'gpuLimit'
       }, {
         title: 'Memory Limit',
-        dataIndex: 'memoryLimit'
+        dataIndex: 'memoryLimit',
+        render: text => `${text} MB`
       }]
     }}
   >
     <string keyName="name" title="Name" />
     <string keyName="description" title="Description" />
-    <number keyName="cpuLimit" title="CPU Limit" uiParams={{min: 0}}/>
-    <string keyName="memoryLimit" title="Memory Limit" />
-    <number keyName="gpuLimit" title="GPU Limit" uiParams={{min: 0}}/>
-    <number keyName="cpuRequest" title="CPU Request" uiParams={{min: 0}}/>
-    <string keyName="memoryRequest" title="Memory Request" />
+    <number keyName="cpuLimit" title="CPU Limit" uiParams={{min: 0, step: 1, precision: 0}}
+      packageName="../src/cms-components/customize-number-precision.js"
+    />
+    <number keyName="memoryLimit" title="Memory Limit"
+      uiParams={{unit: ' MB', step: 1, min: 0, precision: 1}}
+      packageName="../src/cms-components/customize-number-precision"
+    />
+    <number keyName="gpuLimit" title="GPU Limit" uiParams={{min: 0, precision: 1}}/>
+    <number keyName="cpuRequest" title="CPU Request" uiParams={{min: 0, step: 1, precision: 0}}
+      packageName="../src/cms-components/customize-number-precision.js"
+    />
+    <number keyName="memoryRequest" title="Memory Request"
+      uiParams={{unit: ' MB', step: 1, min: 0, precision: 1}}
+      packageName="../src/cms-components/customize-number-precision"
+    />
     <boolean keyName="global" title="Global" />
     <relation keyName="groups" title="Groups"
       packageName='../src/cms-components/customize-relation-table'
