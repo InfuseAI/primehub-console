@@ -3246,9 +3246,9 @@ canner-script@^1.2.1:
     object-path "^0.11.4"
     safer-eval "^1.2.3"
 
-canner@^1.4.6:
-  version "1.4.6"
-  resolved "https://registry.yarnpkg.com/canner/-/canner-1.4.6.tgz#5e3417769a71c082e1bc744d419e360d137e2687"
+canner@^1.4.7:
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/canner/-/canner-1.4.7.tgz#09292e6efa39d28745921f7a219860435dfc0101"
   dependencies:
     ajv "^6.5.2"
     apollo-boost "^0.1.4"
