@@ -61,8 +61,24 @@ export default () => (
   <array keyName="user" title="User" ui="tableRoute"
     uiParams={{
       columns: [{
-        title: 'username',
+        title: 'Username',
         dataIndex: 'username'
+      }, {
+        title: 'Email',
+        dataIndex: 'email'
+      }, {
+        title: 'Name',
+        dataIndex: 'firstName',
+        render: (text, record) => `${text} ${record.lastName}`
+      }, {
+        title: 'Enabled',
+        dataIndex: 'enabled'
+      }, {
+        title: 'Admin',
+        dataIndex: 'isAdmin'
+      }, {
+        title: 'Totp',
+        dataIndex: 'totp'
       }],
     }}
     storage={storage}
@@ -83,7 +99,9 @@ export default () => (
         <boolean keyName="isAdmin" title="IsAdmin" />
         <boolean keyName="enabled" title="Enabled" />
         {/* <number keyName="createdTimestamp" title="CreatedTimestamp" /> */}
-        <string keyName="personalDiskQuota" title="PersonalDiskQuota" />
+        <number keyName="personalDiskQuota" title="PersonalDiskQuota" uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
+          packageName="../src/cms-components/customize-number-precision"
+        />
         <relation keyName="groups" title="Groups"
           packageName='../src/cms-components/customize-relation-table'
           relation={{

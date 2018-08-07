@@ -13,8 +13,8 @@ import {graphqlClient} from './utils';
 export default (
   <root graphqlClient={process.env.NODE_ENV === 'production' ? graphqlClient : undefined}>
     <System/>
-    <Idp/>
-    <UserFederation/>
+    {/* <Idp/> */}
+    {/* <UserFederation/> */}
     <User/>
     <Group/>
     <InstanceType/>
