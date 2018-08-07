@@ -1,7 +1,7 @@
 import * as axios from 'axios';
 import * as React from 'react';
 import {Layout, Menu, Icon, notification, Modal, Avatar} from 'antd';
-import {CMS, ReactRouterProvider} from 'canner';
+import CMS, {ReactRouterProvider} from 'canner';
 import ContentHeader from 'components/header';
 import Loading from 'components/loading';
 import Error from 'components/error';
