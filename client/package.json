@@ -99,7 +99,7 @@
     "@types/react-router-dom": "^4.2.6",
     "antd": "3.6.6",
     "axios": "^0.18.0",
-    "canner": "^1.4.6",
+    "canner": "^1.4.7",
     "canner-helpers": "^0.1.16",
     "gulp": "^3.9.1",
     "gulp-s3": "^0.11.0",
