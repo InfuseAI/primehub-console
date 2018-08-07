@@ -121,6 +121,13 @@ describe('system graphql', function() {
       realm: process.env.KC_REALM, id: process.env.KC_EVERYONE_GROUP_ID
     });
     expect(group.attributes.defaultUserDiskQuota[0]).to.be.equals(`${delta.defaultUserDiskQuota}G`);
+    // should update to realm
+    const realm = await this.kcAdminClient.realms.findOne({
+      realm: process.env.KC_REALM
+    });
+    expect(realm.displayName).to.be.equals(delta.org.name);
+    // tslint:disable-next-line:max-line-length
+    expect(realm.displayNameHtml).to.be.equals(`<img src="${delta.org.logo.url}" alt="${delta.org.name}" width="500" >`);
   });
 
   it('should mutate again', async () => {
