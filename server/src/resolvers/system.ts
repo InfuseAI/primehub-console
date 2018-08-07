@@ -75,5 +75,16 @@ export const update = async (root, args, context) => {
     attributes: attrs
   });
 
+  // update to realm displayName and displayNameHtml
+  if (get(payload, 'org.logo.url') || get(payload, 'org.name')) {
+    await kcAdminClient.realms.update({realm: context.realm}, {
+      displayName: get(payload, 'org.name'),
+      displayNameHtml: get(payload, 'org.logo.url') ?
+        // tslint:disable-next-line:max-line-length
+        `<img src="${get(payload, 'org.logo.url')}" alt="${get(payload, 'org.name') ? get(payload, 'org.name') : ''}" width="500" >` :
+        undefined
+    });
+  }
+
   return mergedData;
 };
