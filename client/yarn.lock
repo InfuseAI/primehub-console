@@ -1178,10 +1178,6 @@
     "@canner/antd-locales" "^0.3.0"
     moment-timezone "^0.5.14"
 
-"@canner/customize-string-input@^0.1.18":
-  version "0.1.18"
-  resolved "https://registry.yarnpkg.com/@canner/customize-string-input/-/customize-string-input-0.1.18.tgz#b5b8246f0af2d567adab693d34eea42a33b6dad0"
-
 "@canner/image-service-config@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@canner/image-service-config/-/image-service-config-0.3.0.tgz#e6a7ba9c783701115c7bd57fb8c4a56eddc03de8"
@@ -3250,9 +3246,9 @@ canner-script@^1.2.1:
     object-path "^0.11.4"
     safer-eval "^1.2.3"
 
-canner@^1.4.4:
-  version "1.4.4"
-  resolved "https://registry.yarnpkg.com/canner/-/canner-1.4.4.tgz#5371acc60f85ee4d9c062a7eb8abf1e202a171bd"
+canner@^1.4.6:
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/canner/-/canner-1.4.6.tgz#5e3417769a71c082e1bc744d419e360d137e2687"
   dependencies:
     ajv "^6.5.2"
     apollo-boost "^0.1.4"

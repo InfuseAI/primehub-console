@@ -106,7 +106,7 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              publicPath: 'https://cdn.canner.io/cms-page/'
+              publicPath: '/'
             }
           }
         ]
