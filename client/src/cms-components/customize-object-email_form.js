@@ -8,7 +8,7 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 
 const SEND_EMAIL = gql`
-  mutation SendEmail($id: string, $resetActions: array, $expiresIn: number) {
+  mutation SendEmail($id: String, $resetActions: [String], $expiresIn: Int) {
     sendEmail(id: $id, resetActions: $resetActions, expiresIn: $expiresIn) {
       id
     }

@@ -7,7 +7,7 @@ import styled from 'styled-components';
 const FormItem = Form.Item;
 
 const SETUP_PASSWORD = gql`
-  mutation ResetPassword($id: string, $password: string, $temporary: boolean) {
+  mutation ResetPassword($id: String, $password: String, $temporary: Boolean) {
     resetPassword(id: $id, password: $password, temporary: $temporary) {
       id
     }
