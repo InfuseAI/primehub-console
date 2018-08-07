@@ -310,6 +310,38 @@ describe('user graphql', function() {
     expect(backQuery.user.personalDiskQuota).to.be.equals('50G');
   });
 
+  /**
+   * mutation
+   */
+  it('should send email', async () => {
+    const user = this.currentUser;
+    await this.graphqlRequest(`
+    mutation ($id: String, $resetActions: [String], $expiresIn: Int) {
+      sendEmail(id: $id, resetActions: $resetActions, expiresIn: $expiresIn) {
+        id
+      }
+    }`, {
+      id: user.id,
+      expiresIn: 19260,
+      resetActions: ['VERIFY_EMAIL']
+    });
+  });
+
+  it('should reset password', async () => {
+    const user = this.currentUser;
+    await this.graphqlRequest(`
+    mutation ($id: String, $password: String, $temporary: Boolean) {
+      resetPassword(id: $id, password: $password, temporary: $temporary) {
+        id
+        __typename
+      }
+    }`, {
+      id: user.id,
+      password: 'password',
+      temporary: false
+    });
+  });
+
   it('should delete an user', async () => {
     const user = this.currentUser;
     await this.graphqlRequest(`

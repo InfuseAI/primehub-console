@@ -1,4 +1,4 @@
-import KcAdminClient from 'keycloak-admin/lib';
+import KcAdminClient from 'keycloak-admin';
 import { pick, omit, find, isUndefined, first } from 'lodash';
 import { toRelay, toAttr, mutateRelation } from './utils';
 import { detaultSystemSettings } from './constant';
@@ -272,6 +272,33 @@ export const destroy = async (root, args, context: Context) => {
     id: userId
   });
   return user;
+};
+
+/**
+ * Mutation
+ */
+
+export const sendEmail = async (root, args, context: Context) => {
+  const {id, resetActions, expiresIn}: {id: string, resetActions: any[], expiresIn: number} = args;
+  await context.kcAdminClient.users.executeActionsEmail({
+    id,
+    lifespan: expiresIn,
+    actions: resetActions
+  });
+  return {id};
+};
+
+export const resetPassword = async (root, args, context: Context) => {
+  const {id, password, temporary}: {id: string, password: string, temporary: boolean} = args;
+  await context.kcAdminClient.users.resetPassword({
+    id,
+    credential: {
+      type: 'password',
+      temporary,
+      value: password
+    }
+  });
+  return {id};
 };
 
 /**

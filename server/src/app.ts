@@ -40,6 +40,8 @@ const resolvers = {
     createUser: user.create,
     updateUser: user.update,
     deleteUser: user.destroy,
+    sendEmail: user.sendEmail,
+    resetPassword: user.resetPassword,
     createGroup: group.create,
     updateGroup: group.update,
     deleteGroup: group.destroy,

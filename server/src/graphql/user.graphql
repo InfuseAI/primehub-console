@@ -32,6 +32,13 @@ type UserConnection {
   edges: [UserEdge]!
 }
 
+"""User response"""
+type UserActionResponse {
+	id: String
+}
+
+"""Input"""
+
 input UserWhereUniqueInput {
   id: ID!
 }

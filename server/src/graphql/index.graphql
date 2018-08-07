@@ -1,5 +1,5 @@
 # import System, SystemUpdateInput from "./system.graphql"
-# import User, UserConnection, UserWhereInput, UserWhereUniqueInput, UserCreateInput, UserUpdateInput from "./user.graphql"
+# import User, UserConnection, UserWhereInput, UserWhereUniqueInput, UserCreateInput, UserUpdateInput, UserActionResponse from "./user.graphql"
 # import Group, GroupConnection, GroupWhereInput, GroupWhereUniqueInput, GroupCreateInput, GroupUpdateInput from "./group.graphql"
 # import InstanceType, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput, InstanceTypeCreateInput, InstanceTypeUpdateInput from "./instanceType.graphql"
 # import Image, ImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput from "./image.graphql"
@@ -103,6 +103,10 @@ type Mutation {
   createUser(data: UserCreateInput!): User!
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   deleteUser(where: UserWhereUniqueInput!): User
+
+  """User mutation"""
+  sendEmail(id: String, resetActions: [String], expiresIn: Int): UserActionResponse
+  resetPassword(id: String, password: String, temporary: Boolean): UserActionResponse
 
   """Group"""
   createGroup(data: GroupCreateInput!): Group!

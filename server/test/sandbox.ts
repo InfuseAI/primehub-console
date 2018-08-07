@@ -81,7 +81,14 @@ export const createSandbox = async () => {
   await client.realms.create({
     id: realmId,
     realm: realmId,
-    enabled: true
+    enabled: true,
+    smtpServer: {
+      auth: true,
+      from: '0830021730-07fb21@inbox.mailtrap.io',
+      host: 'smtp.mailtrap.io',
+      user: process.env.SMTP_USER,
+      password: process.env.SMTP_PWD
+    }
   });
 
   // create a group
