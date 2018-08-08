@@ -29,15 +29,17 @@ export default () => (
     <string keyName="name" title="Name" />
     <string keyName="displayName" title="Display Name" />
     <string keyName="description" title="Description" />
-    <number keyName="cpuLimit" title="CPU Limit" uiParams={{min: 0, step: 1, precision: 0}}
+    <number keyName="cpuLimit" title="CPU Limit" uiParams={{min: 0, step: 1, precision: 1}}
       packageName="../src/cms-components/customize-number-precision.js"
     />
     <number keyName="memoryLimit" title="Memory Limit"
       uiParams={{unit: ' MB', step: 1, min: 0, precision: 1}}
       packageName="../src/cms-components/customize-number-precision"
     />
-    <number keyName="gpuLimit" title="GPU Limit" uiParams={{min: 0, precision: 1}}/>
-    <number keyName="cpuRequest" title="CPU Request" uiParams={{min: 0, step: 1, precision: 0}}
+    <number keyName="gpuLimit" title="GPU Limit" uiParams={{min: 0, precision: 0, step: 1}}
+      packageName="../src/cms-components/customize-number-precision.js"
+    />
+    <number keyName="cpuRequest" title="CPU Request" uiParams={{min: 0, step: 1, precision: 1}}
       packageName="../src/cms-components/customize-number-precision.js"
     />
     <number keyName="memoryRequest" title="Memory Request"

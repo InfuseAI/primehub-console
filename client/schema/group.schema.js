@@ -42,11 +42,13 @@ export default () => (
     />
     <string keyName="displayName" title="DisplayName" />
     <boolean keyName="canUseGpu" title="CanUseGpu" />
-    <number keyName="cpuQuota"
-      title="CpuQuota" uiParams={{min: 0, step: 1, precision: 0}}
+    <number keyName="cpuQuota" uiParams={{min: 0, precision: 1}}
+      title="CpuQuota"
       packageName="../src/cms-components/customize-number-precision.js"
     />
-    <number keyName="gpuQuota" title="GpuQuota" uiParams={{min: 0, precision: 1}} />
+    <number keyName="gpuQuota" title="GpuQuota"  uiParams={{min: 0, step: 1, precision: 0}}
+      packageName="../src/cms-components/customize-number-precision.js"
+    />
     <number keyName="diskQuota" title="DiskQuota"
       uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
       packageName="../src/cms-components/customize-number-precision"

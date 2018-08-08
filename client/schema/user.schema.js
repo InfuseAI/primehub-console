@@ -21,13 +21,14 @@ configure({
             keyName: '__1',
             childrenName: [],
             title: 'Send Email',
-            component: Layouts.block,
+            component: Layouts.default,
             children: [{
               type: 'object',
               nodeType: 'plugins.object',
               keyName: '__1',
               path: 'user/__1',
               pattern: 'array.object',
+              controlDeployAndResetButtons: true,
               loader: import('../src/cms-components/customize-object-email_form')
             }],
             hocs: ['containerRouter'],
@@ -37,7 +38,7 @@ configure({
             name: '__2',
             keyName: '__2',
             childrenName: [],
-            component: Layouts.block,
+            component: Layouts.default,
             title: 'Reset Password',
             children: [{
               type: 'object',
@@ -45,6 +46,7 @@ configure({
               keyName: '__2',
               path: 'user/__2',
               pattern: 'array.object',
+              controlDeployAndResetButtons: true,
               loader: import('../src/cms-components/customize-object-password_form')
             }],
             hocs: ['containerRouter'],
@@ -83,10 +85,10 @@ export default () => (
     }}
     storage={storage}
   >
-    
-    <Layout component={CustomizeBlock} disabledKeysInCreate={['__1', '__2']}>
+    <Layout component={Tab} disabledKeysInCreate={['__1', '__2']}>
+    {/* <Layout component={CustomizeBlock} disabledKeysInCreate={['__1', '__2']}> */}
     {/* <image keyName="thumbnail" title="Thumbnail" disabled /> */}
-    <Block title="Basic Info">
+    <Default title="Basic Info">
       <string keyName="username" title="Username"
         validation={{pattern: '^[a-z0-9_]+$'}}
         required
@@ -137,12 +139,12 @@ export default () => (
           </toolbar>
         </relation>
       </Layout>
-    </Block>
+    </Default>
     {/* <Layout component={HideInCreate} keyName="__1" title="Send Email">
-      <object packageName="../src/cms-components/customize-object-email_form"/>
+      <object keyName="__1" packageName="../src/cms-components/customize-object-email_form"/>
     </Layout>
     <Layout component={HideInCreate} keyName="__2"  title="Reset Password">
-      <object packageName="../src/cms-components/customize-object-password_form"/>
+      <object keyName="__2" packageName="../src/cms-components/customize-object-password_form"/>
     </Layout> */}
 
     </Layout>
