@@ -60,7 +60,9 @@ configure({
 })
 
 export default () => (
-  <array keyName="user" title="User" ui="tableRoute"
+  <array keyName="user" title="User"
+    controlDeployAndResetButtons={true}
+    packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
         title: 'Username',

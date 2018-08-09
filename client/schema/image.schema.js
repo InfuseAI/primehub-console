@@ -2,7 +2,10 @@
 import builder from 'canner-script';
 
 export default () => (
-  <array keyName="image" title="Image" ui="tableRoute"
+  <array keyName="image" title="Image"
+    cannerDataType="array"
+    controlDeployAndResetButtons={true}
+    packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
         title: 'Name',

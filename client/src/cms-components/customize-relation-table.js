@@ -58,9 +58,10 @@ export default class RelationTable extends PureComponent {
     } = this.props;
     value = value && value.toJS ? value.toJS() : [];
     const newColumnsRender = renderValue(uiParams.columns, schema[relation.to].items.items);
+    console.log(rootValue, refId);
     const recordValue = getRecordValue(rootValue, refId);
     // hack
-    const isHidden = uiParams.isHidden ? uiParams.isHidden(recordValue.toJS()) : false;
+    const isHidden = uiParams.isHidden ? uiParams.isHidden(recordValue && recordValue.toJS()) : false;
     if (isHidden) {
       return null;
     }

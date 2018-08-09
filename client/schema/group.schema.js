@@ -2,7 +2,9 @@
 import builder from 'canner-script';
 import {renderRelationField} from './utils';
 export default () => (
-  <array keyName="group" title="Group" ui="tableRoute"
+  <array keyName="group" title="Group"
+    controlDeployAndResetButtons={true}
+    packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
         title: 'Name',
