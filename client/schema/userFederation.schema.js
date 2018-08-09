@@ -4,6 +4,7 @@ import builder, {Block, Default, Tabs} from 'canner-script';
 export default () => (
   <array keyName="userFederations" title="User Federations"
     controlDeployAndResetButtons={true}
+    cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{

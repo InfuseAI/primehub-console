@@ -4,6 +4,7 @@ import {renderRelationField} from './utils';
 export default () => (
   <array keyName="group" title="Group"
     controlDeployAndResetButtons={true}
+    cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{

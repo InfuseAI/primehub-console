@@ -5,6 +5,7 @@ export default () => (
   <array keyName="image" title="Image"
     cannerDataType="array"
     controlDeployAndResetButtons={true}
+    cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{

@@ -37,7 +37,7 @@ export default class ArrayBreadcrumb extends Component {
       okType: 'danger',
       onOk() {
         onChange(refId.child(index), 'delete').then(() => {
-          deploy(refId.getPathArr()[0], value.get([index, 'id']));
+          deploy(refId.getPathArr()[0], value[index].id);
         });
       }
     });
@@ -104,7 +104,7 @@ export default class ArrayBreadcrumb extends Component {
         )}
         <Table
           pagination={showPagination}
-          dataSource={value.toJS().map((datum, i) => {
+          dataSource={value.map((datum, i) => {
             return {...datum, __index: i, key: datum.key || i};
           })}
           columns={newColumnsRender}

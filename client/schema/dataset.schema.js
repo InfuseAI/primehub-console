@@ -4,6 +4,7 @@ import builder from 'canner-script';
 export default () => (
   <array keyName="dataset" title="Dataset"
     controlDeployAndResetButtons={true}
+    cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{

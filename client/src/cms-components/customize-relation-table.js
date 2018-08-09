@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 import { Tag, Tooltip, Icon, Table } from "antd";
 import template from 'lodash/template';
 import difference from "lodash/difference";
+import get from 'lodash/get';
 import Picker from '@canner/antd-share-relation';
 import {renderValue} from '@canner/antd-locales';
 
@@ -25,16 +26,14 @@ export default class RelationTable extends PureComponent {
   }
 
   handleOk = (queue, originData) => {
-    let {onChange, refId, value} = this.props;
-    value = value && value.toJS ? value.toJS() : [];
-    queue = queue.toJS();
+    let {onChange, refId, value = []} = this.props;
     // $FlowFixMe
     const currentIds = value.map(v => v.id);
 
     const idsShouldCreate = difference(queue, currentIds);
     const idsShouldRemove = difference(currentIds, queue);
-    const createActions = idsShouldCreate.map(id => ({refId, type: "connect", value: originData.find(data => data.get('id') === id)}));
-    const delActions = idsShouldRemove.map(id => ({refId, type: "disconnect", value: originData.find(data => data.get('id') === id)}));
+    const createActions = idsShouldCreate.map(id => ({refId, type: "connect", value: originData.find(data => data.id === id)}));
+    const delActions = idsShouldRemove.map(id => ({refId, type: "disconnect", value: originData.find(data => data.id === id)}));
     onChange([...createActions, ...delActions]);
     this.handleCancel();
   }
@@ -47,21 +46,19 @@ export default class RelationTable extends PureComponent {
 
   handleClose = (index) => {
     const {onChange, refId, value} = this.props;
-    onChange(refId, 'disconnect', value.get(index));
+    onChange(refId, 'disconnect', value[index]);
   }
 
   render() {
     const { modalVisible } = this.state;
-    let { disabled, value, uiParams = {}, refId, relation,
+    let { disabled, value = [], uiParams = {}, refId, relation,
       fetch, fetchRelation, updateQuery, subscribe,
       schema, Toolbar, relationValue, goTo, rootValue, title
     } = this.props;
-    value = value && value.toJS ? value.toJS() : [];
     const newColumnsRender = renderValue(uiParams.columns, schema[relation.to].items.items);
-    console.log(rootValue, refId);
     const recordValue = getRecordValue(rootValue, refId);
     // hack
-    const isHidden = uiParams.isHidden ? uiParams.isHidden(recordValue && recordValue.toJS()) : false;
+    const isHidden = uiParams.isHidden ? uiParams.isHidden(recordValue) : false;
     if (isHidden) {
       return null;
     }
@@ -107,5 +104,5 @@ export default class RelationTable extends PureComponent {
 
 function getRecordValue(rootValue, refId) {
   const targetRefId = refId.remove();
-  return rootValue.getIn(targetRefId.getPathArr());
+  return get(rootValue, targetRefId.getPathArr());
 }

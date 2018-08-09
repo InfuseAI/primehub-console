@@ -29,6 +29,7 @@ configure({
               path: 'user/__1',
               pattern: 'array.object',
               controlDeployAndResetButtons: true,
+              cacheActions: true,
               loader: import('../src/cms-components/customize-object-email_form')
             }],
             hocs: ['containerRouter'],
@@ -47,6 +48,7 @@ configure({
               path: 'user/__2',
               pattern: 'array.object',
               controlDeployAndResetButtons: true,
+              cacheActions: true,
               loader: import('../src/cms-components/customize-object-password_form')
             }],
             hocs: ['containerRouter'],
@@ -62,6 +64,7 @@ configure({
 export default () => (
   <array keyName="user" title="User"
     controlDeployAndResetButtons={true}
+    cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
