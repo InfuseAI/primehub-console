@@ -46,6 +46,11 @@ export default () => (
       }}
     />
     <string keyName="url" title="Url" ui="link"/>
+    {/* <object keyName="variables" packageName="../src/cms-components/customize-object-dynamic-field"
+      uiParams={{
+        // isHidden: record => record.access !== 'group',
+      }}
+    /> */}
     <relation keyName="groups" title="Groups"
       packageName='../src/cms-components/customize-relation-table'
       relation={{
