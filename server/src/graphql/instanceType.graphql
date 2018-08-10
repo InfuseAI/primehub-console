@@ -46,10 +46,10 @@ input InstanceTypeCreateInput {
   displayName: String
   description: String
   cpuLimit: Float
-  memoryLimit: String
-  gpuLimit: Float
+  memoryLimit: Int
+  gpuLimit: Int
   cpuRequest: Float
-  memoryRequest: String
+  memoryRequest: Int
   global: Boolean
   groups: GroupCreateManyInput
 }
@@ -59,10 +59,10 @@ input InstanceTypeUpdateInput {
   displayName: String
   description: String
   cpuLimit: Float
-  memoryLimit: String
-  gpuLimit: Float
+  memoryLimit: Int
+  gpuLimit: Int
   cpuRequest: Float
-  memoryRequest: String
+  memoryRequest: Int
   global: Boolean
   groups: GroupUpdateManyInput
 }

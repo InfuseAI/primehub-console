@@ -49,8 +49,8 @@ input GroupCreateInput {
   displayName: String
   canUseGpu: Boolean
   cpuQuota: Float
-  gpuQuota: Float
-  diskQuota: String
+  gpuQuota: Int
+  diskQuota: Int
   users: UserCreateManyInput
 }
 
@@ -59,8 +59,8 @@ input GroupUpdateInput {
   displayName: String
   canUseGpu: Boolean
   cpuQuota: Float
-  gpuQuota: Float
-  diskQuota: String
+  gpuQuota: Int
+  diskQuota: Int
   users: UserUpdateManyInput
 }
 
