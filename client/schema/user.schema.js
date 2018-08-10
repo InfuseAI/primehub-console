@@ -65,6 +65,7 @@ export default () => (
   <array keyName="user" title="User"
     controlDeployAndResetButtons={true}
     cacheActions={true}
+    hideButtons={true}
     packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
@@ -103,7 +104,7 @@ export default () => (
     <Layout component={Tab} disabledKeysInCreate={['__1', '__2']}>
     {/* <Layout component={CustomizeBlock} disabledKeysInCreate={['__1', '__2']}> */}
     {/* <image keyName="thumbnail" title="Thumbnail" disabled /> */}
-    <Default title="Basic Info">
+    <Default title="Basic Info" keyName="basicInfo">
       <string keyName="username" title="Username"
         validation={{pattern: '^[a-z0-9_]+$'}}
         required
