@@ -18,6 +18,7 @@ Canner CMS
 * KC_USERNAME: the admin username in keycloak
 * KC_PWD: the password of amdin user in keycloak
 * KC_EVERYONE_GROUP_ID: the everyone group id in keycloak
+* K8S_CRD_NAMESPACE: specify what namespace to use for crd
 
 ## Build
 ```sh

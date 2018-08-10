@@ -23,12 +23,12 @@ export default class CustomResource<SpecType = any> {
   private crd: any;
   private resource: Resource;
 
-  constructor(kubeClient: any, crd: any) {
+  constructor(kubeClient: any, crd: any, namespace: string) {
     kubeClient.addCustomResourceDefinition(crd);
     const {group, version, names: {plural}} = crd.spec;
     this.crd = crd;
     this.kubeClient = kubeClient;
-    this.resource = kubeClient.apis[group][version].namespaces('default')[plural];
+    this.resource = kubeClient.apis[group][version].namespaces(namespace)[plural];
   }
 
   public async get(name: string): Promise<Item<SpecType>> {

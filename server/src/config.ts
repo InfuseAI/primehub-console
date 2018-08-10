@@ -8,6 +8,8 @@ export interface Config {
   keycloakPassword: string;
   keycloakEveryoneGroupId: string;
   keycloakClientId: string;
+  // k8s
+  k8sCrdNamespace: string;
 }
 
 const defaultConfigs = {
@@ -17,7 +19,8 @@ const defaultConfigs = {
   keycloakUsername: 'wwwy3y3',
   keycloakPassword: 'wwwy3y3',
   keycloakEveryoneGroupId: '15839617-c0d6-4c3b-8b7e-da3da47409ff',
-  keycloakClientId: 'admin-cli'
+  keycloakClientId: 'admin-cli',
+  k8sCrdNamespace: 'default'
 };
 
 const prodConfigs = {
@@ -31,7 +34,8 @@ export default (): Config => {
     keycloakUsername: process.env.KC_USERNAME,
     keycloakPassword: process.env.KC_PWD,
     keycloakEveryoneGroupId: process.env.KC_EVERYONE_GROUP_ID,
-    keycloakClientId: process.env.KC_CLIENT_ID
+    keycloakClientId: process.env.KC_CLIENT_ID,
+    k8sCrdNamespace: process.env.K8S_CRD_NAMESPACE
   });
 
   const env = process.env.NODE_ENV || 'development';
