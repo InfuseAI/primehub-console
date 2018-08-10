@@ -78,7 +78,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
         realm: config.keycloakRealmName,
         everyoneGroupId: config.keycloakEveryoneGroupId,
         kcAdminClient,
-        crdClient: new CrdClient()
+        crdClient: new CrdClient({
+          namespace: config.k8sCrdNamespace
+        })
       };
     }
   });

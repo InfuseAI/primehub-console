@@ -46,19 +46,32 @@ const inTest = process.env.TEST;
 const loadCrd = (filename: string) =>
   yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, `../../crd/${filename}${inTest ? '.spec' : ''}.yaml`), 'utf8'));
 
+export interface CrdArgs {
+  namespace?: string;
+}
+
 export default class CrdClientImpl {
-  public instanceTypes = new CustomResource<InstanceTypeSpec>(
-    client,
-    loadCrd('instance-type')
-  );
+  public instanceTypes: CustomResource<InstanceTypeSpec>;
+  public datasets: CustomResource<DatasetSpec>;
+  public images: CustomResource<ImageSpec>;
+  private namespace: string;
 
-  public datasets = new CustomResource<DatasetSpec>(
-    client,
-    loadCrd('dataset')
-  );
-
-  public images = new CustomResource<ImageSpec>(
-    client,
-    loadCrd('image')
-  );
+  constructor(args?: CrdArgs) {
+    this.namespace = args && args.namespace || 'default';
+    this.instanceTypes = new CustomResource<InstanceTypeSpec>(
+      client,
+      loadCrd('instance-type'),
+      this.namespace
+    );
+    this.datasets = new CustomResource<DatasetSpec>(
+      client,
+      loadCrd('dataset'),
+      this.namespace
+    );
+    this.images = new CustomResource<ImageSpec>(
+      client,
+      loadCrd('image'),
+      this.namespace
+    );
+  }
 }
