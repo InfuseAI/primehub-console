@@ -74,23 +74,6 @@ export default class HeaderContainer extends React.Component<Props, {}> {
               </a>
             </ItemContent>
           </Menu.Item> */}
-          {
-            hasChanged ? 
-            <Menu.Item key="deploy">
-            {
-              deploying ?
-                spinIcon :
-                <Badge dot>
-                  <MenuText>
-                    Save
-                  </MenuText>
-                </Badge>
-            }
-            </Menu.Item> :
-            <Menu.Item key="saved">
-              Saved
-            </Menu.Item>
-          }
         </Menu>
       </div>
     );
