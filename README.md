@@ -47,4 +47,4 @@ docker run -v ~/.kube:/root/.kube -v ~/.minikube:/Users/williamchang/.minikube -
 ```
 
 ## Style customization document
-* [Link](client/README.md)
+* [Link](client/README.md#override-antd-style)
