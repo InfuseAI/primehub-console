@@ -16,6 +16,16 @@ export default () => (
       }]
     }}
   >
+    <toolbar>
+      <filter
+        fields={[{
+          type: 'text',
+          label: 'Name',
+          key: 'name'
+        }]}
+      />
+      <pagination />
+    </toolbar>
     <Block title="Basic Information">
       <string keyName="type"
         title="Type"

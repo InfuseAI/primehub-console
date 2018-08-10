@@ -20,6 +20,16 @@ export default () => (
       }]
     }}
   >
+    <toolbar>
+      <filter
+        fields={[{
+          type: 'text',
+          label: 'Name',
+          key: 'name'
+        }]}
+      />
+      <pagination />
+    </toolbar>
     <string keyName="name" title="Name" />
     <string keyName="displayName" title="Display Name" />
     <string keyName="description" title="Description" />
@@ -51,13 +61,13 @@ export default () => (
       }}
     >
       <toolbar>
-        {/* <filter
+        <filter
           fields={[{
             type: 'text',
             label: 'Display Name',
             key: 'displayName'
           }]}
-        /> */}
+        />
         <pagination />
       </toolbar>
     </relation>

@@ -90,6 +90,16 @@ export default () => (
     }}
     storage={storage}
   >
+    <toolbar>
+      <filter
+        fields={[{
+          type: 'text',
+          label: 'Username',
+          key: 'username'
+        }]}
+      />
+      <pagination />
+    </toolbar>
     <Layout component={Tab} disabledKeysInCreate={['__1', '__2']}>
     {/* <Layout component={CustomizeBlock} disabledKeysInCreate={['__1', '__2']}> */}
     {/* <image keyName="thumbnail" title="Thumbnail" disabled /> */}
@@ -133,13 +143,13 @@ export default () => (
           }}
         >
           <toolbar>
-            {/* <filter
+            <filter
               fields={[{
                 type: 'text',
                 label: 'Display Name',
                 key: 'displayName'
               }]}
-            /> */}
+            />
             <pagination />
           </toolbar>
         </relation>

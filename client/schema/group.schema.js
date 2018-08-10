@@ -30,13 +30,13 @@ export default () => (
     }}
   >
      <toolbar>
-      {/* <filter
+      <filter
         fields={[{
           type: 'text',
           label: 'Display Name',
           key: 'displayName'
         }]}
-      /> */}
+      />
       <pagination />
     </toolbar>
     <string keyName="name" title="Name"
@@ -71,13 +71,13 @@ export default () => (
       }}
     >
       <toolbar>
-        {/* <filter
+        <filter
           fields={[{
             type: 'text',
             label: 'Username',
             key: 'username'
           }]}
-        /> */}
+        />
         <pagination />
       </toolbar>
     </relation>
