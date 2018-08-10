@@ -111,7 +111,8 @@ describe('instanceType graphql', function() {
       name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
-      cpuLimit: 2,
+      cpuLimit: 2.5,
+      gpuLimit: 2,
       memoryLimit: 25,
       global: false
     };
@@ -152,7 +153,8 @@ describe('instanceType graphql', function() {
       name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
-      cpuLimit: 2,
+      cpuLimit: 2.5,
+      gpuLimit: 2,
       memoryLimit: 25,
       global: true
     };
@@ -214,7 +216,8 @@ describe('instanceType graphql', function() {
     const data = {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
-      cpuLimit: 2,
+      cpuLimit: 2.5,
+      gpuLimit: 2,
       memoryLimit: 25
     };
     const mutation = await this.graphqlRequest(`
@@ -243,22 +246,24 @@ describe('instanceType graphql', function() {
   });
 
   it('should create with props and update', async () => {
+    const createdData = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      displayName: faker.internet.userName(),
+      description: faker.lorem.sentence(),
+      cpuLimit: 2.5,
+      gpuLimit: 2,
+      memoryLimit: 25
+    };
     const createMutation = await this.graphqlRequest(`
     mutation($data: InstanceTypeCreateInput!){
       createInstanceType (data: $data) { ${fields} }
     }`, {
-      data: {
-        name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
-        displayName: faker.internet.userName(),
-        description: faker.lorem.sentence(),
-        cpuLimit: 2,
-        memoryLimit: 25
-      }
+      data: createdData
     });
 
     // update
     const instanceType = createMutation.createInstanceType;
-    const data = {
+    const updatedData = {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
       cpuLimit: 5,
@@ -269,10 +274,10 @@ describe('instanceType graphql', function() {
       updateInstanceType (where: $where, data: $data) { ${fields} }
     }`, {
       where: {id: instanceType.id},
-      data
+      data: updatedData
     });
-
-    expect(mutation.updateInstanceType).to.deep.include(data);
+    const expectedData = {...createdData, ...updatedData};
+    expect(mutation.updateInstanceType).to.deep.include(expectedData);
 
     // query one
     const queryOne = await this.graphqlRequest(`
@@ -282,7 +287,7 @@ describe('instanceType graphql', function() {
       where: {id: instanceType.id}
     });
 
-    expect(queryOne.instanceType).to.deep.include(data);
+    expect(queryOne.instanceType).to.deep.include(expectedData);
     // check in k8s
     const instance = await this.crdClient.instanceTypes.get(instanceType.id);
     expect(instance.spec['limits.memory']).to.be.equals('50M');

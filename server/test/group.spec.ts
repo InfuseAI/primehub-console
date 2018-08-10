@@ -84,7 +84,7 @@ describe('group graphql', function() {
       name: faker.internet.userName().toLowerCase(),
       displayName: faker.internet.userName(),
       canUseGpu: true,
-      cpuQuota: 10,
+      cpuQuota: 10.5,
       gpuQuota: 10,
       diskQuota: 20
     };
@@ -149,7 +149,7 @@ describe('group graphql', function() {
       name: faker.internet.userName().toLowerCase(),
       displayName: faker.internet.userName(),
       canUseGpu: false,
-      cpuQuota: 20,
+      cpuQuota: 20.5,
       gpuQuota: 20,
       diskQuota: 30
     };

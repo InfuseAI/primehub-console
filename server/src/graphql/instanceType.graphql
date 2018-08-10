@@ -6,10 +6,10 @@ type InstanceType {
 	name: String!
   displayName: String
   description: String
-  cpuLimit: Int
+  cpuLimit: Float
   memoryLimit: Int
-  gpuLimit: Float
-  cpuRequest: Int
+  gpuLimit: Int
+  cpuRequest: Float
   memoryRequest: Int
   global: Boolean
   groups: [Group]

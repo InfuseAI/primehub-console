@@ -24,7 +24,8 @@ export const create = async (root, args, context: Context) => {
     schema: {
       displayName: {type: FieldType.string},
       canUseGpu: {type: FieldType.boolean},
-      gpuQuota: {type: FieldType.float},
+      cpuQuota: {type: FieldType.float},
+      gpuQuota: {type: FieldType.integer},
       diskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
     }
   });
@@ -76,7 +77,8 @@ export const update = async (root, args, context: Context) => {
     schema: {
       displayName: {type: FieldType.string},
       canUseGpu: {type: FieldType.boolean},
-      gpuQuota: {type: FieldType.float},
+      cpuQuota: {type: FieldType.float},
+      gpuQuota: {type: FieldType.integer},
       diskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
     }
   });
@@ -165,7 +167,7 @@ export const typeResolvers = {
     getFromAttr('canUseGpu', parent.attributes, false, v => v === 'true'),
 
   gpuQuota: async (parent, args, context: Context) =>
-    getFromAttr('gpuQuota', parent.attributes, 0, parseFloat),
+    getFromAttr('gpuQuota', parent.attributes, 0, parseInt),
 
   cpuQuota: async (parent, args, context: Context) =>
     getFromAttr('cpuQuota', parent.attributes, 0, parseFloat),
