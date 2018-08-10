@@ -1,6 +1,7 @@
 import React from 'react';
 import {Select, Input, Button, Form} from 'antd';
 import {Item} from 'canner-helpers';
+import {get} from 'lodash';
 import gql from "graphql-tag";
 import { Mutation } from "react-apollo";
 import styled from 'styled-components';
@@ -185,5 +186,5 @@ function getIdFromRootValue({
   rootValue,
   refId
 }) {
-  return rootValue.getIn(refId.getPathArr().slice(0, 2).concat('id'));
+  return get(rootValue, refId.getPathArr().slice(0, 2).concat('id'));
 }
