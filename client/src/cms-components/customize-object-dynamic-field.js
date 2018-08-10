@@ -1,6 +1,7 @@
 import React from 'react';
 import {Input, Icon, Button} from 'antd';
 import {Item} from 'canner-helpers';
+import get from 'lodash/get';
 import item from '../../node_modules/canner-helpers/lib/item';
 const InputGroup = Input.Group;
 
@@ -11,58 +12,86 @@ export default class DynamicFields extends React.Component {
     this.state = {
       fields: objectToArray(value || {})
     };
-    onDeploy(data => {
-      return {...arrayToObject(this.state.fields)};
-    });
   }
 
-  componentWillReceiveProps(nextProps) {
-    const value = nextProps.value || {};
-    this.setState({
-      fields: objectToArray(nextProps.value || {})
-    });
-  }
+  // componentWillReceiveProps(nextProps) {
+  //   const value = nextProps.value || {};
+  //   this.setState({
+  //     fields: objectToArray(nextProps.value || {})
+  //   });
+  // }
 
   add = () => {
-    const {onChange, refId} = this.props;
+    const {onChange, refId, value} = this.props;
     this.setState({
       fields: this.state.fields.concat({key: '', value: ''})
+    }, () => {
+      onChange(refId, 'update', {...arrayToObject(this.state.fields)});
     });
-    onChange(refId, 'update', {...arrayToObject(this.state.fields), '': ''});
   }
 
-  changeValue = (value, index) => {
+  remove = index => {
     const {fields} = this.state;
-    fields[index].value = value;
+    const {onChange, refId} = this.props;
+    fields.splice(index, 1)
     this.setState({
       fields
+    }, () => {
+      onChange(refId, 'update', {...arrayToObject(this.state.fields)});
+    });
+  }
+
+  changeValue = (newValue, index) => {
+    const {fields, value} = this.state;
+    const {onChange, refId} = this.props;
+    fields[index].value = newValue;
+    this.setState({
+      fields
+    }, () => {
+      onChange(refId, 'update', {...arrayToObject(this.state.fields)});
     });
   }
 
   changeKey = (key, index) => {
-    const {fields} = this.state;
+    const {fields, value} = this.state;
+    const {onChange, refId} = this.props;
     fields[index].key = key;
     this.setState({
       fields
+    }, () => {
+      onChange(refId, 'update', {...arrayToObject(this.state.fields)});
     });
   }
 
   render() {
     const {fields} = this.state;
+    const {rootValue, refId, uiParams, title} = this.props;
+    const recordValue = getRecordValue(rootValue, refId);
+    // hack
+    const isHidden = uiParams.isHidden ? uiParams.isHidden(recordValue) : false;
+    if (isHidden) {
+      return null;
+    }
     return (
       <React.Fragment>
         {
+          uiParams.isHidden && <div style={{marginTop: 16, fontSize: 18}}>{title}</div>
+        }
+        {
           fields.map((field, i) => (
-            <div key={i} style={{display: 'flex', alignItems: 'center'}}>
+            <div key={i} style={{display: 'flex', alignItems: 'center', marginBottom: 8}}>
               <div style={{marginRight: 16}}>{i + 1}.</div>
-              <InputGroup compact>
-                <Input placeholder="key" style={{ width: '20%'}} value={field.key} onChange={e => this.changeKey(e.target.value, i)}/>
-                <Input placeholder="value" style={{ width: '30%'}} value={field.value} onChange={e => this.changeValue(e.target.value, i)}/>
+              <InputGroup compact style={{width: '50%', marginRight: 16}}>
+                <Input placeholder="key" style={{ width: '40%'}} value={field.key} onChange={e => this.changeKey(e.target.value, i)}/>
+                <Input placeholder="value" style={{ width: '60%'}} value={field.value} onChange={e => this.changeValue(e.target.value, i)}/>
               </InputGroup>
+              <a href="javscript:;" onClick={() => this.remove(i)}>
+                <Icon type="close-circle-o"/>
+              </a>
             </div>
           ))
         }
-        <Button type="dashed" onClick={this.add} style={{ width: '400px', marginTop: 16 }}>
+        <Button type="dashed" onClick={this.add} style={{ width: 'calc(50% + 16px)', marginTop: 16 }}>
           <Icon type="plus" /> Add field
         </Button>
       </React.Fragment>
@@ -91,4 +120,9 @@ function arrayToObject(arr) {
     result[item.key] = item.value;
     return result;
   }, {});
+}
+
+function getRecordValue(rootValue, refId) {
+  const targetRefId = refId.remove();
+  return get(rootValue, targetRefId.getPathArr());
 }
