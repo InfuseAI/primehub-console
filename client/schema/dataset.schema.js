@@ -1,5 +1,6 @@
 /** @jsx builder */
 import builder, {Default} from 'canner-script';
+import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
   <array keyName="dataset" title="Dataset"
@@ -88,6 +89,7 @@ export default () => (
     >
       <toolbar>
         <filter
+          component={Filter}
           fields={[{
             type: 'text',
             label: 'Display Name',

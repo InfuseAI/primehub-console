@@ -78,6 +78,7 @@ export default () => (
     >
       <toolbar>
         <filter
+          component={Filter}
           fields={[{
             type: 'text',
             label: 'Username',

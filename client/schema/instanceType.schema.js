@@ -1,5 +1,6 @@
 /** @jsx builder */
 import builder from 'canner-script';
+import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
   <array keyName="instanceType" title="Instance Type"
@@ -78,6 +79,7 @@ export default () => (
     >
       <toolbar>
         <filter
+          component={Filter}
           fields={[{
             type: 'text',
             label: 'Display Name',

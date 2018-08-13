@@ -8,6 +8,7 @@ import CustomizeBlock from '../src/cms-layouts/block';
 import ResetPassword from '../src/cms-components/customize-object-password_form';
 import SendEmail from '../src/cms-components/customize-object-email_form';
 import Layouts from 'canner-layouts';
+import Filter from '../src/cms-toolbar/filter';
 
 configure({
   visitorManager: {
@@ -93,6 +94,7 @@ export default () => (
   >
     <toolbar>
       <filter
+        component={Filter}
         fields={[{
           type: 'text',
           label: 'Username',
@@ -149,6 +151,7 @@ export default () => (
         >
           <toolbar>
             <filter
+              component={Filter}
               fields={[{
                 type: 'text',
                 label: 'Display Name',
