@@ -107,19 +107,6 @@ export default class CMSPage extends React.Component<Props, State> {
     }, 400);
   }
 
-  afterDeploy = () => {
-    setTimeout(() => {
-      this.setState({
-        deploying: false
-      });
-      notification.success({
-        message: 'Save successfully!',
-        description: 'Your changes have been saved.',
-        placement: 'bottomRight'
-      });
-    }, 400);
-  }
-
   reset = () => {
     if (this.cms) {
       return this.cms.reset();
@@ -134,10 +121,10 @@ export default class CMSPage extends React.Component<Props, State> {
 
     if (dataChanged && Object.keys(dataChanged).length > 0) {
       confirm({
-        title: 'Do you want to reset all changes?',
-        content: <div>Leaving without deployment will reset all changes. Click the <b>Save</b> button at the top-right corner to save them.</div>,
-        okText: 'Yes',
-        cancelText: 'No',
+        title: 'Do you want to undo the changes?',  
+        content: <div>Your changes will be lost, if you don't save them.</div>,
+        okText: 'Undo',
+        cancelText: 'Cancel',
         onOk: () => {
           return new Promise((resolve, reject) => {
             setTimeout(resolve, 1000);
@@ -147,7 +134,7 @@ export default class CMSPage extends React.Component<Props, State> {
             });
         },
         onCancel: () => {
-        },
+        }
       });
     } else {
       history.push(`/cms/${key}`);
