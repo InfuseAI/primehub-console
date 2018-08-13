@@ -3,7 +3,7 @@ import builder from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
-  <array keyName="instanceType" title="Instance Type"
+  <array keyName="instanceType" title="Instance Types"
     controlDeployAndResetButtons={true}
     cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"

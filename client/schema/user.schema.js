@@ -63,7 +63,7 @@ configure({
 })
 
 export default () => (
-  <array keyName="user" title="User"
+  <array keyName="user" title="Users"
     controlDeployAndResetButtons={true}
     cacheActions={true}
     hideButtons={true}

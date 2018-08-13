@@ -3,7 +3,7 @@ import builder from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 import {renderRelationField} from './utils';
 export default () => (
-  <array keyName="group" title="Group"
+  <array keyName="group" title="Groups"
     controlDeployAndResetButtons={true}
     cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
