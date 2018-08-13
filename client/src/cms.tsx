@@ -79,16 +79,7 @@ export default class CMSPage extends React.Component<Props, State> {
       });
       return this.cms.deploy(activeKey)
         .then(() => {
-          setTimeout(() => {
-            this.setState({
-              deploying: false
-            });
-            notification.success({
-              message: 'Save successfully!',
-              description: 'Your changes have been saved.',
-              placement: 'bottomRight'
-            });
-          }, 1000)
+          this.afterDeploy();
         })
         .catch(() => {
           this.setState({
@@ -101,6 +92,32 @@ export default class CMSPage extends React.Component<Props, State> {
           });
         });
     }
+  }
+
+  afterDeploy = () => {
+    setTimeout(() => {
+      this.setState({
+        deploying: false
+      });
+      notification.success({
+        message: 'Save successfully!',
+        description: 'Your changes have been saved.',
+        placement: 'bottomRight'
+      });
+    }, 400);
+  }
+
+  afterDeploy = () => {
+    setTimeout(() => {
+      this.setState({
+        deploying: false
+      });
+      notification.success({
+        message: 'Save successfully!',
+        description: 'Your changes have been saved.',
+        placement: 'bottomRight'
+      });
+    }, 400);
   }
 
   reset = () => {
@@ -186,6 +203,7 @@ export default class CMSPage extends React.Component<Props, State> {
               schema={schema}
               // hideButtons={true}
               dataDidChange={this.dataDidChange}
+              afterDeploy={this.afterDeploy}
               ref={cms => this.cms = cms}
             />
           </ReactRouterProvider>
