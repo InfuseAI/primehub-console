@@ -1,5 +1,6 @@
 /** @jsx builder */
 import builder from 'canner-script';
+import Filter from '../src/cms-toolbar/filter';
 import {renderRelationField} from './utils';
 export default () => (
   <array keyName="group" title="Group"
@@ -31,7 +32,12 @@ export default () => (
   >
      <toolbar>
       <filter
+        component={Filter}
         fields={[{
+          type: 'text',
+          label: 'Name',
+          key: 'name'
+        }, {
           type: 'text',
           label: 'Display Name',
           key: 'displayName'

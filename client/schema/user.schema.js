@@ -97,6 +97,10 @@ export default () => (
           type: 'text',
           label: 'Username',
           key: 'username'
+        }, {
+          type: 'text',
+          label: 'Email',
+          key: 'email'
         }]}
       />
       <pagination />
