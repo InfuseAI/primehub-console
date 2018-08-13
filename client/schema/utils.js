@@ -17,3 +17,10 @@ exports.renderRelationField = function(text, record) {
     {text.length}
   </span>
 }
+
+exports.dict = {
+  en: {
+    system: 'System',
+    name: 'Name'
+  }
+}

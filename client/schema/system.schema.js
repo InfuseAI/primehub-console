@@ -2,10 +2,10 @@
 import builder, {Block} from 'canner-script';
 import {storage} from './utils';
 export default () => (
-  <object keyName="system" title="System" storage={storage} >
+  <object keyName="system" title="${system}" storage={storage} >
     <Block title="System Settings">
       <object keyName="org">
-        <string keyName="name" title="Name"/>
+        <string keyName="name" title="${Name}"/>
         <image keyName="logo" title="Logo"/>
       </object>
       <number keyName="defaultUserDiskQuota" title="Default User Disk Quota"

@@ -3211,12 +3211,6 @@ canner-helpers@^0.1.16:
     immutable "^4.0.0-rc.9"
     lodash "^4.17.5"
 
-canner-helpers@^1.0.0-beta.0:
-  version "1.0.0-beta.0"
-  resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-1.0.0-beta.0.tgz#844bc84a5e5d542ee4e1a3ee5ad179100ca26753"
-  dependencies:
-    lodash "^4.17.5"
-
 canner-image-gallery@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/canner-image-gallery/-/canner-image-gallery-0.2.0.tgz#732fb1f312663fb03f0d574b5b52906e895fd7fc"
@@ -3243,24 +3237,24 @@ canner-schema-loader@^1.3.0:
     schema-utils "^0.4.5"
     strip-bom "^3.0.0"
 
-canner-script@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/canner-script/-/canner-script-1.2.1.tgz#564b5598c4242f0b0aeb0056b10eee0b84f45c0d"
+canner-script@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/canner-script/-/canner-script-1.2.4.tgz#b5ca0bc872c6beb165d03e369e7212d6326748b8"
   dependencies:
     eval "^0.1.2"
     object-path "^0.11.4"
     safer-eval "^1.2.3"
 
-canner@^1.4.7-infuse.2:
-  version "1.4.7-infuse.2"
-  resolved "https://registry.yarnpkg.com/canner/-/canner-1.4.7-infuse.2.tgz#06018c76de0e710e6fa87682af152a4d678cbb88"
+canner@^1.4.7:
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/canner/-/canner-1.4.7.tgz#09292e6efa39d28745921f7a219860435dfc0101"
   dependencies:
     ajv "^6.5.2"
     apollo-boost "^0.1.4"
     bson-objectid "^1.2.2"
     canner-compiler "^0.1.6"
     canner-graphql-interface "^1.16.0"
-    canner-helpers "^1.0.0-beta.0"
+    canner-helpers "^0.1.16"
     canner-layouts "^1.1.1"
     canner-ref-id "^0.1.2"
     graphql-tag "^2.9.1"

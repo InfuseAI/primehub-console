@@ -13,7 +13,7 @@ import color from 'styledShare/color';
 import logo from 'images/primehub-logo-w.png';
 import {RouteComponentProps} from 'react-router';
 import schema from '../schema/index.schema.js';
-
+console.log(schema);
 const MenuItemGroup = Menu.ItemGroup;
 const {Content, Sider, Header} = Layout;
 const confirm = Modal.confirm;
