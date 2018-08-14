@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import { Table, Button, Modal } from "antd";
 import PropTypes from 'prop-types';
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, injectIntl, intlShape } from "react-intl";
 import defaultMessage, {renderValue} from "@canner/antd-locales";
-import {injectIntl, intlShape} from 'react-intl';
 
 const ButtonGroup = Button.Group;
 const confirm = Modal.confirm;
@@ -66,7 +65,14 @@ export default class ArrayBreadcrumb extends Component {
     } = uiParams;
 
     // push update button and delete button
-    const newColumns = columns.slice();
+    const newColumns = columns.map(column => {
+      const matched = column.title.match(/^\$\{(.*)\}$/);
+      const title = matched ? intl.formatMessage({
+        id: matched[1],
+        defaultMessage: column.title
+      }) : column.title;
+      return {...column, title};
+    });
     const newColumnsRender = renderValue(newColumns, items.items);
 
     newColumnsRender.push({
