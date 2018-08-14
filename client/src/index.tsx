@@ -1,14 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
-import {IntlProvider} from 'react-intl';
+import {IntlProvider, addLocaleData} from 'react-intl';
+import en from 'react-intl/locale-data/en';
+import zh from 'react-intl/locale-data/zh';
+addLocaleData([...en, ...zh])
 import CMSPage from './cms';
 import schema from '../schema/index.schema.js';
 import Login from './login';
 const firstKey = Object.keys(schema.schema)[0];
 
 (window as any).LOCALE = (window as any).LOCALE || 'en';
-
 ReactDOM.render(
   <IntlProvider locale={(window as any).LOCALE} messages={schema.dict[(window as any).LOCALE]}>
     <Router>

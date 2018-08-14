@@ -165,7 +165,6 @@ export default class CMSPage extends React.Component<Props, State> {
     if (hasError) {
       return <Error/>;
     }
-
     return (
       <Layout style={{minHeight: '100vh'}}>
         <Sider breakpoint="sm">
@@ -209,7 +208,7 @@ export default class CMSPage extends React.Component<Props, State> {
               afterDeploy={this.afterDeploy}
               ref={cms => this.cms = cms}
               intl={{
-                locale: (window as any).LOCALE
+                locale: (window as any).LOCALE,
               }}
             />
           </ReactRouterProvider>
