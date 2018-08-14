@@ -4,6 +4,7 @@ import {FirebaseClientService} from '@canner/image-service-config';
 import {GraphqlClient} from 'canner-graphql-interface';
 import {ImgurService} from '@canner/image-service-config';
 import store from 'store';
+import {FormattedMessage} from 'react-intl';
 
 exports.storage = new ImgurService({
   clientId: "cd7b1ab0aa39732",
@@ -14,6 +15,16 @@ exports.renderRelationField = function(text, record) {
     {text.length}
   </span>
 }
+
+exports.SendEmailTitle = <FormattedMessage
+  id="sendEmail"
+  defaultMessage="Send Email"
+/>
+
+exports.ResetPasswordTitle = <FormattedMessage
+  id="resetPassword"
+  defaultMessage="Reset Password"
+/>;
 
 exports.dict = {
   en: {
