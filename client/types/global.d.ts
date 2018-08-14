@@ -20,8 +20,7 @@ type Omit<T, K extends keyof T> = { [P in Diff<keyof T, K>]: T[P] };
 type PartialPick<T, K extends keyof T> = Partial<T> & Pick<T, K>;
 
 declare global {
-  interface window {
-    cannerApp: any;
-    cannerbundle: any;
+  interface Window {
+    LOCALE: string;
   }
 }

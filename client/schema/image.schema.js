@@ -34,7 +34,7 @@ export default () => (
       }}
       hideTitle
       uiParams={{
-        isHidden: record => record.global,
+        isHidden: record => record && record.global,
         textCol: 'displayName',
         columns: [{
           title: 'Display Name',
