@@ -220,6 +220,9 @@ export default class CMSPage extends React.Component<Props, State> {
               dataDidChange={this.dataDidChange}
               afterDeploy={this.afterDeploy}
               ref={cms => this.cms = cms}
+              intl={{
+                locale: (window as any).LOCALE
+              }}
             />
           </ReactRouterProvider>
         </Content>

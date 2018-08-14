@@ -53,13 +53,13 @@ export default () => (
     <string keyName="url" title="Url" packageName="../src/cms-components/customize-string-link"
       hideTitle
       uiParams={{
-        isHidden: record => record.type !== 'git',
+        isHidden: record => !record || record.type !== 'git',
       }}
     />
     <object keyName="variables" title="variables" packageName="../src/cms-components/customize-object-dynamic-field"
       hideTitle
       uiParams={{
-        isHidden: record => record.type !== 'env',
+        isHidden: record => !record || record.type !== 'env',
       }}
     />
     <relation keyName="groups" title="Groups"
@@ -70,7 +70,7 @@ export default () => (
       }}
       hideTitle
       uiParams={{
-        isHidden: record => record.access !== 'group',
+        isHidden: record => !record || record.access !== 'group',
         textCol: 'displayName',
         columns: [{
           title: 'Display Name',
