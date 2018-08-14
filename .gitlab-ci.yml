@@ -1,0 +1,22 @@
+image: docker:stable
+
+services:
+  - docker:stable-dind
+
+variables:
+  REGISTRY: registry.gitlab.com
+  REPOSITORY: "${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
+  IMAGE: admin-ui
+
+stages:
+  - build
+
+build:
+  stage: build
+  script:
+    - echo "${DOCKER_DRIVER}"
+    - docker login -u gitlab-ci-token -p "${CI_BUILD_TOKEN}" "${REGISTRY}"
+    - docker build -t "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_SHA:0:7}" .
+    - docker push "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_SHA:0:7}"
+  only:
+    - master
