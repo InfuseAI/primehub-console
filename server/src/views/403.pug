@@ -1,0 +1,9 @@
+
+extends ./layout.pug
+
+block head
+block main
+  div(id='root')
+    p #{message}
+    a(href="/oidc/logout") logout
+block footerScript

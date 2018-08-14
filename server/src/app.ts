@@ -1,4 +1,4 @@
-import Koa from 'koa';
+import Koa, {Context} from 'koa';
 import { ApolloServer, gql } from 'apollo-server-koa';
 import { importSchema } from 'graphql-import';
 import path from 'path';
@@ -120,7 +120,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
   // koa
   const app = new Koa() as any;
 
-  app.use(async (ctx, next) => {
+  app.use(async (ctx: Context, next) => {
     try {
       await next();
     } catch (err) {
@@ -130,7 +130,13 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
         (err.isBoom && err.output && err.output.statusCode) ? err.output.statusCode : err.status || 500;
 
       ctx.status = statusCode;
-      ctx.body = {code: errorCode, message: err.message};
+
+      // render or json
+      if (ctx.accepts('html') && ctx.status === 403) {
+        return ctx.render('403', {message: err.message});
+      } else {
+        ctx.body = {code: errorCode, message: err.message};
+      }
     }
   });
   app.use(morgan('combined'));
