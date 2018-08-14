@@ -1,5 +1,6 @@
 /** @jsx builder */
 import builder, {Block, Default, Tabs} from 'canner-script';
+import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
   <array keyName="userFederations" title="User Federations"

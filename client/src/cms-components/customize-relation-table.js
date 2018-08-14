@@ -104,5 +104,5 @@ export default class RelationTable extends PureComponent {
 
 function getRecordValue(rootValue, refId) {
   const targetRefId = refId.remove();
-  return get(rootValue, targetRefId.getPathArr());
+  return get(rootValue, targetRefId.getPathArr(), {});
 }

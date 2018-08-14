@@ -1,8 +1,9 @@
 /** @jsx builder */
 import builder from 'canner-script';
+import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
-  <array keyName="image" title="Image"
+  <array keyName="image" title="Images"
     cannerDataType="array"
     controlDeployAndResetButtons={true}
     cacheActions={true}
@@ -51,13 +52,14 @@ export default () => (
       }}
     >
       <toolbar>
-        {/* <filter
+        <filter
+          component={Filter}
           fields={[{
             type: 'text',
             label: 'Display Name',
             key: 'displayName'
           }]}
-        /> */}
+        />
         <pagination />
       </toolbar>
     </relation>

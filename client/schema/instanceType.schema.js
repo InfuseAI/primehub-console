@@ -1,8 +1,9 @@
 /** @jsx builder */
 import builder from 'canner-script';
+import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
-  <array keyName="instanceType" title="Instance Type"
+  <array keyName="instanceType" title="Instance Types"
     controlDeployAndResetButtons={true}
     cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
@@ -77,13 +78,14 @@ export default () => (
       }}
     >
       <toolbar>
-        {/* <filter
+        <filter
+          component={Filter}
           fields={[{
             type: 'text',
             label: 'Display Name',
             key: 'displayName'
           }]}
-        /> */}
+        />
         <pagination />
       </toolbar>
     </relation>

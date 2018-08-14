@@ -1,5 +1,6 @@
 /** @jsx builder */
-import builder from 'canner-script';
+import builder, {Default} from 'canner-script';
+import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
   <array keyName="dataset" title="Dataset"
@@ -19,6 +20,7 @@ export default () => (
       }]
     }}
   >
+    <Default>
     <string keyName="name" title="Name" />
     <string keyName="displayName" title="Display Name" />
     <string keyName="description" title="Description" />
@@ -42,15 +44,24 @@ export default () => (
         options: [{
           text: 'git',
           value: 'git'
+        }, {
+          text: 'env',
+          value: 'env'
         }]
       }}
     />
-    <string keyName="url" title="Url" ui="link"/>
-    {/* <object keyName="variables" packageName="../src/cms-components/customize-object-dynamic-field"
+    <string keyName="url" title="Url" packageName="../src/cms-components/customize-string-link"
+      hideTitle
       uiParams={{
-        // isHidden: record => record.access !== 'group',
+        isHidden: record => record.type !== 'git',
       }}
-    /> */}
+    />
+    <object keyName="variables" title="variables" packageName="../src/cms-components/customize-object-dynamic-field"
+      hideTitle
+      uiParams={{
+        isHidden: record => record.type !== 'env',
+      }}
+    />
     <relation keyName="groups" title="Groups"
       packageName='../src/cms-components/customize-relation-table'
       relation={{
@@ -77,15 +88,17 @@ export default () => (
       }}
     >
       <toolbar>
-        {/* <filter
+        <filter
+          component={Filter}
           fields={[{
             type: 'text',
             label: 'Display Name',
             key: 'displayName'
           }]}
-        /> */}
+        />
         <pagination />
       </toolbar>
     </relation>
+    </Default>
   </array>
 )

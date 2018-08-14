@@ -7,16 +7,44 @@ import Loading from 'components/loading';
 import Error from 'components/error';
 import isPlainObject from 'lodash.isplainobject';
 import firebase from 'firebase';
-
+import {GraphqlClient} from 'canner-graphql-interface';
 import styled, {StyledComponentClass} from 'styled-components';
 import color from 'styledShare/color';
 import logo from 'images/primehub-logo-w.png';
 import {RouteComponentProps} from 'react-router';
 import schema from '../schema/index.schema.js';
-
+import fetch from 'isomorphic-fetch';
+import store from 'store';
+import queryString from 'query-string';
 const MenuItemGroup = Menu.ItemGroup;
 const {Content, Sider, Header} = Layout;
 const confirm = Modal.confirm;
+const TOKEN_NAME = 'canner_graphql_interface_token';
+const params = queryString.parse(location.search);
+if (params && params.token) {
+  store.set(TOKEN_NAME, params.token);
+}
+const TOKEN = store.get(TOKEN_NAME) || '';
+declare var process : {
+  env: {
+    NODE_ENV: string
+  }
+}
+const graphqlClient = process.env.NODE_ENV === 'production' ? new GraphqlClient({
+  uri: "/graphql",
+  fetch: (uri, options) => {
+    const body = {
+      schema: schema.schema,
+      ...JSON.parse(options.body)
+    };
+    options.body = JSON.stringify(body);
+    options.headers = {
+      Authorization: `Bearer ${TOKEN}`,
+      ...options.headers || {}
+    };
+    return fetch(uri, options);
+  }
+}): undefined;
 
 export const Logo = styled.img`
   background-color: ${color.darkBlue};
@@ -79,16 +107,7 @@ export default class CMSPage extends React.Component<Props, State> {
       });
       return this.cms.deploy(activeKey)
         .then(() => {
-          setTimeout(() => {
-            this.setState({
-              deploying: false
-            });
-            notification.success({
-              message: 'Save successfully!',
-              description: 'Your changes have been saved.',
-              placement: 'bottomRight'
-            });
-          }, 1000)
+          this.afterDeploy();
         })
         .catch(() => {
           this.setState({
@@ -101,6 +120,19 @@ export default class CMSPage extends React.Component<Props, State> {
           });
         });
     }
+  }
+
+  afterDeploy = () => {
+    setTimeout(() => {
+      this.setState({
+        deploying: false
+      });
+      notification.success({
+        message: 'Save successfully!',
+        description: 'Your changes have been saved.',
+        placement: 'bottomRight'
+      });
+    }, 400);
   }
 
   reset = () => {
@@ -117,10 +149,10 @@ export default class CMSPage extends React.Component<Props, State> {
 
     if (dataChanged && Object.keys(dataChanged).length > 0) {
       confirm({
-        title: 'Do you want to reset all changes?',
-        content: <div>Leaving without deployment will reset all changes. Click the <b>Save</b> button at the top-right corner to save them.</div>,
-        okText: 'Yes',
-        cancelText: 'No',
+        title: 'Do you want to undo the changes?',  
+        content: <div>Your changes will be lost, if you don't save them.</div>,
+        okText: 'Undo',
+        cancelText: 'Cancel',
         onOk: () => {
           return new Promise((resolve, reject) => {
             setTimeout(resolve, 1000);
@@ -130,7 +162,7 @@ export default class CMSPage extends React.Component<Props, State> {
             });
         },
         onCancel: () => {
-        },
+        }
       });
     } else {
       history.push(`/cms/${key}`);
@@ -183,9 +215,10 @@ export default class CMSPage extends React.Component<Props, State> {
             history={history}
           >
             <CMS
-              schema={schema}
+              schema={{...schema, graphqlClient}}
               // hideButtons={true}
               dataDidChange={this.dataDidChange}
+              afterDeploy={this.afterDeploy}
               ref={cms => this.cms = cms}
             />
           </ReactRouterProvider>

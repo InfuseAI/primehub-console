@@ -8,6 +8,7 @@ import CustomizeBlock from '../src/cms-layouts/block';
 import ResetPassword from '../src/cms-components/customize-object-password_form';
 import SendEmail from '../src/cms-components/customize-object-email_form';
 import Layouts from 'canner-layouts';
+import Filter from '../src/cms-toolbar/filter';
 
 configure({
   visitorManager: {
@@ -62,9 +63,10 @@ configure({
 })
 
 export default () => (
-  <array keyName="user" title="User"
+  <array keyName="user" title="Users"
     controlDeployAndResetButtons={true}
     cacheActions={true}
+    hideButtons={true}
     packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
@@ -90,10 +92,25 @@ export default () => (
     }}
     storage={storage}
   >
+    <toolbar>
+      <filter
+        component={Filter}
+        fields={[{
+          type: 'text',
+          label: 'Username',
+          key: 'username'
+        }, {
+          type: 'text',
+          label: 'Email',
+          key: 'email'
+        }]}
+      />
+      <pagination />
+    </toolbar>
     <Layout component={Tab} disabledKeysInCreate={['__1', '__2']}>
     {/* <Layout component={CustomizeBlock} disabledKeysInCreate={['__1', '__2']}> */}
     {/* <image keyName="thumbnail" title="Thumbnail" disabled /> */}
-    <Default title="Basic Info">
+    <Default title="Basic Info" keyName="basicInfo">
       <string keyName="username" title="Username"
         validation={{pattern: '^[a-z0-9_]+$'}}
         required
@@ -133,13 +150,14 @@ export default () => (
           }}
         >
           <toolbar>
-            {/* <filter
+            <filter
+              component={Filter}
               fields={[{
                 type: 'text',
                 label: 'Display Name',
                 key: 'displayName'
               }]}
-            /> */}
+            />
             <pagination />
           </toolbar>
         </relation>
