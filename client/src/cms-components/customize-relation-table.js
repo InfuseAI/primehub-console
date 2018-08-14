@@ -5,6 +5,7 @@ import difference from "lodash/difference";
 import get from 'lodash/get';
 import Picker from '@canner/antd-share-relation';
 import {injectIntl} from 'react-intl';
+import {FormattedMessage} from "react-intl";
 import {renderValue} from '@canner/antd-locales';
 
 @injectIntl
@@ -84,13 +85,17 @@ export default class RelationTable extends PureComponent {
         {
           !disabled && <div>
             <a href="javascript:;" onClick={this.showModal}>
-              <Icon type="link" style={{margin: '16px 8px'}}/>connect existed {relation.to}
+              <Icon type="link" style={{margin: '16px 8px'}}/>
+              <FormattedMessage
+                id="relation.multipleSelect.connect"
+                defaultMessage="connect existed "
+              />
+              {schema[relation.to].title}
             </a>
           </div>
         }
         {
           !disabled && <Picker
-            title="選擇你要的物件"
             visible={modalVisible}
             onOk={this.handleOk}
             onCancel={this.handleCancel}

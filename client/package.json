@@ -92,11 +92,11 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@canner/antd-components": "^0.4.0-beta.3",
+    "@canner/antd-components": "0.4.0-beta.4",
     "@types/react-router-dom": "^4.2.6",
     "antd": "3.6.6",
     "axios": "^0.18.0",
-    "canner": "^1.4.7-infuse.3",
+    "canner": "^1.4.7-infuse.4",
     "canner-graphql-interface": "^1.16.2",
     "canner-helpers": "^1.0.0-beta.0",
     "canner-layouts": "^1.1.1",
