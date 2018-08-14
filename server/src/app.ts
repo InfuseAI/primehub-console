@@ -7,6 +7,7 @@ import { Issuer } from 'openid-client';
 import views from 'koa-views';
 import serve from 'koa-static';
 import Router from 'koa-router';
+import * as GraphQLJSON from 'graphql-type-json';
 
 import CrdClient from './crdClient/crdClientImpl';
 import * as system from './resolvers/system';
@@ -58,6 +59,9 @@ const resolvers = {
   ...instanceType.typeResolver(),
   ...dataset.typeResolver(),
   ...image.typeResolver(),
+
+  // scalars
+  JSON: GraphQLJSON
 };
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {

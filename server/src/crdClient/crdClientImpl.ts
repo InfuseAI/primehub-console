@@ -37,6 +37,7 @@ export interface DatasetSpec {
   access?: string;
   type?: string;
   url?: string;
+  variables?: Record<string, any>;
 }
 
 /**
