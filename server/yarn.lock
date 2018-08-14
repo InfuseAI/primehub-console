@@ -186,7 +186,7 @@
   version "3.11.2"
   resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-3.11.2.tgz#699ad86054cc20043c30d66a6fcde30bbf5d3d5e"
 
-"@types/jsonwebtoken@^7.2.7":
+"@types/jsonwebtoken@^7.2.8":
   version "7.2.8"
   resolved "https://registry.yarnpkg.com/@types/jsonwebtoken/-/jsonwebtoken-7.2.8.tgz#8d199dab4ddb5bba3234f8311b804d2027af2b3a"
   dependencies:
@@ -2231,7 +2231,7 @@ jsonfile@^4.0.0:
   optionalDependencies:
     graceful-fs "^4.1.6"
 
-jsonwebtoken@^8.2.1:
+jsonwebtoken@^8.3.0:
   version "8.3.0"
   resolved "https://registry.yarnpkg.com/jsonwebtoken/-/jsonwebtoken-8.3.0.tgz#056c90eee9a65ed6e6c72ddb0a1d325109aaf643"
   dependencies:
@@ -2276,9 +2276,9 @@ jws@^3.1.5:
     jwa "^1.1.5"
     safe-buffer "^5.0.1"
 
-keycloak-admin@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/keycloak-admin/-/keycloak-admin-1.3.0.tgz#cafb57dae30a26cfe21260aad0a2c1527611bd99"
+keycloak-admin@^1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/keycloak-admin/-/keycloak-admin-1.3.1.tgz#2371315a787022108f3c4c32a82f4bfcad37068f"
   dependencies:
     "@types/debug" "^0.0.30"
     axios "^0.18.0"
@@ -2943,6 +2943,19 @@ only@~0.0.2:
 openid-client@^2.0.0:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/openid-client/-/openid-client-2.2.1.tgz#8052a7616f1dc28bc72de5b67e51adfbdec34ec6"
+  dependencies:
+    base64url "^3.0.0"
+    got "^8.3.1"
+    lodash "^4.17.10"
+    lru-cache "^4.1.3"
+    node-jose "^1.0.0"
+    oidc-token-hash "^3.0.1"
+    p-any "^1.1.0"
+    uuid "^3.2.1"
+
+openid-client@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/openid-client/-/openid-client-2.3.0.tgz#7ca548beed82887096b781942f14417a0f5603bc"
   dependencies:
     base64url "^3.0.0"
     got "^8.3.1"

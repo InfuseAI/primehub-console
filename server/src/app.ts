@@ -2,7 +2,8 @@ import Koa from 'koa';
 import { ApolloServer, gql } from 'apollo-server-koa';
 import { importSchema } from 'graphql-import';
 import path from 'path';
-import KcAdminClient from 'keycloak-admin/lib';
+import KcAdminClient from 'keycloak-admin';
+import { Issuer } from 'openid-client';
 import views from 'koa-views';
 import serve from 'koa-static';
 import Router from 'koa-router';
@@ -14,6 +15,9 @@ import * as group from './resolvers/group';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
+
+// controller
+import { OidcCtrl } from './oidc';
 
 // config
 import getConfig from './config';
@@ -58,21 +62,44 @@ const resolvers = {
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {
   const config = getConfig();
+  // create oidc client and controller
+  // tslint:disable-next-line:max-line-length
+  const issuer = await Issuer.discover(`${config.keycloakBaseUrl}/realms/${config.keycloakRealmName}/.well-known/openid-configuration`);
+  const oidcClient = new issuer.Client({
+    client_id: config.keycloakClientId,
+    client_secret: config.keycloakClientSecret
+  });
+  oidcClient.CLOCK_TOLERANCE = 5 * 60;
+  const oidcCtrl = new OidcCtrl({
+    secret: config.payloadSecretKey,
+    realm: config.keycloakRealmName,
+    clientId: config.keycloakClientId,
+    cmsHost: config.cmsHost,
+    keycloakBaseUrl: config.keycloakBaseUrl,
+    oidcClient,
+    grantType: config.keycloakGrantType
+  });
+
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: async () => {
+    context: async ({req}) => {
       const kcAdminClient = new KcAdminClient({
         baseUrl: config.keycloakBaseUrl,
         realmName: config.keycloakRealmName
       });
 
-      await kcAdminClient.auth({
-        username: config.keycloakUsername,
-        password: config.keycloakPassword,
-        clientId: config.keycloakClientId,
-        grantType: 'password',
-      });
+      if (config.keycloakGrantType === 'password') {
+        await kcAdminClient.auth({
+          username: config.keycloakUsername,
+          password: config.keycloakPassword,
+          clientId: config.keycloakClientId,
+          grantType: 'password',
+        });
+      } else {
+        const accessToken = await oidcCtrl.getAccessToken(req.headers.authorization);
+        kcAdminClient.setAccessToken(accessToken);
+      }
 
       return {
         realm: config.keycloakRealmName,
@@ -94,10 +121,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
 
   // router
   const rootRouter = new Router();
-  rootRouter.get('/cms', async ctx => {
+  rootRouter.get('/cms', oidcCtrl.ensureAdmin, async ctx => {
     await ctx.render('cms', {title: 'PrimeHub'});
   });
-  rootRouter.get('/cms/*', async ctx => {
+  rootRouter.get('/cms/*', oidcCtrl.ensureAdmin, async ctx => {
     await ctx.render('cms', {title: 'PrimeHub'});
   });
 
