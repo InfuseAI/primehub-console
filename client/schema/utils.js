@@ -62,7 +62,7 @@ exports.dict = {
     memoryRequest: 'Memory Request',
 
     // dataset
-    dataset: 'Dateset',
+    dataset: 'Datesets',
     description: 'Description',
     type: 'Type',
     images: 'Images',
