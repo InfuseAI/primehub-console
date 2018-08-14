@@ -12,6 +12,7 @@ addLocaleData([...en, ...zh])
 import CMSPage from './cms';
 import schema from '../schema/index.schema.js';
 import Login from './login';
+import myLocales from './utils/locales';
 const firstKey = Object.keys(schema.schema)[0];
 const locales = {
   zh: zh_TW,
@@ -20,7 +21,7 @@ const locales = {
 (window as any).LOCALE = (window as any).LOCALE || 'en';
 const locale = (window as any).LOCALE;
 ReactDOM.render(
-  <IntlProvider locale={locale} messages={schema.dict[locale]}>
+  <IntlProvider locale={locale} messages={{...schema.dict[locale], ...myLocales[locale]}}>
     <LocaleProvider locale={locales[locale]}>
       <Router>
         <React.Fragment>
