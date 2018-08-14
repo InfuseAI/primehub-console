@@ -5,7 +5,7 @@ export default () => (
   <object keyName="system" title="${system}" storage={storage} >
     <Block title="System Settings">
       <object keyName="org">
-        <string keyName="name" title="${Name}"/>
+        <string keyName="name" title="${name}"/>
         <image keyName="logo" title="Logo"/>
       </object>
       <number keyName="defaultUserDiskQuota" title="Default User Disk Quota"
