@@ -13,7 +13,8 @@ export const mapping = (item: Item<DatasetSpec>) => {
     displayName: item.spec.displayName || item.metadata.name,
     access: item.spec.access,
     type: item.spec.type,
-    url: item.spec.url
+    url: item.spec.url,
+    variables: item.spec.variables
   };
 };
 
@@ -27,7 +28,8 @@ export const mutationMapping = (data: any) => {
       displayName: data.displayName,
       access: data.access,
       type: data.type,
-      url: data.url
+      url: data.url,
+      variables: data.variables
     }
   };
 };
