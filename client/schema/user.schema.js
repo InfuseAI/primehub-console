@@ -21,7 +21,7 @@ configure({
             name: '__1',
             keyName: '__1',
             childrenName: [],
-            title: 'Send Email',
+            title: '${sendEmail}',
             component: Layouts.default,
             children: [{
               type: 'object',
@@ -41,7 +41,7 @@ configure({
             keyName: '__2',
             childrenName: [],
             component: Layouts.default,
-            title: 'Reset Password',
+            title: '${resetPassword}',
             children: [{
               type: 'object',
               nodeType: 'plugins.object',
@@ -63,30 +63,30 @@ configure({
 })
 
 export default () => (
-  <array keyName="user" title="Users"
+  <array keyName="user" title="${users}"
     controlDeployAndResetButtons={true}
     cacheActions={true}
     hideButtons={true}
     packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
-        title: 'Username',
+        title: '${username}',
         dataIndex: 'username'
       }, {
-        title: 'Email',
+        title: '${email}',
         dataIndex: 'email'
       }, {
-        title: 'Name',
+        title: '${email}',
         dataIndex: 'firstName',
         render: (text, record) => `${text} ${record.lastName}`
       }, {
-        title: 'Enabled',
+        title: '${enabled}',
         dataIndex: 'enabled'
       }, {
-        title: 'Admin',
+        title: '${isAdmin}',
         dataIndex: 'isAdmin'
       }, {
-        title: 'Totp',
+        title: '${totp}',
         dataIndex: 'totp'
       }],
     }}
@@ -97,11 +97,11 @@ export default () => (
         component={Filter}
         fields={[{
           type: 'text',
-          label: 'Username',
+          label: '${username}',
           key: 'username'
         }, {
           type: 'text',
-          label: 'Email',
+          label: '${email}',
           key: 'email'
         }]}
       />
@@ -110,23 +110,23 @@ export default () => (
     <Layout component={Tab} disabledKeysInCreate={['__1', '__2']}>
     {/* <Layout component={CustomizeBlock} disabledKeysInCreate={['__1', '__2']}> */}
     {/* <image keyName="thumbnail" title="Thumbnail" disabled /> */}
-    <Default title="Basic Info" keyName="basicInfo">
-      <string keyName="username" title="Username"
+    <Default title="${basicInfo}" keyName="basicInfo">
+      <string keyName="username" title="${username}"
         validation={{pattern: '^[a-z0-9_]+$'}}
         required
       />
-      <string keyName="email" title="Email" required validation={{format: 'email'}}/>
+      <string keyName="email" title="${email}" required validation={{format: 'email'}}/>
       <Layout component={HideInCreate}>
-        <string keyName="firstName" title="FirstName" />
-        <string keyName="lastName" title="LastName" />
-        <boolean keyName="totp" title="Totp" />
-        <boolean keyName="isAdmin" title="IsAdmin" />
-        <boolean keyName="enabled" title="Enabled" />
+        <string keyName="firstName" title="${firstName}" />
+        <string keyName="lastName" title="${lastName}" />
+        <boolean keyName="totp" title="${totp}" />
+        <boolean keyName="isAdmin" title="${isAdmin}" />
+        <boolean keyName="enabled" title="${enabled}" />
         {/* <number keyName="createdTimestamp" title="CreatedTimestamp" /> */}
-        <number keyName="personalDiskQuota" title="PersonalDiskQuota" uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
+        <number keyName="personalDiskQuota" title="${personalDiskQuota}" uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
           packageName="../src/cms-components/customize-number-precision"
         />
-        <relation keyName="groups" title="Groups"
+        <relation keyName="groups" title="${groups}"
           packageName='../src/cms-components/customize-relation-table'
           relation={{
             to: 'group',
@@ -135,16 +135,16 @@ export default () => (
           uiParams={{
             textCol: 'displayName',
             columns: [{
-              title: 'Display Name',
+              title: '${displayName}',
               dataIndex: 'displayName'
             }, {
-              title: 'Can Use GPU',
+              title: '${canUseGPU}',
               dataIndex: 'canUseGpu'
             }, {
-              title: 'GPU Quota',
+              title: '${gpuQuota}',
               dataIndex: 'gpuQuota'
             }, {
-              title: 'Disk Quota',
+              title: '${diskQuota}',
               dataIndex: 'diskQuota'
             }]
           }}
@@ -154,7 +154,7 @@ export default () => (
               component={Filter}
               fields={[{
                 type: 'text',
-                label: 'Display Name',
+                label: '${displayName}',
                 key: 'displayName'
               }]}
             />

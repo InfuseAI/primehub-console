@@ -3,28 +3,28 @@ import builder, {Default} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
-  <array keyName="dataset" title="Dataset"
+  <array keyName="dataset" title="${dataset}"
     controlDeployAndResetButtons={true}
     cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
-        title: 'Name',
+        title: '${name}',
         dataIndex: 'name'
       }, {
-        title: 'Display Name',
+        title: '${displayName}',
         dataIndex: 'displayName'
       }, {
-        title: 'Description',
+        title: '${description}',
         dataIndex: 'description'
       }]
     }}
   >
     <Default>
-    <string keyName="name" title="Name" />
-    <string keyName="displayName" title="Display Name" />
-    <string keyName="description" title="Description" />
-    <string keyName="access" title="Access" ui="select"
+    <string keyName="name" title="${name}" />
+    <string keyName="displayName" title="${displayName}" />
+    <string keyName="description" title="${description}" />
+    <string keyName="access" title="${access}" ui="select"
       uiParams={{
         options: [{
           text: 'group',
@@ -38,7 +38,7 @@ export default () => (
         }]
       }}
     />
-    <string keyName="type" title="Type"
+    <string keyName="type" title="${type}"
       ui="select"
       uiParams={{
         options: [{
@@ -50,19 +50,19 @@ export default () => (
         }]
       }}
     />
-    <string keyName="url" title="Url" packageName="../src/cms-components/customize-string-link"
+    <string keyName="url" title="${url}" packageName="../src/cms-components/customize-string-link"
       hideTitle
       uiParams={{
         isHidden: record => !record || record.type !== 'git',
       }}
     />
-    <object keyName="variables" title="variables" packageName="../src/cms-components/customize-object-dynamic-field"
+    <object keyName="variables" title="${variables}" packageName="../src/cms-components/customize-object-dynamic-field"
       hideTitle
       uiParams={{
         isHidden: record => !record || record.type !== 'env',
       }}
     />
-    <relation keyName="groups" title="Groups"
+    <relation keyName="groups" title="${groups}"
       packageName='../src/cms-components/customize-relation-table'
       relation={{
         to: 'group',
@@ -73,16 +73,16 @@ export default () => (
         isHidden: record => !record || record.access !== 'group',
         textCol: 'displayName',
         columns: [{
-          title: 'Display Name',
+          title: '${displayName}',
           dataIndex: 'displayName'
         }, {
-          title: 'Can Use GPU',
+          title: '${canUseGpu}',
           dataIndex: 'canUseGpu'
         }, {
-          title: 'GPU Quota',
+          title: '${gpuQuota}',
           dataIndex: 'gpuQuota'
         }, {
-          title: 'Disk Quota',
+          title: '${diskQuota}',
           dataIndex: 'diskQuota'
         }]
       }}
@@ -92,7 +92,7 @@ export default () => (
           component={Filter}
           fields={[{
             type: 'text',
-            label: 'Display Name',
+            label: '${displayName}',
             key: 'displayName'
           }]}
         />

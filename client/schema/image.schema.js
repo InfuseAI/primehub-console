@@ -3,30 +3,30 @@ import builder from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
-  <array keyName="image" title="Images"
+  <array keyName="image" title="${images}"
     cannerDataType="array"
     controlDeployAndResetButtons={true}
     cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
-        title: 'Name',
+        title: '${name}',
         dataIndex: 'name'
       }, {
-        title: 'Display Name',
+        title: '${displayName}',
         dataIndex: 'displayName'
       }, {
-        title: 'Description',
+        title: '${description}',
         dataIndex: 'description'
       }]
     }}
   >
-    <string keyName="name" title="Name" />
-    <string keyName="displayName" title="Display Name" />
-    <string keyName="description" title="Description" />
-    <string keyName="url" title="Url" ui="link"/>
-    <boolean keyName="global" title="Global" />
-    <relation keyName="groups" title="Groups"
+    <string keyName="name" title="${name}" />
+    <string keyName="displayName" title="${displayName}" />
+    <string keyName="description" title="${description}" />
+    <string keyName="url" title="${url}" ui="link"/>
+    <boolean keyName="global" title="${global}" />
+    <relation keyName="groups" title="${groups}"
       packageName='../src/cms-components/customize-relation-table'
       relation={{
         to: 'group',
@@ -37,16 +37,16 @@ export default () => (
         isHidden: record => record && record.global,
         textCol: 'displayName',
         columns: [{
-          title: 'Display Name',
+          title: '${displayName}',
           dataIndex: 'displayName'
         }, {
-          title: 'Can Use GPU',
+          title: '${canUseGpu}',
           dataIndex: 'canUseGpu'
         }, {
-          title: 'GPU Quota',
+          title: '${gpuQuota}',
           dataIndex: 'gpuQuota'
         }, {
-          title: 'Disk Quota',
+          title: '${diskQuota}',
           dataIndex: 'diskQuota'
         }]
       }}
@@ -56,7 +56,7 @@ export default () => (
           component={Filter}
           fields={[{
             type: 'text',
-            label: 'Display Name',
+            label: '${displayName}',
             key: 'displayName'
           }]}
         />

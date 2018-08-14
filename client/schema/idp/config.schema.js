@@ -6,7 +6,7 @@ export default () => (
     uiParams={{
       selectedKey: 'providerId',
       options: [{
-        title: 'SAML Config',
+        title: '${saml}',
         key: 'saml',
         renderKeys: [
           '', 'singleSignOnServiceUrl', 'backchannelSupported',
@@ -16,7 +16,7 @@ export default () => (
           'useJwksUrl'
         ]
       }, {
-        title: 'OIDC Config',
+        title: '${oidc}',
         key: 'oidc',
         renderKeys: [
           'hideOnLoginPage', 'loginHint', 'validateSignature',
@@ -26,10 +26,10 @@ export default () => (
       }]
     }}
   >
-    <string keyName="hideOnLoginPage" title="Hide on Login Page" layout="horizontal"/>
-    <string keyName="singleSignOnServiceUrl" title="Single Sign-On Service URL" layout="horizontal"/>
-    <string keyName="backchannelSupported" title="Backchannel Logout" layout="horizontal"/>
-    <string keyName="nameIDPolicyFormat" title="NameID Policy Format"
+    <string keyName="hideOnLoginPage" title="${hideOnLoginPage}" layout="horizontal"/>
+    <string keyName="singleSignOnServiceUrl" title="${singleSignOnServiceUrl}" layout="horizontal"/>
+    <string keyName="backchannelSupported" title="${backchannelSupported}" layout="horizontal"/>
+    <string keyName="nameIDPolicyFormat" title="${nameIDPolicyFormat}"
       ui="select"
       uiParams={{
         options: [{
@@ -38,23 +38,23 @@ export default () => (
         }]
       }}
     layout="horizontal"/>
-    <string keyName="postBindingResponse" title="HTTP-POST Binding Response" layout="horizontal"/>
-    <string keyName="postBindingAuthnRequest" title="HTTP-POST Binding for AuthnRequest" layout="horizontal"/>
-    <string keyName="postBindingLogout" title="HTTP-POST Binding Logout" layout="horizontal"/>
-    <string keyName="wantAuthnRequestsSigned" title="Want AuthnRequests Signed" layout="horizontal"/>
-    <string keyName="wantAssertionsSigned" title="Want Assertions Signed" layout="horizontal"/>
-    <string keyName="wantAssertionsEncrypted" title="Want Assertions Encrypted" layout="horizontal"/>
-    <string keyName="forceAuthn" title="Force Authentication" layout="horizontal"/>
-    <string keyName="validateSignature" title="Validate Signature" layout="horizontal"/>
-    <string keyName="samlXmlKeyNameTranformer" title="SamlXmlKeyNameTranformer" layout="horizontal"/>
-    <string keyName="signatureAlgorithm" title="SignatureAlgorithm" layout="horizontal"/>
-    <string keyName="useJwksUrl" title="UseJwksUrl" layout="horizontal"/>
+    <string keyName="postBindingResponse" title="${postBindingResponse}" layout="horizontal"/>
+    <string keyName="postBindingAuthnRequest" title="${postBindingAuthnRequest}" layout="horizontal"/>
+    <string keyName="postBindingLogout" title="${postBindingLogout}" layout="horizontal"/>
+    <string keyName="wantAuthnRequestsSigned" title="${wantAuthnRequestsSigned}" layout="horizontal"/>
+    <string keyName="wantAssertionsSigned" title="${wantAssertionsSigned}" layout="horizontal"/>
+    <string keyName="wantAssertionsEncrypted" title="${wantAssertionsEncrypted}" layout="horizontal"/>
+    <string keyName="forceAuthn" title="${forceAuthn}" layout="horizontal"/>
+    <string keyName="validateSignature" title="${validateSignature}" layout="horizontal"/>
+    <string keyName="samlXmlKeyNameTranformer" title="${samlXmlKeyNameTranformer}" layout="horizontal"/>
+    <string keyName="signatureAlgorithm" title="${signatureAlgorithm}" layout="horizontal"/>
+    <string keyName="useJwksUrl" title="${useJwksUrl}" layout="horizontal"/>
 
-    <string keyName="loginHint" title="LoginHint" layout="horizontal"/>
-    <string keyName="clientId" title="ClientId" layout="horizontal"/>
-    <string keyName="tokenUrl" title="TokenUrl" layout="horizontal"/>
-    <string keyName="authorizationUrl" title="AuthorizationUrl" layout="horizontal"/>
-    <string keyName="disableUserInfo" title="DisableUserInfo" layout="horizontal"/>
-    <string keyName="clientSecret" title="ClientSecret" layout="horizontal"/>
+    <string keyName="loginHint" title="${loginHint}" layout="horizontal"/>
+    <string keyName="clientId" title="${clientId}" layout="horizontal"/>
+    <string keyName="tokenUrl" title="${tokenUrl}" layout="horizontal"/>
+    <string keyName="authorizationUrl" title="${authorizationUrl}" layout="horizontal"/>
+    <string keyName="disableUserInfo" title="${disableUserInfo}" layout="horizontal"/>
+    <string keyName="clientSecret" title="${clientSecret}" layout="horizontal"/>
   </object>
 );

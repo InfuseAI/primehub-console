@@ -4,22 +4,22 @@ import builder, {Tabs, Default} from 'canner-script';
 import Config from './config.schema';
 
 export default () => (
-  <array keyName="idp" title="Identity Provider"
+  <array keyName="idp" title="${idp}"
     ui="tableRoute"
     uiParams={{
       columns: [{
-        title: 'Alias',
+        title: '${alias}',
         dataIndex: 'alias'
       }, {
-        title: 'Provider Id',
+        title: '${providerId}',
         dataIndex: 'providerId'
       }]
     }}
   >
     <Tabs>
-    <Default keyName="idp" title="Identity Provider">
-      <string keyName="alias" title="Alias" layout="horizontal"/>
-      <string keyName="providerId" title="providerId"
+    <Default keyName="idp" title="${idp}">
+      <string keyName="alias" title="${alias}" layout="horizontal"/>
+      <string keyName="providerId" title="${providerId}"
         ui="select"
         uiParams={{
           options: [{
@@ -32,14 +32,14 @@ export default () => (
         }}
       layout="horizontal"/>
       {/* <string keyName="internalId" title="InternalId" layout="horizontal"/> */}
-      <boolean keyName="enabled" title="Enabled" layout="horizontal"/>
-      <boolean keyName="updateProfileFirstLoginMode" title="Update Profile First Login Mode" layout="horizontal"/>
-      <boolean keyName="trustEmail" title="Trust Email" layout="horizontal"/>
-      <boolean keyName="storeToken" title="Store Token" layout="horizontal"/>
-      <boolean keyName="addReadTokenRoleOnCreate" title="Add Read Token Role on Create" layout="horizontal"/>
-      <boolean keyName="authenticateByDefault" title="Authenticate by Default" layout="horizontal"/>
-      <boolean keyName="linkOnly" title="Account Linking Only" layout="horizontal"/>
-      <string keyName="firstBrokerLoginFlowAlias" title="First Login Flow"
+      <boolean keyName="enabled" title="${enabled}" layout="horizontal"/>
+      <boolean keyName="updateProfileFirstLoginMode" title="${updateProfileFirstLoginMode}" layout="horizontal"/>
+      <boolean keyName="trustEmail" title="${trustEmail}" layout="horizontal"/>
+      <boolean keyName="storeToken" title="${storeToken}" layout="horizontal"/>
+      <boolean keyName="addReadTokenRoleOnCreate" title="${addReadTokenRoleOnCreate}" layout="horizontal"/>
+      <boolean keyName="authenticateByDefault" title="${authenticateByDefault}" layout="horizontal"/>
+      <boolean keyName="linkOnly" title="${linkOnly}" layout="horizontal"/>
+      <string keyName="firstBrokerLoginFlowAlias" title="${firstBrokerLoginFlowAlias}"
         ui="select"
         uiParams={{
           options: [{
@@ -49,7 +49,7 @@ export default () => (
         }}
       layout="horizontal"/>
     </Default>
-    <Default keyName="config" title="Config">
+    <Default keyName="config" title="${config}">
       <Config />
     </Default>
     </Tabs>
