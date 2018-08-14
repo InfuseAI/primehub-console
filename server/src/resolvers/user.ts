@@ -1,6 +1,6 @@
 import KcAdminClient from 'keycloak-admin';
 import { pick, omit, find, isUndefined, first } from 'lodash';
-import { toRelay, toAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota } from './utils';
+import { toRelay, toAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter } from './utils';
 import { detaultSystemSettings } from './constant';
 import { Attributes, FieldType } from './attr';
 import { Context } from './interface';
@@ -87,9 +87,7 @@ const deassignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdm
 
 const listQuery = async (kcAdminClient: KcAdminClient, where: any) => {
   let users = await kcAdminClient.users.find();
-  if (where && where.id) {
-    users = users.filter(user => user.id === where.id);
-  }
+  users = filter(users, where);
   return users;
 };
 

@@ -140,7 +140,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
       }
     }
   });
-  app.use(morgan('combined'));
+
+  if (!process.env.TEST) {
+    app.use(morgan('combined'));
+  }
 
   app.use(views(path.join(__dirname, './views'), {
     extension: 'pug'

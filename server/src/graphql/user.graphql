@@ -45,6 +45,8 @@ input UserWhereUniqueInput {
 
 input UserWhereInput {
   id: ID
+	username_contains: String
+	email_contains: String
 }
 
 """Mutation input"""

@@ -1,5 +1,5 @@
 import KcAdminClient from 'keycloak-admin';
-import { toRelay, getFromAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota } from './utils';
+import { toRelay, getFromAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter } from './utils';
 import CrdClient from '../crdClient/crdClientImpl';
 import { mapValues, find, pick, first } from 'lodash';
 import { unflatten } from 'flat';
@@ -138,9 +138,7 @@ const listQuery = async (kcAdminClient: KcAdminClient, where: any, context: Cont
   const everyoneGroupId = context.everyoneGroupId;
   // filter out everyone
   groups = groups.filter(group => group.id !== everyoneGroupId);
-  if (where && where.id) {
-    groups = groups.filter(group => group.id === where.id);
-  }
+  groups = filter(groups, where);
   // inject more fields from single query
   const fetchedGroups = await Promise.all(groups.map(group => kcAdminClient.groups.findOne({id: group.id})));
   return fetchedGroups;
@@ -176,7 +174,7 @@ export const typeResolvers = {
     getFromAttr('diskQuota', parent.attributes, 10, parseDiskQuota),
 
   displayName: async (parent, args, context: Context) =>
-    getFromAttr('displayName', parent.attributes, parent.name),
+    getFromAttr('displayName', parent.attributes, null),
 
   users: async (parent, args, context: Context) => {
     try {

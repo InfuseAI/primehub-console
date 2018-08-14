@@ -171,7 +171,7 @@ describe('user graphql', function() {
     expect(data.user).to.deep.include(user);
   });
 
-  it('should query users with where', async () => {
+  it('should query users with where id equals', async () => {
     const user = this.currentUser;
     const data = await this.graphqlRequest(`
     query ($where: UserWhereInput!){
@@ -183,6 +183,56 @@ describe('user graphql', function() {
     });
 
     expect(data.users[0]).to.deep.include(user);
+  });
+
+  it('should query users with where contains username', async () => {
+    const user = this.currentUser;
+    const data = await this.graphqlRequest(`
+    query ($where: UserWhereInput!){
+      users(where: $where) { ${userFields} }
+    }`, {
+      where: {
+        username_contains: 'notExist'
+      }
+    });
+
+    expect(data.users.length).to.be.equals(0);
+
+    // prefix
+    const prefixData = await this.graphqlRequest(`
+    query ($where: UserWhereInput!){
+      users(where: $where) { ${userFields} }
+    }`, {
+      where: {
+        username_contains: user.username.slice(0, 4)
+      }
+    });
+
+    expect(prefixData.users.length).to.be.equals(1);
+
+    // postfix
+    const postfixData = await this.graphqlRequest(`
+    query ($where: UserWhereInput!){
+      users(where: $where) { ${userFields} }
+    }`, {
+      where: {
+        username_contains: user.username.slice(2)
+      }
+    });
+
+    expect(postfixData.users.length).to.be.equals(1);
+
+    // middle
+    const middleData = await this.graphqlRequest(`
+    query ($where: UserWhereInput!){
+      users(where: $where) { ${userFields} }
+    }`, {
+      where: {
+        username_contains: user.username.slice(2, -1)
+      }
+    });
+
+    expect(middleData.users.length).to.be.equals(1);
   });
 
   it('should update an user', async () => {

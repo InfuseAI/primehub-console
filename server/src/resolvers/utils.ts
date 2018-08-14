@@ -11,7 +11,6 @@ import {
   mapValues
 } from 'lodash';
 import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
-import KcAdminClient from 'keycloak-admin';
 
 export interface Pagination {
   last?: number;
@@ -80,6 +79,23 @@ export const toRelay = (rows: any[], pagination?: Pagination) => {
       endCursor: (_last(paginatedRows) || {} as any).id
     }
   };
+};
+
+export const filter = (rows: any[], where?: any) => {
+  if (isEmpty(where)) {
+    return rows;
+  }
+
+  Object.keys(where).forEach(field => {
+    if (field === 'id') {
+      rows = rows.filter(row => row.id === where.id);
+    } else if (field.indexOf('contains') >= 0) {
+      const fieldName = field.replace('_contains', '');
+      const value = where[field];
+      rows = rows.filter(row => row[fieldName] && row[fieldName].includes && row[fieldName].includes(value));
+    }
+  });
+  return rows;
 };
 
 export const extractPagination = (args: any): Pagination => {

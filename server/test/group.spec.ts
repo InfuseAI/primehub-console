@@ -111,7 +111,7 @@ describe('group graphql', function() {
     expect(data.groups.length).to.be.least(1);
   });
 
-  it('should list groups by where', async () => {
+  it('should list groups by where id equals', async () => {
     const data = await this.graphqlRequest(`
     query ($where: GroupWhereInput!) {
       groups (where: $where) { ${groupFields} }
@@ -120,6 +120,56 @@ describe('group graphql', function() {
     });
 
     expect(data.groups.length).to.be.equals(1);
+  });
+
+  it('should query groups with where contains name', async () => {
+    const group = this.currentGroup;
+    const data = await this.graphqlRequest(`
+    query ($where: GroupWhereInput!){
+      groups(where: $where) { ${groupFields} }
+    }`, {
+      where: {
+        name_contains: 'notExist'
+      }
+    });
+
+    expect(data.groups.length).to.be.equals(0);
+
+    // prefix
+    const prefixData = await this.graphqlRequest(`
+    query ($where: GroupWhereInput!){
+      groups(where: $where) { ${groupFields} }
+    }`, {
+      where: {
+        name_contains: group.name.slice(0, 4)
+      }
+    });
+
+    expect(prefixData.groups.length).to.be.equals(1);
+
+    // postfix
+    const postfixData = await this.graphqlRequest(`
+    query ($where: GroupWhereInput!){
+      groups(where: $where) { ${groupFields} }
+    }`, {
+      where: {
+        name_contains: group.name.slice(2)
+      }
+    });
+
+    expect(postfixData.groups.length).to.be.equals(1);
+
+    // middle
+    const middleData = await this.graphqlRequest(`
+    query ($where: GroupWhereInput!){
+      groups(where: $where) { ${groupFields} }
+    }`, {
+      where: {
+        name_contains: group.name.slice(2, -1)
+      }
+    });
+
+    expect(middleData.groups.length).to.be.equals(1);
   });
 
   it('should get a group', async () => {
