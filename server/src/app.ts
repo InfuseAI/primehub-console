@@ -121,6 +121,13 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
   const app = new Koa() as any;
   app.keys = [config.cookieSignedKey];
 
+  // setup
+  app.use(async (ctx: Context, next) => {
+    ctx.state.locale = config.locale;
+    return next();
+  });
+
+  // error handler
   app.use(async (ctx: Context, next) => {
     try {
       await next();

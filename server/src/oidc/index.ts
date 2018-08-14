@@ -53,7 +53,8 @@ export class OidcCtrl {
 
   public ensureAdmin = async (ctx: Context, next: any) => {
     if (this.grantType === 'password') {
-      ctx.state = {username: '', thumbnail: ''};
+      ctx.state.username = '';
+      ctx.state.thumbnail = '';
       return next();
     }
 
@@ -72,10 +73,8 @@ export class OidcCtrl {
       if (refreshToken.isExpired()) {
         throw Boom.forbidden('refresh token expired', {code: ERRORS.FORCE_LOGIN});
       }
-      ctx.state = {
-        username: ctx.cookies.get('username'),
-        thumbnail: ctx.cookies.get('thumbnail')
-      };
+      ctx.state.username = ctx.cookies.get('username');
+      ctx.state.thumbnail = ctx.cookies.get('thumbnail');
       return next();
     } catch (err) {
       // redirect to keycloak

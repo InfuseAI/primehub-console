@@ -2,6 +2,7 @@ import { pickBy } from 'lodash';
 
 export interface Config {
   env: string;
+  locale: string;
   keycloakBaseUrl: string;
   keycloakRealmName: string;
   keycloakClientId: string;
@@ -27,6 +28,7 @@ export interface Config {
 
 const defaultConfigs = {
   env: 'development',
+  locale: 'en',
   keycloakBaseUrl: 'http://127.0.0.1:8080/auth',
   keycloakRealmName: 'master',
   keycloakGrantType: 'password',
@@ -46,6 +48,7 @@ const prodConfigs = {
 
 export default (): Config => {
   const envConfigs = pickBy({
+    locale: process.env.CANNER_LOCALE,
     keycloakBaseUrl: process.env.KC_BASEURL,
     keycloakRealmName: process.env.KC_REALM,
     keycloakGrantType: process.env.KC_GRANT_TYPE,
