@@ -6,9 +6,9 @@ export default () => (
     <Block title="System Settings">
       <object keyName="org">
         <string keyName="name" title="${name}"/>
-        <image keyName="logo" title="Logo"/>
+        <image keyName="logo" title="${logo}"/>
       </object>
-      <number keyName="defaultUserDiskQuota" title="Default User Disk Quota"
+      <number keyName="defaultUserDiskQuota" title="${defaultUserDiskQuota}"
          uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
          packageName="../src/cms-components/customize-number-precision"
       />

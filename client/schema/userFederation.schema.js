@@ -3,23 +3,23 @@ import builder, {Block, Default, Tabs} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
-  <array keyName="userFederations" title="User Federations"
+  <array keyName="userFederations" title="${userFederations}"
     controlDeployAndResetButtons={true}
     cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
-        title: 'Name',
+        title: '${name}',
         dataIndex: 'name'
       }, {
-        title: 'Type',
+        title: '${type}',
         dataIndex: 'type'
       }]
     }}
   >
-    <Block title="Basic Information">
+    <Block title="${basicInformation}">
       <string keyName="type"
-        title="Type"
+        title="${type}"
         ui="select"
         uiParams={{
           options: [{
@@ -28,9 +28,9 @@ export default () => (
           }]
         }}
       />
-      <string title="Name" keyName="name"/>
+      <string title="${name}" keyName="name"/>
     </Block>
-    <Block title="Config">
+    <Block title="${config}">
     <object keyName="config" packageName='../src/cms-components/customize-object-options'
       uiParams={{
         selectedKey: 'type',
@@ -43,14 +43,14 @@ export default () => (
       }}
     >
       <Tabs keyName="ldap">
-        <Default keyName="requiredSettings" title="Required Settings">
-          <boolean keyName="enabled" title="Enabled"  layout="horizontal"/>
-          <number keyName="priority" title="Priority"  layout="horizontal" uiParams={{precision: 0, step: 1}}
+        <Default keyName="requiredSettings" title="${requiredSettings}">
+          <boolean keyName="enabled" title="${enabled}"  layout="horizontal"/>
+          <number keyName="priority" title="${priority}"  layout="horizontal" uiParams={{precision: 0, step: 1}}
             packageName="../src/cms-components/customize-number-precision"
           />
-          <boolean keyName="importEnabled" title="Import Users"  layout="horizontal"/>
-          <boolean keyName="syncRegistrations" title="Sync Registrations"  layout="horizontal"/>
-          <string keyName="vendor" title="Vendor"
+          <boolean keyName="importEnabled" title="${importEnabled}"  layout="horizontal"/>
+          <boolean keyName="syncRegistrations" title="${syncRegistrations}"  layout="horizontal"/>
+          <string keyName="vendor" title="${vendor}"
             layout="horizontal"
             ui="select"
             uiParams={{
@@ -60,13 +60,13 @@ export default () => (
               }]
             }}
           />
-          <string keyName="usernameLDAPAttribute" title="Username LDAP attribute"  layout="horizontal"/>
-          <string keyName="rdnLDAPAttribute" title="RDN LDAP attribute"  layout="horizontal"/>
-          <string keyName="uuidLDAPAttribute" title="UUID LDAP attribute"  layout="horizontal"/>
-          <string keyName="userObjectClasses" title="User Object Classes"  layout="horizontal"/>
-          <string keyName="connectionUrl" title="Connection URL"  layout="horizontal"/>
-          <string keyName="usersDn" title="Users DN"  layout="horizontal"/>
-          <string keyName="authType" title="Authentication Type"
+          <string keyName="usernameLDAPAttribute" title="${usernameLDAPAttribute}"  layout="horizontal"/>
+          <string keyName="rdnLDAPAttribute" title="${rdnLDAPAttribute}"  layout="horizontal"/>
+          <string keyName="uuidLDAPAttribute" title="${uuidLDAPAttribute}"  layout="horizontal"/>
+          <string keyName="userObjectClasses" title="${userObjectClasses}"  layout="horizontal"/>
+          <string keyName="connectionUrl" title="${connectionUrl}"  layout="horizontal"/>
+          <string keyName="usersDn" title="${usersDn}"  layout="horizontal"/>
+          <string keyName="authType" title="${authType}"
             ui="select"
             uiParams={{
               options: [{
@@ -76,11 +76,11 @@ export default () => (
             }}
             layout="horizontal"
           />
-          <string keyName="bindDn" title="Bind DN"  layout="horizontal"/>
-          <string keyName="bindCredential" title="Bind Credential"  layout="horizontal"/>
-          <number keyName="searchScope" title="Search Scope"  layout="horizontal" uiParams={{min: 0}}/>
-          <boolean keyName="validatePasswordPolicy" title="Validate Password Policy"  layout="horizontal"/>
-          <string keyName="useTruststoreSpi" title="Use Truststore SPI"
+          <string keyName="bindDn" title="${bindDn}"  layout="horizontal"/>
+          <string keyName="bindCredential" title="${bindCredential}"  layout="horizontal"/>
+          <number keyName="searchScope" title="${searchScope}"  layout="horizontal" uiParams={{min: 0}}/>
+          <boolean keyName="validatePasswordPolicy" title="${validatePasswordPolicy}"  layout="horizontal"/>
+          <string keyName="useTruststoreSpi" title="${useTruststoreSpi}"
             ui="select"
             uiParams={{
               options: [{
@@ -90,23 +90,23 @@ export default () => (
             }}
             layout="horizontal"
           />
-          <boolean keyName="connectionPooling" title="Connection Pooling"  layout="horizontal" description="dsa"/>
+          <boolean keyName="connectionPooling" title="${connectionPooling}"  layout="horizontal" description="dsa"/>
 
-          <number keyName="lastSync" title="LastSync"  layout="horizontal"/>
-          <boolean keyName="debug" title="Debug"  layout="horizontal"/>
-          <boolean keyName="pagination" title="Pagination"  layout="horizontal"/>
+          <number keyName="lastSync" title="${lastSync}"  layout="horizontal"/>
+          <boolean keyName="debug" title="${debug}"  layout="horizontal"/>
+          <boolean keyName="pagination" title="${pagination}"  layout="horizontal"/>
         </Default>
-        <Default keyName="kerberosIntegration" title="Kerberos Integration">
-          <boolean keyName="allowKerberosAuthentication" title="Allow Kerberos Authentication"/>
-          <boolean keyName="useKerberosForPasswordAuthentication" title="Use Kerberos For Password Authentication" />
+        <Default keyName="kerberosIntegration" title="${kerberosIntegration}">
+          <boolean keyName="allowKerberosAuthentication" title="${allowKerberosAuthentication}"/>
+          <boolean keyName="useKerberosForPasswordAuthentication" title="${useKerberosForPasswordAuthentication}" />
         </Default>
-        <Default keyName="syncSetting" title="Sync Settings">
-          <number keyName="batchSizeForSync" title="Batch Size" uiParams={{min: 0}} />
-          <number keyName="fullSyncPeriod" title="Periodic Full Sync" />
-          <number keyName="changedSyncPeriod" title="Periodic Changed Users Sync" />
+        <Default keyName="syncSetting" title="${syncSetting} ">
+          <number keyName="batchSizeForSync" title="${batchSizeForSync}" uiParams={{min: 0}} />
+          <number keyName="fullSyncPeriod" title="${fullSyncPeriod}" />
+          <number keyName="changedSyncPeriod" title="${changedSyncPeriod}" />
         </Default>
-        <Default keyName="cacheSettings" title="Cachce Settings">
-          <string keyName="cachePolicy" title="CachePolicy"
+        <Default keyName="cacheSettings" title="${cacheSettings}">
+          <string keyName="cachePolicy" title="${cachePolicy}"
             ui="select"
             uiParams={{
               options: [{

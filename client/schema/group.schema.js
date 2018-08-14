@@ -3,28 +3,28 @@ import builder from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 import {renderRelationField} from './utils';
 export default () => (
-  <array keyName="group" title="Groups"
+  <array keyName="group" title="${group}"
     controlDeployAndResetButtons={true}
     cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
-        title: 'Name',
+        title: '${name}',
         dataIndex: 'name'
       }, {
-        title: 'Display Name',
+        title: '${displayName}',
         dataIndex: 'displayName'
       }, {
-        title: 'Can Use Gpu',
+        title: '${canUseGpu}',
         dataIndex: 'canUseGpu'
       }, {
-        title: 'Cpu Quota',
+        title: '${cpuQuota}',
         dataIndex: 'cpuQuota'
       }, {
-        title: 'Gpu Quota',
+        title: '${gpuQuota}',
         dataIndex: 'gpuQuota'
       }, {
-        title: 'Users',
+        title: '${users}',
         dataIndex: 'users',
         render: renderRelationField
       }]
@@ -35,34 +35,34 @@ export default () => (
         component={Filter}
         fields={[{
           type: 'text',
-          label: 'Name',
+          label: '${name}',
           key: 'name'
         }, {
           type: 'text',
-          label: 'Display Name',
+          label: '${displayName}',
           key: 'displayName'
         }]}
       />
       <pagination />
     </toolbar>
-    <string keyName="name" title="Name"
+    <string keyName="name" title="${name}"
       validation={{pattern: '^[a-z0-9_]+$'}}
       required
     />
-    <string keyName="displayName" title="DisplayName" />
-    <boolean keyName="canUseGpu" title="CanUseGpu" />
+    <string keyName="displayName" title="${displayName}" />
+    <boolean keyName="canUseGpu" title="${canUseGpu}" />
     <number keyName="cpuQuota" uiParams={{min: 0, precision: 1}}
-      title="CpuQuota"
+      title="${cpuQuota}"
       packageName="../src/cms-components/customize-number-precision.js"
     />
-    <number keyName="gpuQuota" title="GpuQuota"  uiParams={{min: 0, step: 1, precision: 0}}
+    <number keyName="gpuQuota" title="${gpuQuota}"  uiParams={{min: 0, step: 1, precision: 0}}
       packageName="../src/cms-components/customize-number-precision.js"
     />
-    <number keyName="diskQuota" title="DiskQuota"
+    <number keyName="diskQuota" title="${diskQuota}"
       uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
       packageName="../src/cms-components/customize-number-precision"
     />
-    <relation keyName="users" title="Users"
+    <relation keyName="users" title="${users}"
       packageName='../src/cms-components/customize-relation-table'
       relation={{
         to: 'user',
@@ -71,7 +71,7 @@ export default () => (
       uiParams={{
         textCol: 'username',
         columns: [{
-          title: 'Username',
+          title: '${username}',
           dataIndex: 'username'
         }]
       }}
@@ -81,7 +81,7 @@ export default () => (
           component={Filter}
           fields={[{
             type: 'text',
-            label: 'Username',
+            label: '${username}',
             key: 'username'
           }]}
         />

@@ -14,17 +14,10 @@ import logo from 'images/primehub-logo-w.png';
 import {RouteComponentProps} from 'react-router';
 import schema from '../schema/index.schema.js';
 import fetch from 'isomorphic-fetch';
-import store from 'store';
-import queryString from 'query-string';
 const MenuItemGroup = Menu.ItemGroup;
 const {Content, Sider, Header} = Layout;
 const confirm = Modal.confirm;
-const TOKEN_NAME = 'canner_graphql_interface_token';
-const params = queryString.parse(location.search);
-if (params && params.token) {
-  store.set(TOKEN_NAME, params.token);
-}
-const TOKEN = store.get(TOKEN_NAME) || '';
+const TOKEN = localStorage.getItem('token');
 declare var process : {
   env: {
     NODE_ENV: string
@@ -33,11 +26,6 @@ declare var process : {
 const graphqlClient = process.env.NODE_ENV === 'production' ? new GraphqlClient({
   uri: "/graphql",
   fetch: (uri, options) => {
-    const body = {
-      schema: schema.schema,
-      ...JSON.parse(options.body)
-    };
-    options.body = JSON.stringify(body);
     options.headers = {
       Authorization: `Bearer ${TOKEN}`,
       ...options.headers || {}
@@ -207,7 +195,7 @@ export default class CMSPage extends React.Component<Props, State> {
               deploying={deploying}
               hasChanged={hasChanged}
               deploy={this.deploy}
-              subMenuTitle={<span><Avatar icon="user" style={{marginRight: '10px'}}/>Hi, </span>}
+              subMenuTitle={<span><Avatar src={localStorage.getItem('thumbnail')} style={{marginRight: '10px'}}/>Hi, {localStorage.getItem('username')}</span>}
             />
           </Header>
           <ReactRouterProvider

@@ -3,7 +3,7 @@ import builder from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
-  <array keyName="instanceType" title="Instance Types"
+  <array keyName="instanceType" title="${instanceTypes}"
     controlDeployAndResetButtons={true}
     cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
@@ -12,46 +12,46 @@ export default () => (
         title: 'Name',
         dataIndex: 'name'
       }, {
-        title: 'Display Name',
+        title: '${displayName}',
         dataIndex: 'displayName'
       }, {
-        title: 'Description',
+        title: '${description}',
         dataIndex: 'description'
       }, {
-        title: 'CPU Limit',
+        title: '${cpuLimit}',
         dataIndex: 'cpuLimit'
       }, {
-        title: 'GPU Limit',
+        title: '${gpuLimit}',
         dataIndex: 'gpuLimit'
       }, {
-        title: 'Memory Limit',
+        title: '${memoryLimit}',
         dataIndex: 'memoryLimit',
         render: text => `${text} MB`
       }]
     }}
   >
-    <string keyName="name" title="Name" />
-    <string keyName="displayName" title="Display Name" />
-    <string keyName="description" title="Description" />
-    <number keyName="cpuLimit" title="CPU Limit" uiParams={{min: 0, step: 1, precision: 1}}
+    <string keyName="name" title="${name}" />
+    <string keyName="displayName" title="${displayName}" />
+    <string keyName="description" title="${description}" />
+    <number keyName="cpuLimit" title="${cpuLimit}" uiParams={{min: 0, step: 1, precision: 1}}
       packageName="../src/cms-components/customize-number-precision.js"
     />
-    <number keyName="memoryLimit" title="Memory Limit"
+    <number keyName="memoryLimit" title="${memoryLimit}"
       uiParams={{unit: ' MB', step: 1, min: 0, precision: 1}}
       packageName="../src/cms-components/customize-number-precision"
     />
-    <number keyName="gpuLimit" title="GPU Limit" uiParams={{min: 0, precision: 0, step: 1}}
+    <number keyName="gpuLimit" title="${gpuLimit}" uiParams={{min: 0, precision: 0, step: 1}}
       packageName="../src/cms-components/customize-number-precision.js"
     />
-    <number keyName="cpuRequest" title="CPU Request" uiParams={{min: 0, step: 1, precision: 1}}
+    <number keyName="cpuRequest" title="${cpuRequest}" uiParams={{min: 0, step: 1, precision: 1}}
       packageName="../src/cms-components/customize-number-precision.js"
     />
-    <number keyName="memoryRequest" title="Memory Request"
+    <number keyName="memoryRequest" title="${memoryRequest}"
       uiParams={{unit: ' MB', step: 1, min: 0, precision: 1}}
       packageName="../src/cms-components/customize-number-precision"
     />
-    <boolean keyName="global" title="Global" />
-    <relation keyName="groups" title="Groups"
+    <boolean keyName="global" title="${global}" />
+    <relation keyName="groups" title="${groups}"
       packageName='../src/cms-components/customize-relation-table'
       relation={{
         to: 'group',
@@ -63,16 +63,16 @@ export default () => (
         isHidden: record => record && record.global,
         textCol: 'displayName',
         columns: [{
-          title: 'Display Name',
+          title: '${displayName}',
           dataIndex: 'displayName'
         }, {
-          title: 'Can Use GPU',
+          title: '${canUseGpu}',
           dataIndex: 'canUseGpu'
         }, {
-          title: 'GPU Quota',
+          title: '${gpuQuota}',
           dataIndex: 'gpuQuota'
         }, {
-          title: 'Disk Quota',
+          title: '${diskQuota}',
           dataIndex: 'diskQuota'
         }]
       }}
@@ -82,7 +82,7 @@ export default () => (
           component={Filter}
           fields={[{
             type: 'text',
-            label: 'Display Name',
+            label: '${displayName}',
             key: 'displayName'
           }]}
         />
