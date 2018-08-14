@@ -2,6 +2,9 @@
 extends ./layout.pug
 
 block head
+  script.
+    window.username = "#{username}";
+    window.thumbnail = "#{thumbnail}";
 block main
   div(id='root')
   script(src="/index.js")

@@ -18,7 +18,6 @@ import fetch from 'isomorphic-fetch';
 const MenuItemGroup = Menu.ItemGroup;
 const {Content, Sider, Header} = Layout;
 const confirm = Modal.confirm;
-const TOKEN = localStorage.getItem('token');
 declare var process : {
   env: {
     NODE_ENV: string

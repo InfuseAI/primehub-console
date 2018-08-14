@@ -5,6 +5,8 @@
 # import Image, ImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput from "./image.graphql"
 # import Dataset, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 
+scalar JSON
+
 type Query {
   """System"""
   system: System!
