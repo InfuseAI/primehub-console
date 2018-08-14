@@ -3,12 +3,14 @@ import {Map, List, fromJS} from 'immutable';
 import {Modal, Table, Button, Icon} from 'antd';
 const ButtonGroup = Button.Group;
 import styled from 'styled-components';
+import {injectIntl} from 'react-intl';
 
 const ButtonWrapper = styled.div`
   text-align: right;
   margin-top: 16px;
 `;
 
+@injectIntl
 export default class Picker extends PureComponent {
   constructor(props) {
     super(props);
@@ -67,8 +69,16 @@ export default class Picker extends PureComponent {
   }
 
   render() {
-    const { visible, columns, pickOne = false, Toolbar } = this.props;
+    const { visible, columns, pickOne = false, Toolbar, intl, schema } = this.props;
     const { value, selectedRowKeys, hasNextPage, hasPreviousPage } = this.state;
+    const newColumns = columns.map(column => {
+      const matched = column.title.match(/^\$\{(.*)\}$/);
+      const title = matched ? intl.formatMessage({
+        id: matched[1],
+        defaultMessage: column.title
+      }) : column.title;
+      return {...column, title};
+    });
     return <Modal
       width={800}
       onOk={this.handleOk}
@@ -84,7 +94,7 @@ export default class Picker extends PureComponent {
             selectedRowKeys: selectedRowKeys
           }}
           size="middle"
-          columns={columns}
+          columns={newColumns}
           // $FlowFixMe
           dataSource={value.toJS().map(v => ({key: v.id, ...v}))}
           pagination={false}

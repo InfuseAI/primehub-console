@@ -4,8 +4,11 @@ import template from 'lodash/template';
 import difference from "lodash/difference";
 import get from 'lodash/get';
 import Picker from '@canner/antd-share-relation';
+import {injectIntl} from 'react-intl';
+import {FormattedMessage} from "react-intl";
 import {renderValue} from '@canner/antd-locales';
 
+@injectIntl
 export default class RelationTable extends PureComponent {
   constructor(props) {
     super(props);
@@ -52,10 +55,18 @@ export default class RelationTable extends PureComponent {
   render() {
     const { modalVisible } = this.state;
     let { disabled, value = [], uiParams = {}, refId, relation,
-      fetch, fetchRelation, updateQuery, subscribe,
+      fetch, fetchRelation, updateQuery, subscribe, intl,
       schema, Toolbar, relationValue, goTo, rootValue, title
     } = this.props;
-    const newColumnsRender = renderValue(uiParams.columns, schema[relation.to].items.items);
+    const newColumns = uiParams.columns.map(column => {
+      const matched = column.title.match(/^\$\{(.*)\}$/);
+      const title = matched ? intl.formatMessage({
+        id: matched[1],
+        defaultMessage: column.title
+      }) : column.title;
+      return {...column, title};
+    });
+    const newColumnsRender = renderValue(newColumns, schema[relation.to].items.items);
     const recordValue = getRecordValue(rootValue, refId);
     // hack
     const isHidden = uiParams.isHidden ? uiParams.isHidden(recordValue) : false;
@@ -74,19 +85,23 @@ export default class RelationTable extends PureComponent {
         {
           !disabled && <div>
             <a href="javascript:;" onClick={this.showModal}>
-              <Icon type="link" style={{margin: '16px 8px'}}/>connect existed {relation.to}
+              <Icon type="link" style={{margin: '16px 8px'}}/>
+              <FormattedMessage
+                id="relation.multipleSelect.connect"
+                defaultMessage="connect existed "
+              />
+              {schema[relation.to].title}
             </a>
           </div>
         }
         {
           !disabled && <Picker
-            title="選擇你要的物件"
             visible={modalVisible}
             onOk={this.handleOk}
             onCancel={this.handleCancel}
             // $FlowFixMe
             pickedIds={value.map(v => v.id)}
-            columns={uiParams.columns}
+            columns={newColumnsRender}
             refId={refId}
             relation={relation}
             relationValue={relationValue}

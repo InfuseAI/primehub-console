@@ -43,7 +43,7 @@ export default () => (
         ui="select"
         uiParams={{
           options: [{
-            text: 'first broker login',
+            text: '${firstBrokerLogin}',
             value: 'first broker login'
           }]
         }}
