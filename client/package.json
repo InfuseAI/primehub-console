@@ -98,7 +98,7 @@
     "axios": "^0.18.0",
     "canner": "^1.4.7-infuse.3",
     "canner-graphql-interface": "^1.16.1",
-    "canner-helpers": "^0.1.16",
+    "canner-helpers": "^1.0.0-beta.0",
     "canner-layouts": "^1.1.1",
     "gulp": "^3.9.1",
     "gulp-s3": "^0.11.0",

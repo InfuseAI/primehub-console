@@ -3,7 +3,7 @@ import builder, {Block} from 'canner-script';
 import {storage} from './utils';
 export default () => (
   <object keyName="system" title="${system}" storage={storage} >
-    <Block title="System Settings">
+    <Block title="${systemSettings}">
       <object keyName="org">
         <string keyName="name" title="${name}"/>
         <image keyName="logo" title="${logo}"/>

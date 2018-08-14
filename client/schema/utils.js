@@ -3,7 +3,6 @@ import firebase from 'firebase';
 import {FirebaseClientService} from '@canner/image-service-config';
 import {GraphqlClient} from 'canner-graphql-interface';
 import {ImgurService} from '@canner/image-service-config';
-import store from 'store';
 import {FormattedMessage} from 'react-intl';
 
 exports.storage = new ImgurService({
@@ -32,6 +31,7 @@ exports.dict = {
     system: 'System',
     name: 'Name',
     logo: 'Logo',
+    systemSettings: 'System Settings',
     defaultUserDiskQuota: 'Default User Disk Quota',
     users: 'Users',
     basicInfo: 'Basic Info',
