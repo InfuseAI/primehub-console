@@ -159,7 +159,14 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
 
   // router
   const rootRouter = new Router();
+
+  // favicon
+  rootRouter.get('/favicon/*', serve(path.resolve(__dirname, '../static')));
+
+  // ctrl
   mountOidc(rootRouter, oidcCtrl);
+
+  // cms
   rootRouter.get('/cms', oidcCtrl.ensureAdmin, async ctx => {
     await ctx.render('cms', {title: 'PrimeHub'});
   });
