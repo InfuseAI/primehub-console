@@ -25,13 +25,7 @@ declare var process : {
 }
 const graphqlClient = process.env.NODE_ENV === 'production' ? new GraphqlClient({
   uri: "/graphql",
-  fetch: (uri, options) => {
-    options.headers = {
-      Authorization: `Bearer ${TOKEN}`,
-      ...options.headers || {}
-    };
-    return fetch(uri, options);
-  }
+  credentials: "same-origin"
 }): undefined;
 
 export const Logo = styled.img`
@@ -194,7 +188,7 @@ export default class CMSPage extends React.Component<Props, State> {
               deploying={deploying}
               hasChanged={hasChanged}
               deploy={this.deploy}
-              subMenuTitle={<span><Avatar src={localStorage.getItem('thumbnail')} style={{marginRight: '10px'}}/>Hi, {localStorage.getItem('username')}</span>}
+              subMenuTitle={<span><Avatar src={(window as any).thumbnail} style={{marginRight: '10px'}}/>Hi, {(window as any).username}</span>}
             />
           </Header>
           <ReactRouterProvider
