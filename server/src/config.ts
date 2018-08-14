@@ -20,6 +20,7 @@ export interface Config {
   k8sCrdNamespace: string;
   // payload
   payloadSecretKey: string;
+  cookieSignedKey: string;
   // host
   cmsHost: string;
 }
@@ -35,6 +36,7 @@ const defaultConfigs = {
   keycloakClientId: 'admin-cli',
   k8sCrdNamespace: 'default',
   payloadSecretKey: 'cannerSecret',
+  cookieSignedKey: 'cannerSignedCookie',
   cmsHost: 'http://localhost:3000'
 };
 
@@ -53,7 +55,8 @@ export default (): Config => {
     keycloakEveryoneGroupId: process.env.KC_EVERYONE_GROUP_ID,
     keycloakClientId: process.env.KC_CLIENT_ID,
     k8sCrdNamespace: process.env.K8S_CRD_NAMESPACE,
-    payloadSecretKey: process.env.PAYLOAD_SECRET
+    payloadSecretKey: process.env.PAYLOAD_SECRET,
+    cookieSignedKey: process.env.COOKIE_SIGNED_KEY
   });
 
   const env = process.env.NODE_ENV || 'development';

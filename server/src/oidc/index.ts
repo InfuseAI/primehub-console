@@ -62,8 +62,8 @@ export class OidcCtrl {
         throw Boom.forbidden('require token', {code: ERRORS.FORCE_LOGIN});
       }
       // check the user is admin, otherwise throw forbidden
-      const accessToken = new Token(ctx.cookies.get('accessToken'), this.clientId);
-      const refreshToken = new Token(ctx.cookies.get('refreshToken'), this.clientId);
+      const accessToken = new Token(ctx.cookies.get('accessToken', {signed: true}), this.clientId);
+      const refreshToken = new Token(ctx.cookies.get('refreshToken', {signed: true}), this.clientId);
       if (!accessToken.hasRole(this.adminRole)) {
         throw Boom.forbidden('require admin user', {code: ERRORS.FORCE_LOGIN});
       }
@@ -92,7 +92,7 @@ export class OidcCtrl {
   }
 
   public getAccessToken = async (ctx: Context): Promise<string> => {
-    const refreshToken = ctx.cookies.get('refreshToken');
+    const refreshToken = ctx.cookies.get('refreshToken', {signed: true});
     // refresh to get token
     const tokenSet = await this.oidcClient.refresh(refreshToken);
     return tokenSet.access_token;
@@ -107,10 +107,11 @@ export class OidcCtrl {
     }
 
     // redirect to frontend
-    ctx.cookies.set('accessToken', tokenSet.access_token);
-    ctx.cookies.set('refreshToken', tokenSet.refresh_token);
-    ctx.cookies.set('username', accessToken.getContent().preferred_username);
-    ctx.cookies.set('thumbnail', accessToken.getContent().email ? gravatar.url(accessToken.getContent().email) : '');
+    ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true});
+    ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true});
+    ctx.cookies.set('username', accessToken.getContent().preferred_username, {signed: true});
+    ctx.cookies.set('thumbnail',
+      accessToken.getContent().email ? gravatar.url(accessToken.getContent().email) : '', {signed: true});
     return ctx.redirect('/cms');
   }
 

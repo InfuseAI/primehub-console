@@ -119,6 +119,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
 
   // koa
   const app = new Koa() as any;
+  app.keys = [config.cookieSignedKey];
 
   app.use(async (ctx: Context, next) => {
     try {
