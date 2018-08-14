@@ -17,21 +17,13 @@ import fetch from 'isomorphic-fetch';
 const MenuItemGroup = Menu.ItemGroup;
 const {Content, Sider, Header} = Layout;
 const confirm = Modal.confirm;
-const TOKEN = localStorage.getItem('token');
 declare var process : {
   env: {
     NODE_ENV: string
   }
 }
 const graphqlClient = process.env.NODE_ENV === 'production' ? new GraphqlClient({
-  uri: "/graphql",
-  fetch: (uri, options) => {
-    options.headers = {
-      Authorization: `Bearer ${TOKEN}`,
-      ...options.headers || {}
-    };
-    return fetch(uri, options);
-  }
+  uri: "/graphql"
 }): undefined;
 
 export const Logo = styled.img`

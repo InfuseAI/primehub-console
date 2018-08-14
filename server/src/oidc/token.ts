@@ -113,4 +113,8 @@ export default class Token {
 
     return (this.content.realm_access.roles.indexOf(roleName) >= 0);
   }
+
+  public getContent(): any {
+    return this.content;
+  }
 }

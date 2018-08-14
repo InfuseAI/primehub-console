@@ -7,6 +7,7 @@ import { Issuer } from 'openid-client';
 import views from 'koa-views';
 import serve from 'koa-static';
 import Router from 'koa-router';
+import morgan from 'koa-morgan';
 import * as GraphQLJSON from 'graphql-type-json';
 
 import CrdClient from './crdClient/crdClientImpl';
@@ -18,7 +19,7 @@ import { crd as dataset} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
 
 // controller
-import { OidcCtrl } from './oidc';
+import { OidcCtrl, mount as mountOidc } from './oidc';
 
 // config
 import getConfig from './config';
@@ -84,15 +85,15 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
     grantType: config.keycloakGrantType
   });
 
+  const kcAdminClient = new KcAdminClient({
+    baseUrl: config.keycloakBaseUrl,
+    realmName: config.keycloakRealmName
+  });
+
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: async ({req}) => {
-      const kcAdminClient = new KcAdminClient({
-        baseUrl: config.keycloakBaseUrl,
-        realmName: config.keycloakRealmName
-      });
-
+    context: async ({ ctx }) => {
       if (config.keycloakGrantType === 'password') {
         await kcAdminClient.auth({
           username: config.keycloakUsername,
@@ -101,7 +102,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
           grantType: 'password',
         });
       } else {
-        const accessToken = await oidcCtrl.getAccessToken(req.headers.authorization);
+        const accessToken = await oidcCtrl.getAccessToken(ctx);
         kcAdminClient.setAccessToken(accessToken);
       }
 
@@ -118,6 +119,22 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
 
   // koa
   const app = new Koa() as any;
+
+  app.use(async (ctx, next) => {
+    try {
+      await next();
+    } catch (err) {
+      // tslint:disable-next-line:no-console
+      const errorCode = (err.isBoom && err.data && err.data.code) ? err.data.code : 'INTERNAL_ERROR';
+      const statusCode =
+        (err.isBoom && err.output && err.output.statusCode) ? err.output.statusCode : err.status || 500;
+
+      ctx.status = statusCode;
+      ctx.body = {code: errorCode, message: err.message};
+    }
+  });
+  app.use(morgan('combined'));
+
   app.use(views(path.join(__dirname, './views'), {
     extension: 'pug'
   }));
@@ -125,6 +142,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
 
   // router
   const rootRouter = new Router();
+  mountOidc(rootRouter, oidcCtrl);
   rootRouter.get('/cms', oidcCtrl.ensureAdmin, async ctx => {
     await ctx.render('cms', {title: 'PrimeHub'});
   });
