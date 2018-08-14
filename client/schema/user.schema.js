@@ -1,7 +1,7 @@
 /** @jsx builder */
 import builder, {Default, Tabs, Layout, configure, Block} from 'canner-script';
 import RelationTable from '../src/cms-components/customize-relation-table';
-import {storage} from './utils';
+import {storage, SendEmailTitle, ResetPasswordTitle} from './utils';
 import HideInCreate from '../src/cms-layouts/hideInCreate';
 import Tab from '../src/cms-layouts/tab';
 import CustomizeBlock from '../src/cms-layouts/block';
@@ -21,7 +21,7 @@ configure({
             name: '__1',
             keyName: '__1',
             childrenName: [],
-            title: '${sendEmail}',
+            title: SendEmailTitle,
             component: Layouts.default,
             children: [{
               type: 'object',
@@ -41,7 +41,7 @@ configure({
             keyName: '__2',
             childrenName: [],
             component: Layouts.default,
-            title: '${resetPassword}',
+            title: ResetPasswordTitle,
             children: [{
               type: 'object',
               nodeType: 'plugins.object',

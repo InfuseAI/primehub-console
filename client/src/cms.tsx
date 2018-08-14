@@ -1,5 +1,6 @@
 import * as axios from 'axios';
 import * as React from 'react';
+import {injectIntl} from 'react-intl';
 import {Layout, Menu, Icon, notification, Modal, Avatar} from 'antd';
 import CMS, {ReactRouterProvider} from 'canner';
 import ContentHeader from 'components/header';
@@ -23,7 +24,8 @@ declare var process : {
   }
 }
 const graphqlClient = process.env.NODE_ENV === 'production' ? new GraphqlClient({
-  uri: "/graphql"
+  uri: "/graphql",
+  credentials: "same-origin"
 }): undefined;
 
 export const Logo = styled.img`
@@ -33,6 +35,7 @@ export const Logo = styled.img`
 `
 
 export interface Props extends RouteComponentProps<void> {
+  intl: any;
 }
 
 export interface State {
@@ -42,6 +45,7 @@ export interface State {
   dataChanged: Object;
 }
 
+@injectIntl
 export default class CMSPage extends React.Component<Props, State> {
 
   state = {
@@ -79,7 +83,7 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   deploy = () => {
-    const {match} = this.props;
+    const {match, intl} = this.props;
     const {activeKey} = match && match.params as any;
     if (this.cms) {
       this.setState({
@@ -94,8 +98,14 @@ export default class CMSPage extends React.Component<Props, State> {
             deploying: false
           });
           notification.error({
-            message: 'Something Error!',
-            description: 'Your changes have NOT been saved.',
+            message: intl.formatMessage({
+              id: 'deploy.error.message',
+              defaultMessage: 'Something Error!'
+            }),
+            description: intl.formatMessage({
+              id: 'deploy.error.description',
+              defaultMessage: 'Your changes have NOT been saved.'
+            }),
             placement: 'bottomRight'
           });
         });
@@ -103,13 +113,20 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   afterDeploy = () => {
+    const {intl} = this.props;
     setTimeout(() => {
       this.setState({
         deploying: false
       });
       notification.success({
-        message: 'Save successfully!',
-        description: 'Your changes have been saved.',
+        message: intl.formatMessage({
+          id: 'deploy.success.message',
+          defaultMessage: 'Save successfully!'
+        }),
+        description: intl.formatMessage({
+          id: 'deploy.success.description',
+          defaultMessage: 'Your changes have been saved.'
+        }),
         placement: 'bottomRight'
       });
     }, 400);
@@ -123,16 +140,28 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   siderMenuOnClick = (menuItem: {key: string}) => {
-    const {history} = this.props;
+    const {history, intl} = this.props;
     const {dataChanged} = this.state;
     const {key} = menuItem;
 
     if (dataChanged && Object.keys(dataChanged).length > 0) {
       confirm({
-        title: 'Do you want to undo the changes?',  
-        content: <div>Your changes will be lost, if you don't save them.</div>,
-        okText: 'Undo',
-        cancelText: 'Cancel',
+        title: intl.formatMessage({
+          id: 'deploy.confirm.title',
+          defaultMessage: 'Do you want to undo the changes?'
+        }),  
+        content: intl.formatMessage({
+          id: 'deploy.confirm.content',
+          defaultMessage: `Your changes will be lost, if you don't save them.`
+        }),
+        okText: intl.formatMessage({
+          id: 'deploy.confirm.ok',
+          defaultMessage: `Undo`
+        }),
+        cancelText: intl.formatMessage({
+          id: 'deploy.confirm.cancel',
+          defaultMessage: `Cancel`
+        }),
         onOk: () => {
           return new Promise((resolve, reject) => {
             setTimeout(resolve, 1000);
@@ -157,7 +186,6 @@ export default class CMSPage extends React.Component<Props, State> {
     if (hasError) {
       return <Error/>;
     }
-
     return (
       <Layout style={{minHeight: '100vh'}}>
         <Sider breakpoint="sm">
@@ -187,7 +215,7 @@ export default class CMSPage extends React.Component<Props, State> {
               deploying={deploying}
               hasChanged={hasChanged}
               deploy={this.deploy}
-              subMenuTitle={<span><Avatar src={localStorage.getItem('thumbnail')} style={{marginRight: '10px'}}/>Hi, {localStorage.getItem('username')}</span>}
+              subMenuTitle={<span><Avatar src={(window as any).thumbnail} style={{marginRight: '10px'}}/>Hi, {(window as any).username}</span>}
             />
           </Header>
           <ReactRouterProvider
@@ -201,7 +229,7 @@ export default class CMSPage extends React.Component<Props, State> {
               afterDeploy={this.afterDeploy}
               ref={cms => this.cms = cms}
               intl={{
-                locale: (window as any).LOCALE
+                locale: (window as any).LOCALE,
               }}
             />
           </ReactRouterProvider>

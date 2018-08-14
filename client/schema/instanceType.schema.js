@@ -9,7 +9,7 @@ export default () => (
     packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
-        title: 'Name',
+        title: '${name}',
         dataIndex: 'name'
       }, {
         title: '${displayName}',
