@@ -114,6 +114,7 @@ describe('instanceType graphql', function() {
       cpuLimit: 2.5,
       gpuLimit: 2,
       memoryLimit: 25,
+      memoryRequest: 20,
       global: false
     };
     const mutation = await this.graphqlRequest(`
@@ -146,6 +147,7 @@ describe('instanceType graphql', function() {
     // check in k8s
     const instanceType = await this.crdClient.instanceTypes.get(data.name);
     expect(instanceType.spec['limits.memory']).to.be.equals('25M');
+    expect(instanceType.spec['requests.memory']).to.be.equals('20M');
   });
 
   it('create a instanceType with props and global = true', async () => {
@@ -156,6 +158,7 @@ describe('instanceType graphql', function() {
       cpuLimit: 2.5,
       gpuLimit: 2,
       memoryLimit: 25,
+      memoryRequest: 20,
       global: true
     };
     const mutation = await this.graphqlRequest(`
@@ -188,6 +191,7 @@ describe('instanceType graphql', function() {
     // check in k8s
     const instanceType = await this.crdClient.instanceTypes.get(data.name);
     expect(instanceType.spec['limits.memory']).to.be.equals('25M');
+    expect(instanceType.spec['requests.memory']).to.be.equals('20M');
   });
 
   it('should query with where', async () => {
@@ -218,7 +222,8 @@ describe('instanceType graphql', function() {
       description: faker.lorem.sentence(),
       cpuLimit: 2.5,
       gpuLimit: 2,
-      memoryLimit: 25
+      memoryLimit: 25,
+      memoryRequest: 20
     };
     const mutation = await this.graphqlRequest(`
     mutation($where: InstanceTypeWhereUniqueInput!, $data: InstanceTypeUpdateInput!){
@@ -243,6 +248,7 @@ describe('instanceType graphql', function() {
     // check in k8s
     const instance = await this.crdClient.instanceTypes.get(instanceType.id);
     expect(instance.spec['limits.memory']).to.be.equals('25M');
+    expect(instance.spec['requests.memory']).to.be.equals('20M');
   });
 
   it('should create with props and update', async () => {
@@ -252,7 +258,8 @@ describe('instanceType graphql', function() {
       description: faker.lorem.sentence(),
       cpuLimit: 2.5,
       gpuLimit: 2,
-      memoryLimit: 25
+      memoryLimit: 25,
+      memoryRequest: 20
     };
     const createMutation = await this.graphqlRequest(`
     mutation($data: InstanceTypeCreateInput!){
@@ -267,7 +274,8 @@ describe('instanceType graphql', function() {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
       cpuLimit: 5,
-      memoryLimit: 50
+      memoryLimit: 50,
+      memoryRequest: 50
     };
     const mutation = await this.graphqlRequest(`
     mutation($where: InstanceTypeWhereUniqueInput!, $data: InstanceTypeUpdateInput!){
@@ -291,6 +299,7 @@ describe('instanceType graphql', function() {
     // check in k8s
     const instance = await this.crdClient.instanceTypes.get(instanceType.id);
     expect(instance.spec['limits.memory']).to.be.equals('50M');
+    expect(instance.spec['requests.memory']).to.be.equals('50M');
   });
 
   it('should create with name-only and update global twice', async () => {
