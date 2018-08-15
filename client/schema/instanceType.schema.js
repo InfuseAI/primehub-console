@@ -3,7 +3,8 @@ import builder from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
-  <array keyName="instanceType" title="${instanceTypes}"
+  <array keyName="instanceType"
+    title="${instanceTypes}"
     controlDeployAndResetButtons={true}
     cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
@@ -26,7 +27,7 @@ export default () => (
       }, {
         title: '${memoryLimit}',
         dataIndex: 'memoryLimit',
-        render: text => `${text} MB`
+        render: text => `${text} GB`
       }]
     }}
   >
@@ -37,7 +38,7 @@ export default () => (
       packageName="../src/cms-components/customize-number-precision.js"
     />
     <number keyName="memoryLimit" title="${memoryLimit}"
-      uiParams={{unit: ' MB', step: 1, min: 0, precision: 1}}
+      uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
       packageName="../src/cms-components/customize-number-precision"
     />
     <number keyName="gpuLimit" title="${gpuLimit}" uiParams={{min: 0, precision: 0, step: 1}}
@@ -47,7 +48,7 @@ export default () => (
       packageName="../src/cms-components/customize-number-precision.js"
     />
     <number keyName="memoryRequest" title="${memoryRequest}"
-      uiParams={{unit: ' MB', step: 1, min: 0, precision: 1}}
+      uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
       packageName="../src/cms-components/customize-number-precision"
     />
     <boolean keyName="global" title="${global}" />

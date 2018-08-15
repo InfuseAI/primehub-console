@@ -29,8 +29,9 @@ export default () => (
     <string keyName="hideOnLoginPage" title="${hideOnLoginPage}" layout="horizontal"/>
     <string keyName="singleSignOnServiceUrl" title="${singleSignOnServiceUrl}" layout="horizontal"/>
     <string keyName="backchannelSupported" title="${backchannelSupported}" layout="horizontal"/>
-    <string keyName="nameIDPolicyFormat" title="${nameIDPolicyFormat}"
+    <string keyName="nameIDPolicyFormat"
       ui="select"
+      title="${nameIDPolicyFormat}"
       uiParams={{
         options: [{
           text: 'Persistent',

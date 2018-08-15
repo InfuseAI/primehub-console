@@ -50,9 +50,10 @@ export default () => (
           />
           <boolean keyName="importEnabled" title="${importEnabled}"  layout="horizontal"/>
           <boolean keyName="syncRegistrations" title="${syncRegistrations}"  layout="horizontal"/>
-          <string keyName="vendor" title="${vendor}"
-            layout="horizontal"
+          <string keyName="vendor"
             ui="select"
+            title="${vendor}"
+            layout="horizontal"
             uiParams={{
               options: [{
                 text: 'Active Directory',
@@ -66,8 +67,9 @@ export default () => (
           <string keyName="userObjectClasses" title="${userObjectClasses}"  layout="horizontal"/>
           <string keyName="connectionUrl" title="${connectionUrl}"  layout="horizontal"/>
           <string keyName="usersDn" title="${usersDn}"  layout="horizontal"/>
-          <string keyName="authType" title="${authType}"
+          <string keyName="authType"
             ui="select"
+            title="${authType}"
             uiParams={{
               options: [{
                 text: 'simple',
@@ -80,8 +82,9 @@ export default () => (
           <string keyName="bindCredential" title="${bindCredential}"  layout="horizontal"/>
           <number keyName="searchScope" title="${searchScope}"  layout="horizontal" uiParams={{min: 0}}/>
           <boolean keyName="validatePasswordPolicy" title="${validatePasswordPolicy}"  layout="horizontal"/>
-          <string keyName="useTruststoreSpi" title="${useTruststoreSpi}"
+          <string keyName="useTruststoreSpi"
             ui="select"
+            title="${useTruststoreSpi}"
             uiParams={{
               options: [{
                 text: 'Only for ldaps',
@@ -106,8 +109,9 @@ export default () => (
           <number keyName="changedSyncPeriod" title="${changedSyncPeriod}" />
         </Default>
         <Default keyName="cacheSettings" title="${cacheSettings}">
-          <string keyName="cachePolicy" title="${cachePolicy}"
+          <string keyName="cachePolicy"
             ui="select"
+            title="${cachePolicy}"
             uiParams={{
               options: [{
                 text: 'DEFAULT',

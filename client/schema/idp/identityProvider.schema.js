@@ -4,8 +4,9 @@ import builder, {Tabs, Default} from 'canner-script';
 import Config from './config.schema';
 
 export default () => (
-  <array keyName="idp" title="${idp}"
+  <array keyName="idp"
     ui="tableRoute"
+    title="${idp}"
     uiParams={{
       columns: [{
         title: '${alias}',
@@ -19,8 +20,9 @@ export default () => (
     <Tabs>
     <Default keyName="idp" title="${idp}">
       <string keyName="alias" title="${alias}" layout="horizontal"/>
-      <string keyName="providerId" title="${providerId}"
+      <string keyName="providerId"
         ui="select"
+        title="${providerId}"
         uiParams={{
           options: [{
             text: 'saml',
@@ -39,8 +41,9 @@ export default () => (
       <boolean keyName="addReadTokenRoleOnCreate" title="${addReadTokenRoleOnCreate}" layout="horizontal"/>
       <boolean keyName="authenticateByDefault" title="${authenticateByDefault}" layout="horizontal"/>
       <boolean keyName="linkOnly" title="${linkOnly}" layout="horizontal"/>
-      <string keyName="firstBrokerLoginFlowAlias" title="${firstBrokerLoginFlowAlias}"
+      <string keyName="firstBrokerLoginFlowAlias" 
         ui="select"
+        title="${firstBrokerLoginFlowAlias}"
         uiParams={{
           options: [{
             text: '${firstBrokerLogin}',

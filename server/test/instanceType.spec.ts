@@ -146,8 +146,8 @@ describe('instanceType graphql', function() {
 
     // check in k8s
     const instanceType = await this.crdClient.instanceTypes.get(data.name);
-    expect(instanceType.spec['limits.memory']).to.be.equals('25M');
-    expect(instanceType.spec['requests.memory']).to.be.equals('20M');
+    expect(instanceType.spec['limits.memory']).to.be.equals('25G');
+    expect(instanceType.spec['requests.memory']).to.be.equals('20G');
   });
 
   it('create a instanceType with props and global = true', async () => {
@@ -190,8 +190,8 @@ describe('instanceType graphql', function() {
 
     // check in k8s
     const instanceType = await this.crdClient.instanceTypes.get(data.name);
-    expect(instanceType.spec['limits.memory']).to.be.equals('25M');
-    expect(instanceType.spec['requests.memory']).to.be.equals('20M');
+    expect(instanceType.spec['limits.memory']).to.be.equals('25G');
+    expect(instanceType.spec['requests.memory']).to.be.equals('20G');
   });
 
   it('should query with where', async () => {
@@ -247,8 +247,8 @@ describe('instanceType graphql', function() {
 
     // check in k8s
     const instance = await this.crdClient.instanceTypes.get(instanceType.id);
-    expect(instance.spec['limits.memory']).to.be.equals('25M');
-    expect(instance.spec['requests.memory']).to.be.equals('20M');
+    expect(instance.spec['limits.memory']).to.be.equals('25G');
+    expect(instance.spec['requests.memory']).to.be.equals('20G');
   });
 
   it('should create with props and update', async () => {
@@ -298,8 +298,8 @@ describe('instanceType graphql', function() {
     expect(queryOne.instanceType).to.deep.include(expectedData);
     // check in k8s
     const instance = await this.crdClient.instanceTypes.get(instanceType.id);
-    expect(instance.spec['limits.memory']).to.be.equals('50M');
-    expect(instance.spec['requests.memory']).to.be.equals('50M');
+    expect(instance.spec['limits.memory']).to.be.equals('50G');
+    expect(instance.spec['requests.memory']).to.be.equals('50G');
   });
 
   it('should create with name-only and update global twice', async () => {
