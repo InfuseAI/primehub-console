@@ -24,7 +24,7 @@ export default () => (
     <string keyName="name" title="${name}" />
     <string keyName="displayName" title="${displayName}" />
     <string keyName="description" title="${description}" />
-    <string keyName="access" title="${access}" ui="select"
+    <string  ui="select" keyName="access" title="${access}"
       uiParams={{
         options: [{
           text: 'group',
@@ -38,8 +38,9 @@ export default () => (
         }]
       }}
     />
-    <string keyName="type" title="${type}"
+    <string keyName="type" 
       ui="select"
+      title="${type}"
       uiParams={{
         options: [{
           text: 'git',

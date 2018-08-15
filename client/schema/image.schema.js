@@ -3,7 +3,8 @@ import builder from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
-  <array keyName="image" title="${images}"
+  <array keyName="image"
+    title="${images}"
     cannerDataType="array"
     controlDeployAndResetButtons={true}
     cacheActions={true}
@@ -24,7 +25,7 @@ export default () => (
     <string keyName="name" title="${name}" />
     <string keyName="displayName" title="${displayName}" />
     <string keyName="description" title="${description}" />
-    <string keyName="url" title="${url}" ui="link"/>
+    <string keyName="url" ui="link" title="${url}"/>
     <boolean keyName="global" title="${global}" />
     <relation keyName="groups" title="${groups}"
       packageName='../src/cms-components/customize-relation-table'
