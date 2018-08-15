@@ -35,11 +35,12 @@ class FilterGroup extends React.Component {
     };
   }
 
-  onChange = (cond) => {
-    let {condition} = this.state;
+  onChange = (cond, key) => {
+    const condition = {...this.state.condition};
     if (isEmpty(cond)) {
+      delete condition[key];
       this.setState({
-        condition: {}
+        condition
       });
     } else {
       Object.keys(cond).forEach(key => {
@@ -67,7 +68,7 @@ class FilterGroup extends React.Component {
       switch (val.type) {
         case 'text':
         default:
-          return <TextFilter onChange={this.onChange} name={val.key} label={val.label}/>;
+          return <TextFilter onChange={cond => this.onChange(cond, val.key)} name={val.key} label={val.label}/>;
       }
     });
     return (
