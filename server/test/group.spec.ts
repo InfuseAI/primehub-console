@@ -36,7 +36,7 @@ declare module 'mocha' {
   // tslint:disable-next-line:interface-name
   interface ISuiteCallbackContext {
     graphqlRequest?: (query: string, variables?: any) => Promise<any>;
-    kcAdminClient: KeycloakAdminClient;
+    kcAdminClient?: KeycloakAdminClient;
     currentGroup?: any;
   }
 }
@@ -69,7 +69,7 @@ describe('group graphql', function() {
     expect(data.createGroup).to.be.deep.include({
       name: groupData.name,
       // displayName default to name
-      displayName: groupData.name,
+      displayName: null,
       canUseGpu: false,
       cpuQuota: 0,
       gpuQuota: 0,

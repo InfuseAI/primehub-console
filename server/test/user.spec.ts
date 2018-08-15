@@ -36,7 +36,7 @@ declare module 'mocha' {
   // tslint:disable-next-line:interface-name
   interface ISuiteCallbackContext {
     graphqlRequest?: (query: string, variables?: any) => Promise<any>;
-    kcAdminClient: KeycloakAdminClient;
+    kcAdminClient?: KeycloakAdminClient;
     currentUser?: any;
   }
 }
