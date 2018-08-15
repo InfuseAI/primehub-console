@@ -3268,9 +3268,9 @@ canner-script@^1.2.7:
     react-intl "^2.4.0"
     safer-eval "^1.2.3"
 
-canner@^1.4.7-infuse.4:
-  version "1.4.7-infuse.4"
-  resolved "https://registry.yarnpkg.com/canner/-/canner-1.4.7-infuse.4.tgz#e30f2a892a6b30cc0fa06adda37a12dae33eb3b5"
+canner@^1.4.7-infuse.6:
+  version "1.4.7-infuse.6"
+  resolved "https://registry.yarnpkg.com/canner/-/canner-1.4.7-infuse.6.tgz#3fd1d3ec430ef99064c97965d4be03f8a2aaf049"
   dependencies:
     ajv "^6.5.2"
     apollo-boost "^0.1.4"
