@@ -52,12 +52,27 @@ export const onCreate = async (
       }
     });
   }
+
+  if (data && (data.access === 'everyone' || data.access === 'admin')) {
+    const everyoneGroupId = context.everyoneGroupId;
+    await context.kcAdminClient.groups.addRealmRoleMappings({
+      id: everyoneGroupId,
+      roles: [{
+        id: role.id,
+        name: role.name
+      }]
+    });
+  }
 };
 
 export const onUpdate = async (
   {role, resource, data, context}:
   {role: RoleRepresentation, resource: any, data: any, context: Context}) => {
-  if (data && data.groups) {
+  if (!data) {
+    return;
+  }
+
+  if (data.groups) {
     // add to group
     await mutateRelation({
       resource: data.groups,
@@ -79,6 +94,25 @@ export const onUpdate = async (
           }]
         });
       }
+    });
+  }
+
+  const everyoneGroupId = context.everyoneGroupId;
+  if (data.access === 'everyone' || data.access === 'admin') {
+    await context.kcAdminClient.groups.addRealmRoleMappings({
+      id: everyoneGroupId,
+      roles: [{
+        id: role.id,
+        name: role.name
+      }]
+    });
+  } else {
+    await context.kcAdminClient.groups.delRealmRoleMappings({
+      id: everyoneGroupId,
+      roles: [{
+        id: role.id,
+        name: role.name
+      }]
     });
   }
 };

@@ -2,6 +2,7 @@
 import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
+import KeycloakAdminClient from 'keycloak-admin';
 import { cleanupDatasets } from './sandbox';
 
 chai.use(chaiHttp);
@@ -32,12 +33,14 @@ declare module 'mocha' {
   interface ISuiteCallbackContext {
     graphqlRequest?: (query: string, variables?: any) => Promise<any>;
     currentDataset?: any;
+    kcAdminClient?: KeycloakAdminClient;
   }
 }
 
 describe('dataset graphql', function() {
   before(() => {
     this.graphqlRequest = (global as any).graphqlRequest;
+    this.kcAdminClient = (global as any).kcAdminClient;
   });
 
   after(async () => {
@@ -92,14 +95,21 @@ describe('dataset graphql', function() {
       groups: []
     });
     this.currentDataset = queryOne.dataset;
+
+    // check on keycloak
+    const roles = await this.kcAdminClient.groups.listRealmRoleMappings({
+      realm: process.env.KC_REALM,
+      id: process.env.KC_EVERYONE_GROUP_ID
+    });
+    expect(roles.find(role => role.name === `ds:${data.name}`)).to.be.not.ok;
   });
 
-  it('create a dataset with props', async () => {
+  it('create a dataset with props with access = everyone', async () => {
     const data = {
       name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
-      access: 'private',
+      access: 'everyone',
       type: 'git',
       url: faker.internet.url()
     };
@@ -129,6 +139,57 @@ describe('dataset graphql', function() {
       groups: [],
       ...data
     });
+
+    // check on keycloak
+    const roles = await this.kcAdminClient.groups.listRealmRoleMappings({
+      realm: process.env.KC_REALM,
+      id: process.env.KC_EVERYONE_GROUP_ID
+    });
+    expect(roles.find(role => role.name === `ds:${data.name}`)).to.be.ok;
+  });
+
+  it('create a dataset with props with access = admin', async () => {
+    const data = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      displayName: faker.internet.userName(),
+      description: faker.lorem.sentence(),
+      access: 'admin',
+      type: 'git',
+      url: faker.internet.url()
+    };
+    const mutation = await this.graphqlRequest(`
+    mutation($data: DatasetCreateInput!){
+      createDataset (data: $data) { ${fields} }
+    }`, {
+      data
+    });
+
+    expect(mutation.createDataset).to.be.eql({
+      id: data.name,
+      groups: [],
+      ...data
+    });
+
+    // get one
+    const queryOne = await this.graphqlRequest(`
+    query($where: DatasetWhereUniqueInput!){
+      dataset (where: $where) { ${fields} }
+    }`, {
+      where: {id: data.name}
+    });
+
+    expect(queryOne.dataset).to.be.eql({
+      id: data.name,
+      groups: [],
+      ...data
+    });
+
+    // check on keycloak
+    const roles = await this.kcAdminClient.groups.listRealmRoleMappings({
+      realm: process.env.KC_REALM,
+      id: process.env.KC_EVERYONE_GROUP_ID
+    });
+    expect(roles.find(role => role.name === `ds:${data.name}`)).to.be.ok;
   });
 
   it('should query with where', async () => {
@@ -157,7 +218,7 @@ describe('dataset graphql', function() {
     const data = {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
-      access: 'private',
+      access: 'everyone',
       type: 'git',
       url: faker.internet.url()
     };
@@ -180,6 +241,13 @@ describe('dataset graphql', function() {
     });
 
     expect(queryOne.dataset).to.deep.include(data);
+
+    // check on keycloak
+    const roles = await this.kcAdminClient.groups.listRealmRoleMappings({
+      realm: process.env.KC_REALM,
+      id: process.env.KC_EVERYONE_GROUP_ID
+    });
+    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
   });
 
   it('should create with props and update', async () => {
@@ -191,7 +259,7 @@ describe('dataset graphql', function() {
         name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
         displayName: faker.internet.userName(),
         description: faker.lorem.sentence(),
-        access: 'private',
+        access: 'everyone',
         type: 'git',
         url: faker.internet.url()
       }
@@ -202,7 +270,7 @@ describe('dataset graphql', function() {
     const data = {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
-      access: 'private',
+      access: 'group',
       type: 'git',
       url: faker.internet.url()
     };
@@ -225,6 +293,85 @@ describe('dataset graphql', function() {
     });
 
     expect(queryOne.dataset).to.deep.include(data);
+
+    // check on keycloak
+    const roles = await this.kcAdminClient.groups.listRealmRoleMappings({
+      realm: process.env.KC_REALM,
+      id: process.env.KC_EVERYONE_GROUP_ID
+    });
+    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.not.ok;
+  });
+
+  it('should update dataset access multiple times', async () => {
+    const createMutation = await this.graphqlRequest(`
+    mutation($data: DatasetCreateInput!){
+      createDataset (data: $data) { ${fields} }
+    }`, {
+      data: {
+        name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+        displayName: faker.internet.userName(),
+        description: faker.lorem.sentence(),
+        access: 'group',
+        type: 'git',
+        url: faker.internet.url()
+      }
+    });
+
+    // update to group
+    const dataset = createMutation.createDataset;
+    const data = {
+      access: 'group'
+    };
+    const mutation = await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
+      updateDataset (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: dataset.id},
+      data
+    });
+
+    // check on keycloak
+    let roles = await this.kcAdminClient.groups.listRealmRoleMappings({
+      realm: process.env.KC_REALM,
+      id: process.env.KC_EVERYONE_GROUP_ID
+    });
+    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.not.ok;
+
+    // update to admin
+    await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
+      updateDataset (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: dataset.id},
+      data: {
+        access: 'admin'
+      }
+    });
+
+    // check on keycloak
+    roles = await this.kcAdminClient.groups.listRealmRoleMappings({
+      realm: process.env.KC_REALM,
+      id: process.env.KC_EVERYONE_GROUP_ID
+    });
+    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
+
+    // update to everyone
+    await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
+      updateDataset (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: dataset.id},
+      data: {
+        access: 'everyone'
+      }
+    });
+
+    // check on keycloak
+    roles = await this.kcAdminClient.groups.listRealmRoleMappings({
+      realm: process.env.KC_REALM,
+      id: process.env.KC_EVERYONE_GROUP_ID
+    });
+    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
   });
 
   it('should delete dataset', async () => {

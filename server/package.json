@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@koa/cors": "^2.2.1",
+    "@kubernetes/client-node": "^0.5.2",
     "apollo-server": "2",
     "apollo-server-koa": "2",
     "axios": "^0.18.0",
@@ -33,6 +34,7 @@
     "graphql-type-json": "^0.2.1",
     "gravatar": "^1.6.0",
     "js-yaml": "^3.12.0",
+    "json-stream": "^1.0.0",
     "jsonwebtoken": "^8.3.0",
     "keycloak-admin": "^1.3.1",
     "koa": "^2.5.2",
@@ -49,7 +51,7 @@
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
-    "@types/bluebird": "^3.5.20",
+    "@types/bluebird": "^3.5.23",
     "@types/boom": "^7.2.0",
     "@types/chai": "^4.1.2",
     "@types/chai-http": "^3.0.5",
