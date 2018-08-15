@@ -1,4 +1,5 @@
 import { Resource } from 'kubernetes-client';
+import { Watch } from '@kubernetes/client-node';
 import { pick } from 'lodash';
 
 export interface Metadata {
@@ -20,13 +21,17 @@ export interface Item<T> {
 
 export default class CustomResource<SpecType = any> {
   private kubeClient: any;
+  private watchApi: Watch;
   private crd: any;
   private resource: Resource;
+  private namespace: string;
 
-  constructor(kubeClient: any, crd: any, namespace: string) {
+  constructor(kubeClient: any, watch: Watch, crd: any, namespace: string) {
     kubeClient.addCustomResourceDefinition(crd);
     const {group, version, names: {plural}} = crd.spec;
     this.crd = crd;
+    this.namespace = namespace;
+    this.watchApi = watch;
     this.kubeClient = kubeClient;
     this.resource = kubeClient.apis[group][version].namespaces(namespace)[plural];
   }
@@ -59,6 +64,19 @@ export default class CustomResource<SpecType = any> {
 
   public async del(name: string): Promise<void> {
     await this.resource(name).delete();
+  }
+
+  public watch(handler: (type: string, object: any) => void) {
+    const {group, version, names: {plural}} = this.crd.spec;
+    this.watchApi.watch(`/apis/${group}/${version}/namespaces/${this.namespace}/${plural}`,
+      {},
+      handler,
+      err => {
+        if (err) {
+          // tslint:disable-next-line:no-console
+          console.log(err);
+        }
+      });
   }
 
   private prepareCustomObject({metadata, spec}: {metadata?: Metadata, spec: SpecType}) {
