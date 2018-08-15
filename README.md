@@ -19,6 +19,10 @@ Canner CMS
 * KC_PWD: the password of amdin user in keycloak
 * KC_EVERYONE_GROUP_ID: the everyone group id in keycloak
 * K8S_CRD_NAMESPACE: specify what namespace to use for crd
+* KC_GRANT_TYPE: `password` or `authorization_code`
+* KC_CLIENT_SECRET: client secret
+* KC_CLIENT_ID: client id
+* CANNER_LOCALE: language of cms, default to `en`
 
 ## Build
 ```sh
@@ -48,3 +52,16 @@ docker run -v ~/.kube:/root/.kube -v ~/.minikube:/Users/williamchang/.minikube -
 
 ## Style customization document
 * [Link](client/README.md#override-antd-style)
+
+## Manual
+### How to use with keycloak oidc
+```sh
+export KC_GRANT_TYPE=authorization_code
+export KC_CLIENT_SECRET=<your client secret>
+export KC_CLIENT_ID=<your client id>
+```
+
+Simply visit `http://localhost:3000/cms`, an authenticated user will be redirected to keycloak login portal.
+
+### How to change cms language
+Change `CANNER_LOCALE` to `en` or `zh`
