@@ -4,6 +4,7 @@ import CustomResource, { Item } from '../crdClient/customResource';
 import pluralize from 'pluralize';
 import { isEmpty, omit, mapValues, find } from 'lodash';
 import KeycloakAdminClient from 'keycloak-admin';
+import Boom from 'boom';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
 
 export class Crd<SpecType> {
@@ -196,9 +197,19 @@ export class Crd<SpecType> {
     const customResource = crdClient[this.customResourceMethod];
     // create role on keycloak
     const roleName = `${this.getPrefix()}${name}`;
-    await kcAdminClient.roles.create({
-      name: roleName
-    });
+    try {
+      await kcAdminClient.roles.create({
+        name: roleName
+      });
+    } catch (err) {
+      if (err.response && err.response.status === 409) {
+        throw Boom.conflict(`role ${roleName} already exist! Please delete it on keycloak`, {
+          code: 'RESOURCE_CONFLICT'
+        });
+      }
+      throw err;
+    }
+
     const role = await kcAdminClient.roles.findOneByName({name: roleName});
 
     // create crd on k8s
