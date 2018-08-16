@@ -3,6 +3,7 @@ import { ApolloServer, gql } from 'apollo-server-koa';
 import { importSchema } from 'graphql-import';
 import path from 'path';
 import KcAdminClient from 'keycloak-admin';
+import { omit } from 'lodash';
 import { Issuer } from 'openid-client';
 import views from 'koa-views';
 import serve from 'koa-static';
@@ -114,7 +115,16 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
           namespace: config.k8sCrdNamespace
         })
       };
-    }
+    },
+    formatError: error => {
+      // tslint:disable-next-line:no-console
+      console.log(omit(error, 'extensions'));
+      if (error.extensions) {
+        // tslint:disable-next-line:no-console
+        console.log(error.extensions);
+      }
+      return new Error('Internal server error');
+    },
   });
 
   // koa
