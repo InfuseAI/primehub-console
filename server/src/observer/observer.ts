@@ -11,11 +11,32 @@ export default class Observer {
     this.keycloakAdmin = keycloakAdmin;
   }
 
-  public watchDataset() {
-    this.crdClient.datasets.watch(((type, object) => {
-      if (type === 'ADDED') {
-        // check if it's already on keycloak
-      }
-    }));
+  public watch() {
+    const resources = [{
+      crd: this.crdClient.datasets,
+      prefix: 'ds'
+    }, {
+      crd: this.crdClient.images,
+      prefix: 'img'
+    }, {
+      crd: this.crdClient.instanceTypes,
+      prefix: 'it'
+    }];
+
+    resources.forEach(resource => {
+      resource.crd.watch(async (type, object) => {
+        if (type === 'ADDED') {
+          // check if it's already on keycloak
+          const role = await this.keycloakAdmin.roles.findOneByName({
+            name: `${resource.prefix}:${object.name}`
+          });
+          if (!role) {
+            // ...
+          }
+        } else if (type === 'DELETED') {
+          // delete the role on keycloak
+        }
+      });
+    });
   }
 }
