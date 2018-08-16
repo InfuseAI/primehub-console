@@ -25,6 +25,9 @@ import { OidcCtrl, mount as mountOidc } from './oidc';
 // config
 import getConfig from './config';
 
+// observer
+import Observer from './observer/observer';
+
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
 
@@ -91,6 +94,32 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
     realmName: config.keycloakRealmName
   });
 
+  const crdClient = new CrdClient({
+    namespace: config.k8sCrdNamespace
+  });
+
+  // create observer with kc client with password
+  if (!process.env.TEST) {
+    const kcAdminClientForObserver = new KcAdminClient({
+      baseUrl: config.keycloakApiBaseUrl,
+      realmName: config.keycloakRealmName
+    });
+    await kcAdminClientForObserver.auth({
+      username: config.keycloakUsername,
+      password: config.keycloakPassword,
+      clientId: config.keycloakClientId,
+      clientSecret: config.keycloakClientSecret,
+      grantType: 'password',
+    });
+    const observer = new Observer({
+      crdClient,
+      keycloakAdmin: kcAdminClientForObserver,
+      everyoneGroupId: config.keycloakEveryoneGroupId
+    });
+    observer.observe();
+  }
+
+  // apollo server
   const server = new ApolloServer({
     typeDefs,
     resolvers,
@@ -111,9 +140,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
         realm: config.keycloakRealmName,
         everyoneGroupId: config.keycloakEveryoneGroupId,
         kcAdminClient,
-        crdClient: new CrdClient({
-          namespace: config.k8sCrdNamespace
-        })
+        crdClient
       };
     },
     formatError: error => {
