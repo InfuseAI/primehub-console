@@ -67,3 +67,6 @@ Simply visit `http://localhost:3000/cms`, an authenticated user will be redirect
 
 ### How to change cms language
 Change `CANNER_LOCALE` to `en` or `zh`
+
+### About observer
+To start observer, you must set `KC_USERNAME` & `KC_PASSWORD`, because observer will rely on these credentials obtain token from keycloak itself.
