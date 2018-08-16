@@ -13,7 +13,8 @@ Canner CMS
 * kubernetes
 
 ## Env variables
-* KC_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. Ex: 'http://127.0.0.1:8080/auth'
+* KC_API_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. Ex: 'http://127.0.0.1:8080/auth'. For API usage.
+* KC_OIDC_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. For oidc usage.
 * KC_REALM: the realm name of keycloak
 * KC_USERNAME: the admin username in keycloak
 * KC_PWD: the password of amdin user in keycloak

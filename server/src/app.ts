@@ -69,7 +69,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
   const config = getConfig();
   // create oidc client and controller
   // tslint:disable-next-line:max-line-length
-  const issuer = await Issuer.discover(`${config.keycloakBaseUrl}/realms/${config.keycloakRealmName}/.well-known/openid-configuration`);
+  const issuer = await Issuer.discover(`${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/.well-known/openid-configuration`);
   const oidcClient = new issuer.Client({
     client_id: config.keycloakClientId,
     client_secret: config.keycloakClientSecret
@@ -80,13 +80,13 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
     realm: config.keycloakRealmName,
     clientId: config.keycloakClientId,
     cmsHost: config.cmsHost,
-    keycloakBaseUrl: config.keycloakBaseUrl,
+    keycloakBaseUrl: config.keycloakOidcBaseUrl,
     oidcClient,
     grantType: config.keycloakGrantType
   });
 
   const kcAdminClient = new KcAdminClient({
-    baseUrl: config.keycloakBaseUrl,
+    baseUrl: config.keycloakApiBaseUrl,
     realmName: config.keycloakRealmName
   });
 
