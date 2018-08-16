@@ -23,6 +23,7 @@ Canner CMS
 * KC_CLIENT_SECRET: client secret
 * KC_CLIENT_ID: client id
 * CANNER_LOCALE: language of cms, default to `en`
+* CANNER_CMS_HOST: cms host, default to `http://localhost:3000`, DO NOT postfix with a slash.
 
 ## Build
 ```sh

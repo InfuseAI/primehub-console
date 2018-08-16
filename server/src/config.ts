@@ -59,7 +59,8 @@ export default (): Config => {
     keycloakClientId: process.env.KC_CLIENT_ID,
     k8sCrdNamespace: process.env.K8S_CRD_NAMESPACE,
     payloadSecretKey: process.env.PAYLOAD_SECRET,
-    cookieSignedKey: process.env.COOKIE_SIGNED_KEY
+    cookieSignedKey: process.env.COOKIE_SIGNED_KEY,
+    cmsHost: process.env.CANNER_CMS_HOST
   });
 
   const env = process.env.NODE_ENV || 'development';
