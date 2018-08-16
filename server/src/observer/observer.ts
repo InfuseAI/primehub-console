@@ -1,42 +1,59 @@
 // tslint:disable:no-console
-import CrdClient from '../crdClient/crdClientImpl';
+import CrdClient, { InstanceTypeSpec, DatasetSpec, ImageSpec } from '../crdClient/crdClientImpl';
 import KeycloakAdmin from 'keycloak-admin';
+import Watcher from './watcher';
+import { crd as instanceType} from '../resolvers/instanceType';
+import { crd as dataset} from '../resolvers/dataset';
+import { crd as image} from '../resolvers/image';
 
 export default class Observer {
-  private crdClient: CrdClient;
-  private keycloakAdmin: KeycloakAdmin;
+  private datasetWatcher: Watcher<DatasetSpec>;
+  private imageWatcher: Watcher<ImageSpec>;
+  private instanceTypeWatcher: Watcher<InstanceTypeSpec>;
 
-  constructor(crdClient: CrdClient, keycloakAdmin: KeycloakAdmin) {
-    this.crdClient = crdClient;
-    this.keycloakAdmin = keycloakAdmin;
+  constructor({
+    crdClient,
+    keycloakAdmin,
+    everyoneGroupId
+  }: {
+    crdClient: CrdClient,
+    keycloakAdmin: KeycloakAdmin,
+    everyoneGroupId: string
+  }) {
+    this.datasetWatcher = new Watcher<DatasetSpec>({
+      crd: dataset,
+      resource: crdClient.datasets,
+      keycloakAdmin,
+      defaultCreateData: object => ({access: object.spec.access || 'everyone'}),
+      everyoneGroupId
+    });
+
+    this.imageWatcher = new Watcher<ImageSpec>({
+      crd: image,
+      resource: crdClient.images,
+      keycloakAdmin,
+      defaultCreateData: object => ({global: true}),
+      everyoneGroupId
+    });
+
+    this.instanceTypeWatcher = new Watcher<ImageSpec>({
+      crd: instanceType,
+      resource: crdClient.instanceTypes,
+      keycloakAdmin,
+      defaultCreateData: object => ({global: true}),
+      everyoneGroupId
+    });
   }
 
-  public watch() {
-    const resources = [{
-      crd: this.crdClient.datasets,
-      prefix: 'ds'
-    }, {
-      crd: this.crdClient.images,
-      prefix: 'img'
-    }, {
-      crd: this.crdClient.instanceTypes,
-      prefix: 'it'
-    }];
+  public observe(options?: {rewatch?: boolean}) {
+    this.datasetWatcher.watch(options);
+    this.imageWatcher.watch(options);
+    this.instanceTypeWatcher.watch(options);
+  }
 
-    resources.forEach(resource => {
-      resource.crd.watch(async (type, object) => {
-        if (type === 'ADDED') {
-          // check if it's already on keycloak
-          const role = await this.keycloakAdmin.roles.findOneByName({
-            name: `${resource.prefix}:${object.name}`
-          });
-          if (!role) {
-            // ...
-          }
-        } else if (type === 'DELETED') {
-          // delete the role on keycloak
-        }
-      });
-    });
+  public abort() {
+    this.datasetWatcher.abort();
+    this.imageWatcher.abort();
+    this.instanceTypeWatcher.abort();
   }
 }

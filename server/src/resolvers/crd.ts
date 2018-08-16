@@ -118,6 +118,25 @@ export class Crd<SpecType> {
     return Boolean(find(roles, role => role.name.slice(this.getPrefix().length) === resource));
   }
 
+  public createOnKeycloak = async (data: any, metadata: any, spec: any, context: any) => {
+    const name = metadata.name;
+    const {kcAdminClient} = context;
+    // create role on keycloak
+    const roleName = `${this.getPrefix()}${name}`;
+    await kcAdminClient.roles.create({
+      name: roleName
+    });
+    const role = await kcAdminClient.roles.findOneByName({name: roleName});
+
+    if (this.onCreate) {
+      await this.onCreate({role, resource: {metadata, spec}, data, context});
+    }
+  }
+
+  public getPrefix() {
+    return `${this.prefixName}:`;
+  }
+
   /**
    * query methods
    */
@@ -222,9 +241,5 @@ export class Crd<SpecType> {
     const crd = await customResource.get(name);
     await customResource.del(name);
     return this.propMapping(crd);
-  }
-
-  private getPrefix() {
-    return `${this.prefixName}:`;
   }
 }

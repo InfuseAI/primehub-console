@@ -36,6 +36,10 @@ export default class CustomResource<SpecType = any> {
     this.resource = kubeClient.apis[group][version].namespaces(namespace)[plural];
   }
 
+  public getResourcePlural() {
+    return this.crd.spec && this.crd.spec.names && this.crd.spec.names.plural;
+  }
+
   public async get(name: string): Promise<Item<SpecType>> {
     const {body} = await this.resource(name).get();
     return pick(body, ['metadata', 'spec']);
@@ -66,17 +70,12 @@ export default class CustomResource<SpecType = any> {
     await this.resource(name).delete();
   }
 
-  public watch(handler: (type: string, object: any) => void) {
+  public watch(handler: (type: string, object: any) => void, done: (err?: Error) => void) {
     const {group, version, names: {plural}} = this.crd.spec;
-    this.watchApi.watch(`/apis/${group}/${version}/namespaces/${this.namespace}/${plural}`,
+    return this.watchApi.watch(`/apis/${group}/${version}/namespaces/${this.namespace}/${plural}`,
       {},
       handler,
-      err => {
-        if (err) {
-          // tslint:disable-next-line:no-console
-          console.log(err);
-        }
-      });
+      done);
   }
 
   private prepareCustomObject({metadata, spec}: {metadata?: Metadata, spec: SpecType}) {
