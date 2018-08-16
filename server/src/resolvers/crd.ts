@@ -127,7 +127,6 @@ export class Crd<SpecType> {
       name: roleName
     });
     const role = await kcAdminClient.roles.findOneByName({name: roleName});
-
     if (this.onCreate) {
       await this.onCreate({role, resource: {metadata, spec}, data, context});
     }

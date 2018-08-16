@@ -43,6 +43,7 @@ export default class Watcher<T> {
           const role = await this.keycloakAdmin.roles.findOneByName({
             name: `${prefix}${object.metadata.name}`
           });
+
           if (!role) {
             // tslint:disable-next-line:max-line-length
             console.log(`Watcher:${this.resource.getResourcePlural()}: ${object.metadata.name} role not exist. Going to add one`);
@@ -68,6 +69,10 @@ export default class Watcher<T> {
             });
             console.log(`Watcher:${this.resource.getResourcePlural()}: ${object.metadata.name} role deleted`);
           } catch (e) {
+            if (e.response && e.response.status === 404) {
+              // tslint:disable-next-line:max-line-length
+              return console.log(`Watcher:${this.resource.getResourcePlural()}: ${object.metadata.name} role already deleted`);
+            }
             console.log(`Watcher:${this.resource.getResourcePlural()}: ${object.metadata.name} cannot be deleted`);
             console.log(e.stack);
           }
