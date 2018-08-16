@@ -1,4 +1,5 @@
 import kubeClient from 'kubernetes-client';
+import * as k8s from '@kubernetes/client-node';
 import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
@@ -13,6 +14,16 @@ export const client = new Client({
   config: inCluster ? config.getInCluster() : config.fromKubeconfig(),
   version: '1.10'
 });
+
+// kubernetes-client/javascript for watch
+let watch: k8s.Watch;
+const kc = new k8s.KubeConfig();
+if (inCluster) {
+  kc.loadFromCluster();
+} else {
+  kc.loadFromFile(`${process.env.HOME}/.kube/config`);
+}
+watch = new k8s.Watch(kc);
 
 /**
  * Spec interface
@@ -61,16 +72,19 @@ export default class CrdClientImpl {
     this.namespace = args && args.namespace || 'default';
     this.instanceTypes = new CustomResource<InstanceTypeSpec>(
       client,
+      watch,
       loadCrd('instance-type'),
       this.namespace
     );
     this.datasets = new CustomResource<DatasetSpec>(
       client,
+      watch,
       loadCrd('dataset'),
       this.namespace
     );
     this.images = new CustomResource<ImageSpec>(
       client,
+      watch,
       loadCrd('image'),
       this.namespace
     );
