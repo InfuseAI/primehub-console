@@ -16,6 +16,11 @@ export class Crd<SpecType> {
   private resourceName: string;
   private onCreate?: (data: any) => Promise<any>;
   private onUpdate?: (data: any) => Promise<any>;
+  private customUpdate?: ({
+    name, metadata, spec, customResource
+  }: {
+    name: string, metadata: any, spec: any, customResource: any
+  }) => Promise<any>;
 
   constructor({
     customResourceMethod,
@@ -25,7 +30,8 @@ export class Crd<SpecType> {
     prefixName,
     resourceName,
     onCreate,
-    onUpdate
+    onUpdate,
+    customUpdate
   }: {
     customResourceMethod: string,
     propMapping: (item: Item<SpecType>) => Record<string, any>,
@@ -34,7 +40,12 @@ export class Crd<SpecType> {
     prefixName: string,
     resourceName: string,
     onCreate?: (data: any) => Promise<any>,
-    onUpdate?: (data: any) => Promise<any>
+    onUpdate?: (data: any) => Promise<any>,
+    customUpdate?: ({
+      name, metadata, spec, customResource
+    }: {
+      name: string, metadata: any, spec: any, customResource: any
+    }) => Promise<any>;
   }) {
     this.customResourceMethod = customResourceMethod;
     this.propMapping = propMapping;
@@ -44,6 +55,7 @@ export class Crd<SpecType> {
     this.resourceName = resourceName;
     this.onCreate = onCreate;
     this.onUpdate = onUpdate;
+    this.customUpdate = customUpdate;
   }
 
   /**
@@ -230,10 +242,15 @@ export class Crd<SpecType> {
 
     // update crd on k8s
     const {metadata, spec} = this.mutationMapping(args.data);
-    const res = await customResource.patch(name, {
+    const res = (this.customUpdate) ?
+    await this.customUpdate({
+      name, metadata, spec, customResource
+    }) :
+    await customResource.patch(name, {
       metadata: omit(metadata, 'name'),
       spec
     });
+
     if (this.onUpdate) {
       await this.onUpdate({role, resource: res, data: args.data, context});
     }

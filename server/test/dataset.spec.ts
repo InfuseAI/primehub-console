@@ -18,6 +18,7 @@ const fields = `
   access
   type
   url
+  variables
   groups {
     id
     name
@@ -73,6 +74,7 @@ describe('dataset graphql', function() {
       access: null,
       type: null,
       url: null,
+      variables: null,
       groups: []
     });
 
@@ -92,6 +94,7 @@ describe('dataset graphql', function() {
       access: null,
       type: null,
       url: null,
+      variables: null,
       groups: []
     });
     this.currentDataset = queryOne.dataset;
@@ -123,6 +126,7 @@ describe('dataset graphql', function() {
     expect(mutation.createDataset).to.be.eql({
       id: data.name,
       groups: [],
+      variables: null,
       ...data
     });
 
@@ -137,6 +141,7 @@ describe('dataset graphql', function() {
     expect(queryOne.dataset).to.be.eql({
       id: data.name,
       groups: [],
+      variables: null,
       ...data
     });
 
@@ -167,6 +172,7 @@ describe('dataset graphql', function() {
     expect(mutation.createDataset).to.be.eql({
       id: data.name,
       groups: [],
+      variables: null,
       ...data
     });
 
@@ -181,6 +187,7 @@ describe('dataset graphql', function() {
     expect(queryOne.dataset).to.be.eql({
       id: data.name,
       groups: [],
+      variables: null,
       ...data
     });
 
@@ -190,6 +197,87 @@ describe('dataset graphql', function() {
       id: process.env.KC_EVERYONE_GROUP_ID
     });
     expect(roles.find(role => role.name === `ds:${data.name}`)).to.be.ok;
+  });
+
+  it('update a dataset with variables', async () => {
+    const data = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      displayName: faker.internet.userName(),
+      description: faker.lorem.sentence(),
+      access: 'admin',
+      type: 'env',
+      variables: {
+        first: 'first'
+      }
+    };
+    const mutation = await this.graphqlRequest(`
+    mutation($data: DatasetCreateInput!){
+      createDataset (data: $data) { ${fields} }
+    }`, {
+      data
+    });
+
+    expect(mutation.createDataset).to.be.deep.equal({
+      id: data.name,
+      url: null,
+      groups: [],
+      ...data
+    });
+    const dataset = mutation.createDataset;
+
+    // add member to variables
+    await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
+      updateDataset (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: dataset.id},
+      data: {
+        variables: {
+          first: 'first',
+          second: 'second'
+        }
+      }
+    });
+
+    // query
+    const queryOne = await this.graphqlRequest(`
+    query($where: DatasetWhereUniqueInput!){
+      dataset (where: $where) { id variables }
+    }`, {
+      where: {id: dataset.id}
+    });
+
+    expect(queryOne.dataset.variables).to.be.eql({
+      first: 'first',
+      second: 'second'
+    });
+
+    // delete one member, update one and add one
+    await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
+      updateDataset (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: dataset.id},
+      data: {
+        variables: {
+          second: 'second-second',
+          third: 'third'
+        }
+      }
+    });
+
+    // query
+    const queryTwo = await this.graphqlRequest(`
+    query($where: DatasetWhereUniqueInput!){
+      dataset (where: $where) { id variables }
+    }`, {
+      where: {id: dataset.id}
+    });
+
+    expect(queryTwo.dataset.variables).to.be.eql({
+      second: 'second-second',
+      third: 'third'
+    });
   });
 
   it('should query with where', async () => {

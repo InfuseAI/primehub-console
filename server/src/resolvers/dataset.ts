@@ -1,9 +1,10 @@
 import { Item } from '../crdClient/customResource';
 import { DatasetSpec } from '../crdClient/crdClientImpl';
 import { Crd } from './crd';
-import { mutateRelation } from './utils';
+import { mutateRelation, mergeVariables } from './utils';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 import { Context } from './interface';
+import { omit } from 'lodash';
 
 export const mapping = (item: Item<DatasetSpec>) => {
   return {
@@ -117,6 +118,18 @@ export const onUpdate = async (
   }
 };
 
+const customUpdate = async ({name, metadata, spec, customResource}) => {
+  // find original variables first
+  const row = await customResource.get(name);
+  const originalVariables = row.spec.variables || {};
+  const newVariables = spec.variables || {};
+  spec.variables = mergeVariables(originalVariables, newVariables);
+  return customResource.patch(name, {
+    metadata: omit(metadata, 'name'),
+    spec
+  });
+};
+
 export const crd = new Crd<DatasetSpec>({
   customResourceMethod: 'datasets',
   propMapping: mapping,
@@ -124,5 +137,6 @@ export const crd = new Crd<DatasetSpec>({
   resourceName: 'dataset',
   mutationMapping,
   onCreate,
-  onUpdate
+  onUpdate,
+  customUpdate
 });
