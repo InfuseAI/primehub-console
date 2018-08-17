@@ -104,16 +104,16 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
       baseUrl: config.keycloakApiBaseUrl,
       realmName: config.keycloakRealmName
     });
-    await kcAdminClientForObserver.auth({
-      username: config.keycloakUsername,
-      password: config.keycloakPassword,
-      clientId: config.keycloakClientId,
-      clientSecret: config.keycloakClientSecret,
-      grantType: 'password',
-    });
+
     const observer = new Observer({
       crdClient,
       keycloakAdmin: kcAdminClientForObserver,
+      credentials: {
+        username: config.keycloakUsername,
+        password: config.keycloakPassword,
+        clientId: config.keycloakClientId,
+        clientSecret: config.keycloakClientSecret
+      },
       everyoneGroupId: config.keycloakEveryoneGroupId
     });
     observer.observe();

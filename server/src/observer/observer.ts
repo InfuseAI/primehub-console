@@ -10,22 +10,26 @@ export default class Observer {
   private datasetWatcher: Watcher<DatasetSpec>;
   private imageWatcher: Watcher<ImageSpec>;
   private instanceTypeWatcher: Watcher<InstanceTypeSpec>;
+  private credentials: any;
 
   constructor({
     crdClient,
     keycloakAdmin,
-    everyoneGroupId
+    everyoneGroupId,
+    credentials
   }: {
     crdClient: CrdClient,
     keycloakAdmin: KeycloakAdmin,
-    everyoneGroupId: string
+    everyoneGroupId: string,
+    credentials: any
   }) {
     this.datasetWatcher = new Watcher<DatasetSpec>({
       crd: dataset,
       resource: crdClient.datasets,
       keycloakAdmin,
       defaultCreateData: object => ({access: object.spec.access || 'everyone'}),
-      everyoneGroupId
+      everyoneGroupId,
+      credentials
     });
 
     this.imageWatcher = new Watcher<ImageSpec>({
@@ -33,7 +37,8 @@ export default class Observer {
       resource: crdClient.images,
       keycloakAdmin,
       defaultCreateData: object => ({global: true}),
-      everyoneGroupId
+      everyoneGroupId,
+      credentials
     });
 
     this.instanceTypeWatcher = new Watcher<ImageSpec>({
@@ -41,7 +46,8 @@ export default class Observer {
       resource: crdClient.instanceTypes,
       keycloakAdmin,
       defaultCreateData: object => ({global: true}),
-      everyoneGroupId
+      everyoneGroupId,
+      credentials
     });
   }
 

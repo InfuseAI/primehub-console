@@ -11,32 +11,41 @@ export default class Watcher<T> {
   private defaultCreateData: any;
   private everyoneGroupId: string;
   private request: any;
+  private credentials: any;
 
   constructor({
     crd,
     resource,
     keycloakAdmin,
     defaultCreateData,
-    everyoneGroupId
+    everyoneGroupId,
+    credentials
   }: {
     crd: Crd<T>,
     resource: CustomResource<T>,
     keycloakAdmin: KeycloakAdmin,
     defaultCreateData: any,
-    everyoneGroupId: string
+    everyoneGroupId: string,
+    credentials: any
   }) {
     this.crd = crd;
     this.resource = resource;
     this.keycloakAdmin = keycloakAdmin;
     this.defaultCreateData = defaultCreateData;
     this.everyoneGroupId = everyoneGroupId;
+    this.credentials = credentials;
   }
 
-  public watch(options?: {rewatch?: boolean}) {
+  public watch = (options?: {rewatch?: boolean}) => {
     const prefix = this.crd.getPrefix();
     console.log(`Watcher: started watching ${this.resource.getResourcePlural()}...`);
     this.request = this.resource.watch((type, object) => {
       const handler = async () => {
+        await this.keycloakAdmin.auth({
+          ...this.credentials,
+          grantType: 'password',
+        });
+
         if (type === 'ADDED') {
           // check if it's already on keycloak
           console.log(`Watcher:${this.resource.getResourcePlural()}: ${object.metadata.name} added event`);
@@ -80,7 +89,7 @@ export default class Watcher<T> {
       };
 
       handler()
-        .catch(err => console.log(err.stack));
+        .catch(err => console.log(err));
     }, err => {
       if (err) {
         return console.log(err);
@@ -93,7 +102,7 @@ export default class Watcher<T> {
     });
   }
 
-  public abort() {
+  public abort = () => {
     this.request.abort();
   }
 }
