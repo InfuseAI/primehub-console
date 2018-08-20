@@ -24,7 +24,7 @@ export default class Tab extends React.Component {
         this.setState({
           deploying: false
         });
-        goTo(routes[0]);
+        goTo({pathname: routes[0]});
       })
       .catch(() => {
         this.setState({
@@ -36,11 +36,11 @@ export default class Tab extends React.Component {
   reset = reset => {
     const {refId, goTo, routes} = this.props;
     reset(refId.getPathArr()[0])
-      .then(() => goTo(routes[0]));
+      .then(() => goTo({pathname: routes[0]}));
   }
 
   render() {
-    const {children, disabledKeysInCreate, params, refId} = this.props;
+    const {children, disabledKeysInCreate, routerParams, refId} = this.props;
     const {deploying} = this.state;
     const key = refId.getPathArr()[0];
     return (
@@ -54,7 +54,7 @@ export default class Tab extends React.Component {
                   <TabPane key={i} tab={child.title}
                     disabled={isDisabled({
                       keys: disabledKeysInCreate,
-                      params,
+                      routerParams,
                       childKeyName: child.keyName
                     })}
                   >
@@ -84,10 +84,10 @@ export default class Tab extends React.Component {
 
 function isDisabled({
   keys,
-  params,
+  routerParams,
   childKeyName
 }) {
-  if (params && params.op === 'create' &&
+  if (routerParams && routerParams.operator === 'create' &&
     keys.indexOf(childKeyName) !== -1
   ) {
     return true;

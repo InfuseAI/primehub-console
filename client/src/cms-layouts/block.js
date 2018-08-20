@@ -6,13 +6,13 @@ import {Item} from 'canner-helpers';
 export default class Block extends React.Component {
   render() {
     // eslint-disable-next-line no-unused-vars
-    const {title, description, params, disabledKeysInCreate, children} = this.props;
+    const {title, description, routerParams, disabledKeysInCreate, children} = this.props;
     return <React.Fragment>
       {
         children.map((child, i) => (
           !isDisabled({
             keys: disabledKeysInCreate,
-            params,
+            routerParams,
             childKeyName: child.keyName
           }) && <Item
             hideTitle={true}
@@ -26,10 +26,10 @@ export default class Block extends React.Component {
 
 function isDisabled({
   keys,
-  params,
+  routerParams,
   childKeyName
 }) {
-  if (params && params.op === 'create' &&
+  if (routerParams && routerParams.operator === 'create' &&
     keys.indexOf(childKeyName) !== -1
   ) {
     return true;

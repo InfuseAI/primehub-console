@@ -1,5 +1,5 @@
 /** @jsx builder */
-import builder from 'canner-script';
+import builder, {Condition} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
@@ -27,42 +27,43 @@ export default () => (
     <string keyName="description" title="${description}" />
     <string keyName="url" ui="link" title="${url}"/>
     <boolean keyName="global" title="${global}" />
-    <relation keyName="groups" title="${groups}"
-      packageName='../src/cms-components/customize-relation-table'
-      relation={{
-        to: 'group',
-        type: 'toMany'
-      }}
-      hideTitle
-      uiParams={{
-        isHidden: record => record && record.global,
-        textCol: 'displayName',
-        columns: [{
-          title: '${displayName}',
-          dataIndex: 'displayName'
-        }, {
-          title: '${canUseGpu}',
-          dataIndex: 'canUseGpu'
-        }, {
-          title: '${gpuQuota}',
-          dataIndex: 'gpuQuota'
-        }, {
-          title: '${diskQuota}',
-          dataIndex: 'diskQuota'
-        }]
-      }}
-    >
-      <toolbar>
-        <filter
-          component={Filter}
-          fields={[{
-            type: 'text',
-            label: '${displayName}',
-            key: 'displayName'
-          }]}
-        />
-        <pagination />
-      </toolbar>
-    </relation>
+    <Condition match={data => !data.global}>
+      <relation keyName="groups" title="${groups}"
+        packageName='../src/cms-components/customize-relation-table'
+        relation={{
+          to: 'group',
+          type: 'toMany'
+        }}
+        hideTitle
+        uiParams={{
+          textCol: 'displayName',
+          columns: [{
+            title: '${displayName}',
+            dataIndex: 'displayName'
+          }, {
+            title: '${canUseGpu}',
+            dataIndex: 'canUseGpu'
+          }, {
+            title: '${gpuQuota}',
+            dataIndex: 'gpuQuota'
+          }, {
+            title: '${diskQuota}',
+            dataIndex: 'diskQuota'
+          }]
+        }}
+      >
+        <toolbar>
+          <filter
+            component={Filter}
+            fields={[{
+              type: 'text',
+              label: '${displayName}',
+              key: 'displayName'
+            }]}
+          />
+          <pagination />
+        </toolbar>
+      </relation>
+    </Condition>
   </array>
 )

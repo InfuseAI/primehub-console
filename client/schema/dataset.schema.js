@@ -1,5 +1,5 @@
 /** @jsx builder */
-import builder, {Default} from 'canner-script';
+import builder, {Default, Condition} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 
 export default () => (
@@ -51,55 +51,52 @@ export default () => (
         }]
       }}
     />
-    <string keyName="url" title="${url}" packageName="../src/cms-components/customize-string-link"
-      hideTitle
-      uiParams={{
-        isHidden: record => !record || record.type !== 'git',
-      }}
-    />
-    <object keyName="variables" title="${variables}" packageName="../src/cms-components/customize-object-dynamic-field"
-      hideTitle
-      uiParams={{
-        isHidden: record => !record || record.type !== 'env',
-      }}
-    />
-    <relation keyName="groups" title="${groups}"
-      packageName='../src/cms-components/customize-relation-table'
-      relation={{
-        to: 'group',
-        type: 'toMany'
-      }}
-      hideTitle
-      uiParams={{
-        isHidden: record => !record || record.access !== 'group',
-        textCol: 'displayName',
-        columns: [{
-          title: '${displayName}',
-          dataIndex: 'displayName'
-        }, {
-          title: '${canUseGpu}',
-          dataIndex: 'canUseGpu'
-        }, {
-          title: '${gpuQuota}',
-          dataIndex: 'gpuQuota'
-        }, {
-          title: '${diskQuota}',
-          dataIndex: 'diskQuota'
-        }]
-      }}
-    >
-      <toolbar>
-        <filter
-          component={Filter}
-          fields={[{
-            type: 'text',
-            label: '${displayName}',
-            key: 'displayName'
-          }]}
-        />
-        <pagination />
-      </toolbar>
-    </relation>
+    <Condition match={data => data.type === 'git'}>
+      <string keyName="url" ui="link" title="${url}"/>
+    </Condition>
+    <Condition match={data => data.type === 'env'}>
+      <object keyName="variables"
+        title="${variables}"
+        packageName="../src/cms-components/customize-object-dynamic-field"
+      />
+    </Condition>
+    <Condition match={data => data.access === 'group'}>
+      <relation keyName="groups" title="${groups}"
+        packageName='../src/cms-components/customize-relation-table'
+        relation={{
+          to: 'group',
+          type: 'toMany'
+        }}
+        uiParams={{
+          textCol: 'displayName',
+          columns: [{
+            title: '${displayName}',
+            dataIndex: 'displayName'
+          }, {
+            title: '${canUseGpu}',
+            dataIndex: 'canUseGpu'
+          }, {
+            title: '${gpuQuota}',
+            dataIndex: 'gpuQuota'
+          }, {
+            title: '${diskQuota}',
+            dataIndex: 'diskQuota'
+          }]
+        }}
+      >
+        <toolbar>
+          <filter
+            component={Filter}
+            fields={[{
+              type: 'text',
+              label: '${displayName}',
+              key: 'displayName'
+            }]}
+          />
+          <pagination />
+        </toolbar>
+      </relation>
+    </Condition>
     </Default>
   </array>
 )

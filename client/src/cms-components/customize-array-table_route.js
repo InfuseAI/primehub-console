@@ -21,12 +21,12 @@ export default class ArrayBreadcrumb extends Component {
 
   add = () => {
     const {goTo, refId} = this.props;
-    goTo(`${refId.toString()}`, {op: 'create'});
+    goTo({pathname: refId.toString(), operator: 'create'});
   }
 
   edit = (recordId) => {
     const {goTo, refId} = this.props;
-    goTo(`${refId.toString()}/${recordId}`);
+    goTo({pathname: `${refId.toString()}/${recordId}`});
   }
 
   remove = (index) => {

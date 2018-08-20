@@ -2,7 +2,9 @@ import * as axios from 'axios';
 import * as React from 'react';
 import {injectIntl} from 'react-intl';
 import {Layout, Menu, Icon, notification, Modal, Avatar} from 'antd';
-import CMS, {ReactRouterProvider} from 'canner';
+import Canner from 'canner';
+import Container from '@canner/container';
+import R from '@canner/history-router';
 import ContentHeader from 'components/header';
 import Loading from 'components/loading';
 import Error from 'components/error';
@@ -208,32 +210,31 @@ export default class CMSPage extends React.Component<Props, State> {
             }
           </Menu>
         </Sider>
-        <Content style={{padding: "0"}}>
-          <Header style={{padding: "0px", zIndex: 1000}}>
-            <ContentHeader
+        <Container
+          schema={schema}
+          sidebarConfig={{
+            menuConfig: false
+          }}
+          navbarConfig={{
+            renderMenu: () => <ContentHeader
               appUrl={''}
               deploying={deploying}
               hasChanged={hasChanged}
               deploy={this.deploy}
               subMenuTitle={<span><Avatar src={(window as any).thumbnail} style={{marginRight: '10px'}}/>Hi, {(window as any).username}</span>}
             />
-          </Header>
-          <ReactRouterProvider
-            baseUrl="/cms"
-            history={history}
-          >
-            <CMS
-              schema={{...schema, graphqlClient}}
-              // hideButtons={true}
-              dataDidChange={this.dataDidChange}
-              afterDeploy={this.afterDeploy}
-              ref={cms => this.cms = cms}
-              intl={{
-                locale: (window as any).LOCALE,
-              }}
-            />
-          </ReactRouterProvider>
-        </Content>
+          }}
+          router={new R({
+            history,
+            baseUrl: "/cms"
+          })}
+        >
+          <Canner
+            schema={{...schema}}
+            afterDeploy={this.afterDeploy}
+            dataDidChange={this.dataDidChange}
+          />
+        </Container>
       </Layout>
     )
   }
