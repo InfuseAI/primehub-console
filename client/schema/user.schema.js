@@ -75,7 +75,7 @@ export default () => (
         title: '${email}',
         dataIndex: 'email'
       }, {
-        title: '${email}',
+        title: '${completeName}',
         dataIndex: 'firstName',
         render: (text, record) => `${text} ${record.lastName}`
       }, {
