@@ -33,6 +33,9 @@ COPY client ./client
 # install and build
 RUN cd client && yarn && npm run build
 
+# check installed pkg in client
+RUN cd client && yarn list --pattern canner
+
 # leave only dist
 RUN cd client && ls | grep -v dist | xargs rm -rf
 
