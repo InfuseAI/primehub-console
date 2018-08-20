@@ -1,8 +1,7 @@
 /** @jsx builder */
-import builder, {Default, Tabs, Layout, configure, Block} from 'canner-script';
+import builder, {Default, Tabs, Layout, configure, Block, Condition} from 'canner-script';
 import RelationTable from '../src/cms-components/customize-relation-table';
 import {storage, SendEmailTitle, ResetPasswordTitle} from './utils';
-import HideInCreate from '../src/cms-layouts/hideInCreate';
 import Tab from '../src/cms-layouts/tab';
 import CustomizeBlock from '../src/cms-layouts/block';
 import ResetPassword from '../src/cms-components/customize-object-password_form';
@@ -116,7 +115,7 @@ export default () => (
         required
       />
       <string keyName="email" title="${email}" required validation={{format: 'email'}}/>
-      <Layout component={HideInCreate}>
+      <Condition match={(data, operator) => operator === 'update'}>
         <string keyName="firstName" title="${firstName}" />
         <string keyName="lastName" title="${lastName}" />
         <boolean keyName="totp" title="${totp}" />
@@ -161,7 +160,7 @@ export default () => (
             <pagination />
           </toolbar>
         </relation>
-      </Layout>
+      </Condition>
     </Default>
     {/* <Layout component={HideInCreate} keyName="__1" title="Send Email">
       <object keyName="__1" packageName="../src/cms-components/customize-object-email_form"/>
