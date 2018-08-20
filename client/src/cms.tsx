@@ -10,7 +10,6 @@ import Loading from 'components/loading';
 import Error from 'components/error';
 import isPlainObject from 'lodash.isplainobject';
 import firebase from 'firebase';
-import {GraphqlClient} from 'canner-graphql-interface';
 import styled, {StyledComponentClass} from 'styled-components';
 import color from 'styledShare/color';
 import logo from 'images/primehub-logo-w.png';
@@ -25,10 +24,6 @@ declare var process : {
     NODE_ENV: string
   }
 }
-const graphqlClient = process.env.NODE_ENV === 'production' ? new GraphqlClient({
-  uri: "/graphql",
-  credentials: "same-origin"
-}): undefined;
 
 export const Logo = styled.img`
   background-color: ${color.darkBlue};
@@ -233,6 +228,10 @@ export default class CMSPage extends React.Component<Props, State> {
             schema={{...schema}}
             afterDeploy={this.afterDeploy}
             dataDidChange={this.dataDidChange}
+            ref={cms => this.cms = cms}
+            intl={{
+              locale: (window as any).LOCALE,
+            }}
           />
         </Container>
       </Layout>

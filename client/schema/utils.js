@@ -5,6 +5,11 @@ import {GraphqlClient} from 'canner-graphql-interface';
 import {ImgurService} from '@canner/image-service-config';
 import {FormattedMessage} from 'react-intl';
 
+exports.graphqlClient = new GraphqlClient({
+  uri: "/graphql",
+  credentials: "same-origin"
+});
+
 exports.storage = new ImgurService({
   clientId: "cd7b1ab0aa39732",
   mashapeKey: "bF1fkS9EKrmshtCbRspDUxPL5yhCp1rzz8ejsnqLqwI2KQC3s9"
