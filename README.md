@@ -70,3 +70,14 @@ Change `CANNER_LOCALE` to `en` or `zh`
 
 ### About observer
 To start observer, you must set `KC_USERNAME` & `KC_PASSWORD`, because observer will rely on these credentials obtain token from keycloak itself.
+
+### Create fake users/groups
+```sh
+$ npm run build:prod
+
+// add groups. default count is 500
+$ node ./lib/bin/addGroups --count=10 --host=http://localhost:3000
+
+// add users. default count is 500
+$ node ./lib/bin/addUsers --count=10 --host=http://localhost:3000
+```
