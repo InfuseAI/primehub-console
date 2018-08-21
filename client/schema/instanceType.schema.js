@@ -31,7 +31,10 @@ export default () => (
       }]
     }}
   >
-    <string keyName="name" title="${name}" />
+    <string keyName="name" title="${name}"
+      validation={{pattern: '^[a-z0-9_-]+$'}}
+      required
+    />
     <string keyName="displayName" title="${displayName}" />
     <string keyName="description" title="${description}" />
     <number keyName="cpuLimit" title="${cpuLimit}" uiParams={{min: 0, step: 1, precision: 1}}

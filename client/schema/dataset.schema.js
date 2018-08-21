@@ -21,7 +21,10 @@ export default () => (
     }}
   >
     <Default>
-    <string keyName="name" title="${name}" />
+    <string keyName="name" title="${name}"
+      validation={{pattern: '^[a-z0-9_-]+$'}}
+      required
+    />
     <string keyName="displayName" title="${displayName}" />
     <string keyName="description" title="${description}" />
     <string  ui="select" keyName="access" title="${access}"
