@@ -98,7 +98,12 @@ describe('observer', function() {
     this.observer = new Observer({
       crdClient: this.crdClient,
       keycloakAdmin: this.kcAdminClient,
-      everyoneGroupId: this.everyoneGroupId
+      everyoneGroupId: this.everyoneGroupId,
+      credentials: {
+        username: process.env.KC_USERNAME,
+        password: process.env.KC_PWD,
+        clientId: 'admin-cli'
+      }
     });
   });
 

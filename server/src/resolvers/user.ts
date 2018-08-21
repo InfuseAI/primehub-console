@@ -1,7 +1,9 @@
 import KcAdminClient from 'keycloak-admin';
-import { pick, omit, find, isUndefined, first } from 'lodash';
-import { toRelay, toAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter } from './utils';
-import { detaultSystemSettings } from './constant';
+import { pick, omit, find, isUndefined, first, sortBy } from 'lodash';
+import {
+  toRelay, toAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter, paginate, extractPagination
+} from './utils';
+import { detaultSystemSettings, keycloakMaxCount } from './constant';
 import { Attributes, FieldType } from './attr';
 import { Context } from './interface';
 
@@ -86,19 +88,22 @@ const deassignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdm
  */
 
 const listQuery = async (kcAdminClient: KcAdminClient, where: any) => {
-  let users = await kcAdminClient.users.find();
+  let users = await kcAdminClient.users.find({
+    max: keycloakMaxCount
+  });
+  users = sortBy(users, 'createdTimestamp');
   users = filter(users, where);
   return users;
 };
 
 export const query = async (root, args, context: Context) => {
   const users = await listQuery(context.kcAdminClient, args && args.where);
-  return users;
+  return paginate(users, extractPagination(args));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
   const users = await listQuery(context.kcAdminClient, args && args.where);
-  return toRelay(users);
+  return toRelay(users, extractPagination(args));
 };
 
 export const queryOne = async (root, args, context: Context) => {
