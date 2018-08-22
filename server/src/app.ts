@@ -18,6 +18,7 @@ import * as group from './resolvers/group';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
+import Agent, { HttpsAgent } from 'agentkeepalive';
 
 // controller
 import { OidcCtrl, mount as mountOidc } from './oidc';
@@ -69,6 +70,15 @@ const resolvers = {
   JSON: GraphQLJSON
 };
 
+// construct http agent
+const httpAgent = new Agent({
+  maxSockets: 100
+});
+
+const httpsAgent = new HttpsAgent({
+  maxSockets: 100
+});
+
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {
   const config = getConfig();
   // create oidc client and controller
@@ -91,7 +101,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
 
   const kcAdminClient = new KcAdminClient({
     baseUrl: config.keycloakApiBaseUrl,
-    realmName: config.keycloakRealmName
+    realmName: config.keycloakRealmName,
+    requestConfigs: {
+      httpAgent,
+      httpsAgent
+    }
   });
 
   const crdClient = new CrdClient({
@@ -102,7 +116,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
   if (!process.env.TEST) {
     const kcAdminClientForObserver = new KcAdminClient({
       baseUrl: config.keycloakApiBaseUrl,
-      realmName: config.keycloakRealmName
+      realmName: config.keycloakRealmName,
+      requestConfigs: {
+        httpAgent,
+        httpsAgent
+      }
     });
 
     const observer = new Observer({
