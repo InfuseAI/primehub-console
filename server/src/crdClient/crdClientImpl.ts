@@ -49,6 +49,7 @@ export interface DatasetSpec {
   type?: string;
   url?: string;
   variables?: Record<string, any>;
+  volumeName?: string;
 }
 
 /**

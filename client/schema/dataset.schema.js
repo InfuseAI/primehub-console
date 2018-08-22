@@ -77,7 +77,7 @@ export default () => (
       />
     </Condition>
     <Condition match={data => data.type === 'pv'}>
-      <string keyName="volumnName" title="${volumnName}"/>
+      <string keyName="volumeName" title="${volumeName}"/>
     </Condition>
     <Condition match={data => data.access === 'group'}>
       <relation keyName="groups" title="${groups}"

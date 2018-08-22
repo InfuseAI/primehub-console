@@ -15,7 +15,8 @@ export const mapping = (item: Item<DatasetSpec>) => {
     access: item.spec.access,
     type: item.spec.type,
     url: item.spec.url,
-    variables: item.spec.variables
+    variables: item.spec.variables,
+    volumeName: item.spec.volumeName
   };
 };
 
@@ -30,7 +31,8 @@ export const mutationMapping = (data: any) => {
       access: data.access,
       type: data.type,
       url: data.url,
-      variables: data.variables
+      variables: data.variables,
+      volumeName: data.volumeName
     }
   };
 };
