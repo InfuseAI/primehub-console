@@ -111,7 +111,14 @@ export default () => (
     {/* <image keyName="thumbnail" title="Thumbnail" disabled /> */}
     <Default title="${basicInfo}" keyName="basicInfo">
       <string keyName="username" title="${username}"
-        validation={{pattern: '^[a-z0-9_]+$'}}
+        validation={{
+          validator: (value, cb) => {
+            console.log(value);
+            if (!value.match(/^[a-z0-9_]+$/)) {
+              return cb('only alphabet, number and underscore (_) are allowed');
+            }
+          }
+        }}
         required
       />
       <string keyName="email" title="${email}" required validation={{format: 'email'}}/>
