@@ -59,7 +59,7 @@ export default () => (
       packageName="../src/cms-components/customize-number-precision.js"
     />
     <number keyName="diskQuota" title="${diskQuota}"
-      uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
+      uiParams={{unit: ' GB', step: 1, min: 1, precision: 0}}
       packageName="../src/cms-components/customize-number-precision"
     />
     <relation keyName="users" title="${users}"

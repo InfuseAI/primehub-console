@@ -9,8 +9,8 @@ export default () => (
         <image keyName="logo" title="${logo}"/>
       </object>
       <number keyName="defaultUserDiskQuota" title="${defaultUserDiskQuota}"
-         uiParams={{unit: ' GB', step: 1, min: 0.1, precision: 1, defaultValue: 0.1}}
-         validation={{min: 0.1}}
+         uiParams={{unit: ' GB', step: 1, min: 1, precision: 0, defaultValue: 1}}
+         validation={{min: 1}}
          packageName="../src/cms-components/customize-number-precision"
       />
     </Block>

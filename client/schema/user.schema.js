@@ -129,7 +129,9 @@ export default () => (
         <boolean keyName="isAdmin" title="${isAdmin}" />
         <boolean keyName="enabled" title="${enabled}" />
         {/* <number keyName="createdTimestamp" title="CreatedTimestamp" /> */}
-        <number keyName="personalDiskQuota" title="${personalDiskQuota}" uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
+        <number keyName="personalDiskQuota" title="${personalDiskQuota}"
+          uiParams={{unit: ' GB', step: 1, min: 1, precision: 0, defaultValue: 1}}
+          validation={{min: 1}}
           packageName="../src/cms-components/customize-number-precision"
         />
         <relation keyName="groups" title="${groups}"
