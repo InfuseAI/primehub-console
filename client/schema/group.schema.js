@@ -1,5 +1,5 @@
 /** @jsx builder */
-import builder from 'canner-script';
+import builder, {Condition} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 import {renderRelationField} from './utils';
 export default () => (
@@ -37,10 +37,6 @@ export default () => (
           type: 'text',
           label: '${name}',
           key: 'name'
-        }, {
-          type: 'text',
-          label: '${displayName}',
-          key: 'displayName'
         }]}
       />
       <pagination />
@@ -49,6 +45,7 @@ export default () => (
       validation={{pattern: '^[a-z0-9_]+$'}}
       required
     />
+
     <string keyName="displayName" title="${displayName}" />
     <boolean keyName="canUseGpu" title="${canUseGpu}" />
     <number keyName="cpuQuota" uiParams={{min: 0, precision: 1}}
@@ -59,7 +56,7 @@ export default () => (
       packageName="../src/cms-components/customize-number-precision.js"
     />
     <number keyName="diskQuota" title="${diskQuota}"
-      uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
+      uiParams={{unit: ' GB', step: 1, min: 1, precision: 0}}
       packageName="../src/cms-components/customize-number-precision"
     />
     <relation keyName="users" title="${users}"

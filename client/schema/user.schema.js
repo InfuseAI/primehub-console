@@ -111,7 +111,14 @@ export default () => (
     {/* <image keyName="thumbnail" title="Thumbnail" disabled /> */}
     <Default title="${basicInfo}" keyName="basicInfo">
       <string keyName="username" title="${username}"
-        validation={{pattern: '^[a-z0-9_]+$'}}
+        validation={{
+          validator: (value, cb) => {
+            console.log(value);
+            if (!value.match(/^[a-z0-9_]+$/)) {
+              return cb('only alphabet, number and underscore (_) are allowed');
+            }
+          }
+        }}
         required
       />
       <string keyName="email" title="${email}" required validation={{format: 'email'}}/>
@@ -122,7 +129,9 @@ export default () => (
         <boolean keyName="isAdmin" title="${isAdmin}" />
         <boolean keyName="enabled" title="${enabled}" />
         {/* <number keyName="createdTimestamp" title="CreatedTimestamp" /> */}
-        <number keyName="personalDiskQuota" title="${personalDiskQuota}" uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
+        <number keyName="personalDiskQuota" title="${personalDiskQuota}"
+          uiParams={{unit: ' GB', step: 1, min: 1, precision: 0, defaultValue: 1}}
+          validation={{min: 1}}
           packageName="../src/cms-components/customize-number-precision"
         />
         <relation keyName="groups" title="${groups}"

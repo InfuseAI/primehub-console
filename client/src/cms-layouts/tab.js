@@ -15,7 +15,7 @@ export default class Tab extends React.Component {
   }
 
   deploy = deploy => {
-    const {refId, goTo, routes} = this.props;
+    const {refId, goTo, routes, routerParams: {operator}} = this.props;
     this.setState({
       deploying: true
     })
@@ -51,13 +51,11 @@ export default class Tab extends React.Component {
             return <Tabs>
               {
                 children.map((child, i) => (
-                  <TabPane key={i} tab={child.title}
-                    disabled={isDisabled({
-                      keys: disabledKeysInCreate,
-                      routerParams,
-                      childKeyName: child.keyName
-                    })}
-                  >
+                  !isDisabled({
+                    keys: disabledKeysInCreate,
+                    routerParams,
+                    childKeyName: child.keyName
+                  }) && <TabPane key={i} tab={child.title}>
                     <Item
                       hideTitle={true}
                       filter={node => node.keyName === child.keyName}
