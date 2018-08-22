@@ -37,10 +37,6 @@ export default () => (
           type: 'text',
           label: '${name}',
           key: 'name'
-        }, {
-          type: 'text',
-          label: '${displayName}',
-          key: 'displayName'
         }]}
       />
       <pagination />
