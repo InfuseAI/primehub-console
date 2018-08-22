@@ -22,7 +22,9 @@ export default () => (
       }]
     }}
   >
-    <string keyName="name" title="${name}" />
+    <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
+      <string keyName="name" title="${name}" />
+    </Condition>
     <string keyName="displayName" title="${displayName}" />
     <string keyName="description" title="${description}" />
     <string keyName="url" ui="link" title="${url}"/>

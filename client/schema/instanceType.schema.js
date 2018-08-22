@@ -31,7 +31,9 @@ export default () => (
       }]
     }}
   >
-    <string keyName="name" title="${name}" />
+    <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
+      <string keyName="name" title="${name}" />
+    </Condition>
     <string keyName="displayName" title="${displayName}" />
     <string keyName="description" title="${description}" />
     <number keyName="cpuLimit" title="${cpuLimit}" uiParams={{min: 0, step: 1, precision: 1}}

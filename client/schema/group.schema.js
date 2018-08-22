@@ -1,5 +1,5 @@
 /** @jsx builder */
-import builder from 'canner-script';
+import builder, {Condition} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 import {renderRelationField} from './utils';
 export default () => (
@@ -45,6 +45,7 @@ export default () => (
       validation={{pattern: '^[a-z0-9_]+$'}}
       required
     />
+
     <string keyName="displayName" title="${displayName}" />
     <boolean keyName="canUseGpu" title="${canUseGpu}" />
     <number keyName="cpuQuota" uiParams={{min: 0, precision: 1}}
