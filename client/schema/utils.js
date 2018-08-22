@@ -82,6 +82,7 @@ exports.dict = {
     syncRegistrations: 'Sync Registrations',
     vendor: 'Vendor',
     access: 'Access',
+    volumnName: 'Volumn Name',
     // userfederation
     userFederations: 'User Federations',
     basicInformation: 'Basic Information',
@@ -204,6 +205,7 @@ exports.dict = {
     syncRegistrations: 'Sync Registrations',
     vendor: 'Vendor',
     access: 'Access',
+    volumnName: 'Volumn Name',
     // userfederation
     userFederations: 'User Federations',
     basicInformation: 'Basic Information',

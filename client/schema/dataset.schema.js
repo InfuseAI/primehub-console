@@ -48,6 +48,9 @@ export default () => (
         }, {
           text: 'env',
           value: 'env'
+        }, {
+          text: 'pv',
+          value: 'pv'
         }]
       }}
     />
@@ -59,6 +62,9 @@ export default () => (
         title="${variables}"
         packageName="../src/cms-components/customize-object-dynamic-field"
       />
+    </Condition>
+    <Condition match={data => data.type === 'pv'}>
+      <string keyName="volumnName" title="${volumnName}"/>
     </Condition>
     <Condition match={data => data.access === 'group'}>
       <relation keyName="groups" title="${groups}"
