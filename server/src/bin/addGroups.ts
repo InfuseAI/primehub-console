@@ -1,40 +1,35 @@
-import axios from 'axios';
+import KcClient from 'keycloak-admin';
 import faker from 'faker';
 import minimist from 'minimist';
 const argv = minimist(process.argv.slice(2));
 
-const host = argv.host || 'http://localhost:3000';
+const baseUrl = argv.baseUrl || 'http://localhost:8080/auth';
 const count = argv.count || 500;
-const url = `${host}/graphql`;
-
-const graphqlRequest = async (query, variables) => {
-  const res = await axios
-    .post(url, {
-      operationName: null,
-      query,
-      variables
-    });
-
-  if (res.data && res.data.errors) {
-    // tslint:disable-next-line:no-console
-    console.log(JSON.stringify(res.data.errors, null, 2));
-  }
-  return res.data.data;
-};
+const realm = argv.realm || 'master';
+const user = argv.user || 'wwwy3y3';
+const pwd = argv.pwd || 'wwwy3y3';
+const clientId = argv.clientId || 'admin-cli';
 
 const main = async () => {
+  const client = new KcClient({
+    realmName: realm,
+    baseUrl
+  });
+
+  await client.auth({
+    username: user,
+    password: pwd,
+    clientId,
+    grantType: 'password',
+  });
+
   for (let index = 0; index < count; index++) {
     const groupData = {
       name: faker.internet.userName().toLowerCase()
     };
-    const data = await graphqlRequest(`
-    mutation($data: GroupCreateInput!){
-      createGroup (data: $data) { id name }
-    }`, {
-      data: groupData
-    });
+    await client.groups.create(groupData);
     // tslint:disable-next-line:no-console
-    console.log(`create group: ${data.createGroup.name}`);
+    console.log(`create group: ${groupData.name}`);
   }
 };
 
