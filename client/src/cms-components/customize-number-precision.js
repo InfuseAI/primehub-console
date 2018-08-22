@@ -3,6 +3,13 @@ import { InputNumber } from "antd";
 import isNaN from "lodash/isNaN";
 
 export default class Input extends PureComponent {
+  componentDidMount() {
+    const {value, refId, onChange, uiParams} = this.props;
+    if (!value) {
+      onChange(refId, 'update', uiParams.defaultValue || uiParams.min || 0);
+    }
+  }
+
   onChange = (val) => {
     const {onChange, refId} = this.props;
     onChange(refId, "update", val);
