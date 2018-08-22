@@ -223,11 +223,10 @@ export default class CMSPage extends React.Component<Props, State> {
             history,
             baseUrl: "/cms"
           })}
+          dataDidChange={this.dataDidChange}
         >
           <Canner
-            schema={{...schema}}
             afterDeploy={this.afterDeploy}
-            dataDidChange={this.dataDidChange}
             ref={cms => this.cms = cms}
             intl={{
               locale: (window as any).LOCALE,

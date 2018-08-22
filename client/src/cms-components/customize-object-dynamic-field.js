@@ -85,7 +85,7 @@ export default class DynamicFields extends React.Component {
                 <Input placeholder="key" style={{ width: '40%'}} value={field.key} onChange={e => this.changeKey(e.target.value, i)}/>
                 <Input placeholder="value" style={{ width: '60%'}} value={field.value} onChange={e => this.changeValue(e.target.value, i)}/>
               </InputGroup>
-              <a href="javscript:;" onClick={() => this.remove(i)}>
+              <a href="javascript:;" onClick={() => this.remove(i)}>
                 <Icon type="close-circle-o"/>
               </a>
             </div>
