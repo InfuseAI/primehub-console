@@ -144,19 +144,29 @@ const listQuery = async (kcAdminClient: KcAdminClient, where: any, context: Cont
   // filter out everyone
   groups = groups.filter(group => group.id !== everyoneGroupId);
   groups = filter(groups, where);
-  // inject more fields from single query
-  const fetchedGroups = await Promise.all(groups.map(group => kcAdminClient.groups.findOne({id: group.id})));
-  return fetchedGroups;
+  return groups;
 };
 
 export const query = async (root, args, context: Context) => {
   const groups = await listQuery(context.kcAdminClient, args && args.where, context);
-  return paginate(groups, extractPagination(args));
+  const paginatedGroups = paginate(groups, extractPagination(args));
+  const fetchedGroups = await Promise.all(
+    paginatedGroups.map(group => context.kcAdminClient.groups.findOne({id: group.id})));
+  return fetchedGroups;
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
   const groups = await listQuery(context.kcAdminClient, args && args.where, context);
-  return toRelay(groups, extractPagination(args));
+  const relayResponse = toRelay(groups, extractPagination(args));
+  relayResponse.edges = await Promise.all(relayResponse.edges.map(
+    async edge => {
+      return {
+        cursor: edge.cursor,
+        node: await context.kcAdminClient.groups.findOne({id: edge.node.id})
+      };
+    })
+  );
+  return relayResponse;
 };
 
 export const queryOne = async (root, args, context: Context) => {
