@@ -82,4 +82,7 @@ $ node ./lib/bin/addGroups --count=10 --baseUrl=http://localhost:8080/auth --use
 
 // add users. default count is 500
 $ node ./lib/bin/addUsers --count=10 --baseUrl=http://localhost:8080/auth --user=user --pwd=password --clientId=admin-cli --realm=master
+
+// add all users to at least [min] count of groups, at most [max] count of groups.
+$ node ./lib/bin/addMembers --min=10 --max=20 --baseUrl=http://localhost:8080/auth --user=user --pwd=password --clientId=admin-cli --realm=master
 ```
