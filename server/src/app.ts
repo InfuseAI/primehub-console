@@ -219,7 +219,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
   const rootRouter = new Router();
 
   // favicon
-  const serveStatic = serve(path.resolve(__dirname, '../static'));
+  const serveStatic = serve(path.resolve(__dirname, '../static'), {maxage: 86400000});
   rootRouter.get('/favicon/*', serveStatic);
   rootRouter.get('/js/*', serveStatic);
   rootRouter.get('/font/*', serveStatic);
