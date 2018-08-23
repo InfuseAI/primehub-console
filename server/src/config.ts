@@ -25,6 +25,9 @@ export interface Config {
   cookieSignedKey: string;
   // host
   cmsHost: string;
+  // request
+  keycloakMaxSockets: number;
+  keycloakMaxFreeSockets: number;
 }
 
 const defaultConfigs = {
@@ -41,7 +44,9 @@ const defaultConfigs = {
   k8sCrdNamespace: 'default',
   payloadSecretKey: 'cannerSecret',
   cookieSignedKey: 'cannerSignedCookie',
-  cmsHost: 'http://localhost:3000'
+  cmsHost: 'http://localhost:3000',
+  keycloakMaxSockets: 80,
+  keycloakMaxFreeSockets: 10
 };
 
 const prodConfigs = {
@@ -63,7 +68,9 @@ export default (): Config => {
     k8sCrdNamespace: process.env.K8S_CRD_NAMESPACE,
     payloadSecretKey: process.env.PAYLOAD_SECRET,
     cookieSignedKey: process.env.COOKIE_SIGNED_KEY,
-    cmsHost: process.env.CANNER_CMS_HOST
+    cmsHost: process.env.CANNER_CMS_HOST,
+    keycloakMaxSockets: process.env.KC_MAX_SOCKETS,
+    keycloakMaxFreeSockets: process.env.KC_MAX_FREE_SOCKETS
   });
 
   const env = process.env.NODE_ENV || 'development';

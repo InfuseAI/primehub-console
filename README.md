@@ -25,6 +25,8 @@ Canner CMS
 * KC_CLIENT_ID: client id
 * CANNER_LOCALE: language of cms, default to `en`
 * CANNER_CMS_HOST: cms host, default to `http://localhost:3000`, DO NOT postfix with a slash.
+* KC_MAX_SOCKETS: Maximum number of sockets to allow per host. Default = 80
+* KC_MAX_FREE_SOCKETS: Maximum number of sockets (per host) to leave open in a free state. Default = 10
 
 ## Build
 ```sh
@@ -70,3 +72,17 @@ Change `CANNER_LOCALE` to `en` or `zh`
 
 ### About observer
 To start observer, you must set `KC_USERNAME` & `KC_PASSWORD`, because observer will rely on these credentials obtain token from keycloak itself.
+
+### Create fake users/groups
+```sh
+$ npm run build:prod
+
+// add groups. default count is 500
+$ node ./lib/bin/addGroups --count=10 --baseUrl=http://localhost:8080/auth --user=user --pwd=password --clientId=admin-cli --realm=master
+
+// add users. default count is 500
+$ node ./lib/bin/addUsers --count=10 --baseUrl=http://localhost:8080/auth --user=user --pwd=password --clientId=admin-cli --realm=master
+
+// add all users to at least [min] count of groups, at most [max] count of groups.
+$ node ./lib/bin/addMembers --min=10 --max=20 --baseUrl=http://localhost:8080/auth --user=user --pwd=password --clientId=admin-cli --realm=master
+```

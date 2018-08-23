@@ -21,8 +21,19 @@ export default () => (
     }}
   >
     <Default>
+
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
-      <string keyName="name" title="${name}" />
+      <string keyName="name" title="${name}"
+        validation={{
+          validator: (value, cb) => {
+            console.log(value);
+            if (!value.match(/^[a-z0-9_-]+$/)) {
+              return cb('only alphabet, number, dash (-) and underscore (_) are allowed');
+            }
+          }
+        }}
+        required
+      />
     </Condition>
     <string keyName="displayName" title="${displayName}" />
     <string keyName="description" title="${description}" />
@@ -66,7 +77,7 @@ export default () => (
       />
     </Condition>
     <Condition match={data => data.type === 'pv'}>
-      <string keyName="volumnName" title="${volumnName}"/>
+      <string keyName="volumeName" title="${volumeName}"/>
     </Condition>
     <Condition match={data => data.access === 'group'}>
       <relation keyName="groups" title="${groups}"

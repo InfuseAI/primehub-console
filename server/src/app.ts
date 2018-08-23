@@ -1,3 +1,4 @@
+// tslint:disable:no-console
 import Koa, {Context} from 'koa';
 import { ApolloServer, gql } from 'apollo-server-koa';
 import { importSchema } from 'graphql-import';
@@ -18,6 +19,7 @@ import * as group from './resolvers/group';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
+import Agent, { HttpsAgent } from 'agentkeepalive';
 
 // controller
 import { OidcCtrl, mount as mountOidc } from './oidc';
@@ -71,6 +73,16 @@ const resolvers = {
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {
   const config = getConfig();
+  // construct http agent
+  const httpAgent = new Agent({
+    maxSockets: config.keycloakMaxSockets,
+    maxFreeSockets: config.keycloakMaxFreeSockets
+  });
+
+  const httpsAgent = new HttpsAgent({
+    maxSockets: config.keycloakMaxSockets,
+    maxFreeSockets: config.keycloakMaxFreeSockets
+  });
   // create oidc client and controller
   // tslint:disable-next-line:max-line-length
   const issuer = await Issuer.discover(`${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/.well-known/openid-configuration`);
@@ -91,7 +103,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
 
   const kcAdminClient = new KcAdminClient({
     baseUrl: config.keycloakApiBaseUrl,
-    realmName: config.keycloakRealmName
+    realmName: config.keycloakRealmName,
+    requestConfigs: {
+      httpAgent,
+      httpsAgent
+    }
   });
 
   const crdClient = new CrdClient({
@@ -102,7 +118,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
   if (!process.env.TEST) {
     const kcAdminClientForObserver = new KcAdminClient({
       baseUrl: config.keycloakApiBaseUrl,
-      realmName: config.keycloakRealmName
+      realmName: config.keycloakRealmName,
+      requestConfigs: {
+        httpAgent,
+        httpsAgent
+      }
     });
 
     const observer = new Observer({
@@ -144,12 +164,14 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
       };
     },
     formatError: error => {
-      // tslint:disable-next-line:no-console
       console.log(omit(error, 'extensions'));
       if (error.extensions) {
-        // tslint:disable-next-line:no-console
         console.log(error.extensions);
       }
+      console.log(`== http agent ==`);
+      console.log(httpAgent.getCurrentStatus());
+      console.log(`== https agent ==`);
+      console.log(httpsAgent.getCurrentStatus());
       return new Error('Internal server error');
     },
   });
@@ -169,7 +191,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
     try {
       await next();
     } catch (err) {
-      // tslint:disable-next-line:no-console
       const errorCode = (err.isBoom && err.data && err.data.code) ? err.data.code : 'INTERNAL_ERROR';
       const statusCode =
         (err.isBoom && err.output && err.output.statusCode) ? err.output.statusCode : err.status || 500;

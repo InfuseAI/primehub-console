@@ -5,3 +5,5 @@ export const detaultSystemSettings = {
   },
   defaultUserDiskQuota: '20G'
 };
+
+export const keycloakMaxCount = 10000;

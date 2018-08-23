@@ -10,6 +10,7 @@ type Dataset {
   type: String
   url: String
   variables: JSON
+  volumeName: String
   groups: [Group]
 }
 
@@ -47,6 +48,7 @@ input DatasetCreateInput {
   type: String
   url: String
   variables: JSON
+  volumeName: String
   groups: GroupCreateManyInput
 }
 
@@ -58,5 +60,6 @@ input DatasetUpdateInput {
   type: String
   url: String
   variables: JSON
+  volumeName: String
   groups: GroupUpdateManyInput
 }

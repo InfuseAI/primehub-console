@@ -1,5 +1,7 @@
 import KcAdminClient from 'keycloak-admin';
-import { toRelay, getFromAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter } from './utils';
+import {
+  toRelay, getFromAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter, paginate, extractPagination
+} from './utils';
 import CrdClient from '../crdClient/crdClientImpl';
 import { mapValues, find, pick, first } from 'lodash';
 import { unflatten } from 'flat';
@@ -8,6 +10,7 @@ import { crd as datasetResolver } from './dataset';
 import { crd as imageResolver } from './image';
 import { Context } from './interface';
 import { Attributes, FieldType } from './attr';
+import { keycloakMaxCount } from './constant';
 
 /**
  * Mutation
@@ -134,7 +137,9 @@ export const destroy = async (root, args, context: Context) => {
  */
 
 const listQuery = async (kcAdminClient: KcAdminClient, where: any, context: Context) => {
-  let groups = await kcAdminClient.groups.find();
+  let groups = await kcAdminClient.groups.find({
+    max: keycloakMaxCount
+  });
   const everyoneGroupId = context.everyoneGroupId;
   // filter out everyone
   groups = groups.filter(group => group.id !== everyoneGroupId);
@@ -145,12 +150,13 @@ const listQuery = async (kcAdminClient: KcAdminClient, where: any, context: Cont
 };
 
 export const query = async (root, args, context: Context) => {
-  return listQuery(context.kcAdminClient, args && args.where, context);
+  const groups = await listQuery(context.kcAdminClient, args && args.where, context);
+  return paginate(groups, extractPagination(args));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
   const groups = await listQuery(context.kcAdminClient, args && args.where, context);
-  return toRelay(groups);
+  return toRelay(groups, extractPagination(args));
 };
 
 export const queryOne = async (root, args, context: Context) => {
