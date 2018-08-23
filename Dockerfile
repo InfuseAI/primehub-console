@@ -16,6 +16,7 @@ RUN cd server && yarn install --production=false
 COPY server/tsconfig.release.json ./server/
 COPY tsconfig.json ./
 COPY server/src ./server/src
+COPY server/static ./server/static
 COPY server/crd ./server/crd
 
 # build lib
