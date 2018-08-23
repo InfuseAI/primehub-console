@@ -98,7 +98,7 @@
     "@types/react-router-dom": "^4.2.6",
     "antd": "3.6.6",
     "axios": "^0.18.0",
-    "canner": "^1.5.0-canary.12",
+    "canner": "^1.5.0-canary.13",
     "canner-graphql-interface": "^1.5.0-canary.12",
     "canner-helpers": "^1.5.0-canary.12",
     "canner-layouts": "^1.5.0-canary.12",

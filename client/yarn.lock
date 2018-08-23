@@ -3188,7 +3188,7 @@ canner-compiler@^0.1.6:
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/canner-compiler/-/canner-compiler-0.1.6.tgz#516b5b2ded2029cf94fe4ef65ce024adad79fdd0"
 
-canner-graphql-interface@^1.5.0-canary.12:
+canner-graphql-interface@^1.5.0-canary.12, canner-graphql-interface@^1.5.0-canary.13:
   version "1.16.2"
   resolved "https://registry.yarnpkg.com/canner-graphql-interface/-/canner-graphql-interface-1.16.2.tgz#399ead8f213d8a004682f37640e2a4bb264691b3"
   dependencies:
@@ -3221,6 +3221,10 @@ canner-helpers@^1.5.0-canary.12:
   version "1.5.0-canary.12"
   resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-1.5.0-canary.12.tgz#bd1ee0d3025cfcb6b7d115547c9812d45388d716"
 
+canner-helpers@^1.5.0-canary.13:
+  version "1.5.0-canary.13"
+  resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-1.5.0-canary.13.tgz#5d5bb73a90f6a8611777d47a9c858e5233a53a80"
+
 canner-image-gallery@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/canner-image-gallery/-/canner-image-gallery-0.2.0.tgz#732fb1f312663fb03f0d574b5b52906e895fd7fc"
@@ -3237,6 +3241,12 @@ canner-layouts@^1.5.0-canary.12:
   resolved "https://registry.yarnpkg.com/canner-layouts/-/canner-layouts-1.5.0-canary.12.tgz#0f0dabc52041bf2c449c434df04ee24d8763fcbc"
   dependencies:
     canner-helpers "^1.5.0-canary.12"
+
+canner-layouts@^1.5.0-canary.13:
+  version "1.5.0-canary.13"
+  resolved "https://registry.yarnpkg.com/canner-layouts/-/canner-layouts-1.5.0-canary.13.tgz#5045e60adca94991bcd56f2cb6aaccceff853848"
+  dependencies:
+    canner-helpers "^1.5.0-canary.13"
 
 canner-ref-id@^0.1.2:
   version "0.1.2"
@@ -3260,17 +3270,17 @@ canner-script@^1.5.0-canary.12:
     react-intl "^2.4.0"
     safer-eval "^1.2.3"
 
-canner@^1.5.0-canary.12:
-  version "1.5.0-canary.12"
-  resolved "https://registry.yarnpkg.com/canner/-/canner-1.5.0-canary.12.tgz#200be57ae14d4fdf1bcd8cfa47da1934203b83a7"
+canner@^1.5.0-canary.13:
+  version "1.5.0-canary.13"
+  resolved "https://registry.yarnpkg.com/canner/-/canner-1.5.0-canary.13.tgz#93777feffc8b835343fd9787715a8ff0a5067874"
   dependencies:
     ajv "^6.5.2"
     apollo-boost "^0.1.4"
     bson-objectid "^1.2.2"
     canner-compiler "^0.1.6"
-    canner-graphql-interface "^1.5.0-canary.12"
-    canner-helpers "^1.5.0-canary.12"
-    canner-layouts "^1.5.0-canary.12"
+    canner-graphql-interface "^1.5.0-canary.13"
+    canner-helpers "^1.5.0-canary.13"
+    canner-layouts "^1.5.0-canary.13"
     canner-ref-id "^0.1.2"
     graphql-tag "^2.9.1"
     immer "^1.3.0"
