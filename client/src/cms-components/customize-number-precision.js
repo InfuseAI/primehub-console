@@ -5,8 +5,10 @@ import isNaN from "lodash/isNaN";
 export default class Input extends PureComponent {
   componentDidMount() {
     const {value, refId, onChange, uiParams} = this.props;
-    if (!value) {
-      onChange(refId, 'update', uiParams.defaultValue || uiParams.min || 0);
+    if (!value && (uiParams.defaultValue || uiParams.min)) {
+      setTimeout(() => {
+        onChange(refId, 'update', uiParams.defaultValue || uiParams.min);
+      }, 500)
     }
   }
 
@@ -27,7 +29,7 @@ export default class Input extends PureComponent {
         precision={uiParams && uiParams.precision}
         formatter={value => `${value}${uiParams && uiParams.unit ? uiParams.unit : ''}`}
         parser={value => value.replace(/[^0-9\.]/g, '')}
-        value={value}
+        value={value || uiParams.defaultValue || uiParams.min}
         onChange={this.onChange}
       />
     );
