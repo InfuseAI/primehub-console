@@ -1,7 +1,7 @@
 import React from 'react';
 import firebase from 'firebase';
 import {FirebaseClientService} from '@canner/image-service-config';
-import {GraphqlClient} from 'canner-graphql-interface';
+import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlClient';
 import {ImgurService} from '@canner/image-service-config';
 import {FormattedMessage} from 'react-intl';
 

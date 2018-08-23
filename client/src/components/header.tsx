@@ -25,7 +25,6 @@ export interface Props {
   appUrl: any;
   deploying: boolean;
   hasChanged: boolean;
-  deploy: Function;
   subMenuTitle: any;
 }
 
@@ -36,8 +35,6 @@ export default class HeaderContainer extends React.Component<Props, {}> {
     if(menuItem.key === 'logout') {
       // firebase.auth().signOut();
       location.href = "/oidc/logout";
-    } else if (menuItem.key === 'deploy') {
-      this.props.deploy();
     }
   }
 

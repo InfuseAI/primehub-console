@@ -1,4 +1,3 @@
-import * as axios from 'axios';
 import * as React from 'react';
 import {injectIntl} from 'react-intl';
 import {Layout, Menu, Icon, notification, Modal, Avatar} from 'antd';
@@ -6,18 +5,13 @@ import Canner from 'canner';
 import Container from '@canner/container';
 import R from '@canner/history-router';
 import ContentHeader from 'components/header';
-import Loading from 'components/loading';
 import Error from 'components/error';
-import isPlainObject from 'lodash.isplainobject';
-import firebase from 'firebase';
 import styled, {StyledComponentClass} from 'styled-components';
 import color from 'styledShare/color';
 import logo from 'images/primehub-logo-w.png';
 import {RouteComponentProps} from 'react-router';
 import schema from '../schema/index.schema.js';
-import fetch from 'isomorphic-fetch';
-const MenuItemGroup = Menu.ItemGroup;
-const {Content, Sider, Header} = Layout;
+const {Sider} = Layout;
 const confirm = Modal.confirm;
 declare var process : {
   env: {
@@ -77,36 +71,6 @@ export default class CMSPage extends React.Component<Props, State> {
     this.setState({
       dataChanged
     });
-  }
-
-  deploy = () => {
-    const {match, intl} = this.props;
-    const {activeKey} = match && match.params as any;
-    if (this.cms) {
-      this.setState({
-        deploying: true
-      });
-      return this.cms.deploy(activeKey)
-        .then(() => {
-          this.afterDeploy();
-        })
-        .catch(() => {
-          this.setState({
-            deploying: false
-          });
-          notification.error({
-            message: intl.formatMessage({
-              id: 'deploy.error.message',
-              defaultMessage: 'Something Error!'
-            }),
-            description: intl.formatMessage({
-              id: 'deploy.error.description',
-              defaultMessage: 'Your changes have NOT been saved.'
-            }),
-            placement: 'bottomRight'
-          });
-        });
-    }
   }
 
   afterDeploy = () => {
@@ -215,7 +179,6 @@ export default class CMSPage extends React.Component<Props, State> {
               appUrl={''}
               deploying={deploying}
               hasChanged={hasChanged}
-              deploy={this.deploy}
               subMenuTitle={<span><Avatar src={(window as any).thumbnail} style={{marginRight: '10px'}}/>Hi, {(window as any).username}</span>}
             />
           }}

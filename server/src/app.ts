@@ -219,7 +219,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
   const rootRouter = new Router();
 
   // favicon
-  rootRouter.get('/favicon/*', serve(path.resolve(__dirname, '../static')));
+  const serveStatic = serve(path.resolve(__dirname, '../static'));
+  rootRouter.get('/favicon/*', serveStatic);
+  rootRouter.get('/js/*', serveStatic);
 
   // ctrl
   mountOidc(rootRouter, oidcCtrl);
