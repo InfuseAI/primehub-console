@@ -52,7 +52,7 @@ export default class CMSPage extends React.Component<Props, State> {
     dataChanged: {}
   }
 
-  cms: CMS
+  container: Container
 
   // componentWillMount() {
   //   const {history, location} = this.props;
@@ -130,8 +130,8 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   reset = () => {
-    if (this.cms) {
-      return this.cms.reset();
+    if (this.container) {
+      return this.container.cannerRef.current.reset();
     }
     return Promise.resolve();
   }
@@ -223,11 +223,11 @@ export default class CMSPage extends React.Component<Props, State> {
             history,
             baseUrl: "/cms"
           })}
+          ref={container => this.container = container}
           dataDidChange={this.dataDidChange}
         >
           <Canner
             afterDeploy={this.afterDeploy}
-            ref={cms => this.cms = cms}
             intl={{
               locale: (window as any).LOCALE,
             }}
