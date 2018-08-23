@@ -50,12 +50,12 @@ module.exports = {
         }]
       },
       {
-        test: /\.(png|jpg|gif|svg)$/,
+        test: /\.(eot|svg|ttf|woff)$/,
         use: [
           {
             loader: 'file-loader',
             options: {
-              publicPath: 'https://cdn.canner.io/cms-page/'
+              publicPath: '/font'
             }
           }
         ]

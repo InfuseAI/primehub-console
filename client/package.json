@@ -88,7 +88,8 @@
     "table-row-hover-bg": "rgba(222, 229, 241, 0.37)",
     "item-active-bg": "rgba(222, 229, 241, 0.37)",
     "item-hover-bg": "rgba(222, 229, 241, 0.37)",
-    "font-size-base": "14px"
+    "font-size-base": "14px",
+    "icon-url": "'/font/iconfont'"
   },
   "license": "Apache-2.0",
   "dependencies": {
