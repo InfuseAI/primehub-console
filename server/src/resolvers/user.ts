@@ -6,6 +6,7 @@ import {
 import { detaultSystemSettings, keycloakMaxCount } from './constant';
 import { Attributes, FieldType } from './attr';
 import { Context } from './interface';
+import Boom from 'boom';
 
 /**
  * utils
@@ -284,6 +285,10 @@ export const destroy = async (root, args, context: Context) => {
 
 export const sendEmail = async (root, args, context: Context) => {
   const {id, resetActions, expiresIn}: {id: string, resetActions: any[], expiresIn: number} = args;
+  const user = await context.kcAdminClient.users.findOne({id});
+  if (!user.email) {
+    throw Boom.badData('user email not defined', {code: 'USER_EMAIL_NOT_EXIST'});
+  }
   await context.kcAdminClient.users.executeActionsEmail({
     id,
     lifespan: expiresIn,

@@ -4,7 +4,7 @@
 type User {
   id: ID!
   username: String!
-  email: String!
+  email: String
   firstName: String
   lastName: String
   totp: Boolean
@@ -52,7 +52,7 @@ input UserWhereInput {
 """Mutation input"""
 input UserCreateInput {
   username: String!
-  email: String!
+  email: String
   firstName: String
   lastName: String
   totp: Boolean
