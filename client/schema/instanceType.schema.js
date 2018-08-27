@@ -77,6 +77,9 @@ export default () => (
           // hack
           textCol: 'displayName',
           columns: [{
+            title: '${name}',
+            dataIndex: 'name'
+          }, {
             title: '${displayName}',
             dataIndex: 'displayName'
           }, {
@@ -96,8 +99,8 @@ export default () => (
             component={Filter}
             fields={[{
               type: 'text',
-              label: '${displayName}',
-              key: 'displayName'
+              label: '${name}',
+              key: 'name'
             }]}
           />
           <pagination />
