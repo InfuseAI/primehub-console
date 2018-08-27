@@ -6,7 +6,7 @@
 
 type Group {
   id: ID!
-	name: String!
+  name: String!
   displayName: String
   canUseGpu: Boolean
   cpuQuota: Float

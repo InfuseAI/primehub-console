@@ -3,15 +3,15 @@
 
 type User {
   id: ID!
-	username: String!
-	email: String!
-	firstName: String
-	lastName: String
-	totp: Boolean
-	isAdmin: Boolean
-	enabled: Boolean
-	createdTimestamp: Float
-	personalDiskQuota: Int
+  username: String!
+  email: String!
+  firstName: String
+  lastName: String
+  totp: Boolean
+  isAdmin: Boolean
+  enabled: Boolean
+  createdTimestamp: Float
+  personalDiskQuota: Int
   groups: [Group]
 }
 
@@ -34,7 +34,7 @@ type UserConnection {
 
 """User response"""
 type UserActionResponse {
-	id: String
+  id: String
 }
 
 """Input"""
@@ -45,34 +45,34 @@ input UserWhereUniqueInput {
 
 input UserWhereInput {
   id: ID
-	username_contains: String
-	email_contains: String
+  username_contains: String
+  email_contains: String
 }
 
 """Mutation input"""
 input UserCreateInput {
-	username: String!
-	email: String!
-	firstName: String
-	lastName: String
-	totp: Boolean
-	isAdmin: Boolean
-	enabled: Boolean
-	createdTimestamp: Float
-	personalDiskQuota: Int
+  username: String!
+  email: String!
+  firstName: String
+  lastName: String
+  totp: Boolean
+  isAdmin: Boolean
+  enabled: Boolean
+  createdTimestamp: Float
+  personalDiskQuota: Int
   groups: GroupCreateManyInput
 }
 
 input UserUpdateInput {
   username: String
-	email: String
-	firstName: String
-	lastName: String
-	totp: Boolean
-	isAdmin: Boolean
-	enabled: Boolean
-	createdTimestamp: Float
-	personalDiskQuota: Int
+  email: String
+  firstName: String
+  lastName: String
+  totp: Boolean
+  isAdmin: Boolean
+  enabled: Boolean
+  createdTimestamp: Float
+  personalDiskQuota: Int
   groups: GroupUpdateManyInput
 }
 

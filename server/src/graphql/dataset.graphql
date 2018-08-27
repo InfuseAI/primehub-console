@@ -3,7 +3,7 @@
 
 type Dataset {
   id: ID!
-	name: String!
+  name: String!
   displayName: String
   description: String
   access: String
