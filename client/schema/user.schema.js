@@ -113,7 +113,6 @@ export default () => (
       <string keyName="username" title="${username}"
         validation={{
           validator: (value, cb) => {
-            console.log(value);
             if (!value.match(/^[a-z0-9_]+$/)) {
               return cb('only alphabet, number and underscore (_) are allowed');
             }
@@ -121,7 +120,14 @@ export default () => (
         }}
         required
       />
-      <string keyName="email" title="${email}" required validation={{format: 'email'}}/>
+      <string keyName="email" title="${email}" validation={{
+          validator: (value, cb) => {
+            if (value && !value.match(/(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
+              return cb('should match format "email"');
+            }
+          }
+        }}
+      />
       <Condition match={(data, operator) => operator === 'update'}>
         <string keyName="firstName" title="${firstName}" />
         <string keyName="lastName" title="${lastName}" />
