@@ -114,7 +114,7 @@ export default () => (
         validation={{
           validator: (value, cb) => {
             if (!value.match(/^[a-z0-9_]+$/)) {
-              return cb('only alphabet, number and underscore (_) are allowed');
+              return cb('only lowercase letters, numbers, and underscores ("_") are allowed');
             }
           }
         }}

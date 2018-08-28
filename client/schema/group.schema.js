@@ -42,7 +42,13 @@ export default () => (
       <pagination />
     </toolbar>
     <string keyName="name" title="${name}"
-      validation={{pattern: '^[a-z0-9_]+$'}}
+      validation={{
+        validator: (value, cb) => {
+          if (!value.match(/^[a-z0-9_]+$/)) {
+            return cb('only lowercase letters, numbers, and underscores ("_") are allowed');
+          }
+        }
+      }}
       required
     />
 
