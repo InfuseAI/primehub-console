@@ -36,9 +36,8 @@ export default () => (
       <string keyName="name" title="${name}"
         validation={{
           validator: (value, cb) => {
-            console.log(value);
-            if (!value.match(/^[a-z0-9_-]+$/)) {
-              return cb('only alphabet, number, dash (-) and underscore (_) are allowed');
+            if (!value.match(/^[a-z0-9-\.]+$/)) {
+              return cb('only lowercase letters, numbers, dash ("-") and dot (".") are allowed');
             }
           }
         }}
