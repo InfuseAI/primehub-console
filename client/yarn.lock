@@ -3260,9 +3260,9 @@ canner-schema-loader@^1.5.0-canary.12:
     object-path "^0.11.4"
     strip-bom "^3.0.0"
 
-canner-script@^1.5.0-canary.12:
-  version "1.5.0-canary.12"
-  resolved "https://registry.yarnpkg.com/canner-script/-/canner-script-1.5.0-canary.12.tgz#29bb36fa3b9600b95954b50a4cbeecfbb815547d"
+canner-script@^1.5.0-canary.17:
+  version "1.5.0-canary.17"
+  resolved "https://registry.yarnpkg.com/canner-script/-/canner-script-1.5.0-canary.17.tgz#5c00324b95c3ca500c1f192d873127e0d022b1c4"
   dependencies:
     eval "^0.1.2"
     object-path "^0.11.4"

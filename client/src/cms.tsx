@@ -194,6 +194,13 @@ export default class CMSPage extends React.Component<Props, State> {
             intl={{
               locale: (window as any).LOCALE,
             }}
+            errorHandler={e => {
+              return notification.error({
+                message: e.message,
+                description: '',
+                placement: 'bottomRight'
+              });
+            }}
           />
         </Container>
       </Layout>
