@@ -12,7 +12,7 @@ import Filter from '../src/cms-toolbar/filter';
 configure({
   visitorManager: {
     visitors: [{
-      'plugins.array': path => {
+      'component.array': path => {
         if (path.node.keyName === 'user') {
           const {children} = path.node;
           const layouts = [{
@@ -24,7 +24,7 @@ configure({
             component: Layouts.default,
             children: [{
               type: 'object',
-              nodeType: 'plugins.object',
+              nodeType: 'component.object',
               keyName: '__1',
               path: 'user/__1',
               pattern: 'array.object',
@@ -43,7 +43,7 @@ configure({
             title: ResetPasswordTitle,
             children: [{
               type: 'object',
-              nodeType: 'plugins.object',
+              nodeType: 'component.object',
               keyName: '__2',
               path: 'user/__2',
               pattern: 'array.object',
