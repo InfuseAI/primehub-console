@@ -1,10 +1,11 @@
 // tslint:disable:no-console
 import Koa, {Context} from 'koa';
+import stringify from 'json-stringify-safe';
 import { ApolloServer, gql } from 'apollo-server-koa';
 import { importSchema } from 'graphql-import';
 import path from 'path';
 import KcAdminClient from 'keycloak-admin';
-import { omit } from 'lodash';
+import { omit, get } from 'lodash';
 import { Issuer } from 'openid-client';
 import views from 'koa-views';
 import serve from 'koa-static';
@@ -164,15 +165,20 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
       };
     },
     formatError: error => {
-      console.log(omit(error, 'extensions'));
-      if (error.extensions) {
-        console.log(error.extensions);
-      }
+      console.log(error);
       console.log(`== http agent ==`);
       console.log(httpAgent.getCurrentStatus());
       console.log(`== https agent ==`);
       console.log(httpsAgent.getCurrentStatus());
-      return new Error('Internal server error');
+
+      const errors = get(error, 'errors', []);
+      try {
+        JSON.stringify(errors);
+      } catch (err) {
+        console.log('formatResponse: circular reference(s) detected, removing them');
+        error.errors = JSON.parse(stringify(errors));
+      }
+      return error;
     },
   });
 

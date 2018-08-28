@@ -11,6 +11,7 @@ import { crd as imageResolver } from './image';
 import { Context } from './interface';
 import { Attributes, FieldType } from './attr';
 import { keycloakMaxCount } from './constant';
+import { ApolloError } from 'apollo-server';
 
 /**
  * Mutation
@@ -32,10 +33,17 @@ export const create = async (root, args, context: Context) => {
       diskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
     }
   });
-  await kcAdminClient.groups.create({
-    name: payload.name,
-    attributes: attrs.toKeycloakAttrs()
-  });
+  try {
+    await kcAdminClient.groups.create({
+      name: payload.name,
+      attributes: attrs.toKeycloakAttrs()
+    });
+  } catch (err) {
+    if (!err.response || err.response.status !== 409) {
+      throw err;
+    }
+    throw new ApolloError('Group exists with same name', 'GROUP_CONFLICT_NAME');
+  }
 
   // find the group
   const groups = await kcAdminClient.groups.find({search: payload.name});
@@ -88,10 +96,17 @@ export const update = async (root, args, context: Context) => {
   attrs.mergeWithData(pick(payload, ['displayName', 'canUseGpu', 'gpuQuota', 'cpuQuota', 'diskQuota']));
 
   // update
-  await kcAdminClient.groups.update({id: groupId}, {
-    name: payload.name,
-    attributes: attrs.toKeycloakAttrs()
-  });
+  try {
+    await kcAdminClient.groups.update({id: groupId}, {
+      name: payload.name,
+      attributes: attrs.toKeycloakAttrs()
+    });
+  } catch (err) {
+    if (!err.response || err.response.status !== 409) {
+      throw err;
+    }
+    throw new ApolloError('Group exists with same name', 'GROUP_CONFLICT_NAME');
+  }
 
   // connect to users
   try {

@@ -1,12 +1,12 @@
 import KcAdminClient from 'keycloak-admin';
-import { pick, omit, find, isUndefined, first, sortBy } from 'lodash';
+import { pick, omit, find, isUndefined, first, sortBy, get } from 'lodash';
 import {
   toRelay, toAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter, paginate, extractPagination
 } from './utils';
 import { detaultSystemSettings, keycloakMaxCount } from './constant';
 import { Attributes, FieldType } from './attr';
 import { Context } from './interface';
-import Boom from 'boom';
+import { ApolloError } from 'apollo-server';
 
 /**
  * utils
@@ -135,15 +135,32 @@ export const create = async (root, args, context: Context) => {
     }
   });
 
-  await kcAdminClient.users.create({
-    username: payload.username,
-    email: payload.email,
-    firstName: payload.firstName,
-    lastName: payload.lastName,
-    // force enabled to true
-    enabled: true,
-    attributes: attrs.toKeycloakAttrs()
-  });
+  try {
+    await kcAdminClient.users.create({
+      username: payload.username,
+      email: payload.email,
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      // force enabled to true
+      enabled: true,
+      attributes: attrs.toKeycloakAttrs()
+    });
+  } catch (err) {
+    if (!err.response || err.response.status !== 409) {
+      throw err;
+    }
+    // 409 error, check it's email or username
+    const message = get(err, 'response.data.errorMessage');
+
+    if (message.indexOf('username') >= 0) {
+      throw new ApolloError(message, 'USER_CONFLICT_USERNAME');
+    }
+
+    if (message.indexOf('email') >= 0) {
+      throw new ApolloError(message, 'USER_CONFLICT_EMAIL');
+    }
+    throw err;
+  }
 
   // find the user
   const users = await kcAdminClient.users.find({
@@ -205,14 +222,21 @@ export const update = async (root, args, context: Context) => {
   });
 
   // update
-  await kcAdminClient.users.update({id: userId}, {
-    username: payload.username,
-    email: payload.email,
-    firstName: payload.firstName,
-    lastName: payload.lastName,
-    enabled: isUndefined(payload.enabled) ? true : payload.enabled,
-    attributes: attrs.toKeycloakAttrs()
-  });
+  try {
+    await kcAdminClient.users.update({id: userId}, {
+      username: payload.username,
+      email: payload.email,
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      enabled: isUndefined(payload.enabled) ? true : payload.enabled,
+      attributes: attrs.toKeycloakAttrs()
+    });
+  } catch (err) {
+    if (!err.response || err.response.status !== 409) {
+      throw err;
+    }
+    throw new ApolloError('User exists with same email', 'USER_CONFLICT_EMAIL');
+  }
 
   // set admin
   if (!isUndefined(payload.isAdmin)) {
@@ -287,7 +311,7 @@ export const sendEmail = async (root, args, context: Context) => {
   const {id, resetActions, expiresIn}: {id: string, resetActions: any[], expiresIn: number} = args;
   const user = await context.kcAdminClient.users.findOne({id});
   if (!user.email) {
-    throw Boom.badData('user email not defined', {code: 'USER_EMAIL_NOT_EXIST'});
+    throw new ApolloError('user email not defined', 'USER_EMAIL_NOT_EXIST');
   }
   await context.kcAdminClient.users.executeActionsEmail({
     id,

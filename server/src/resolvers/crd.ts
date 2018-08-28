@@ -4,7 +4,7 @@ import CustomResource, { Item } from '../crdClient/customResource';
 import pluralize from 'pluralize';
 import { isEmpty, omit, mapValues, find } from 'lodash';
 import KeycloakAdminClient from 'keycloak-admin';
-import Boom from 'boom';
+import { ApolloError } from 'apollo-server';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
 
 export class Crd<SpecType> {
@@ -215,9 +215,9 @@ export class Crd<SpecType> {
       });
     } catch (err) {
       if (err.response && err.response.status === 409) {
-        throw Boom.conflict(`role ${roleName} already exist! Please delete it on keycloak`, {
-          code: 'RESOURCE_CONFLICT'
-        });
+        throw new ApolloError(`Resource already exist`,
+          'RESOURCE_CONFLICT'
+        );
       }
       throw err;
     }

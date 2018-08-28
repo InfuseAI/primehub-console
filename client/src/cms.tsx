@@ -195,9 +195,36 @@ export default class CMSPage extends React.Component<Props, State> {
               locale: (window as any).LOCALE,
             }}
             errorHandler={e => {
+              console.dir(e);
+              // default message and description
+              let message = e.message || 'Error';
+              let description = 'Please print server log to dev team';
+              // get the first error
+              const errorCode = e.graphQLErrors && e.graphQLErrors[0] && e.graphQLErrors[0].extensions && e.graphQLErrors[0].extensions.code;
+              switch (errorCode) {
+                case 'USER_CONFLICT_USERNAME':
+                  message = 'Conflict Error';
+                  description = 'User exists with same username';
+                  break;
+
+                case 'USER_CONFLICT_EMAIL':
+                  message = 'Conflict Error';
+                  description = 'User exists with same email';
+                  break;
+
+                case 'GROUP_CONFLICT_NAME':
+                  message = 'Conflict Error';
+                  description = 'Group exists with same name';
+                  break;
+
+                case 'RESOURCE_CONFLICT':
+                  message = 'Conflict Error';
+                  description = 'Resource name already exist';
+                  break;
+              }
               return notification.error({
-                message: e.message,
-                description: '',
+                message,
+                description,
                 placement: 'bottomRight'
               });
             }}
