@@ -26,7 +26,7 @@ import Agent, { HttpsAgent } from 'agentkeepalive';
 import { OidcCtrl, mount as mountOidc } from './oidc';
 
 // config
-import getConfig from './config';
+import config from './config';
 
 // observer
 import Observer from './observer/observer';
@@ -73,7 +73,6 @@ const resolvers = {
 };
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {
-  const config = getConfig();
   // construct http agent
   const httpAgent = new Agent({
     maxSockets: config.keycloakMaxSockets,

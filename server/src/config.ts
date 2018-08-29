@@ -18,16 +18,23 @@ export interface Config {
 
   // everyone group
   keycloakEveryoneGroupId: string;
+
   // k8s
   k8sCrdNamespace: string;
+
   // payload
   payloadSecretKey: string;
   cookieSignedKey: string;
+
   // host
   cmsHost: string;
+
   // request
   keycloakMaxSockets: number;
   keycloakMaxFreeSockets: number;
+
+  // multi cluster namespace
+  rolePrefix?: string;
 }
 
 const defaultConfigs = {
@@ -53,7 +60,7 @@ const prodConfigs = {
   env: 'production'
 };
 
-export default (): Config => {
+const createConfig = (): Config => {
   const envConfigs = pickBy({
     locale: process.env.CANNER_LOCALE,
     keycloakApiBaseUrl: process.env.KC_API_BASEURL,
@@ -70,7 +77,8 @@ export default (): Config => {
     cookieSignedKey: process.env.COOKIE_SIGNED_KEY,
     cmsHost: process.env.CANNER_CMS_HOST,
     keycloakMaxSockets: process.env.KC_MAX_SOCKETS,
-    keycloakMaxFreeSockets: process.env.KC_MAX_FREE_SOCKETS
+    keycloakMaxFreeSockets: process.env.KC_MAX_FREE_SOCKETS,
+    rolePrefix: process.env.KC_ROLE_PREFIX
   });
 
   const env = process.env.NODE_ENV || 'development';
@@ -81,3 +89,5 @@ export default (): Config => {
       return {...defaultConfigs, ...envConfigs};
   }
 };
+
+export default createConfig();

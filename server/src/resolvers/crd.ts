@@ -6,6 +6,7 @@ import { isEmpty, omit, mapValues, find } from 'lodash';
 import KeycloakAdminClient from 'keycloak-admin';
 import { ApolloError } from 'apollo-server';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
+import config from '../config';
 
 export class Crd<SpecType> {
   private customResourceMethod: string;
@@ -21,6 +22,7 @@ export class Crd<SpecType> {
   }: {
     name: string, metadata: any, spec: any, customResource: any
   }) => Promise<any>;
+  private rolePrefix?: string;
 
   constructor({
     customResourceMethod,
@@ -45,7 +47,7 @@ export class Crd<SpecType> {
       name, metadata, spec, customResource
     }: {
       name: string, metadata: any, spec: any, customResource: any
-    }) => Promise<any>;
+    }) => Promise<any>
   }) {
     this.customResourceMethod = customResourceMethod;
     this.propMapping = propMapping;
@@ -56,6 +58,7 @@ export class Crd<SpecType> {
     this.onCreate = onCreate;
     this.onUpdate = onUpdate;
     this.customUpdate = customUpdate;
+    this.rolePrefix = config.rolePrefix;
   }
 
   /**
@@ -146,7 +149,9 @@ export class Crd<SpecType> {
   }
 
   public getPrefix() {
-    return `${this.prefixName}:`;
+    return (this.rolePrefix)
+      ? `${this.rolePrefix}:${this.prefixName}:`
+      : `${this.prefixName}:`;
   }
 
   /**

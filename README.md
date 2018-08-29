@@ -27,6 +27,7 @@ Canner CMS
 * CANNER_CMS_HOST: cms host, default to `http://localhost:3000`, DO NOT postfix with a slash.
 * KC_MAX_SOCKETS: Maximum number of sockets to allow per host. Default = 80
 * KC_MAX_FREE_SOCKETS: Maximum number of sockets (per host) to leave open in a free state. Default = 10
+* KC_ROLE_PREFIX: Prefix will be append at role when creating custom resource, for example: `cluster-1:ds:dataset` if `KC_ROLE_PREFIX` = `cluster-1`.
 
 ## Build
 ```sh
