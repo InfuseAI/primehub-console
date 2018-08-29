@@ -164,7 +164,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
       };
     },
     formatError: error => {
-      console.log(error);
       console.log(`== http agent ==`);
       console.log(httpAgent.getCurrentStatus());
       console.log(`== https agent ==`);
@@ -177,6 +176,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
         console.log('formatResponse: circular reference(s) detected, removing them');
         error.errors = JSON.parse(stringify(errors));
       }
+
+      console.log(JSON.stringify(error, null, 2));
       return error;
     },
   });
