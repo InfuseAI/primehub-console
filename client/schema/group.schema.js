@@ -1,7 +1,7 @@
 /** @jsx builder */
 import builder, {Condition} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
-import {renderRelationField} from './utils';
+import {renderRelationField, parseToStepDot5} from './utils';
 export default () => (
   <array keyName="group" title="${group}"
     controlDeployAndResetButtons={true}
@@ -54,7 +54,9 @@ export default () => (
 
     <string keyName="displayName" title="${displayName}" />
     <boolean keyName="canUseGpu" title="${canUseGpu}" />
-    <number keyName="cpuQuota" uiParams={{min: 0, precision: 1}}
+    <number keyName="cpuQuota"
+      uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
+      defaultValue={1}
       title="${cpuQuota}"
       packageName="../src/cms-components/customize-number-precision.js"
     />

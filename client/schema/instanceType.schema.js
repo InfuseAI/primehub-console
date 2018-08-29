@@ -1,6 +1,7 @@
 /** @jsx builder */
 import builder, {Condition} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
+import {parseToStepDot5} from './utils';
 
 export default () => (
   <array keyName="instanceType"
@@ -46,7 +47,9 @@ export default () => (
     </Condition>
     <string keyName="displayName" title="${displayName}" />
     <string keyName="description" title="${description}" />
-    <number keyName="cpuLimit" title="${cpuLimit}" uiParams={{min: 0, step: 1, precision: 1}}
+    <number keyName="cpuLimit" title="${cpuLimit}"
+      uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
+      defaultValue={1}
       packageName="../src/cms-components/customize-number-precision.js"
     />
     <number keyName="memoryLimit" title="${memoryLimit}"
@@ -56,7 +59,9 @@ export default () => (
     <number keyName="gpuLimit" title="${gpuLimit}" uiParams={{min: 0, precision: 0, step: 1}}
       packageName="../src/cms-components/customize-number-precision.js"
     />
-    <number keyName="cpuRequest" title="${cpuRequest}" uiParams={{min: 0, step: 1, precision: 1}}
+    <number keyName="cpuRequest" title="${cpuRequest}"
+      uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
+      defaultValue={1}
       packageName="../src/cms-components/customize-number-precision.js"
     />
     <number keyName="memoryRequest" title="${memoryRequest}"

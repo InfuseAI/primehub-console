@@ -29,7 +29,22 @@ exports.ResetPasswordTitle = <FormattedMessage
   id="resetPassword"
   defaultMessage="Reset Password"
 />;
-
+exports.parseToStepDot5 = function(value) {
+  let [int, float] = value.split('.');
+  if (!float) {
+    return value;
+  }
+  float = float[0];
+  if (float && float < 3) {
+    return `${int}.0`;
+  }
+  if (float && float < 8) {
+    return `${int}.5`;
+  }
+  if (float && float < 10) {
+    return `${1 + Number(int)}.0`;
+  }
+}
 exports.dict = {
   en: {
     // system
@@ -42,8 +57,8 @@ exports.dict = {
     basicInfo: 'Basic Info',
     username: 'Username',
     email: 'Email',
-    firstName: 'FirstName',
-    lastName: 'LastName',
+    firstName: 'First Name',
+    lastName: 'Last Name',
     completeName: 'Name',
     totp: 'Totp',
     isAdmin: 'Is Admin',
@@ -56,13 +71,13 @@ exports.dict = {
     displayName: 'Display Name',
     canUseGpu: 'Can Use GPU',
     canUseGPU: 'Can Use GPU',
-    cpuLimit: 'Cpu Limit',
+    cpuLimit: 'CPU Limit',
     cpuQuota: 'CPU Quota',
     gpuQuota: 'GPU Quota',
     diskQuota: 'Disk Quota',
     // instance type
     instanceTypes: 'Instance Types',
-    memoryLimit: 'MemoryLimit',
+    memoryLimit: 'Memory Limit',
     gpuLimit: 'GPU Limit',
     cpuRequest: 'CPU Request',
     memoryRequest: 'Memory Request',
@@ -179,13 +194,13 @@ exports.dict = {
     resetPassword: 'Reset Password',
     displayName: 'Display Name',
     canUseGpu: 'Can Use GPU',
-    cpuLimit: 'Cpu Limit',
+    cpuLimit: 'CPU Limit',
     cpuQuota: 'CPU Quota',
     gpuQuota: 'GPU Quota',
     diskQuota: 'Disk Quota',
     // instance type
     instanceTypes: 'Instance Types',
-    memoryLimit: 'MemoryLimit',
+    memoryLimit: 'Memory Limit',
     gpuLimit: 'GPU Limit',
     cpuRequest: 'CPU Request',
     memoryRequest: 'Memory Request',

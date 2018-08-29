@@ -136,7 +136,8 @@ export default () => (
         <boolean keyName="enabled" title="${enabled}" />
         {/* <number keyName="createdTimestamp" title="CreatedTimestamp" /> */}
         <number keyName="personalDiskQuota" title="${personalDiskQuota}"
-          uiParams={{unit: ' GB', step: 1, min: 1, precision: 0, defaultValue: 1}}
+          uiParams={{unit: ' GB', step: 1, min: 1, precision: 0}}
+          defaultValue={1}
           validation={{min: 1}}
           packageName="../src/cms-components/customize-number-precision"
         />
