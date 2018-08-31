@@ -4,7 +4,9 @@ const {theme} = require('./package.json');
 // plugins
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
+if (process.env.NODE_ENV === 'development') {
+  delete theme['icon-url'];
+}
 module.exports = {
   mode: 'production',
   entry: './src/antd.less',

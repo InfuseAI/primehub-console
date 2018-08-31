@@ -65,9 +65,10 @@
     "check:src": "npm run lint && npm run test",
     "test": "jest",
     "test:watch": "jest --watch",
-    "start": "npm run antd && ./node_modules/.bin/webpack-dev-server --config webpack.config.dev.js --mode development  --https",
+    "start": "npm run antd:dev && ./node_modules/.bin/webpack-dev-server --config webpack.config.dev.js --mode development  --https",
     "build": "npm run clean && npm run antd && ./node_modules/.bin/webpack --config webpack.config.prod.js --mode production",
     "antd": "./node_modules/.bin/webpack --config webpack.config.antd.js --mode production",
+    "antd:dev": "NODE_ENV=development ./node_modules/.bin/webpack --config webpack.config.antd.js --mode production",
     "validate": "npm ls"
   },
   "pre-commit": [],
