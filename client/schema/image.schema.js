@@ -27,8 +27,8 @@ export default () => (
       <string keyName="name" title="${name}"
         validation={{
           validator: (value, cb) => {
-            if (!value.match(/^[a-z0-9-\.]+$/)) {
-              return cb('only lowercase letters, numbers, dash ("-") and dot (".") are allowed');
+            if (!value.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/)) {
+              return cb(`lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`);
             }
           }
         }}
@@ -46,7 +46,6 @@ export default () => (
           to: 'group',
           type: 'toMany'
         }}
-        hideTitle
         uiParams={{
           columns: [{
             title: '${name}',
