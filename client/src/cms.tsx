@@ -11,6 +11,7 @@ import color from 'styledShare/color';
 import logo from 'images/primehub-logo-w.png';
 import {RouteComponentProps} from 'react-router';
 import schema from '../schema/index.schema.js';
+import myLocales from './utils/locales';
 const {Sider} = Layout;
 const confirm = Modal.confirm;
 declare var process : {
@@ -109,15 +110,15 @@ export default class CMSPage extends React.Component<Props, State> {
       confirm({
         title: intl.formatMessage({
           id: 'deploy.confirm.title',
-          defaultMessage: 'Do you want to undo the changes?'
+          defaultMessage: 'Do you want to discard the changes?'
         }),  
         content: intl.formatMessage({
           id: 'deploy.confirm.content',
-          defaultMessage: `Your changes will be lost, if you don't save them.`
+          defaultMessage: `Your changes will be lost. Are you sure?`
         }),
         okText: intl.formatMessage({
           id: 'deploy.confirm.ok',
-          defaultMessage: `Undo`
+          defaultMessage: `Discard`
         }),
         cancelText: intl.formatMessage({
           id: 'deploy.confirm.cancel',
@@ -125,7 +126,7 @@ export default class CMSPage extends React.Component<Props, State> {
         }),
         onOk: () => {
           return new Promise((resolve, reject) => {
-            setTimeout(resolve, 1000);
+            resolve();
           }).then(this.reset)
             .then(() => {
               history.push(`/cms/${key}`);
@@ -193,6 +194,9 @@ export default class CMSPage extends React.Component<Props, State> {
             afterDeploy={this.afterDeploy}
             intl={{
               locale: (window as any).LOCALE,
+              messages: {
+                ...myLocales
+              }
             }}
             errorHandler={e => {
               console.dir(e);

@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { Tag, Tooltip, Icon, Table } from "antd";
+import { Tag, Tooltip, Icon, Table, Button } from "antd";
 import template from 'lodash/template';
 import difference from "lodash/difference";
 import get from 'lodash/get';
@@ -7,6 +7,7 @@ import Picker from '@canner/antd-share-relation';
 import {injectIntl} from 'react-intl';
 import {FormattedMessage} from "react-intl";
 import {renderValue} from '@canner/antd-locales';
+import pluralize from 'pluralize';
 
 @injectIntl
 export default class RelationTable extends PureComponent {
@@ -78,22 +79,23 @@ export default class RelationTable extends PureComponent {
         {
           uiParams.isHidden && <div style={{marginTop: 16, fontSize: 18}}>{title}</div>
         }
+        {
+          !disabled && <div>
+            <Button onClick={this.showModal} style={{margin: '16px 8px 0'}}>
+              <Icon type="link"/>
+              <FormattedMessage
+                id="relation.multipleSelect.connect"
+                defaultMessage="connect existing "
+              />
+              {pluralize.plural(schema[relation.to].keyName)}
+            </Button>
+          </div>
+        }
         <Table
           dataSource={value}
           columns={newColumnsRender}
+          style={{marginBottom: 16}}
         />
-        {
-          !disabled && <div>
-            <a href="javascript:;" onClick={this.showModal}>
-              <Icon type="link" style={{margin: '16px 8px'}}/>
-              <FormattedMessage
-                id="relation.multipleSelect.connect"
-                defaultMessage="connect existed "
-              />
-              {schema[relation.to].title}
-            </a>
-          </div>
-        }
         {
           !disabled && <Picker
             visible={modalVisible}
