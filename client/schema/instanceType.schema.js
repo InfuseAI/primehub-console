@@ -76,7 +76,6 @@ export default () => (
           to: 'group',
           type: 'toMany'
         }}
-        hideTitle
         uiParams={{
           // hack
           textCol: 'displayName',
