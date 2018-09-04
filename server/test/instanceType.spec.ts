@@ -41,9 +41,10 @@ declare module 'mocha' {
 }
 
 describe('instanceType graphql', function() {
-  before(() => {
+  before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.crdClient = (global as any).crdClient;
+    await (global as any).authKcAdmin();
   });
 
   after(async () => {

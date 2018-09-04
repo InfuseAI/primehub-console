@@ -6,7 +6,8 @@ import { isEmpty, omit, mapValues, find } from 'lodash';
 import KeycloakAdminClient from 'keycloak-admin';
 import { ApolloError } from 'apollo-server';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
-import config from '../config';
+import {createConfig} from '../config';
+const config = createConfig();
 
 export class Crd<SpecType> {
   private customResourceMethod: string;

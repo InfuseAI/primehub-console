@@ -26,7 +26,7 @@ import Agent, { HttpsAgent } from 'agentkeepalive';
 import { OidcCtrl, mount as mountOidc } from './oidc';
 
 // config
-import config from './config';
+import {createConfig} from './config';
 
 // observer
 import Observer from './observer/observer';
@@ -73,6 +73,7 @@ const resolvers = {
 };
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {
+  const config = createConfig();
   // construct http agent
   const httpAgent = new Agent({
     maxSockets: config.keycloakMaxSockets,
@@ -84,6 +85,13 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
     maxFreeSockets: config.keycloakMaxFreeSockets
   });
   // create oidc client and controller
+  Issuer.defaultHttpOptions = {
+    agent: {
+      http: httpAgent,
+      https: httpsAgent
+    }
+  };
+
   // tslint:disable-next-line:max-line-length
   const issuer = await Issuer.discover(`${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/.well-known/openid-configuration`);
   const oidcClient = new issuer.Client({

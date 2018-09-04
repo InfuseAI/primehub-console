@@ -43,9 +43,10 @@ declare module 'mocha' {
 
 describe('group graphql', function() {
   this.timeout(5000);
-  before(() => {
+  before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;
+    await (global as any).authKcAdmin();
   });
 
   it('should expect empty groups when query', async () => {

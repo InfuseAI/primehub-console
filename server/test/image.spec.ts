@@ -35,8 +35,9 @@ declare module 'mocha' {
 }
 
 describe('image graphql', function() {
-  before(() => {
+  before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
+    await (global as any).authKcAdmin();
   });
 
   after(async () => {

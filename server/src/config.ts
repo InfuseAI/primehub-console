@@ -60,7 +60,7 @@ const prodConfigs = {
   env: 'production'
 };
 
-const createConfig = (): Config => {
+export const createConfig = (): Config => {
   const envConfigs = pickBy({
     locale: process.env.CANNER_LOCALE,
     keycloakApiBaseUrl: process.env.KC_API_BASEURL,

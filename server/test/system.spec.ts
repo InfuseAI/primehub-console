@@ -16,9 +16,10 @@ declare module 'mocha' {
 }
 
 describe('system graphql', function() {
-  before(() => {
+  before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;
+    await (global as any).authKcAdmin();
   });
 
   it('should query', async () => {

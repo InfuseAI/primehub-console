@@ -42,10 +42,11 @@ declare module 'mocha' {
 }
 
 describe('user graphql', function() {
-  this.timeout(5000);
-  before(() => {
+  this.timeout(10000);
+  before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;
+    await (global as any).authKcAdmin();
   });
 
   it('should expect users when query users', async () => {

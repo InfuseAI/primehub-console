@@ -104,8 +104,11 @@ export const createSandbox = async () => {
   (global as any).kcAdminClient = client;
 
   // authorize with username/passowrd
-  await client.auth(masterRealmCred);
+  (global as any).authKcAdmin = async () => {
+    await client.auth(masterRealmCred);
+  };
 
+  await (global as any).authKcAdmin();
   // create new realm
   const realmId = faker.internet.userName().toLowerCase();
   await client.realms.create({

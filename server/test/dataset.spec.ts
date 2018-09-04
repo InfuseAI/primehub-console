@@ -39,9 +39,10 @@ declare module 'mocha' {
 }
 
 describe('dataset graphql', function() {
-  before(() => {
+  before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;
+    await (global as any).authKcAdmin();
   });
 
   after(async () => {

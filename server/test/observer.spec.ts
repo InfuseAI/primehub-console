@@ -192,8 +192,8 @@ describe('observer', function() {
     datasets.push(dataset);
 
     // check if roles created on keycloak
+    await BPromise.delay(1000);
     const roles = await this.kcAdminClient.roles.find();
-
     datasets.forEach(e => {
       expect(roles.find(role => role.name === `ds:${e.name}`)).to.be.ok;
     });
@@ -229,6 +229,7 @@ describe('observer', function() {
     });
 
     // check roles not exist on keycloak
+    await BPromise.delay(1000);
     const roles = await this.kcAdminClient.roles.find();
 
     datasets.forEach(e => {

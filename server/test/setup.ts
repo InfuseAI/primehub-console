@@ -3,6 +3,7 @@
  */
 
 import chai from 'chai';
+import http from 'http';
 
 const expect = chai.expect;
 
@@ -15,11 +16,12 @@ before(async () => {
   await createSandbox();
 
   // create app
-  const PORT = 3000;
+  const PORT = 4000;
   const {app, server} = await createApp();
-  (global as any).server = app.listen(PORT);
+  const httpServer = http.createServer(app.callback());
+  const requester = chai.request(httpServer).keepOpen();
   (global as any).graphqlRequest = async (query, variables) => {
-    const res = await chai.request((global as any).server)
+    const res = await requester
       .post(server.graphqlPath)
       .send({
         operationName: null,

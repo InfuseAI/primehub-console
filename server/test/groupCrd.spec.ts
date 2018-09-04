@@ -33,7 +33,7 @@ const resources = [{
 }];
 
 describe('group resource relation graphql', function() {
-  before(() => {
+  before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.createGroup = async () => {
       const data = await this.graphqlRequest(`
@@ -46,6 +46,7 @@ describe('group resource relation graphql', function() {
       });
       return data.createGroup;
     };
+    await (global as any).authKcAdmin();
   });
 
   after(async () => {

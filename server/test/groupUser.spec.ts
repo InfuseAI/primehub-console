@@ -19,7 +19,7 @@ declare module 'mocha' {
 }
 
 describe('group user relation graphql', function() {
-  before(() => {
+  before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.createUser = async () => {
       const data = await this.graphqlRequest(`
@@ -45,6 +45,8 @@ describe('group user relation graphql', function() {
       });
       return data.createGroup;
     };
+
+    await (global as any).authKcAdmin();
   });
 
   it('should create a group with users', async () => {

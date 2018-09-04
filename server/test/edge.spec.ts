@@ -45,29 +45,28 @@ declare module 'mocha' {
 
 describe('Many users graphql', function() {
   this.timeout(200000);
-  before(() => {
+  before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;
+    await (global as any).authKcAdmin();
   });
 
-  it('should add 110 users', async () => {
-    const usersData = times(110, index => {
+  it('should add 200 users', async () => {
+    const usersData = times(200, index => {
       return {
         username: faker.internet.userName().toLowerCase(),
         firstName: `${index}${faker.name.firstName()}`,
         email: faker.internet.email().toLowerCase()
       };
     });
-    await BPromise.mapSeries(usersData, async user => {
-      await BPromise.delay(100);
-      const res = await this.graphqlRequest(`
+    await Promise.all(usersData.map(user => {
+      return this.graphqlRequest(`
       mutation($data: UserCreateInput!){
         createUser (data: $data) { id username email firstName }
       }`, {
         data: user
       });
-      return res.createUser;
-    });
+    }));
   });
 
   it('should expect users when query users', async () => {
@@ -87,7 +86,7 @@ describe('Many users graphql', function() {
         }
       }
     }`);
-    expect(data.usersConnection.edges.length).to.be.eql(12);
+    expect(data.usersConnection.edges.length).to.be.eql(100);
     expect(data.usersConnection.edges[0].node).to.deep.include(this.users[99]);
   });
 });
