@@ -94,7 +94,7 @@ export class Attributes {
     const definedValues = reduce(this.schema, (result, value, key) => {
       const fieldName = value.rename || key;
       if (!keycloakAttr[fieldName]) {
-        return;
+        return result;
       }
       definedFields.push(fieldName);
       const typeTransform = transforms[value.type];
