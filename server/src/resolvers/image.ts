@@ -11,7 +11,7 @@ export const mapping = (item: Item<ImageSpec>) => {
     id: item.metadata.name,
     name: item.metadata.name,
     displayName: item.spec.displayName || item.metadata.name,
-    description: item.metadata.description,
+    description: item.spec.description,
     url: item.spec.url
   };
 };
@@ -110,11 +110,11 @@ export const onUpdate = async (
 export const mutationMapping = (data: any) => {
   return {
     metadata: {
-      name: data.name,
-      description: data.description
+      name: data.name
     },
     spec: {
       displayName: data.displayName,
+      description: data.description,
       url: data.url
     }
   };

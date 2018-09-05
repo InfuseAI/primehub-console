@@ -10,7 +10,7 @@ export const mapping = (item: Item<InstanceTypeSpec>) => {
   return {
     id: item.metadata.name,
     name: item.metadata.name,
-    description: item.metadata.description,
+    description: item.spec.description,
     displayName: item.spec.displayName || item.metadata.name,
     cpuLimit: item.spec['limits.cpu'] || 0,
     cpuRequest: item.spec['requests.cpu'] || 0,
@@ -31,11 +31,11 @@ export const resolveType = {
 export const mutationMapping = (data: any) => {
   return {
     metadata: {
-      name: data.name,
-      description: data.description
+      name: data.name
     },
     spec: {
       'displayName': data.displayName,
+      'description': data.description,
       'limits.cpu': data.cpuLimit,
       'limits.memory': data.memoryLimit ? stringifyMemory(data.memoryLimit) : undefined,
       'limits.nvidia.com/gpu': data.gpuLimit,

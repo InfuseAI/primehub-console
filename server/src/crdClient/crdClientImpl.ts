@@ -31,6 +31,7 @@ watch = new k8s.Watch(kc);
 
 export interface InstanceTypeSpec {
   displayName?: string;
+  description?: string;
   'limits.cpu'?: number;
   'limits.memory'?: string;
   'requests.cpu'?: number;
@@ -40,11 +41,13 @@ export interface InstanceTypeSpec {
 
 export interface ImageSpec {
   displayName?: string;
+  description?: string;
   url?: string;
 }
 
 export interface DatasetSpec {
   displayName?: string;
+  description?: string;
   access?: string;
   type?: string;
   url?: string;

@@ -10,7 +10,7 @@ export const mapping = (item: Item<DatasetSpec>) => {
   return {
     id: item.metadata.name,
     name: item.metadata.name,
-    description: item.metadata.description,
+    description: item.spec.description,
     displayName: item.spec.displayName || item.metadata.name,
     access: item.spec.access,
     type: item.spec.type,
@@ -23,11 +23,11 @@ export const mapping = (item: Item<DatasetSpec>) => {
 export const mutationMapping = (data: any) => {
   return {
     metadata: {
-      name: data.name,
-      description: data.description
+      name: data.name
     },
     spec: {
       displayName: data.displayName,
+      description: data.description,
       access: data.access,
       type: data.type,
       url: data.url,
