@@ -74,6 +74,7 @@ exports.dict = {
     cpuLimit: 'CPU Limit',
     cpuQuota: 'CPU Quota',
     gpuQuota: 'GPU Quota',
+    projectGpuQuota: 'Project GPU Quota',
     diskQuota: 'Disk Quota',
     // instance type
     instanceTypes: 'Instance Types',
@@ -197,6 +198,7 @@ exports.dict = {
     cpuLimit: 'CPU Limit',
     cpuQuota: 'CPU Quota',
     gpuQuota: 'GPU Quota',
+    projectGpuQuota: 'Project GPU Quota',
     diskQuota: 'Disk Quota',
     // instance type
     instanceTypes: 'Instance Types',

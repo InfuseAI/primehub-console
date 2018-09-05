@@ -63,7 +63,7 @@ export default () => (
     <number keyName="gpuQuota" title="${gpuQuota}"  uiParams={{min: 0, step: 1, precision: 0}}
       packageName="../src/cms-components/customize-number-precision.js"
     />
-    <number keyName="projectGpuQuota" title="${gpuQuota}"  uiParams={{min: 0, step: 1, precision: 0}}
+    <number keyName="projectGpuQuota" title="${projectGpuQuota}"  uiParams={{min: 0, step: 1, precision: 0}}
       packageName="../src/cms-components/customize-number-precision.js"
     />
     <number keyName="diskQuota" title="${diskQuota}"

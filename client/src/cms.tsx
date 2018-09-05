@@ -202,7 +202,7 @@ export default class CMSPage extends React.Component<Props, State> {
               console.dir(e);
               // default message and description
               let message = e.message || 'Error';
-              let description = 'Please print server log to dev team';
+              let description = '';
               // get the first error
               const errorCode = e.graphQLErrors && e.graphQLErrors[0] && e.graphQLErrors[0].extensions && e.graphQLErrors[0].extensions.code;
               switch (errorCode) {
