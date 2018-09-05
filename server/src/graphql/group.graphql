@@ -11,6 +11,7 @@ type Group {
   canUseGpu: Boolean
   cpuQuota: Float
   gpuQuota: Int
+  projectGpuQuota: Int
   diskQuota: Int
   users: [User]
   instanceTypes: [InstanceType]
@@ -52,6 +53,7 @@ input GroupCreateInput {
   canUseGpu: Boolean
   cpuQuota: Float
   gpuQuota: Int
+  projectGpuQuota: Int
   diskQuota: Int
   users: UserCreateManyInput
 }
@@ -62,6 +64,7 @@ input GroupUpdateInput {
   canUseGpu: Boolean
   cpuQuota: Float
   gpuQuota: Int
+  projectGpuQuota: Int
   diskQuota: Int
   users: UserUpdateManyInput
 }

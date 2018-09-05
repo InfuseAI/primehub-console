@@ -131,7 +131,10 @@ export const create = async (root, args, context: Context) => {
   const payload = args.data;
   const attrs = new Attributes({
     data: {
-      personalDiskQuota: payload.personalDiskQuota ? stringifyDiskQuota(payload.personalDiskQuota) : undefined
+      personalDiskQuota: payload.personalDiskQuota
+    },
+    schema: {
+      personalDiskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
     }
   });
 
