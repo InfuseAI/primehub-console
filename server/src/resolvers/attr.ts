@@ -1,4 +1,4 @@
-import { mapValues, reduce, isUndefined, isNull, isEmpty } from 'lodash';
+import { mapValues, reduce, isUndefined, isNull, isEmpty, omit } from 'lodash';
 
 const noop = v => v;
 
@@ -21,6 +21,7 @@ export interface SchemaType {
     type?: FieldType,
     serialize?: any,
     deserialize?: any
+    rename?: string
   };
 }
 
@@ -75,7 +76,9 @@ export class Attributes {
       if (this.schema && this.schema[key] && this.schema[key].serialize) {
         value = this.schema[key].serialize(value);
       }
-      result[key] = [value];
+
+      const fieldName = (this.schema[key] && this.schema[key].rename) || key;
+      result[fieldName] = [value];
       return result;
     }, {});
 
@@ -87,12 +90,23 @@ export class Attributes {
       return {};
     }
 
-    return mapValues(keycloakAttr, (val, key) => {
-      const typeTransform =
-        (this.schema && this.schema[key] && transforms[this.schema[key].type]);
-      const customTransform = this.schema && this.schema[key] && this.schema[key].deserialize;
+    const definedFields = [];
+    const definedValues = reduce(this.schema, (result, value, key) => {
+      const fieldName = value.rename || key;
+      if (!keycloakAttr[fieldName]) {
+        return;
+      }
+      definedFields.push(fieldName);
+      const typeTransform = transforms[value.type];
+      const customTransform = value.deserialize;
       const transform = customTransform || typeTransform || noop;
-      return transform(val[0]);
-    });
+      result[fieldName] = transform(keycloakAttr[fieldName][0]);
+      return result;
+    }, {});
+
+    // merge with fields not defined in schema
+    const notDefinedValues = mapValues(omit(keycloakAttr, definedFields),
+      attr => attr[0]);
+    return {...definedValues, ...notDefinedValues};
   }
 }

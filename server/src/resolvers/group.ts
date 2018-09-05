@@ -24,12 +24,13 @@ export const create = async (root, args, context: Context) => {
   // displayName, canUseGpu, gpuQuota, diskQuota in attributes
   const payload = args.data;
   const attrs = new Attributes({
-    data: pick(payload, ['displayName', 'canUseGpu', 'gpuQuota', 'cpuQuota', 'diskQuota']),
+    data: pick(payload, ['displayName', 'canUseGpu', 'gpuQuota', 'projectGpuQuota', 'cpuQuota', 'diskQuota']),
     schema: {
       displayName: {type: FieldType.string},
       canUseGpu: {type: FieldType.boolean},
       cpuQuota: {type: FieldType.float},
-      gpuQuota: {type: FieldType.integer},
+      gpuQuota: {type: FieldType.integer, rename: 'quota-gpu'},
+      projectGpuQuota: {type: FieldType.integer, rename: 'project-quota-gpu'},
       diskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
     }
   });
@@ -89,11 +90,13 @@ export const update = async (root, args, context: Context) => {
       displayName: {type: FieldType.string},
       canUseGpu: {type: FieldType.boolean},
       cpuQuota: {type: FieldType.float},
-      gpuQuota: {type: FieldType.integer},
+      gpuQuota: {type: FieldType.integer, rename: 'quota-gpu'},
+      projectGpuQuota: {type: FieldType.integer, rename: 'project-quota-gpu'},
       diskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
     }
   });
-  attrs.mergeWithData(pick(payload, ['displayName', 'canUseGpu', 'gpuQuota', 'cpuQuota', 'diskQuota']));
+  attrs.mergeWithData(pick(payload,
+    ['displayName', 'canUseGpu', 'gpuQuota', 'projectGpuQuota', 'cpuQuota', 'diskQuota']));
 
   // update
   try {
@@ -196,7 +199,10 @@ export const typeResolvers = {
     getFromAttr('canUseGpu', parent.attributes, false, v => v === 'true'),
 
   gpuQuota: async (parent, args, context: Context) =>
-    getFromAttr('gpuQuota', parent.attributes, 0, parseInt),
+    getFromAttr('quota-gpu', parent.attributes, 0, parseInt),
+
+  projectGpuQuota: async (parent, args, context: Context) =>
+    getFromAttr('project-quota-gpu', parent.attributes, 0, parseInt),
 
   cpuQuota: async (parent, args, context: Context) =>
     getFromAttr('cpuQuota', parent.attributes, 0, parseFloat),
