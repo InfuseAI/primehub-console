@@ -44,8 +44,8 @@ export default () => (
     <string keyName="name" title="${name}"
       validation={{
         validator: (value, cb) => {
-          if (!value.match(/^[A-Za-z0-9]([-A-Za-z0-9]*[A-Za-z0-9])?(\.[A-Za-z0-9]([-A-Za-z0-9]*[A-Za-z0-9])?)*$/)) {
-            return cb(`alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`);
+          if (!value.match(/^[A-Za-z0-9]([-A-Za-z0-9_]*[A-Za-z0-9])?(\.[A-Za-z0-9]([-A-Za-z0-9_]*[A-Za-z0-9])?)*$/)) {
+            return cb(`alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character.`);
           }
         }
       }}
