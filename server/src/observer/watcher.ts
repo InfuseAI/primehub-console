@@ -11,7 +11,7 @@ export default class Watcher<T> {
   private defaultCreateData: any;
   private everyoneGroupId: string;
   private request: any;
-  private credentials: any;
+  private getAccessToken: () => Promise<string>;
 
   constructor({
     crd,
@@ -19,21 +19,21 @@ export default class Watcher<T> {
     keycloakAdmin,
     defaultCreateData,
     everyoneGroupId,
-    credentials
+    getAccessToken
   }: {
     crd: Crd<T>,
     resource: CustomResource<T>,
     keycloakAdmin: KeycloakAdmin,
     defaultCreateData: any,
     everyoneGroupId: string,
-    credentials: any
+    getAccessToken: () => Promise<string>
   }) {
     this.crd = crd;
     this.resource = resource;
     this.keycloakAdmin = keycloakAdmin;
     this.defaultCreateData = defaultCreateData;
     this.everyoneGroupId = everyoneGroupId;
-    this.credentials = credentials;
+    this.getAccessToken = getAccessToken;
   }
 
   public watch = (options?: {rewatch?: boolean}) => {
@@ -41,10 +41,8 @@ export default class Watcher<T> {
     console.log(`Watcher: started watching ${this.resource.getResourcePlural()}...`);
     this.request = this.resource.watch((type, object) => {
       const handler = async () => {
-        await this.keycloakAdmin.auth({
-          ...this.credentials,
-          grantType: 'password',
-        });
+        const accessToken = await this.getAccessToken();
+        this.keycloakAdmin.setAccessToken(accessToken);
 
         if (type === 'ADDED') {
           // check if it's already on keycloak

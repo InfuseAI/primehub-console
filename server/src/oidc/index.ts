@@ -97,6 +97,13 @@ export class OidcCtrl {
     return tokenSet.access_token;
   }
 
+  public clientCredentialGrant = async () => {
+    const tokenSet = await this.oidcClient.grant({
+      grant_type: 'client_credentials'
+    });
+    return tokenSet.access_token;
+  }
+
   public callback = async (ctx: Context) => {
     const query = ctx.query;
     const tokenSet = await this.oidcClient.authorizationCallback(this.redirectUri, query);

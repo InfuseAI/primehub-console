@@ -136,13 +136,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
     const observer = new Observer({
       crdClient,
       keycloakAdmin: kcAdminClientForObserver,
-      credentials: {
-        username: config.keycloakUsername,
-        password: config.keycloakPassword,
-        clientId: config.keycloakClientId,
-        clientSecret: config.keycloakClientSecret
-      },
-      everyoneGroupId: config.keycloakEveryoneGroupId
+      everyoneGroupId: config.keycloakEveryoneGroupId,
+      getAccessToken: async () => oidcCtrl.clientCredentialGrant()
     });
     observer.observe();
   }
