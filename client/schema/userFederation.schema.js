@@ -17,6 +17,9 @@ export default () => (
       }]
     }}
   >
+    <toolbar async>
+      <pagination />
+    </toolbar>
     <Block title="${basicInformation}">
       <string keyName="type"
         title="${type}"

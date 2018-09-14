@@ -22,7 +22,9 @@ export default () => (
       }]
     }}
   >
-
+    <toolbar async>
+      <pagination />
+    </toolbar>
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
       <string keyName="name" title="${name}"
         validation={{
@@ -65,7 +67,7 @@ export default () => (
           }]
         }}
       >
-        <toolbar>
+        <toolbar async>
           <filter
             component={Filter}
             fields={[{

@@ -23,6 +23,9 @@ export default () => (
       }]
     }}
   >
+    <toolbar async>
+      <pagination />
+    </toolbar>
     <Default>
 
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
@@ -107,7 +110,7 @@ export default () => (
           }]
         }}
       >
-        <toolbar>
+        <toolbar async>
           <filter
             component={Filter}
             fields={[{
