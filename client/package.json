@@ -94,7 +94,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@canner/antd-components": "^0.4.0-beta.9",
+    "@canner/antd-components": "^0.4.0-alpha.3",
     "@canner/container": "^1.5.0-canary.35",
     "@canner/history-router": "^1.5.0-canary.35",
     "@types/react-router-dom": "^4.2.6",
