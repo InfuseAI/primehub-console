@@ -69,7 +69,7 @@ class FilterGroup extends React.Component {
       switch (val.type) {
         case 'text':
         default:
-          return <TextFilter onChange={cond => this.onChange(cond, val.key)} name={val.key} label={val.label}/>;
+          return <TextFilter onChange={cond => this.onChange(cond, val.key)} name={val.key} label={val.label} search={this.submit}/>;
       }
     });
     return (

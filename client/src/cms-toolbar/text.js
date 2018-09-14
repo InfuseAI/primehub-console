@@ -28,7 +28,7 @@ export default class TextFilter extends Component {
   }
 
   render() {
-    const {label, intl} = this.props;
+    const {label, intl, search} = this.props;
     const matched = label.match(/\$\{(.*)\}/);
     const intlLabel = matched ? intl.formatMessage({
       id: matched[1],
@@ -41,6 +41,7 @@ export default class TextFilter extends Component {
           style={{width: '150px'}}
           placeholder={intlLabel}
           onChange={this.onInput}
+          onPressEnter={search}
         />
       </FilterPlugin>
     );
