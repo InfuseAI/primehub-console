@@ -3572,11 +3572,11 @@ caniuse-lite@^1.0.30000844:
   version "1.0.30000865"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000865.tgz#70026616e8afe6e1442f8bb4e1092987d81a2f25"
 
-canner-compiler@^1.5.0-canary.20:
-  version "1.5.0-canary.20"
-  resolved "https://registry.yarnpkg.com/canner-compiler/-/canner-compiler-1.5.0-canary.20.tgz#6742abc7e66eb0698c874114cd9ee374c17df97f"
+canner-compiler@^1.5.0-canary.35:
+  version "1.5.0-canary.35"
+  resolved "https://registry.yarnpkg.com/canner-compiler/-/canner-compiler-1.5.0-canary.35.tgz#c438df21aced5eb20adc17527783d377ae774476"
 
-canner-graphql-interface@^1.5.0-canary.20, canner-graphql-interface@^1.5.0-canary.35:
+canner-graphql-interface@^1.5.0-canary.35:
   version "1.16.2"
   resolved "https://registry.yarnpkg.com/canner-graphql-interface/-/canner-graphql-interface-1.16.2.tgz#399ead8f213d8a004682f37640e2a4bb264691b3"
   dependencies:
@@ -3605,10 +3605,6 @@ canner-graphql-utils@^1.4.0:
     lowdb "^1.0.0"
     pluralize "^7.0.0"
 
-canner-helpers@^1.5.0-canary.20:
-  version "1.5.0-canary.20"
-  resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-1.5.0-canary.20.tgz#5e0a0b4a6726e89d6a838748f01b76e29ef2dcba"
-
 canner-helpers@^1.5.0-canary.35:
   version "1.5.0-canary.35"
   resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-1.5.0-canary.35.tgz#f14a9c9b8d542743fed7918b0ee480510d2e0842"
@@ -3625,12 +3621,6 @@ canner-image-gallery@^0.3.0:
     grid-draggable "3.3.0"
     react-loading-image "^0.4.1"
     styled-components "^3.2.3"
-
-canner-layouts@^1.5.0-canary.20:
-  version "1.5.0-canary.20"
-  resolved "https://registry.yarnpkg.com/canner-layouts/-/canner-layouts-1.5.0-canary.20.tgz#2cf31771c8d95e44d2b89adccaeed7af54382b04"
-  dependencies:
-    canner-helpers "^1.5.0-canary.20"
 
 canner-layouts@^1.5.0-canary.35:
   version "1.5.0-canary.35"
@@ -3654,9 +3644,9 @@ canner-schema-loader@^1.5.0-canary.35:
     loader-utils "^1.1.0"
     object-path "^0.11.4"
 
-canner-script@^1.5.0-canary.17:
-  version "1.5.0-canary.17"
-  resolved "https://registry.yarnpkg.com/canner-script/-/canner-script-1.5.0-canary.17.tgz#5c00324b95c3ca500c1f192d873127e0d022b1c4"
+canner-script@^1.5.0-canary.35:
+  version "1.5.0-canary.35"
+  resolved "https://registry.yarnpkg.com/canner-script/-/canner-script-1.5.0-canary.35.tgz#c6517de8f24b182fc4efaa5ecfd31fe023cd17db"
   dependencies:
     eval "^0.1.2"
     object-path "^0.11.4"
@@ -3706,17 +3696,17 @@ canner-slate-editor@^1.5.4:
     slate-trailing-block "^0.5.0"
     styled-components "^3.2.3"
 
-canner@^1.5.0-canary.20:
-  version "1.5.0-canary.20"
-  resolved "https://registry.yarnpkg.com/canner/-/canner-1.5.0-canary.20.tgz#abb610b40e476786ebca5f7ff05f46074765c9b4"
+canner@^1.5.0-canary.35:
+  version "1.5.0-canary.35"
+  resolved "https://registry.yarnpkg.com/canner/-/canner-1.5.0-canary.35.tgz#3398730424737e1c0769c7254e3d8fc7c94d1899"
   dependencies:
     ajv "^6.5.2"
     apollo-boost "^0.1.4"
     bson-objectid "^1.2.2"
-    canner-compiler "^1.5.0-canary.20"
-    canner-graphql-interface "^1.5.0-canary.20"
-    canner-helpers "^1.5.0-canary.20"
-    canner-layouts "^1.5.0-canary.20"
+    canner-compiler "^1.5.0-canary.35"
+    canner-graphql-interface "^1.5.0-canary.35"
+    canner-helpers "^1.5.0-canary.35"
+    canner-layouts "^1.5.0-canary.35"
     canner-ref-id "^0.1.2"
     graphql-tag "^2.9.1"
     immer "^1.3.0"

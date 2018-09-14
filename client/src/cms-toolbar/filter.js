@@ -9,6 +9,7 @@ import defaultMessage from './locale';
 
 const FilterRow = styled(Row)`
   margin-bottom: 30px;
+  width: 100%;
   border: 1px #f8f8f8 solid;
   padding: 15px;
   margin-top: 20px;
