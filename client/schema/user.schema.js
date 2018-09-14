@@ -30,7 +30,9 @@ configure({
               pattern: 'array.object',
               controlDeployAndResetButtons: true,
               cacheActions: true,
-              loader: import('../src/cms-components/customize-object-email_form')
+              loader: new Promise(resolve => require.ensure([], function(require) {
+                resolve(require('../src/cms-components/customize-object-email_form'));
+              }))
             }],
             hocs: ['containerRouter'],
             __CANNER_KEY__: children[0].__CANNER_KEY__.slice(-1)
@@ -49,7 +51,9 @@ configure({
               pattern: 'array.object',
               controlDeployAndResetButtons: true,
               cacheActions: true,
-              loader: import('../src/cms-components/customize-object-password_form')
+              loader: new Promise(resolve => require.ensure([], function(require) {
+                resolve(require('../src/cms-components/customize-object-password_form'));
+              }))
             }],
             hocs: ['containerRouter'],
             __CANNER_KEY__: children[0].__CANNER_KEY__.slice(-1)
@@ -91,7 +95,7 @@ export default () => (
     }}
     storage={storage}
   >
-    <toolbar>
+    <toolbar async>
       <filter
         component={Filter}
         fields={[{
@@ -166,7 +170,7 @@ export default () => (
             }]
           }}
         >
-          <toolbar>
+          <toolbar async>
             <filter
               component={Filter}
               fields={[{
@@ -180,13 +184,6 @@ export default () => (
         </relation>
       </Condition>
     </Default>
-    {/* <Layout component={HideInCreate} keyName="__1" title="Send Email">
-      <object keyName="__1" packageName="../src/cms-components/customize-object-email_form"/>
-    </Layout>
-    <Layout component={HideInCreate} keyName="__2"  title="Reset Password">
-      <object keyName="__2" packageName="../src/cms-components/customize-object-password_form"/>
-    </Layout> */}
-
     </Layout>
   </array>
 )

@@ -15,10 +15,10 @@ export default (
     <System/>
     {/* <Idp/> */}
     {/* <UserFederation/> */}
-    <User/>
+    <User/>  
     <Group/>
     <InstanceType/>
     <Image/>
-    <Dataset/>    
+    <Dataset/>  
   </root>
 )

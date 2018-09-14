@@ -1178,15 +1178,15 @@
     "@canner/antd-locales" "^0.4.0-beta.9"
     moment-timezone "^0.5.14"
 
-"@canner/container@^1.5.0-canary.12":
-  version "1.5.0-canary.12"
-  resolved "https://registry.yarnpkg.com/@canner/container/-/container-1.5.0-canary.12.tgz#944a9fe0a587d684d14715b1279d0c1e4c663403"
+"@canner/container@^1.5.0-canary.35":
+  version "1.5.0-canary.35"
+  resolved "https://registry.yarnpkg.com/@canner/container/-/container-1.5.0-canary.35.tgz#2a2ba43e6a43171de353b8466f7174c1c18f44ab"
   dependencies:
     styled-components "^3.2.1"
 
-"@canner/history-router@^1.5.0-canary.12":
-  version "1.5.0-canary.12"
-  resolved "https://registry.yarnpkg.com/@canner/history-router/-/history-router-1.5.0-canary.12.tgz#0202fcfd433f4b51e7178f42e4c6b8ca19289ea3"
+"@canner/history-router@^1.5.0-canary.35":
+  version "1.5.0-canary.35"
+  resolved "https://registry.yarnpkg.com/@canner/history-router/-/history-router-1.5.0-canary.35.tgz#528bab8478e42b5a6e123843af4f65fec2d6d78c"
   dependencies:
     query-string "^6.1.0"
 
@@ -2154,7 +2154,7 @@ babel-eslint@^8.2.2:
     eslint-scope "3.7.1"
     eslint-visitor-keys "^1.0.0"
 
-babel-generator@^6.18.0, babel-generator@^6.26.0:
+babel-generator@^6.18.0, babel-generator@^6.26.0, babel-generator@^6.26.1:
   version "6.26.1"
   resolved "https://registry.yarnpkg.com/babel-generator/-/babel-generator-6.26.1.tgz#1844408d3b8f0d35a404ea7ac180f087a601bd90"
   dependencies:
@@ -3188,7 +3188,7 @@ canner-compiler@^1.5.0-canary.20:
   version "1.5.0-canary.20"
   resolved "https://registry.yarnpkg.com/canner-compiler/-/canner-compiler-1.5.0-canary.20.tgz#6742abc7e66eb0698c874114cd9ee374c17df97f"
 
-canner-graphql-interface@^1.5.0-canary.12, canner-graphql-interface@^1.5.0-canary.20:
+canner-graphql-interface@^1.5.0-canary.20, canner-graphql-interface@^1.5.0-canary.35:
   version "1.16.2"
   resolved "https://registry.yarnpkg.com/canner-graphql-interface/-/canner-graphql-interface-1.16.2.tgz#399ead8f213d8a004682f37640e2a4bb264691b3"
   dependencies:
@@ -3217,13 +3217,15 @@ canner-graphql-utils@^1.4.0:
     lowdb "^1.0.0"
     pluralize "^7.0.0"
 
-canner-helpers@^1.5.0-canary.12:
-  version "1.5.0-canary.12"
-  resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-1.5.0-canary.12.tgz#bd1ee0d3025cfcb6b7d115547c9812d45388d716"
-
 canner-helpers@^1.5.0-canary.20:
   version "1.5.0-canary.20"
   resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-1.5.0-canary.20.tgz#5e0a0b4a6726e89d6a838748f01b76e29ef2dcba"
+
+canner-helpers@^1.5.0-canary.35:
+  version "1.5.0-canary.35"
+  resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-1.5.0-canary.35.tgz#f14a9c9b8d542743fed7918b0ee480510d2e0842"
+  dependencies:
+    faker "^4.1.0"
 
 canner-image-gallery@^0.2.0:
   version "0.2.0"
@@ -3236,29 +3238,33 @@ canner-image-gallery@^0.2.0:
     react-loading-image "^0.4.1"
     styled-components "^3.2.3"
 
-canner-layouts@^1.5.0-canary.12:
-  version "1.5.0-canary.12"
-  resolved "https://registry.yarnpkg.com/canner-layouts/-/canner-layouts-1.5.0-canary.12.tgz#0f0dabc52041bf2c449c434df04ee24d8763fcbc"
-  dependencies:
-    canner-helpers "^1.5.0-canary.12"
-
 canner-layouts@^1.5.0-canary.20:
   version "1.5.0-canary.20"
   resolved "https://registry.yarnpkg.com/canner-layouts/-/canner-layouts-1.5.0-canary.20.tgz#2cf31771c8d95e44d2b89adccaeed7af54382b04"
   dependencies:
     canner-helpers "^1.5.0-canary.20"
 
+canner-layouts@^1.5.0-canary.35:
+  version "1.5.0-canary.35"
+  resolved "https://registry.yarnpkg.com/canner-layouts/-/canner-layouts-1.5.0-canary.35.tgz#f73c4a56ee9d923f23f0f4b330eef38f6c5aef8d"
+  dependencies:
+    canner-helpers "^1.5.0-canary.35"
+
 canner-ref-id@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/canner-ref-id/-/canner-ref-id-0.1.2.tgz#9c534d517818e915cef1004116012458bd165d83"
 
-canner-schema-loader@^1.5.0-canary.12:
-  version "1.5.0-canary.12"
-  resolved "https://registry.yarnpkg.com/canner-schema-loader/-/canner-schema-loader-1.5.0-canary.12.tgz#fc24d8b68b9d6db95bc58c3a8156985794ebb597"
+canner-schema-loader@^1.5.0-canary.35:
+  version "1.5.0-y.0"
+  resolved "https://registry.yarnpkg.com/canner-schema-loader/-/canner-schema-loader-1.5.0-y.0.tgz#f6f59afb676863f16c0cc822ad2b7c00908f239e"
   dependencies:
+    babel-generator "^6.26.1"
+    babel-template "^6.26.0"
+    babel-traverse "^6.26.0"
+    babel-types "^6.26.0"
+    babylon "^6.18.0"
     loader-utils "^1.1.0"
     object-path "^0.11.4"
-    strip-bom "^3.0.0"
 
 canner-script@^1.5.0-canary.17:
   version "1.5.0-canary.17"
@@ -4912,6 +4918,10 @@ extsprintf@1.3.0:
 extsprintf@^1.2.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.4.0.tgz#e2689f8f356fad62cca65a3a91c5df5f9551692f"
+
+faker@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/faker/-/faker-4.1.0.tgz#1e45bbbecc6774b3c195fad2835109c6d748cc3f"
 
 fancy-log@1.3.x, fancy-log@^1.1.0:
   version "1.3.2"

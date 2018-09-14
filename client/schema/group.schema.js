@@ -30,7 +30,7 @@ export default () => (
       }]
     }}
   >
-     <toolbar>
+     <toolbar async>
       <filter
         component={Filter}
         fields={[{
@@ -84,7 +84,7 @@ export default () => (
         }]
       }}
     >
-      <toolbar>
+      <toolbar async>
         <filter
           component={Filter}
           fields={[{
