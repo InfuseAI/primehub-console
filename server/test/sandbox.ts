@@ -37,7 +37,7 @@ const k8sClient = new Client({
 });
 (global as any).k8sClient = k8sClient;
 
-const assignAdmin = async (kcAdminClient: KcAdminClient, realm: string, userId: string) => {
+export const assignAdmin = async (kcAdminClient: KcAdminClient, realm: string, userId: string) => {
   const clients = await kcAdminClient.clients.find({realm});
   const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
 

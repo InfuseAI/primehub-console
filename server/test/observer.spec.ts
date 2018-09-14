@@ -6,8 +6,10 @@ import Observer from '../src/observer/observer';
 import CrdClient from '../src/crdClient/crdClientImpl';
 import faker from 'faker';
 import KcAdminClient from 'keycloak-admin';
-import { cleaupAllCrd } from './sandbox';
+import { cleaupAllCrd, assignAdmin } from './sandbox';
 import { pick } from 'lodash';
+import ClientRepresentation from 'keycloak-admin/lib/defs/clientRepresentation';
+import { Issuer } from 'openid-client';
 
 chai.use(chaiHttp);
 
@@ -18,6 +20,7 @@ declare module 'mocha' {
   interface ISuiteCallbackContext {
     graphqlRequest?: (query: string, variables?: any) => Promise<any>;
     kcAdminClient?: KcAdminClient;
+    kcAdminClientForObserver?: KcAdminClient;
     crdClient: CrdClient;
     observer: Observer;
     // mock functions
@@ -25,24 +28,105 @@ declare module 'mocha' {
     mockImage?: () => Promise<any>;
     mockInstanceType?: () => Promise<any>;
     everyoneGroupId: string;
+    oidcClient?: any;
   }
 }
 
 describe('observer', function() {
   before(async () => {
+    const realmName = process.env.KC_REALM;
+    this.kcAdminClient = (global as any).kcAdminClient;
     this.crdClient = (global as any).crdClient;
     this.graphqlRequest = (global as any).graphqlRequest;
-    const client = new KcAdminClient({
-      realmName: process.env.KC_REALM
+
+    // create a new client
+    const clientId = faker.internet.userName();
+    await this.kcAdminClient.clients.create({
+      realm: realmName,
+      clientId,
+      attributes: {},
+      enabled: true,
+      protocol: 'openid-connect',
+      redirectUris: []
     });
-    // authorize with username/passowrd
-    await client.auth({
-      username: process.env.KC_USERNAME,
-      password: process.env.KC_PWD,
-      grantType: 'password',
-      clientId: 'admin-cli'
+    const clients = await this.kcAdminClient.clients.find({
+      realm: realmName,
+      clientId
     });
-    this.kcAdminClient = client;
+    const client = clients[0];
+
+    // update client
+    await this.kcAdminClient.clients.update({
+      realm: realmName,
+      id: client.id
+    }, {
+      clientId: client.clientId,
+      attributes: {
+        'display.on.consent.screen': 'false',
+        'exclude.session.state.from.auth.response': 'false',
+        'saml_force_name_id_format': 'false',
+        'saml.assertion.signature': 'false',
+        'saml.authnstatement': 'false',
+        'saml.client.signature': 'false',
+        'saml.encrypt': 'false',
+        'saml.force.post.binding': 'false',
+        'saml.multivalued.roles': 'false',
+        'saml.onetimeuse.condition': 'false',
+        'saml.server.signature': 'false',
+        'saml.server.signature.keyinfo.ext': 'false',
+        'tls.client.certificate.bound.access.tokens': 'false'
+      },
+      authenticationFlowBindingOverrides: {},
+      authorizationServicesEnabled: false,
+      bearerOnly: false,
+      clientAuthenticatorType: 'client-secret',
+      consentRequired: false,
+      defaultClientScopes: ['role_list', 'profile', 'email'],
+      directAccessGrantsEnabled: true,
+      frontchannelLogout: false,
+      fullScopeAllowed: true,
+      implicitFlowEnabled: false,
+      nodeReRegistrationTimeout: -1,
+      notBefore: 0,
+      optionalClientScopes: ['address', 'phone', 'offline_access'],
+      protocol: 'openid-connect',
+      publicClient: false,
+      serviceAccountsEnabled: true,
+      standardFlowEnabled: true,
+      surrogateAuthRequired: false,
+      webOrigins: [],
+      redirectUris: [
+        'http://localhost:3000/*'
+      ]
+    });
+
+    const serviceAccountUser = await this.kcAdminClient.clients.getServiceAccountUser({
+      realm: realmName,
+      id: client.id
+    });
+
+    // add admin role to client
+    await assignAdmin(this.kcAdminClient, realmName, serviceAccountUser.id);
+
+    // get client secret
+    const clientSecret = await this.kcAdminClient.clients.getClientSecret({
+      realm: realmName,
+      id: client.id
+    });
+    // tslint:disable-next-line:max-line-length
+    const issuer = await Issuer.discover(`http://127.0.0.1:8080/auth/realms/${realmName}/.well-known/openid-configuration`);
+    const oidcClient = new issuer.Client({
+      client_id: clientId,
+      client_secret: clientSecret.value
+    });
+    oidcClient.CLOCK_TOLERANCE = 5 * 60;
+
+    // assign to this scope
+    this.kcAdminClientForObserver = new KcAdminClient({
+      baseUrl: 'http://127.0.0.1:8080/auth',
+      realmName
+    });
+    this.oidcClient = oidcClient;
     this.everyoneGroupId = process.env.KC_EVERYONE_GROUP_ID;
     this.mockDataset = async () => {
       const data = {
@@ -94,15 +178,16 @@ describe('observer', function() {
     await cleaupAllCrd();
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     this.observer = new Observer({
       crdClient: this.crdClient,
-      keycloakAdmin: this.kcAdminClient,
+      keycloakAdmin: this.kcAdminClientForObserver,
       everyoneGroupId: this.everyoneGroupId,
-      credentials: {
-        username: process.env.KC_USERNAME,
-        password: process.env.KC_PWD,
-        clientId: 'admin-cli'
+      getAccessToken: async () => {
+        const tokenSet = await this.oidcClient.grant({
+          grant_type: 'client_credentials'
+        });
+        return tokenSet.access_token;
       }
     });
   });
@@ -157,7 +242,7 @@ describe('observer', function() {
     await BPromise.delay(1000);
 
     // check if roles created on keycloak
-    const roles = await this.kcAdminClient.roles.find();
+    const roles = await this.kcAdminClientForObserver.roles.find();
 
     datasets.forEach(e => {
       expect(roles.find(role => role.name === `ds:${e.name}`)).to.be.ok;
@@ -193,7 +278,7 @@ describe('observer', function() {
 
     // check if roles created on keycloak
     await BPromise.delay(1000);
-    const roles = await this.kcAdminClient.roles.find();
+    const roles = await this.kcAdminClientForObserver.roles.find();
     datasets.forEach(e => {
       expect(roles.find(role => role.name === `ds:${e.name}`)).to.be.ok;
     });
@@ -230,7 +315,7 @@ describe('observer', function() {
 
     // check roles not exist on keycloak
     await BPromise.delay(1000);
-    const roles = await this.kcAdminClient.roles.find();
+    const roles = await this.kcAdminClientForObserver.roles.find();
 
     datasets.forEach(e => {
       expect(roles.find(role => role.name === `ds:${e.name}`)).to.be.not.ok;
