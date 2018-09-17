@@ -114,16 +114,18 @@ export default () => (
     {/* <Layout component={CustomizeBlock} disabledKeysInCreate={['__1', '__2']}> */}
     {/* <image keyName="thumbnail" title="Thumbnail" disabled /> */}
     <Default title="${basicInfo}" keyName="basicInfo">
-      <string keyName="username" title="${username}"
-        validation={{
-          validator: (value, cb) => {
-            if (!value.match(/^[a-z][-a-z0-9_.@]*$/)) {
-              return cb(`only lower case alphanumeric characters, '-', '_", or '.', and underscores ("_") are allowed, and must start with a letter.`);
+      <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
+        <string keyName="username" title="${username}"
+          validation={{
+            validator: (value, cb) => {
+              if (!value.match(/^[a-z][-a-z0-9_.@]*$/)) {
+                return cb(`only lower case alphanumeric characters, '-', '_", or '.', and underscores ("_") are allowed, and must start with a letter.`);
+              }
             }
-          }
-        }}
-        required
-      />
+          }}
+          required
+        />
+      </Condition>
       <string keyName="email" title="${email}" validation={{
           validator: (value, cb) => {
             if (value && !value.match(/(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
