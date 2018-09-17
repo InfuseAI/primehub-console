@@ -1,10 +1,13 @@
 import { Context } from 'koa';
-import jwt from 'jsonwebtoken';
 import Boom from 'boom';
 import Router from 'koa-router';
 import gravatar from 'gravatar';
 import querystring from 'querystring';
 import Token from './token';
+import { URL } from 'url';
+import { get } from 'lodash';
+import { ErrorCodes } from '../errorCodes';
+import { ApolloError } from 'apollo-server-koa';
 
 const CALLBACK_PATH = '/oidc/callback';
 
@@ -81,9 +84,8 @@ export class OidcCtrl {
       if (err.data && err.data.code === ERRORS.FORCE_LOGIN) {
         // tslint:disable-next-line:no-console
         console.log(err);
-        const loginUrl = this.oidcClient.authorizationUrl({
-          redirect_uri: this.redirectUri
-        });
+        const backUrl = this.buildBackUrl(ctx.href);
+        const loginUrl = this.getLoginUrl(backUrl);
         return ctx.redirect(loginUrl);
       }
       throw err;
@@ -92,9 +94,36 @@ export class OidcCtrl {
 
   public getAccessToken = async (ctx: Context): Promise<string> => {
     const refreshToken = ctx.cookies.get('refreshToken', {signed: true});
+    const refreshTokenInst = new Token(refreshToken, this.clientId);
+
+    if (refreshTokenInst.isExpired()) {
+      throw this.createExpiredError(ctx.header.referer);
+    }
+
     // refresh to get token
-    const tokenSet = await this.oidcClient.refresh(refreshToken);
-    return tokenSet.access_token;
+    // catch invalid_grant error
+    try {
+      const tokenSet = await this.oidcClient.refresh(refreshToken);
+      return tokenSet.access_token;
+    } catch (err) {
+      if (err.error === 'invalid_grant' &&
+        get(err, 'error_description', '').indexOf('expired') >= 0) {
+        throw this.createExpiredError(ctx.header.referer);
+      }
+
+      throw err;
+    }
+  }
+
+  public getLoginUrl = (backUrl?: string) => {
+    let redirectUri = this.redirectUri;
+    if (backUrl) {
+      redirectUri += `?backUrl=${backUrl}`;
+    }
+    const loginUrl = this.oidcClient.authorizationUrl({
+      redirect_uri: redirectUri
+    });
+    return loginUrl;
   }
 
   public clientCredentialGrant = async () => {
@@ -106,7 +135,10 @@ export class OidcCtrl {
 
   public callback = async (ctx: Context) => {
     const query = ctx.query;
-    const tokenSet = await this.oidcClient.authorizationCallback(this.redirectUri, query);
+    const redirectUri = query.backUrl ?
+      `${this.redirectUri}?backUrl=${encodeURIComponent(query.backUrl)}` : this.redirectUri;
+
+    const tokenSet = await this.oidcClient.authorizationCallback(redirectUri, query);
     const accessToken = new Token(tokenSet.access_token, this.clientId);
     if (!accessToken.hasRole(this.adminRole)) {
       throw Boom.forbidden('only admin can access admin-ui');
@@ -118,7 +150,9 @@ export class OidcCtrl {
     ctx.cookies.set('username', accessToken.getContent().preferred_username, {signed: true});
     ctx.cookies.set('thumbnail',
       accessToken.getContent().email ? gravatar.url(accessToken.getContent().email) : '', {signed: true});
-    return ctx.redirect('/cms');
+
+    const backUrl = query.backUrl || '/cms';
+    return ctx.redirect(backUrl);
   }
 
   public logout = async (ctx: Context) => {
@@ -128,6 +162,22 @@ export class OidcCtrl {
     ctx.cookies.set('username', null);
     ctx.cookies.set('thumbnail', null);
     return ctx.redirect(`${this.keycloakBaseUrl}/realms/${this.realm}/protocol/openid-connect/logout?${qs}`);
+  }
+
+  private buildBackUrl = (currentUrl?: string) => {
+    if (!currentUrl) {
+      return null;
+    }
+    const url = new URL(currentUrl);
+    return encodeURIComponent(url.pathname + url.search);
+  }
+
+  private createExpiredError = (currentUrl?: string) => {
+    const err = new ApolloError('expired', ErrorCodes.REFRESH_TOKEN_EXPIRED);
+    const backUrl = this.buildBackUrl(currentUrl);
+    const loginUrl = this.getLoginUrl(backUrl);
+    err.extensions.loginUrl = loginUrl;
+    return err;
   }
 }
 

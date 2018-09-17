@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {injectIntl} from 'react-intl';
-import {Layout, Menu, Icon, notification, Modal, Avatar} from 'antd';
+import {Layout, Menu, Icon, notification, Modal, Avatar, Button} from 'antd';
 import Canner from 'canner';
 import Container from '@canner/container';
 import R from '@canner/history-router';
@@ -12,6 +12,7 @@ import logo from 'images/primehub-logo-w.png';
 import {RouteComponentProps} from 'react-router';
 import schema from '../schema/index.schema.js';
 import myLocales from './utils/locales';
+import get from 'lodash.get';
 const {Sider} = Layout;
 const confirm = Modal.confirm;
 declare var process : {
@@ -203,8 +204,20 @@ export default class CMSPage extends React.Component<Props, State> {
               // default message and description
               let message = e.message || 'Error';
               let description = '';
+              let btn;
+              let key;
+              let duration;
+
               // get the first error
-              const errorCode = e.graphQLErrors && e.graphQLErrors[0] && e.graphQLErrors[0].extensions && e.graphQLErrors[0].extensions.code;
+              let errorCode;
+              // from networkError
+              if (e.networkError) {
+                errorCode = get(e, 'networkError.result.errors.0.extensions.code');
+              } else {
+                // from graphQLErrors
+                errorCode = get(e, 'graphQLErrors.0.extensions.code');
+              }
+
               switch (errorCode) {
                 case 'USER_CONFLICT_USERNAME':
                   message = 'Conflict Error';
@@ -225,11 +238,29 @@ export default class CMSPage extends React.Component<Props, State> {
                   message = 'Conflict Error';
                   description = 'Resource name already exist';
                   break;
+
+                case 'REFRESH_TOKEN_EXPIRED':
+                  // show notification with button
+                  message = 'Token Expired';
+                  description = 'Please login again';
+                  const loginUrl = get(e, 'networkError.result.errors.0.loginUrl');
+                  // add current location to redirect_uri
+                  duration = 20;
+                  key = 'REFRESH_TOKEN_EXPIRED';
+                  btn = (
+                    <Button type="primary" onClick={() => window.location.replace(loginUrl)}>
+                      Login
+                    </Button>
+                  );
+                  break;
               }
               return notification.error({
                 message,
                 description,
-                placement: 'bottomRight'
+                placement: 'bottomRight',
+                duration,
+                btn,
+                key
               });
             }}
           />

@@ -3572,11 +3572,11 @@ caniuse-lite@^1.0.30000844:
   version "1.0.30000865"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000865.tgz#70026616e8afe6e1442f8bb4e1092987d81a2f25"
 
-canner-compiler@^1.5.0-canary.36:
-  version "1.5.0-canary.36"
-  resolved "https://registry.yarnpkg.com/canner-compiler/-/canner-compiler-1.5.0-canary.36.tgz#a25235c43806ddb77a00dbe3576916c29153da8f"
+canner-compiler@^1.5.0-canary.38:
+  version "1.5.0-canary.38"
+  resolved "https://registry.yarnpkg.com/canner-compiler/-/canner-compiler-1.5.0-canary.38.tgz#9d8cacc1ba62b5037bffc66df586b7ed9ea8db6f"
 
-canner-graphql-interface@^1.5.0-canary.35, canner-graphql-interface@^1.5.0-canary.36:
+canner-graphql-interface@^1.5.0-canary.35, canner-graphql-interface@^1.5.0-canary.38:
   version "1.16.2"
   resolved "https://registry.yarnpkg.com/canner-graphql-interface/-/canner-graphql-interface-1.16.2.tgz#399ead8f213d8a004682f37640e2a4bb264691b3"
   dependencies:
@@ -3611,9 +3611,9 @@ canner-helpers@^1.5.0-canary.35:
   dependencies:
     faker "^4.1.0"
 
-canner-helpers@^1.5.0-canary.36:
-  version "1.5.0-canary.36"
-  resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-1.5.0-canary.36.tgz#b857d17b90181d639635d994fcdd77371003c038"
+canner-helpers@^1.5.0-canary.38:
+  version "1.5.0-canary.38"
+  resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-1.5.0-canary.38.tgz#d2b8cf03267ed98add3ba5d98adee042b3a169f3"
   dependencies:
     faker "^4.1.0"
 
@@ -3634,11 +3634,11 @@ canner-layouts@^1.5.0-canary.35:
   dependencies:
     canner-helpers "^1.5.0-canary.35"
 
-canner-layouts@^1.5.0-canary.36:
-  version "1.5.0-canary.36"
-  resolved "https://registry.yarnpkg.com/canner-layouts/-/canner-layouts-1.5.0-canary.36.tgz#1b7a7caed080426f671ef5c84f592ad50ab55f9e"
+canner-layouts@^1.5.0-canary.38:
+  version "1.5.0-canary.38"
+  resolved "https://registry.yarnpkg.com/canner-layouts/-/canner-layouts-1.5.0-canary.38.tgz#babbfbb0cc383813a7aa5795276e55fb0b75cb81"
   dependencies:
-    canner-helpers "^1.5.0-canary.36"
+    canner-helpers "^1.5.0-canary.38"
 
 canner-ref-id@^0.1.2:
   version "0.1.2"
@@ -3708,17 +3708,17 @@ canner-slate-editor@^1.5.4:
     slate-trailing-block "^0.5.0"
     styled-components "^3.2.3"
 
-canner@^1.5.0-canary.36:
-  version "1.5.0-canary.36"
-  resolved "https://registry.yarnpkg.com/canner/-/canner-1.5.0-canary.36.tgz#010d7b64b4dd1341f2a2b57adb8f2a946416ae8c"
+canner@^1.5.0-canary.38:
+  version "1.5.0-canary.38"
+  resolved "https://registry.yarnpkg.com/canner/-/canner-1.5.0-canary.38.tgz#3b5acdc77e19a4018844749a5759aed91c243daf"
   dependencies:
     ajv "^6.5.2"
     apollo-boost "^0.1.4"
     bson-objectid "^1.2.2"
-    canner-compiler "^1.5.0-canary.36"
-    canner-graphql-interface "^1.5.0-canary.36"
-    canner-helpers "^1.5.0-canary.36"
-    canner-layouts "^1.5.0-canary.36"
+    canner-compiler "^1.5.0-canary.38"
+    canner-graphql-interface "^1.5.0-canary.38"
+    canner-helpers "^1.5.0-canary.38"
+    canner-layouts "^1.5.0-canary.38"
     canner-ref-id "^0.1.2"
     graphql-tag "^2.9.1"
     immer "^1.3.0"
@@ -8093,6 +8093,10 @@ lodash.flatten@^4.2.0:
 lodash.foreach@^4.3.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.foreach/-/lodash.foreach-4.5.0.tgz#1a6a35eace401280c7f06dddec35165ab27e3e53"
+
+lodash.get@^4.4.2:
+  version "4.4.2"
+  resolved "https://registry.yarnpkg.com/lodash.get/-/lodash.get-4.4.2.tgz#2d177f652fa31e939b4438d5341499dfa3825e99"
 
 lodash.isarguments@^3.0.0:
   version "3.1.0"

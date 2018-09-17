@@ -1,11 +1,11 @@
 // tslint:disable:no-console
 import Koa, {Context} from 'koa';
 import stringify from 'json-stringify-safe';
-import { ApolloServer, gql } from 'apollo-server-koa';
+import { ApolloServer, gql, ApolloError } from 'apollo-server-koa';
 import { importSchema } from 'graphql-import';
 import path from 'path';
 import KcAdminClient from 'keycloak-admin';
-import { omit, get } from 'lodash';
+import { omit, get, isEmpty } from 'lodash';
 import { Issuer } from 'openid-client';
 import views from 'koa-views';
 import serve from 'koa-static';
@@ -21,6 +21,7 @@ import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
 import Agent, { HttpsAgent } from 'agentkeepalive';
+import { ErrorCodes } from './errorCodes';
 
 // controller
 import { OidcCtrl, mount as mountOidc } from './oidc';
@@ -30,6 +31,7 @@ import {createConfig} from './config';
 
 // observer
 import Observer from './observer/observer';
+import Boom from 'boom';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -172,17 +174,36 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
       console.log(`== https agent ==`);
       console.log(httpsAgent.getCurrentStatus());
 
-      const errors = get(error, 'errors', []);
-      try {
-        JSON.stringify(errors);
-      } catch (err) {
-        console.log('formatResponse: circular reference(s) detected, removing them');
-        error.errors = JSON.parse(stringify(errors));
+      let errorCode: string;
+      let errorMessage: string;
+      const additionalProperties: any = {};
+      const extensions = error.extensions;
+      const exception = extensions.exception;
+
+      // error code override: BoomError > ApolloError > default internal error
+      if (exception.isBoom && exception.data && exception.data.code) {
+        errorCode = exception.data.code;
+        errorMessage = get(exception, 'output.payload.message', 'internal server error');
+      } else if (extensions.code) {
+        // GraphqlError with code
+        errorCode = extensions.code;
+        errorMessage = error.message;
+      } else {
+        errorCode = ErrorCodes.INTERNAL_ERROR;
+        errorMessage = 'internal server error';
       }
 
-      console.log(JSON.stringify(error, null, 2));
-      return error;
-    },
+      // print error message and stacktrace
+      console.log(`Error Code: ${errorCode}`);
+      console.log(get(exception, 'stacktrace', []).join('\n'));
+
+      // cusomized handler for error code
+      if (errorCode === ErrorCodes.REFRESH_TOKEN_EXPIRED) {
+        additionalProperties.loginUrl = extensions.loginUrl;
+      }
+
+      return new ApolloError(errorMessage, errorCode, additionalProperties);
+    }
   });
 
   // koa
