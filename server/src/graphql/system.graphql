@@ -5,9 +5,40 @@ type Org {
   logo: CannerImage
 }
 
+type Email {
+  host: String
+  port: Int
+  fromDisplayName: String
+  from: String
+  replyToDisplayName: String
+  replyTo: String
+  envelopeFrom: String
+  enableSSL: Boolean
+  enableStartTLS: Boolean
+  enableAuth: Boolean
+  username: String
+  password: String
+}
+
 type System {
   org: Org
+  email: Email
   defaultUserDiskQuota: Int
+}
+
+input EmailInput {
+  host: String
+  port: Int
+  fromDisplayName: String
+  from: String
+  replyToDisplayName: String
+  replyTo: String
+  envelopeFrom: String
+  enableSSL: Boolean
+  enableStartTLS: Boolean
+  enableAuth: Boolean
+  username: String
+  password: String
 }
 
 input OrgUpdateInput {
@@ -17,5 +48,6 @@ input OrgUpdateInput {
 
 input SystemUpdateInput {
   org: OrgUpdateInput
+  email: EmailInput
   defaultUserDiskQuota: Int
 }

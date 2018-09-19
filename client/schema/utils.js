@@ -169,7 +169,22 @@ exports.dict = {
     tokenUrl: 'TokenUrl',
     authorizationUrl: 'AuthorizationUrl',
     disableUserInfo: 'DisableUserInfo',
-    clientSecret: 'ClientSecret'
+    clientSecret: 'ClientSecret',
+
+    // email
+    emailSettings: 'Email Settings',
+    'email.host': 'Smtp Host',
+    'email.port': 'Smtp port',
+    'email.fromDisplayName': 'From Display Name',
+    'email.from': 'From',
+    'email.replyToDisplayName': 'Reply To Display Name',
+    'email.replyTo': 'Reply To',
+    'email.envelopeFrom': 'Envelope From',
+    'email.enableSSL': 'Enable SSL',
+    'email.enableStartTLS': 'Enable StartTLS',
+    'email.enableAuth': 'Enable Authentication',
+    'email.username': 'Username',
+    'email.password': 'Password'
   },
   zh: {
     // system

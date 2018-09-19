@@ -1,9 +1,15 @@
 import KcAdminClient from 'keycloak-admin';
-import { mapValues, isEmpty, get } from 'lodash';
+import { mapValues, isEmpty, get, isUndefined, isNil, reduce } from 'lodash';
 import { unflatten, flatten } from 'flat';
 import { detaultSystemSettings } from './constant';
 import { Context } from './interface';
 import { parseFromAttr, toAttr, parseDiskQuota, stringifyDiskQuota } from './utils';
+const smtpKeyMapping = {
+  enableSSL: 'ssl',
+  enableStartTLS: 'starttls',
+  enableAuth: 'auth',
+  username: 'user'
+};
 
 export const query = async (root, args, context: Context) => {
   const everyoneGroupId = context.everyoneGroupId;
@@ -28,6 +34,19 @@ export const query = async (root, args, context: Context) => {
       } : detaultSystemSettings.org.logo
     },
     defaultUserDiskQuota: parseDiskQuota(fetchedData.defaultUserDiskQuota || detaultSystemSettings.defaultUserDiskQuota)
+  };
+};
+
+export const queryEmail = async (root, args, context: Context) => {
+  const {kcAdminClient, realm} = context;
+  const foundRealm = await kcAdminClient.realms.findOne({realm});
+  const smtpServer = foundRealm.smtpServer || {} as any;
+  return {
+    ...smtpServer,
+    enableSSL: isUndefined(smtpServer.ssl) ? false : smtpServer.ssl,
+    enableStartTLS: isUndefined(smtpServer.starttls) ? false : smtpServer.starttls,
+    enableAuth: isUndefined(smtpServer.auth) ? false : smtpServer.auth,
+    username: smtpServer.user
   };
 };
 
@@ -83,6 +102,27 @@ export const update = async (root, args, context) => {
         // tslint:disable-next-line:max-line-length
         `<img src="${get(payload, 'org.logo.url')}" alt="${get(payload, 'org.name') ? get(payload, 'org.name') : ''}" width="500" >` :
         undefined
+    });
+  }
+
+  // update smtp
+  let email = payload.email;
+  if (email) {
+    email = reduce(email, (result, val, key) => {
+      if (isNil(val)) {
+        return result;
+      }
+
+      if (smtpKeyMapping[key]) {
+        key = smtpKeyMapping[key];
+      }
+
+      result[key] = val.toString();
+      return result;
+    }, {});
+    console.log(email);
+    await kcAdminClient.realms.update({realm: context.realm}, {
+      smtpServer: email
     });
   }
 
