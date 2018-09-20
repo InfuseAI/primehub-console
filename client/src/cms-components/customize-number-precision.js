@@ -13,8 +13,10 @@ export default class Input extends PureComponent {
   }
 
   onChange = (val) => {
-    const {onChange, refId} = this.props;
-    onChange(refId, "update", val);
+    const {onChange, refId, uiParams: {min}} = this.props;
+    if (val >= min) {
+      onChange(refId, "update", val);
+    }
   }
 
   render() {
@@ -29,7 +31,7 @@ export default class Input extends PureComponent {
         precision={uiParams && uiParams.precision}
         formatter={value => `${value}${uiParams && uiParams.unit ? uiParams.unit : ''}`}
         parser={uiParams && uiParams.parser ? uiParams && uiParams.parser : value => value.replace(/[^0-9\.]/g, '')}
-        value={value || uiParams.defaultValue || uiParams.min}
+        value={value}
         onChange={this.onChange}
       />
     );
