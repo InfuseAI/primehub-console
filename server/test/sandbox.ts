@@ -156,11 +156,89 @@ export const createSandbox = async () => {
   const users = await client.users.find({realm: realmId, username});
   await assignAdmin(client, realmId, users[0].id);
 
+  // create new client
+  const authClientId = faker.internet.userName();
+  await client.clients.create({
+    realm: realmId,
+    clientId: authClientId,
+    attributes: {},
+    enabled: true,
+    protocol: 'openid-connect',
+    redirectUris: []
+  });
+  const authClients = await client.clients.find({
+    realm: realmId,
+    clientId: authClientId
+  });
+  const authClient = authClients[0];
+
+  // update authClient
+  await client.clients.update({
+    realm: realmId,
+    id: authClient.id
+  }, {
+    clientId: authClient.clientId,
+    attributes: {
+      'display.on.consent.screen': 'false',
+      'exclude.session.state.from.auth.response': 'false',
+      'saml_force_name_id_format': 'false',
+      'saml.assertion.signature': 'false',
+      'saml.authnstatement': 'false',
+      'saml.client.signature': 'false',
+      'saml.encrypt': 'false',
+      'saml.force.post.binding': 'false',
+      'saml.multivalued.roles': 'false',
+      'saml.onetimeuse.condition': 'false',
+      'saml.server.signature': 'false',
+      'saml.server.signature.keyinfo.ext': 'false',
+      'tls.client.certificate.bound.access.tokens': 'false'
+    },
+    authenticationFlowBindingOverrides: {},
+    authorizationServicesEnabled: false,
+    bearerOnly: false,
+    clientAuthenticatorType: 'client-secret',
+    consentRequired: false,
+    defaultClientScopes: ['role_list', 'profile', 'email'],
+    directAccessGrantsEnabled: true,
+    frontchannelLogout: false,
+    fullScopeAllowed: true,
+    implicitFlowEnabled: false,
+    nodeReRegistrationTimeout: -1,
+    notBefore: 0,
+    optionalClientScopes: ['address', 'phone', 'offline_access'],
+    protocol: 'openid-connect',
+    publicClient: false,
+    serviceAccountsEnabled: true,
+    standardFlowEnabled: true,
+    surrogateAuthRequired: false,
+    webOrigins: [],
+    redirectUris: [
+      'http://localhost:3000/*'
+    ]
+  });
+
+  const serviceAccountUser = await client.clients.getServiceAccountUser({
+    realm: realmId,
+    id: authClient.id
+  });
+
+  // add admin role to client
+  await assignAdmin(client, realmId, serviceAccountUser.id);
+
+  // get client secret
+  const clientSecret = await client.clients.getClientSecret({
+    realm: realmId,
+    id: authClient.id
+  });
+
   // assign to env
   process.env.KC_REALM = realmId;
   process.env.KC_EVERYONE_GROUP_ID = group.id;
   process.env.KC_USERNAME = username;
   process.env.KC_PWD = password;
+  process.env.SHARED_GRAPHQL_SECRET_KEY = 'secret';
+  process.env.KC_CLIENT_ID = authClient.clientId;
+  process.env.KC_CLIENT_SECRET = clientSecret.value;
 };
 
 export const destroySandbox = async () => {

@@ -6,4 +6,5 @@ export interface Context {
   everyoneGroupId: string;
   kcAdminClient: KcAdminClient;
   crdClient: CrdClient;
+  readOnly?: boolean;
 }

@@ -35,6 +35,9 @@ export interface Config {
 
   // multi cluster namespace
   rolePrefix?: string;
+
+  // shared client secret key
+  sharedGraphqlSecretKey?: string;
 }
 
 const defaultConfigs = {
@@ -78,7 +81,8 @@ export const createConfig = (): Config => {
     cmsHost: process.env.CANNER_CMS_HOST,
     keycloakMaxSockets: process.env.KC_MAX_SOCKETS,
     keycloakMaxFreeSockets: process.env.KC_MAX_FREE_SOCKETS,
-    rolePrefix: process.env.KC_ROLE_PREFIX
+    rolePrefix: process.env.KC_ROLE_PREFIX,
+    sharedGraphqlSecretKey: process.env.SHARED_GRAPHQL_SECRET_KEY
   });
 
   const env = process.env.NODE_ENV || 'development';

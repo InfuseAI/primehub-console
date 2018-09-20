@@ -20,20 +20,28 @@ before(async () => {
   const {app, server} = await createApp();
   const httpServer = http.createServer(app.callback());
   const requester = chai.request(httpServer).keepOpen();
-  (global as any).graphqlRequest = async (query, variables) => {
-    const res = await requester
-      .post(server.graphqlPath)
-      .send({
-        operationName: null,
-        query,
-        variables
-      });
+  (global as any).graphqlRequest = async (query, variables, authorzation?) => {
+    const request = requester
+      .post(server.graphqlPath);
+
+    if (authorzation) {
+      request.set('Authorization', authorzation);
+    } else {
+      request.auth(process.env.KC_USERNAME, process.env.KC_PWD);
+    }
+
+    const res = await request.send({
+      operationName: null,
+      query,
+      variables
+    });
 
     if (res.body && res.body.errors) {
       // tslint:disable-next-line:no-console
       console.log(JSON.stringify(res.body.errors, null, 2));
+      return res.body.errors;
     }
-    expect(res).to.have.status(200);
+
     return res.body.data;
   };
 });

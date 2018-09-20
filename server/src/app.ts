@@ -12,6 +12,8 @@ import serve from 'koa-static';
 import Router from 'koa-router';
 import morgan from 'koa-morgan';
 import * as GraphQLJSON from 'graphql-type-json';
+import { makeExecutableSchema } from 'graphql-tools';
+import { applyMiddleware } from 'graphql-middleware';
 
 import CrdClient from './crdClient/crdClientImpl';
 import * as system from './resolvers/system';
@@ -22,6 +24,7 @@ import { crd as dataset} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import { ErrorCodes } from './errorCodes';
+import basicAuth from 'basic-auth';
 
 // controller
 import { OidcCtrl, mount as mountOidc } from './oidc';
@@ -32,6 +35,9 @@ import {createConfig} from './config';
 // observer
 import Observer from './observer/observer';
 import Boom from 'boom';
+
+// graphql middlewares
+import readOnlyMiddleware from './middlewares/readonly';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -111,7 +117,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
     grantType: config.keycloakGrantType
   });
 
-  const kcAdminClient = new KcAdminClient({
+  const createKcAdminClient = () => new KcAdminClient({
     baseUrl: config.keycloakApiBaseUrl,
     realmName: config.keycloakRealmName,
     requestConfigs: {
@@ -145,18 +151,53 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
   }
 
   // apollo server
+  const schema = makeExecutableSchema({
+    typeDefs: typeDefs as any,
+    resolvers
+  });
+  const schemaWithMiddleware = applyMiddleware(schema, readOnlyMiddleware);
   const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    context: async ({ ctx }) => {
-      if (config.keycloakGrantType === 'password') {
+    schema: schemaWithMiddleware as any,
+    context: async ({ ctx }: { ctx: Koa.Context }) => {
+      let readOnly = false;
+      const kcAdminClient = createKcAdminClient();
+      const {authorization = ''}: {authorization: string} = ctx.header;
+
+      // if sharedGraphqlSecretKey is set and token is brought in bearer
+      // no matter what grant type is chosen, Bearer type always has higest priority
+      if (authorization.indexOf('Bearer') >= 0) {
+        const apiToken = authorization.replace('Bearer ', '');
+
+        // sharedGraphqlSecretKey should not be empty
+        if (isEmpty(config.sharedGraphqlSecretKey)
+            || config.sharedGraphqlSecretKey !== apiToken) {
+          throw Boom.forbidden('apiToken not valid');
+        }
+
+        // use service account token and put on readonly mode
+        readOnly = true;
+        const accessToken = await oidcCtrl.clientCredentialGrant();
+        kcAdminClient.setAccessToken(accessToken);
+      } else if (config.keycloakGrantType === 'password'
+          && authorization.indexOf('Basic') >= 0
+      ) {
+        // basic auth and specified grant type to password
+        // used for test
+        const credentials = basicAuth(ctx.req);
+        if (!credentials || !credentials.name || !credentials.pass) {
+          throw Boom.forbidden('basic auth not valid');
+        }
+
+        // use password grant type if specified, or basic auth provided
         await kcAdminClient.auth({
-          username: config.keycloakUsername,
-          password: config.keycloakPassword,
+          username: credentials.name,
+          password: credentials.pass,
           clientId: config.keycloakClientId,
+          clientSecret: config.keycloakClientSecret,
           grantType: 'password',
         });
       } else {
+        // default to refresh_token grant type
         const accessToken = await oidcCtrl.getAccessToken(ctx);
         kcAdminClient.setAccessToken(accessToken);
       }
@@ -165,7 +206,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
         realm: config.keycloakRealmName,
         everyoneGroupId: config.keycloakEveryoneGroupId,
         kcAdminClient,
-        crdClient
+        crdClient,
+        readOnly
       };
     },
     formatError: error => {
