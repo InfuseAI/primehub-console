@@ -28,6 +28,7 @@ Canner CMS
 * KC_MAX_SOCKETS: Maximum number of sockets to allow per host. Default = 80
 * KC_MAX_FREE_SOCKETS: Maximum number of sockets (per host) to leave open in a free state. Default = 10
 * KC_ROLE_PREFIX: Prefix will be append at role when creating custom resource, for example: `cluster-1:ds:dataset` if `KC_ROLE_PREFIX` = `cluster-1`.
+* SHARED_GRAPHQL_SECRET_KEY: secret key to request read-only graphql with. Client should put this shared key in header `Authorization: "Bearer <SHARED_GRAPHQL_SECRET_KEY>"`
 
 ## Build
 ```sh
