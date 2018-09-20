@@ -84,7 +84,7 @@ exports.dict = {
     memoryRequest: 'Memory Request',
 
     // dataset
-    dataset: 'Datesets',
+    dataset: 'Datasets',
     description: 'Description',
     type: 'Type',
     images: 'Images',
@@ -208,7 +208,7 @@ exports.dict = {
     memoryRequest: 'Memory Request',
 
     // dataset
-    dataset: 'Dateset',
+    dataset: 'Dataset',
     description: 'Description',
     type: 'Type',
     images: 'Images',
