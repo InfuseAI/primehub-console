@@ -78,6 +78,17 @@ export default () => (
     <Condition match={data => data.type === 'env'}>
       <object keyName="variables"
         title="${variables}"
+        validation={{
+          validator: (value, cb) => {
+            return Object.keys(value).reduce((result, key) => {
+              console.log(key);
+              if (!key.match(/^[a-zA-Z_]+[a-zA-Z0-9_]*$/)) {
+                return cb(`should be alphanumeric charcter, '_', and must start with a letter.`);
+              }
+              return result;
+            }, '');
+          }
+        }}
         packageName="../src/cms-components/customize-object-dynamic-field"
       />
     </Condition>
