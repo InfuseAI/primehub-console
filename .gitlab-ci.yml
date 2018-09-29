@@ -16,6 +16,7 @@ build:
   script:
     - echo "${DOCKER_DRIVER}"
     - docker login -u gitlab-ci-token -p "${CI_BUILD_TOKEN}" "${REGISTRY}"
+    - docker pull "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_BEFORE_SHA:0:7}" || true
     - docker build -t "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_SHA:0:7}" .
     - docker push "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_SHA:0:7}"
   only:
