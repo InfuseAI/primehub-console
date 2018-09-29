@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import fetch from "isomorphic-fetch"
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 import {IntlProvider, addLocaleData} from 'react-intl';
-import {LocaleProvider} from 'antd';
+import {LocaleProvider, notification} from 'antd';
 import en from 'react-intl/locale-data/en';
 import zh from 'react-intl/locale-data/zh';
 import zh_TW from 'antd/lib/locale-provider/zh_TW';
@@ -13,6 +14,7 @@ import CMSPage from './cms';
 import schema from '../schema/index.schema.js';
 import Login from './login';
 import myLocales from './utils/locales';
+import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 const firstKey = Object.keys(schema.schema)[0];
 const locales = {
   zh: zh_TW,
@@ -20,6 +22,29 @@ const locales = {
 };
 (window as any).LOCALE = (window as any).LOCALE || 'en';
 const locale = (window as any).LOCALE;
+
+/**
+ * Background worker
+ */
+const tokenSyncWorker = new BackgroundTokenSyncer({
+  refreshTokenExp: (window as any).refreshTokenExp,
+  refreshWarningCallback: () => {
+    // notify with fixed card
+    notification.warning({
+      message: 'Warning',
+      description: 'In less than 1 minite, you\'re going to be redirected to keycloak in exchange of new authentication token.',
+      placement: 'bottomRight',
+      duration: null,
+      key: 'refreshWarning'
+    });
+  }
+})
+tokenSyncWorker.run().catch(console.error);
+
+
+/**
+ * UI
+ */
 ReactDOM.render(
   <IntlProvider locale={locale} messages={{...schema.dict[locale], ...myLocales[locale]}}>
     <LocaleProvider locale={locales[locale]}>

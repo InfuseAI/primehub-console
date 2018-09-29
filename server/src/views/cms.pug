@@ -6,6 +6,7 @@ block head
     window.LOCALE= '#{locale}';
     window.username = "#{username}";
     window.thumbnail = "#{thumbnail}";
+    window.refreshTokenExp = #{refreshTokenExp};
 block main
   div(id='root')
   script(src="/index.js")

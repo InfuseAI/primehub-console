@@ -76,6 +76,7 @@ export class OidcCtrl {
       if (refreshToken.isExpired()) {
         throw Boom.forbidden('refresh token expired', {code: ERRORS.FORCE_LOGIN});
       }
+      ctx.state.refreshTokenExp = parseInt(refreshToken.getContent().exp, 10);
       ctx.state.username = ctx.cookies.get('username');
       ctx.state.thumbnail = ctx.cookies.get('thumbnail');
       return next();
