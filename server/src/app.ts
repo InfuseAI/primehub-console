@@ -157,6 +157,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
   });
   const schemaWithMiddleware = applyMiddleware(schema, readOnlyMiddleware);
   const server = new ApolloServer({
+    debug: true,
     schema: schemaWithMiddleware as any,
     context: async ({ ctx }: { ctx: Koa.Context }) => {
       let readOnly = false;
