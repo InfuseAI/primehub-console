@@ -8,10 +8,10 @@ import Group from './group.schema';
 import InstanceType from './instanceType.schema';
 import Image from './image.schema';
 import Dataset from './dataset.schema';
-import {dict, graphqlClient} from './utils';
+import {dict, graphqlClient, imageStorage} from './utils';
 
 export default (
-  <root dict={dict} graphqlClient={process.env.NODE_ENV === 'production' ? graphqlClient : undefined}>
+  <root imageStorage={imageStorage} dict={dict} graphqlClient={process.env.NODE_ENV === 'production' ? graphqlClient : undefined}>
     <System/>
     {/* <Idp/> */}
     {/* <UserFederation/> */}

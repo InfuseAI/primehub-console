@@ -1,8 +1,7 @@
 /** @jsx builder */
 import builder, {Block} from 'canner-script';
-import {storage} from './utils';
 export default () => (
-  <object keyName="system" title="${system}" storage={storage} >
+  <object keyName="system" title="${system}" >
     <Block title="${systemSettings}">
       <object keyName="org">
         <string keyName="name" title="${name}"/>

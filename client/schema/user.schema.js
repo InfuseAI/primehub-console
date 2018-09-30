@@ -1,7 +1,7 @@
 /** @jsx builder */
 import builder, {Default, Tabs, Layout, configure, Block, Condition} from 'canner-script';
 import RelationTable from '../src/cms-components/customize-relation-table';
-import {storage, SendEmailTitle, ResetPasswordTitle} from './utils';
+import {SendEmailTitle, ResetPasswordTitle} from './utils';
 import Tab from '../src/cms-layouts/tab';
 import CustomizeBlock from '../src/cms-layouts/block';
 import ResetPassword from '../src/cms-components/customize-object-password_form';
@@ -93,7 +93,6 @@ export default () => (
         dataIndex: 'totp'
       }],
     }}
-    storage={storage}
   >
     <toolbar async>
       <filter
