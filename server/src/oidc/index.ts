@@ -107,8 +107,14 @@ export class OidcCtrl {
       const tokenSet = await this.oidcClient.refresh(refreshToken);
       return tokenSet.access_token;
     } catch (err) {
-      if (err.error === 'invalid_grant' &&
-        get(err, 'error_description', '').indexOf('expired') >= 0) {
+      /**
+       * Possible errors
+       * invalid_grant for expiration
+       * invalid_grant (Session not active) => for user deleted
+       * invalid_scope (User or client no longer has role permissions for client key: realm-management)
+       *  => for remove user from admin
+       */
+      if (err.error === 'invalid_grant' || err.error === 'invalid_scope') {
         throw this.createExpiredError(ctx.header.referer);
       }
 

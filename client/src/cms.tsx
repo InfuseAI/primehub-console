@@ -241,7 +241,7 @@ export default class CMSPage extends React.Component<Props, State> {
 
                 case 'REFRESH_TOKEN_EXPIRED':
                   // show notification with button
-                  message = 'Token Expired';
+                  message = 'Token Expired or Invalid';
                   description = 'Please login again';
                   const loginUrl = get(e, 'networkError.result.errors.0.loginUrl');
                   // add current location to redirect_uri
