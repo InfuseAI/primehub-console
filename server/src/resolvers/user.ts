@@ -7,10 +7,13 @@ import { detaultSystemSettings, keycloakMaxCount } from './constant';
 import { Attributes, FieldType } from './attr';
 import { Context } from './interface';
 import { ApolloError } from 'apollo-server';
+import { RequiredActionAlias } from 'keycloak-admin/lib/defs/requiredActionProviderRepresentation';
 
 /**
  * utils
  */
+
+const TWELVE_HOURS = 43200;
 
 export const assignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdminClient) => {
   if (realm === 'master') {
@@ -170,6 +173,25 @@ export const create = async (root, args, context: Context) => {
     username: payload.username
   });
   const user = first(users);
+
+  // send email
+  if (payload.sendEmail && user.email) {
+    kcAdminClient.users.executeActionsEmail({
+      id: user.id,
+      lifespan: TWELVE_HOURS,
+      actions: [RequiredActionAlias.VERIFY_EMAIL]
+    })
+    .then(() => {
+      // tslint:disable-next-line:no-console
+      console.log(`send activation email to ${user.email}`);
+    })
+    .catch(err => {
+      // tslint:disable-next-line:no-console
+      console.log(`fail to send activation email to ${user.email}`);
+      // tslint:disable-next-line:no-console
+      console.log(err);
+    });
+  }
 
   // set admin
   if (payload.isAdmin) {

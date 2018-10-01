@@ -184,6 +184,10 @@ export default () => (
           </toolbar>
         </relation>
       </Condition>
+
+      <Condition match={(data, operator) => operator === 'create'} defaultMode="hidden">
+        <boolean keyName="sendEmail" title="${user.sendEmail}" />
+      </Condition>
     </Default>
     </Layout>
   </array>

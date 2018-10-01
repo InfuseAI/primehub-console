@@ -10,6 +10,8 @@ type User {
   totp: Boolean
   isAdmin: Boolean
   enabled: Boolean
+  """todo: take this property out when leo has time to implement customize component"""
+  sendEmail: Boolean
   createdTimestamp: Float
   personalDiskQuota: Int
   groups: [Group]
@@ -58,6 +60,7 @@ input UserCreateInput {
   totp: Boolean
   isAdmin: Boolean
   enabled: Boolean
+  sendEmail: Boolean
   createdTimestamp: Float
   personalDiskQuota: Int
   groups: GroupCreateManyInput
@@ -71,6 +74,7 @@ input UserUpdateInput {
   totp: Boolean
   isAdmin: Boolean
   enabled: Boolean
+  sendEmail: Boolean
   createdTimestamp: Float
   personalDiskQuota: Int
   groups: GroupUpdateManyInput
