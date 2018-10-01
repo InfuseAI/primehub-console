@@ -70,6 +70,9 @@ const resolvers = {
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation()
   },
+  System: {
+    email: system.queryEmail
+  },
   User: user.typeResolvers,
   Group: group.typeResolvers,
   ...instanceType.typeResolver(),
