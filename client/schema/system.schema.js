@@ -1,6 +1,5 @@
 /** @jsx builder */
 import builder, {Block, Condition} from 'canner-script';
-import {storage} from './utils';
 
 const emailValidator = (value, cb) => {
   if (value && !value.match(/(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
@@ -9,7 +8,7 @@ const emailValidator = (value, cb) => {
 };
 
 export default () => (
-  <object keyName="system" title="${system}" storage={storage} >
+  <object keyName="system" title="${system}" >
     <Block title="${systemSettings}">
       <object keyName="org">
         <string keyName="name" title="${name}"/>
@@ -51,7 +50,7 @@ export default () => (
         <boolean keyName="enableAuth" title="${smtp.enableAuth}"/>
         <Condition match={data => data.enableAuth}>
           <string keyName="username" title="${smtp.auth.username}"/>
-          <string keyName="password" title="${smtp.auth.password}"/>
+          <string keyName="password" title="${smtp.auth.password}" uiParams={{type: "password"}}/>
         </Condition>
       </object>
     </Block>

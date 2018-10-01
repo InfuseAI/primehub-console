@@ -1,8 +1,7 @@
 import React from 'react';
 import firebase from 'firebase';
-import {FirebaseClientService} from '@canner/image-service-config';
 import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlClient';
-import {ImgurService} from '@canner/image-service-config';
+import {ImgurStorage} from 'canner-storage';
 import {FormattedMessage} from 'react-intl';
 
 exports.graphqlClient = new GraphqlClient({
@@ -10,10 +9,10 @@ exports.graphqlClient = new GraphqlClient({
   credentials: "same-origin"
 });
 
-exports.storage = new ImgurService({
+exports.imageStorage = new ImgurStorage({
   clientId: "cd7b1ab0aa39732",
   mashapeKey: "bF1fkS9EKrmshtCbRspDUxPL5yhCp1rzz8ejsnqLqwI2KQC3s9"
-}).getServiceConfig();
+});
 exports.renderRelationField = function(text, record) {
   return <span>
     {text.length}
