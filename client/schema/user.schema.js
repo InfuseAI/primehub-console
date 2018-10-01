@@ -113,33 +113,45 @@ export default () => (
     {/* <Layout component={CustomizeBlock} disabledKeysInCreate={['__1', '__2']}> */}
     {/* <image keyName="thumbnail" title="Thumbnail" disabled /> */}
     <Default title="${basicInfo}" keyName="basicInfo">
-      <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
-        <string keyName="username" title="${username}"
-          validation={{
+    {/**
+      * Fields will be hidden if federated is true
+      */}
+
+      <Condition match={(data) => data.federated === false} defaultMode="disabled">
+        <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
+          <string keyName="username" title="${username}"
+            validation={{
+              validator: (value, cb) => {
+                if (!value.match(/^[a-z][-a-z0-9_.@]*$/)) {
+                  return cb(`only lower case alphanumeric characters, '-', '_", or '.', and underscores ("_") are allowed, and must start with a letter.`);
+                }
+              }
+            }}
+            required
+          />
+        </Condition>
+        <string keyName="email" title="${email}" validation={{
             validator: (value, cb) => {
-              if (!value.match(/^[a-z][-a-z0-9_.@]*$/)) {
-                return cb(`only lower case alphanumeric characters, '-', '_", or '.', and underscores ("_") are allowed, and must start with a letter.`);
+              if (value && !value.match(/(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
+                return cb('should match format "email"');
               }
             }
           }}
-          required
         />
+        <Condition match={(data, operator) => operator === 'update'}>
+          <string keyName="firstName" title="${firstName}" />
+          <string keyName="lastName" title="${lastName}" />
+          <boolean keyName="enabled" title="${enabled}" />
+          {/* <number keyName="createdTimestamp" title="CreatedTimestamp" /> */}
+        </Condition>
       </Condition>
-      <string keyName="email" title="${email}" validation={{
-          validator: (value, cb) => {
-            if (value && !value.match(/(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
-              return cb('should match format "email"');
-            }
-          }
-        }}
-      />
+
+      {/**
+        * Fields will NOT be hidden if federated is true
+        */}
       <Condition match={(data, operator) => operator === 'update'}>
-        <string keyName="firstName" title="${firstName}" />
-        <string keyName="lastName" title="${lastName}" />
         <boolean keyName="totp" title="${totp}" />
         <boolean keyName="isAdmin" title="${isAdmin}" />
-        <boolean keyName="enabled" title="${enabled}" />
-        {/* <number keyName="createdTimestamp" title="CreatedTimestamp" /> */}
         <number keyName="personalDiskQuota" title="${personalDiskQuota}"
           uiParams={{unit: ' GB', step: 1, min: 1, precision: 0}}
           defaultValue={1}
@@ -183,6 +195,10 @@ export default () => (
             <pagination />
           </toolbar>
         </relation>
+      </Condition>
+
+      <Condition match={() => false} defaultMode="hidden">
+        <boolean keyName="federated" />
       </Condition>
     </Default>
     </Layout>

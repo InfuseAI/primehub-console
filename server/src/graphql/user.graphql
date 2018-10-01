@@ -12,6 +12,7 @@ type User {
   enabled: Boolean
   createdTimestamp: Float
   personalDiskQuota: Int
+  federated: Boolean
   groups: [Group]
 }
 
@@ -60,6 +61,7 @@ input UserCreateInput {
   enabled: Boolean
   createdTimestamp: Float
   personalDiskQuota: Int
+  federated: Boolean
   groups: GroupCreateManyInput
 }
 
@@ -73,6 +75,7 @@ input UserUpdateInput {
   enabled: Boolean
   createdTimestamp: Float
   personalDiskQuota: Int
+  federated: Boolean
   groups: GroupUpdateManyInput
 }
 
