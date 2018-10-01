@@ -71,7 +71,7 @@ const resolvers = {
     ...image.resolveInMutation()
   },
   System: {
-    email: system.queryEmail
+    smtp: system.querySmtp
   },
   User: user.typeResolvers,
   Group: group.typeResolvers,

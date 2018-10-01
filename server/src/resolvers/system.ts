@@ -37,15 +37,18 @@ export const query = async (root, args, context: Context) => {
   };
 };
 
-export const queryEmail = async (root, args, context: Context) => {
+// if val is not defined or equals to 'false', return false, otherwise true.
+const parseBooleanString = val => val === 'true';
+export const querySmtp = async (root, args, context: Context) => {
   const {kcAdminClient, realm} = context;
   const foundRealm = await kcAdminClient.realms.findOne({realm});
   const smtpServer = foundRealm.smtpServer || {} as any;
   return {
     ...smtpServer,
-    enableSSL: isUndefined(smtpServer.ssl) ? false : smtpServer.ssl,
-    enableStartTLS: isUndefined(smtpServer.starttls) ? false : smtpServer.starttls,
-    enableAuth: isUndefined(smtpServer.auth) ? false : smtpServer.auth,
+    port: smtpServer.port && parseInt(smtpServer.ssl, 10),
+    enableSSL: parseBooleanString(smtpServer.ssl),
+    enableStartTLS: parseBooleanString(smtpServer.starttls),
+    enableAuth: parseBooleanString(smtpServer.auth),
     username: smtpServer.user
   };
 };
@@ -106,9 +109,10 @@ export const update = async (root, args, context) => {
   }
 
   // update smtp
-  let email = payload.email;
-  if (email) {
-    email = reduce(email, (result, val, key) => {
+  let smtp = payload.smtp;
+  console.log(smtp);
+  if (smtp) {
+    const smtpPayload = reduce(smtp, (result, val, key) => {
       if (isNil(val)) {
         return result;
       }
@@ -120,9 +124,9 @@ export const update = async (root, args, context) => {
       result[key] = val.toString();
       return result;
     }, {});
-    console.log(email);
+    console.log(smtpPayload);
     await kcAdminClient.realms.update({realm: context.realm}, {
-      smtpServer: email
+      smtpServer: smtpPayload
     });
   }
 

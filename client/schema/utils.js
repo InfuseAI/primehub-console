@@ -171,20 +171,20 @@ exports.dict = {
     disableUserInfo: 'DisableUserInfo',
     clientSecret: 'ClientSecret',
 
-    // email
-    emailSettings: 'Email Settings',
-    'email.host': 'Smtp Host',
-    'email.port': 'Smtp port',
-    'email.fromDisplayName': 'From Display Name',
-    'email.from': 'From',
-    'email.replyToDisplayName': 'Reply To Display Name',
-    'email.replyTo': 'Reply To',
-    'email.envelopeFrom': 'Envelope From',
-    'email.enableSSL': 'Enable SSL',
-    'email.enableStartTLS': 'Enable StartTLS',
-    'email.enableAuth': 'Enable Authentication',
-    'email.username': 'Username',
-    'email.password': 'Password'
+    // smtp
+    smtpSettings: 'Email Settings',
+    'smtp.host': 'Smtp Host',
+    'smtp.port': 'Smtp port',
+    'smtp.fromDisplayName': 'From Display Name',
+    'smtp.from': 'From',
+    'smtp.replyToDisplayName': 'Reply To Display Name',
+    'smtp.replyTo': 'Reply To',
+    'smtp.envelopeFrom': 'Envelope From',
+    'smtp.enableSSL': 'Enable SSL',
+    'smtp.enableStartTLS': 'Enable StartTLS',
+    'smtp.enableAuth': 'Enable Authentication',
+    'smtp.auth.username': 'Username',
+    'smtp.auth.password': 'Password'
   },
   zh: {
     // system

@@ -5,7 +5,7 @@ type Org {
   logo: CannerImage
 }
 
-type Email {
+type Smtp {
   host: String
   port: Int
   fromDisplayName: String
@@ -22,11 +22,11 @@ type Email {
 
 type System {
   org: Org
-  email: Email
+  smtp: Smtp
   defaultUserDiskQuota: Int
 }
 
-input EmailInput {
+input SmtpInput {
   host: String
   port: Int
   fromDisplayName: String
@@ -48,6 +48,6 @@ input OrgUpdateInput {
 
 input SystemUpdateInput {
   org: OrgUpdateInput
-  email: EmailInput
+  smtp: SmtpInput
   defaultUserDiskQuota: Int
 }

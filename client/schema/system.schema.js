@@ -22,33 +22,36 @@ export default () => (
       />
     </Block>
 
-    <Block title="${emailSettings}">
-      <object keyName="email">
-        <string keyName="host" title="${email.host}"/>
-        <number keyName="port" title="${email.port}"/>
-        <string keyName="fromDisplayName" title="${email.fromDisplayName}"/>
-        <string keyName="from" title="${email.from}"
+    <Block title="${smtpSettings}">
+      <object keyName="smtp">
+        <string keyName="host" title="${smtp.host}"/>
+        <number keyName="port" title="${smtp.port}"
+          uiParams={{defaultValue: 25}}
+          packageName="../src/cms-components/customize-number-precision"
+        />
+        <string keyName="fromDisplayName" title="${smtp.fromDisplayName}"/>
+        <string keyName="from" title="${smtp.from}"
           validation={{
             validator: emailValidator
           }}
         />
-        <string keyName="replyToDisplayName" title="${email.replyToDisplayName}"/>
-        <string keyName="replyTo" title="${email.replyTo}"
+        <string keyName="replyToDisplayName" title="${smtp.replyToDisplayName}"/>
+        <string keyName="replyTo" title="${smtp.replyTo}"
           validation={{
             validator: emailValidator
           }}
         />
-        <string keyName="envelopeFrom" title="${email.envelopeFrom}"
+        <string keyName="envelopeFrom" title="${smtp.envelopeFrom}"
           validation={{
             validator: emailValidator
           }}
         />
-        <boolean keyName="enableSSL" title="${email.enableSSL}"/>
-        <boolean keyName="enableStartTLS" title="${email.enableStartTLS}"/>
-        <boolean keyName="enableAuth" title="${email.enableAuth}"/>
+        <boolean keyName="enableSSL" title="${smtp.enableSSL}"/>
+        <boolean keyName="enableStartTLS" title="${smtp.enableStartTLS}"/>
+        <boolean keyName="enableAuth" title="${smtp.enableAuth}"/>
         <Condition match={data => data.enableAuth}>
-          <string keyName="username" title="${email.auth.username}"/>
-          <string keyName="password" title="${email.auth.password}"/>
+          <string keyName="username" title="${smtp.auth.username}"/>
+          <string keyName="password" title="${smtp.auth.password}"/>
         </Condition>
       </object>
     </Block>
