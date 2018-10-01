@@ -15,6 +15,35 @@ declare module 'mocha' {
   }
 }
 
+const SECRET_VALUE = '**********';
+
+const systemFields = `
+  org {
+    name
+    logo {
+      contentType
+      name
+      size
+      url
+    }
+  }
+  smtp {
+    host
+    port
+    fromDisplayName
+    from
+    replyToDisplayName
+    replyTo
+    envelopeFrom
+    enableSSL
+    enableStartTLS
+    enableAuth
+    username
+    password
+  }
+  defaultUserDiskQuota
+`;
+
 describe('system graphql', function() {
   before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
@@ -24,18 +53,7 @@ describe('system graphql', function() {
 
   it('should query', async () => {
     const data = await this.graphqlRequest(`{
-      system {
-        org {
-          name
-          logo {
-            contentType
-            name
-            size
-            url
-          }
-        },
-        defaultUserDiskQuota
-      }
+      system { ${systemFields} }
     }`);
 
     expect(data).to.be.eql({
@@ -43,6 +61,20 @@ describe('system graphql', function() {
         org: {
           name: 'infuse ai',
           logo: null
+        },
+        smtp: {
+          host: null,
+          port: null,
+          fromDisplayName: null,
+          from: null,
+          replyToDisplayName: null,
+          replyTo: null,
+          envelopeFrom: null,
+          enableSSL: false,
+          enableStartTLS: false,
+          enableAuth: false,
+          username: null,
+          password: null
         },
         defaultUserDiskQuota: 20
       }
@@ -66,9 +98,13 @@ describe('system graphql', function() {
           url: 'test'
         }
       },
+      smtp: {
+        host: 'test.canner.io',
+        from: 'wwwy3y3@canner.io'
+      },
       defaultUserDiskQuota: 30
     };
-    const data = await this.graphqlRequest(`
+    await this.graphqlRequest(`
     mutation($data: SystemUpdateInput!){
       updateSystem (data: $data) {
         org {
@@ -82,24 +118,10 @@ describe('system graphql', function() {
     }`, {
       data: delta
     });
-    expect(data).to.be.eql({
-      updateSystem: delta
-    });
 
     // query again
     const queryData = await this.graphqlRequest(`{
-      system {
-        org {
-          name
-          logo {
-            contentType
-            name
-            size
-            url
-          }
-        },
-        defaultUserDiskQuota
-      }
+      system { ${systemFields} }
     }`);
 
     expect(queryData).to.be.eql({
@@ -112,6 +134,20 @@ describe('system graphql', function() {
             size: null,
             url: delta.org.logo.url
           }
+        },
+        smtp: {
+          host: delta.smtp.host,
+          port: null,
+          fromDisplayName: null,
+          from: delta.smtp.from,
+          replyToDisplayName: null,
+          replyTo: null,
+          envelopeFrom: null,
+          enableSSL: false,
+          enableStartTLS: false,
+          enableAuth: false,
+          username: null,
+          password: null
         },
         defaultUserDiskQuota: delta.defaultUserDiskQuota
       }
@@ -140,9 +176,17 @@ describe('system graphql', function() {
           contentType: 'test',
         }
       },
+      smtp: {
+        host: 'test.canner.io',
+        from: 'wwwy3y3@canner.io',
+        port: 123,
+        enableAuth: true,
+        username: 'wwwy3y3',
+        password: 'wwwy3y3'
+      },
       defaultUserDiskQuota: 20
     };
-    const data = await this.graphqlRequest(`
+    await this.graphqlRequest(`
     mutation($data: SystemUpdateInput!){
       updateSystem (data: $data) {
         org {
@@ -157,24 +201,10 @@ describe('system graphql', function() {
     }`, {
       data: delta
     });
-    expect(data).to.be.eql({
-      updateSystem: delta
-    });
 
     // query again
     const queryData = await this.graphqlRequest(`{
-      system {
-        org {
-          name
-          logo {
-            contentType
-            name
-            size
-            url
-          }
-        },
-        defaultUserDiskQuota
-      }
+      system { ${systemFields} }
     }`);
 
     expect(queryData).to.be.eql({
@@ -187,6 +217,20 @@ describe('system graphql', function() {
             size: null,
             url: delta.org.logo.url
           }
+        },
+        smtp: {
+          host: delta.smtp.host,
+          port: delta.smtp.port,
+          fromDisplayName: null,
+          from: delta.smtp.from,
+          replyToDisplayName: null,
+          replyTo: null,
+          envelopeFrom: null,
+          enableSSL: false,
+          enableStartTLS: false,
+          enableAuth: delta.smtp.enableAuth,
+          username: delta.smtp.username,
+          password: SECRET_VALUE
         },
         defaultUserDiskQuota: delta.defaultUserDiskQuota
       }

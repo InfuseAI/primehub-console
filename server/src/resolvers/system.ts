@@ -45,7 +45,7 @@ export const querySmtp = async (root, args, context: Context) => {
   const smtpServer = foundRealm.smtpServer || {} as any;
   return {
     ...smtpServer,
-    port: smtpServer.port && parseInt(smtpServer.ssl, 10),
+    port: smtpServer.port && parseInt(smtpServer.port, 10),
     enableSSL: parseBooleanString(smtpServer.ssl),
     enableStartTLS: parseBooleanString(smtpServer.starttls),
     enableAuth: parseBooleanString(smtpServer.auth),
@@ -109,8 +109,8 @@ export const update = async (root, args, context) => {
   }
 
   // update smtp
-  let smtp = payload.smtp;
-  console.log(smtp);
+  const smtp = payload.smtp;
+
   if (smtp) {
     const smtpPayload = reduce(smtp, (result, val, key) => {
       if (isNil(val)) {
@@ -124,7 +124,7 @@ export const update = async (root, args, context) => {
       result[key] = val.toString();
       return result;
     }, {});
-    console.log(smtpPayload);
+
     await kcAdminClient.realms.update({realm: context.realm}, {
       smtpServer: smtpPayload
     });

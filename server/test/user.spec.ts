@@ -372,6 +372,22 @@ describe('user graphql', function() {
    * mutation
    */
   it('should send email', async () => {
+    await this.graphqlRequest(`
+    mutation($data: SystemUpdateInput!){
+      updateSystem (data: $data) {
+        __typename
+      }
+    }`, {
+      data: {
+        smtp: {
+          enableAuth: true,
+          from: '0830021730-07fb21@inbox.mailtrap.io',
+          host: 'smtp.mailtrap.io',
+          username: process.env.SMTP_USER,
+          password: process.env.SMTP_PWD
+        }
+      }
+    });
     const user = this.currentUser;
     await this.graphqlRequest(`
     mutation ($id: String, $resetActions: [String], $expiresIn: Int) {

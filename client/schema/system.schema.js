@@ -25,7 +25,7 @@ export default () => (
       <object keyName="smtp">
         <string keyName="host" title="${smtp.host}"/>
         <number keyName="port" title="${smtp.port}"
-          uiParams={{defaultValue: 25}}
+          uiParams={{defaultValue: 25, min: 1, step: 1, precision: 0}}
           packageName="../src/cms-components/customize-number-precision"
         />
         <string keyName="fromDisplayName" title="${smtp.fromDisplayName}"/>
