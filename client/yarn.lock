@@ -1239,15 +1239,15 @@
     "@canner/antd-locales" "^0.4.2-alpha.16"
     moment-timezone "^0.5.14"
 
-"@canner/container@^1.5.0-canary.47":
-  version "1.5.0-canary.47"
-  resolved "https://registry.yarnpkg.com/@canner/container/-/container-1.5.0-canary.47.tgz#e474444685ad9c55ea5a60b28174b775bace2d8a"
+"@canner/container@1.5.0-canary.55":
+  version "1.5.0-canary.55"
+  resolved "https://registry.yarnpkg.com/@canner/container/-/container-1.5.0-canary.55.tgz#79e443ffad42c2b562f53f78ca578ed59c4261b8"
   dependencies:
     styled-components "^3.2.1"
 
-"@canner/history-router@^1.5.0-canary.47":
-  version "1.5.0-canary.47"
-  resolved "https://registry.yarnpkg.com/@canner/history-router/-/history-router-1.5.0-canary.47.tgz#1c3afb09d659d6f1fe5265230dc0912abed01c92"
+"@canner/history-router@1.5.0-canary.55":
+  version "1.5.0-canary.55"
+  resolved "https://registry.yarnpkg.com/@canner/history-router/-/history-router-1.5.0-canary.55.tgz#e8e4df4db1d413cd03589519de348af4e00d4747"
   dependencies:
     query-string "^6.1.0"
 
@@ -1593,13 +1593,6 @@
 "@canner/slate-util-what@^1.5.0":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@canner/slate-util-what/-/slate-util-what-1.5.0.tgz#7d016d8aefe4b478c6e768f63266f47b0e425987"
-
-"@canner/storage@^1.5.0-canary.53":
-  version "1.5.0-canary.53"
-  resolved "https://registry.yarnpkg.com/@canner/storage/-/storage-1.5.0-canary.53.tgz#d6a5cb6745d501868b89621b7ce213e82ecb7717"
-  dependencies:
-    axios "^0.18.0"
-    promise-polyfill "^8.1.0"
 
 "@firebase/app-types@0.3.2":
   version "0.3.2"
@@ -3572,13 +3565,13 @@ caniuse-lite@^1.0.30000844:
   version "1.0.30000865"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000865.tgz#70026616e8afe6e1442f8bb4e1092987d81a2f25"
 
-canner-compiler@1.5.0-canary.47:
-  version "1.5.0-canary.47"
-  resolved "https://registry.yarnpkg.com/canner-compiler/-/canner-compiler-1.5.0-canary.47.tgz#340de1dcb9ca94d40ea653caf986c26d9cb6af54"
+canner-compiler@1.5.0-canary.55:
+  version "1.5.0-canary.55"
+  resolved "https://registry.yarnpkg.com/canner-compiler/-/canner-compiler-1.5.0-canary.55.tgz#e596aab672be9da043eddb75e065d408455c43bf"
 
-canner-graphql-interface@1.5.0-canary.47:
-  version "1.5.0-canary.47"
-  resolved "https://registry.yarnpkg.com/canner-graphql-interface/-/canner-graphql-interface-1.5.0-canary.47.tgz#95cf50b4c2a5234cd6c5fe95a0e56fd97e3ff1c5"
+canner-graphql-interface@1.5.0-canary.55:
+  version "1.5.0-canary.55"
+  resolved "https://registry.yarnpkg.com/canner-graphql-interface/-/canner-graphql-interface-1.5.0-canary.55.tgz#1cdf05417b42aa687de36bc93a6011d67c6ec691"
   dependencies:
     apollo-cache "^1.1.7"
     apollo-cache-inmemory "^1.1.12"
@@ -3586,7 +3579,7 @@ canner-graphql-interface@1.5.0-canary.47:
     apollo-link "^1.2.2"
     apollo-link-http "^1.5.4"
     apollo-utilities "^1.0.11"
-    canner-graphql-utils "^1.4.0"
+    canner-graphql-utils "1.5.0-canary.55"
     dataloader "^1.4.0"
     graphql "0.13.0"
     graphql-anywhere "^4.1.6"
@@ -3598,38 +3591,17 @@ canner-graphql-interface@1.5.0-canary.47:
     pluralize "^7.0.0"
     uuid "^3.2.1"
 
-canner-graphql-interface@^1.5.0-canary.47:
-  version "1.16.2"
-  resolved "https://registry.yarnpkg.com/canner-graphql-interface/-/canner-graphql-interface-1.16.2.tgz#399ead8f213d8a004682f37640e2a4bb264691b3"
-  dependencies:
-    apollo-cache "^1.1.7"
-    apollo-cache-inmemory "^1.1.12"
-    apollo-client "^2.2.8"
-    apollo-link "^1.2.2"
-    apollo-link-http "^1.5.4"
-    apollo-utilities "^1.0.11"
-    canner-graphql-utils "^1.4.0"
-    graphql "0.13.0"
-    graphql-anywhere "^4.1.6"
-    graphql-tag "^2.8.0"
-    graphql-tools "^2.21.0"
-    isomorphic-fetch "^2.2.1"
-    lodash "^4.17.5"
-    lowdb "^1.0.0"
-    pluralize "^7.0.0"
-    uuid "^3.2.1"
-
-canner-graphql-utils@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/canner-graphql-utils/-/canner-graphql-utils-1.4.0.tgz#6d704fb8b4483b7730ab13c598670f953f52a1db"
+canner-graphql-utils@1.5.0-canary.55:
+  version "1.5.0-canary.55"
+  resolved "https://registry.yarnpkg.com/canner-graphql-utils/-/canner-graphql-utils-1.5.0-canary.55.tgz#e285bb72f62504378b73fdbc5f275a2310e9997d"
   dependencies:
     lodash "^4.17.5"
     lowdb "^1.0.0"
     pluralize "^7.0.0"
 
-canner-helpers@1.5.0-canary.47, canner-helpers@^1.5.0-canary.47:
-  version "1.5.0-canary.47"
-  resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-1.5.0-canary.47.tgz#67268248b4ab59ff08245070428b6ae7b375effb"
+canner-helpers@1.5.0-canary.55:
+  version "1.5.0-canary.55"
+  resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-1.5.0-canary.55.tgz#0469b2ace3d9934fc08362006613dcac8e0e555f"
   dependencies:
     faker "^4.1.0"
 
@@ -3643,19 +3615,19 @@ canner-image-gallery@^0.3.4:
     react-loading-image "^0.4.1"
     styled-components "^3.2.3"
 
-canner-layouts@1.5.0-canary.47, canner-layouts@^1.5.0-canary.47:
-  version "1.5.0-canary.47"
-  resolved "https://registry.yarnpkg.com/canner-layouts/-/canner-layouts-1.5.0-canary.47.tgz#f41fc1410cf63b0ffc6ed58707f6b5c24a0be7e5"
+canner-layouts@1.5.0-canary.55:
+  version "1.5.0-canary.55"
+  resolved "https://registry.yarnpkg.com/canner-layouts/-/canner-layouts-1.5.0-canary.55.tgz#e1c8ea249eac03997903b5c6221aa274accd8030"
   dependencies:
-    canner-helpers "1.5.0-canary.47"
+    canner-helpers "1.5.0-canary.55"
 
-canner-ref-id@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/canner-ref-id/-/canner-ref-id-0.1.2.tgz#9c534d517818e915cef1004116012458bd165d83"
+canner-ref-id@1.5.0-canary.55:
+  version "1.5.0-canary.55"
+  resolved "https://registry.yarnpkg.com/canner-ref-id/-/canner-ref-id-1.5.0-canary.55.tgz#e86a85811d3f115717d008315d94c25d7a1c1cc3"
 
-canner-schema-loader@^1.5.0-canary.47:
-  version "1.5.0-y.0"
-  resolved "https://registry.yarnpkg.com/canner-schema-loader/-/canner-schema-loader-1.5.0-y.0.tgz#f6f59afb676863f16c0cc822ad2b7c00908f239e"
+canner-schema-loader@1.5.0-canary.55:
+  version "1.5.0-canary.55"
+  resolved "https://registry.yarnpkg.com/canner-schema-loader/-/canner-schema-loader-1.5.0-canary.55.tgz#c348255ed8dda2971a3107f12229aea7444f2c90"
   dependencies:
     babel-generator "^6.26.1"
     babel-template "^6.26.0"
@@ -3665,9 +3637,9 @@ canner-schema-loader@^1.5.0-canary.47:
     loader-utils "^1.1.0"
     object-path "^0.11.4"
 
-canner-script@^1.5.0-canary.47:
-  version "1.5.0-canary.47"
-  resolved "https://registry.yarnpkg.com/canner-script/-/canner-script-1.5.0-canary.47.tgz#fbbe3bc732bcc71a67899c4992ee804f3c8816fb"
+canner-script@1.5.0-canary.55:
+  version "1.5.0-canary.55"
+  resolved "https://registry.yarnpkg.com/canner-script/-/canner-script-1.5.0-canary.55.tgz#c83e8e22ccd51f796f3c096b7a471d8178a508f3"
   dependencies:
     eval "^0.1.2"
     object-path "^0.11.4"
@@ -3717,25 +3689,25 @@ canner-slate-editor@^1.5.4:
     slate-trailing-block "^0.5.0"
     styled-components "^3.2.3"
 
-canner-storage@^1.5.0-canary.47:
+canner-storage@1.5.0-canary.47:
   version "1.5.0-canary.47"
   resolved "https://registry.yarnpkg.com/canner-storage/-/canner-storage-1.5.0-canary.47.tgz#a395b904c39c4d27983e86145d4977ce665411ac"
   dependencies:
     axios "^0.18.0"
     promise-polyfill "^8.1.0"
 
-canner@^1.5.0-canary.47:
-  version "1.5.0-canary.47"
-  resolved "https://registry.yarnpkg.com/canner/-/canner-1.5.0-canary.47.tgz#8091782d1b81b47198b6f6676b3402facf98c81a"
+canner@1.5.0-canary.55:
+  version "1.5.0-canary.55"
+  resolved "https://registry.yarnpkg.com/canner/-/canner-1.5.0-canary.55.tgz#56168fa0e5f961009d2f15f23b5d6b9318fdefab"
   dependencies:
     ajv "^6.5.2"
     apollo-boost "^0.1.4"
     bson-objectid "^1.2.2"
-    canner-compiler "1.5.0-canary.47"
-    canner-graphql-interface "1.5.0-canary.47"
-    canner-helpers "1.5.0-canary.47"
-    canner-layouts "1.5.0-canary.47"
-    canner-ref-id "^0.1.2"
+    canner-compiler "1.5.0-canary.55"
+    canner-graphql-interface "1.5.0-canary.55"
+    canner-helpers "1.5.0-canary.55"
+    canner-layouts "1.5.0-canary.55"
+    canner-ref-id "1.5.0-canary.55"
     graphql-tag "^2.9.1"
     immer "^1.3.0"
     immutable "^3.8.2"

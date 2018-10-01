@@ -364,6 +364,9 @@ export const resetPassword = async (root, args, context: Context) => {
  */
 
 export const typeResolvers = {
+  federated: (parent, args, context: Context) => {
+    return !isUndefined(parent.federationLink);
+  },
   isAdmin: async (parent, args, context: Context) => {
     const userId = parent.id;
     // admin is determined by user's role

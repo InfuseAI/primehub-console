@@ -14,6 +14,7 @@ type User {
   sendEmail: Boolean
   createdTimestamp: Float
   personalDiskQuota: Int
+  federated: Boolean
   groups: [Group]
 }
 
@@ -63,6 +64,7 @@ input UserCreateInput {
   sendEmail: Boolean
   createdTimestamp: Float
   personalDiskQuota: Int
+  federated: Boolean
   groups: GroupCreateManyInput
 }
 
@@ -77,6 +79,7 @@ input UserUpdateInput {
   sendEmail: Boolean
   createdTimestamp: Float
   personalDiskQuota: Int
+  federated: Boolean
   groups: GroupUpdateManyInput
 }
 
