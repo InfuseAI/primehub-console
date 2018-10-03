@@ -16,7 +16,8 @@ export const mapping = (item: Item<InstanceTypeSpec>) => {
     cpuRequest: item.spec['requests.cpu'] || 0,
     gpuLimit: item.spec['limits.nvidia.com/gpu'] || 0,
     memoryLimit: item.spec['limits.memory'] ? parseMemory(item.spec['limits.memory']) : null,
-    memoryRequest: item.spec['requests.memory'] ? parseMemory(item.spec['requests.memory']) : null
+    memoryRequest: item.spec['requests.memory'] ? parseMemory(item.spec['requests.memory']) : null,
+    spec: item.spec
   };
 };
 

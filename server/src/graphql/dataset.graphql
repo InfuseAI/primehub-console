@@ -11,6 +11,7 @@ type Dataset {
   url: String
   variables: JSON
   volumeName: String
+  spec: JSON
   groups: [Group]
 }
 

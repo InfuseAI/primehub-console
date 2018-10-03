@@ -12,6 +12,7 @@ type InstanceType {
   cpuRequest: Float
   memoryRequest: Int
   global: Boolean
+  spec: JSON
   groups: [Group]
 }
 

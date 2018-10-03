@@ -3,6 +3,7 @@ import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
 import { cleanupImages } from './sandbox';
+import { pick } from 'lodash';
 
 chai.use(chaiHttp);
 
@@ -16,6 +17,7 @@ const fields = `
   description
   url
   global
+  spec
   groups {
     id
     name
@@ -69,6 +71,7 @@ describe('image graphql', function() {
       description: null,
       url: null,
       global: false,
+      spec: {},
       groups: []
     });
 
@@ -87,6 +90,7 @@ describe('image graphql', function() {
       description: null,
       url: null,
       global: false,
+      spec: {},
       groups: []
     });
     this.currentImage = queryOne.image;
@@ -110,6 +114,7 @@ describe('image graphql', function() {
     expect(mutation.createImage).to.be.eql({
       id: data.name,
       groups: [],
+      spec: pick(data, ['displayName', 'description', 'url']),
       ...data
     });
 
@@ -124,6 +129,7 @@ describe('image graphql', function() {
     expect(queryOne.image).to.be.eql({
       id: data.name,
       groups: [],
+      spec: pick(data, ['displayName', 'description', 'url']),
       ...data
     });
   });
@@ -146,6 +152,7 @@ describe('image graphql', function() {
     expect(mutation.createImage).to.be.eql({
       id: data.name,
       groups: [],
+      spec: pick(data, ['displayName', 'description', 'url']),
       ...data
     });
 
@@ -160,6 +167,7 @@ describe('image graphql', function() {
     expect(queryOne.image).to.be.eql({
       id: data.name,
       groups: [],
+      spec: pick(data, ['displayName', 'description', 'url']),
       ...data
     });
   });
