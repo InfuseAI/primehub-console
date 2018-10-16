@@ -8,13 +8,13 @@ type Group {
   id: ID!
   name: String!
   displayName: String
-  cpuQuota: Float
-  gpuQuota: Int
-  memoryQuota: Float
-  diskQuota: Int
-  projectCpuQuota: Float
-  projectGpuQuota: Int
-  projectMemoryQuota: Float
+  quotaCpu: Float
+  quotaGpu: Int
+  quotaMemory: Float
+  quotaDisk: Int
+  projectQuotaCpu: Float
+  projectQuotaGpu: Int
+  projectQuotaMemory: Float
   users: [User]
   instanceTypes: [InstanceType]
   images: [Image]
@@ -52,26 +52,26 @@ input GroupWhereInput {
 input GroupCreateInput {
   name: String!
   displayName: String
-  cpuQuota: Float
-  gpuQuota: Int
-  memoryQuota: Float
-  diskQuota: Int
-  projectCpuQuota: Float
-  projectGpuQuota: Int
-  projectMemoryQuota: Float
+  quotaCpu: Float
+  quotaGpu: Int
+  quotaMemory: Float
+  quotaDisk: Int
+  projectQuotaCpu: Float
+  projectQuotaGpu: Int
+  projectQuotaMemory: Float
   users: UserCreateManyInput
 }
 
 input GroupUpdateInput {
   name: String
   displayName: String
-  cpuQuota: Float
-  gpuQuota: Int
-  memoryQuota: Float
-  diskQuota: Int
-  projectCpuQuota: Float
-  projectGpuQuota: Int
-  projectMemoryQuota: Float
+  quotaCpu: Float
+  quotaGpu: Int
+  quotaMemory: Float
+  quotaDisk: Int
+  projectQuotaCpu: Float
+  projectQuotaGpu: Int
+  projectQuotaMemory: Float
   users: UserUpdateManyInput
 }
 

@@ -24,9 +24,9 @@ const userFields = `
     id
     name
     displayName
-    cpuQuota
-    gpuQuota
-    diskQuota
+    quotaCpu
+    quotaGpu
+    quotaDisk
   }`;
 
 // interface

@@ -28,9 +28,9 @@ const fields = `
     id
     name
     displayName
-    cpuQuota
-    gpuQuota
-    diskQuota
+    quotaCpu
+    quotaGpu
+    quotaDisk
   }`;
 
 declare module 'mocha' {
