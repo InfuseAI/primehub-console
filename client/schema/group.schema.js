@@ -16,13 +16,13 @@ export default () => (
         title: '${displayName}',
         dataIndex: 'displayName'
       }, {
-        title: '${cpuQuota}',
+        title: '${cpuQuotaListTitle}',
         dataIndex: 'quotaCpu',
         render: text => {
           return text === null ? '∞' : text;
         }
       }, {
-        title: '${gpuQuota}',
+        title: '${gpuQuotaListTitle}',
         dataIndex: 'quotaGpu',
         render: text => {
           return text === null ? '∞' : text;
