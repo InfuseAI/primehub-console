@@ -24,6 +24,7 @@ export default class Input extends PureComponent {
 
     return (
       <InputNumber
+        style={{width: 'auto'}}
         disabled={disabled}
         min={uiParams && uiParams.min}
         max={uiParams && uiParams.max}
