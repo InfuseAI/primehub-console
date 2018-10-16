@@ -64,16 +64,7 @@ export default class ArrayBreadcrumb extends Component {
       columns = []
     } = uiParams;
 
-    // push update button and delete button
-    const newColumns = columns.map(column => {
-      const matched = column.title.match(/^\$\{(.*)\}$/);
-      const title = matched ? intl.formatMessage({
-        id: matched[1],
-        defaultMessage: column.title
-      }) : column.title;
-      return {...column, title};
-    });
-    const newColumnsRender = renderValue(newColumns, items.items);
+    const newColumnsRender = renderValue(columns, items.items);
 
     newColumnsRender.push({
       title: intl.formatMessage({ id: "array.table.actions" }),

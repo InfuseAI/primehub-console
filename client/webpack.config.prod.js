@@ -110,7 +110,11 @@ module.exports = {
             }
           }
         ]
-      }
+      },
+      {
+        test: /\.less$/,
+        loader: 'ignore-loader'
+      },
     ]
   }
 };

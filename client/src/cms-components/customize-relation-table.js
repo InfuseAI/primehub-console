@@ -59,15 +59,7 @@ export default class RelationTable extends PureComponent {
       fetch, fetchRelation, updateQuery, subscribe, intl,
       schema, Toolbar, relationValue, goTo, rootValue, title
     } = this.props;
-    const newColumns = uiParams.columns.map(column => {
-      const matched = column.title.match(/^\$\{(.*)\}$/);
-      const title = matched ? intl.formatMessage({
-        id: matched[1],
-        defaultMessage: column.title
-      }) : column.title;
-      return {...column, title};
-    });
-    const newColumnsRender = renderValue(newColumns, schema[relation.to].items.items);
+    const newColumnsRender = renderValue(uiParams.columns, schema[relation.to].items.items);
     const recordValue = getRecordValue(rootValue, refId);
     // hack
     const isHidden = uiParams.isHidden ? uiParams.isHidden(recordValue) : false;

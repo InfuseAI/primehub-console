@@ -103,6 +103,12 @@ module.exports = {
         }]
       },
       {
+        test: /\.less$/,
+        use: [{
+          loader: 'ignore-loader'
+        }]
+      },
+      {
         test: /\.(png|jpg|gif|svg)$/,
         use: [
           {

@@ -1,5 +1,6 @@
 /** @jsx builder */
 import builder, {Default, Tabs, Layout, configure, Block, Condition} from 'canner-script';
+import {Tag} from 'antd';
 import RelationTable from '../src/cms-components/customize-relation-table';
 import {SendEmailTitle, ResetPasswordTitle} from './utils';
 import Tab from '../src/cms-layouts/tab';
@@ -171,15 +172,24 @@ export default () => (
             }, {
               title: '${displayName}',
               dataIndex: 'displayName'
-            }, {
-              title: '${canUseGPU}',
-              dataIndex: 'canUseGpu'
+            }, , {
+              title: '${cpuQuota}',
+              dataIndex: 'quotaCpu',
+              render: text => {
+                return text === null ? React.createElement(Tag, {}, 'unlimited') : text;
+              }
             }, {
               title: '${gpuQuota}',
-              dataIndex: 'gpuQuota'
+              dataIndex: 'quotaGpu',
+              render: text => {
+                return text === null ? React.createElement(Tag, {}, 'unlimited') : text;
+              }
             }, {
-              title: '${diskQuota}',
-              dataIndex: 'diskQuota'
+              title: '${quotaDisk}',
+              dataIndex: 'quotaDisk',
+              render: text => {
+                return text === null ? React.createElement(Tag, {}, 'unlimited') : text;
+              }
             }]
           }}
         >

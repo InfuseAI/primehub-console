@@ -1,7 +1,7 @@
 import React from 'react';
 import firebase from 'firebase';
 import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlClient';
-import {ImgurStorage} from 'canner-storage';
+import {ImgurStorage} from '@canner/storage';
 import {FormattedMessage} from 'react-intl';
 
 exports.graphqlClient = new GraphqlClient({
@@ -74,8 +74,10 @@ exports.dict = {
     cpuLimit: 'CPU Limit',
     cpuQuota: 'CPU Quota',
     gpuQuota: 'GPU Quota',
+    quotaMemory: 'Memory Quota',
+    groupQuota: 'Group Quota',
     projectGpuQuota: 'Project GPU Quota',
-    diskQuota: 'Disk Quota',
+    quotaDisk: 'Disk Quota',
     // instance type
     instanceTypes: 'Instance Types',
     memoryLimit: 'Memory Limit',
@@ -214,8 +216,10 @@ exports.dict = {
     cpuLimit: 'CPU Limit',
     cpuQuota: 'CPU Quota',
     gpuQuota: 'GPU Quota',
+    groupQuota: 'Group Quota',
+    quotaMemory: 'Memory Quota',
     projectGpuQuota: 'Project GPU Quota',
-    diskQuota: 'Disk Quota',
+    quotaDisk: 'Disk Quota',
     // instance type
     instanceTypes: 'Instance Types',
     memoryLimit: 'Memory Limit',

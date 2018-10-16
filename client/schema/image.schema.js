@@ -1,6 +1,7 @@
 /** @jsx builder */
 import builder, {Condition} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
+import {Tag} from 'antd';
 
 export default () => (
   <array keyName="image"
@@ -56,14 +57,23 @@ export default () => (
             title: '${displayName}',
             dataIndex: 'displayName'
           }, {
-            title: '${canUseGpu}',
-            dataIndex: 'canUseGpu'
+            title: '${cpuQuota}',
+            dataIndex: 'quotaCpu',
+            render: text => {
+              return text === null ? React.createElement(Tag, {}, 'unlimited') : text;
+            }
           }, {
             title: '${gpuQuota}',
-            dataIndex: 'gpuQuota'
+            dataIndex: 'quotaGpu',
+            render: text => {
+              return text === null ? React.createElement(Tag, {}, 'unlimited') : text;
+            }
           }, {
-            title: '${diskQuota}',
-            dataIndex: 'diskQuota'
+            title: '${quotaDisk}',
+            dataIndex: 'quotaDisk',
+            render: text => {
+              return text === null ? React.createElement(Tag, {}, 'unlimited') : text;
+            }
           }]
         }}
       >
