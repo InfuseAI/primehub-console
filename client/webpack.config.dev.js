@@ -2,6 +2,7 @@ const path = require('path');
 const {externals} = require('./webpack.settings');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const tsImportPluginFactory = require('ts-import-plugin');
 // const AntDesignThemePlugin = require('antd-theme-webpack-plugin');
 // const options = {
 //   antDir: path.join(__dirname, './node_modules/antd'),
@@ -33,6 +34,7 @@ module.exports = {
     extensions: ['.js', '.ts', '.tsx'],
     alias: {
       'styled-components': path.resolve(__dirname, 'node_modules', 'styled-components'),
+      'antd': path.resolve(__dirname, 'node_modules', 'antd'),
       styledShare: path.resolve(__dirname, 'src/styled_share'),
       utils: path.resolve(__dirname, 'src/utils'),
       images: path.resolve(__dirname, 'src/images'),
@@ -57,7 +59,13 @@ module.exports = {
           transpileOnly: true,
           compilerOptions: {
             module: 'es2015'
-          }
+          },
+          getCustomTransformers: () => ({
+            before: [tsImportPluginFactory({
+              libraryName: 'antd',
+              style: true,
+            })]
+          }),
         }
       },
       {
@@ -90,6 +98,12 @@ module.exports = {
                 require('@babel/preset-react'),
                 require('@babel/preset-stage-0'),
               ],
+              plugins: [[
+                "import", {
+                  libraryName: 'antd',
+                  style: true
+                }
+              ]]
             },
           },
         ],
@@ -104,9 +118,7 @@ module.exports = {
       },
       {
         test: /\.less$/,
-        use: [{
-          loader: 'ignore-loader'
-        }]
+        loader: 'ignore-loader'
       },
       {
         test: /\.(png|jpg|gif|svg)$/,

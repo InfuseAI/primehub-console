@@ -80,7 +80,6 @@ exports.dict = {
     projectMemQuota: 'Group Mem Quota',
     quotaMemory: 'Memory Quota',
     groupQuota: 'Group Quota',
-    projectGpuQuota: 'Project GPU Quota',
     quotaDisk: 'Disk Quota',
     // instance type
     instanceTypes: 'Instance Types',

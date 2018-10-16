@@ -19,37 +19,25 @@ export default () => (
         title: '${cpuQuota}',
         dataIndex: 'quotaCpu',
         render: text => {
-          return text === null ? React.createElement(Tag, {}, '∞') : text;
+          return text === null ? '∞' : text;
         }
       }, {
         title: '${gpuQuota}',
         dataIndex: 'quotaGpu',
         render: text => {
-          return text === null ? React.createElement(Tag, {}, '∞') : text;
-        }
-      }, {
-        title: '${memQuota}',
-        dataIndex: 'quotaMemory',
-        render: text => {
-          return text === null ? React.createElement(Tag, {}, '∞') : `${text} G`;
+          return text === null ? '∞' : text;
         }
       }, {
         title: '${projectCpuQuota}',
         dataIndex: 'projectQuotaCpu',
         render: text => {
-          return text === null ? React.createElement(Tag, {}, '∞') : text;
+          return text === null ? '∞' : text;
         }
       }, {
         title: '${projectGpuQuota}',
         dataIndex: 'projectQuotaGpu',
         render: text => {
-          return text === null ? React.createElement(Tag, {}, '∞') : text;
-        }
-      }, {
-        title: '${projectMemQuota}',
-        dataIndex: 'projectQuotaMemory',
-        render: text => {
-          return text === null ? React.createElement(Tag, {}, '∞') : `${text} G`;
+          return text === null ? '∞' : text;
         }
       }, {
         title: '${users}',

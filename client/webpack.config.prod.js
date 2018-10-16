@@ -4,6 +4,7 @@ const {externals, resolve} = require('./webpack.settings');
 // plugins
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const tsImportPluginFactory = require('ts-import-plugin');
 
 module.exports = {
   mode: 'production',
@@ -55,7 +56,13 @@ module.exports = {
           transpileOnly: true,
           compilerOptions: {
             module: 'es2015'
-          }
+          },
+          getCustomTransformers: () => ({
+            before: [tsImportPluginFactory({
+              libraryName: 'antd',
+              style: true,
+            })]
+          }),
         }
       },
       {
@@ -88,6 +95,12 @@ module.exports = {
                 require('@babel/preset-react'),
                 require('@babel/preset-stage-0'),
               ],
+              plugins: [[
+                "import", {
+                  libraryName: 'antd',
+                  style: true
+                }
+              ]]
             },
           },
         ],
