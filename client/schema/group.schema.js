@@ -85,7 +85,7 @@ export default () => (
         <Col sm={8} xs={24}>
           <number keyName="quotaDisk" title="${quotaDisk}"
             uiParams={{unit: ' GB', step: 1, min: 1, precision: 0}}
-            defaultValue={() => 1}
+            defaultValue={() => 20}
             packageName="../src/cms-components/customize-number-precision"
             nullable
           />
