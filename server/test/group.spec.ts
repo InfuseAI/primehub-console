@@ -13,13 +13,13 @@ const groupFields = `
   id
   name
   displayName
-  cpuQuota
-  gpuQuota
-  memoryQuota
-  diskQuota
-  projectCpuQuota
-  projectGpuQuota
-  projectMemoryQuota
+  quotaCpu
+  quotaGpu
+  quotaMemory
+  quotaDisk
+  projectQuotaGpu
+  projectQuotaCpu
+  projectQuotaMemory
   users {
     id
     username
@@ -74,13 +74,13 @@ describe('group graphql', function() {
       name: groupData.name,
       // displayName default to name
       displayName: null,
-      cpuQuota: null,
-      gpuQuota: null,
-      memoryQuota: null,
-      projectCpuQuota: null,
-      projectGpuQuota: null,
-      projectMemoryQuota: null,
-      diskQuota: 10,
+      quotaCpu: null,
+      quotaGpu: null,
+      quotaMemory: null,
+      projectQuotaGpu: null,
+      projectQuotaCpu: null,
+      projectQuotaMemory: null,
+      quotaDisk: 20,
       users: []
     });
     this.currentGroup = data.createGroup;
@@ -90,13 +90,13 @@ describe('group graphql', function() {
     const groupData = {
       name: faker.internet.userName().toLowerCase(),
       displayName: faker.internet.userName(),
-      cpuQuota: 10.5,
-      gpuQuota: 10,
-      memoryQuota: 1.5,
-      projectCpuQuota: 1.5,
-      projectGpuQuota: 10,
-      projectMemoryQuota: 0.5,
-      diskQuota: 20
+      quotaCpu: 10.5,
+      quotaGpu: 10,
+      quotaMemory: 1.5,
+      projectQuotaGpu: 10,
+      projectQuotaCpu: 1.5,
+      projectQuotaMemory: 0.5,
+      quotaDisk: 20
     };
     const data = await this.graphqlRequest(`
     mutation($data: GroupCreateInput!){
@@ -107,7 +107,7 @@ describe('group graphql', function() {
 
     expect(data.createGroup).to.be.deep.include(groupData);
 
-    // check diskQuota save as 20G in keycloak
+    // check quotaDisk save as 20G in keycloak
     const group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: data.createGroup.id});
     expect(group.attributes['quota-disk'][0]).to.be.equals('20G');
     expect(group.attributes['quota-cpu'][0]).to.be.equals('10.5');
@@ -214,10 +214,10 @@ describe('group graphql', function() {
     const updated = {
       name: faker.internet.userName().toLowerCase(),
       displayName: faker.internet.userName(),
-      cpuQuota: 20.5,
-      gpuQuota: 20,
-      projectGpuQuota: 10,
-      diskQuota: 30
+      quotaCpu: 20.5,
+      quotaGpu: 20,
+      projectQuotaGpu: 10,
+      quotaDisk: 30
     };
     await this.graphqlRequest(`
     mutation($where: GroupWhereUniqueInput!, $data: GroupUpdateInput!){
@@ -237,9 +237,10 @@ describe('group graphql', function() {
 
     expect(data.group).to.be.deep.include(updated);
 
-    // check diskQuota save as 30G in keycloak
+    // check quotaDisk save as 30G in keycloak
     const group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
     expect(group.attributes['quota-disk'][0]).to.be.equals('30G');
+    expect(group.attributes['quota-cpu'][0]).to.be.equals('20.5');
     expect(group.attributes['quota-gpu'][0]).to.be.equals('20');
     expect(group.attributes['project-quota-gpu'][0]).to.be.equals('10');
   });
@@ -252,13 +253,13 @@ describe('group graphql', function() {
       data: {
         name: faker.internet.userName().toLowerCase(),
         displayName: faker.internet.userName(),
-        cpuQuota: 10,
-        gpuQuota: 10,
-        memoryQuota: 1.5,
-        projectCpuQuota: null,
-        projectGpuQuota: 10,
-        projectMemoryQuota: null,
-        diskQuota: 20
+        quotaCpu: 10,
+        quotaGpu: 10,
+        quotaMemory: 1.5,
+        projectQuotaGpu: null,
+        projectQuotaCpu: 10,
+        projectQuotaMemory: null,
+        quotaDisk: 20
       }
     });
     const groupId = create.createGroup.id;
@@ -267,13 +268,13 @@ describe('group graphql', function() {
     const updated = {
       name: faker.internet.userName().toLowerCase(),
       displayName: faker.internet.userName(),
-      cpuQuota: 20,
-      gpuQuota: 20,
-      memoryQuota: null,
-      projectCpuQuota: 0.5,
-      projectGpuQuota: 10,
-      projectMemoryQuota: 5,
-      diskQuota: 30
+      quotaCpu: 20,
+      quotaGpu: 20,
+      quotaMemory: null,
+      projectQuotaGpu: 10,
+      projectQuotaCpu: 0.5,
+      projectQuotaMemory: 5,
+      quotaDisk: 30
     };
     await this.graphqlRequest(`
     mutation($where: GroupWhereUniqueInput!, $data: GroupUpdateInput!){
@@ -293,7 +294,7 @@ describe('group graphql', function() {
 
     expect(data.group).to.be.deep.include(updated);
 
-    // check diskQuota save as 30G in keycloak
+    // check quotaDisk save as 30G in keycloak
     let group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
     expect(group.attributes['quota-disk'][0]).to.be.equals('30G');
     expect(group.attributes['quota-cpu'][0]).to.be.equals('20');
@@ -305,10 +306,10 @@ describe('group graphql', function() {
 
     // update again
     const updatedAgain = {
-      cpuQuota: null,
-      memoryQuota: null,
-      gpuQuota: 2,
-      projectMemoryQuota: 0.5,
+      quotaCpu: null,
+      quotaMemory: null,
+      quotaGpu: 2,
+      projectQuotaMemory: 0.5,
     };
     await this.graphqlRequest(`
     mutation($where: GroupWhereUniqueInput!, $data: GroupUpdateInput!){
@@ -328,7 +329,7 @@ describe('group graphql', function() {
 
     expect(dataAgain.group).to.be.deep.include(updatedAgain);
 
-    // check diskQuota save as 30G in keycloak
+    // check quotaDisk save as 30G in keycloak
     group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
     expect(group.attributes['quota-disk'][0]).to.be.equals('30G');
     expect(group.attributes['quota-cpu']).to.be.undefined;
