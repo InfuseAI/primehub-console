@@ -92,19 +92,19 @@ export default () => (
             title: '${cpuQuota}',
             dataIndex: 'quotaCpu',
             render: text => {
-              return text === null ? React.createElement(Tag, {}, 'unlimited') : text;
+              return text === null ? React.createElement(Tag, {}, '∞') : text;
             }
           }, {
             title: '${gpuQuota}',
             dataIndex: 'quotaGpu',
             render: text => {
-              return text === null ? React.createElement(Tag, {}, 'unlimited') : text;
+              return text === null ? React.createElement(Tag, {}, '∞') : text;
             }
           }, {
             title: '${quotaDisk}',
             dataIndex: 'quotaDisk',
             render: text => {
-              return text === null ? React.createElement(Tag, {}, 'unlimited') : text;
+              return text === null ? React.createElement(Tag, {}, '∞') : text;
             }
           }]
         }}
