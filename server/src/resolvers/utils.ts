@@ -8,7 +8,8 @@ import {
   find,
   reduce,
   isArray,
-  mapValues
+  mapValues,
+  isNaN
 } from 'lodash';
 import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
 
@@ -157,9 +158,15 @@ export const mutateRelation = async ({
 };
 
 export const stringifyDiskQuota = (quota: number) => `${quota}G`;
-export const parseDiskQuota = (quotaWithUnit: string) => parseInt(quotaWithUnit.slice(0, -1), 10);
+export const parseDiskQuota = (quotaWithUnit: string) => {
+  const value = parseInt(quotaWithUnit.slice(0, -1), 10);
+  return isNaN(value) ? null : value;
+};
 export const stringifyMemory = (mem: number) => `${mem}G`;
-export const parseMemory = (memWithUnit: string) => parseInt(memWithUnit.slice(0, -1), 10);
+export const parseMemory = (memWithUnit: string) => {
+  const value = parseFloat(memWithUnit.slice(0, -1));
+  return isNaN(value) ? null : value;
+};
 
 export const mergeVariables = (originalVariables: any, newVariables: any) => {
   const mergedVariables = mapValues(originalVariables, (value, key) => {

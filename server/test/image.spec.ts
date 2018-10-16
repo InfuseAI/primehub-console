@@ -22,7 +22,6 @@ const fields = `
     id
     name
     displayName
-    canUseGpu
     cpuQuota
     gpuQuota
     diskQuota

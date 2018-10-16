@@ -64,7 +64,7 @@ describe('system graphql', function() {
         },
         smtp: {
           host: null,
-          port: null,
+          port: 25,
           fromDisplayName: null,
           from: null,
           replyToDisplayName: null,
@@ -137,7 +137,7 @@ describe('system graphql', function() {
         },
         smtp: {
           host: delta.smtp.host,
-          port: null,
+          port: 25,
           fromDisplayName: null,
           from: delta.smtp.from,
           replyToDisplayName: null,

@@ -1,6 +1,15 @@
 import KcAdminClient from 'keycloak-admin';
 import {
-  toRelay, getFromAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter, paginate, extractPagination
+  toRelay,
+  getFromAttr,
+  mutateRelation,
+  parseDiskQuota,
+  stringifyDiskQuota,
+  parseMemory,
+  stringifyMemory,
+  filter,
+  paginate,
+  extractPagination
 } from './utils';
 import CrdClient from '../crdClient/crdClientImpl';
 import { mapValues, find, pick, first } from 'lodash';
@@ -13,6 +22,29 @@ import { Attributes, FieldType } from './attr';
 import { keycloakMaxCount } from './constant';
 import { ApolloError } from 'apollo-server';
 
+// constants
+const groupAttrs = [
+  'displayName',
+  'cpuQuota',
+  'gpuQuota',
+  'memoryQuota',
+  'diskQuota',
+  'projectGpuQuota',
+  'projectCpuQuota',
+  'projectMemoryQuota'
+];
+
+const attrSchema = {
+  displayName: {type: FieldType.string},
+  cpuQuota: {type: FieldType.float, rename: 'quota-cpu'},
+  gpuQuota: {type: FieldType.integer, rename: 'quota-gpu'},
+  memoryQuota: {serialize: stringifyMemory, deserialize: parseMemory, rename: 'quota-memory'},
+  diskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota, rename: 'quota-disk'},
+  projectCpuQuota: {type: FieldType.float, rename: 'project-quota-cpu'},
+  projectGpuQuota: {type: FieldType.integer, rename: 'project-quota-gpu'},
+  projectMemoryQuota: {serialize: stringifyMemory, deserialize: parseMemory, rename: 'project-quota-memory'}
+};
+
 /**
  * Mutation
  */
@@ -24,15 +56,8 @@ export const create = async (root, args, context: Context) => {
   // displayName, canUseGpu, gpuQuota, diskQuota in attributes
   const payload = args.data;
   const attrs = new Attributes({
-    data: pick(payload, ['displayName', 'canUseGpu', 'gpuQuota', 'projectGpuQuota', 'cpuQuota', 'diskQuota']),
-    schema: {
-      displayName: {type: FieldType.string},
-      canUseGpu: {type: FieldType.boolean},
-      cpuQuota: {type: FieldType.float},
-      gpuQuota: {type: FieldType.integer, rename: 'quota-gpu'},
-      projectGpuQuota: {type: FieldType.integer, rename: 'project-quota-gpu'},
-      diskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
-    }
+    data: pick(payload, groupAttrs),
+    schema: attrSchema
   });
   try {
     await kcAdminClient.groups.create({
@@ -86,17 +111,9 @@ export const update = async (root, args, context: Context) => {
   // displayName, canUseGpu, gpuQuota, diskQuota in attributes
   const attrs = new Attributes({
     keycloakAttr: group.attributes,
-    schema: {
-      displayName: {type: FieldType.string},
-      canUseGpu: {type: FieldType.boolean},
-      cpuQuota: {type: FieldType.float},
-      gpuQuota: {type: FieldType.integer, rename: 'quota-gpu'},
-      projectGpuQuota: {type: FieldType.integer, rename: 'project-quota-gpu'},
-      diskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
-    }
+    schema: attrSchema
   });
-  attrs.mergeWithData(pick(payload,
-    ['displayName', 'canUseGpu', 'gpuQuota', 'projectGpuQuota', 'cpuQuota', 'diskQuota']));
+  attrs.mergeWithData(pick(payload, groupAttrs));
 
   // update
   try {
@@ -195,20 +212,26 @@ export const queryOne = async (root, args, context: Context) => {
 };
 
 export const typeResolvers = {
-  canUseGpu: async (parent, args, context: Context) =>
-    getFromAttr('canUseGpu', parent.attributes, false, v => v === 'true'),
+  cpuQuota: async (parent, args, context: Context) =>
+    getFromAttr('quota-cpu', parent.attributes, null, parseFloat),
 
   gpuQuota: async (parent, args, context: Context) =>
-    getFromAttr('quota-gpu', parent.attributes, 0, parseInt),
+    getFromAttr('quota-gpu', parent.attributes, null, parseInt),
 
-  projectGpuQuota: async (parent, args, context: Context) =>
-    getFromAttr('project-quota-gpu', parent.attributes, 0, parseInt),
-
-  cpuQuota: async (parent, args, context: Context) =>
-    getFromAttr('cpuQuota', parent.attributes, 0, parseFloat),
+  memoryQuota: async (parent, args, context: Context) =>
+    getFromAttr('quota-memory', parent.attributes, null, parseMemory),
 
   diskQuota: async (parent, args, context: Context) =>
-    getFromAttr('diskQuota', parent.attributes, 10, parseDiskQuota),
+    getFromAttr('quota-disk', parent.attributes, 10, parseDiskQuota),
+
+  projectCpuQuota: async (parent, args, context: Context) =>
+    getFromAttr('project-quota-cpu', parent.attributes, null, parseFloat),
+
+  projectGpuQuota: async (parent, args, context: Context) =>
+    getFromAttr('project-quota-gpu', parent.attributes, null, parseInt),
+
+  projectMemoryQuota: async (parent, args, context: Context) =>
+    getFromAttr('project-quota-memory', parent.attributes, null, parseMemory),
 
   displayName: async (parent, args, context: Context) =>
     getFromAttr('displayName', parent.attributes, null),
