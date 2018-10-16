@@ -12,7 +12,8 @@ export const mapping = (item: Item<ImageSpec>) => {
     name: item.metadata.name,
     displayName: item.spec.displayName || item.metadata.name,
     description: item.spec.description,
-    url: item.spec.url
+    url: item.spec.url,
+    spec: item.spec
   };
 };
 

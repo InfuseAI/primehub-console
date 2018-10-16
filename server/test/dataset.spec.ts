@@ -4,6 +4,7 @@ import chaiHttp = require('chai-http');
 import faker from 'faker';
 import KeycloakAdminClient from 'keycloak-admin';
 import { cleanupDatasets } from './sandbox';
+import { pick } from 'lodash';
 
 chai.use(chaiHttp);
 
@@ -19,11 +20,11 @@ const fields = `
   type
   url
   variables
+  spec
   groups {
     id
     name
     displayName
-    canUseGpu
     cpuQuota
     gpuQuota
     diskQuota
@@ -76,6 +77,7 @@ describe('dataset graphql', function() {
       type: null,
       url: null,
       variables: null,
+      spec: {},
       groups: []
     });
 
@@ -96,6 +98,7 @@ describe('dataset graphql', function() {
       type: null,
       url: null,
       variables: null,
+      spec: {},
       groups: []
     });
     this.currentDataset = queryOne.dataset;
@@ -128,6 +131,7 @@ describe('dataset graphql', function() {
       id: data.name,
       groups: [],
       variables: null,
+      spec: pick(data, ['displayName', 'description', 'access', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
 
@@ -143,6 +147,7 @@ describe('dataset graphql', function() {
       id: data.name,
       groups: [],
       variables: null,
+      spec: pick(data, ['displayName', 'description', 'access', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
 
@@ -174,6 +179,7 @@ describe('dataset graphql', function() {
       id: data.name,
       groups: [],
       variables: null,
+      spec: pick(data, ['displayName', 'description', 'access', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
 
@@ -189,6 +195,7 @@ describe('dataset graphql', function() {
       id: data.name,
       groups: [],
       variables: null,
+      spec: pick(data, ['displayName', 'description', 'access', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
 
@@ -222,6 +229,7 @@ describe('dataset graphql', function() {
       id: data.name,
       url: null,
       groups: [],
+      spec: pick(data, ['displayName', 'description', 'access', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
     const dataset = mutation.createDataset;

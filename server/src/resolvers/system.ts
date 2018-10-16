@@ -45,7 +45,7 @@ export const querySmtp = async (root, args, context: Context) => {
   const smtpServer = foundRealm.smtpServer || {} as any;
   return {
     ...smtpServer,
-    port: smtpServer.port && parseInt(smtpServer.port, 10),
+    port: smtpServer.port && parseInt(smtpServer.port, 10) || 25,
     enableSSL: parseBooleanString(smtpServer.ssl),
     enableStartTLS: parseBooleanString(smtpServer.starttls),
     enableAuth: parseBooleanString(smtpServer.auth),

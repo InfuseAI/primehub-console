@@ -16,7 +16,8 @@ export const mapping = (item: Item<DatasetSpec>) => {
     type: item.spec.type,
     url: item.spec.url,
     variables: item.spec.variables,
-    volumeName: item.spec.volumeName
+    volumeName: item.spec.volumeName,
+    spec: item.spec
   };
 };
 

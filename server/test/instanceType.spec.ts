@@ -4,6 +4,8 @@ import chaiHttp = require('chai-http');
 import faker from 'faker';
 import CrdClient from '../src/crdClient/crdClientImpl';
 import { cleanupInstanceTypes } from './sandbox';
+import { pickBy, isUndefined } from 'lodash';
+import { stringifyMemory } from '../src/resolvers/utils';
 
 chai.use(chaiHttp);
 
@@ -21,11 +23,11 @@ const fields = `
   cpuRequest
   memoryRequest
   global
+  spec
   groups {
     id
     name
     displayName
-    canUseGpu
     cpuQuota
     gpuQuota
     diskQuota
@@ -39,6 +41,18 @@ declare module 'mocha' {
     currentInstanceType?: any;
   }
 }
+
+const pickSpec = (data: any) => {
+  return pickBy({
+    'displayName': data.displayName,
+    'description': data.description,
+    'limits.cpu': data.cpuLimit,
+    'limits.memory': data.memoryLimit ? stringifyMemory(data.memoryLimit) : undefined,
+    'limits.nvidia.com/gpu': data.gpuLimit,
+    'requests.cpu': data.cpuRequest,
+    'requests.memory': data.memoryRequest ? stringifyMemory(data.memoryRequest) : undefined
+  }, e => !isUndefined(e));
+};
 
 describe('instanceType graphql', function() {
   before(async () => {
@@ -80,6 +94,7 @@ describe('instanceType graphql', function() {
       cpuRequest: 0,
       memoryRequest: null,
       global: false,
+      spec: {},
       groups: []
     });
 
@@ -102,6 +117,7 @@ describe('instanceType graphql', function() {
       cpuRequest: 0,
       memoryRequest: null,
       global: false,
+      spec: {},
       groups: []
     });
     this.currentInstanceType = queryOne.instanceType;
@@ -128,6 +144,7 @@ describe('instanceType graphql', function() {
     expect(mutation.createInstanceType).to.deep.include({
       id: data.name,
       groups: [],
+      spec: pickSpec(data),
       ...data
     });
 
@@ -142,6 +159,7 @@ describe('instanceType graphql', function() {
     expect(queryOne.instanceType).to.deep.include({
       id: data.name,
       groups: [],
+      spec: pickSpec(data),
       ...data
     });
 
@@ -172,6 +190,7 @@ describe('instanceType graphql', function() {
     expect(mutation.createInstanceType).to.deep.include({
       id: data.name,
       groups: [],
+      spec: pickSpec(data),
       ...data
     });
 
@@ -186,6 +205,7 @@ describe('instanceType graphql', function() {
     expect(queryOne.instanceType).to.deep.include({
       id: data.name,
       groups: [],
+      spec: pickSpec(data),
       ...data
     });
 

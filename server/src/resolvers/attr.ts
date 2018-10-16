@@ -81,7 +81,6 @@ export class Attributes {
       result[fieldName] = [value];
       return result;
     }, {});
-
     return isEmpty(attrs) ? undefined : attrs;
   }
 
@@ -100,7 +99,7 @@ export class Attributes {
       const typeTransform = transforms[value.type];
       const customTransform = value.deserialize;
       const transform = customTransform || typeTransform || noop;
-      result[fieldName] = transform(keycloakAttr[fieldName][0]);
+      result[key] = transform(keycloakAttr[fieldName][0]);
       return result;
     }, {});
 
