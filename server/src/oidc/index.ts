@@ -122,6 +122,43 @@ export class OidcCtrl {
     }
   }
 
+  public setRefreshToken = async (ctx: Context) => {
+    const refreshToken = ctx.cookies.get('refreshToken', {signed: true});
+    if (!refreshToken) {
+      throw Boom.forbidden('require token');
+    }
+    const refreshTokenInst = new Token(refreshToken, this.clientId);
+    const backUrl = this.buildBackUrl(ctx.header.referer);
+    const redirectUrl = this.getLoginUrl(backUrl);
+
+    if (refreshTokenInst.isExpired()) {
+      return ctx.body = {redirectUrl};
+    }
+
+    // get refresh token
+    try {
+      const tokenSet = await this.oidcClient.refresh(refreshToken);
+      // set refreshToken, accessToken on cookie
+      ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true});
+      ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true});
+      const newToken = new Token(tokenSet.refresh_token, this.clientId);
+      return ctx.body = {redirectUrl, exp: parseInt(newToken.getContent().exp, 10)};
+    } catch (err) {
+      /**
+       * Possible errors
+       * invalid_grant for expiration
+       * invalid_grant (Session not active) => for user deleted
+       * invalid_scope (User or client no longer has role permissions for client key: realm-management)
+       *  => for remove user from admin
+       */
+      if (err.error === 'invalid_grant' || err.error === 'invalid_scope') {
+        return ctx.body = {redirectUrl};
+      }
+
+      throw err;
+    }
+  }
+
   public getLoginUrl = (backUrl?: string) => {
     let redirectUri = this.redirectUri;
     if (backUrl) {
@@ -190,5 +227,6 @@ export class OidcCtrl {
 
 export const mount = (rootRouter: Router, oidcCtrl: OidcCtrl) => {
   rootRouter.get(CALLBACK_PATH, oidcCtrl.callback);
+  rootRouter.post('/oidc/refresh-token', oidcCtrl.setRefreshToken);
   rootRouter.get('/oidc/logout', oidcCtrl.logout);
 };
