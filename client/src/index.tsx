@@ -57,7 +57,7 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       placement: 'bottomRight',
       duration: null,
       btn: (
-        <Button type="primary" onClick={() => window.location.replace(loginUrl)}>
+        <Button type="primary" onClick={() => window.location.replace('/oidc/logout')}>
           Login Again
         </Button>
       ),
