@@ -14,6 +14,7 @@ export class BackgroundTokenSyncer {
   }>;
   // if we can't extend expiration time, notify user
   private reLoginNotify: ({loginUrl}: {loginUrl: string}) => void;
+  private reloginNotifyCalled: boolean = false;
 
   constructor({
     interval,
@@ -59,12 +60,12 @@ export class BackgroundTokenSyncer {
     // not expired, but check if close
     // if close => exchange new refresh token
     const timeDiff = this.refreshTokenExp - nowInSecond;
-    if (timeDiff <= ONE_MINUTE) {
+    if (timeDiff <= ONE_MINUTE && !this.reloginNotifyCalled) {
       try {
         const newTokenResponse = await this.getNewRefreshToken();
         if (!newTokenResponse.exp) {
-          // if expire not set, require user to redirect
-          window.location.replace(newTokenResponse.redirectUrl);
+          // if expire not set, log user out
+          window.location.replace('/oidc/logout');
           return;
         }
   
@@ -72,11 +73,12 @@ export class BackgroundTokenSyncer {
         // if expired time doesn't get extend, notify user with re-login button
         if (this.refreshTokenExp >= newTokenResponse.exp) {
           this.reLoginNotify({loginUrl: newTokenResponse.redirectUrl});
-          return;
+          this.reloginNotifyCalled = true;
+        } else {
+          // successfully get longer exp token
+          this.refreshTokenExp = newTokenResponse.exp;
         }
   
-        // successfully get longer exp token
-        this.refreshTokenExp = newTokenResponse.exp;
         console.log(`use new refresh token with exp: ${this.refreshTokenExp}`);
       } catch (e) {
         console.log('refresh token request failed', e);
