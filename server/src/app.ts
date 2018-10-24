@@ -100,7 +100,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
     agent: {
       http: httpAgent,
       https: httpsAgent
-    }
+    },
+    retries: config.keycloakRetries,
+    timeout: config.keycloakTimeout,
   };
 
   // tslint:disable-next-line:max-line-length
