@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import { Table, Button, Modal, Icon } from "antd";
+import { Table, Button, Modal, Icon, notification } from "antd";
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl, intlShape } from "react-intl";
 import defaultMessage, {renderValue} from "@canner/antd-locales";
-import EmailForm from './customize-object-email_form';
+import EmailForm from '../cms-toolbar/sendEmailModal';
 
 const ButtonGroup = Button.Group;
 const confirm = Modal.confirm;
@@ -25,7 +25,26 @@ export default class ArrayBreadcrumb extends Component {
     selectedRowKeys: []
   }
 
-  onSelectChange = (selectedRowKeys) => {
+  onSelectChange = (record, selected) => {
+    let {selectedRowKeys} = this.state;
+    if (selected) {
+      selectedRowKeys.push(record.id);
+    } else {
+      selectedRowKeys = selectedRowKeys.filter(id => id !== record.id);
+    }
+    this.setState({selectedRowKeys});
+  }
+
+  onSelectAll = (selected, selectedRows, changeRows) => {
+    let {selectedRowKeys} = this.state;
+    const changeKeys = changeRows.map(row => row.id);
+    if (selected) {
+      changeKeys.forEach(id => {
+        selectedRowKeys.push(id);
+      });
+    } else {
+      selectedRowKeys = selectedRowKeys.filter(id => changeKeys.indexOf(id) === -1);
+    }
     this.setState({selectedRowKeys});
   }
 
@@ -54,9 +73,18 @@ export default class ArrayBreadcrumb extends Component {
   }
 
   openModal = () => {
-    this.setState({
-      emailFormVisible: true
-    });
+    const {selectedRowKeys} = this.state;
+    if (selectedRowKeys.length < 1) {
+      notification.info({
+        message: 'No Selected Users',
+        description: 'Please select one or more users to send emails.',
+        placement: 'bottomRight'
+      })
+    } else {
+      this.setState({
+        emailFormVisible: true
+      });
+    }
   }
 
   closeModal = () => {
@@ -95,7 +123,8 @@ export default class ArrayBreadcrumb extends Component {
 
     const rowSelection = {
       selectedRowKeys,
-      onChange: this.onSelectChange,
+      onSelect: this.onSelectChange,
+      onSelectAll: this.onSelectAll
     };
   
     let {
@@ -181,8 +210,12 @@ export default class ArrayBreadcrumb extends Component {
           onCancel={this.closeModal}
           visible={emailFormVisible}
           width={600}
+          title="Send Email Form"
+          destroyOnClose
         >
           <EmailForm
+            ids={selectedRowKeys}
+            closeModal={this.closeModal}
           />
         </Modal>
       </div>
