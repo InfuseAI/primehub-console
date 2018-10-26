@@ -64,7 +64,7 @@ configure({
       }
     }]
   }
-})
+});
 
 export default () => (
   <array keyName="user" title="${users}"

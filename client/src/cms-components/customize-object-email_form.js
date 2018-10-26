@@ -81,8 +81,8 @@ export default class EmailForm extends React.Component {
     const {loading} = this.state;
 
     const formItemLayout = {
-      labelCol: { span: 6 },
-      wrapperCol: { span: 14 },
+      labelCol: { xs: 24, sm: 6 },
+      wrapperCol: { xs: 24, sm: 14 },
     };
     return (
       <Mutation mutation={SEND_EMAIL} onCompleted={this.onCompleted} onError={this.onError}>
