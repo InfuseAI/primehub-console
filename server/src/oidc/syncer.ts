@@ -58,12 +58,14 @@ export default class TokenSyncer {
 
     // going to expire in safe duration
     // exchange token
+    console.log(`[TokenSyncer] token expired in a minute, start exchange`);
     const tokenSet = await this.oidcClient.refresh(this.refreshToken.toString());
     const newAccessToken = new Token(tokenSet.access_token, this.clientId);
     const newRefreshToken = new Token(tokenSet.refresh_token, this.clientId);
 
     // exp in refresh token not extended
     if (this.refreshToken.getContent().exp >= newRefreshToken.getContent().exp) {
+      console.log(`[TokenSyncer] refreshToken exp not extended, use clientCredential grant to get new one`);
       // use client_credentials grant to obtain new refresh token
       const clientCredTokenSet = await this.clientCredentialGrant();
       this.accessToken = new Token(clientCredTokenSet.access_token, this.clientId);
@@ -73,6 +75,7 @@ export default class TokenSyncer {
       this.refreshToken = newRefreshToken;
     }
 
+    console.log(`[TokenSyncer] successfully exchange, exp extended to ${this.accessToken.getContent().exp}`);
     this.scheduleNextSync();
   }
 
