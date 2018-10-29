@@ -3,6 +3,7 @@ import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
 import { cleaupAllCrd } from './sandbox';
+import BPromise from 'bluebird';
 
 chai.use(chaiHttp);
 

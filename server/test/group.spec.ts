@@ -3,6 +3,7 @@ import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
 import KeycloakAdminClient from 'keycloak-admin';
+import BPromise from 'bluebird';
 
 chai.use(chaiHttp);
 
@@ -45,7 +46,6 @@ declare module 'mocha' {
 }
 
 describe('group graphql', function() {
-  this.timeout(5000);
   before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;

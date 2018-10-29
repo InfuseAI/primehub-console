@@ -9,7 +9,51 @@ variables:
   IMAGE: admin-ui
 
 stages:
+  - test
   - build
+
+test:
+  image:
+    name: wwwy3y3/minikube-ci-node:8
+    # override the default command. so that gitlab-ci can run the shell
+    entrypoint: []
+  stage: test
+  only:
+    - master
+  before_script:
+    - date
+    # start minikube
+    - sudo bash ci/start.sh &
+  script:
+    # Wait for minikube ready
+    - >
+      JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}';
+      until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True";
+      do sleep 1;
+      done
+
+    # Init helm
+    - date
+    - kubectl get nodes
+    - kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default
+    - kubectl apply -f ci/helm-rbac.yaml
+    - helm init --service-account tiller --wait
+
+    # Helmfile install keycloak
+    - helmfile -f ci/helmfile.d -l app=keycloak charts
+    - >
+      until kubectl get pod keycloak-0 -o jsonpath="{.status.phase}" 2>&1 | grep -q "Running";
+      do sleep 1;
+      done
+
+    # Check endpoints
+    - date
+    - sudo bash ci/keycloak-endpoint.sh
+
+    # install and run test
+    - cd server && yarn && KC_API_BASEURL=http://id.mycrop.local/auth KC_OIDC_BASEURL=http://id.mycrop.local/auth npm run test
+  after_script:
+    - date
 
 build:
   stage: build

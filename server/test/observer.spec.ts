@@ -113,8 +113,10 @@ describe('observer', function() {
       realm: realmName,
       id: client.id
     });
+    const baseUrl = process.env.KC_OIDC_BASEURL || 'http://127.0.0.1:8080/auth';
+    const apiBaseUrl = process.env.KC_API_BASEURL || 'http://127.0.0.1:8080/auth';
     // tslint:disable-next-line:max-line-length
-    const issuer = await Issuer.discover(`http://127.0.0.1:8080/auth/realms/${realmName}/.well-known/openid-configuration`);
+    const issuer = await Issuer.discover(`${baseUrl}/realms/${realmName}/.well-known/openid-configuration`);
     const oidcClient = new issuer.Client({
       client_id: clientId,
       client_secret: clientSecret.value
@@ -123,7 +125,7 @@ describe('observer', function() {
 
     // assign to this scope
     this.kcAdminClientForObserver = new KcAdminClient({
-      baseUrl: 'http://127.0.0.1:8080/auth',
+      baseUrl: apiBaseUrl,
       realmName
     });
     this.oidcClient = oidcClient;
