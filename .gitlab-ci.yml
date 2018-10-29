@@ -51,7 +51,7 @@ test:
     - sudo bash ci/keycloak-endpoint.sh
 
     # install and run test
-    - cd server && yarn && KC_API_BASEURL=http://id.mycrop.local/auth KC_OIDC_BASEURL=http://id.mycrop.local/auth npm run test
+    - cd server && yarn && KC_MAX_SOCKETS=30 KC_API_BASEURL=http://id.mycrop.local/auth KC_OIDC_BASEURL=http://id.mycrop.local/auth npm run test
   after_script:
     - date
 
