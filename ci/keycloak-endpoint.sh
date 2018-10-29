@@ -9,7 +9,7 @@ chk_url() {
 }
 
 endpoints=(
-  http://id.mycrop.local
+  http://keycloak.local:8080
 )
 
 now=$SECONDS

@@ -36,6 +36,7 @@ describe('observer', function() {
   before(async () => {
     const realmName = process.env.KC_REALM;
     this.kcAdminClient = (global as any).kcAdminClient;
+    await (global as any).authKcAdmin();
     this.crdClient = (global as any).crdClient;
     this.graphqlRequest = (global as any).graphqlRequest;
 
@@ -241,7 +242,7 @@ describe('observer', function() {
 
     // start observer and wait
     this.observer.observe();
-    await BPromise.delay(1000);
+    await BPromise.delay(2000);
 
     // check if roles created on keycloak
     const roles = await this.kcAdminClientForObserver.roles.find();
@@ -262,7 +263,7 @@ describe('observer', function() {
   it('should detect add event', async () => {
     const datasets = [];
     this.observer.observe();
-    await BPromise.delay(1000);
+    await BPromise.delay(2000);
 
     // create some resources on k8s only
     datasets.push(await this.mockDataset());
@@ -279,7 +280,7 @@ describe('observer', function() {
     datasets.push(dataset);
 
     // check if roles created on keycloak
-    await BPromise.delay(1000);
+    await BPromise.delay(2000);
     const roles = await this.kcAdminClientForObserver.roles.find();
     datasets.forEach(e => {
       expect(roles.find(role => role.name === `ds:${e.name}`)).to.be.ok;
@@ -289,7 +290,7 @@ describe('observer', function() {
   it('should detect delete event', async () => {
     const datasets = [];
     this.observer.observe();
-    await BPromise.delay(1000);
+    await BPromise.delay(2000);
 
     // create some resources on k8s only
     datasets.push(await this.mockDataset());
@@ -316,7 +317,7 @@ describe('observer', function() {
     });
 
     // check roles not exist on keycloak
-    await BPromise.delay(1000);
+    await BPromise.delay(2000);
     const roles = await this.kcAdminClientForObserver.roles.find();
 
     datasets.forEach(e => {

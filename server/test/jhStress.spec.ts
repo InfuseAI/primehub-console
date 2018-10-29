@@ -41,8 +41,7 @@ declare module 'mocha' {
   }
 }
 
-describe('readonly graphql', function() {
-  this.timeout(100000);
+describe('jupyterHub stress test', function() {
   before(async () => {
     this.graphqlRequestWithAuth = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;
@@ -117,7 +116,7 @@ describe('readonly graphql', function() {
     }));
   });
 
-  it('should query ', async () => {
+  it('should query with shared-token', async () => {
     const query = jhQuery(this.currentUserId);
 
     // make it busy

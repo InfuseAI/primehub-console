@@ -13,6 +13,12 @@ stages:
   - build
 
 test:
+  services:
+    - name: jboss/keycloak
+      alias: keycloak.local
+  variables:
+    KEYCLOAK_USER: wwwy3y3
+    KEYCLOAK_PASSWORD: wwwy3y3
   image:
     name: wwwy3y3/minikube-ci-node:8
     # override the default command. so that gitlab-ci can run the shell
@@ -25,6 +31,10 @@ test:
     # start minikube
     - sudo bash ci/start.sh &
   script:
+     # Check keycloak endpoints
+    - date
+    - sudo bash ci/keycloak-endpoint.sh
+
     # Wait for minikube ready
     - >
       JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}';
@@ -40,18 +50,14 @@ test:
     - helm init --service-account tiller --wait
 
     # Helmfile install keycloak
-    - helmfile -f ci/helmfile.d -l app=keycloak charts
-    - >
-      until kubectl get pod keycloak-0 -o jsonpath="{.status.phase}" 2>&1 | grep -q "Running";
-      do sleep 1;
-      done
-
-    # Check endpoints
-    - date
-    - sudo bash ci/keycloak-endpoint.sh
+    # - helmfile -f ci/helmfile.d -l app=keycloak charts
+    # - >
+    #   until kubectl get pod keycloak-0 -o jsonpath="{.status.phase}" 2>&1 | grep -q "Running";
+    #   do sleep 1;
+    #   done
 
     # install and run test
-    - cd server && yarn && KC_MAX_SOCKETS=30 KC_API_BASEURL=http://id.mycrop.local/auth KC_OIDC_BASEURL=http://id.mycrop.local/auth npm run test
+    - cd server && yarn && KC_MAX_SOCKETS=30 KC_API_BASEURL=http://keycloak.local:8080/auth KC_OIDC_BASEURL=http://keycloak.local:8080/auth npm run test
   after_script:
     - date
 
