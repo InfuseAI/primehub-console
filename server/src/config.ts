@@ -38,6 +38,10 @@ export interface Config {
 
   // shared client secret key
   sharedGraphqlSecretKey?: string;
+
+  // keycloak
+  keycloakRetries: number;
+  keycloakTimeout: number;
 }
 
 const defaultConfigs = {
@@ -56,7 +60,9 @@ const defaultConfigs = {
   cookieSignedKey: 'cannerSignedCookie',
   cmsHost: 'http://localhost:3000',
   keycloakMaxSockets: 80,
-  keycloakMaxFreeSockets: 10
+  keycloakMaxFreeSockets: 10,
+  keycloakRetries: 0,
+  keycloakTimeout: 3000
 };
 
 const prodConfigs = {
@@ -82,7 +88,9 @@ export const createConfig = (): Config => {
     keycloakMaxSockets: process.env.KC_MAX_SOCKETS,
     keycloakMaxFreeSockets: process.env.KC_MAX_FREE_SOCKETS,
     rolePrefix: process.env.KC_ROLE_PREFIX,
-    sharedGraphqlSecretKey: process.env.SHARED_GRAPHQL_SECRET_KEY
+    sharedGraphqlSecretKey: process.env.SHARED_GRAPHQL_SECRET_KEY,
+    keycloakRetries: process.env.KC_OIDC_RETRIES,
+    keycloakTimeout: process.env.KC_OIDC_TIMEOUT
   });
 
   const env = process.env.NODE_ENV || 'development';

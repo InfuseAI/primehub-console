@@ -228,7 +228,6 @@ exports.dict = {
     projectGpuQuota: 'Group GPU Quota',
     projectMemQuota: 'Group Mem Quota',
     quotaMemory: 'Memory Quota',
-    projectGpuQuota: 'Project GPU Quota',
     quotaDisk: 'Disk Quota',
     // instance type
     instanceTypes: 'Instance Types',
@@ -323,6 +322,21 @@ exports.dict = {
     tokenUrl: 'TokenUrl',
     authorizationUrl: 'AuthorizationUrl',
     disableUserInfo: 'DisableUserInfo',
-    clientSecret: 'ClientSecret'
+    clientSecret: 'ClientSecret',
+
+    // smtp
+    smtpSettings: 'Smtp 設定',
+    'smtp.host': 'Smtp Host',
+    'smtp.port': 'Smtp Port',
+    'smtp.fromDisplayName': 'From Display Name',
+    'smtp.from': 'From',
+    'smtp.replyToDisplayName': 'Reply To Display Name',
+    'smtp.replyTo': 'Reply To',
+    'smtp.envelopeFrom': 'Envelope From',
+    'smtp.enableSSL': 'Enable SSL',
+    'smtp.enableStartTLS': 'Enable StartTLS',
+    'smtp.enableAuth': 'Enable Authentication',
+    'smtp.auth.username': 'Username',
+    'smtp.auth.password': 'Password'
   }
 }
