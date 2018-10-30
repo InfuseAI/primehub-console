@@ -72,6 +72,14 @@ export default class ArrayBreadcrumb extends Component {
     
   }
 
+  send = (index) => {
+    const {onChange, refId} = this.props;
+    onChange(refId.child(index).child('status'), 'update', 'published')
+      .then(() => {
+        deploy(refId.getPathArr()[0]);
+      });
+  }
+
   openModal = () => {
     const {selectedRowKeys} = this.state;
     if (selectedRowKeys.length < 1) {
@@ -100,7 +108,12 @@ export default class ArrayBreadcrumb extends Component {
       showPagination,
       items,
       intl,
-      keyName
+      keyName,
+      goTo,
+      reset,
+      deploy,
+      refId,
+      onChange
     } = this.props;
 
     const {
@@ -129,28 +142,58 @@ export default class ArrayBreadcrumb extends Component {
   
     let {
       createKeys,
-      columns = []
+      columns = [],
+      removeActions,
+      announcementCustomActions
     } = uiParams;
 
-    const newColumnsRender = renderValue(columns, items.items);
-
-    newColumnsRender.push({
-      title: intl.formatMessage({ id: "array.table.actions" }),
-      dataIndex: "__settings",
-      key: "__settings",
-      render: (text, record) => {
-        return (
-          <ButtonGroup>
-            <Button icon="edit"
-              onClick={() => this.edit(record.id)}
-            />
-            <Button icon="delete"
-              onClick={() => this.remove(record.__index)}
-            />
-          </ButtonGroup>
-        );
-      }
+    const newColumnsRender = renderValue(columns, items.items, {
+      refId,
+      deploy,
+      reset,
+      onChange,
+      goTo,
+      uiParams,
+      intl
     });
+    if (!removeActions) {
+      newColumnsRender.push({
+        title: intl.formatMessage({ id: "array.table.actions" }),
+        dataIndex: "__settings",
+        key: "__settings",
+        render: (text, record) => {
+          return (
+            <ButtonGroup>
+              <Button icon="edit"
+                onClick={() => this.edit(record.id)}
+              />
+              <Button icon="delete"
+                onClick={() => this.remove(record.__index)}
+              />
+            </ButtonGroup>
+          );
+        }
+      });
+    }
+    if (announcementCustomActions) {
+
+      newColumnsRender.push({
+        title: intl.formatMessage({ id: "array.table.actions" }),
+        dataIndex: 'status',
+        render: (status, record) => (
+          <React.Fragment>
+            <Button type="primary" onClick={() => this.send(record.__index)} disabled={record.status === 'published'}>
+              <Icon type="notification" theme="filled" style={{color: 'white'}} />
+              Send
+            </Button>
+            <Button.Group style={{marginLeft: 8, marginTop: 8}}>
+              <Button icon="edit" onClick={() => this.edit(record.id)}></Button>
+              <Button icon="delete" onClick={() => this.remove(record.__index)}></Button>
+            </Button.Group>
+          </React.Fragment>
+        )
+      })
+    }
 
     return (
       <div>

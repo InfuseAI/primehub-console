@@ -3,6 +3,7 @@ import firebase from 'firebase';
 import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlClient';
 import {ImgurStorage} from '@canner/storage';
 import {FormattedMessage} from 'react-intl';
+import {Tag, Button, Icon} from 'antd';
 
 exports.graphqlClient = new GraphqlClient({
   uri: "/graphql",
@@ -19,9 +20,63 @@ exports.renderRelationField = function(text, record) {
   </span>
 }
 
-exports.renderContent = function(context) {
-  return <div className=".ql-editor" dangerouslySetInnerHTML={content.html}>
+exports.renderContent = function(content) {
+  return <div className=".ql-editor" dangerouslySetInnerHTML={content ? content.html : '<p></p>'}>
   </div>;
+}
+exports.renderStatus = function(status) {
+  if (status === 'published') {
+    return <Tag color="green">Published</Tag>
+  } else {
+    // draft
+    return <Tag color="orange">Draft</Tag>;
+  }
+}
+
+exports.renderActions = function(text, record, cannerProps) {
+  const {refId, onChange, deploy, goTo, intl} = cannerProps;
+  const {id, __index} = record;
+  const key = refId.getPathArr()[0];
+
+  function send() {
+    console.log(record);
+    console.log(refId.child(__index).child('status'));
+    onChange(refId.child(__index).child('status'), 'update', 'published')
+      .then(() => {
+        deploy(key);
+      });
+  }
+
+  function edit() {
+    goTo({
+      pathname: `/${key}/${id}`
+    })
+  }
+
+  function goToDelete() {
+    confirm({
+      title: intl.formatMessage({id: "array.table.delete.confirm"}),
+      okType: 'danger',
+      onOk() {
+        onChange(refId.child(__index), 'delete').then(() => {
+          deploy(key);
+        });
+      }
+    });
+  }
+
+  return (
+    <React.Fragment>
+      <Button type="primary" onClick={send} disabled={record.status === 'published'}>
+        <Icon type="notification" theme="filled" style={{color: 'white'}} />
+        Send
+      </Button>
+      <Button.Group style={{marginLeft: 8}}>
+        <Button icon="edit" onClick={edit}></Button>
+        <Button icon="delete" onClick={goToDelete}></Button>
+      </Button.Group>
+    </React.Fragment>
+  )
 }
 
 exports.SendEmailTitle = <FormattedMessage
@@ -205,6 +260,7 @@ exports.dict = {
     'anno.global': 'Global',
     'anno.sendEmail': 'Send Email',
     'anno.status': 'Status',
+    'anno.actions': 'Actions',
     'anno.sendEmailMessage': 'Also send announcement via email.'
   },
   zh: {
@@ -360,6 +416,7 @@ exports.dict = {
     'anno.global': 'Global',
     'anno.sendEmail': 'Send Email',
     'anno.status': 'Status',
+    'anno.actions': 'Actions',
     'anno.sendEmailMessage': 'Also send announcement via email.'
   }
 }

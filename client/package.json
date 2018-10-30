@@ -96,7 +96,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@canner/antd-components": "^0.5.3",
+    "@canner/antd-components": "^0.5.8",
     "@canner/container": "^2.0.0",
     "@canner/history-router": "^2.0.0",
     "@canner/storage": "2.0.0",
