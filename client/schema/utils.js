@@ -19,6 +19,11 @@ exports.renderRelationField = function(text, record) {
   </span>
 }
 
+exports.renderContent = function(context) {
+  return <div className=".ql-editor" dangerouslySetInnerHTML={content.html}>
+  </div>;
+}
+
 exports.SendEmailTitle = <FormattedMessage
   id="sendEmail"
   defaultMessage="Send Email"

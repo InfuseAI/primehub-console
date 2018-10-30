@@ -9,6 +9,7 @@ import ResetPassword from '../src/cms-components/customize-object-password_form'
 import SendEmail from '../src/cms-components/customize-object-email_form';
 import Layouts from 'canner-layouts';
 import Filter from '../src/cms-toolbar/filter';
+import {GroupRelation} from './utils.schema';
 
 configure({
   visitorManager: {
@@ -159,52 +160,7 @@ export default () => (
           validation={{min: 1}}
           packageName="../src/cms-components/customize-number-precision"
         />
-        <relation keyName="groups" title="${groups}"
-          packageName='../src/cms-components/customize-relation-table'
-          relation={{
-            to: 'group',
-            type: 'toMany'
-          }}
-          uiParams={{
-            columns: [{
-              title: '${name}',
-              dataIndex: 'name'
-            }, {
-              title: '${displayName}',
-              dataIndex: 'displayName'
-            }, , {
-              title: '${cpuQuota}',
-              dataIndex: 'quotaCpu',
-              render: text => {
-                return text === null ? '∞' : text;
-              }
-            }, {
-              title: '${gpuQuota}',
-              dataIndex: 'quotaGpu',
-              render: text => {
-                return text === null ? '∞' : text;
-              }
-            }, {
-              title: '${quotaDisk}',
-              dataIndex: 'quotaDisk',
-              render: text => {
-                return text === null ? '∞' : text;
-              }
-            }]
-          }}
-        >
-          <toolbar async>
-            <filter
-              component={Filter}
-              fields={[{
-                type: 'text',
-                label: '${name}',
-                key: 'name'
-              }]}
-            />
-            <pagination />
-          </toolbar>
-        </relation>
+        <GroupRelation />
       </Condition>
 
       <Condition match={(data, operator) => operator === 'create'} defaultMode="hidden">

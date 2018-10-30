@@ -2,6 +2,7 @@
 import builder, {Condition} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 import {Tag} from 'antd';
+import {GroupRelation} from './utils.schema';
 
 export default () => (
   <array keyName="image"
@@ -43,52 +44,7 @@ export default () => (
     <string keyName="url" ui="link" title="${url}"/>
     <boolean keyName="global" title="${global}" />
     <Condition match={data => !data.global}>
-      <relation keyName="groups" title="${groups}"
-        packageName='../src/cms-components/customize-relation-table'
-        relation={{
-          to: 'group',
-          type: 'toMany'
-        }}
-        uiParams={{
-          columns: [{
-            title: '${name}',
-            dataIndex: 'name'
-          }, {
-            title: '${displayName}',
-            dataIndex: 'displayName'
-          }, {
-            title: '${cpuQuota}',
-            dataIndex: 'quotaCpu',
-            render: text => {
-              return text === null ? '∞' : text;
-            }
-          }, {
-            title: '${gpuQuota}',
-            dataIndex: 'quotaGpu',
-            render: text => {
-              return text === null ? '∞' : text;
-            }
-          }, {
-            title: '${quotaDisk}',
-            dataIndex: 'quotaDisk',
-            render: text => {
-              return text === null ? '∞' : text;
-            }
-          }]
-        }}
-      >
-        <toolbar async>
-          <filter
-            component={Filter}
-            fields={[{
-              type: 'text',
-              label: '${name}',
-              key: 'name'
-            }]}
-          />
-          <pagination />
-        </toolbar>
-      </relation>
+      <GroupRelation />
     </Condition>
   </array>
 )
