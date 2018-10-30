@@ -12,12 +12,7 @@ interface Props {
 }
 
 const Wrapper = styled.div`
-  box-shadow: 1px 1px 1px 1px #ccc;
-  margin-bottom: 24px;
   width: 100%;
-  .ant-tabs-bar {
-    margin-bottom: 0;
-  }
 `
 
 type State = {

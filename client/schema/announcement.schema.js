@@ -19,7 +19,7 @@ export default () => (
       columns: [{
         title: '${anno.content}',
         dataIndex: 'content',
-        width: '250px',
+        width: 160,
         render: renderContent
       }, {
         title: '${anno.expiryDate}',

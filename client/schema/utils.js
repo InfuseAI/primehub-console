@@ -21,21 +21,21 @@ exports.renderRelationField = function(text, record) {
 }
 
 exports.renderContent = function(content) {
-  var html = content ? content.html : '<p></p>';
+  var html = content ? content.html : '<p>-</p>';
   var div = document.createElement("div");
   div.innerHTML = html;
   var text = div.textContent || div.innerText || "";
   return (
     <div
       style={{
-        width: 250,
+        width: 160,
         height: 30,
         whiteSpace: 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden'
       }}
     >
-      {text}
+      {text || '-'}
     </div>
   );
 }
