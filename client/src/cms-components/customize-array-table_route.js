@@ -134,11 +134,11 @@ export default class ArrayBreadcrumb extends Component {
       />
     );
 
-    const rowSelection = {
+    const rowSelection = keyName === "user" ? {
       selectedRowKeys,
       onSelect: this.onSelectChange,
       onSelectAll: this.onSelectAll
-    };
+    } : undefined;
   
     let {
       createKeys,

@@ -2,8 +2,10 @@
 import builder, {Condition, Block, Row, Col} from 'canner-script';
 import {Tag} from 'antd';
 import Filter from '../src/cms-toolbar/filter';
+import TabsFilter from '../src/cms-toolbar/tabsFilter.tsx';
 import {renderContent, renderStatus, renderActions} from './utils';
 import {GroupRelation} from './utils.schema';
+import moment from 'moment';
 
 export default () => (
   <array keyName="announcement" title="${announcement}"
@@ -17,7 +19,8 @@ export default () => (
       columns: [{
         title: '${anno.content}',
         dataIndex: 'content',
-        // render: renderContent
+        width: '250px',
+        render: renderContent
       }, {
         title: '${anno.expiryDate}',
         dataIndex: 'expiryDate'
@@ -35,6 +38,7 @@ export default () => (
     }}
   >
      <toolbar async>
+      <filter component={TabsFilter}/>
       <pagination />
     </toolbar>
     <object
@@ -48,6 +52,7 @@ export default () => (
     />
     <dateTime
       keyName="expiryDate"
+      defaultValue={() => moment().toISOString()}
       title="${anno.expiryDate}" packageName="../src/cms-components/customize-string-date.tsx"
       uiParams={{
         minuteStep: 30

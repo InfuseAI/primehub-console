@@ -21,8 +21,23 @@ exports.renderRelationField = function(text, record) {
 }
 
 exports.renderContent = function(content) {
-  return <div className=".ql-editor" dangerouslySetInnerHTML={content ? content.html : '<p></p>'}>
-  </div>;
+  var html = content ? content.html : '<p></p>';
+  var div = document.createElement("div");
+  div.innerHTML = html;
+  var text = div.textContent || div.innerText || "";
+  return (
+    <div
+      style={{
+        width: 250,
+        height: 30,
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden'
+      }}
+    >
+      {text}
+    </div>
+  );
 }
 exports.renderStatus = function(status) {
   if (status === 'published') {
