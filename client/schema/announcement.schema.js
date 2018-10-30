@@ -46,5 +46,6 @@ export default () => (
     <dateTime keyName="expiryDate" title="${expiryDate}" />
     <boolean keyName="global" title="${global}" />
     <GroupRelation />
+    <boolean keyName="sendEmail" title="${sendEmail}" packageName="../src/cms-components/customize-boolean-send_email.js" />
   </array>
 )
