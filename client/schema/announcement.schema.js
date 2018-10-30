@@ -43,9 +43,9 @@ export default () => (
       <pagination />
     </toolbar>
     <object keyName="content" title="Content" ui="editor" />
-    <dateTime keyName="expiryDate" title="${expiryDate}" />
+    <dateTime keyName="expiryDate" title="${expiryDate}" packageName="../src/cms-components/customize-string-date.tsx"/>
     <boolean keyName="global" title="${global}" />
     <GroupRelation />
-    <boolean keyName="sendEmail" title="${sendEmail}" packageName="../src/cms-components/customize-boolean-send_email.js" />
+    <boolean keyName="sendEmail" title="${sendEmail}" packageName="../src/cms-components/customize-boolean-send_email.tsx" />
   </array>
 )
