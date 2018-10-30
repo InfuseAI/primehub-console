@@ -14,28 +14,21 @@ export default () => (
       disableDelete: true,
       updateKeys: [],
       columns: [{
-        title: '${content}',
+        title: '${anno.content}',
         dataIndex: 'content',
         render: renderContent
       }, {
-        title: '${expiryDate}',
+        title: '${anno.expiryDate}',
         dataIndex: 'expiryDate'
       }, {
-        title: '${global}',
+        title: '${anno.global}',
         dataIndex: 'global'
       }, {
-        title: '${sendEmail}',
+        title: '${anno.sendEmail}',
         dataIndex: 'sendEmail'
       }, {
-        title: '${status}',
-        dataIndex: 'status',
-        render: text => 
-      }, {
-        title: '${projectGpuQuota}',
-        dataIndex: 'projectQuotaGpu',
-        render: text => {
-          return text === null ? '∞' : text;
-        }
+        title: '${anno.status}',
+        dataIndex: 'status'
       }]
     }}
   >
@@ -43,9 +36,9 @@ export default () => (
       <pagination />
     </toolbar>
     <object keyName="content" title="Content" ui="editor" />
-    <dateTime keyName="expiryDate" title="${expiryDate}" packageName="../src/cms-components/customize-string-date.tsx"/>
-    <boolean keyName="global" title="${global}" />
+    <dateTime keyName="expiryDate" title="${anno.expiryDate}" packageName="../src/cms-components/customize-string-date.tsx"/>
+    <boolean keyName="global" title="${anno.global}" />
     <GroupRelation />
-    <boolean keyName="sendEmail" title="${sendEmail}" packageName="../src/cms-components/customize-boolean-send_email.tsx" />
+    <boolean keyName="sendEmail" title="${anno.sendEmail}" packageName="../src/cms-components/customize-boolean-send_email.tsx" />
   </array>
 )

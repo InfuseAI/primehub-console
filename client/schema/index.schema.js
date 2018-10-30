@@ -8,6 +8,8 @@ import Group from './group.schema';
 import InstanceType from './instanceType.schema';
 import Image from './image.schema';
 import Dataset from './dataset.schema';
+import Announcement from './announcement.schema';
+
 import {dict, graphqlClient, imageStorage} from './utils';
 
 export default (
@@ -19,6 +21,7 @@ export default (
     <Group/>
     <InstanceType/>
     <Image/>
-    <Dataset/>  
+    <Dataset/>
+    <Announcement />
   </root>
 )

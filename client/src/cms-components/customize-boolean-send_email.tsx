@@ -14,7 +14,7 @@ export default class SendEmail extends React.Component<Props> {
     return (
       <Checkbox onChange={this.onChange} checked={value}>
         <FormattedMessage
-          id="sendEmailMessage"
+          id="anno.sendEmailMessage"
           defaultMessage="Also send announcement via email."
         />
       </Checkbox>

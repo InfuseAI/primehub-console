@@ -196,7 +196,16 @@ exports.dict = {
     'smtp.enableStartTLS': 'Enable StartTLS',
     'smtp.enableAuth': 'Enable Authentication',
     'smtp.auth.username': 'Username',
-    'smtp.auth.password': 'Password'
+    'smtp.auth.password': 'Password',
+
+    // announcement
+    announcement: "Announcement",
+    'anno.content': 'Content',
+    'anno.expiryDate': 'Expiry Date',
+    'anno.global': 'Global',
+    'anno.sendEmail': 'Send Email',
+    'anno.status': 'Status',
+    'anno.sendEmailMessage': 'Also send announcement via email.'
   },
   zh: {
     // system
@@ -342,6 +351,15 @@ exports.dict = {
     'smtp.enableStartTLS': 'Enable StartTLS',
     'smtp.enableAuth': 'Enable Authentication',
     'smtp.auth.username': 'Username',
-    'smtp.auth.password': 'Password'
+    'smtp.auth.password': 'Password',
+
+    // announcement
+    announcement: "Announcement",
+    'anno.content': 'Content',
+    'anno.expiryDate': 'Expiry Date',
+    'anno.global': 'Global',
+    'anno.sendEmail': 'Send Email',
+    'anno.status': 'Status',
+    'anno.sendEmailMessage': 'Also send announcement via email.'
   }
 }
