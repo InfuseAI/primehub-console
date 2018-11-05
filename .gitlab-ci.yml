@@ -42,20 +42,6 @@ test:
       do sleep 1;
       done
 
-    # Init helm
-    - date
-    - kubectl get nodes
-    - kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default
-    - kubectl apply -f ci/helm-rbac.yaml
-    - helm init --service-account tiller --wait
-
-    # Helmfile install keycloak
-    # - helmfile -f ci/helmfile.d -l app=keycloak charts
-    # - >
-    #   until kubectl get pod keycloak-0 -o jsonpath="{.status.phase}" 2>&1 | grep -q "Running";
-    #   do sleep 1;
-    #   done
-
     # install and run test
     - cd server && yarn && KC_MAX_SOCKETS=30 KC_API_BASEURL=http://keycloak.local:8080/auth KC_OIDC_BASEURL=http://keycloak.local:8080/auth npm run test
   after_script:
