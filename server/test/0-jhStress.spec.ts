@@ -4,6 +4,7 @@ import chaiHttp = require('chai-http');
 import faker from 'faker';
 import KeycloakAdminClient from 'keycloak-admin';
 import { range } from 'lodash';
+import { cleaupAllCrd } from './sandbox';
 
 chai.use(chaiHttp);
 
@@ -114,6 +115,10 @@ describe('jupyterHub stress test', function() {
     await Promise.all(range(10).map(async () => {
       await createGroupWithCrd(this.currentUserId);
     }));
+  });
+
+  after(async () => {
+    await cleaupAllCrd();
   });
 
   it('should query with shared-token', async () => {
