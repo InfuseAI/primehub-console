@@ -56,7 +56,7 @@ describe('group graphql', function() {
     const data = await this.graphqlRequest(`{
       groups {${groupFields}}
     }`);
-    expect(data.groups).to.be.eql([]);
+    expect(data.groups.length).to.be.least(0);
   });
 
   it('should add a group with only name', async () => {
