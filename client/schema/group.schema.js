@@ -52,6 +52,7 @@ export default () => (
         fields={[{
           type: 'text',
           label: '${name}',
+          placeholder: '{name}',
           key: 'name'
         }]}
       />
