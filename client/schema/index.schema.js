@@ -26,12 +26,11 @@ const schema = (
     {/* <Announcement /> */}
   </root>
 )
-console.log(schema);
 if (process.env.NODE_ENV === 'production') {
   schema.graphqlClient = graphqlClient;
 } else {
   schema.connector = new LocalStorageConnector({
-    defaultData: createFakeData(schema.schema, 10)
+    defaultData: createFakeData(schema.schema, 265)
   })
 }
 
