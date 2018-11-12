@@ -9,11 +9,12 @@ import InstanceType from './instanceType.schema';
 import Image from './image.schema';
 import Dataset from './dataset.schema';
 import Announcement from './announcement.schema';
-
+import {LocalStorageConnector} from 'canner-graphql-interface';
+import {createFakeData} from 'canner-helpers';
 import {dict, graphqlClient, imageStorage} from './utils';
 
-export default (
-  <root imageStorage={imageStorage} dict={dict} graphqlClient={process.env.NODE_ENV === 'production' ? graphqlClient : undefined}>
+const schema = (
+  <root imageStorage={imageStorage} dict={dict}>
     <System/>
     {/* <Idp/> */}
     {/* <UserFederation/> */}
@@ -25,3 +26,13 @@ export default (
     {/* <Announcement /> */}
   </root>
 )
+console.log(schema);
+if (process.env.NODE_ENV === 'production') {
+  schema.graphqlClient = graphqlClient;
+} else {
+  schema.connector = new LocalStorageConnector({
+    defaultData: createFakeData(schema.schema, 10)
+  })
+}
+
+export default schema

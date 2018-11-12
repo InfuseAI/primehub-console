@@ -23,6 +23,22 @@ export default () => (
         dataIndex: 'description'
       }]
     }}
+    graphql={
+      `query($imageAfter: String, $imageBefore: String, $imageLast: Int, $imageFirst: Int,$imageWhere: ImageWhereInput) {
+        image: imagesConnection(after: $imageAfter, before: $imageBefore, last: $imageLast, first: $imageFirst,where: $imageWhere) {
+          edges {
+            cursor
+            node {
+              id name displayName description
+            }
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+          }
+        }
+      }`
+    }
   >
     <toolbar async>
       <pagination />

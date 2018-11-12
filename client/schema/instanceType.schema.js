@@ -33,6 +33,28 @@ export default () => (
         render: text => `${text} GB`
       }]
     }}
+    graphql={`
+      query($instanceTypeAfter: String, $instanceTypeBefore: String, $instanceTypeLast: Int, $instanceTypeFirst: Int,$instanceTypeWhere: InstanceTypeWhereInput) {
+        instanceType: instanceTypesConnection(after: $instanceTypeAfter, before: $instanceTypeBefore, last: $instanceTypeLast, first: $instanceTypeFirst,where: $instanceTypeWhere) {
+          edges {
+            cursor
+            node {
+              id
+              name
+              displayName
+              description
+              cpuLimit
+              memoryLimit
+              gpuLimit
+            }
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+          }
+        }
+      }
+    `}
   >
     <toolbar async>
       <pagination />

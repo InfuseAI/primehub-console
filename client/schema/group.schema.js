@@ -39,12 +39,36 @@ export default () => (
         render: text => {
           return text === null ? '∞' : text;
         }
-      }, {
-        title: '${users}',
-        dataIndex: 'users',
-        render: renderRelationField
-      }]
+      },
+      // {
+      //   title: '${users}',
+      //   dataIndex: 'users',
+      //   render: renderRelationField
+      // }
+    ]
     }}
+    graphql={`
+      query($groupAfter: String, $groupBefore: String, $groupLast: Int, $groupFirst: Int,$groupWhere: GroupWhereInput) {
+        group: groupsConnection(after: $groupAfter, before: $groupBefore, last: $groupLast, first: $groupFirst,where: $groupWhere) {
+          edges {
+            cursor
+            node {
+              id
+              name
+              displayName
+              quotaCpu
+              quotaGpu
+              projectQuotaCpu
+              projectQuotaGpu
+            }
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+          }
+        }
+      }
+    `}
   >
      <toolbar async>
       <filter
