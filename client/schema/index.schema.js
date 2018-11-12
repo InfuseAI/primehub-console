@@ -22,6 +22,6 @@ export default (
     <InstanceType/>
     <Image/>
     <Dataset/>
-    <Announcement />
+    {/* <Announcement /> */}
   </root>
 )
