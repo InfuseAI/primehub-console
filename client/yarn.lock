@@ -10105,6 +10105,12 @@ react-spinners@^0.2.6:
     react-emotion "^8.0.6"
     recompose "0.26.0"
 
+react-timezone@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/react-timezone/-/react-timezone-2.1.0.tgz#4e730ad5da4f74d832031effdc4cb75f88a5badd"
+  dependencies:
+    prop-types "^15.6.1"
+
 react-window-detect-dimensions@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/react-window-detect-dimensions/-/react-window-detect-dimensions-0.2.0.tgz#ab5bb7f4b6e68813ef1c89598236f0d12cd3df51"
