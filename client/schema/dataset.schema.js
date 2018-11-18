@@ -1,6 +1,7 @@
 /** @jsx builder */
 import builder, {Default, Condition} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
+import {GroupRelation} from './utils.schema';
 
 export default () => (
   <array keyName="dataset" title="${dataset}"
@@ -96,43 +97,7 @@ export default () => (
       <string keyName="volumeName" title="${volumeName}"/>
     </Condition>
     <Condition match={data => data.access === 'group'}>
-      <relation keyName="groups" title="${groups}"
-        packageName='../src/cms-components/customize-relation-table'
-        relation={{
-          to: 'group',
-          type: 'toMany'
-        }}
-        uiParams={{
-          columns: [{
-            title: '${name}',
-            dataIndex: 'name'
-          }, {
-            title: '${displayName}',
-            dataIndex: 'displayName'
-          }, {
-            title: '${canUseGpu}',
-            dataIndex: 'canUseGpu'
-          }, {
-            title: '${gpuQuota}',
-            dataIndex: 'gpuQuota'
-          }, {
-            title: '${diskQuota}',
-            dataIndex: 'diskQuota'
-          }]
-        }}
-      >
-        <toolbar async>
-          <filter
-            component={Filter}
-            fields={[{
-              type: 'text',
-              label: '${name}',
-              key: 'name'
-            }]}
-          />
-          <pagination />
-        </toolbar>
-      </relation>
+      <GroupRelation />
     </Condition>
     </Default>
   </array>

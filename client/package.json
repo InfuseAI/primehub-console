@@ -96,7 +96,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@canner/antd-components": "^0.5.3",
+    "@canner/antd-components": "^0.5.8",
     "@canner/container": "^2.0.0",
     "@canner/history-router": "^2.0.0",
     "@canner/storage": "2.0.0",
@@ -112,6 +112,7 @@
     "isomorphic-fetch": "^2.2.1",
     "lodash.get": "^4.4.2",
     "lodash.isplainobject": "^4.0.6",
+    "react-dotdotdot": "^1.2.3",
     "react-router-dom": "^4.2.2",
     "styled-components": "^3.2.6",
     "typescript": "^2.8.3"

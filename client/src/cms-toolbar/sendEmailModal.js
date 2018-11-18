@@ -1,27 +1,22 @@
 import React from 'react';
-import {Select, Input, Button, Form, notification} from 'antd';
+import {Select, Input, Button, Form, notification, Alert} from 'antd';
 import {Item} from 'canner-helpers';
 import {get} from 'lodash';
 import gql from "graphql-tag";
 import { Mutation } from "react-apollo";
 import styled from 'styled-components';
-import Spin from './spin';
+import Spin from '../cms-components/spin';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-const SEND_EMAIL = gql`
-  mutation SendEmail($id: String, $resetActions: [String], $expiresIn: Int) {
-    sendEmail(id: $id, resetActions: $resetActions, expiresIn: $expiresIn) {
-      id
+const SEND_MULTI_EMAIL = gql`
+  mutation SendEmail($in: [String], $resetActions: [String], $expiresIn: Int) {
+    sendEmail(in: $in, resetActions: $resetActions, expiresIn: $expiresIn) {
+      status
     }
   }
 `
-const Title = styled.span`
-  font-size: 18px;
-  font-weight: 400;
-  color: rgba(0, 0, 0, 0.65);
-`;
 
 @Form.create()
 export default class EmailForm extends React.Component {
@@ -30,6 +25,7 @@ export default class EmailForm extends React.Component {
   };
 
   onCompleted = () => {
+    const {closeModal} = this.props;
     setTimeout(() => {
       notification.success({
         message: 'Send email successfully!',
@@ -38,10 +34,12 @@ export default class EmailForm extends React.Component {
       this.setState({
         loading: false
       });
+      closeModal();
     }, 700);
   }
 
   onError = (e) => {
+    const {closeModal} = this.props;
     console.log(e);
     setTimeout(() => {
       notification.error({
@@ -51,15 +49,12 @@ export default class EmailForm extends React.Component {
       this.setState({
         loading: false
       });
+      closeModal();
     }, 700);
   }
 
   onClick = (sendEmail) => {
-    const {rootValue, refId} = this.props;
-    const id = getIdFromRootValue({
-      rootValue,
-      refId
-    });
+    const {rootValue, refId, ids} = this.props;
 
     this.props.form.validateFields((err, values) => {
       if (!err) {
@@ -70,67 +65,70 @@ export default class EmailForm extends React.Component {
         sendEmail({variables: {
           resetActions: values.resetActions,
           expiresIn,
-          id
+          in: ids
         }})
       }
     });
   }
 
   render() {
-    const {form: {getFieldDecorator}} = this.props;
+    const {form: {getFieldDecorator}, ids = []} = this.props;
     const {loading} = this.state;
 
     const formItemLayout = {
-      labelCol: { xs: 24, sm: 6 },
-      wrapperCol: { xs: 24, sm: 14 },
+      labelCol: { xs: 24, sm: 8 },
+      wrapperCol: { xs: 24, sm: 16 },
     };
     return (
-      <Mutation mutation={SEND_EMAIL} onCompleted={this.onCompleted} onError={this.onError}>
+      <Mutation mutation={SEND_MULTI_EMAIL} onCompleted={this.onCompleted} onError={this.onError}>
         {(sendEmail) => (
           <Spin tip="Sending..." spinning={loading} delay={600}>
-            <Form>
-              <FormItem
-                label={<Title>Reset Actions</Title>}
-                {...formItemLayout}
-              >
-                {getFieldDecorator('resetActions', {
-                  rules: [{
-                    required: true, message: 'Please select an action.'
-                  }]
-                })(
-                  <Select
-                    mode="multiple"
-                  >
-                    <Option value="VERIFY_EMAIL">Verify Email</Option>
-                    <Option value="UPDATE_PROFILE">Update Profile</Option>
-                    <Option value="CONFIGURE_TOTP">Configure OTP</Option>
-                    <Option value="UPDATE_PASSWORD">Update Password</Option>
-                  </Select>
-                )}
-              </FormItem>
-              <FormItem
-                label={<Title>Expires In</Title>}
-                {...formItemLayout}
-              >
-                {getFieldDecorator('expiresIn', {
-                  rules: [],
-                  initialValue: {
-                    number: 0,
-                    unit: 'hours'
-                  }
-                })(
-                  <Expires />
-                )}
-              </FormItem>
-              <FormItem
-                label={<Title>Reset Actions Email</Title>}
-                {...formItemLayout}
-              >
-                <Button htmlType="button" onClick={() => this.onClick(sendEmail)}>
-                  Send Email
-                </Button>
-              </FormItem>
-            </Form>
+            <Alert message={<div>Selected <b>{ids.length}</b> users.</div>} type="info" style={{marginBottom: 16}} />
+            {ids.length && (
+              <Form>
+                <FormItem
+                  label="Reset Actions"
+                  {...formItemLayout}
+                >
+                  {getFieldDecorator('resetActions', {
+                    rules: [{
+                      required: true, message: 'Please select an action.'
+                    }]
+                  })(
+                    <Select
+                      mode="multiple"
+                    >
+                      <Option value="VERIFY_EMAIL">Verify Email</Option>
+                      <Option value="UPDATE_PROFILE">Update Profile</Option>
+                      <Option value="CONFIGURE_TOTP">Configure OTP</Option>
+                      <Option value="UPDATE_PASSWORD">Update Password</Option>
+                    </Select>
+                  )}
+                </FormItem>
+                <FormItem
+                  label="Expires In"
+                  {...formItemLayout}
+                >
+                  {getFieldDecorator('expiresIn', {
+                    rules: [],
+                    initialValue: {
+                      number: 0,
+                      unit: 'hours'
+                    }
+                  })(
+                    <Expires />
+                  )}
+                </FormItem>
+                <FormItem
+                  label="Reset Actions Email"
+                  {...formItemLayout}
+                >
+                  <Button htmlType="button" onClick={() => this.onClick(sendEmail)}>
+                    Send Email
+                  </Button>
+                </FormItem>
+              </Form>
+            )}
           </Spin>
         )}
       </Mutation>
