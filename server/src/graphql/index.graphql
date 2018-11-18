@@ -1,5 +1,5 @@
 # import System, SystemUpdateInput from "./system.graphql"
-# import User, UserConnection, UserWhereInput, UserWhereUniqueInput, UserCreateInput, UserUpdateInput, UserActionResponse from "./user.graphql"
+# import User, UsersOrderBy, UserMultiEmailResponse, UserConnection, UserWhereInput, UserWhereUniqueInput, UserCreateInput, UserUpdateInput, UserActionResponse from "./user.graphql"
 # import Group, GroupConnection, GroupWhereInput, GroupWhereUniqueInput, GroupCreateInput, GroupUpdateInput from "./group.graphql"
 # import InstanceType, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput, InstanceTypeCreateInput, InstanceTypeUpdateInput from "./instanceType.graphql"
 # import Image, ImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput from "./image.graphql"
@@ -19,6 +19,7 @@ type Query {
     after: String
     first: Int
     last: Int
+    userOrderBy: UsersOrderBy
   ): [User]!
   usersConnection(
     where: UserWhereInput
@@ -26,6 +27,7 @@ type Query {
     after: String
     first: Int
     last: Int
+    userOrderBy: UsersOrderBy
   ): UserConnection!
 
   """Group"""
@@ -108,6 +110,7 @@ type Mutation {
 
   """User mutation"""
   sendEmail(id: String, resetActions: [String], expiresIn: Int): UserActionResponse
+  sendMultiEmail(in: [String], resetActions: [String], expiresIn: Int): UserMultiEmailResponse
   resetPassword(id: String, password: String, temporary: Boolean): UserActionResponse
 
   """Group"""

@@ -11,8 +11,8 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 
 const SEND_MULTI_EMAIL = gql`
-  mutation SendEmail($in: [String], $resetActions: [String], $expiresIn: Int) {
-    sendEmail(in: $in, resetActions: $resetActions, expiresIn: $expiresIn) {
+  mutation SendMultiEmail($in: [String], $resetActions: [String], $expiresIn: Int) {
+    sendMultiEmail(in: $in, resetActions: $resetActions, expiresIn: $expiresIn) {
       status
     }
   }

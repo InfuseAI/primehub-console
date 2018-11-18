@@ -1,5 +1,5 @@
 import KcAdminClient from 'keycloak-admin';
-import { pick, omit, find, isUndefined, first, sortBy, get } from 'lodash';
+import { pick, omit, find, isUndefined, first, sortBy, get, every } from 'lodash';
 import {
   toRelay, toAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter, paginate, extractPagination
 } from './utils';
@@ -8,6 +8,7 @@ import { Attributes, FieldType } from './attr';
 import { Context } from './interface';
 import { ApolloError } from 'apollo-server';
 import { RequiredActionAlias } from 'keycloak-admin/lib/defs/requiredActionProviderRepresentation';
+import BPromise from 'bluebird';
 
 /**
  * utils
@@ -333,7 +334,11 @@ export const destroy = async (root, args, context: Context) => {
  */
 
 export const sendEmail = async (root, args, context: Context) => {
-  const {id, resetActions, expiresIn}: {id: string, resetActions: any[], expiresIn: number} = args;
+  const {id, in: userIds, resetActions, expiresIn}: {
+    id: string, in: string[], resetActions: any[], expiresIn: number
+  } = args;
+
+  // send to one
   const user = await context.kcAdminClient.users.findOne({id});
   if (!user.email) {
     throw new ApolloError('user email not defined', 'USER_EMAIL_NOT_EXIST');
@@ -344,6 +349,31 @@ export const sendEmail = async (root, args, context: Context) => {
     actions: resetActions
   });
   return {id};
+};
+
+export const sendMultiEmail = async (root, args, context: Context) => {
+  const {in: userIds, resetActions, expiresIn}: {
+    in: string[], resetActions: any[], expiresIn: number
+  } = args;
+
+  // send to multi users
+  const results = await BPromise.map(userIds, userId => {
+    return context.kcAdminClient.users.executeActionsEmail({
+      id: userId,
+      lifespan: expiresIn,
+      actions: resetActions
+    })
+    .then(() => ({userId, status: true}))
+    .catch(err => {
+      // tslint:disable-next-line:no-console
+      console.log(`fail to send email to ${userId}, errorMessage: ${get(err, 'response.data.errorMessage')}`);
+      return {userId, status: false};
+    });
+  });
+  const status = every(results, 'status');
+  return {
+    status
+  };
 };
 
 export const resetPassword = async (root, args, context: Context) => {

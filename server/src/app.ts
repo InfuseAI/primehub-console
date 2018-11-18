@@ -63,6 +63,7 @@ const resolvers = {
     updateUser: user.update,
     deleteUser: user.destroy,
     sendEmail: user.sendEmail,
+    sendMultiEmail: user.sendMultiEmail,
     resetPassword: user.resetPassword,
     createGroup: group.create,
     updateGroup: group.update,

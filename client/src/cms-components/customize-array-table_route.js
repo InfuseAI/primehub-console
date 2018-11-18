@@ -134,11 +134,11 @@ export default class ArrayBreadcrumb extends Component {
       />
     );
 
-    // const rowSelection = keyName === "user" ? {
-    //   selectedRowKeys,
-    //   onSelect: this.onSelectChange,
-    //   onSelectAll: this.onSelectAll
-    // } : undefined;
+    const rowSelection = keyName === "user" ? {
+      selectedRowKeys,
+      onSelect: this.onSelectChange,
+      onSelectAll: this.onSelectAll
+    } : undefined;
   
     let {
       createKeys,
@@ -205,21 +205,21 @@ export default class ArrayBreadcrumb extends Component {
           }}
         >
           {
-            // keyName === "user" && (
-            //   <Button
-            //     onClick={this.openModal}
-            //   >
-            //     <Icon
-            //       type="mail"
-            //       theme="outlined"
-            //       style={{
-            //         position: 'relative',
-            //         top: 1
-            //       }}
-            //     />
-            //     {sendEmailText}
-            //   </Button>
-            // )
+            keyName === "user" && (
+              <Button
+                onClick={this.openModal}
+              >
+                <Icon
+                  type="mail"
+                  theme="outlined"
+                  style={{
+                    position: 'relative',
+                    top: 1
+                  }}
+                />
+                {sendEmailText}
+              </Button>
+            )
           }
           {(!createKeys || createKeys.length > 0) && (
             <Button
@@ -245,7 +245,7 @@ export default class ArrayBreadcrumb extends Component {
           columns={newColumnsRender}
           style={{marginBottom: 32}}
           rowKey="id"
-          // rowSelection={rowSelection}
+          rowSelection={rowSelection}
         />
         <Modal
           closable

@@ -40,6 +40,10 @@ type UserActionResponse {
   id: String
 }
 
+type UserMultiEmailResponse {
+  status: Boolean
+}
+
 """Input"""
 
 input UserWhereUniqueInput {
@@ -94,4 +98,8 @@ input UserUpdateManyInput {
   connect: [UserWhereUniqueInput!]
   disconnect: [UserWhereUniqueInput!]
   delete: [UserWhereUniqueInput!]
+}
+
+input UsersOrderBy {
+  field: String
 }
