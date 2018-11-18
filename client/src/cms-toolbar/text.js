@@ -28,18 +28,17 @@ export default class TextFilter extends Component {
   }
 
   render() {
-    const {label, intl, search} = this.props;
-    const matched = label.match(/\$\{(.*)\}/);
-    const intlLabel = matched ? intl.formatMessage({
-      id: matched[1],
-      defaultMessage: label
-    }) : label;
+    const {label, intl, search, placeholder} = this.props;
+    const matched = placeholder && placeholder.match && placeholder.match(/{(.*)}/);
+    const intlPlaceholder = matched ? intl.formatMessage({
+      id: matched[1]
+    }) : placeholder;
     return (
       <FilterPlugin>
-        <Label>{intlLabel}</Label>
+        <Label>{label}</Label>
         <Input
           style={{width: '150px'}}
-          placeholder={intlLabel}
+          placeholder={intlPlaceholder}
           onChange={this.onInput}
           onPressEnter={search}
         />

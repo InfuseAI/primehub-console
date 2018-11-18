@@ -23,6 +23,28 @@ export default () => (
         dataIndex: 'description'
       }]
     }}
+    graphql={
+      `
+      query($datasetAfter: String, $datasetBefore: String, $datasetLast: Int, $datasetFirst: Int, $datasetWhere: DatasetWhereInput) {
+        dataset: datasetsConnection(after: $datasetAfter, before: $datasetBefore, last: $datasetLast, first: $datasetFirst,where: $datasetWhere) {
+          edges {
+            cursor
+            node {
+              id
+              name
+              displayName
+              description
+              type
+            }
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+          }
+        }
+      }
+      `
+    }
   >
     <toolbar async>
       <pagination />
