@@ -53,7 +53,7 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
     // notify with fixed card
     notification.warning({
       message: 'Warning',
-      description: 'In less than 1 minite, you\'re going to reach the max using time and redirected to keycloak in exchange of new authentication token.',
+      description: 'In less than 1 minute, you\'re going to be redirected to login page.',
       placement: 'bottomRight',
       duration: null,
       btn: (

@@ -35,6 +35,8 @@ input ImageWhereUniqueInput {
 
 input ImageWhereInput {
   id: ID
+  name_contains: String
+  displayName_contains: String
 }
 
 """Mutation input"""

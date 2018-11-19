@@ -38,6 +38,8 @@ input DatasetWhereUniqueInput {
 
 input DatasetWhereInput {
   id: ID
+  name_contains: String
+  displayName_contains: String
 }
 
 """Mutation input"""
