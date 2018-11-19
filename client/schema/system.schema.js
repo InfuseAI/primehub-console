@@ -1,5 +1,7 @@
 /** @jsx builder */
 import builder, {Block, Condition} from 'canner-script';
+import moment from 'moment';
+import 'moment-timezone';
 
 const emailValidator = (value, cb) => {
   if (value && !value.match(/(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
@@ -19,13 +21,25 @@ export default () => (
          validation={{min: 1}}
          packageName="../src/cms-components/customize-number-precision"
       />
+      <object
+        keyName="timezone"
+        title="${timezone}"
+        packageName="../src/cms-components/customize-object-timezone.tsx"
+        defaultValue={() => ({
+          name: moment.tz.guess(),
+          offset: -(new Date().getTimezoneOffset() / 60)
+        })}
+      >
+        <string keyName="name" />
+        <string keyName="offset" />
+      </object>
     </Block>
 
     <Block title="${smtpSettings}">
       <object keyName="smtp">
         <string keyName="host" title="${smtp.host}"/>
         <number keyName="port" title="${smtp.port}"
-          uiParams={{min: 1, step: 1, precision: 0}}
+          uiParams={{min: 1, step: 1, precision: 0, defaultValue: 1}}
           packageName="../src/cms-components/customize-number-precision"
         />
         <string keyName="fromDisplayName" title="${smtp.fromDisplayName}"/>

@@ -63,7 +63,6 @@ export default class TimeZone extends React.Component<Props> {
 
   render() {
     const {value, offset = 0} = this.props;
-    console.log(value)
     return (
       <Select
         showSearch
