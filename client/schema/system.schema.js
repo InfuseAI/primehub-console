@@ -31,7 +31,7 @@ export default () => (
         })}
       >
         <string keyName="name" />
-        <string keyName="offset" />
+        <number keyName="offset" />
       </object>
     </Block>
 
