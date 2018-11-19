@@ -21,7 +21,24 @@ export const mapping = (item: Item<DatasetSpec>) => {
   };
 };
 
-export const mutationMapping = (data: any) => {
+export const createMapping = (data: any) => {
+  return {
+    metadata: {
+      name: data.name
+    },
+    spec: {
+      displayName: data.displayName || data.name,
+      description: data.description,
+      access: data.access,
+      type: data.type,
+      url: data.url,
+      variables: data.variables,
+      volumeName: data.volumeName
+    }
+  };
+};
+
+export const updateMapping = (data: any) => {
   return {
     metadata: {
       name: data.name
@@ -138,7 +155,8 @@ export const crd = new Crd<DatasetSpec>({
   propMapping: mapping,
   prefixName: 'ds',
   resourceName: 'dataset',
-  mutationMapping,
+  createMapping,
+  updateMapping,
   onCreate,
   onUpdate,
   customUpdate

@@ -12,7 +12,8 @@ const config = createConfig();
 export class Crd<SpecType> {
   private customResourceMethod: string;
   private propMapping: (item: Item<SpecType>) => Record<string, any>;
-  private mutationMapping: (data: any) => any;
+  private createMapping: (data: any) => any;
+  private updateMapping: (data: any) => any;
   private resolveType?: Record<string, any>;
   private prefixName: string;
   private resourceName: string;
@@ -28,7 +29,8 @@ export class Crd<SpecType> {
   constructor({
     customResourceMethod,
     propMapping,
-    mutationMapping,
+    createMapping,
+    updateMapping,
     resolveType,
     prefixName,
     resourceName,
@@ -38,7 +40,8 @@ export class Crd<SpecType> {
   }: {
     customResourceMethod: string,
     propMapping: (item: Item<SpecType>) => Record<string, any>,
-    mutationMapping: (data: any) => any,
+    createMapping: (data: any) => any,
+    updateMapping: (data: any) => any,
     resolveType?: Record<string, any>,
     prefixName: string,
     resourceName: string,
@@ -52,7 +55,8 @@ export class Crd<SpecType> {
   }) {
     this.customResourceMethod = customResourceMethod;
     this.propMapping = propMapping;
-    this.mutationMapping = mutationMapping;
+    this.createMapping = createMapping;
+    this.updateMapping = updateMapping;
     this.resolveType = resolveType;
     this.prefixName = prefixName;
     this.resourceName = resourceName;
@@ -231,7 +235,7 @@ export class Crd<SpecType> {
     const role = await kcAdminClient.roles.findOneByName({name: roleName});
 
     // create crd on k8s
-    const {metadata, spec} = this.mutationMapping(args.data);
+    const {metadata, spec} = this.createMapping(args.data);
     const res = await customResource.create(metadata, spec);
     if (this.onCreate) {
       await this.onCreate({role, resource: res, data: args.data, context});
@@ -247,7 +251,7 @@ export class Crd<SpecType> {
     const role = await kcAdminClient.roles.findOneByName({name: roleName});
 
     // update crd on k8s
-    const {metadata, spec} = this.mutationMapping(args.data);
+    const {metadata, spec} = this.updateMapping(args.data);
     const res = (this.customUpdate) ?
     await this.customUpdate({
       name, metadata, spec, customResource

@@ -29,7 +29,24 @@ export const resolveType = {
   }
 };
 
-export const mutationMapping = (data: any) => {
+export const createMapping = (data: any) => {
+  return {
+    metadata: {
+      name: data.name
+    },
+    spec: {
+      'displayName': data.displayName || data.name,
+      'description': data.description,
+      'limits.cpu': data.cpuLimit,
+      'limits.memory': data.memoryLimit ? stringifyMemory(data.memoryLimit) : undefined,
+      'limits.nvidia.com/gpu': data.gpuLimit,
+      'requests.cpu': data.cpuRequest,
+      'requests.memory': data.memoryRequest ? stringifyMemory(data.memoryRequest) : undefined
+    }
+  };
+};
+
+export const updateMapping = (data: any) => {
   return {
     metadata: {
       name: data.name
@@ -135,7 +152,8 @@ export const crd = new Crd<InstanceTypeSpec>({
   resolveType,
   prefixName: 'it',
   resourceName: 'instanceType',
-  mutationMapping,
+  createMapping,
+  updateMapping,
   onCreate,
   onUpdate
 });

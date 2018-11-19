@@ -77,7 +77,9 @@ describe('dataset graphql', function() {
       type: null,
       url: null,
       variables: null,
-      spec: {},
+      spec: {
+        displayName: data.name,
+      },
       groups: []
     });
 
@@ -98,7 +100,9 @@ describe('dataset graphql', function() {
       type: null,
       url: null,
       variables: null,
-      spec: {},
+      spec: {
+        displayName: data.name,
+      },
       groups: []
     });
     this.currentDataset = queryOne.dataset;

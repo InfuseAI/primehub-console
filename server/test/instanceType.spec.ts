@@ -94,7 +94,9 @@ describe('instanceType graphql', function() {
       cpuRequest: 0,
       memoryRequest: null,
       global: false,
-      spec: {},
+      spec: {
+        displayName: data.name,
+      },
       groups: []
     });
 
@@ -117,7 +119,9 @@ describe('instanceType graphql', function() {
       cpuRequest: 0,
       memoryRequest: null,
       global: false,
-      spec: {},
+      spec: {
+        displayName: data.name,
+      },
       groups: []
     });
     this.currentInstanceType = queryOne.instanceType;

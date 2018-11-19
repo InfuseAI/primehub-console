@@ -70,7 +70,9 @@ describe('image graphql', function() {
       description: null,
       url: null,
       global: false,
-      spec: {},
+      spec: {
+        displayName: data.name,
+      },
       groups: []
     });
 
@@ -89,7 +91,9 @@ describe('image graphql', function() {
       description: null,
       url: null,
       global: false,
-      spec: {},
+      spec: {
+        displayName: data.name,
+      },
       groups: []
     });
     this.currentImage = queryOne.image;

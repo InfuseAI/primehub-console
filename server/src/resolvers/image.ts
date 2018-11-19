@@ -108,7 +108,20 @@ export const onUpdate = async (
   }
 };
 
-export const mutationMapping = (data: any) => {
+export const createMapping = (data: any) => {
+  return {
+    metadata: {
+      name: data.name
+    },
+    spec: {
+      displayName: data.displayName || data.name,
+      description: data.description,
+      url: data.url
+    }
+  };
+};
+
+export const updateMapping = (data: any) => {
   return {
     metadata: {
       name: data.name
@@ -127,7 +140,8 @@ export const crd = new Crd<ImageSpec>({
   resolveType,
   prefixName: 'img',
   resourceName: 'image',
-  mutationMapping,
+  createMapping,
+  updateMapping,
   onCreate,
   onUpdate
 });
