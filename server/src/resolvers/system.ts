@@ -69,8 +69,6 @@ export const update = async (root, args, context) => {
   const orgLogoSize = parseFromAttr('org.logo.size', attributes, parseInt);
   const orgLogoUrl = parseFromAttr('org.logo.url', attributes);
   const defaultUserDiskQuota = parseFromAttr('defaultUserDiskQuota', attributes, parseDiskQuota);
-  const tzName = parseFromAttr('timezone.name', attributes);
-  const tzOffset = parseFromAttr('timezone.offset', attributes);
 
   // merge with payload
   const payload = args.data;
@@ -91,8 +89,8 @@ export const update = async (root, args, context) => {
       logo: (logo) ? logo : undefined
     },
     defaultUserDiskQuota: payload.defaultUserDiskQuota || defaultUserDiskQuota,
-    timezone: (tzName && !isUndefined(tzOffset))
-      ? {name: tzName, offset: tzOffset}
+    timezone: (payload.timezone && payload.timezone.name && !isUndefined(payload.timezone.offset))
+      ? payload.timezone
       : undefined
   };
 
