@@ -1,5 +1,5 @@
 import { Context } from './interface';
-import { toRelay, paginate, extractPagination } from './utils';
+import { toRelay, paginate, extractPagination, filter } from './utils';
 import CustomResource, { Item } from '../crdClient/customResource';
 import pluralize from 'pluralize';
 import { isEmpty, omit, mapValues, find } from 'lodash';
@@ -166,9 +166,7 @@ export class Crd<SpecType> {
   private listQuery = async (customResource: CustomResource<SpecType>, where: any) => {
     const rows = await customResource.list();
     let mappedRows = rows.map(this.propMapping);
-    if (where && where.id) {
-      mappedRows = mappedRows.filter(row => row.id === where.id);
-    }
+    mappedRows = filter(mappedRows, where);
     return mappedRows;
   }
 
