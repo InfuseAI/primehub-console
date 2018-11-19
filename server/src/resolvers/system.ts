@@ -33,7 +33,13 @@ export const query = async (root, args, context: Context) => {
         url: get(fetchedData, 'org.logo.url')
       } : detaultSystemSettings.org.logo
     },
-    defaultUserDiskQuota: parseDiskQuota(fetchedData.defaultUserDiskQuota || detaultSystemSettings.defaultUserDiskQuota)
+    defaultUserDiskQuota:
+      parseDiskQuota(fetchedData.defaultUserDiskQuota || detaultSystemSettings.defaultUserDiskQuota),
+    timezone: {
+      name: get(fetchedData, 'timezone.name') || detaultSystemSettings.timezone.name,
+      offset:
+        parseInt(get(fetchedData, 'timezone.offset') || detaultSystemSettings.timezone.offset, 10)
+    }
   };
 };
 
@@ -63,6 +69,8 @@ export const update = async (root, args, context) => {
   const orgLogoSize = parseFromAttr('org.logo.size', attributes, parseInt);
   const orgLogoUrl = parseFromAttr('org.logo.url', attributes);
   const defaultUserDiskQuota = parseFromAttr('defaultUserDiskQuota', attributes, parseDiskQuota);
+  const tzName = parseFromAttr('timezone.name', attributes);
+  const tzOffset = parseFromAttr('timezone.offset', attributes);
 
   // merge with payload
   const payload = args.data;
@@ -82,7 +90,10 @@ export const update = async (root, args, context) => {
       name: get(payload, 'org.name') || orgName,
       logo: (logo) ? logo : undefined
     },
-    defaultUserDiskQuota: payload.defaultUserDiskQuota || defaultUserDiskQuota
+    defaultUserDiskQuota: payload.defaultUserDiskQuota || defaultUserDiskQuota,
+    timezone: (tzName && !isUndefined(tzOffset))
+      ? {name: tzName, offset: tzOffset}
+      : undefined
   };
 
   const savedToDB = {

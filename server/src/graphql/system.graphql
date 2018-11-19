@@ -5,6 +5,11 @@ type Org {
   logo: CannerImage
 }
 
+type Timezone {
+  name: String!
+  offset: Int!
+}
+
 type Smtp {
   host: String
   port: Int
@@ -24,6 +29,12 @@ type System {
   org: Org
   smtp: Smtp
   defaultUserDiskQuota: Int
+  timezone: Timezone
+}
+
+input TimezoneInput {
+  name: String
+  offset: Int
 }
 
 input SmtpInput {
@@ -50,4 +61,5 @@ input SystemUpdateInput {
   org: OrgUpdateInput
   smtp: SmtpInput
   defaultUserDiskQuota: Int
+  timezone: TimezoneInput
 }
