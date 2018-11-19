@@ -29,20 +29,28 @@ export default class TextFilter extends Component {
 
   render() {
     const {label, intl, search, placeholder} = this.props;
-    const matched = placeholder && placeholder.match && placeholder.match(/{(.*)}/);
-    const intlPlaceholder = matched ? intl.formatMessage({
-      id: matched[1]
-    }) : placeholder;
+    
     return (
       <FilterPlugin>
-        <Label>{label}</Label>
+        <Label>{i18n(label, intl)}</Label>
         <Input
           style={{width: '150px'}}
-          placeholder={intlPlaceholder}
+          placeholder={i18n(placeholder, intl)}
           onChange={this.onInput}
           onPressEnter={search}
         />
       </FilterPlugin>
     );
   }
+}
+
+function i18n(text, intl) {
+  if (text && typeof text === 'string') {
+    const matched = text && text.match && text.match(/{(.*)}/);
+    const intlText = matched ? intl.formatMessage({
+      id: matched[1]
+    }) : text;
+    return intlText;
+  }
+  return text;
 }

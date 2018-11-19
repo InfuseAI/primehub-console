@@ -41,6 +41,18 @@ export default () => (
     }
   >
     <toolbar async>
+      <filter
+        component={Filter}
+        fields={[{
+          type: 'text',
+          label: '${name}',
+          key: 'name'
+        }, {
+          type: 'text',
+          label: '${displayName}',
+          key: 'displayName'
+        }]}
+      />
       <pagination />
     </toolbar>
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
