@@ -41,7 +41,6 @@ declare module 'mocha' {
 }
 
 describe('user graphql', function() {
-  this.timeout(10000);
   before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;
@@ -208,7 +207,7 @@ describe('user graphql', function() {
       }
     });
 
-    expect(prefixData.users.length).to.be.equals(1);
+    expect(prefixData.users.length).to.be.least(1);
 
     // postfix
     const postfixData = await this.graphqlRequest(`

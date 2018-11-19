@@ -100,7 +100,9 @@ export const createSandbox = async () => {
   /**
    * Keycloak
    */
-  const client = new KcAdminClient();
+  const client = new KcAdminClient({
+    baseUrl: process.env.KC_API_BASEURL || 'http://127.0.0.1:8080/auth'
+  });
   (global as any).kcAdminClient = client;
 
   // authorize with username/passowrd
@@ -259,7 +261,9 @@ export const destroySandbox = async () => {
   /**
    * Keycloak
    */
-  const client = new KcAdminClient();
+  const client = new KcAdminClient({
+    baseUrl: process.env.KC_API_BASEURL || 'http://127.0.0.1:8080/auth'
+  });
 
   // authorize with username/passowrd
   await client.auth(masterRealmCred);

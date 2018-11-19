@@ -95,6 +95,29 @@ export default () => (
         dataIndex: 'totp'
       }],
     }}
+    graphql={`
+    query ($userAfter: String, $userBefore: String, $userLast: Int,$userFirst: Int, $userWhere: UserWhereInput, $userOrderBy: UsersOrderBy) {
+      user: usersConnection(after: $userAfter, before: $userBefore, last: $userLast, first: $userFirst,where: $userWhere, userOrderBy: $userOrderBy) {
+        edges {
+          cursor
+          node {
+            id
+            username
+            email
+            firstName
+            lastName
+            enabled
+            totp
+            isAdmin
+          }
+        }
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+        }
+      }
+    }
+    `}
   >
     <toolbar async>
       <filter

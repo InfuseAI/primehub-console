@@ -14,6 +14,8 @@ import { createApp } from '../src/app';
 before(async () => {
   // setup testing realm and related env
   await createSandbox();
+  // tslint:disable-next-line:no-console
+  console.log(`sandbox created`);
 
   // create app
   const PORT = 4000;

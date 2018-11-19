@@ -24,6 +24,10 @@ export default class Token {
     }
   }
 
+  public toString() {
+    return this.token;
+  }
+
   /**
    * Determine if this token is expired.
    *

@@ -38,6 +38,7 @@ import Boom from 'boom';
 
 // graphql middlewares
 import readOnlyMiddleware from './middlewares/readonly';
+import TokenSyncer from './oidc/syncer';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -135,6 +136,13 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
     namespace: config.k8sCrdNamespace
   });
 
+  // token syncer
+  const tokenSyncer = new TokenSyncer({
+    oidcClient,
+    clientId: config.keycloakClientId
+  });
+  await tokenSyncer.start();
+
   // create observer with kc client with password
   if (!process.env.TEST) {
     const kcAdminClientForObserver = new KcAdminClient({
@@ -150,7 +158,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
       crdClient,
       keycloakAdmin: kcAdminClientForObserver,
       everyoneGroupId: config.keycloakEveryoneGroupId,
-      getAccessToken: async () => oidcCtrl.clientCredentialGrant()
+      getAccessToken: async () => tokenSyncer.getAccessToken()
     });
     observer.observe();
   }
@@ -182,7 +190,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
 
         // use service account token and put on readonly mode
         readOnly = true;
-        const accessToken = await oidcCtrl.clientCredentialGrant();
+        const accessToken = await tokenSyncer.getAccessToken();
         kcAdminClient.setAccessToken(accessToken);
       } else if (config.keycloakGrantType === 'password'
           && authorization.indexOf('Basic') >= 0
