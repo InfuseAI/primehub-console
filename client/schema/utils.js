@@ -6,7 +6,7 @@ import {FormattedMessage} from 'react-intl';
 import {Tag, Button, Icon} from 'antd';
 
 exports.graphqlClient = new GraphqlClient({
-  uri: "/graphql",
+  uri: window.APP_PREFIX + "graphql",
   credentials: "same-origin"
 });
 

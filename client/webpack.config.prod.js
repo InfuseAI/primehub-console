@@ -9,13 +9,13 @@ const tsImportPluginFactory = require('ts-import-plugin');
 module.exports = {
   mode: 'production',
   entry: {
-    index: './src/index.tsx'
+    index: ['./src/public-import.js', './src/index.tsx']
   },
   output: {
     path: path.join(__dirname, './dist'),
     filename: '[name].js',
     chunkFilename: '[chunkhash].js',
-    publicPath: '/'
+    publicPath: ''
   },
   externals,
   resolve,
@@ -118,9 +118,7 @@ module.exports = {
         use: [
           {
             loader: 'file-loader',
-            options: {
-              publicPath: '/'
-            }
+            options: {}
           }
         ]
       },

@@ -5,5 +5,5 @@ block head
 block main
   div(id='root')
     p #{message}
-    a(href="/oidc/logout") logout
+    a(href=`${staticPath}oidc/logout`) logout
 block footerScript

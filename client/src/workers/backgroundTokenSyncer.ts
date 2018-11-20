@@ -15,12 +15,14 @@ export class BackgroundTokenSyncer {
   // if we can't extend expiration time, notify user
   private reLoginNotify: ({loginUrl}: {loginUrl: string}) => void;
   private reloginNotifyCalled: boolean = false;
+  private appPrefix: string;
 
   constructor({
     interval,
     refreshTokenExp,
     getNewRefreshToken,
-    reLoginNotify = () => {}
+    reLoginNotify = () => {},
+    appPrefix
   }: {
     interval?: number,
     refreshTokenExp: number,
@@ -28,7 +30,8 @@ export class BackgroundTokenSyncer {
       redirectUrl?: string;
       exp?: number;
     }>,
-    reLoginNotify: ({loginUrl}: {loginUrl: string}) => void
+    reLoginNotify: ({loginUrl}: {loginUrl: string}) => void,
+    appPrefix?: string
   }) {
     this.interval = interval || 1000;
 
@@ -41,6 +44,7 @@ export class BackgroundTokenSyncer {
     this.getNewRefreshToken = getNewRefreshToken;
     this.refreshTokenExp = refreshTokenExp;
     this.reLoginNotify = reLoginNotify;
+    this.appPrefix = appPrefix || '/';
   }
 
   public run = async () => {
@@ -65,7 +69,7 @@ export class BackgroundTokenSyncer {
         const newTokenResponse = await this.getNewRefreshToken();
         if (!newTokenResponse.exp) {
           // if expire not set, log user out
-          window.location.replace('/oidc/logout');
+          window.location.replace(`${this.appPrefix}oidc/logout`);
           return;
         }
   

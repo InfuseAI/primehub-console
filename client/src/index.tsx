@@ -41,9 +41,10 @@ function parseJSON(response) {
 }
 
 const tokenSyncWorker = new BackgroundTokenSyncer({
+  appPrefix: (window as any).APP_PREFIX,
   refreshTokenExp: (window as any).refreshTokenExp,
   getNewRefreshToken: () => {
-    return fetch('/oidc/refresh-token', {
+    return fetch(`${(window as any).APP_PREFIX}oidc/refresh-token`, {
       method: 'POST'
     })
     .then(checkStatus)
@@ -57,7 +58,7 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       placement: 'bottomRight',
       duration: null,
       btn: (
-        <Button type="primary" onClick={() => window.location.replace('/oidc/logout')}>
+        <Button type="primary" onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
           Login Again
         </Button>
       ),
@@ -78,8 +79,8 @@ ReactDOM.render(
         <React.Fragment>
           <Switch>
             {/* <Route path="/login" component={Login} /> */}
-            <Route path="/cms/:activeKey" component={CMSPage}/>
-            <Redirect to={`/cms/${firstKey}`}/>
+            <Route path={`${(window as any).APP_PREFIX}cms/:activeKey`} component={CMSPage}/>
+            <Redirect to={`${(window as any).APP_PREFIX}cms/${firstKey}`}/>
           </Switch>
         </React.Fragment>
       </Router>

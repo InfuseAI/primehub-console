@@ -25,6 +25,7 @@ import { crd as image} from './resolvers/image';
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import { ErrorCodes } from './errorCodes';
 import basicAuth from 'basic-auth';
+import koaMount from 'koa-mount';
 
 // controller
 import { OidcCtrl, mount as mountOidc } from './oidc';
@@ -87,6 +88,8 @@ const resolvers = {
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {
   const config = createConfig();
+  const staticPath = config.appPrefix ? `${config.appPrefix}/` : '/';
+
   // construct http agent
   const httpAgent = new Agent({
     maxSockets: config.keycloakMaxSockets,
@@ -121,7 +124,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
     cmsHost: config.cmsHost,
     keycloakBaseUrl: config.keycloakOidcBaseUrl,
     oidcClient,
-    grantType: config.keycloakGrantType
+    grantType: config.keycloakGrantType,
+    appPrefix: config.appPrefix
   });
 
   const createKcAdminClient = () => new KcAdminClient({
@@ -286,7 +290,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
 
       // render or json
       if (ctx.accepts('html') && ctx.status === 403) {
-        return ctx.render('403', {message: err.message});
+        return ctx.render('403', {message: err.message, staticPath});
       } else {
         ctx.body = {code: errorCode, message: err.message};
       }
@@ -300,13 +304,20 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
   app.use(views(path.join(__dirname, './views'), {
     extension: 'pug'
   }));
-  app.use(serve(path.resolve(__dirname, '../../client/dist')));
+  const serveClientStatic = config.appPrefix
+    ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../../client/dist')))
+    : serve(path.resolve(__dirname, '../../client/dist'));
+  app.use(serveClientStatic);
 
   // router
-  const rootRouter = new Router();
+  const rootRouter = new Router({
+    prefix: config.appPrefix
+  });
 
   // favicon
-  const serveStatic = serve(path.resolve(__dirname, '../static'), {maxage: 86400000});
+  const serveStatic = config.appPrefix
+    ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../static'), {maxage: 86400000}))
+    : serve(path.resolve(__dirname, '../static'), {maxage: 86400000});
   rootRouter.get('/favicon/*', serveStatic);
   rootRouter.get('/js/*', serveStatic);
   rootRouter.get('/font/*', serveStatic);
@@ -316,12 +327,12 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
 
   // cms
   rootRouter.get('/cms', oidcCtrl.ensureAdmin, async ctx => {
-    await ctx.render('cms', {title: 'PrimeHub'});
+    await ctx.render('cms', {title: 'PrimeHub', staticPath});
   });
   rootRouter.get('/cms/*', oidcCtrl.ensureAdmin, async ctx => {
-    await ctx.render('cms', {title: 'PrimeHub'});
+    await ctx.render('cms', {title: 'PrimeHub', staticPath});
   });
   app.use(rootRouter.routes());
-  server.applyMiddleware({ app });
+  server.applyMiddleware({ app, path: config.appPrefix ? `${config.appPrefix}/graphql` : '/graphql' });
   return {app, server};
 };

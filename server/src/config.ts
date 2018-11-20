@@ -1,4 +1,4 @@
-import { pickBy } from 'lodash';
+import { pickBy, isEmpty } from 'lodash';
 
 export interface Config {
   env: string;
@@ -42,6 +42,8 @@ export interface Config {
   // keycloak
   keycloakRetries: number;
   keycloakTimeout: number;
+
+  appPrefix?: string;
 }
 
 const defaultConfigs = {
@@ -62,11 +64,20 @@ const defaultConfigs = {
   keycloakMaxSockets: 80,
   keycloakMaxFreeSockets: 10,
   keycloakRetries: 0,
-  keycloakTimeout: 3000
+  keycloakTimeout: 3000,
 };
 
 const prodConfigs = {
   env: 'production'
+};
+
+const sanitizePath = (path: string) => {
+  if (isEmpty(path) || path === '/') {
+    return null;
+  }
+  path = path.startsWith('/') ? path : `/${path}`;
+  path = path.endsWith('/') ? path.slice(0, -1) : path;
+  return path;
 };
 
 export const createConfig = (): Config => {
@@ -90,7 +101,8 @@ export const createConfig = (): Config => {
     rolePrefix: process.env.KC_ROLE_PREFIX,
     sharedGraphqlSecretKey: process.env.SHARED_GRAPHQL_SECRET_KEY,
     keycloakRetries: process.env.KC_OIDC_RETRIES,
-    keycloakTimeout: process.env.KC_OIDC_TIMEOUT
+    keycloakTimeout: process.env.KC_OIDC_TIMEOUT,
+    appPrefix: sanitizePath(process.env.APP_PREFIX)
   });
 
   const env = process.env.NODE_ENV || 'development';

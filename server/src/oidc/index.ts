@@ -25,6 +25,8 @@ export class OidcCtrl {
   private redirectUri: string;
   private adminRole: string;
   private grantType: string;
+  private appPrefix?: string;
+  private defaultReturnPath: string;
 
   constructor({
     secret,
@@ -33,7 +35,8 @@ export class OidcCtrl {
     cmsHost,
     keycloakBaseUrl,
     oidcClient,
-    grantType
+    grantType,
+    appPrefix
   }: {
     secret: string,
     clientId: string,
@@ -41,7 +44,8 @@ export class OidcCtrl {
     cmsHost: string,
     keycloakBaseUrl: string,
     oidcClient: any,
-    grantType: string
+    grantType: string,
+    appPrefix?: string
   }) {
     this.secret = secret;
     this.clientId = clientId;
@@ -50,8 +54,10 @@ export class OidcCtrl {
     this.grantType = grantType;
     this.keycloakBaseUrl = keycloakBaseUrl;
     this.oidcClient = oidcClient;
-    this.redirectUri = `${this.cmsHost}${CALLBACK_PATH}`;
+    this.redirectUri = `${this.cmsHost}${appPrefix || ''}${CALLBACK_PATH}`;
+    this.defaultReturnPath = appPrefix ? `${appPrefix}/cms` : '/cms';
     this.adminRole = (this.realm === 'master') ? 'realm:admin' : 'realm-management:realm-admin';
+    this.appPrefix = appPrefix;
   }
 
   public ensureAdmin = async (ctx: Context, next: any) => {
@@ -195,12 +201,12 @@ export class OidcCtrl {
     ctx.cookies.set('thumbnail',
       accessToken.getContent().email ? gravatar.url(accessToken.getContent().email) : '', {signed: true});
 
-    const backUrl = query.backUrl || '/cms';
+    const backUrl = query.backUrl || this.defaultReturnPath;
     return ctx.redirect(backUrl);
   }
 
   public logout = async (ctx: Context) => {
-    const qs = querystring.stringify({redirect_uri: `${this.cmsHost}/cms`});
+    const qs = querystring.stringify({redirect_uri: `${this.cmsHost}${this.defaultReturnPath}`});
     ctx.cookies.set('accessToken', null);
     ctx.cookies.set('refreshToken', null);
     ctx.cookies.set('username', null);

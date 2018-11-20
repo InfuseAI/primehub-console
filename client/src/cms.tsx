@@ -130,14 +130,14 @@ export default class CMSPage extends React.Component<Props, State> {
             resolve();
           }).then(this.reset)
             .then(() => {
-              history.push(`/cms/${key}`);
+              history.push(`${(window as any).APP_PREFIX}cms/${key}`);
             });
         },
         onCancel: () => {
         }
       });
     } else {
-      history.push(`/cms/${key}`);
+      history.push(`${(window as any).APP_PREFIX}cms/${key}`);
     }
   }
 
@@ -186,7 +186,7 @@ export default class CMSPage extends React.Component<Props, State> {
           }}
           router={new R({
             history,
-            baseUrl: "/cms"
+            baseUrl: `${(window as any).APP_PREFIX}cms`
           })}
           ref={container => this.container = container}
           dataDidChange={this.dataDidChange}

@@ -3,6 +3,8 @@ html
   head
     title #{title}
     include ./utils/head.pug
+    script.
+      window.APP_PREFIX = "#{staticPath}";
     block head
   body
     //- script(src="https://cdnjs.cloudflare.com/ajax/libs/react/16.4.0/umd/react.production.min.js")
@@ -13,14 +15,14 @@ html
     //- script(src='https://cdnjs.cloudflare.com/ajax/libs/styled-components/3.4.0-4/styled-components.min.js')
     //- script(src='https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.21/moment-timezone.min.js')
     //- script(src='https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.23.0/polyfill.js')
-    script(src="/js/react.production.min.js")
-    script(src="/js/react-dom.production.min.js")
-    script(src="/js/moment-with-locales.min.js")
-    script(src="/js/lodash.min.js")
-    script(src="/js/antd.min.v3.10.1.js")
-    script(src='/js/styled-components.min.js')
-    script(src='/js/moment-timezone.min.js')
-    script(src='/js/polyfill.js')
-    script(src='/js/firebase-app.js')
+    script(src=`${staticPath}js/react.production.min.js`)
+    script(src=`${staticPath}js/react-dom.production.min.js`)
+    script(src=`${staticPath}js/moment-with-locales.min.js`)
+    script(src=`${staticPath}js/lodash.min.js`)
+    script(src=`${staticPath}js/antd.min.v3.10.1.js`)
+    script(src=`${staticPath}js/styled-components.min.js`)
+    script(src=`${staticPath}js/moment-timezone.min.js`)
+    script(src=`${staticPath}js/polyfill.js`)
+    script(src=`${staticPath}js/firebase-app.js`)
     block main
     block footerScript

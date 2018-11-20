@@ -34,7 +34,7 @@ export default class HeaderContainer extends React.Component<Props, {}> {
   headerMenuOnClick = (menuItem: {key: string}) => {
     if(menuItem.key === 'logout') {
       // firebase.auth().signOut();
-      location.href = "/oidc/logout";
+      location.href = `${(window as any).APP_PREFIX}oidc/logout`;
     }
   }
 

@@ -9,5 +9,5 @@ block head
     window.refreshTokenExp = #{refreshTokenExp};
 block main
   div(id='root')
-  script(src="/index.js")
+  script(src= `${staticPath}index.js`)
 block footerScript
