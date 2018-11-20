@@ -58,7 +58,7 @@ export default class HeaderContainer extends React.Component<Props, {}> {
           selectedKeys={[]}
           >
           <SubMenu title={subMenuTitle}>
-            <Menu.Item theme="light" key="logout">
+            <Menu.Item data-e2e="logout-button" theme="light" key="logout">
               <ItemContent>
                 <Icon type="poweroff" /> Logout
               </ItemContent>
