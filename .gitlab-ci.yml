@@ -11,6 +11,7 @@ variables:
 stages:
   - test
   - build
+  - release
 
 test:
   services:
@@ -57,3 +58,14 @@ build:
     - docker push "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_SHA:0:7}"
   only:
     - master
+
+release:tag:
+  stage: release
+  script:
+    - echo "${DOCKER_DRIVER}"
+    - docker login -u gitlab-ci-token -p "${CI_BUILD_TOKEN}" "${REGISTRY}"
+    - docker pull "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_SHA:0:7}" || true
+    - docker build -t "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_TAG}" .
+    - docker push "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_TAG}"
+  only:
+    - tags
