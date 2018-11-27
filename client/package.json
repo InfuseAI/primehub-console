@@ -103,7 +103,7 @@
     "@types/react-router-dom": "^4.2.6",
     "antd": "3.10.0",
     "axios": "^0.18.0",
-    "canner": "^2.0.11-alpha.1",
+    "canner": "^2.0.13",
     "canner-graphql-interface": "2.0.5",
     "canner-helpers": "2.0.11-alpha.1",
     "canner-layouts": "2.0.11-alpha.1",
