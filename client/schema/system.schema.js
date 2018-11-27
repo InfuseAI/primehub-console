@@ -19,6 +19,7 @@ export default () => (
       <number keyName="defaultUserDiskQuota" title="${defaultUserDiskQuota}"
          uiParams={{unit: ' GB', step: 1, min: 1, precision: 0, defaultValue: 1}}
          validation={{min: 1}}
+         description="${quotaForNewly}"
          packageName="../src/cms-components/customize-number-precision"
       />
       <object

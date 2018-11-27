@@ -121,6 +121,8 @@ exports.parseToStepDot5 = function(value) {
 }
 exports.dict = {
   en: {
+    // common
+    quotaForNewly: 'It only works for newly created volume.',
     // system
     system: 'System',
     name: 'Name',
@@ -279,6 +281,8 @@ exports.dict = {
     'anno.sendEmailMessage': 'Also send announcement via email.'
   },
   zh: {
+    // common
+    quotaForNewly: 'It only works for newly created volume.',
     // system
     system: '系統',
     name: '名稱',
