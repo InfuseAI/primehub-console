@@ -109,6 +109,24 @@ export default () => (
     />
     <Condition match={data => data.type === 'git'}>
       <string keyName="url" ui="link" title="${url}"/>
+      <relation
+        title="${secret}"
+        keyName="secret"
+        uiParams={{
+          textCol: 'displayName',
+          columns: [{
+            title: '${name}',
+            dataIndex: 'name'
+          }, {
+            title: '${displayName}',
+            dataIndex: 'displayName'
+          }]
+        }}
+        relation={{
+          to: 'secret',
+          type: 'toOne'
+        }}
+      />
     </Condition>
     <Condition match={data => data.type === 'env'}>
       <object keyName="variables"

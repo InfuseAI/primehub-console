@@ -278,7 +278,10 @@ exports.dict = {
     'anno.sendEmail': 'Send Email',
     'anno.status': 'Status',
     'anno.actions': 'Actions',
-    'anno.sendEmailMessage': 'Also send announcement via email.'
+    'anno.sendEmailMessage': 'Also send announcement via email.',
+
+    // secret
+    secret: 'Secret'
   },
   zh: {
     // common
@@ -436,6 +439,9 @@ exports.dict = {
     'anno.sendEmail': 'Send Email',
     'anno.status': 'Status',
     'anno.actions': 'Actions',
-    'anno.sendEmailMessage': 'Also send announcement via email.'
+    'anno.sendEmailMessage': 'Also send announcement via email.',
+
+    // secret
+    secret: 'Secret'
   }
 }

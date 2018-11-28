@@ -9,6 +9,7 @@ import InstanceType from './instanceType.schema';
 import Image from './image.schema';
 import Dataset from './dataset.schema';
 import Announcement from './announcement.schema';
+import Secret from './secret.schema';
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {createFakeData} from 'canner-helpers';
 import {dict, graphqlClient, imageStorage} from './utils';
@@ -23,6 +24,7 @@ const schema = (
     <InstanceType/>
     <Image/>
     <Dataset/>
+    <Secret />
     {/* <Announcement /> */}
   </root>
 )
