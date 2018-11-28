@@ -50,6 +50,16 @@ export default class CMSPage extends React.Component<Props, State> {
 
   container: Container
 
+  componentDidUpdate(prevProps: Props) {
+    const prevPathname = prevProps.location.pathname;
+    const prevSearch = prevProps.location.search;
+    const pathname = this.props.location.pathname;
+    const search = this.props.location.search;
+    if (prevPathname !== pathname || (prevSearch === '' && search === '?operator=create')) {
+      notification.destroy();
+    }
+  }
+
   componentDidCatch(error, info) {
     // Display fallback UI
     this.setState({ hasError: true });
