@@ -3291,11 +3291,33 @@ caniuse-lite@^1.0.30000844:
   version "1.0.30000865"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000865.tgz#70026616e8afe6e1442f8bb4e1092987d81a2f25"
 
-canner-compiler@2.0.11:
-  version "2.0.11"
-  resolved "https://registry.yarnpkg.com/canner-compiler/-/canner-compiler-2.0.11.tgz#edb7858398c87105e2098997ed455ef102b68209"
+canner-compiler@2.0.14:
+  version "2.0.14"
+  resolved "https://registry.yarnpkg.com/canner-compiler/-/canner-compiler-2.0.14.tgz#3e7fec66ee4683d5fc3590573326c40d29b0b4f0"
 
-canner-graphql-interface@2.0.5, canner-graphql-interface@^2.0.5:
+canner-graphql-interface@2.0.15:
+  version "2.0.15"
+  resolved "https://registry.yarnpkg.com/canner-graphql-interface/-/canner-graphql-interface-2.0.15.tgz#b1d07e2ab86145bebc7c6633a96a13b85875acd1"
+  dependencies:
+    apollo-cache "^1.1.7"
+    apollo-cache-inmemory "^1.1.12"
+    apollo-client "^2.2.8"
+    apollo-link "^1.2.2"
+    apollo-link-http "^1.5.4"
+    apollo-utilities "^1.0.11"
+    canner-graphql-utils "^2.0.5"
+    dataloader "^1.4.0"
+    graphql "0.13.0"
+    graphql-anywhere "^4.1.6"
+    graphql-tag "^2.8.0"
+    graphql-tools "^2.21.0"
+    isomorphic-fetch "^2.2.1"
+    lodash "^4.17.5"
+    lowdb "^1.0.0"
+    pluralize "^7.0.0"
+    uuid "^3.2.1"
+
+canner-graphql-interface@2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/canner-graphql-interface/-/canner-graphql-interface-2.0.5.tgz#35823286933eb1514d3c87d8bbbee7f82863ec77"
   dependencies:
@@ -3325,15 +3347,15 @@ canner-graphql-utils@^2.0.5:
     lowdb "^1.0.0"
     pluralize "^7.0.0"
 
-canner-helpers@2.0.11:
-  version "2.0.11"
-  resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-2.0.11.tgz#a842cc33732faeb68c8d305a8906e2b96f28495c"
-  dependencies:
-    faker "^4.1.0"
-
 canner-helpers@2.0.11-alpha.1:
   version "2.0.11-alpha.1"
   resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-2.0.11-alpha.1.tgz#527213ec280d9cd44653b1b903777608415df959"
+  dependencies:
+    faker "^4.1.0"
+
+canner-helpers@2.0.14:
+  version "2.0.14"
+  resolved "https://registry.yarnpkg.com/canner-helpers/-/canner-helpers-2.0.14.tgz#7e772e48781dbd8fe8a04ba749382b5a253f3945"
   dependencies:
     faker "^4.1.0"
 
@@ -3347,21 +3369,21 @@ canner-image-gallery@^0.3.4:
     react-loading-image "^0.4.1"
     styled-components "^3.2.3"
 
-canner-layouts@2.0.11:
-  version "2.0.11"
-  resolved "https://registry.yarnpkg.com/canner-layouts/-/canner-layouts-2.0.11.tgz#dd81d4a2c9206e3f2c04f8b63232699cad465544"
-  dependencies:
-    canner-helpers "2.0.11"
-
 canner-layouts@2.0.11-alpha.1:
   version "2.0.11-alpha.1"
   resolved "https://registry.yarnpkg.com/canner-layouts/-/canner-layouts-2.0.11-alpha.1.tgz#5f96b4964463cceee44bc04f2a78f3bf81685a7b"
   dependencies:
     canner-helpers "2.0.11-alpha.1"
 
-canner-ref-id@2.0.11:
-  version "2.0.11"
-  resolved "https://registry.yarnpkg.com/canner-ref-id/-/canner-ref-id-2.0.11.tgz#a44cedb4e0b1f310fad7b1ae53f28aebdf52c84e"
+canner-layouts@2.0.14:
+  version "2.0.14"
+  resolved "https://registry.yarnpkg.com/canner-layouts/-/canner-layouts-2.0.14.tgz#cf2b2e2a0faeca960f3b4745c32b6b60b526fce9"
+  dependencies:
+    canner-helpers "2.0.14"
+
+canner-ref-id@2.0.14:
+  version "2.0.14"
+  resolved "https://registry.yarnpkg.com/canner-ref-id/-/canner-ref-id-2.0.14.tgz#5715d45d92dee2efa3ef683c77cfc199db4375ae"
 
 canner-schema-loader@2.0.11-alpha.1:
   version "2.0.11-alpha.1"
@@ -3385,18 +3407,18 @@ canner-script@2.0.11-alpha.1:
     react-intl "^2.4.0"
     safer-eval "^1.2.3"
 
-canner@^2.0.13:
-  version "2.0.13"
-  resolved "https://registry.yarnpkg.com/canner/-/canner-2.0.13.tgz#7e009030ed8e2deaaae0db11c3e9034c93e9665a"
+canner@^2.0.16:
+  version "2.0.16"
+  resolved "https://registry.yarnpkg.com/canner/-/canner-2.0.16.tgz#32a29a4e828a3235c561c21827e9bfda9271cb94"
   dependencies:
     ajv "^6.5.2"
     apollo-boost "^0.1.4"
     bson-objectid "^1.2.2"
-    canner-compiler "2.0.11"
-    canner-graphql-interface "^2.0.5"
-    canner-helpers "2.0.11"
-    canner-layouts "2.0.11"
-    canner-ref-id "2.0.11"
+    canner-compiler "2.0.14"
+    canner-graphql-interface "2.0.15"
+    canner-helpers "2.0.14"
+    canner-layouts "2.0.14"
+    canner-ref-id "2.0.14"
     graphql-tag "^2.9.1"
     immer "^1.3.0"
     immutable "^3.8.2"
