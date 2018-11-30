@@ -23,14 +23,16 @@ export default () => (
         dataIndex: 'description'
       }, {
         title: '${cpuLimit}',
-        dataIndex: 'cpuLimit'
+        dataIndex: 'cpuLimit',
+        render: v => v || 0
       }, {
         title: '${gpuLimit}',
-        dataIndex: 'gpuLimit'
+        dataIndex: 'gpuLimit',
+        render: v => v || 0
       }, {
         title: '${memoryLimit}',
         dataIndex: 'memoryLimit',
-        render: text => `${text} GB`
+        render: text => `${text || 0} GB`
       }]
     }}
     graphql={`
@@ -88,10 +90,13 @@ export default () => (
     <number keyName="cpuLimit" title="${cpuLimit}"
       uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
       defaultValue={1}
+      required
       packageName="../src/cms-components/customize-number-precision.js"
     />
     <number keyName="memoryLimit" title="${memoryLimit}"
-      uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
+      uiParams={{unit: ' GB', step: 1, min: 0.1, precision: 1}}
+      defaultValue={0.1}
+      required
       packageName="../src/cms-components/customize-number-precision"
     />
     <number keyName="gpuLimit" title="${gpuLimit}" uiParams={{min: 0, precision: 0, step: 1}}
@@ -100,10 +105,13 @@ export default () => (
     <number keyName="cpuRequest" title="${cpuRequest}"
       uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
       defaultValue={1}
+      required
       packageName="../src/cms-components/customize-number-precision.js"
     />
     <number keyName="memoryRequest" title="${memoryRequest}"
-      uiParams={{unit: ' GB', step: 1, min: 0, precision: 1}}
+      uiParams={{unit: ' GB', step: 1, min: 0.1, precision: 1}}
+      defaultValue={0.1}
+      required
       packageName="../src/cms-components/customize-number-precision"
     />
     <boolean keyName="global" title="${global}" />
