@@ -19,6 +19,10 @@ export interface Item<T> {
   spec: T;
 }
 
+// constants
+// WATCH_TIMEOUT_SECONDS: 10 minutes
+const WATCH_TIMEOUT_SECONDS = 60 * 10;
+
 export default class CustomResource<SpecType = any> {
   private kubeClient: any;
   private watchApi: Watch;
@@ -73,7 +77,9 @@ export default class CustomResource<SpecType = any> {
   public watch(handler: (type: string, object: any) => void, done: (err?: Error) => void) {
     const {group, version, names: {plural}} = this.crd.spec;
     return this.watchApi.watch(`/apis/${group}/${version}/namespaces/${this.namespace}/${plural}`,
-      {},
+      {
+        timeoutSeconds: WATCH_TIMEOUT_SECONDS
+      },
       handler,
       done);
   }
