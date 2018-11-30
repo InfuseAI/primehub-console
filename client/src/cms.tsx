@@ -50,17 +50,15 @@ export default class CMSPage extends React.Component<Props, State> {
 
   container: Container
 
-  // componentWillMount() {
-  //   const {history, location} = this.props;
-  //   firebase.auth().onAuthStateChanged((user) => {
-  //     if (!user) {
-  //       history.push({
-  //         pathname: "/login",
-  //         state: { from: location }
-  //       })
-  //     }
-  //   })
-  // }
+  componentDidUpdate(prevProps: Props) {
+    const prevPathname = prevProps.location.pathname;
+    const prevSearch = prevProps.location.search;
+    const pathname = this.props.location.pathname;
+    const search = this.props.location.search;
+    if (prevPathname !== pathname || (prevSearch === '' && search === '?operator=create')) {
+      notification.destroy();
+    }
+  }
 
   componentDidCatch(error, info) {
     // Display fallback UI
@@ -69,14 +67,54 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   dataDidChange = (dataChanged: object) => {
-    console.log(dataChanged);
     this.setState({
       dataChanged
     });
   }
 
-  afterDeploy = () => {
-    const {intl} = this.props;
+  afterDeploy = (data) => {
+    const {intl, history} = this.props;
+    if (get(data, 'actions.0.type') === 'CREATE_ARRAY') {
+      const link = `${(window as any).APP_PREFIX}cms/${data.key}/${getCreateId(data.result)}`;
+      setTimeout(() => {
+        this.setState({
+          deploying: false
+        });
+        notification.success({
+          message: intl.formatMessage({
+            id: 'deploy.success.message',
+            defaultMessage: 'Save successfully!'
+          }),
+          description: (
+            <div>
+            {
+              intl.formatMessage({
+                id: 'deploy.success.create.description1',
+                defaultMessage: 'Your changes have been saved. Click'
+              })
+            }
+            <a href="javascript:;" onClick={() => history.push(link)} style={{margin: '0 8px'}}>
+            {
+              intl.formatMessage({
+                id: 'deploy.success.create.description2',
+                defaultMessage: 'here'
+              })
+            }
+            </a>
+            {
+              intl.formatMessage({
+                id: 'deploy.success.create.description3',
+                defaultMessage: 'to edit.'
+              })
+            }
+            </div>
+          ),
+          duration: 10,
+          placement: 'bottomRight'
+        });
+      }, 400);
+      return ;
+    }
     setTimeout(() => {
       this.setState({
         deploying: false
@@ -268,4 +306,8 @@ export default class CMSPage extends React.Component<Props, State> {
       </Layout>
     )
   }
+}
+
+function getCreateId(result) {
+  return result[Object.keys(result)[0]].id;
 }

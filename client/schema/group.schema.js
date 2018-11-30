@@ -98,6 +98,7 @@ export default () => (
       <Row type="flex">
         <Col sm={8} xs={24}>
           <number keyName="quotaCpu"
+            description="${quotaForNewly}"
             uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
             defaultValue={0.5}
             title="${cpuQuota}"
@@ -108,6 +109,7 @@ export default () => (
         <Col sm={8} xs={24}>
           <number keyName="quotaGpu" title="${gpuQuota}"  uiParams={{min: 0, step: 1, precision: 0}}
             defaultValue={() => 0}
+            description="${quotaForNewly}"
             packageName="../src/cms-components/customize-number-checkbox.js"
             nullable
           />
@@ -115,6 +117,7 @@ export default () => (
         <Col sm={8} xs={24}>
           <number keyName="quotaMemory" title="${quotaMemory}"  uiParams={{min: 0, step: 1, precision: 1, unit: ' GB'}}
             defaultValue={() => null}
+            description="${quotaForNewly}"
             packageName="../src/cms-components/customize-number-checkbox.js"
             nullable
           />
@@ -123,6 +126,7 @@ export default () => (
           <number keyName="quotaDisk" title="${quotaDisk}"
             uiParams={{unit: ' GB', step: 1, min: 1, precision: 0}}
             defaultValue={() => 20}
+            description="${quotaForNewly}"
             packageName="../src/cms-components/customize-number-precision"
             nullable
           />
@@ -133,6 +137,7 @@ export default () => (
       <Row type="flex">
         <Col sm={8} xs={24}>
           <number keyName="projectQuotaCpu"
+            description="${quotaForNewly}"
             uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
             title="${cpuQuota}"
             packageName="../src/cms-components/customize-number-checkbox.js"
@@ -144,6 +149,7 @@ export default () => (
           <number keyName="projectQuotaGpu" title="${gpuQuota}"  uiParams={{min: 0, step: 1, precision: 0}}
             packageName="../src/cms-components/customize-number-checkbox.js"
             nullable
+            description="${quotaForNewly}"
             defaultValue={() => null}
           />
         </Col>
@@ -151,6 +157,7 @@ export default () => (
           <number keyName="projectQuotaMemory" title="${quotaMemory}"  uiParams={{min: 0, step: 1, precision: 1, unit: ' GB'}}
             packageName="../src/cms-components/customize-number-checkbox.js"
             nullable
+            description="${quotaForNewly}"
             defaultValue={() => null}
           />
         </Col>

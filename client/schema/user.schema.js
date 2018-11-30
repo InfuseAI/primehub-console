@@ -178,6 +178,7 @@ export default () => (
         <boolean keyName="totp" title="${totp}" />
         <boolean keyName="isAdmin" title="${isAdmin}" />
         <number keyName="personalDiskQuota" title="${personalDiskQuota}"
+          description="${quotaForNewly}"
           uiParams={{unit: ' GB', step: 1, min: 1, precision: 0}}
           defaultValue={1}
           validation={{min: 1}}
