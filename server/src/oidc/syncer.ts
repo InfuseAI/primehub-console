@@ -1,5 +1,7 @@
-// tslint:disable:no-console
 import Token from './token';
+import * as logger from '../logger';
+
+// constants
 const ONE_MINUTE = 60;
 
 export default class TokenSyncer {
@@ -58,14 +60,22 @@ export default class TokenSyncer {
 
     // going to expire in safe duration
     // exchange token
-    console.log(`[TokenSyncer] token expired in a minute, start exchange`);
+    logger.info({
+      component: logger.components.tokenSyncer,
+      type: 'START_SYNC',
+      message: 'token expired in a minute, start exchange'
+    });
     const tokenSet = await this.oidcClient.refresh(this.refreshToken.toString());
     const newAccessToken = new Token(tokenSet.access_token, this.clientId);
     const newRefreshToken = new Token(tokenSet.refresh_token, this.clientId);
 
     // exp in refresh token not extended
     if (this.refreshToken.getContent().exp >= newRefreshToken.getContent().exp) {
-      console.log(`[TokenSyncer] refreshToken exp not extended, use clientCredential grant to get new one`);
+      logger.info({
+        component: logger.components.tokenSyncer,
+        type: 'EXP_NOT_EXTEND',
+        message: 'refreshToken exp not extended, use clientCredential grant to get new one'
+      });
       // use client_credentials grant to obtain new refresh token
       const clientCredTokenSet = await this.clientCredentialGrant();
       this.accessToken = new Token(clientCredTokenSet.access_token, this.clientId);
@@ -75,15 +85,22 @@ export default class TokenSyncer {
       this.refreshToken = newRefreshToken;
     }
 
-    console.log(`[TokenSyncer] successfully exchange, exp extended to ${this.accessToken.getContent().exp}`);
+    logger.info({
+      component: logger.components.tokenSyncer,
+      type: 'SUCCESS_EXCHANGE',
+      message: `exp extended to ${this.accessToken.getContent().exp}`
+    });
     this.scheduleNextSync();
   }
 
   private scheduleNextSync = () => {
     setTimeout(() => {
       this.sync().catch(err => {
-        console.log(`error in token syncer, but still schedule next`);
-        console.log(err);
+        logger.error({
+          component: logger.components.tokenSyncer,
+          type: 'ERROR',
+          message: `error in token syncer, but still schedule next`
+        });
         this.scheduleNextSync();
       });
     }, this.syncDuration);

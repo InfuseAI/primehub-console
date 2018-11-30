@@ -1,8 +1,8 @@
-// tslint:disable:no-console
 import KeycloakAdmin from 'keycloak-admin';
 import { Crd } from '../resolvers/crd';
 import CustomResource from '../crdClient/customResource';
 import { isUndefined } from 'lodash';
+import * as logger from '../logger';
 
 export default class Watcher<T> {
   private crd: Crd<T>;
@@ -38,7 +38,11 @@ export default class Watcher<T> {
 
   public watch = (options?: {rewatch?: boolean}) => {
     const prefix = this.crd.getPrefix();
-    console.log(`Watcher: started watching ${this.resource.getResourcePlural()}...`);
+    logger.info({
+      component: logger.components.watcher,
+      type: 'START',
+      resource: this.resource.getResourcePlural()
+    });
     this.request = this.resource.watch((type, object) => {
       const handler = async () => {
         const accessToken = await this.getAccessToken();
@@ -46,14 +50,23 @@ export default class Watcher<T> {
 
         if (type === 'ADDED') {
           // check if it's already on keycloak
-          console.log(`Watcher:${this.resource.getResourcePlural()}: ${object.metadata.name} added event`);
+          logger.info({
+            component: logger.components.watcher,
+            type: 'K8S_ADD_EVENT',
+            resource: this.resource.getResourcePlural(),
+            name: object.metadata.name
+          });
           const role = await this.keycloakAdmin.roles.findOneByName({
             name: `${prefix}${object.metadata.name}`
           });
 
           if (!role) {
-            // tslint:disable-next-line:max-line-length
-            console.log(`Watcher:${this.resource.getResourcePlural()}: ${object.metadata.name} role not exist. Going to add one`);
+            logger.info({
+              component: logger.components.watcher,
+              type: 'ADD_ROLE',
+              resource: this.resource.getResourcePlural(),
+              name: object.metadata.name
+            });
             // create one
             await this.crd.createOnKeycloak(
               this.defaultCreateData(object),
@@ -64,9 +77,19 @@ export default class Watcher<T> {
                 everyoneGroupId: this.everyoneGroupId
               }
             );
-            console.log(`Watcher:${this.resource.getResourcePlural()}: ${object.metadata.name} added to keycloak`);
+            logger.info({
+              component: logger.components.watcher,
+              type: 'SUCCESS_ADD_ROLE',
+              resource: this.resource.getResourcePlural(),
+              name: object.metadata.name
+            });
           } else {
-            console.log(`Watcher:${this.resource.getResourcePlural()}: ${object.metadata.name} role already exist`);
+            logger.info({
+              component: logger.components.watcher,
+              type: 'ROLE_ALREADY_EXIST',
+              resource: this.resource.getResourcePlural(),
+              name: object.metadata.name
+            });
           }
         } else if (type === 'DELETED') {
           // delete the role on keycloak
@@ -74,23 +97,48 @@ export default class Watcher<T> {
             await this.keycloakAdmin.roles.delByName({
               name: `${prefix}${object.metadata.name}`
             });
-            console.log(`Watcher:${this.resource.getResourcePlural()}: ${object.metadata.name} role deleted`);
+            logger.info({
+              component: logger.components.watcher,
+              type: 'DELETE_ROLE',
+              resource: this.resource.getResourcePlural(),
+              name: object.metadata.name
+            });
           } catch (e) {
             if (e.response && e.response.status === 404) {
-              // tslint:disable-next-line:max-line-length
-              return console.log(`Watcher:${this.resource.getResourcePlural()}: ${object.metadata.name} role already deleted`);
+              logger.info({
+                component: logger.components.watcher,
+                type: 'ROLE_ALREADY_DELETED',
+                resource: this.resource.getResourcePlural(),
+                name: object.metadata.name
+              });
+              return;
             }
-            console.log(`Watcher:${this.resource.getResourcePlural()}: ${object.metadata.name} cannot be deleted`);
-            console.log(e.stack);
+            throw e;
           }
         }
       };
 
       handler()
-        .catch(err => console.log(err));
+        .catch(err => {
+          logger.error({
+            component: logger.components.watcher,
+            resource: this.resource.getResourcePlural(),
+            type: 'HANDLER_ERROR',
+            name: object.metadata.name,
+            stacktrace: err.stack,
+            message: err.message
+          });
+        });
     }, err => {
       if (err) {
-        return console.log(err);
+        logger.error({
+          component: logger.components.watcher,
+          resource: this.resource.getResourcePlural(),
+          type: 'WATCH_ERROR',
+          stacktrace: err.stack,
+          message: err.message
+        });
+        return;
       }
 
       const rewatch = (options && !isUndefined(options.rewatch)) ? options.rewatch : true;

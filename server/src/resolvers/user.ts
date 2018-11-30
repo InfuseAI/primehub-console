@@ -9,6 +9,7 @@ import { Context } from './interface';
 import { ApolloError } from 'apollo-server';
 import { RequiredActionAlias } from 'keycloak-admin/lib/defs/requiredActionProviderRepresentation';
 import BPromise from 'bluebird';
+import * as logger from '../logger';
 
 /**
  * utils
@@ -183,14 +184,19 @@ export const create = async (root, args, context: Context) => {
       actions: [RequiredActionAlias.VERIFY_EMAIL]
     })
     .then(() => {
-      // tslint:disable-next-line:no-console
-      console.log(`send activation email to ${user.email}`);
+      logger.info({
+        component: logger.components.user,
+        type: 'SEND_ACTIVATION_EMAIL',
+        email: user.email
+      });
     })
     .catch(err => {
-      // tslint:disable-next-line:no-console
-      console.log(`fail to send activation email to ${user.email}`);
-      // tslint:disable-next-line:no-console
-      console.log(err);
+      logger.error({
+        component: logger.components.user,
+        type: 'FAIL_SEND_ACTIVATION_EMAIL',
+        email: user.email,
+        realm: context.realm
+      });
     });
   }
 
@@ -199,8 +205,12 @@ export const create = async (root, args, context: Context) => {
     try {
       await assignAdmin(user.id, context.realm, kcAdminClient);
     } catch (e) {
-      // tslint:disable-next-line:no-console
-      console.log(e);
+      logger.error({
+        component: logger.components.user,
+        type: 'FAIL_ASSIGN_ADMIN',
+        userId: user.id,
+        realm: context.realm
+      });
     }
   }
 
@@ -217,8 +227,13 @@ export const create = async (root, args, context: Context) => {
       }
     });
   } catch (e) {
-    // tslint:disable-next-line:no-console
-    console.log(e);
+    logger.error({
+      component: logger.components.user,
+      type: 'FAIL_CONNECT_GROUP',
+      userId: user.id,
+      groups: payload.groups,
+      realm: context.realm
+    });
   }
 
   return user;
@@ -273,8 +288,12 @@ export const update = async (root, args, context: Context) => {
         await deassignAdmin(user.id, context.realm, kcAdminClient);
       }
     } catch (e) {
-      // tslint:disable-next-line:no-console
-      console.log(e);
+      logger.error({
+        component: logger.components.user,
+        type: 'FAIL_ASSIGN_ADMIN',
+        userId: user.id,
+        realm: context.realm
+      });
     }
   }
 
@@ -285,8 +304,12 @@ export const update = async (root, args, context: Context) => {
         id: userId
       });
     } catch (e) {
-      // tslint:disable-next-line:no-console
-      console.log(e);
+      logger.error({
+        component: logger.components.user,
+        type: 'FAIL_REMOVE_TOTP',
+        userId: user.id,
+        realm: context.realm
+      });
     }
   }
 
@@ -310,8 +333,13 @@ export const update = async (root, args, context: Context) => {
       }
     });
   } catch (e) {
-    // tslint:disable-next-line:no-console
-    console.log(e);
+    logger.error({
+      component: logger.components.user,
+      type: 'FAIL_CONNECT_GROUP',
+      userId: user.id,
+      groups: payload.groups,
+      realm: context.realm
+    });
   }
 
   return user;
@@ -365,8 +393,13 @@ export const sendMultiEmail = async (root, args, context: Context) => {
     })
     .then(() => ({userId, status: true}))
     .catch(err => {
-      // tslint:disable-next-line:no-console
-      console.log(`fail to send email to ${userId}, errorMessage: ${get(err, 'response.data.errorMessage')}`);
+      logger.error({
+        component: logger.components.user,
+        type: 'FAIL_SEND_MULTI_EMAIL',
+        userId,
+        realm: context.realm,
+        message: get(err, 'response.data.errorMessage')
+      });
       return {userId, status: false};
     });
   });

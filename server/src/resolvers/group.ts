@@ -11,9 +11,7 @@ import {
   paginate,
   extractPagination
 } from './utils';
-import CrdClient from '../crdClient/crdClientImpl';
-import { mapValues, find, pick, first } from 'lodash';
-import { unflatten } from 'flat';
+import { pick, first } from 'lodash';
 import { crd as instanceTypeResolver } from './instanceType';
 import { crd as datasetResolver } from './dataset';
 import { crd as imageResolver } from './image';
@@ -21,6 +19,7 @@ import { Context } from './interface';
 import { Attributes, FieldType } from './attr';
 import { keycloakMaxCount } from './constant';
 import { ApolloError } from 'apollo-server';
+import * as logger from '../logger';
 
 // constants
 const groupAttrs = [
@@ -90,8 +89,12 @@ export const create = async (root, args, context: Context) => {
       }
     });
   } catch (e) {
-    // tslint:disable-next-line:no-console
-    console.log(e);
+    logger.error({
+      component: logger.components.group,
+      type: 'CREATE_USER_RELATION_MUTATION',
+      stacktrace: e.stack,
+      message: e.message
+    });
   }
 
   return group;
@@ -148,8 +151,12 @@ export const update = async (root, args, context: Context) => {
       }
     });
   } catch (e) {
-    // tslint:disable-next-line:no-console
-    console.log(e);
+    logger.error({
+      component: logger.components.watcher,
+      type: 'UPDATE_USER_RELATION_MUTATION',
+      stacktrace: e.stack,
+      message: e.message
+    });
   }
 
   return group;

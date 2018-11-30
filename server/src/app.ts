@@ -1,4 +1,3 @@
-// tslint:disable:no-console
 import Koa, {Context} from 'koa';
 import { ApolloServer, gql, ApolloError } from 'apollo-server-koa';
 import { importSchema } from 'graphql-import';
@@ -31,7 +30,7 @@ import koaMount from 'koa-mount';
 import { OidcCtrl, mount as mountOidc } from './oidc';
 
 // config
-import {createConfig} from './config';
+import {createConfig, Config} from './config';
 
 // observer
 import Observer from './observer/observer';
@@ -41,6 +40,9 @@ import Boom from 'boom';
 import readOnlyMiddleware from './middlewares/readonly';
 import TokenSyncer from './oidc/syncer';
 import GitSyncSecret from './k8sResource/gitSyncSecret';
+
+// logger
+import * as logger from './logger';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -93,7 +95,7 @@ const resolvers = {
   JSON: GraphQLJSON
 };
 
-export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {
+export const createApp = async (): Promise<{app: Koa, server: ApolloServer, config: Config}> => {
   const config = createConfig();
   const staticPath = config.appPrefix ? `${config.appPrefix}/` : '/';
 
@@ -241,11 +243,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
       };
     },
     formatError: error => {
-      console.log(`== http agent ==`);
-      console.log(httpAgent.getCurrentStatus());
-      console.log(`== https agent ==`);
-      console.log(httpsAgent.getCurrentStatus());
-
       let errorCode: string;
       let errorMessage: string;
       const additionalProperties: any = {};
@@ -266,8 +263,12 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
       }
 
       // print error message and stacktrace
-      console.log(`Error Code: ${errorCode}`);
-      console.log(get(exception, 'stacktrace', []).join('\n'));
+      logger.error({
+        code: errorCode,
+        stacktrace: get(exception, 'stacktrace', []).join('\n'),
+        httpAgent: httpAgent.getCurrentStatus(),
+        httpsAgent: httpsAgent.getCurrentStatus()
+      });
 
       // cusomized handler for error code
       if (errorCode === ErrorCodes.REFRESH_TOKEN_EXPIRED) {
@@ -309,7 +310,17 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
   });
 
   if (!process.env.TEST) {
-    app.use(morgan('combined'));
+    const morganFormat: any = (tokens, req, res) => {
+      return logger.info({
+        method: tokens.method(req, res),
+        url: tokens.url(req, res),
+        status: parseInt(tokens.status(req, res), 10),
+        contentLength: tokens.res(req, res, 'content-length'),
+        responseTime: `${tokens['response-time'](req, res)} ms`,
+        userAgent: req.headers['user-agent']
+      });
+    };
+    app.use(morgan(morganFormat));
   }
 
   app.use(views(path.join(__dirname, './views'), {
@@ -345,5 +356,5 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
   });
   app.use(rootRouter.routes());
   server.applyMiddleware({ app, path: config.appPrefix ? `${config.appPrefix}/graphql` : '/graphql' });
-  return {app, server};
+  return {app, server, config};
 };

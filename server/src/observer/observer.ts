@@ -1,4 +1,3 @@
-// tslint:disable:no-console
 import CrdClient, { InstanceTypeSpec, DatasetSpec, ImageSpec } from '../crdClient/crdClientImpl';
 import KeycloakAdmin from 'keycloak-admin';
 import Watcher from './watcher';

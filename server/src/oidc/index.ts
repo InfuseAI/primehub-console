@@ -5,9 +5,9 @@ import gravatar from 'gravatar';
 import querystring from 'querystring';
 import Token from './token';
 import { URL } from 'url';
-import { get } from 'lodash';
 import { ErrorCodes } from '../errorCodes';
 import { ApolloError } from 'apollo-server-koa';
+import * as logger from '../logger';
 
 const CALLBACK_PATH = '/oidc/callback';
 
@@ -89,8 +89,11 @@ export class OidcCtrl {
     } catch (err) {
       // redirect to keycloak
       if (err.data && err.data.code === ERRORS.FORCE_LOGIN) {
-        // tslint:disable-next-line:no-console
-        console.log(err);
+        logger.warn({
+          component: logger.components.authentication,
+          type: 'FORCE_LOGIN',
+          url: ctx.url
+        });
         const backUrl = this.buildBackUrl(ctx.href);
         const loginUrl = this.getLoginUrl(backUrl);
         return ctx.redirect(loginUrl);
