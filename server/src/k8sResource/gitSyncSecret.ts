@@ -1,5 +1,6 @@
 import { client as kubeClient } from '../crdClient/crdClientImpl';
 import { get } from 'lodash';
+import { ApolloError } from 'apollo-server';
 
 // constants
 const PREFIX = 'gitsync-secret-';
@@ -31,23 +32,30 @@ export default class GitSyncSecret {
   }
 
   public async create({name, displayName, secret}: {name: string, displayName: string, secret: string}) {
-    const {body} = await this.resource.post({
-      body: {
-        Kind: 'Secret',
-        apiVersion: 'v1',
-        metadata: {
-          name: gitSyncPrefix(name),
-          annotations: {
-            displayName
-          }
-        },
-        data: {
-          ssh: Buffer.from(secret).toString('base64')
-        },
-        type: 'Opaque'
+    try {
+      const {body} = await this.resource.post({
+        body: {
+          Kind: 'Secret',
+          apiVersion: 'v1',
+          metadata: {
+            name: gitSyncPrefix(name),
+            annotations: {
+              displayName
+            }
+          },
+          data: {
+            ssh: Buffer.from(secret).toString('base64')
+          },
+          type: 'Opaque'
+        }
+      });
+      return this.propsMapping(body);
+    } catch (e) {
+      if (e.statusCode === 409) {
+        throw new ApolloError(e.message, 'RESOURCE_CONFLICT');
       }
-    });
-    return this.propsMapping(body);
+      throw e;
+    }
   }
 
   public async update(name: string, {displayName, secret}: {displayName: string, secret: string}) {
