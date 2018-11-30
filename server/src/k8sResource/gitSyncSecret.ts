@@ -27,8 +27,15 @@ export default class GitSyncSecret {
   }
 
   public async findOne(name: string) {
-    const {body} = await this.resource(name).get();
-    return this.propsMapping(body);
+    try {
+      const {body} = await this.resource(name).get();
+      return this.propsMapping(body);
+    } catch (e) {
+      if (e.statusCode === 404) {
+        return null;
+      }
+      throw e;
+    }
   }
 
   public async create({name, displayName, secret}: {name: string, displayName: string, secret: string}) {
