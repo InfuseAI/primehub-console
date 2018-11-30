@@ -4,6 +4,7 @@
 # import InstanceType, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput, InstanceTypeCreateInput, InstanceTypeUpdateInput from "./instanceType.graphql"
 # import Image, ImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput from "./image.graphql"
 # import Dataset, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
+# import Secret, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
 
 scalar JSON
 
@@ -97,6 +98,23 @@ type Query {
     first: Int
     last: Int
   ): DatasetConnection!
+
+  """Secret"""
+  secret(where: SecretWhereUniqueInput!): Secret!
+  secrets(
+    where: SecretWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [Secret]!
+  secretsConnection(
+    where: SecretWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): SecretConnection!
 }
 
 type Mutation {
@@ -122,6 +140,11 @@ type Mutation {
   createInstanceType(data: InstanceTypeCreateInput!): InstanceType!
   updateInstanceType(data: InstanceTypeUpdateInput!, where: InstanceTypeWhereUniqueInput!): InstanceType
   deleteInstanceType(where: InstanceTypeWhereUniqueInput!): InstanceType
+
+  """Secret"""
+  createSecret(data: SecretCreateInput!): Secret!
+  updateSecret(data: SecretUpdateInput!, where: SecretWhereUniqueInput!): Secret
+  deleteSecret(where: SecretWhereUniqueInput!): Secret
 
   """Image"""
   createImage(data: ImageCreateInput!): Image!

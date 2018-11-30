@@ -1,5 +1,6 @@
-# import PageInfo from "common.graphql"
-# import Group, GroupCreateManyInput, GroupUpdateManyInput from "group.graphql"
+# import PageInfo from "./common.graphql"
+# import Group, GroupCreateManyInput, GroupUpdateManyInput from "./group.graphql"
+# import Secret, SecretCreateOneInput, SecretUpdateOneInput from "./secret.graphql"
 
 type Dataset {
   id: ID!
@@ -13,6 +14,7 @@ type Dataset {
   volumeName: String
   spec: JSON
   groups: [Group]
+  secret: Secret
 }
 
 """An edge in a connection."""
@@ -53,6 +55,7 @@ input DatasetCreateInput {
   variables: JSON
   volumeName: String
   groups: GroupCreateManyInput
+  secret: SecretCreateOneInput
 }
 
 input DatasetUpdateInput {
@@ -65,4 +68,5 @@ input DatasetUpdateInput {
   variables: JSON
   volumeName: String
   groups: GroupUpdateManyInput
+  secret: SecretUpdateOneInput
 }

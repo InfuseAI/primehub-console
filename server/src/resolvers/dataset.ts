@@ -4,7 +4,8 @@ import { Crd } from './crd';
 import { mutateRelation, mergeVariables } from './utils';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 import { Context } from './interface';
-import { omit } from 'lodash';
+import { omit, get } from 'lodash';
+import { resolveInDataSet } from './secret';
 
 export const mapping = (item: Item<DatasetSpec>) => {
   return {
@@ -17,14 +18,23 @@ export const mapping = (item: Item<DatasetSpec>) => {
     url: item.spec.url,
     variables: item.spec.variables,
     volumeName: item.spec.volumeName,
-    spec: item.spec
+    spec: item.spec,
+    secret: get(item, 'spec.gitsync.secret')
   };
 };
 
 export const createMapping = (data: any) => {
+  const gitSyncSecretId = get(data, 'secret.connect.id');
+  const gitSyncProp = gitSyncSecretId
+    ? {gitsync: {secret: gitSyncSecretId}}
+    : {};
+  const annotations = (data.type === 'git')
+    ? {annotations: {'primehub-gitsync': 'true'}}
+    : {};
   return {
     metadata: {
-      name: data.name
+      name: data.name,
+      ...annotations
     },
     spec: {
       displayName: data.displayName || data.name,
@@ -33,15 +43,31 @@ export const createMapping = (data: any) => {
       type: data.type,
       url: data.url,
       variables: data.variables,
-      volumeName: data.volumeName
+      volumeName: data.volumeName,
+      ...gitSyncProp
     }
   };
 };
 
 export const updateMapping = (data: any) => {
+  const secretConnect = get(data, 'secret.connect.id');
+  const secretDisconnect = get(data, 'secret.disconnect');
+  let gitSyncProp: any = {};
+  if (secretConnect) {
+    gitSyncProp = {gitsync: {secret: secretConnect}};
+  } else if (secretDisconnect) {
+    gitSyncProp = {gitsync: null};
+  }
+
+  // gitsync annotation
+  const annotations = (data.type === 'git')
+    ? {annotations: {'primehub-gitsync': 'true'}}
+    : {};
+
   return {
     metadata: {
-      name: data.name
+      name: data.name,
+      ...annotations
     },
     spec: {
       displayName: data.displayName,
@@ -50,7 +76,8 @@ export const updateMapping = (data: any) => {
       type: data.type,
       url: data.url,
       variables: data.variables,
-      volumeName: data.volumeName
+      volumeName: data.volumeName,
+      ...gitSyncProp
     }
   };
 };
@@ -150,6 +177,10 @@ const customUpdate = async ({name, metadata, spec, customResource}) => {
   });
 };
 
+export const resolveType = {
+  ...resolveInDataSet
+};
+
 export const crd = new Crd<DatasetSpec>({
   customResourceMethod: 'datasets',
   propMapping: mapping,
@@ -159,5 +190,6 @@ export const crd = new Crd<DatasetSpec>({
   updateMapping,
   onCreate,
   onUpdate,
+  resolveType,
   customUpdate
 });

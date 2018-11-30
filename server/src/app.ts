@@ -1,11 +1,10 @@
 // tslint:disable:no-console
 import Koa, {Context} from 'koa';
-import stringify from 'json-stringify-safe';
 import { ApolloServer, gql, ApolloError } from 'apollo-server-koa';
 import { importSchema } from 'graphql-import';
 import path from 'path';
 import KcAdminClient from 'keycloak-admin';
-import { omit, get, isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { Issuer } from 'openid-client';
 import views from 'koa-views';
 import serve from 'koa-static';
@@ -19,6 +18,7 @@ import CrdClient from './crdClient/crdClientImpl';
 import * as system from './resolvers/system';
 import * as user from './resolvers/user';
 import * as group from './resolvers/group';
+import * as secret from './resolvers/secret';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
@@ -40,6 +40,7 @@ import Boom from 'boom';
 // graphql middlewares
 import readOnlyMiddleware from './middlewares/readonly';
 import TokenSyncer from './oidc/syncer';
+import GitSyncSecret from './k8sResource/gitSyncSecret';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -54,6 +55,9 @@ const resolvers = {
     group: group.queryOne,
     groups: group.query,
     groupsConnection: group.connectionQuery,
+    secret: secret.queryOne,
+    secrets: secret.query,
+    secretsConnection: secret.connectionQuery,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers()
@@ -69,6 +73,9 @@ const resolvers = {
     createGroup: group.create,
     updateGroup: group.update,
     deleteGroup: group.destroy,
+    createSecret: secret.create,
+    updateSecret: secret.update,
+    deleteSecret: secret.destroy,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation()
@@ -89,6 +96,9 @@ const resolvers = {
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => {
   const config = createConfig();
   const staticPath = config.appPrefix ? `${config.appPrefix}/` : '/';
+
+  // gitsync secret client
+  const gitSyncSecret = new GitSyncSecret({namespace: config.k8sCrdNamespace});
 
   // construct http agent
   const httpAgent = new Agent({
@@ -226,7 +236,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer}> => 
         everyoneGroupId: config.keycloakEveryoneGroupId,
         kcAdminClient,
         crdClient,
-        readOnly
+        gitSyncSecret,
+        readOnly,
       };
     },
     formatError: error => {
