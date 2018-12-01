@@ -95,7 +95,7 @@ export default () => (
     />
     <number keyName="memoryLimit" title="${memoryLimit}"
       uiParams={{unit: ' GB', step: 1, min: 0.1, precision: 1}}
-      defaultValue={0.1}
+      defaultValue={1.0}
       required
       packageName="../src/cms-components/customize-number-precision"
     />
@@ -110,7 +110,7 @@ export default () => (
     />
     <number keyName="memoryRequest" title="${memoryRequest}"
       uiParams={{unit: ' GB', step: 1, min: 0.1, precision: 1}}
-      defaultValue={0.1}
+      defaultValue={1.0}
       required
       packageName="../src/cms-components/customize-number-precision"
     />

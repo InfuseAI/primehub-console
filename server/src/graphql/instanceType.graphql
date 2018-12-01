@@ -7,10 +7,10 @@ type InstanceType {
   displayName: String
   description: String
   cpuLimit: Float
-  memoryLimit: Int
+  memoryLimit: Float
   gpuLimit: Int
   cpuRequest: Float
-  memoryRequest: Int
+  memoryRequest: Float
   global: Boolean
   spec: JSON
   groups: [Group]
@@ -49,10 +49,10 @@ input InstanceTypeCreateInput {
   displayName: String
   description: String
   cpuLimit: Float
-  memoryLimit: Int
+  memoryLimit: Float
   gpuLimit: Int
   cpuRequest: Float
-  memoryRequest: Int
+  memoryRequest: Float
   global: Boolean
   groups: GroupCreateManyInput
 }
@@ -62,10 +62,10 @@ input InstanceTypeUpdateInput {
   displayName: String
   description: String
   cpuLimit: Float
-  memoryLimit: Int
+  memoryLimit: Float
   gpuLimit: Int
   cpuRequest: Float
-  memoryRequest: Int
+  memoryRequest: Float
   global: Boolean
   groups: GroupUpdateManyInput
 }

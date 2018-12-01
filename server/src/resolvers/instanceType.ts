@@ -3,8 +3,9 @@ import { Item } from '../crdClient/customResource';
 import { InstanceTypeSpec } from '../crdClient/crdClientImpl';
 import { mutateRelation, parseMemory, stringifyMemory } from './utils';
 import { Crd } from './crd';
-import { isUndefined } from 'lodash';
+import { isUndefined, isNil } from 'lodash';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
+import Boom from 'boom';
 
 export const mapping = (item: Item<InstanceTypeSpec>) => {
   return {
@@ -29,7 +30,34 @@ export const resolveType = {
   }
 };
 
+const expectInputNotNilAndLargerThanZero = (num: number, fieldName: string) => {
+  if (isNil(num)) {
+    throw Boom.badData(`field ${fieldName} should not be nil`);
+  }
+
+  if (num <= 0) {
+    throw Boom.badData(`field ${fieldName} should > zero`);
+  }
+};
+
+const expectInputLargerThanZero = (num: number, fieldName: string) => {
+  // not exist, skip
+  if (isUndefined(num)) {
+    return;
+  }
+
+  if (num <= 0) {
+    throw Boom.badData(`field ${fieldName} should > zero`);
+  }
+};
+
 export const createMapping = (data: any) => {
+  // validate the request / limit for cpu and memory should always > 0
+  expectInputNotNilAndLargerThanZero(data.cpuLimit, 'cpuLimit');
+  expectInputNotNilAndLargerThanZero(data.memoryLimit, 'memoryLimit');
+  expectInputNotNilAndLargerThanZero(data.cpuRequest, 'cpuRequest');
+  expectInputNotNilAndLargerThanZero(data.memoryRequest, 'memoryRequest');
+
   return {
     metadata: {
       name: data.name
@@ -47,6 +75,11 @@ export const createMapping = (data: any) => {
 };
 
 export const updateMapping = (data: any) => {
+  expectInputLargerThanZero(data.cpuLimit, 'cpuLimit');
+  expectInputLargerThanZero(data.memoryLimit, 'memoryLimit');
+  expectInputLargerThanZero(data.cpuRequest, 'cpuRequest');
+  expectInputLargerThanZero(data.memoryRequest, 'memoryRequest');
+
   return {
     metadata: {
       name: data.name
