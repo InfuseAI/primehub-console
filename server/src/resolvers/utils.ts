@@ -169,6 +169,10 @@ export const parseMemory = (memWithUnit: string) => {
 };
 
 export const mergeVariables = (originalVariables: any, newVariables: any) => {
+  if (isEmpty(newVariables)) {
+    return originalVariables;
+  }
+
   const mergedVariables = mapValues(originalVariables, (value, key) => {
     if (isUndefined(newVariables[key])) {
       return null;
