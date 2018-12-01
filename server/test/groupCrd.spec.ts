@@ -59,12 +59,20 @@ describe('group resource relation graphql', function() {
       it('should create resource with group', async () => {
         const resourceName = faker.internet.userName().toLowerCase().replace(/_/g, '-');
         const group = await this.createGroup();
+        const payload = resource.name === 'instanceType'
+          ? {
+            cpuLimit: 2,
+            memoryLimit: 2,
+            cpuRequest: 2,
+            memoryRequest: 2
+          } : {};
         const mutation = await this.graphqlRequest(`
         mutation($data: ${resource.pascal}CreateInput!){
           create${resource.pascal} (data: $data) { id name groups {id name} }
         }`, {
           data: {
             name: resourceName,
+            ...payload,
             groups: {
               connect: [{id: group.id}]
             }
@@ -116,12 +124,20 @@ describe('group resource relation graphql', function() {
       it('should update resource with connect/disconnect', async () => {
         const resourceName = faker.internet.userName().toLowerCase().replace(/_/g, '-');
         const firstGroup = await this.createGroup();
+        const payload = resource.name === 'instanceType'
+          ? {
+            cpuLimit: 2,
+            memoryLimit: 2,
+            cpuRequest: 2,
+            memoryRequest: 2
+          } : {};
         await this.graphqlRequest(`
         mutation($data: ${resource.pascal}CreateInput!){
           create${resource.pascal} (data: $data) { id name groups {id name} }
         }`, {
           data: {
             name: resourceName,
+            ...payload,
             groups: {
               connect: [{id: firstGroup.id}]
             }
@@ -169,12 +185,20 @@ describe('group resource relation graphql', function() {
       it('should delete resource', async () => {
         const resourceName = faker.internet.userName().toLowerCase().replace(/_/g, '-');
         const group = await this.createGroup();
+        const payload = resource.name === 'instanceType'
+          ? {
+            cpuLimit: 2,
+            memoryLimit: 2,
+            cpuRequest: 2,
+            memoryRequest: 2
+          } : {};
         await this.graphqlRequest(`
         mutation($data: ${resource.pascal}CreateInput!){
           create${resource.pascal} (data: $data) { id name groups {id name} }
         }`, {
           data: {
             name: resourceName,
+            ...payload,
             groups: {
               connect: [{id: group.id}]
             }

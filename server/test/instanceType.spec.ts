@@ -72,9 +72,13 @@ describe('instanceType graphql', function() {
     expect(data.instanceTypes).to.be.eql([]);
   });
 
-  it('create a instanceType with only name', async () => {
+  it('create a instanceType with only required fields', async () => {
     const data = {
-      name: faker.internet.userName().toLowerCase().replace(/_/g, '-')
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      cpuLimit: 2,
+      memoryLimit: 2,
+      cpuRequest: 2,
+      memoryRequest: 2
     };
     const mutation = await this.graphqlRequest(`
     mutation($data: InstanceTypeCreateInput!){
@@ -84,20 +88,18 @@ describe('instanceType graphql', function() {
     });
 
     expect(mutation.createInstanceType).to.be.eql({
+      ...data,
       id: data.name,
       name: data.name,
       displayName: data.name,
       description: null,
-      cpuLimit: 0,
-      memoryLimit: null,
       gpuLimit: 0,
-      cpuRequest: 0,
-      memoryRequest: null,
       global: false,
-      spec: {
-        displayName: data.name,
-      },
-      groups: []
+      spec: pickSpec({
+        ...data,
+        displayName: data.name
+      }),
+      groups: [],
     });
 
     // get one
@@ -109,19 +111,17 @@ describe('instanceType graphql', function() {
     });
 
     expect(queryOne.instanceType).to.be.eql({
+      ...data,
       id: data.name,
       name: data.name,
       displayName: data.name,
       description: null,
-      cpuLimit: 0,
-      memoryLimit: null,
       gpuLimit: 0,
-      cpuRequest: 0,
-      memoryRequest: null,
       global: false,
-      spec: {
+      spec: pickSpec({
+        ...data,
         displayName: data.name,
-      },
+      }),
       groups: []
     });
     this.currentInstanceType = queryOne.instanceType;
@@ -133,6 +133,7 @@ describe('instanceType graphql', function() {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
       cpuLimit: 2.5,
+      cpuRequest: 2.5,
       gpuLimit: 2,
       memoryLimit: 25,
       memoryRequest: 20,
@@ -179,6 +180,7 @@ describe('instanceType graphql', function() {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
       cpuLimit: 2.5,
+      cpuRequest: 2.5,
       gpuLimit: 2,
       memoryLimit: 25,
       memoryRequest: 20,
@@ -230,14 +232,19 @@ describe('instanceType graphql', function() {
     expect(queryOne.instanceType).to.be.eql(this.currentInstanceType);
   });
 
-  it('should create with name-only and update', async () => {
+  it('should create with required fields and update', async () => {
+    const createdData = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      cpuLimit: 2,
+      memoryLimit: 2,
+      cpuRequest: 2,
+      memoryRequest: 2
+    };
     const createMutation = await this.graphqlRequest(`
     mutation($data: InstanceTypeCreateInput!){
       createInstanceType (data: $data) { ${fields} }
     }`, {
-      data: {
-        name: faker.internet.userName().toLowerCase().replace(/_/g, '-')
-      }
+      data: createdData
     });
 
     // update
@@ -258,7 +265,7 @@ describe('instanceType graphql', function() {
       data
     });
 
-    expect(mutation.updateInstanceType).to.deep.include(data);
+    expect(mutation.updateInstanceType).to.deep.include({...createdData, ...data});
 
     // query one
     const queryOne = await this.graphqlRequest(`
@@ -268,7 +275,7 @@ describe('instanceType graphql', function() {
       where: {id: instanceType.id}
     });
 
-    expect(queryOne.instanceType).to.deep.include(data);
+    expect(queryOne.instanceType).to.deep.include({...createdData, ...data});
 
     // check in k8s
     const instance = await this.crdClient.instanceTypes.get(instanceType.id);
@@ -282,6 +289,7 @@ describe('instanceType graphql', function() {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
       cpuLimit: 2.5,
+      cpuRequest: 2.5,
       gpuLimit: 2,
       memoryLimit: 25,
       memoryRequest: 20
@@ -327,13 +335,17 @@ describe('instanceType graphql', function() {
     expect(instance.spec['requests.memory']).to.be.equals('50G');
   });
 
-  it('should create with name-only and update global twice', async () => {
+  it('should create with required fields and update global twice', async () => {
     const createMutation = await this.graphqlRequest(`
     mutation($data: InstanceTypeCreateInput!){
       createInstanceType (data: $data) { ${fields} }
     }`, {
       data: {
-        name: faker.internet.userName().toLowerCase().replace(/_/g, '-')
+        name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+        cpuLimit: 2.5,
+        cpuRequest: 2.5,
+        memoryLimit: 25,
+        memoryRequest: 20
       }
     });
 

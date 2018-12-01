@@ -230,7 +230,11 @@ describe('observer', function() {
       createInstanceType (data: $data) { id name }
     }`, {
       data: {
-        name: faker.internet.userName().toLowerCase().replace(/_/g, '-')
+        name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+        cpuLimit: 2,
+        memoryLimit: 2,
+        cpuRequest: 2,
+        memoryRequest: 2
       }
     });
     instanceTypes.push(instanceType);
