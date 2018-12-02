@@ -106,6 +106,10 @@ describe('jupyterHub stress test', function() {
         }`, {
           data: {
             name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+            cpuLimit: 2.5,
+            cpuRequest: 2.5,
+            memoryLimit: 25,
+            memoryRequest: 20,
             groups: {
               connect: [{id: groupId}]
             }

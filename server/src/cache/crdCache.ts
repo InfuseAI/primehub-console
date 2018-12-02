@@ -1,5 +1,6 @@
 import { Item } from '../crdClient/customResource';
 import * as logger from '../logger';
+const createEmptySpec = () => ({spec: {}, metadata: {name: 'empty'}});
 
 export class CrdCache<SpecType> {
   private fetching: boolean = false;
@@ -33,9 +34,9 @@ export class CrdCache<SpecType> {
       return this.waitForFetch(name);
     }
 
-    // check if it's still fresh
+    // check if it's still fresh, or is cache empty
     const duration = Date.now() - this.lastTimeFetch;
-    if (duration >= this.maxAge) {
+    if (this.cached.size === 0 || duration >= this.maxAge) {
       logger.info({
         component: logger.components.crdCache,
         type: 'CACHE_NOT_FRESH',
@@ -71,6 +72,10 @@ export class CrdCache<SpecType> {
     });
   }
 
+  public clear = () => {
+    this.cached.clear();
+  }
+
   private waitForFetch = async (name: string): Promise<Item<SpecType>> => {
     if (this.fetchingPromise) {
       return this.fetchingPromise.then(() => this.fetched(name));
@@ -79,6 +84,6 @@ export class CrdCache<SpecType> {
   }
 
   private fetched = (name: string) => {
-    return this.cached.get(name);
+    return this.cached.get(name) || createEmptySpec() as any;
   }
 }

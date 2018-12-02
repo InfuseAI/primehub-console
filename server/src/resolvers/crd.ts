@@ -7,9 +7,11 @@ import KeycloakAdminClient from 'keycloak-admin';
 import { ApolloError } from 'apollo-server';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
 import {createConfig} from '../config';
+import { CrdCache } from '../cache/crdCache';
 const config = createConfig();
 
 export class Crd<SpecType> {
+  private cache: CrdCache<SpecType>;
   private customResourceMethod: string;
   private propMapping: (item: Item<SpecType>) => Record<string, any>;
   private createMapping: (data: any) => any;
@@ -64,6 +66,10 @@ export class Crd<SpecType> {
     this.onUpdate = onUpdate;
     this.customUpdate = customUpdate;
     this.rolePrefix = config.rolePrefix;
+  }
+
+  public setCache(cache: CrdCache<SpecType>) {
+    this.cache = cache;
   }
 
   /**
@@ -249,6 +255,11 @@ export class Crd<SpecType> {
     if (this.onCreate) {
       await this.onCreate({role, resource: res, data: args.data, context});
     }
+    // clear cache
+    if (this.cache) {
+      this.cache.clear();
+    }
+
     return this.propMapping(res);
   }
 
@@ -273,6 +284,10 @@ export class Crd<SpecType> {
     if (this.onUpdate) {
       await this.onUpdate({role, resource: res, data: args.data, context});
     }
+    // clear cache
+    if (this.cache) {
+      this.cache.clear();
+    }
     return this.propMapping(res);
   }
 
@@ -286,6 +301,10 @@ export class Crd<SpecType> {
     // delete crd on k8s
     const crd = await customResource.get(name);
     await customResource.del(name);
+    // clear cache
+    if (this.cache) {
+      this.cache.clear();
+    }
     return this.propMapping(crd);
   }
 }

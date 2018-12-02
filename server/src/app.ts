@@ -196,11 +196,13 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     resource: 'image',
     originList: crdClient.images.list
   });
+  image.setCache(imageCache);
 
   const instCache = new CrdCache({
     resource: 'instanceType',
     originList: crdClient.instanceTypes.list
   });
+  instanceType.setCache(imageCache);
 
   await imageCache.refetch();
   await instCache.refetch();
