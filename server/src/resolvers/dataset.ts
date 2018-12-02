@@ -4,7 +4,7 @@ import { Crd } from './crd';
 import { mutateRelation, mergeVariables } from './utils';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 import { Context } from './interface';
-import { omit, get } from 'lodash';
+import { omit, get, isUndefined } from 'lodash';
 import { resolveInDataSet } from './secret';
 
 export const mapping = (item: Item<DatasetSpec>) => {
@@ -60,9 +60,15 @@ export const updateMapping = (data: any) => {
   }
 
   // gitsync annotation
-  const annotations = (data.type === 'git')
-    ? {annotations: {'primehub-gitsync': 'true'}}
-    : {};
+  let annotations: any = {};
+  // update to git type
+  if (data.type === 'git') {
+    annotations = {annotations: {'primehub-gitsync': 'true'}};
+  } else if (!isUndefined(data.type)) {
+    // set to other type
+    annotations = {annotations: null};
+    gitSyncProp = {gitsync: null};
+  }
 
   return {
     metadata: {
