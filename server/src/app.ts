@@ -394,6 +394,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   rootRouter.get('/cms/*', oidcCtrl.ensureAdmin, async ctx => {
     await ctx.render('cms', {title: 'PrimeHub', staticPath});
   });
+
+  // health check
+  rootRouter.get('/health', async ctx => {
+    ctx.status = 204;
+  });
   app.use(rootRouter.routes());
   server.applyMiddleware({ app, path: config.appPrefix ? `${config.appPrefix}/graphql` : '/graphql' });
   return {app, server, config};
