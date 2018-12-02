@@ -212,7 +212,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
   const schemaWithMiddleware = applyMiddleware(schema, readOnlyMiddleware);
   const server = new ApolloServer({
-    tracing: true,
+    tracing: config.apolloTracing,
     debug: true,
     schema: schemaWithMiddleware as any,
     context: async ({ ctx }: { ctx: Koa.Context }) => {
