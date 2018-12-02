@@ -13,7 +13,7 @@ import * as GraphQLJSON from 'graphql-type-json';
 import { makeExecutableSchema } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
 
-import CrdClient from './crdClient/crdClientImpl';
+import CrdClient, { InstanceTypeSpec, DatasetSpec, ImageSpec } from './crdClient/crdClientImpl';
 import * as system from './resolvers/system';
 import * as user from './resolvers/user';
 import * as group from './resolvers/group';
@@ -27,7 +27,14 @@ import basicAuth from 'basic-auth';
 import koaMount from 'koa-mount';
 
 // cache
-import { getDataset, getImage, getInstanceType, addCacheLayerToKc } from './cache';
+import {
+  memGetDataset,
+  memGetImage,
+  memGetInstanceType,
+  addCacheLayerToKc
+} from './cache';
+
+import { CrdCache } from './cache/crdCache';
 
 // controller
 import { OidcCtrl, mount as mountOidc } from './oidc';
@@ -46,6 +53,7 @@ import GitSyncSecret from './k8sResource/gitSyncSecret';
 
 // logger
 import * as logger from './logger';
+import { Item } from './crdClient/customResource';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -183,6 +191,20 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     observer.observe();
   }
 
+  // crd cache
+  const imageCache = new CrdCache({
+    resource: 'image',
+    originList: crdClient.images.list
+  });
+
+  const instCache = new CrdCache({
+    resource: 'instanceType',
+    originList: crdClient.instanceTypes.list
+  });
+
+  await imageCache.refetch();
+  await instCache.refetch();
+
   // apollo server
   const schema = makeExecutableSchema({
     typeDefs: typeDefs as any,
@@ -195,6 +217,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     schema: schemaWithMiddleware as any,
     context: async ({ ctx }: { ctx: Koa.Context }) => {
       let readOnly = false;
+      let getInstanceType: (name: string) => Promise<Item<InstanceTypeSpec>>;
+      let getImage: (name: string) => Promise<Item<ImageSpec>>;
+
       const kcAdminClient = createKcAdminClient();
       const {authorization = ''}: {authorization: string} = ctx.header;
 
@@ -208,6 +233,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
             || config.sharedGraphqlSecretKey !== apiToken) {
           throw Boom.forbidden('apiToken not valid');
         }
+
+        // since it's from jupyterHub
+        // we use batch for crd resource get method
+        getInstanceType = instCache.get;
+        getImage = imageCache.get;
 
         // use service account token and put on readonly mode
         readOnly = true;
@@ -245,9 +275,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         everyoneGroupId: config.keycloakEveryoneGroupId,
         kcAdminClient,
         crdClient,
-        getInstanceType: getInstanceType(crdClient),
-        getImage: getImage(crdClient),
-        getDataset: getDataset(crdClient),
+        getInstanceType: getInstanceType || memGetInstanceType(crdClient),
+        getImage: getImage || memGetImage(crdClient),
+        getDataset: memGetDataset(crdClient),
         gitSyncSecret,
         readOnly,
       };

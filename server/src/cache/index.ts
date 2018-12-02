@@ -10,6 +10,6 @@ export const addCacheLayerToKc = (kcAdminClient: KeycloakAdminClient) => {
   return kcAdminClient;
 };
 
-export const getInstanceType = (crdClient: CrdClientImpl) => memoize(crdClient.instanceTypes.get);
-export const getImage = (crdClient: CrdClientImpl) => memoize(crdClient.images.get);
-export const getDataset = (crdClient: CrdClientImpl) => memoize(crdClient.datasets.get);
+export const memGetInstanceType = (crdClient: CrdClientImpl) => memoize(crdClient.instanceTypes.get);
+export const memGetImage = (crdClient: CrdClientImpl) => memoize(crdClient.images.get);
+export const memGetDataset = (crdClient: CrdClientImpl) => memoize(crdClient.datasets.get);

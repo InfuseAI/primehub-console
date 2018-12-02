@@ -14,6 +14,7 @@ export enum components {
   authentication = 'Authentication',
   tokenSyncer = 'TokenSyncer',
   watcher = 'Watcher',
+  crdCache = 'CrdCache',
   group = 'Group',
   user = 'User',
 }
