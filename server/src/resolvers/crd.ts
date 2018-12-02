@@ -202,7 +202,18 @@ export class Crd<SpecType> {
     roles = roles.filter(role => role.name.startsWith(prefix));
     const names = roles.map(role => role.name.slice(prefix.length));
     const rows = await Promise.all(names.map(name => {
-      return context.crdClient[this.customResourceMethod].get(name);
+      if (this.resourceName === 'dataset') {
+        return context.getDataset(name);
+      }
+
+      if (this.resourceName === 'image') {
+        return context.getImage(name);
+      }
+
+      if (this.resourceName === 'instanceType') {
+        return context.getInstanceType(name);
+      }
+      // return context.crdClient[this.customResourceMethod].get(name);
     }));
     return rows.map(this.propMapping);
   }

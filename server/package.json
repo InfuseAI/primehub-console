@@ -53,6 +53,7 @@
     "lodash": "^4.17.10",
     "minimist": "^1.2.0",
     "openid-client": "^2.3.0",
+    "p-is-promise": "^2.0.0",
     "pluralize": "^7.0.0",
     "pug": "^2.0.3"
   },

@@ -26,6 +26,9 @@ import { ErrorCodes } from './errorCodes';
 import basicAuth from 'basic-auth';
 import koaMount from 'koa-mount';
 
+// cache
+import { getDataset, getImage, getInstanceType, addCacheLayerToKc } from './cache';
+
 // controller
 import { OidcCtrl, mount as mountOidc } from './oidc';
 
@@ -187,6 +190,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
   const schemaWithMiddleware = applyMiddleware(schema, readOnlyMiddleware);
   const server = new ApolloServer({
+    tracing: true,
     debug: true,
     schema: schemaWithMiddleware as any,
     context: async ({ ctx }: { ctx: Koa.Context }) => {
@@ -233,11 +237,17 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         kcAdminClient.setAccessToken(accessToken);
       }
 
+      // cache layer
+      addCacheLayerToKc(kcAdminClient);
+
       return {
         realm: config.keycloakRealmName,
         everyoneGroupId: config.keycloakEveryoneGroupId,
         kcAdminClient,
         crdClient,
+        getInstanceType: getInstanceType(crdClient),
+        getImage: getImage(crdClient),
+        getDataset: getDataset(crdClient),
         gitSyncSecret,
         readOnly,
       };

@@ -44,7 +44,7 @@ export default class CustomResource<SpecType = any> {
     return this.crd.spec && this.crd.spec.names && this.crd.spec.names.plural;
   }
 
-  public async get(name: string): Promise<Item<SpecType>> {
+  public get = async (name: string): Promise<Item<SpecType>> => {
     const {body} = await this.resource(name).get();
     return pick(body, ['metadata', 'spec']);
   }
