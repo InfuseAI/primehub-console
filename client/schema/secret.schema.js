@@ -4,7 +4,7 @@ import CannerScript, {Condition} from 'canner-script';
 export default () => (
   <array ui="tableRoute"
     keyName="secret"
-    title="Secret"
+    title="Secrets"
     uiParams={{
       columns: [{
         title: 'Name',
