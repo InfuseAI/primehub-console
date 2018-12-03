@@ -50,47 +50,36 @@ export default class Watcher<T> {
 
         if (type === 'ADDED') {
           // check if it's already on keycloak
-          logger.info({
-            component: logger.components.watcher,
-            type: 'K8S_ADD_EVENT',
-            resource: this.resource.getResourcePlural(),
-            name: object.metadata.name
-          });
           const role = await this.keycloakAdmin.roles.findOneByName({
             name: `${prefix}${object.metadata.name}`
           });
 
-          if (!role) {
-            logger.info({
-              component: logger.components.watcher,
-              type: 'ADD_ROLE',
-              resource: this.resource.getResourcePlural(),
-              name: object.metadata.name
-            });
-            // create one
-            await this.crd.createOnKeycloak(
-              this.defaultCreateData(object),
-              object.metadata,
-              object.spec,
-              {
-                kcAdminClient: this.keycloakAdmin,
-                everyoneGroupId: this.everyoneGroupId
-              }
-            );
-            logger.info({
-              component: logger.components.watcher,
-              type: 'SUCCESS_ADD_ROLE',
-              resource: this.resource.getResourcePlural(),
-              name: object.metadata.name
-            });
-          } else {
-            logger.info({
-              component: logger.components.watcher,
-              type: 'ROLE_ALREADY_EXIST',
-              resource: this.resource.getResourcePlural(),
-              name: object.metadata.name
-            });
+          if (role) {
+            return;
           }
+
+          logger.info({
+            component: logger.components.watcher,
+            type: 'ADD_ROLE',
+            resource: this.resource.getResourcePlural(),
+            name: object.metadata.name
+          });
+          // create one
+          await this.crd.createOnKeycloak(
+            this.defaultCreateData(object),
+            object.metadata,
+            object.spec,
+            {
+              kcAdminClient: this.keycloakAdmin,
+              everyoneGroupId: this.everyoneGroupId
+            }
+          );
+          logger.info({
+            component: logger.components.watcher,
+            type: 'SUCCESS_ADD_ROLE',
+            resource: this.resource.getResourcePlural(),
+            name: object.metadata.name
+          });
         } else if (type === 'DELETED') {
           // delete the role on keycloak
           try {
