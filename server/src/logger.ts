@@ -20,12 +20,11 @@ export enum components {
 }
 
 export const log = (levelType: level = level.info, payload?: any) => {
-  const args: any[] = devEnv ? [null, 2] : [];
   console.log(JSON.stringify({
     time: new Date().toISOString(),
     level: levelType,
     ...payload
-  }, ...args));
+  }));
 };
 
 export const info = (payload: any) => {
