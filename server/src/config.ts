@@ -45,6 +45,7 @@ export interface Config {
 
   appPrefix?: string;
   apolloTracing: boolean;
+  graphqlPlayground: boolean;
 }
 
 const defaultConfigs = {
@@ -66,11 +67,13 @@ const defaultConfigs = {
   keycloakMaxFreeSockets: 10,
   keycloakRetries: 0,
   keycloakTimeout: 3000,
-  apolloTracing: false
+  apolloTracing: false,
+  graphqlPlayground: true
 };
 
 const prodConfigs = {
-  env: 'production'
+  env: 'production',
+  graphqlPlayground: false
 };
 
 const sanitizePath = (path: string) => {
@@ -105,7 +108,8 @@ export const createConfig = (): Config => {
     keycloakRetries: process.env.KC_OIDC_RETRIES,
     keycloakTimeout: process.env.KC_OIDC_TIMEOUT,
     appPrefix: sanitizePath(process.env.APP_PREFIX),
-    apolloTracing: process.env.APOLLO_TRACING
+    apolloTracing: process.env.APOLLO_TRACING,
+    graphqlPlayground: process.env.GRAPHQL_PLAYGROUND
   });
 
   const env = process.env.NODE_ENV || 'development';

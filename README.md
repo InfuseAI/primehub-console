@@ -31,6 +31,7 @@ Canner CMS
 * SHARED_GRAPHQL_SECRET_KEY: secret key to request read-only graphql with. Client should put this shared key in header `Authorization: "Bearer <SHARED_GRAPHQL_SECRET_KEY>"`
 * APP_PREFIX: ex: `/admin`
 * APOLLO_TRACING: (boolean) default: false
+* GRAPHQL_PLAYGROUND: (boolean) default: false
 
 ## Build
 ```sh

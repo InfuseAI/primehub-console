@@ -214,6 +214,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
   const schemaWithMiddleware = applyMiddleware(schema, readOnlyMiddleware);
   const server = new ApolloServer({
+    playground: config.graphqlPlayground,
     tracing: config.apolloTracing,
     debug: true,
     schema: schemaWithMiddleware as any,
