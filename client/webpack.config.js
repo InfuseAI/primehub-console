@@ -2,6 +2,7 @@ const antdTheme = require('./package.json').theme;
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const tsImportPluginFactory = require('ts-import-plugin');
+const {externals, resolve} = require('./webpack.settings');
 const path = require('path');
 
 const devMode = process.env.NODE_ENV !== 'production'
@@ -16,26 +17,8 @@ module.exports = {
     publicPath: devMode ? 'https://localhost:8090/' : ''
   },
   mode: devMode ? 'development' : 'production',
-  externals: {
-    'react': "React",
-    'react-dom': "ReactDOM",
-    'antd': 'antd',
-    'lodash': '_',
-    'firebase': 'firebase',
-    'immutable': 'Immutable',
-    'styled-components': 'styled',
-    'canner-slate-editor': 'CannerSlateEditor'
-  },
-  resolve: {
-    extensions: ['.js', '.ts', '.tsx'],
-    alias: {
-      'styled-components': path.resolve(__dirname, 'node_modules', 'styled-components'),
-      styledShare: path.resolve(__dirname, 'src/styled_share'),
-      utils: path.resolve(__dirname, 'src/utils'),
-      images: path.resolve(__dirname, 'src/images'),
-      components: path.resolve(__dirname, 'src/components')
-    }
-  },
+  externals,
+  resolve,
   devServer: {
     port: "8090",
     contentBase: path.join(__dirname, 'dist'),

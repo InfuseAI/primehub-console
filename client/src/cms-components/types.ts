@@ -7,4 +7,8 @@ export interface Props {
   routes: Array<string>,
   goTo: Function,
   reset: Function,
+  intl: any,
+  keyName: string,
+  items: any,
+  showPagination: boolean
 }
