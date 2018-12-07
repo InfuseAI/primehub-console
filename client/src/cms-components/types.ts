@@ -10,5 +10,10 @@ export interface Props {
   intl: any,
   keyName: string,
   items: any,
-  showPagination: boolean
+  showPagination: any,
+  disabled: any,
+  title: string,
+  rootValue: Object,
+  form: any,
+  size: string
 }

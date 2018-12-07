@@ -1,11 +1,14 @@
 import React from 'react';
 import {Input, Icon, Button} from 'antd';
-import {Item} from 'canner-helpers';
 import get from 'lodash/get';
-import item from '../../node_modules/canner-helpers/lib/item';
+import {Props} from './types';
 const InputGroup = Input.Group;
 
-export default class DynamicFields extends React.Component {
+type State = {
+  fields: Array<any>
+}
+
+export default class DynamicFields extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     const {value, onDeploy, refId, onChange} = props;
@@ -14,15 +17,8 @@ export default class DynamicFields extends React.Component {
     };
   }
 
-  // componentWillReceiveProps(nextProps) {
-  //   const value = nextProps.value || {};
-  //   this.setState({
-  //     fields: objectToArray(nextProps.value || {})
-  //   });
-  // }
-
   add = () => {
-    const {onChange, refId, value} = this.props;
+    const {onChange, refId} = this.props;
     this.setState({
       fields: this.state.fields.concat({key: '', value: ''})
     }, () => {
@@ -42,7 +38,7 @@ export default class DynamicFields extends React.Component {
   }
 
   changeValue = (newValue, index) => {
-    const {fields, value} = this.state;
+    const {fields} = this.state;
     const {onChange, refId} = this.props;
     fields[index].value = newValue;
     this.setState({
@@ -53,7 +49,7 @@ export default class DynamicFields extends React.Component {
   }
 
   changeKey = (key, index) => {
-    const {fields, value} = this.state;
+    const {fields} = this.state;
     const {onChange, refId} = this.props;
     fields[index].key = key;
     this.setState({
