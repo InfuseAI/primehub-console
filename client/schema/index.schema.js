@@ -32,7 +32,8 @@ if (process.env.NODE_ENV === 'production') {
   schema.graphqlClient = graphqlClient;
 } else {
   schema.connector = new LocalStorageConnector({
-    defaultData: createFakeData(schema.schema, 265)
+    defaultData: createFakeData(schema.schema, 265),
+    localStorageKey: 'infuse'
   })
 }
 
