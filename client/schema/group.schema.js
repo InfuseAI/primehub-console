@@ -185,5 +185,7 @@ export default () => (
         </toolbar>
       </relation>
     </Block>
+    {/* writable is only used to check in dataset.groups table, no need to show */}
+    <boolean keyName="writable" hidden />
   </array>
 )
