@@ -47,7 +47,15 @@ export default class DatesetGroupTable extends PureComponent {
       value.filter(item => !item.writable).map(v => v.id);
     const idsShouldCreate = difference(queue, currentIds);
     const idsShouldRemove = difference(currentIds, queue);
-    const createActions = idsShouldCreate.map(id => ({refId, type: "connect", value: originData.find(data => data.id === id)}));
+    const createActions = idsShouldCreate.map(id => ({
+      refId,
+      type: "connect",
+      value: {
+        ...originData.find(data => data.id === id),
+        writable,
+      },
+      transformGqlPayload: (payload) => ({...payload, writable})
+    }));
     const delActions = idsShouldRemove.map(id => ({refId, type: "disconnect", value: originData.find(data => data.id === id)}));
     onChange([...createActions, ...delActions]);
     this.handleCancel();
@@ -80,7 +88,6 @@ export default class DatesetGroupTable extends PureComponent {
     const {readOnly, writable} = getDisplayTableType(recordValue);
     const readOnlyValue = value.filter(item => !item.writable);
     const writableValue = value.filter(item => item.writable);
-    console.log(readOnlyValue, writableValue);
     return (
       <div>
         {
