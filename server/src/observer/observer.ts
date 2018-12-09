@@ -25,7 +25,7 @@ export default class Observer {
       crd: dataset,
       resource: crdClient.datasets,
       keycloakAdmin,
-      defaultCreateData: object => ({access: object.spec.access || 'everyone'}),
+      defaultCreateData: object => ({global: true}),
       everyoneGroupId,
       getAccessToken
     });

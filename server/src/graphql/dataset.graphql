@@ -1,5 +1,5 @@
 # import PageInfo from "./common.graphql"
-# import Group, GroupCreateManyInput, GroupUpdateManyInput from "./group.graphql"
+# import Group, GroupWhereUniqueInput from "./group.graphql"
 # import Secret, SecretCreateOneInput, SecretUpdateOneInput from "./secret.graphql"
 
 type Dataset {
@@ -7,11 +7,12 @@ type Dataset {
   name: String!
   displayName: String
   description: String
-  access: String
+  global: Boolean
   type: String
   url: String
   variables: JSON
   volumeName: String
+  writable: Boolean
   spec: JSON
   groups: [Group]
   secret: Secret
@@ -44,17 +45,64 @@ input DatasetWhereInput {
   displayName_contains: String
 }
 
+"""group relation"""
+input DatasetGroupWhereUniqueInput {
+  id: ID!
+  writable: Boolean
+}
+
+input DatasetGroupCreateManyInput {
+  create: [DatasetGroupCreateInput!]
+  connect: [DatasetGroupWhereUniqueInput!]
+}
+
+input DatasetGroupUpdateManyInput {
+  create: [DatasetGroupUpdateInput!]
+  connect: [DatasetGroupWhereUniqueInput!]
+  disconnect: [GroupWhereUniqueInput!]
+  delete: [GroupWhereUniqueInput!]
+}
+
+input DatasetGroupCreateInput {
+  name: String!
+  displayName: String
+  quotaCpu: Float
+  quotaGpu: Int
+  quotaMemory: Float
+  quotaDisk: Int
+  projectQuotaCpu: Float
+  projectQuotaGpu: Int
+  projectQuotaMemory: Float
+  writable: Boolean
+  # users: UserCreateManyInput
+}
+
+input DatasetGroupUpdateInput {
+  name: String
+  displayName: String
+  quotaCpu: Float
+  quotaGpu: Int
+  quotaMemory: Float
+  quotaDisk: Int
+  projectQuotaCpu: Float
+  projectQuotaGpu: Int
+  projectQuotaMemory: Float
+  writable: Boolean
+  # users: UserUpdateManyInput
+}
+
+
 """Mutation input"""
 input DatasetCreateInput {
   name: String!
   displayName: String
   description: String
-  access: String
+  global: Boolean
   type: String
   url: String
   variables: JSON
   volumeName: String
-  groups: GroupCreateManyInput
+  groups: DatasetGroupCreateManyInput
   secret: SecretCreateOneInput
 }
 
@@ -62,11 +110,11 @@ input DatasetUpdateInput {
   name: String
   displayName: String
   description: String
-  access: String
+  global: Boolean
   type: String
   url: String
   variables: JSON
   volumeName: String
-  groups: GroupUpdateManyInput
+  groups: DatasetGroupUpdateManyInput
   secret: SecretUpdateOneInput
 }

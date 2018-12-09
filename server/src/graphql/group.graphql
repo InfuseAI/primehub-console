@@ -19,6 +19,8 @@ type Group {
   instanceTypes: [InstanceType]
   images: [Image]
   datasets: [Dataset]
+  # for relation with dataset
+  writable: Boolean
 }
 
 """An edge in a connection."""

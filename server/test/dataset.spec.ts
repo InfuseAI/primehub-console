@@ -16,7 +16,7 @@ const fields = `
   name
   displayName
   description
-  access
+  global
   type
   url
   variables
@@ -28,6 +28,7 @@ const fields = `
     quotaCpu
     quotaGpu
     quotaDisk
+    writable
   }`;
 
 declare module 'mocha' {
@@ -73,7 +74,7 @@ describe('dataset graphql', function() {
       name: data.name,
       displayName: data.name,
       description: null,
-      access: null,
+      global: false,
       type: null,
       url: null,
       variables: null,
@@ -96,7 +97,7 @@ describe('dataset graphql', function() {
       name: data.name,
       displayName: data.name,
       description: null,
-      access: null,
+      global: false,
       type: null,
       url: null,
       variables: null,
@@ -115,12 +116,12 @@ describe('dataset graphql', function() {
     expect(roles.find(role => role.name === `ds:${data.name}`)).to.be.not.ok;
   });
 
-  it('create a dataset with props with access = everyone', async () => {
+  it('create a dataset with props with global = true', async () => {
     const data = {
       name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
-      access: 'everyone',
+      global: true,
       type: 'git',
       url: faker.internet.url()
     };
@@ -135,7 +136,7 @@ describe('dataset graphql', function() {
       id: data.name,
       groups: [],
       variables: null,
-      spec: pick(data, ['displayName', 'description', 'access', 'type', 'url', 'variables', 'volumeName']),
+      spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
 
@@ -151,7 +152,7 @@ describe('dataset graphql', function() {
       id: data.name,
       groups: [],
       variables: null,
-      spec: pick(data, ['displayName', 'description', 'access', 'type', 'url', 'variables', 'volumeName']),
+      spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
 
@@ -163,12 +164,12 @@ describe('dataset graphql', function() {
     expect(roles.find(role => role.name === `ds:${data.name}`)).to.be.ok;
   });
 
-  it('create a dataset with props with access = admin', async () => {
+  it('create a dataset with props with global = false', async () => {
     const data = {
       name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
-      access: 'admin',
+      global: false,
       type: 'git',
       url: faker.internet.url()
     };
@@ -183,7 +184,7 @@ describe('dataset graphql', function() {
       id: data.name,
       groups: [],
       variables: null,
-      spec: pick(data, ['displayName', 'description', 'access', 'type', 'url', 'variables', 'volumeName']),
+      spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
 
@@ -199,7 +200,7 @@ describe('dataset graphql', function() {
       id: data.name,
       groups: [],
       variables: null,
-      spec: pick(data, ['displayName', 'description', 'access', 'type', 'url', 'variables', 'volumeName']),
+      spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
 
@@ -208,7 +209,7 @@ describe('dataset graphql', function() {
       realm: process.env.KC_REALM,
       id: process.env.KC_EVERYONE_GROUP_ID
     });
-    expect(roles.find(role => role.name === `ds:${data.name}`)).to.be.ok;
+    expect(roles.find(role => role.name === `ds:${data.name}`)).to.be.not.ok;
   });
 
   it('update a dataset with variables', async () => {
@@ -216,7 +217,7 @@ describe('dataset graphql', function() {
       name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
-      access: 'admin',
+      global: false,
       type: 'env',
       variables: {
         first: 'first'
@@ -233,7 +234,7 @@ describe('dataset graphql', function() {
       id: data.name,
       url: null,
       groups: [],
-      spec: pick(data, ['displayName', 'description', 'access', 'type', 'url', 'variables', 'volumeName']),
+      spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
     const dataset = mutation.createDataset;
@@ -319,7 +320,7 @@ describe('dataset graphql', function() {
     const data = {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
-      access: 'everyone',
+      global: true,
       type: 'git',
       url: faker.internet.url()
     };
@@ -360,7 +361,7 @@ describe('dataset graphql', function() {
         name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
         displayName: faker.internet.userName(),
         description: faker.lorem.sentence(),
-        access: 'everyone',
+        global: true,
         type: 'git',
         url: faker.internet.url()
       }
@@ -371,7 +372,7 @@ describe('dataset graphql', function() {
     const data = {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
-      access: 'group',
+      global: false,
       type: 'git',
       url: faker.internet.url()
     };
@@ -403,7 +404,7 @@ describe('dataset graphql', function() {
     expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.not.ok;
   });
 
-  it('should update dataset access multiple times', async () => {
+  it('should update dataset global multiple times', async () => {
     const createMutation = await this.graphqlRequest(`
     mutation($data: DatasetCreateInput!){
       createDataset (data: $data) { ${fields} }
@@ -412,16 +413,16 @@ describe('dataset graphql', function() {
         name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
         displayName: faker.internet.userName(),
         description: faker.lorem.sentence(),
-        access: 'group',
+        global: false,
         type: 'git',
         url: faker.internet.url()
       }
     });
 
-    // update to group
+    // update global to false
     const dataset = createMutation.createDataset;
     const data = {
-      access: 'group'
+      global: false
     };
     const mutation = await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
@@ -438,14 +439,14 @@ describe('dataset graphql', function() {
     });
     expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.not.ok;
 
-    // update to admin
+    // update global to true
     await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
       updateDataset (where: $where, data: $data) { ${fields} }
     }`, {
       where: {id: dataset.id},
       data: {
-        access: 'admin'
+        global: true
       }
     });
 
@@ -456,14 +457,14 @@ describe('dataset graphql', function() {
     });
     expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
 
-    // update to everyone
+    // update to true
     await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
       updateDataset (where: $where, data: $data) { ${fields} }
     }`, {
       where: {id: dataset.id},
       data: {
-        access: 'everyone'
+        global: true
       }
     });
 

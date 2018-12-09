@@ -7,6 +7,11 @@ export const addCacheLayerToKc = (kcAdminClient: KeycloakAdminClient) => {
   kcAdminClient.groups.listRealmRoleMappings =
     memoize(kcAdminClient.groups.listRealmRoleMappings, {cacheKey: args => args.id});
 
+  // find groups
+  kcAdminClient.groups.find = memoize(kcAdminClient.groups.find);
+  // find one group
+  kcAdminClient.groups.findOne = memoize(kcAdminClient.groups.findOne, {cacheKey: args => args.id});
+
   return kcAdminClient;
 };
 

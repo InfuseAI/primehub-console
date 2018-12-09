@@ -22,9 +22,9 @@ export class Crd<SpecType> {
   private onCreate?: (data: any) => Promise<any>;
   private onUpdate?: (data: any) => Promise<any>;
   private customUpdate?: ({
-    name, metadata, spec, customResource
+    name, metadata, spec, customResource, context
   }: {
-    name: string, metadata: any, spec: any, customResource: any
+    name: string, metadata: any, spec: any, customResource: any, context: Context
   }) => Promise<any>;
   private rolePrefix?: string;
 
@@ -50,9 +50,9 @@ export class Crd<SpecType> {
     onCreate?: (data: any) => Promise<any>,
     onUpdate?: (data: any) => Promise<any>,
     customUpdate?: ({
-      name, metadata, spec, customResource
+      name, metadata, spec, customResource, context
     }: {
-      name: string, metadata: any, spec: any, customResource: any
+      name: string, metadata: any, spec: any, customResource: any, context: Context
     }) => Promise<any>
   }) {
     this.customResourceMethod = customResourceMethod;
@@ -118,7 +118,7 @@ export class Crd<SpecType> {
     this.resolveType = mapValues(this.resolveType, resolver => resolver.bind(this));
 
     return {
-      [typename]: {...this.resolveType, ...defaultType}
+      [typename]: {...defaultType, ...this.resolveType}
     };
   }
 
@@ -155,11 +155,11 @@ export class Crd<SpecType> {
     });
     const role = await kcAdminClient.roles.findOneByName({name: roleName});
     if (this.onCreate) {
-      await this.onCreate({role, resource: {metadata, spec}, data, context});
+      await this.onCreate({role, resource: {metadata, spec}, data, context, getPrefix: this.getPrefix});
     }
   }
 
-  public getPrefix() {
+  public getPrefix = () => {
     return (this.rolePrefix)
       ? `${this.rolePrefix}:${this.prefixName}:`
       : `${this.prefixName}:`;
@@ -253,7 +253,7 @@ export class Crd<SpecType> {
     const {metadata, spec} = this.createMapping(args.data);
     const res = await customResource.create(metadata, spec);
     if (this.onCreate) {
-      await this.onCreate({role, resource: res, data: args.data, context});
+      await this.onCreate({role, resource: res, data: args.data, context, getPrefix: this.getPrefix});
     }
     // clear cache
     if (this.cache) {
@@ -274,7 +274,7 @@ export class Crd<SpecType> {
     const {metadata, spec} = this.updateMapping(args.data);
     const res = (this.customUpdate) ?
     await this.customUpdate({
-      name, metadata, spec, customResource
+      name, metadata, spec, customResource, context
     }) :
     await customResource.patch(name, {
       metadata: omit(metadata, 'name'),
@@ -282,7 +282,7 @@ export class Crd<SpecType> {
     });
 
     if (this.onUpdate) {
-      await this.onUpdate({role, resource: res, data: args.data, context});
+      await this.onUpdate({role, resource: res, data: args.data, context, getPrefix: this.getPrefix});
     }
     // clear cache
     if (this.cache) {
