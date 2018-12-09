@@ -21,10 +21,11 @@ export class Crd<SpecType> {
   private resourceName: string;
   private onCreate?: (data: any) => Promise<any>;
   private onUpdate?: (data: any) => Promise<any>;
+  private onDelete?: (data: any) => Promise<any>;
   private customUpdate?: ({
-    name, metadata, spec, customResource, context
+    name, metadata, spec, customResource, context, getPrefix
   }: {
-    name: string, metadata: any, spec: any, customResource: any, context: Context
+    name: string, metadata: any, spec: any, customResource: any, context: Context, getPrefix: () => string
   }) => Promise<any>;
   private rolePrefix?: string;
 
@@ -38,6 +39,7 @@ export class Crd<SpecType> {
     resourceName,
     onCreate,
     onUpdate,
+    onDelete,
     customUpdate
   }: {
     customResourceMethod: string,
@@ -49,10 +51,11 @@ export class Crd<SpecType> {
     resourceName: string,
     onCreate?: (data: any) => Promise<any>,
     onUpdate?: (data: any) => Promise<any>,
+    onDelete?: (data: any) => Promise<any>,
     customUpdate?: ({
-      name, metadata, spec, customResource, context
+      name, metadata, spec, customResource, context, getPrefix
     }: {
-      name: string, metadata: any, spec: any, customResource: any, context: Context
+      name: string, metadata: any, spec: any, customResource: any, context: Context, getPrefix: () => string
     }) => Promise<any>
   }) {
     this.customResourceMethod = customResourceMethod;
@@ -64,6 +67,7 @@ export class Crd<SpecType> {
     this.resourceName = resourceName;
     this.onCreate = onCreate;
     this.onUpdate = onUpdate;
+    this.onDelete = onDelete;
     this.customUpdate = customUpdate;
     this.rolePrefix = config.rolePrefix;
   }
@@ -274,7 +278,7 @@ export class Crd<SpecType> {
     const {metadata, spec} = this.updateMapping(args.data);
     const res = (this.customUpdate) ?
     await this.customUpdate({
-      name, metadata, spec, customResource, context
+      name, metadata, spec, customResource, context, getPrefix: this.getPrefix
     }) :
     await customResource.patch(name, {
       metadata: omit(metadata, 'name'),
@@ -301,6 +305,9 @@ export class Crd<SpecType> {
     // delete crd on k8s
     const crd = await customResource.get(name);
     await customResource.del(name);
+    if (this.onDelete) {
+      await this.onDelete({name, context, getPrefix: this.getPrefix});
+    }
     // clear cache
     if (this.cache) {
       this.cache.clear();

@@ -36,6 +36,7 @@ declare module 'mocha' {
   interface ISuiteCallbackContext {
     graphqlRequest?: (query: string, variables?: any) => Promise<any>;
     currentDataset?: any;
+    createGroup?: any;
     kcAdminClient?: KeycloakAdminClient;
   }
 }
@@ -44,6 +45,17 @@ describe('dataset graphql', function() {
   before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;
+    this.createGroup = async () => {
+      const data = await this.graphqlRequest(`
+      mutation($data: GroupCreateInput!){
+        createGroup (data: $data) { id name }
+      }`, {
+        data: {
+          name: faker.internet.userName().toLowerCase()
+        }
+      });
+      return data.createGroup;
+    };
     await (global as any).authKcAdmin();
   });
 
@@ -493,5 +505,333 @@ describe('dataset graphql', function() {
     });
 
     expect(data.dataset).to.be.null;
+  });
+
+  it('add a pv dataset and connect with groups', async () => {
+    const data = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      displayName: faker.internet.userName(),
+      description: faker.lorem.sentence(),
+      global: false,
+      type: 'pv',
+      url: faker.internet.url()
+    };
+    const createMutation = await this.graphqlRequest(`
+    mutation($data: DatasetCreateInput!){
+      createDataset (data: $data) { ${fields} }
+    }`, {
+      data
+    });
+
+    // update with connect
+    const group = await this.createGroup();
+    const dataset = createMutation.createDataset;
+    await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
+      updateDataset (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: dataset.id},
+      data: {
+        groups: {
+          connect: [{
+            id: group.id
+          }]
+        }
+      }
+    });
+
+    // get one
+    const queryOne = await this.graphqlRequest(`
+    query($where: DatasetWhereUniqueInput!){
+      dataset (where: $where) { ${fields} }
+    }`, {
+      where: {id: dataset.id}
+    });
+
+    expect(queryOne.dataset).to.be.deep.include({
+      id: data.name,
+      groups: [{
+        id: group.id,
+        displayName: null,
+        name: group.name,
+        quotaCpu: null,
+        quotaDisk: 20,
+        quotaGpu: null,
+        writable: false
+      }],
+      ...data,
+    });
+
+    // connect with second group
+    const secGroup = await this.createGroup();
+
+    // update with writable
+    await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
+      updateDataset (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: dataset.id},
+      data: {
+        groups: {
+          connect: [{
+            id: secGroup.id,
+            writable: true
+          }]
+        }
+      }
+    });
+
+    // get one
+    const queryOneAgain = await this.graphqlRequest(`
+    query($where: DatasetWhereUniqueInput!){
+      dataset (where: $where) { ${fields} }
+    }`, {
+      where: {id: dataset.id}
+    });
+
+    expect(queryOneAgain.dataset).to.be.deep.include({
+      id: data.name,
+      ...data,
+    });
+    expect(queryOneAgain.dataset.groups).to.deep.include.members([{
+      id: group.id,
+      displayName: null,
+      name: group.name,
+      quotaCpu: null,
+      quotaDisk: 20,
+      quotaGpu: null,
+      writable: false
+    }, {
+      id: secGroup.id,
+      displayName: null,
+      name: secGroup.name,
+      quotaCpu: null,
+      quotaDisk: 20,
+      quotaGpu: null,
+      writable: true
+    }]);
+
+    // check keycloak
+    const roles = await this.kcAdminClient.groups.listRealmRoleMappings({
+      realm: process.env.KC_REALM,
+      id: group.id
+    });
+    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
+    expect(roles.find(role => role.name === `ds:rw:${dataset.name}`)).to.be.not.ok;
+    const secGroupRoles = await this.kcAdminClient.groups.listRealmRoleMappings({
+      realm: process.env.KC_REALM,
+      id: secGroup.id
+    });
+    expect(secGroupRoles.find(role => role.name === `ds:${dataset.name}`)).to.be.not.ok;
+    expect(secGroupRoles.find(role => role.name === `ds:rw:${dataset.name}`)).to.be.ok;
+  });
+
+  it('add a pv dataset and connect with writable groups, then disconnect', async () => {
+    const data = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      displayName: faker.internet.userName(),
+      description: faker.lorem.sentence(),
+      global: false,
+      type: 'pv',
+      url: faker.internet.url()
+    };
+    const createMutation = await this.graphqlRequest(`
+    mutation($data: DatasetCreateInput!){
+      createDataset (data: $data) { ${fields} }
+    }`, {
+      data
+    });
+
+    // update with connect
+    const group = await this.createGroup();
+    const secGroup = await this.createGroup();
+    const dataset = createMutation.createDataset;
+    await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
+      updateDataset (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: dataset.id},
+      data: {
+        groups: {
+          connect: [{
+            id: group.id,
+            writable: false
+          }, {
+            id: secGroup.id,
+            writable: true
+          }]
+        }
+      }
+    });
+
+    // get one
+    const queryOne = await this.graphqlRequest(`
+    query($where: DatasetWhereUniqueInput!){
+      dataset (where: $where) { ${fields} }
+    }`, {
+      where: {id: dataset.id}
+    });
+
+    expect(queryOne.dataset).to.be.deep.include({
+      id: data.name,
+      ...data,
+    });
+    expect(queryOne.dataset.groups).to.deep.include.members([{
+      id: group.id,
+      displayName: null,
+      name: group.name,
+      quotaCpu: null,
+      quotaDisk: 20,
+      quotaGpu: null,
+      writable: false
+    }, {
+      id: secGroup.id,
+      displayName: null,
+      name: secGroup.name,
+      quotaCpu: null,
+      quotaDisk: 20,
+      quotaGpu: null,
+      writable: true
+    }]);
+
+    // check keycloak
+    const roles = await this.kcAdminClient.groups.listRealmRoleMappings({
+      realm: process.env.KC_REALM,
+      id: group.id
+    });
+    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
+    expect(roles.find(role => role.name === `ds:rw:${dataset.name}`)).to.be.not.ok;
+    const secGroupRoles = await this.kcAdminClient.groups.listRealmRoleMappings({
+      realm: process.env.KC_REALM,
+      id: secGroup.id
+    });
+    expect(secGroupRoles.find(role => role.name === `ds:${dataset.name}`)).to.be.not.ok;
+    expect(secGroupRoles.find(role => role.name === `ds:rw:${dataset.name}`)).to.be.ok;
+
+    // disconnect
+    await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
+      updateDataset (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: dataset.id},
+      data: {
+        groups: {
+          disconnect: [{
+            id: group.id
+          }, {
+            id: secGroup.id
+          }]
+        }
+      }
+    });
+
+    // get one
+    const queryOneAgain = await this.graphqlRequest(`
+    query($where: DatasetWhereUniqueInput!){
+      dataset (where: $where) { ${fields} }
+    }`, {
+      where: {id: dataset.id}
+    });
+
+    expect(queryOneAgain.dataset).to.be.deep.include({
+      id: data.name,
+      groups: [],
+      ...data,
+    });
+  });
+
+  it('add a pv dataset and connect with writable groups, then change type', async () => {
+    const data = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      displayName: faker.internet.userName(),
+      description: faker.lorem.sentence(),
+      global: false,
+      type: 'pv',
+      url: faker.internet.url()
+    };
+    const createMutation = await this.graphqlRequest(`
+    mutation($data: DatasetCreateInput!){
+      createDataset (data: $data) { ${fields} }
+    }`, {
+      data
+    });
+
+    // update with connect
+    const group = await this.createGroup();
+    const secGroup = await this.createGroup();
+    const dataset = createMutation.createDataset;
+    await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
+      updateDataset (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: dataset.id},
+      data: {
+        groups: {
+          connect: [{
+            id: group.id,
+            writable: false
+          }, {
+            id: secGroup.id,
+            writable: true
+          }]
+        }
+      }
+    });
+
+    // change type
+    await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
+      updateDataset (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: dataset.id},
+      data: {
+        type: 'git'
+      }
+    });
+
+    // get one
+    const queryOne = await this.graphqlRequest(`
+    query($where: DatasetWhereUniqueInput!){
+      dataset (where: $where) { ${fields} }
+    }`, {
+      where: {id: dataset.id}
+    });
+
+    expect(queryOne.dataset).to.be.deep.include({
+      id: data.name,
+      ...data,
+      type: 'git'
+    });
+    expect(queryOne.dataset.groups).to.deep.include.members([{
+      id: group.id,
+      displayName: null,
+      name: group.name,
+      quotaCpu: null,
+      quotaDisk: 20,
+      quotaGpu: null,
+      writable: false
+    }, {
+      id: secGroup.id,
+      displayName: null,
+      name: secGroup.name,
+      quotaCpu: null,
+      quotaDisk: 20,
+      quotaGpu: null,
+      writable: false
+    }]);
+
+    // check keycloak
+    const roles = await this.kcAdminClient.groups.listRealmRoleMappings({
+      realm: process.env.KC_REALM,
+      id: group.id
+    });
+    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
+    expect(roles.find(role => role.name === `ds:rw:${dataset.name}`)).to.be.not.ok;
+    const secGroupRoles = await this.kcAdminClient.groups.listRealmRoleMappings({
+      realm: process.env.KC_REALM,
+      id: secGroup.id
+    });
+    expect(secGroupRoles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
+    expect(secGroupRoles.find(role => role.name === `ds:rw:${dataset.name}`)).to.be.not.ok;
   });
 });

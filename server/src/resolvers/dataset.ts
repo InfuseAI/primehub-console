@@ -21,8 +21,15 @@ const getWritableRole = async ({
   const roleName = `${getPrefix()}rw:${datasetId}`;
   const role = await kcAdminClient.roles.findOneByName({name: roleName});
   if (!role) {
-    await kcAdminClient.roles.create({name: roleName});
-    return kcAdminClient.roles.findOneByName({name: roleName});
+    try {
+      await kcAdminClient.roles.create({name: roleName});
+      return kcAdminClient.roles.findOneByName({name: roleName});
+    } catch (e) {
+      if (e.response && e.response.status === 409) {
+        return kcAdminClient.roles.findOneByName({name: roleName});
+      }
+      throw e;
+    }
   }
   return role;
 };
@@ -244,20 +251,40 @@ export const onUpdate = async (
             name: role.name
           }]
         });
-        const writableRole = await getWritableRole({
-          kcAdminClient: context.kcAdminClient,
-          datasetId: where.id,
-          getPrefix
-        });
-        await context.kcAdminClient.groups.delRealmRoleMappings({
-          id: where.id,
-          roles: [{
-            id: writableRole.id,
-            name: writableRole.name
-          }]
-        });
+
+        if (datasetType === 'pv') {
+          // remove writable as well
+          const writableRole = await getWritableRole({
+            kcAdminClient: context.kcAdminClient,
+            datasetId,
+            getPrefix
+          });
+          await context.kcAdminClient.groups.delRealmRoleMappings({
+            id: where.id,
+            roles: [{
+              id: writableRole.id,
+              name: writableRole.name
+            }]
+          });
+        }
       }
     });
+  }
+};
+
+export const onDelete = async ({
+  name, context, getPrefix
+}: {name: string, context: Context, getPrefix: () => string}) => {
+  // delete writable as well
+  try {
+    await context.kcAdminClient.roles.delByName({
+      name: `${getPrefix()}rw:${name}`
+    });
+  } catch (e) {
+    if (e.response && e.response.status === 404) {
+      return;
+    }
+    throw e;
   }
 };
 
@@ -356,7 +383,7 @@ export const resolveType = {
         }
 
         const groupRep = await context.kcAdminClient.groups.findOne({id: group.id});
-        return (findRole.name.indexOf(':rw:'))
+        return (findRole.name.indexOf(':rw:') >= 0)
           ? {...groupRep, writable: true}
           : {...groupRep, writable: false};
       })
@@ -376,6 +403,7 @@ export const crd = new Crd<DatasetSpec>({
   updateMapping,
   onCreate,
   onUpdate,
+  onDelete,
   resolveType,
   customUpdate
 });
