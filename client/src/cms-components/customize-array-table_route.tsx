@@ -1,15 +1,16 @@
 import React, { Component } from "react";
 import { Table, Button, Modal, Icon, notification } from "antd";
 import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl, intlShape } from "react-intl";
+import { FormattedMessage, injectIntl } from "react-intl";
 import defaultMessage, {renderValue} from "@canner/antd-locales";
 import EmailForm from '../cms-toolbar/sendEmailModal';
+import {Props} from './types';
 
 const ButtonGroup = Button.Group;
 const confirm = Modal.confirm;
 
 @injectIntl
-export default class ArrayBreadcrumb extends Component {
+export default class ArrayBreadcrumb extends Component<Props> {
   static defaultProps = {
     value: [],
     showPagination: true,
@@ -73,7 +74,7 @@ export default class ArrayBreadcrumb extends Component {
   }
 
   send = (index) => {
-    const {onChange, refId} = this.props;
+    const {onChange, refId, deploy} = this.props;
     onChange(refId.child(index).child('status'), 'update', 'published')
       .then(() => {
         deploy(refId.getPathArr()[0]);

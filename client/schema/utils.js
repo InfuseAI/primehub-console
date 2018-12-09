@@ -305,6 +305,8 @@ exports.dict = {
     'user.sendEmail': '寄送認證信',
     personalDiskQuota: '私人硬碟額度',
     groups: 'Groups',
+    readOnlyGroups: 'Readonly Groups',
+    writableGroups: 'Writable Groups',
     group: 'Groups',
     sendEmail: 'Send Email',
     resetPassword: 'Reset Password',

@@ -12,7 +12,7 @@ export default () => (
     controlDeployAndResetButtons={true}
     cacheActions={true}
     hideButtons={true}
-    packageName="../src/cms-components/customize-array-table_route.js"
+    packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       announcementCustomActions: true,
       removeActions: true,

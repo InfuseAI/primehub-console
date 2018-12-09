@@ -101,21 +101,21 @@ export default () => (
             uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
             defaultValue={0.5}
             title="${cpuQuota}"
-            packageName="../src/cms-components/customize-number-checkbox.js"
+            packageName="../src/cms-components/customize-number-checkbox"
             nullable
           />
         </Col>
         <Col sm={8} xs={24}>
           <number keyName="quotaGpu" title="${gpuQuota}"  uiParams={{min: 0, step: 1, precision: 0}}
             defaultValue={() => 0}
-            packageName="../src/cms-components/customize-number-checkbox.js"
+            packageName="../src/cms-components/customize-number-checkbox"
             nullable
           />
         </Col>
         <Col sm={8} xs={24}>
           <number keyName="quotaMemory" title="${quotaMemory}"  uiParams={{min: 0, step: 1, precision: 1, unit: ' GB'}}
             defaultValue={() => null}
-            packageName="../src/cms-components/customize-number-checkbox.js"
+            packageName="../src/cms-components/customize-number-checkbox"
             nullable
           />
         </Col>
@@ -136,21 +136,21 @@ export default () => (
           <number keyName="projectQuotaCpu"
             uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
             title="${cpuQuota}"
-            packageName="../src/cms-components/customize-number-checkbox.js"
+            packageName="../src/cms-components/customize-number-checkbox"
             nullable
             defaultValue={() => null}
           />
         </Col>
         <Col sm={8} xs={24}>
           <number keyName="projectQuotaGpu" title="${gpuQuota}"  uiParams={{min: 0, step: 1, precision: 0}}
-            packageName="../src/cms-components/customize-number-checkbox.js"
+            packageName="../src/cms-components/customize-number-checkbox"
             nullable
             defaultValue={() => null}
           />
         </Col>
         <Col sm={8} xs={24}>
           <number keyName="projectQuotaMemory" title="${quotaMemory}"  uiParams={{min: 0, step: 1, precision: 1, unit: ' GB'}}
-            packageName="../src/cms-components/customize-number-checkbox.js"
+            packageName="../src/cms-components/customize-number-checkbox"
             nullable
             defaultValue={() => null}
           />
@@ -185,5 +185,7 @@ export default () => (
         </toolbar>
       </relation>
     </Block>
+    {/* writable is only used to check in dataset.groups table, no need to show */}
+    <boolean keyName="writable" hidden />
   </array>
 )
