@@ -22,6 +22,7 @@ export class Crd<SpecType> {
   private onCreate?: (data: any) => Promise<any>;
   private onUpdate?: (data: any) => Promise<any>;
   private onDelete?: (data: any) => Promise<any>;
+  private customParseNameFromRole?: (roleName: string) => string;
   private customUpdate?: ({
     name, metadata, spec, customResource, context, getPrefix
   }: {
@@ -40,6 +41,7 @@ export class Crd<SpecType> {
     onCreate,
     onUpdate,
     onDelete,
+    customParseNameFromRole,
     customUpdate
   }: {
     customResourceMethod: string,
@@ -52,6 +54,7 @@ export class Crd<SpecType> {
     onCreate?: (data: any) => Promise<any>,
     onUpdate?: (data: any) => Promise<any>,
     onDelete?: (data: any) => Promise<any>,
+    customParseNameFromRole?: (roleName: string) => string,
     customUpdate?: ({
       name, metadata, spec, customResource, context, getPrefix
     }: {
@@ -69,6 +72,7 @@ export class Crd<SpecType> {
     this.onUpdate = onUpdate;
     this.onDelete = onDelete;
     this.customUpdate = customUpdate;
+    this.customParseNameFromRole = customParseNameFromRole;
     this.rolePrefix = config.rolePrefix;
   }
 
@@ -142,11 +146,20 @@ export class Crd<SpecType> {
     };
   }
 
+  public parseNameFromRole = (roleName: string) => {
+    return this.customParseNameFromRole
+      ? this.customParseNameFromRole(roleName)
+      : roleName.slice(this.getPrefix().length);
+  }
+
   public findInGroup = async (groupId: string, resource: string, kcAdminClient: KeycloakAdminClient) => {
     const roles = await kcAdminClient.groups.listRealmRoleMappings({
       id: groupId
     });
-    return Boolean(find(roles, role => role.name.slice(this.getPrefix().length) === resource));
+    return Boolean(find(roles, role => {
+      const resourceNameFromRole = this.parseNameFromRole(role.name);
+      return resourceNameFromRole === resource;
+    }));
   }
 
   public createOnKeycloak = async (data: any, metadata: any, spec: any, context: any) => {
@@ -210,10 +223,20 @@ export class Crd<SpecType> {
     });
     const prefix = this.getPrefix();
     roles = roles.filter(role => role.name.startsWith(prefix));
-    const names = roles.map(role => role.name.slice(prefix.length));
-    const rows = await Promise.all(names.map(name => {
+    const namesWithRole = roles.map(role => {
+      return {name: this.parseNameFromRole(role.name), roleName: role.name};
+    });
+
+    // todo: make this logic better
+    const rows = await Promise.all(namesWithRole.map(({name, roleName}) => {
       if (this.resourceName === 'dataset') {
-        return context.getDataset(name);
+        return context.getDataset(name)
+          .then(dataset => {
+            return {
+              roleName,
+              ...dataset
+            };
+          });
       }
 
       if (this.resourceName === 'image') {

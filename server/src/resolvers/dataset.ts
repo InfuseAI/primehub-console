@@ -4,7 +4,7 @@ import { Crd } from './crd';
 import { mutateRelation, mergeVariables } from './utils';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 import { Context } from './interface';
-import { omit, get, isUndefined } from 'lodash';
+import { omit, get, isUndefined, last, isNil } from 'lodash';
 import { resolveInDataSet } from './secret';
 import KeycloakAdminClient from 'keycloak-admin';
 
@@ -45,6 +45,7 @@ export const mapping = (item: Item<DatasetSpec>) => {
     variables: item.spec.variables,
     volumeName: item.spec.volumeName,
     spec: item.spec,
+    writable: (item as any).roleName && (item as any).roleName.indexOf(':rw:') >= 0,
     secret: get(item, 'spec.gitsync.secret')
   };
 };
@@ -394,6 +395,10 @@ export const resolveType = {
   ...resolveInDataSet
 };
 
+export const customParseNameFromRole = (roleName: string) => {
+  return last(roleName.split(':'));
+};
+
 export const crd = new Crd<DatasetSpec>({
   customResourceMethod: 'datasets',
   propMapping: mapping,
@@ -404,6 +409,7 @@ export const crd = new Crd<DatasetSpec>({
   onCreate,
   onUpdate,
   onDelete,
+  customParseNameFromRole,
   resolveType,
   customUpdate
 });
