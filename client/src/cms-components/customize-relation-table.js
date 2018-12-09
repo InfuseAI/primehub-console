@@ -33,7 +33,6 @@ export default class RelationTable extends PureComponent {
     let {onChange, refId, value = []} = this.props;
     // $FlowFixMe
     const currentIds = value.map(v => v.id);
-
     const idsShouldCreate = difference(queue, currentIds);
     const idsShouldRemove = difference(currentIds, queue);
     const createActions = idsShouldCreate.map(id => ({refId, type: "connect", value: originData.find(data => data.id === id)}));

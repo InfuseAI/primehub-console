@@ -1,7 +1,7 @@
 /** @jsx builder */
 import builder, {Default, Condition} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
-import {GroupRelation} from './utils.schema';
+import {groupColumns} from './utils.schema';
 
 export default () => (
   <array keyName="dataset" title="${dataset}"
@@ -77,20 +77,7 @@ export default () => (
     </Condition>
     <string keyName="displayName" title="${displayName}" />
     <string keyName="description" title="${description}" />
-    <string  ui="select" keyName="access" title="${access}"
-      uiParams={{
-        options: [{
-          text: 'group',
-          value: 'group'
-        }, {
-          text: 'everyone',
-          value: 'everyone'
-        }, {
-          text: 'admin',
-          value: 'admin'
-        }]
-      }}
-    />
+    <boolean keyName="global" title="${global}" />
     <string keyName="type" 
       ui="select"
       title="${type}"
@@ -148,8 +135,29 @@ export default () => (
     <Condition match={data => data.type === 'pv'}>
       <string keyName="volumeName" title="${volumeName}"/>
     </Condition>
-    <Condition match={data => data.access === 'group'}>
-      <GroupRelation />
+    <Condition match={data => !(data.global && data.type !== 'pv')}>
+      <relation keyName="groups"
+        packageName='../src/cms-components/customize-relation-dataset_groups_table'
+        relation={{
+          to: 'group',
+          type: 'toMany'
+        }}
+        uiParams={{
+          columns: groupColumns
+        }}
+      >
+        <toolbar async>
+          <filter
+            component={Filter}
+            fields={[{
+              type: 'text',
+              label: '${name}',
+              key: 'name'
+            }]}
+          />
+          <pagination />
+        </toolbar>
+      </relation>
     </Condition>
     </Default>
   </array>

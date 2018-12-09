@@ -1,8 +1,8 @@
 import React, { PureComponent } from "react";
 import { InputNumber } from "antd";
-import isNaN from "lodash/isNaN";
+import {Props} from './types';
 
-export default class Input extends PureComponent {
+export default class Input extends PureComponent<Props> {
   componentDidMount() {
     const {value, refId, onChange, uiParams} = this.props;
     if (!value && (uiParams.defaultValue || uiParams.min)) {

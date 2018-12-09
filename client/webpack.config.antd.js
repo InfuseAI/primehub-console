@@ -15,6 +15,7 @@ module.exports = {
     filename: 'antd.js',
     publicPath: '/'
   },
+  mode: 'production',
   resolveLoader: {
     moduleExtensions: ['-loader']
   },
