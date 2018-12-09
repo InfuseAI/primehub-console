@@ -97,6 +97,12 @@ export const create = async (root, args, context: Context) => {
     });
   }
 
+  logger.info({
+    component: logger.components.group,
+    type: 'CREATE',
+    id: group.id
+  });
+
   return group;
 };
 
@@ -159,6 +165,12 @@ export const update = async (root, args, context: Context) => {
     });
   }
 
+  logger.info({
+    component: logger.components.group,
+    type: 'UPDATE',
+    id: group.id
+  });
+
   return group;
 };
 
@@ -171,6 +183,13 @@ export const destroy = async (root, args, context: Context) => {
   await kcAdminClient.groups.del({
     id: groupId
   });
+
+  logger.info({
+    component: logger.components.group,
+    type: 'DELETE',
+    id: group.id
+  });
+
   return group;
 };
 

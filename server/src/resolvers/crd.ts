@@ -9,6 +9,7 @@ const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
 import {createConfig} from '../config';
 import { CrdCache } from '../cache/crdCache';
 const config = createConfig();
+import * as logger from '../logger';
 
 export class Crd<SpecType> {
   private cache: CrdCache<SpecType>;
@@ -287,6 +288,12 @@ export class Crd<SpecType> {
       this.cache.clear();
     }
 
+    logger.info({
+      component: logger.components[this.resourceName],
+      type: 'CREATE',
+      id: res.metadata.name
+    });
+
     return this.propMapping(res);
   }
 
@@ -315,6 +322,12 @@ export class Crd<SpecType> {
     if (this.cache) {
       this.cache.clear();
     }
+
+    logger.info({
+      component: logger.components[this.resourceName],
+      type: 'UPDATE',
+      id: res.metadata.name
+    });
     return this.propMapping(res);
   }
 
@@ -335,6 +348,12 @@ export class Crd<SpecType> {
     if (this.cache) {
       this.cache.clear();
     }
+
+    logger.info({
+      component: logger.components[this.resourceName],
+      type: 'DELETE',
+      id: name
+    });
     return this.propMapping(crd);
   }
 }

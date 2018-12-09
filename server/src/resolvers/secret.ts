@@ -1,6 +1,7 @@
 import { Context } from './interface';
 import { toRelay, filter, paginate, extractPagination } from './utils';
 import GitSyncSecret from '../k8sResource/gitSyncSecret';
+import * as logger from '../logger';
 
 /**
  * Query
@@ -54,16 +55,32 @@ export const resolveInDataSet = {
 export const create = async (root, args, context: Context) => {
   const data = args.data;
   const {gitSyncSecret} = context;
-  return gitSyncSecret.create({
+
+  const created = await gitSyncSecret.create({
     ...data,
     displayName: data.displayName || data.name
   });
+
+  logger.info({
+    component: logger.components.secret,
+    type: 'CREATE',
+    id: created.id
+  });
+
+  return created;
 };
 
 export const update = async (root, args, context: Context) => {
   const id = args.where.id;
   const data = args.data;
   const {gitSyncSecret} = context;
+
+  logger.info({
+    component: logger.components.secret,
+    type: 'UPDATE',
+    id
+  });
+
   return gitSyncSecret.update(id, data);
 };
 
@@ -71,6 +88,13 @@ export const destroy = async (root, args, context: Context) => {
   const id = args.where.id;
   const {gitSyncSecret} = context;
   await gitSyncSecret.delete(id);
+
+  logger.info({
+    component: logger.components.secret,
+    type: 'DELETE',
+    id
+  });
+
   return {
     id,
     name: id

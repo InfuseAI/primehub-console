@@ -17,6 +17,10 @@ export enum components {
   crdCache = 'CrdCache',
   group = 'Group',
   user = 'User',
+  dataset = 'Dataset',
+  image = 'Image',
+  instanceType = 'InstanceType',
+  secret = 'Secret',
 }
 
 export const log = (levelType: level = level.info, payload?: any) => {

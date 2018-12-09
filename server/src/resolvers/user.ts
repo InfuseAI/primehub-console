@@ -236,6 +236,12 @@ export const create = async (root, args, context: Context) => {
     });
   }
 
+  logger.info({
+    component: logger.components.user,
+    type: 'CREATE',
+    id: user.id
+  });
+
   return user;
 };
 
@@ -342,6 +348,12 @@ export const update = async (root, args, context: Context) => {
     });
   }
 
+  logger.info({
+    component: logger.components.user,
+    type: 'UPDATE',
+    id: user.id
+  });
+
   return user;
 };
 
@@ -352,6 +364,12 @@ export const destroy = async (root, args, context: Context) => {
     id: userId
   });
   await kcAdminClient.users.del({
+    id: userId
+  });
+
+  logger.info({
+    component: logger.components.user,
+    type: 'DELETE',
     id: userId
   });
   return user;
@@ -376,6 +394,13 @@ export const sendEmail = async (root, args, context: Context) => {
     lifespan: expiresIn,
     actions: resetActions
   });
+
+  logger.info({
+    component: logger.components.user,
+    type: 'SEND_EMAIL',
+    id
+  });
+
   return {id};
 };
 
@@ -404,6 +429,12 @@ export const sendMultiEmail = async (root, args, context: Context) => {
     });
   });
   const status = every(results, 'status');
+
+  logger.info({
+    component: logger.components.user,
+    type: 'SEND_MULTI_EMAIL',
+    status
+  });
   return {
     status
   };
@@ -418,6 +449,12 @@ export const resetPassword = async (root, args, context: Context) => {
       temporary,
       value: password
     }
+  });
+
+  logger.info({
+    component: logger.components.user,
+    type: 'RESET_PASSWORD',
+    id
   });
   return {id};
 };
