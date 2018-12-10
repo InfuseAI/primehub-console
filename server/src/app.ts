@@ -406,7 +406,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   // health check
   rootRouter.get('/health', async ctx => {
-    ctx.status = 204;
+    ctx.status = 200;
   });
   app.use(rootRouter.routes());
   server.applyMiddleware({ app, path: config.appPrefix ? `${config.appPrefix}/graphql` : '/graphql' });
