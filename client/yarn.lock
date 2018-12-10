@@ -3086,9 +3086,9 @@ canner-compiler@2.0.14:
   version "2.0.14"
   resolved "https://registry.yarnpkg.com/canner-compiler/-/canner-compiler-2.0.14.tgz#3e7fec66ee4683d5fc3590573326c40d29b0b4f0"
 
-canner-graphql-interface@2.0.22:
-  version "2.0.22"
-  resolved "https://registry.npmjs.org/canner-graphql-interface/-/canner-graphql-interface-2.0.22.tgz#895ad2c043a88e5ec6fe52ffad6892024dcb296b"
+canner-graphql-interface@2.0.25:
+  version "2.0.25"
+  resolved "https://registry.yarnpkg.com/canner-graphql-interface/-/canner-graphql-interface-2.0.25.tgz#050afc57ca000f9800a634ed4b3b937c5071ee75"
   dependencies:
     apollo-cache "^1.1.7"
     apollo-cache-inmemory "^1.1.12"
@@ -3164,15 +3164,15 @@ canner-script@2.0.11-alpha.1:
     react-intl "^2.4.0"
     safer-eval "^1.2.3"
 
-canner@^2.0.24:
-  version "2.0.24"
-  resolved "https://registry.npmjs.org/canner/-/canner-2.0.24.tgz#73cff896248110cae0f6384ae0cc59bb1710a641"
+canner@^2.0.25:
+  version "2.0.25"
+  resolved "https://registry.yarnpkg.com/canner/-/canner-2.0.25.tgz#e3f9405f9f0f1c164ff7de7ed989afb460d3a1af"
   dependencies:
     ajv "^6.5.2"
     apollo-boost "^0.1.4"
     bson-objectid "^1.2.2"
     canner-compiler "2.0.14"
-    canner-graphql-interface "2.0.22"
+    canner-graphql-interface "2.0.25"
     canner-helpers "2.0.14"
     canner-layouts "2.0.14"
     canner-ref-id "2.0.14"

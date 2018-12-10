@@ -34,11 +34,15 @@ exports.GroupRelation = () => (
     packageName='../src/cms-components/customize-relation-table'
     relation={{
       to: 'group',
-      type: 'toMany'
+      type: 'toMany',
+      fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu', 'quotaDisk']
     }}
     uiParams={{
       columns: groupColumns 
     }}
+    graphql={`
+      query($groupFirst: Int,$groupWhere: GroupWhereInput){group: groupsConnection(first: $groupFirst,where: $groupWhere){edges{cursor node{name displayName quotaCpu quotaGpu quotaDisk id}} pageInfo{hasNextPage hasPreviousPage}}}
+    `}
   >
     <toolbar async>
       <filter
