@@ -9,7 +9,7 @@ const devMode = process.env.NODE_ENV !== 'production'
 
 module.exports = {
   entry: {
-    index: './src/index.tsx'
+    index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx']
   },
   output: {
     path: path.join(__dirname, 'dist'),
