@@ -62,6 +62,7 @@ input GroupCreateInput {
   projectQuotaGpu: Int
   projectQuotaMemory: Float
   users: UserCreateManyInput
+  writable: Boolean
 }
 
 input GroupUpdateInput {
@@ -75,6 +76,7 @@ input GroupUpdateInput {
   projectQuotaGpu: Int
   projectQuotaMemory: Float
   users: UserUpdateManyInput
+  writable: Boolean
 }
 
 """Relation input"""

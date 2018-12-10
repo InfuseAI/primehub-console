@@ -291,6 +291,7 @@ export class Crd<SpecType> {
     logger.info({
       component: logger.components[this.resourceName],
       type: 'CREATE',
+      userId: context.userId,
       id: res.metadata.name
     });
 
@@ -326,6 +327,7 @@ export class Crd<SpecType> {
     logger.info({
       component: logger.components[this.resourceName],
       type: 'UPDATE',
+      userId: context.userId,
       id: res.metadata.name
     });
     return this.propMapping(res);
@@ -352,6 +354,7 @@ export class Crd<SpecType> {
     logger.info({
       component: logger.components[this.resourceName],
       type: 'DELETE',
+      userId: context.userId,
       id: name
     });
     return this.propMapping(crd);

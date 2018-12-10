@@ -99,7 +99,8 @@ export default class TokenSyncer {
         logger.error({
           component: logger.components.tokenSyncer,
           type: 'ERROR',
-          message: `error in token syncer, but still schedule next`
+          message: err.message,
+          stacktrace: err.stacktrace,
         });
         this.scheduleNextSync();
       });

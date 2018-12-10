@@ -100,6 +100,7 @@ export const create = async (root, args, context: Context) => {
   logger.info({
     component: logger.components.group,
     type: 'CREATE',
+    userId: context.userId,
     id: group.id
   });
 
@@ -168,6 +169,7 @@ export const update = async (root, args, context: Context) => {
   logger.info({
     component: logger.components.group,
     type: 'UPDATE',
+    userId: context.userId,
     id: group.id
   });
 
@@ -187,6 +189,7 @@ export const destroy = async (root, args, context: Context) => {
   logger.info({
     component: logger.components.group,
     type: 'DELETE',
+    userId: context.userId,
     id: group.id
   });
 

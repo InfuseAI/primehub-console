@@ -187,6 +187,7 @@ export const create = async (root, args, context: Context) => {
       logger.info({
         component: logger.components.user,
         type: 'SEND_ACTIVATION_EMAIL',
+        userId: context.userId,
         email: user.email
       });
     })
@@ -194,6 +195,7 @@ export const create = async (root, args, context: Context) => {
       logger.error({
         component: logger.components.user,
         type: 'FAIL_SEND_ACTIVATION_EMAIL',
+        userId: context.userId,
         email: user.email,
         realm: context.realm
       });
@@ -239,6 +241,7 @@ export const create = async (root, args, context: Context) => {
   logger.info({
     component: logger.components.user,
     type: 'CREATE',
+    userId: context.userId,
     id: user.id
   });
 
@@ -351,6 +354,7 @@ export const update = async (root, args, context: Context) => {
   logger.info({
     component: logger.components.user,
     type: 'UPDATE',
+    userId: context.userId,
     id: user.id
   });
 
@@ -370,6 +374,7 @@ export const destroy = async (root, args, context: Context) => {
   logger.info({
     component: logger.components.user,
     type: 'DELETE',
+    userId: context.userId,
     id: userId
   });
   return user;
@@ -398,6 +403,7 @@ export const sendEmail = async (root, args, context: Context) => {
   logger.info({
     component: logger.components.user,
     type: 'SEND_EMAIL',
+    userId: context.userId,
     id
   });
 
@@ -433,6 +439,7 @@ export const sendMultiEmail = async (root, args, context: Context) => {
   logger.info({
     component: logger.components.user,
     type: 'SEND_MULTI_EMAIL',
+    userId: context.userId,
     status
   });
   return {
@@ -454,6 +461,7 @@ export const resetPassword = async (root, args, context: Context) => {
   logger.info({
     component: logger.components.user,
     type: 'RESET_PASSWORD',
+    userId: context.userId,
     id
   });
   return {id};

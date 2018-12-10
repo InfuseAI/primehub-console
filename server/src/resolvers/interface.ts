@@ -13,4 +13,5 @@ export interface Context {
   getDataset: (name: string) => Promise<Item<DatasetSpec>>;
   gitSyncSecret: GitSyncSecret;
   readOnly?: boolean;
+  userId: string;
 }

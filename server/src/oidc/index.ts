@@ -205,16 +205,37 @@ export class OidcCtrl {
       accessToken.getContent().email ? gravatar.url(accessToken.getContent().email) : '', {signed: true});
 
     const backUrl = query.backUrl || this.defaultReturnPath;
+
+    logger.info({
+      component: logger.components.user,
+      type: 'LOGIN',
+      userId: accessToken.getContent().sub,
+      email: accessToken.getContent().email
+    });
     return ctx.redirect(backUrl);
   }
 
   public logout = async (ctx: Context) => {
     const qs = querystring.stringify({redirect_uri: `${this.cmsHost}${this.defaultReturnPath}`});
+    const accessToken = new Token(ctx.cookies.get('accessToken', {signed: true}), this.clientId);
     ctx.cookies.set('accessToken', null);
     ctx.cookies.set('refreshToken', null);
     ctx.cookies.set('username', null);
     ctx.cookies.set('thumbnail', null);
+
+    logger.info({
+      component: logger.components.user,
+      type: 'LOGOUT',
+      userId: accessToken.getContent().sub
+    });
     return ctx.redirect(`${this.keycloakBaseUrl}/realms/${this.realm}/protocol/openid-connect/logout?${qs}`);
+  }
+
+  public getUserFromContext = (ctx: Context) => {
+    const accessToken = new Token(ctx.cookies.get('accessToken', {signed: true}), this.clientId);
+    return {
+      userId: accessToken.getContent().sub
+    };
   }
 
   private buildBackUrl = (currentUrl?: string) => {
