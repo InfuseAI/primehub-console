@@ -140,11 +140,16 @@ export default () => (
         packageName='../src/cms-components/customize-relation-dataset_groups_table'
         relation={{
           to: 'group',
-          type: 'toMany'
+          type: 'toMany',
+          fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu', 'quotaDisk', 'writable']
         }}
         uiParams={{
           columns: groupColumns
         }}
+        graphql={`
+          query($groupFirst: Int,$groupWhere: GroupWhereInput){group: groupsConnection(first: $groupFirst,where: $groupWhere){edges{cursor node{name displayName quotaCpu quotaGpu quotaDisk id}} pageInfo{hasNextPage hasPreviousPage}}}
+        `}
+        fetchPolicy="no-cache"
       >
         <toolbar async>
           <filter
