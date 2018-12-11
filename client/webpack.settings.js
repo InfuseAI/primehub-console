@@ -10,7 +10,8 @@ module.exports = {
     'firebase': 'firebase',
     'immutable': 'Immutable',
     'styled-components': 'styled',
-    'canner-slate-editor': 'CannerSlateEditor'
+    'canner-slate-editor': 'CannerSlateEditor',
+    'moment': 'moment'
   },
   resolve: {
     extensions: ['.js', '.ts', '.tsx'],
