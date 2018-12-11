@@ -15,7 +15,7 @@ export default () => (
       }]
     }}
     graphql={`
-      query($secretWhere: secretWhereInput) {
+      query($secretWhere: SecretWhereInput) {
       secret: secretsConnection(where: $secretWhere) {
         edges {
           cursor

@@ -23,7 +23,7 @@ export default () => (
         dataIndex: 'description'
       }]
     }}
-    fetchPolicy="network-only"
+    refetch
     graphql={
       `
       query($datasetAfter: String, $datasetBefore: String, $datasetLast: Int, $datasetFirst: Int, $datasetWhere: DatasetWhereInput) {
