@@ -65,6 +65,7 @@ export const create = async (root, args, context: Context) => {
     component: logger.components.secret,
     type: 'CREATE',
     userId: context.userId,
+    username: context.username,
     id: created.id
   });
 
@@ -80,6 +81,7 @@ export const update = async (root, args, context: Context) => {
     component: logger.components.secret,
     type: 'UPDATE',
     userId: context.userId,
+    username: context.username,
     id
   });
 
@@ -95,6 +97,7 @@ export const destroy = async (root, args, context: Context) => {
     component: logger.components.secret,
     type: 'DELETE',
     userId: context.userId,
+    username: context.username,
     id
   });
 

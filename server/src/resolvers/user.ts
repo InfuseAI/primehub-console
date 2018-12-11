@@ -188,6 +188,7 @@ export const create = async (root, args, context: Context) => {
         component: logger.components.user,
         type: 'SEND_ACTIVATION_EMAIL',
         userId: context.userId,
+        username: context.username,
         email: user.email
       });
     })
@@ -196,6 +197,7 @@ export const create = async (root, args, context: Context) => {
         component: logger.components.user,
         type: 'FAIL_SEND_ACTIVATION_EMAIL',
         userId: context.userId,
+        username: context.username,
         email: user.email,
         realm: context.realm
       });
@@ -210,7 +212,9 @@ export const create = async (root, args, context: Context) => {
       logger.error({
         component: logger.components.user,
         type: 'FAIL_ASSIGN_ADMIN',
-        userId: user.id,
+        userId: context.userId,
+        username: context.username,
+        targetUserId: user.id,
         realm: context.realm
       });
     }
@@ -232,7 +236,9 @@ export const create = async (root, args, context: Context) => {
     logger.error({
       component: logger.components.user,
       type: 'FAIL_CONNECT_GROUP',
-      userId: user.id,
+      userId: context.userId,
+      username: context.username,
+      targetUserId: user.id,
       groups: payload.groups,
       realm: context.realm
     });
@@ -242,6 +248,7 @@ export const create = async (root, args, context: Context) => {
     component: logger.components.user,
     type: 'CREATE',
     userId: context.userId,
+    username: context.username,
     id: user.id
   });
 
@@ -300,7 +307,9 @@ export const update = async (root, args, context: Context) => {
       logger.error({
         component: logger.components.user,
         type: 'FAIL_ASSIGN_ADMIN',
-        userId: user.id,
+        targetUserId: user.id,
+        userId: context.userId,
+        username: context.username,
         realm: context.realm
       });
     }
@@ -316,7 +325,9 @@ export const update = async (root, args, context: Context) => {
       logger.error({
         component: logger.components.user,
         type: 'FAIL_REMOVE_TOTP',
-        userId: user.id,
+        targetUserId: user.id,
+        userId: context.userId,
+        username: context.username,
         realm: context.realm
       });
     }
@@ -345,7 +356,9 @@ export const update = async (root, args, context: Context) => {
     logger.error({
       component: logger.components.user,
       type: 'FAIL_CONNECT_GROUP',
-      userId: user.id,
+      targetUserId: user.id,
+      userId: context.userId,
+      username: context.username,
       groups: payload.groups,
       realm: context.realm
     });
@@ -355,6 +368,7 @@ export const update = async (root, args, context: Context) => {
     component: logger.components.user,
     type: 'UPDATE',
     userId: context.userId,
+    username: context.username,
     id: user.id
   });
 
@@ -375,6 +389,7 @@ export const destroy = async (root, args, context: Context) => {
     component: logger.components.user,
     type: 'DELETE',
     userId: context.userId,
+    username: context.username,
     id: userId
   });
   return user;
@@ -404,6 +419,7 @@ export const sendEmail = async (root, args, context: Context) => {
     component: logger.components.user,
     type: 'SEND_EMAIL',
     userId: context.userId,
+    username: context.username,
     id
   });
 
@@ -427,7 +443,9 @@ export const sendMultiEmail = async (root, args, context: Context) => {
       logger.error({
         component: logger.components.user,
         type: 'FAIL_SEND_MULTI_EMAIL',
-        userId,
+        targetUserId: userId,
+        userId: context.userId,
+        username: context.username,
         realm: context.realm,
         message: get(err, 'response.data.errorMessage')
       });
@@ -440,6 +458,7 @@ export const sendMultiEmail = async (root, args, context: Context) => {
     component: logger.components.user,
     type: 'SEND_MULTI_EMAIL',
     userId: context.userId,
+    username: context.username,
     status
   });
   return {
@@ -461,7 +480,9 @@ export const resetPassword = async (root, args, context: Context) => {
   logger.info({
     component: logger.components.user,
     type: 'RESET_PASSWORD',
+    targetUserId: id,
     userId: context.userId,
+    username: context.username,
     id
   });
   return {id};

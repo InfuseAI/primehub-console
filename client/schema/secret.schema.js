@@ -14,6 +14,7 @@ export default () => (
         dataIndex: 'displayName'
       }]
     }}
+    fetchPolicy="network-only"
   >
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
       <string keyName="name" title="${name}"
