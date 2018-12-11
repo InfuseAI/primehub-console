@@ -41,7 +41,25 @@ exports.GroupRelation = () => (
       columns: groupColumns 
     }}
     graphql={`
-      query($groupFirst: Int,$groupWhere: GroupWhereInput){group: groupsConnection(first: $groupFirst,where: $groupWhere){edges{cursor node{name displayName quotaCpu quotaGpu quotaDisk id}} pageInfo{hasNextPage hasPreviousPage}}}
+    query($groupAfter: String, $groupBefore: String, $groupLast: Int, $groupFirst: Int,$groupWhere: GroupWhereInput) {
+      group: groupsConnection(after: $groupAfter, before: $groupBefore, last: $groupLast, first: $groupFirst,where: $groupWhere) {
+        edges {
+          cursor
+          node {
+            id
+            name
+            displayName
+            quotaCpu
+            quotaGpu
+            quotaDisk
+          }
+        }
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+        }
+      }
+    }
     `}
   >
     <toolbar async>
