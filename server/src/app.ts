@@ -291,7 +291,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         getDataset: memGetDataset(crdClient),
         gitSyncSecret,
         readOnly,
-        userId
+        userId,
+        username
       };
     },
     formatError: error => {
@@ -386,6 +387,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   // router
   const rootRouter = new Router({
     prefix: config.appPrefix
+  });
+
+  // redirect
+  rootRouter.get('/', async ctx => {
+    return ctx.redirect('/cms');
   });
 
   // favicon
