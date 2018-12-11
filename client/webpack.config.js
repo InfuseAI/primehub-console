@@ -2,10 +2,12 @@ const antdTheme = require('./package.json').theme;
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const tsImportPluginFactory = require('ts-import-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const {externals, resolve} = require('./webpack.settings');
 const path = require('path');
-
+const webpack = require('webpack');
 const devMode = process.env.NODE_ENV !== 'production'
+const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -77,9 +79,15 @@ module.exports = {
     new HtmlWebPackPlugin({
       template: 'docs/index.html'
     }),
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new MiniCssExtractPlugin({
       filename: devMode ? '[name].css' : '[name].[hash].css',
       chunkFilename: devMode ? '[id].css' : '[id].[hash].css',
-    })
+    }),
+    new BundleAnalyzerPlugin({
+      analyzerMode: devMode ? 'server' : 'disabled',
+      openAnalyzer: false
+    }),
+    new CompressionPlugin()
   ]
 };
