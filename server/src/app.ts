@@ -380,8 +380,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     extension: 'pug'
   }));
   const serveClientStatic = config.appPrefix
-    ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../../client/dist')))
-    : serve(path.resolve(__dirname, '../../client/dist'));
+    ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../../client/dist'), {gzip: true}))
+    : serve(path.resolve(__dirname, '../../client/dist'), {gzip: true});
   app.use(serveClientStatic);
 
   // router
