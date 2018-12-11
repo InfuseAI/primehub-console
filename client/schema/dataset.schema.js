@@ -23,6 +23,7 @@ export default () => (
         dataIndex: 'description'
       }]
     }}
+    fetchPolicy="no-cache"
     graphql={
       `
       query($datasetAfter: String, $datasetBefore: String, $datasetLast: Int, $datasetFirst: Int, $datasetWhere: DatasetWhereInput) {
