@@ -14,6 +14,25 @@ export default () => (
         dataIndex: 'displayName'
       }]
     }}
+    graphql={`
+      query($secretWhere: secretWhereInput) {
+      secret: secretsConnection(where: $secretWhere) {
+        edges {
+          cursor
+          node {
+            id
+            name
+            displayName
+            secret
+          }
+        }
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+        }
+      }
+    }
+    `}
     fetchPolicy="network-only"
   >
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
