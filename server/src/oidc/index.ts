@@ -210,6 +210,7 @@ export class OidcCtrl {
       component: logger.components.user,
       type: 'LOGIN',
       userId: accessToken.getContent().sub,
+      username: accessToken.getContent().preferred_username,
       email: accessToken.getContent().email
     });
     return ctx.redirect(backUrl);
@@ -226,7 +227,8 @@ export class OidcCtrl {
     logger.info({
       component: logger.components.user,
       type: 'LOGOUT',
-      userId: accessToken.getContent().sub
+      userId: accessToken.getContent().sub,
+      username: accessToken.getContent().preferred_username
     });
     return ctx.redirect(`${this.keycloakBaseUrl}/realms/${this.realm}/protocol/openid-connect/logout?${qs}`);
   }
@@ -234,7 +236,8 @@ export class OidcCtrl {
   public getUserFromContext = (ctx: Context) => {
     const accessToken = new Token(ctx.cookies.get('accessToken', {signed: true}), this.clientId);
     return {
-      userId: accessToken.getContent().sub
+      userId: accessToken.getContent().sub,
+      username: accessToken.getContent().preferred_username
     };
   }
 

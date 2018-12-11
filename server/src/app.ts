@@ -221,6 +221,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     context: async ({ ctx }: { ctx: Koa.Context }) => {
       let readOnly = false;
       let userId: string;
+      let username: string;
       let getInstanceType: (name: string) => Promise<Item<InstanceTypeSpec>>;
       let getImage: (name: string) => Promise<Item<ImageSpec>>;
 
@@ -247,7 +248,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         readOnly = true;
         const accessToken = await tokenSyncer.getAccessToken();
         kcAdminClient.setAccessToken(accessToken);
-        userId = 'jupyterHub';
+        username = userId = 'jupyterHub';
       } else if (config.keycloakGrantType === 'password'
           && authorization.indexOf('Basic') >= 0
       ) {
@@ -258,7 +259,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           throw Boom.forbidden('basic auth not valid');
         }
 
-        userId = credentials.name;
+        username = userId = credentials.name;
 
         // use password grant type if specified, or basic auth provided
         await kcAdminClient.auth({
@@ -272,7 +273,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         // default to refresh_token grant type
         const accessToken = await oidcCtrl.getAccessToken(ctx);
         kcAdminClient.setAccessToken(accessToken);
-        userId = oidcCtrl.getUserFromContext(ctx).userId;
+        const userInfo = oidcCtrl.getUserFromContext(ctx);
+        userId = userInfo.userId;
+        username = userInfo.username;
       }
 
       // cache layer

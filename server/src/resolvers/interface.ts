@@ -14,4 +14,5 @@ export interface Context {
   gitSyncSecret: GitSyncSecret;
   readOnly?: boolean;
   userId: string;
+  username: string;
 }
