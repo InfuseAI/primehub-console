@@ -362,6 +362,14 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     }
   });
 
+  // redirect
+  app.use(async (ctx: Context, next) => {
+    if (ctx.path === '/') {
+      return ctx.redirect('/cms');
+    }
+    return next();
+  });
+
   if (!process.env.TEST) {
     const morganFormat: any = (tokens, req, res) => {
       return logger.info({
@@ -387,11 +395,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   // router
   const rootRouter = new Router({
     prefix: config.appPrefix
-  });
-
-  // redirect
-  rootRouter.get('/', async ctx => {
-    return ctx.redirect('/cms');
   });
 
   // favicon

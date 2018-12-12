@@ -8,6 +8,7 @@ import { URL } from 'url';
 import { ErrorCodes } from '../errorCodes';
 import { ApolloError } from 'apollo-server-koa';
 import * as logger from '../logger';
+import { get } from 'lodash';
 
 const CALLBACK_PATH = '/oidc/callback';
 
@@ -227,8 +228,8 @@ export class OidcCtrl {
     logger.info({
       component: logger.components.user,
       type: 'LOGOUT',
-      userId: accessToken.getContent().sub,
-      username: accessToken.getContent().preferred_username
+      userId: get(accessToken.getContent(), 'sub'),
+      username: get(accessToken.getContent(), 'preferred_username')
     });
     return ctx.redirect(`${this.keycloakBaseUrl}/realms/${this.realm}/protocol/openid-connect/logout?${qs}`);
   }
