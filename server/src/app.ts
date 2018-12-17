@@ -362,14 +362,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     }
   });
 
-  // redirect
-  app.use(async (ctx: Context, next) => {
-    if (ctx.path === '/') {
-      return ctx.redirect('/cms');
-    }
-    return next();
-  });
-
   if (!process.env.TEST) {
     const morganFormat: any = (tokens, req, res) => {
       return logger.info({
@@ -388,8 +380,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     extension: 'pug'
   }));
   const serveClientStatic = config.appPrefix
-    ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../../client/dist'), {gzip: true}))
-    : serve(path.resolve(__dirname, '../../client/dist'), {gzip: true});
+    ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../../client/dist'), {gzip: true, index: false}))
+    : serve(path.resolve(__dirname, '../../client/dist'), {gzip: true, index: false});
   app.use(serveClientStatic);
 
   // router
@@ -397,10 +389,15 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     prefix: config.appPrefix
   });
 
+  // redirect
+  rootRouter.get('/', async (ctx: Context) => {
+    return ctx.redirect(`${config.appPrefix || ''}/cms`);
+  });
+
   // favicon
   const serveStatic = config.appPrefix
-    ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../static'), {maxage: 86400000}))
-    : serve(path.resolve(__dirname, '../static'), {maxage: 86400000});
+    ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../static'), {maxage: 86400000, index: false}))
+    : serve(path.resolve(__dirname, '../static'), {maxage: 86400000, index: false});
   rootRouter.get('/favicon/*', serveStatic);
   rootRouter.get('/js/*', serveStatic);
   rootRouter.get('/font/*', serveStatic);
