@@ -2607,9 +2607,9 @@ canner-script@2.0.11-alpha.1:
     react-intl "^2.4.0"
     safer-eval "^1.2.3"
 
-canner@^2.0.45:
-  version "2.0.45"
-  resolved "https://registry.yarnpkg.com/canner/-/canner-2.0.45.tgz#5920dd1ced4064a950cd44c184a10e4b1d59905c"
+canner@^2.0.46:
+  version "2.0.46"
+  resolved "https://registry.yarnpkg.com/canner/-/canner-2.0.46.tgz#f9ac8e9b0a081427f31f5e6eccd31ab9c892db98"
   dependencies:
     ajv "^6.5.2"
     apollo-boost "^0.1.4"

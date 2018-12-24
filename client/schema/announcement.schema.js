@@ -38,7 +38,9 @@ export default () => (
     }}
   >
      <toolbar async>
-      <filter component={TabsFilter}/>
+      <filter component={TabsFilter} defaultFilter={{
+        expiryDate_gt: moment().toISOString()
+      }}/>
       <pagination />
     </toolbar>
     <object

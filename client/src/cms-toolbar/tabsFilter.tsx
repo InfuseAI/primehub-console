@@ -25,7 +25,9 @@ export default class TabsFilter extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.onChange("0");
+    if (!this.props.where || !this.props.where.expiryDate || !this.props.where.expiryDate.gt) {
+      this.onChange("0");
+    }
   }
 
   onChange = (index: string) => {
