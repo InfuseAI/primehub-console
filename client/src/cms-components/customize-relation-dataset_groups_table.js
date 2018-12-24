@@ -105,7 +105,7 @@ export default class DatesetGroupTable extends PureComponent {
               </Title>
               {
                 !disabled && <div>
-                  <Button onClick={() => this.showModal({writable: false})} style={{margin: '16px 8px 16px 0'}}>
+                  <Button data-testid="connect-button" onClick={() => this.showModal({writable: false})} style={{margin: '16px 8px 16px 0'}}>
                     <Icon type="link"/>
                     <FormattedMessage
                       id="relation.multipleSelect.connect"

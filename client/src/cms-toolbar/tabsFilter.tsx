@@ -25,7 +25,9 @@ export default class TabsFilter extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.onChange("0");
+    if (!this.props.where || !this.props.where.expiryDate || !this.props.where.expiryDate.gt) {
+      this.onChange("0");
+    }
   }
 
   onChange = (index: string) => {
@@ -77,7 +79,7 @@ export default class TabsFilter extends React.Component<Props, State> {
       <Wrapper>
         <Tabs activeKey={`${activeKey}`} defaultActiveKey="0" onChange={this.onChange}>
           {fields.map((field, i) => (
-            <TabPane tab={field.title} key={i}></TabPane>
+            <TabPane data-testid={`tab-pane-${field.title}`} tab={field.title} key={i}></TabPane>
           ))}
         </Tabs>
       </Wrapper>

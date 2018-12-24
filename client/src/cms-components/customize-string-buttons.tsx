@@ -55,13 +55,13 @@ export default class Buttons extends React.Component<Props> {
   render() {
     return (
       <Wrapper>
-        <Button type="primary" onClick={this.send}>
+        <Button type="primary" onClick={this.send} data-testid="send-announcement-button" >
           Send Announcement
         </Button>
-        <Button onClick={this.saveAsDraft}>
+        <Button onClick={this.saveAsDraft} data-testid="save-as-draft-button">
           Save as draft
         </Button>
-        <Button onClick={this.reset}>
+        <Button onClick={this.reset} data-testid="cancel-button">
           Cancel
         </Button>
       </Wrapper>

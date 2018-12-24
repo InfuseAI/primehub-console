@@ -124,7 +124,7 @@ export default class EmailForm extends React.Component {
                     validator: this.validateToNextPassword,
                   }],
                 })(
-                  <Input type="password" />
+                  <Input type="password" data-testid="reset-password-password-input"/>
                 )}
               </FormItem>
               <FormItem
@@ -138,7 +138,7 @@ export default class EmailForm extends React.Component {
                     validator: this.compareToFirstPassword,
                   }],
                 })(
-                  <Input type="password" onBlur={this.handleConfirmBlur} />
+                  <Input data-testid="reset-password-confirm-input" type="password" onBlur={this.handleConfirmBlur} />
                 )}
               </FormItem>
               <FormItem
@@ -149,13 +149,13 @@ export default class EmailForm extends React.Component {
                   rules: [],
                   initialValue: false
                 })(
-                  <Switch />
+                  <Switch data-testid="reset-password-temporary-switch" />
                 )}
               </FormItem>
               <FormItem
                 wrapperCol={{span: 14, offset: 6}}
               >
-                <Button htmlType="button" onClick={() => this.onClick(resetPassword)}>
+                <Button data-testid="reset-password-reset-button" htmlType="button" onClick={() => this.onClick(resetPassword)}>
                   Reset Password
                 </Button>
               </FormItem>

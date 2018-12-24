@@ -72,7 +72,7 @@ export default class RelationTable extends PureComponent {
         }
         {
           !disabled && <div>
-            <Button onClick={this.showModal} style={{margin: '16px 8px 16px 0'}}>
+            <Button data-testid="connect-button" onClick={this.showModal} style={{margin: '16px 8px 16px 0'}}>
               <Icon type="link"/>
               <FormattedMessage
                 id="relation.multipleSelect.connect"

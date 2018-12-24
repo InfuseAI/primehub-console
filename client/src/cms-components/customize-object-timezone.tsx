@@ -67,6 +67,7 @@ export default class TimeZone extends React.Component<Props> {
       <Select
         showSearch
         style={{ width: 350 }}
+        data-testid="timezone-select"
         placeholder="Select a timezone"
         optionFilterProp="children"
         onChange={this.onChange}
@@ -74,7 +75,7 @@ export default class TimeZone extends React.Component<Props> {
         filterOption={(input, option) => (option.props.children as string).toLowerCase().indexOf(input.toLowerCase()) >= 0}
       >
         {this.timezones().map((zone, index) => (
-          <Option key={zone} value={zone.name}>
+          <Option key={zone} value={zone.name} data-testid={`timezone-option-${zone.name}`}>
             {this.stringifyZone(zone, offset)}
           </Option>
         ))}

@@ -80,7 +80,7 @@ class FilterGroup extends React.Component {
           </FilterPlugins>
         </Col>
         <ButtonCol span={4}>
-          <Button type="primary" icon="search" size="large" onClick={this.submit}>
+          <Button data-testid="search-button" type="primary" icon="search" size="large" onClick={this.submit}>
             <FormattedMessage
               id="query.filter.search"
               defaultMessage={defaultMessage.en['query.filter.search']}

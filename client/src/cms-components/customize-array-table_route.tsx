@@ -166,9 +166,11 @@ export default class ArrayBreadcrumb extends Component<Props> {
           return (
             <ButtonGroup>
               <Button icon="edit"
+                data-testid="edit-button"
                 onClick={() => this.edit(record.id)}
               />
               <Button icon="delete"
+                data-testid="delete-button"
                 onClick={() => this.remove(record.__index)}
               />
             </ButtonGroup>
@@ -183,13 +185,13 @@ export default class ArrayBreadcrumb extends Component<Props> {
         dataIndex: 'status',
         render: (status, record) => (
           <React.Fragment>
-            <Button type="primary" onClick={() => this.send(record.__index)} disabled={record.status === 'published'}>
+            <Button data-testid="notification-button" type="primary" onClick={() => this.send(record.__index)} disabled={record.status === 'published'}>
               <Icon type="notification" theme="filled" style={{color: 'white'}} />
               Send
             </Button>
             <Button.Group style={{marginLeft: 8, marginTop: 8}}>
-              <Button icon="edit" onClick={() => this.edit(record.id)}></Button>
-              <Button icon="delete" onClick={() => this.remove(record.__index)}></Button>
+              <Button data-testid="edit-button" icon="edit" onClick={() => this.edit(record.id)}></Button>
+              <Button data-testid="delete-button" icon="delete" onClick={() => this.remove(record.__index)}></Button>
             </Button.Group>
           </React.Fragment>
         )
@@ -209,6 +211,7 @@ export default class ArrayBreadcrumb extends Component<Props> {
             keyName === "user" && (
               <Button
                 onClick={this.openModal}
+                data-testid="mail-button"
               >
                 <Icon
                   type="mail"
@@ -225,6 +228,7 @@ export default class ArrayBreadcrumb extends Component<Props> {
           {(!createKeys || createKeys.length > 0) && (
             <Button
               onClick={this.add}
+              data-testid="add-button"
             >
               <Icon
                 type="plus"
