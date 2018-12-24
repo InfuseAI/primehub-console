@@ -1,6 +1,12 @@
 # import PageInfo from "common.graphql"
 # import Group, GroupCreateManyInput, GroupUpdateManyInput from "group.graphql"
 
+type UserAnnouncement {
+  id: ID!
+  content: String
+  expiryDate: String
+}
+
 type User {
   id: ID!
   username: String!
@@ -16,6 +22,7 @@ type User {
   personalDiskQuota: Int
   federated: Boolean
   groups: [Group]
+  announcements: [UserAnnouncement]
 }
 
 """An edge in a connection."""

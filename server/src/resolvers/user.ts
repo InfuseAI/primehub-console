@@ -1,5 +1,5 @@
 import KcAdminClient from 'keycloak-admin';
-import { pick, omit, find, isUndefined, first, sortBy, get, every } from 'lodash';
+import { pick, omit, find, isUndefined, first, sortBy, get, every, isEmpty, reduce, uniq, flatten } from 'lodash';
 import {
   toRelay, toAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter, paginate, extractPagination
 } from './utils';
@@ -10,6 +10,8 @@ import { ApolloError } from 'apollo-server';
 import { RequiredActionAlias } from 'keycloak-admin/lib/defs/requiredActionProviderRepresentation';
 import BPromise from 'bluebird';
 import * as logger from '../logger';
+import { crd as annCrdResolver } from '../resolvers/announcement';
+import moment from 'moment';
 
 /**
  * utils
@@ -549,6 +551,61 @@ export const typeResolvers = {
       return Promise.all(groups.map(async group => {
         return context.kcAdminClient.groups.findOne({id: group.id});
       }));
+    } catch (err) {
+      return [];
+    }
+  },
+
+  announcements: async (parent, args, context: Context) => {
+    try {
+      let filterTime: number;
+      const now = Math.ceil(Date.now() / 1000);
+      const lastReadTime = parseInt(get(parent, 'attributes.annLastReadTime.0'), 10);
+      if (isNaN(lastReadTime)) {
+        filterTime = now;
+      } else if (now > lastReadTime) {
+        filterTime = now;
+      } else {
+        filterTime = lastReadTime;
+      }
+      const groups = await context.kcAdminClient.users.listGroups({
+        id: parent.id
+      });
+      const announcements = await context.crdClient.announcements.list();
+      const filteredAnn = announcements
+      .filter(item => item.spec.status === 'published' && item.spec.expiryDate >= filterTime)
+      .map(item => {
+        return {
+          id: item.metadata.name,
+          content: item.spec.content,
+          expiryDate: moment.unix(item.spec.expiryDate).utc().toISOString()
+        };
+      });
+
+      if (isEmpty(filteredAnn)) {
+        return [];
+      }
+
+      const prefix = annCrdResolver.getPrefix();
+      const annMap = reduce(filteredAnn, (result, ann) => {
+        result[`${prefix}${ann.id}`] = ann;
+        return result;
+      }, {});
+
+      // filter announcements in groups
+      const roles = await Promise.all(groups.map(async group => {
+        const groupRoles = await context.kcAdminClient.groups.listRealmRoleMappings({
+          id: group.id
+        });
+
+        return groupRoles.filter(role => role.name.startsWith(prefix)).map(role => role.name);
+      }));
+
+      // unique roles
+      const uniqRoles = uniq(flatten(roles));
+
+      // map to crd
+      return uniqRoles.map(roleName => annMap[roleName]).filter(v => v);
     } catch (err) {
       return [];
     }

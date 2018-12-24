@@ -39,6 +39,7 @@ import { CrdCache } from './cache/crdCache';
 
 // controller
 import { OidcCtrl, mount as mountOidc } from './oidc';
+import { AnnCtrl, mount as mountAnn } from './announcement';
 
 // config
 import {createConfig, Config} from './config';
@@ -174,6 +175,13 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     clientId: config.keycloakClientId
   });
   await tokenSyncer.start();
+
+  // ann
+  const annCtrl = new AnnCtrl({
+    createKcAdminClient,
+    sharedGraphqlSecretKey: config.sharedGraphqlSecretKey,
+    getAccessToken: () => tokenSyncer.getAccessToken()
+  });
 
   // create observer with kc client with password
   if (!process.env.TEST) {
@@ -409,6 +417,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   // ctrl
   mountOidc(rootRouter, oidcCtrl);
+  mountAnn(rootRouter, annCtrl);
 
   // cms
   rootRouter.get('/cms', oidcCtrl.ensureAdmin, async ctx => {
