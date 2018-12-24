@@ -28,7 +28,7 @@ export default class TextFilter extends Component {
   }
 
   render() {
-    const {label, intl, search, placeholder} = this.props;
+    const {label, intl, search, placeholder, name} = this.props;
     
     return (
       <FilterPlugin>
@@ -38,6 +38,7 @@ export default class TextFilter extends Component {
           placeholder={i18n(placeholder, intl)}
           onChange={this.onInput}
           onPressEnter={search}
+          data-testid={`text-filter-${name}`}
         />
       </FilterPlugin>
     );

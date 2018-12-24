@@ -97,11 +97,12 @@ export default class EmailForm extends React.Component {
                   })(
                     <Select
                       mode="multiple"
+                      data-testid="reset-actions-select"
                     >
-                      <Option value="VERIFY_EMAIL">Verify Email</Option>
-                      <Option value="UPDATE_PROFILE">Update Profile</Option>
-                      <Option value="CONFIGURE_TOTP">Configure OTP</Option>
-                      <Option value="UPDATE_PASSWORD">Update Password</Option>
+                      <Option data-testid={`reset-actions-option-verify-email`} value="VERIFY_EMAIL">Verify Email</Option>
+                      <Option data-testid={`reset-actions-option-update-profile`} value="UPDATE_PROFILE">Update Profile</Option>
+                      <Option data-testid={`reset-actions-option-configure-otp`} value="CONFIGURE_TOTP">Configure OTP</Option>
+                      <Option data-testid={`reset-actions-option-update-password`} value="UPDATE_PASSWORD">Update Password</Option>
                     </Select>
                   )}
                 </FormItem>
@@ -123,7 +124,7 @@ export default class EmailForm extends React.Component {
                   label="Reset Actions Email"
                   {...formItemLayout}
                 >
-                  <Button htmlType="button" onClick={() => this.onClick(sendEmail)}>
+                  <Button data-testid="email-button" htmlType="button" onClick={() => this.onClick(sendEmail)}>
                     Send Email
                   </Button>
                 </FormItem>
@@ -187,6 +188,7 @@ class Expires extends React.Component {
     return (
       <span>
         <Input
+          data-testid="expires-in-input"
           type="text"
           size={size}
           value={state.number}
@@ -195,13 +197,14 @@ class Expires extends React.Component {
           min="0"
         />
         <Select
+          data-testid="expires-in-select"
           value={state.unit}
           size={size}
           style={{ width: '32%' }}
           onChange={this.handleUnitChange}
         >
-          <Option value="hours">Hours</Option>
-          <Option value="minutes">Minutes</Option>
+          <Option data-testid="expires-in-option-hours" value="hours">Hours</Option>
+          <Option data-testid="expires-in-option-minutes" value="minutes">Minutes</Option>
         </Select>
       </span>
     );

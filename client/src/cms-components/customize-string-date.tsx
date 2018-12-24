@@ -35,11 +35,11 @@ export default class Date extends React.Component<Props> {
     const timeOptions = genTimeOptions(uiParams.minuteStep || 30);
     return (
       <Wrapper>
-        <DatePicker onChange={this.changeDate} value={date} />
-        <Select value={value ? timeValue : '00:00'} style={{ width: 120, marginLeft: 16 }} onChange={this.changeTime}>
+        <DatePicker onChange={this.changeDate} value={date} data-testid="date-picker" />
+        <Select data-testid="date-select" value={value ? timeValue : '00:00'} style={{ width: 120, marginLeft: 16 }} onChange={this.changeTime}>
           {
             timeOptions.map(option => (
-              <Option key={option} value={option}>{option}</Option>
+              <Option data-testid={`date-option-${option}`} key={option} value={option}>{option}</Option>
             ))
           }
         </Select>

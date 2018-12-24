@@ -78,8 +78,8 @@ export default class DynamicFields extends React.Component<Props, State> {
             <div key={i} style={{display: 'flex', alignItems: 'center', marginBottom: 8}}>
               <div style={{marginRight: 16}}>{i + 1}.</div>
               <InputGroup compact style={{width: '50%', marginRight: 16}}>
-                <Input placeholder="key" style={{ width: '40%'}} value={field.key} onChange={e => this.changeKey(e.target.value, i)}/>
-                <Input placeholder="value" style={{ width: '60%'}} value={field.value} onChange={e => this.changeValue(e.target.value, i)}/>
+                <Input data-testid={`key-input-${i}`} placeholder="key" style={{ width: '40%'}} value={field.key} onChange={e => this.changeKey(e.target.value, i)}/>
+                <Input data-testid={`value-input-${i}`} placeholder="value" style={{ width: '60%'}} value={field.value} onChange={e => this.changeValue(e.target.value, i)}/>
               </InputGroup>
               <a href="javascript:;" onClick={() => this.remove(i)}>
                 <Icon type="close-circle-o"/>
@@ -87,7 +87,7 @@ export default class DynamicFields extends React.Component<Props, State> {
             </div>
           ))
         }
-        <Button type="dashed" onClick={this.add} style={{ width: 'calc(50% + 16px)', marginTop: 16 }}>
+        <Button type="dashed" data-testid="add-field-button" onClick={this.add} style={{ width: 'calc(50% + 16px)', marginTop: 16 }}>
           <Icon type="plus" /> Add field
         </Button>
       </React.Fragment>
