@@ -1,0 +1,12 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: announcementspecs.primehub.io
+spec:
+  group: primehub.io
+  version: v1alpha1
+  names:
+    kind: AnnouncementSpec
+    plural: announcementspecs
+    singular: announcementspec
+  scope: Namespaced

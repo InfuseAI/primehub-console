@@ -55,6 +55,13 @@ export interface DatasetSpec {
   volumeName?: string;
 }
 
+export interface AnnouncementSpec {
+  content: string;
+  expiryDate: number;
+  sendEmail: boolean;
+  status: string; // published, draft
+}
+
 /**
  * CRD
  */
@@ -70,6 +77,7 @@ export default class CrdClientImpl {
   public instanceTypes: CustomResource<InstanceTypeSpec>;
   public datasets: CustomResource<DatasetSpec>;
   public images: CustomResource<ImageSpec>;
+  public announcements: CustomResource<AnnouncementSpec>;
   private namespace: string;
 
   constructor(args?: CrdArgs) {
@@ -90,6 +98,12 @@ export default class CrdClientImpl {
       client,
       watch,
       loadCrd('image'),
+      this.namespace
+    );
+    this.announcements = new CustomResource<AnnouncementSpec>(
+      client,
+      watch,
+      loadCrd('announcement'),
       this.namespace
     );
   }

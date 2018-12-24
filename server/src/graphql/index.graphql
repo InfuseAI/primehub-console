@@ -3,6 +3,7 @@
 # import Group, GroupConnection, GroupWhereInput, GroupWhereUniqueInput, GroupCreateInput, GroupUpdateInput from "./group.graphql"
 # import InstanceType, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput, InstanceTypeCreateInput, InstanceTypeUpdateInput from "./instanceType.graphql"
 # import Image, ImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput from "./image.graphql"
+# import Announcement, AnnouncementConnection, AnnouncementWhereInput, AnnouncementWhereUniqueInput, AnnouncementCreateInput, AnnouncementUpdateInput from "./announcement.graphql"
 # import Dataset, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
 
@@ -82,6 +83,23 @@ type Query {
     last: Int
   ): ImageConnection!
 
+  """Announcement"""
+  announcement(where: AnnouncementWhereUniqueInput!): Announcement
+  announcements(
+    where: AnnouncementWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [Announcement]!
+  announcementsConnection(
+    where: AnnouncementWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): AnnouncementConnection!
+
   """Dataset"""
   dataset(where: DatasetWhereUniqueInput!): Dataset
   datasets(
@@ -150,6 +168,11 @@ type Mutation {
   createImage(data: ImageCreateInput!): Image!
   updateImage(data: ImageUpdateInput!, where: ImageWhereUniqueInput!): Image
   deleteImage(where: ImageWhereUniqueInput!): Image
+
+  """Announcement"""
+  createAnnouncement(data: AnnouncementCreateInput!): Announcement!
+  updateAnnouncement(data: AnnouncementUpdateInput!, where: AnnouncementWhereUniqueInput!): Announcement
+  deleteAnnouncement(where: AnnouncementWhereUniqueInput): Announcement
 
   """Dataset"""
   createDataset(data: DatasetCreateInput!): Dataset!

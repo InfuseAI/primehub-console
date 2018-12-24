@@ -21,6 +21,7 @@ import * as secret from './resolvers/secret';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
+import { crd as ann} from './resolvers/announcement';
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import { ErrorCodes } from './errorCodes';
 import basicAuth from 'basic-auth';
@@ -73,7 +74,8 @@ const resolvers = {
     secretsConnection: secret.connectionQuery,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
-    ...image.resolvers()
+    ...image.resolvers(),
+    ...ann.resolvers()
   },
   Mutation: {
     updateSystem: system.update,
@@ -91,7 +93,8 @@ const resolvers = {
     deleteSecret: secret.destroy,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
-    ...image.resolveInMutation()
+    ...image.resolveInMutation(),
+    ...ann.resolveInMutation()
   },
   System: {
     smtp: system.querySmtp
@@ -101,6 +104,7 @@ const resolvers = {
   ...instanceType.typeResolver(),
   ...dataset.typeResolver(),
   ...image.typeResolver(),
+  ...ann.typeResolver(),
 
   // scalars
   JSON: GraphQLJSON
@@ -401,6 +405,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   rootRouter.get('/favicon/*', serveStatic);
   rootRouter.get('/js/*', serveStatic);
   rootRouter.get('/font/*', serveStatic);
+  rootRouter.get('/css/*', serveStatic);
 
   // ctrl
   mountOidc(rootRouter, oidcCtrl);

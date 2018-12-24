@@ -2,7 +2,7 @@ import { Context } from './interface';
 import { toRelay, paginate, extractPagination, filter } from './utils';
 import CustomResource, { Item } from '../crdClient/customResource';
 import pluralize from 'pluralize';
-import { isEmpty, omit, mapValues, find } from 'lodash';
+import { isEmpty, omit, mapValues, find, get } from 'lodash';
 import KeycloakAdminClient from 'keycloak-admin';
 import { ApolloError } from 'apollo-server';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
@@ -15,7 +15,7 @@ export class Crd<SpecType> {
   private cache: CrdCache<SpecType>;
   private customResourceMethod: string;
   private propMapping: (item: Item<SpecType>) => Record<string, any>;
-  private createMapping: (data: any) => any;
+  private createMapping: (data: any, name: string) => any;
   private updateMapping: (data: any) => any;
   private resolveType?: Record<string, any>;
   private prefixName: string;
@@ -29,6 +29,8 @@ export class Crd<SpecType> {
   }: {
     name: string, metadata: any, spec: any, customResource: any, context: Context, getPrefix: () => string
   }) => Promise<any>;
+  private customParseWhere?: (where: any) => any;
+  private generateName?: () => string;
   private rolePrefix?: string;
 
   constructor({
@@ -43,11 +45,13 @@ export class Crd<SpecType> {
     onUpdate,
     onDelete,
     customParseNameFromRole,
-    customUpdate
+    customUpdate,
+    customParseWhere,
+    generateName
   }: {
     customResourceMethod: string,
     propMapping: (item: Item<SpecType>) => Record<string, any>,
-    createMapping: (data: any) => any,
+    createMapping: (data: any, name: string) => any,
     updateMapping: (data: any) => any,
     resolveType?: Record<string, any>,
     prefixName: string,
@@ -60,7 +64,9 @@ export class Crd<SpecType> {
       name, metadata, spec, customResource, context, getPrefix
     }: {
       name: string, metadata: any, spec: any, customResource: any, context: Context, getPrefix: () => string
-    }) => Promise<any>
+    }) => Promise<any>,
+    customParseWhere?: (where: any) => any,
+    generateName?: () => string,
   }) {
     this.customResourceMethod = customResourceMethod;
     this.propMapping = propMapping;
@@ -75,6 +81,8 @@ export class Crd<SpecType> {
     this.customUpdate = customUpdate;
     this.customParseNameFromRole = customParseNameFromRole;
     this.rolePrefix = config.rolePrefix;
+    this.customParseWhere = customParseWhere;
+    this.generateName = generateName;
   }
 
   public setCache(cache: CrdCache<SpecType>) {
@@ -194,15 +202,21 @@ export class Crd<SpecType> {
     return mappedRows;
   }
 
+  private parseWhere = (argsWhere: any) => {
+    return this.customParseWhere && this.customParseWhere(argsWhere) || argsWhere;
+  }
+
   private query = async (root, args, context: Context) => {
     const customResource = context.crdClient[this.customResourceMethod];
-    const rows = await this.listQuery(customResource, args && args.where);
+    const where = this.parseWhere(args && args.where);
+    const rows = await this.listQuery(customResource, where);
     return paginate(rows, extractPagination(args));
   }
 
   private connectionQuery = async (root, args, context: Context) => {
     const customResource = context.crdClient[this.customResourceMethod];
-    const rows = await this.listQuery(customResource, args && args.where);
+    const where = this.parseWhere(args && args.where);
+    const rows = await this.listQuery(customResource, where);
     return toRelay(rows, extractPagination(args));
   }
 
@@ -257,7 +271,7 @@ export class Crd<SpecType> {
    */
 
   private create = async (root, args, context: Context) => {
-    const {name} = args.data;
+    const name = (this.generateName) ? this.generateName() : get(args, 'data.name');
     const {kcAdminClient, crdClient} = context;
     const customResource = crdClient[this.customResourceMethod];
     // create role on keycloak
@@ -278,7 +292,7 @@ export class Crd<SpecType> {
     const role = await kcAdminClient.roles.findOneByName({name: roleName});
 
     // create crd on k8s
-    const {metadata, spec} = this.createMapping(args.data);
+    const {metadata, spec} = this.createMapping(args.data, name);
     const res = await customResource.create(metadata, spec);
     if (this.onCreate) {
       await this.onCreate({role, resource: res, data: args.data, context, getPrefix: this.getPrefix});

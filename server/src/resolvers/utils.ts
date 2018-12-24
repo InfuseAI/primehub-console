@@ -94,6 +94,14 @@ export const filter = (rows: any[], where?: any) => {
       const fieldName = field.replace('_contains', '');
       const value = where[field];
       rows = rows.filter(row => row[fieldName] && row[fieldName].includes && row[fieldName].includes(value));
+    } else if (field.indexOf('gt') >= 0) {
+      const fieldName = field.replace('_gt', '');
+      const value = where[field];
+      rows = rows.filter(row => row[fieldName] && row[fieldName] > value);
+    } else if (field.indexOf('lt') >= 0) {
+      const fieldName = field.replace('_lt', '');
+      const value = where[field];
+      rows = rows.filter(row => row[fieldName] && row[fieldName] < value);
     }
   });
   return rows;
