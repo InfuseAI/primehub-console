@@ -59,7 +59,9 @@ export default () => (
       }}
     />
     <boolean keyName="global" title="${anno.global}" />
-    <GroupRelation />
+    <Condition match={(data, operator) => !data.global}>
+      <GroupRelation />
+    </Condition>
     <boolean keyName="sendEmail" title="${anno.sendEmail}" packageName="../src/cms-components/customize-boolean-send_email.tsx" />
     <string
       defaultValue="published"
