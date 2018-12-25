@@ -271,7 +271,7 @@ exports.dict = {
     'smtp.auth.password': 'Password',
 
     // announcement
-    announcement: "Announcement",
+    announcement: "Announcements",
     'anno.content': 'Content',
     'anno.expiryDate': 'Expiry Date',
     'anno.global': 'Global',
@@ -434,7 +434,7 @@ exports.dict = {
     'smtp.auth.password': 'Password',
 
     // announcement
-    announcement: "Announcement",
+    announcement: "Announcements",
     'anno.content': 'Content',
     'anno.expiryDate': 'Expiry Date',
     'anno.global': 'Global',
