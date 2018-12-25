@@ -272,6 +272,7 @@ exports.dict = {
 
     // announcement
     announcement: "Announcement",
+    'anno.title': 'Title',
     'anno.content': 'Content',
     'anno.expiryDate': 'Expiry Date',
     'anno.global': 'Global',
@@ -435,6 +436,7 @@ exports.dict = {
 
     // announcement
     announcement: "Announcement",
+    'anno.title': 'Title',
     'anno.content': 'Content',
     'anno.expiryDate': 'Expiry Date',
     'anno.global': 'Global',

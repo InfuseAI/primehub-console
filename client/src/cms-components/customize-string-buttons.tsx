@@ -53,12 +53,13 @@ export default class Buttons extends React.Component<Props> {
   }
 
   render() {
+    const {routerParams: {operator}, value} = this.props;
     return (
       <Wrapper>
         <Button type="primary" onClick={this.send} data-testid="send-announcement-button" >
           Send Announcement
         </Button>
-        <Button onClick={this.saveAsDraft} data-testid="save-as-draft-button">
+        <Button disabled={operator === 'update' && value === 'published'} onClick={this.saveAsDraft} data-testid="save-as-draft-button">
           Save as draft
         </Button>
         <Button onClick={this.reset} data-testid="cancel-button">
