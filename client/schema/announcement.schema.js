@@ -43,6 +43,16 @@ export default () => (
       }}/>
       <pagination />
     </toolbar>
+    <string
+      keyName="title"
+      title="${anno.title}"
+      ui="textarea"
+      uiParams={{
+        rows: 1,
+        formatter: str => str.substr(0, 40)
+      }}
+      validation={{maxLength: 40}}
+    />
     <object
       keyName="content"
       title="Content"
@@ -50,6 +60,19 @@ export default () => (
       defaultValue={{
         html: "<p></p>",
         __typename: null
+      }}
+      uiParams={{
+        toolbar: [
+          ['bold', 'italic', 'underline','strike'],
+          [{'list': 'ordered'}, {'list': 'bullet'}],
+          ['link'],
+          ['clean']
+        ],
+        formats: [
+          'bold', 'italic', 'underline', 'strike',
+          'list', 'bullet',
+          'link'
+        ]
       }}
     />
     <dateTime
@@ -60,7 +83,7 @@ export default () => (
         minuteStep: 30
       }}
     />
-    <boolean keyName="global" title="${anno.global}" />
+    <boolean keyName="global" title="${anno.global}" defaultValue={() => true}/>
     <Condition match={(data, operator) => !data.global}>
       <GroupRelation />
     </Condition>

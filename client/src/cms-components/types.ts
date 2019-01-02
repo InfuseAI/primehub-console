@@ -15,5 +15,6 @@ export interface Props {
   title: string,
   rootValue: Object,
   form: any,
-  size: string
+  size: string,
+  routerParams: any
 }
