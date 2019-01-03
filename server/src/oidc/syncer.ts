@@ -5,6 +5,7 @@ import * as logger from '../logger';
 const ONE_MINUTE = 60;
 
 export default class TokenSyncer {
+  private retryTimes: number = 0;
   private oidcClient: any;
   private clientId: string;
   private accessToken: Token;
@@ -33,7 +34,7 @@ export default class TokenSyncer {
 
   public getAccessToken = async () => {
     if (this.accessToken.isExpired()) {
-      throw new Error(`cannot obtain access token not expired`);
+      throw new Error(`cannot obtain access token that's expired`);
     }
     return this.accessToken.toString();
   }
@@ -65,25 +66,11 @@ export default class TokenSyncer {
       type: 'START_SYNC',
       message: 'token expired in a minute, start exchange'
     });
-    const tokenSet = await this.oidcClient.refresh(this.refreshToken.toString());
-    const newAccessToken = new Token(tokenSet.access_token, this.clientId);
-    const newRefreshToken = new Token(tokenSet.refresh_token, this.clientId);
 
-    // exp in refresh token not extended
-    if (this.refreshToken.getContent().exp >= newRefreshToken.getContent().exp) {
-      logger.info({
-        component: logger.components.tokenSyncer,
-        type: 'EXP_NOT_EXTEND',
-        message: 'refreshToken exp not extended, use clientCredential grant to get new one'
-      });
-      // use client_credentials grant to obtain new refresh token
-      const clientCredTokenSet = await this.clientCredentialGrant();
-      this.accessToken = new Token(clientCredTokenSet.access_token, this.clientId);
-      this.refreshToken = new Token(clientCredTokenSet.refresh_token, this.clientId);
-    } else {
-      this.accessToken = newAccessToken;
-      this.refreshToken = newRefreshToken;
-    }
+    // try to get tokenSet from refresh grant or client credential
+    const {accessToken: newAccessToken, refreshToken: newRefreshToken} = await this.getTokenSet();
+    this.accessToken = newAccessToken;
+    this.refreshToken = newRefreshToken;
 
     logger.info({
       component: logger.components.tokenSyncer,
@@ -102,8 +89,61 @@ export default class TokenSyncer {
           message: err.message,
           stacktrace: err.stacktrace,
         });
+
+        // try 3 times, if it fails, stop trying
+        if (this.retryTimes >= 3) {
+          logger.error({
+            component: logger.components.tokenSyncer,
+            type: 'CIRCUIT_BREAK',
+            message: 'reach maximum retry times of token exchanging, stop trying',
+          });
+          return;
+        }
+
+        this.retryTimes += 1;
         this.scheduleNextSync();
       });
     }, this.syncDuration);
+  }
+
+  private getTokenSet = async () => {
+    let accessToken: Token;
+    let refreshToken: Token;
+    try {
+      const tokenSet = await this.oidcClient.refresh(this.refreshToken.toString());
+      accessToken = new Token(tokenSet.access_token, this.clientId);
+      refreshToken = new Token(tokenSet.refresh_token, this.clientId);
+
+      // exp in refresh token not extended
+      if (this.refreshToken.getContent().exp >= refreshToken.getContent().exp) {
+        logger.info({
+          component: logger.components.tokenSyncer,
+          type: 'EXP_NOT_EXTEND',
+          message: 'refreshToken exp not extended, use clientCredential grant to get new one'
+        });
+        // use client_credentials grant to obtain new refresh token
+        const clientCredTokenSet = await this.clientCredentialGrant();
+        accessToken = new Token(clientCredTokenSet.access_token, this.clientId);
+        refreshToken = new Token(clientCredTokenSet.refresh_token, this.clientId);
+      }
+    } catch (err) {
+      /**
+       * Possible errors
+       * invalid_grant for expiration
+       * invalid_grant (Session not active) => for user deleted
+       * invalid_scope (User or client no longer has role permissions for client key: realm-management)
+       *  => for remove user from admin
+       */
+      if (err.error === 'invalid_grant') {
+        // get from client credential
+        const clientCredTokenSet = await this.clientCredentialGrant();
+        accessToken = new Token(clientCredTokenSet.access_token, this.clientId);
+        refreshToken = new Token(clientCredTokenSet.refresh_token, this.clientId);
+      } else {
+        throw err;
+      }
+    }
+
+    return {accessToken, refreshToken};
   }
 }
