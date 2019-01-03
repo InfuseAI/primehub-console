@@ -57,7 +57,8 @@
     "p-is-promise": "^2.0.0",
     "pluralize": "^7.0.0",
     "pug": "^2.0.3",
-    "shortid": "^2.2.14"
+    "shortid": "^2.2.14",
+    "xss": "^1.0.3"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",

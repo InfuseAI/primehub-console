@@ -7,22 +7,23 @@ enum AnnStatus {
 }
 
 type Editor {
-  html: String
+  html: String!
 }
 
 input EditorInput {
-  html: String
+  html: String!
 }
 
 type Announcement {
   id: ID!
-  content: Editor
-  expiryDate: String
-  sendEmail: Boolean
-  status: AnnStatus
-  global: Boolean
-  spec: JSON
-  groups: [Group]
+  title: String!
+  content: Editor!
+  expiryDate: String!
+  sendEmail: Boolean!
+  status: AnnStatus!
+  global: Boolean!
+  spec: JSON!
+  groups: [Group]!
 }
 
 """An edge in a connection."""
@@ -54,8 +55,9 @@ input AnnouncementWhereInput {
 
 """Mutation input"""
 input AnnouncementCreateInput {
-  content: EditorInput
-  expiryDate: String
+  title: String!
+  content: EditorInput!
+  expiryDate: String!
   sendEmail: Boolean
   status: AnnStatus
   global: Boolean
@@ -63,6 +65,7 @@ input AnnouncementCreateInput {
 }
 
 input AnnouncementUpdateInput {
+  title: String
   content: EditorInput
   expiryDate: String
   sendEmail: Boolean

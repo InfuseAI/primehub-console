@@ -32,7 +32,7 @@ export class AnnCtrl {
     }
     const kcAdminClient = this.createKcAdminClient();
     const {userId} = ctx.params;
-    const {time} = ctx.request.body;
+    const {time} = ctx.request.body as any;
     const {authorization = ''}: {authorization: string} = ctx.header;
 
     if (!userId) {
@@ -60,7 +60,7 @@ export class AnnCtrl {
     const accessToken = await this.getAccessToken();
     kcAdminClient.setAccessToken(accessToken);
 
-    // update user attribute annLastReadTime
+    // update user attribute announcementReadTimestamp
     const user = await kcAdminClient.users.findOne({
       id: userId
     });
@@ -70,11 +70,11 @@ export class AnnCtrl {
       keycloakAttr: user.attributes,
       schema: {
         personalDiskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota},
-        annLastReadTime: {type: FieldType.integer}
+        announcementReadTimestamp: {type: FieldType.integer}
       }
     });
     attrs.mergeWithData({
-      annLastReadTime: time
+      announcementReadTimestamp: time
     });
 
     await kcAdminClient.users.update({id: userId}, {

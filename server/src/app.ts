@@ -21,7 +21,7 @@ import * as secret from './resolvers/secret';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
-import { crd as ann} from './resolvers/announcement';
+import * as ann from './resolvers/announcement';
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import { ErrorCodes } from './errorCodes';
 import basicAuth from 'basic-auth';
@@ -73,10 +73,12 @@ const resolvers = {
     secret: secret.queryOne,
     secrets: secret.query,
     secretsConnection: secret.connectionQuery,
+    announcement: ann.queryOne,
+    announcements: ann.listQuery,
+    announcementsConnection: ann.connectionQuery,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),
-    ...ann.resolvers()
   },
   Mutation: {
     updateSystem: system.update,
@@ -92,20 +94,22 @@ const resolvers = {
     createSecret: secret.create,
     updateSecret: secret.update,
     deleteSecret: secret.destroy,
+    createAnnouncement: ann.create,
+    updateAnnouncement: ann.update,
+    deleteAnnouncement: ann.destroy,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation(),
-    ...ann.resolveInMutation()
   },
   System: {
     smtp: system.querySmtp
   },
   User: user.typeResolvers,
   Group: group.typeResolvers,
+  Announcement: ann.typeResolvers,
   ...instanceType.typeResolver(),
   ...dataset.typeResolver(),
   ...image.typeResolver(),
-  ...ann.typeResolver(),
 
   // scalars
   JSON: GraphQLJSON
@@ -216,8 +220,15 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
   instanceType.setCache(imageCache);
 
+  const annCache = new CrdCache({
+    resource: 'announcement',
+    originList: crdClient.announcements.list,
+    returnNullIfNotFound: true
+  });
+
   await imageCache.refetch();
   await instCache.refetch();
+  await annCache.refetch();
 
   // apollo server
   const schema = makeExecutableSchema({
@@ -301,6 +312,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         getInstanceType: getInstanceType || memGetInstanceType(crdClient),
         getImage: getImage || memGetImage(crdClient),
         getDataset: memGetDataset(crdClient),
+        annCache,
         gitSyncSecret,
         readOnly,
         userId,
@@ -335,7 +347,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         httpsAgent: httpsAgent.getCurrentStatus()
       });
 
-      // cusomized handler for error code
+      // customized handler for error code
       if (errorCode === ErrorCodes.REFRESH_TOKEN_EXPIRED) {
         additionalProperties.loginUrl = extensions.loginUrl;
       }

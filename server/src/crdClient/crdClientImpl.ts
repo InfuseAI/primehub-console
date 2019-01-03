@@ -56,9 +56,11 @@ export interface DatasetSpec {
 }
 
 export interface AnnouncementSpec {
+  title: string;
   content: string;
   expiryDate: number;
   sendEmail: boolean;
+  emailSent?: number;
   status: string; // published, draft
 }
 

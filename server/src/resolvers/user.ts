@@ -1,17 +1,17 @@
 import KcAdminClient from 'keycloak-admin';
-import { pick, omit, find, isUndefined, first, sortBy, get, every, isEmpty, reduce, uniq, flatten } from 'lodash';
+import { find, isUndefined, first, sortBy, get, every, isEmpty, reduce, uniq, flatten, orderBy } from 'lodash';
 import {
-  toRelay, toAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter, paginate, extractPagination
+  toRelay, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter, paginate, extractPagination
 } from './utils';
 import { detaultSystemSettings, keycloakMaxCount } from './constant';
-import { Attributes, FieldType } from './attr';
+import { Attributes } from './attr';
 import { Context } from './interface';
 import { ApolloError } from 'apollo-server';
 import { RequiredActionAlias } from 'keycloak-admin/lib/defs/requiredActionProviderRepresentation';
 import BPromise from 'bluebird';
 import * as logger from '../logger';
-import { crd as annCrdResolver } from '../resolvers/announcement';
 import moment from 'moment';
+import { LABEL_PREFIX, GLOBAL_LABEL } from './announcement';
 
 /**
  * utils
@@ -560,7 +560,7 @@ export const typeResolvers = {
     try {
       let filterTime: number;
       const now = Math.ceil(Date.now() / 1000);
-      const lastReadTime = parseInt(get(parent, 'attributes.annLastReadTime.0'), 10);
+      const lastReadTime = parseInt(get(parent, 'attributes.announcementReadTimestamp.0'), 10);
       if (isNaN(lastReadTime)) {
         filterTime = now;
       } else if (now > lastReadTime) {
@@ -571,41 +571,31 @@ export const typeResolvers = {
       const groups = await context.kcAdminClient.users.listGroups({
         id: parent.id
       });
-      const announcements = await context.crdClient.announcements.list();
+
+      const announcements = await context.annCache.list();
       const filteredAnn = announcements
       .filter(item => item.spec.status === 'published' && item.spec.expiryDate >= filterTime)
+      .filter(item => {
+        if (item.metadata.labels[GLOBAL_LABEL] === 'true') {
+          return true;
+        }
+
+        // if in groups
+        return groups.some(group => item.metadata.labels[`${LABEL_PREFIX}/${group.id}`]);
+      })
       .map(item => {
         return {
           id: item.metadata.name,
+          title: item.spec.title,
           content: item.spec.content,
-          expiryDate: moment.unix(item.spec.expiryDate).utc().toISOString()
+          expiryDate: moment.unix(item.spec.expiryDate).utc().toISOString(),
+          createDate: item.metadata.creationTimestamp
         };
       });
 
-      if (isEmpty(filteredAnn)) {
-        return [];
-      }
+      const orderedAnn = orderBy(filteredAnn, ['createDate'], ['desc']);
 
-      const prefix = annCrdResolver.getPrefix();
-      const annMap = reduce(filteredAnn, (result, ann) => {
-        result[`${prefix}${ann.id}`] = ann;
-        return result;
-      }, {});
-
-      // filter announcements in groups
-      const roles = await Promise.all(groups.map(async group => {
-        const groupRoles = await context.kcAdminClient.groups.listRealmRoleMappings({
-          id: group.id
-        });
-
-        return groupRoles.filter(role => role.name.startsWith(prefix)).map(role => role.name);
-      }));
-
-      // unique roles
-      const uniqRoles = uniq(flatten(roles));
-
-      // map to crd
-      return uniqRoles.map(roleName => annMap[roleName]).filter(v => v);
+      return isEmpty(orderedAnn) ? [] : orderedAnn;
     } catch (err) {
       return [];
     }

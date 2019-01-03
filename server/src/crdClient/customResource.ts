@@ -12,6 +12,7 @@ export interface Metadata {
   resourceVersion?: string;
   selfLink?: string;
   uid?: string;
+  labels: Record<string, any>;
 }
 
 export interface Item<T> {
@@ -49,8 +50,8 @@ export default class CustomResource<SpecType = any> {
     return pick(body, ['metadata', 'spec']);
   }
 
-  public list = async (): Promise<Array<Item<SpecType>>> => {
-    const {body} = await this.resource.get();
+  public list = async (qs?: any): Promise<Array<Item<SpecType>>> => {
+    const {body} = await this.resource.get({qs});
     return body.items.map(item => pick(item, ['metadata', 'spec']));
   }
 

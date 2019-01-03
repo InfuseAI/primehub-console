@@ -10,6 +10,7 @@ const expect = chai.expect;
 import { createSandbox, destroySandbox } from './sandbox';
 // import app
 import { createApp } from '../src/app';
+import { AxiosRequestConfig } from 'axios';
 
 before(async () => {
   // setup testing realm and related env
@@ -46,6 +47,8 @@ before(async () => {
 
     return res.body.data;
   };
+
+  (global as any).httpRequester = requester;
 });
 
 after(async () => {

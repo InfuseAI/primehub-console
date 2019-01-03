@@ -3,6 +3,7 @@
 
 type UserAnnouncement {
   id: ID!
+  title: String
   content: String
   expiryDate: String
 }
