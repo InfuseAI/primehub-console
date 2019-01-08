@@ -97,7 +97,9 @@ export default class TokenSyncer {
             type: 'CIRCUIT_BREAK',
             message: 'reach maximum retry times of token exchanging, stop trying',
           });
-          return;
+
+          // exit hard
+          return process.exit(1);
         }
 
         this.retryTimes += 1;
