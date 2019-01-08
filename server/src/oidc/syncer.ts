@@ -71,6 +71,7 @@ export default class TokenSyncer {
     const {accessToken: newAccessToken, refreshToken: newRefreshToken} = await this.getTokenSet();
     this.accessToken = newAccessToken;
     this.refreshToken = newRefreshToken;
+    this.retryTimes = 0;
 
     logger.info({
       component: logger.components.tokenSyncer,
