@@ -574,7 +574,7 @@ export const typeResolvers = {
 
       const announcements = await context.annCache.list();
       const filteredAnn = announcements
-      .filter(item => item.spec.status === 'published' && item.spec.expiryDate >= filterTime)
+      .filter(item => item.spec.status === 'published' && item.spec.expiryDate > filterTime)
       .filter(item => {
         if (item.metadata.labels[GLOBAL_LABEL] === 'true') {
           return true;
@@ -593,7 +593,7 @@ export const typeResolvers = {
         };
       });
 
-      const orderedAnn = orderBy(filteredAnn, ['createDate'], ['desc']);
+      const orderedAnn = orderBy(filteredAnn, ['expiryDate'], ['desc']);
 
       return isEmpty(orderedAnn) ? [] : orderedAnn;
     } catch (err) {
