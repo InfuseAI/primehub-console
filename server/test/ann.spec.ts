@@ -6,6 +6,7 @@ import KeycloakAdminClient from 'keycloak-admin';
 import moment from 'moment';
 import { cleanupAnns } from './sandbox';
 import { omit } from 'lodash';
+import BPromise from 'bluebird';
 
 chai.use(chaiHttp);
 
@@ -389,6 +390,9 @@ describe('announcement graphql', function() {
     }`, {
       data: globalAnnData
     });
+
+    // delay for a sec to make announcement have order
+    await BPromise.delay(1000);
 
     // create group ann
     const group = await this.createGroup();

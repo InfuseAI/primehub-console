@@ -6,6 +6,7 @@ import { isNil, get, isEmpty, isBoolean, forEach, orderBy } from 'lodash';
 import moment from 'moment';
 import * as logger from '../logger';
 import Boom from 'boom';
+import xss from 'xss';
 
 /**
  * interface
@@ -57,7 +58,7 @@ const createMapping = (data: any, name: string) => {
     },
     spec: {
       title:  get(data, 'title'),
-      content: get(data, 'content.html', `<p></p>`),
+      content: xss(get(data, 'content.html', `<p></p>`)),
       expiryDate: isNil(data.expiryDate) ? moment.utc().unix() : moment.utc(data.expiryDate).unix(),
       sendEmail: isNil(data.sendEmail) ? undefined : Boolean(data.sendEmail),
       status: isNil(data.status) ? 'draft' : data.status
@@ -104,7 +105,7 @@ const updateMapping = (data: any) => {
     },
     spec: {
       title: isNil(get(data, 'title')) ? undefined : get(data, 'title'),
-      content: isNil(get(data, 'content.html')) ? undefined : get(data, 'content.html'),
+      content: isNil(get(data, 'content.html')) ? undefined : xss(get(data, 'content.html')),
       expiryDate: isNil(data.expiryDate) ? undefined : moment.utc(data.expiryDate).unix(),
       sendEmail: isNil(data.sendEmail) ? undefined : Boolean(data.sendEmail),
       status: isNil(data.status) ? undefined : data.status

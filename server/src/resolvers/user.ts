@@ -1,5 +1,5 @@
 import KcAdminClient from 'keycloak-admin';
-import { find, isUndefined, first, sortBy, get, every, isEmpty, reduce, uniq, flatten, orderBy } from 'lodash';
+import { find, isUndefined, first, sortBy, get, every, isEmpty, orderBy } from 'lodash';
 import {
   toRelay, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter, paginate, extractPagination
 } from './utils';
