@@ -91,7 +91,8 @@ export const update = async (root, args, context) => {
     defaultUserDiskQuota: payload.defaultUserDiskQuota || defaultUserDiskQuota,
     timezone: (payload.timezone && payload.timezone.name && !isUndefined(payload.timezone.offset))
       ? payload.timezone
-      : undefined
+      : undefined,
+    smtpPassword: get(payload, 'smtp.password')
   };
 
   const savedToDB = {

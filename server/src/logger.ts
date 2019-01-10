@@ -22,6 +22,7 @@ export enum components {
   instanceType = 'InstanceType',
   secret = 'Secret',
   announcement = 'Announcement',
+  emailClient = 'EmailClient'
 }
 
 export const log = (levelType: level = level.info, payload?: any) => {

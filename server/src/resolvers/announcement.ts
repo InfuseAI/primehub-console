@@ -2,11 +2,14 @@ import { Context } from './interface';
 import CustomResource, { Item } from '../crdClient/customResource';
 import { AnnouncementSpec } from '../crdClient/crdClientImpl';
 import { filter, paginate, extractPagination, toRelay } from './utils';
-import { isNil, get, isEmpty, isBoolean, forEach, orderBy } from 'lodash';
+import { isNil, get, isEmpty, isBoolean, forEach, orderBy, uniq } from 'lodash';
 import moment from 'moment';
 import * as logger from '../logger';
 import Boom from 'boom';
 import xss from 'xss';
+import BPromise from 'bluebird';
+import { EmailClient } from '../announcement/emailClient';
+import { keycloakMaxCount } from './constant';
 
 /**
  * interface
@@ -29,7 +32,7 @@ interface AnnResponse {
  */
 
 export const LABEL_PREFIX = 'groups.keycloak';
-export const GLOBAL_LABEL = `${LABEL_PREFIX}/gloabl`;
+export const GLOBAL_LABEL = `${LABEL_PREFIX}/global`;
 
 /**
  * utility
@@ -37,6 +40,16 @@ export const GLOBAL_LABEL = `${LABEL_PREFIX}/gloabl`;
 
 const generateName = () => {
   return `ann-${Math.random().toString(36).substring(2, 15)}`;
+};
+
+export const getGroupIdsFromLabels = (labels: any): string[] => {
+  const groupIds = [];
+  forEach(labels, (_, label) => {
+    if (label.indexOf(LABEL_PREFIX) >= 0 && label !== GLOBAL_LABEL) {
+      groupIds.push(label.split('/')[1]);
+    }
+  });
+  return groupIds;
 };
 
 const createMapping = (data: any, name: string) => {
@@ -113,8 +126,96 @@ const updateMapping = (data: any) => {
   };
 };
 
-const onPublish = (ann: AnnResponse) => {
+const parseBooleanString = val => val === 'true';
+const sendEmail = async (ann: AnnResponse, context: Context) => {
+  if (!ann.sendEmail) {
+    return;
+  }
   // send emails
+  const {kcAdminClient, realm} = context;
+  const foundRealm = await kcAdminClient.realms.findOne({realm});
+  const everyoneGroup = await kcAdminClient.groups.findOne({id: context.everyoneGroupId});
+  const smtpPassword = get(everyoneGroup, 'attributes.smtpPassword.0');
+  const smtpServer = foundRealm.smtpServer || {} as any;
+  const smtpConfig = {
+    ...smtpServer,
+    port: smtpServer.port && parseInt(smtpServer.port, 10) || 25,
+    enableSSL: parseBooleanString(smtpServer.ssl),
+    enableStartTLS: parseBooleanString(smtpServer.starttls),
+    enableAuth: parseBooleanString(smtpServer.auth),
+    username: smtpServer.user,
+    password: smtpPassword
+  };
+
+  // validate smtpConfig
+  if (!smtpConfig.host || !smtpConfig.port) {
+    logger.error({
+      component: logger.components.emailClient,
+      type: 'FAIL_SENDING_ANNOUNCEMENT',
+      userId: context.userId,
+      username: context.username,
+      id: ann.id,
+      message: `required email settings to setup`
+    });
+    return;
+  }
+
+  // collect emails
+  let emails: string[] = [];
+  if (ann.global) {
+    // send to everyone
+    const users = await kcAdminClient.users.find({
+      max: keycloakMaxCount
+    });
+    users.forEach(user => {
+      if (user.email) {
+        emails.push(user.email);
+      }
+    });
+  } else {
+    const groupIds = getGroupIdsFromLabels(ann.metadata.labels);
+    const emailMap = {};
+    BPromise.map(groupIds, async groupId => {
+      const members = await context.kcAdminClient.groups.listMembers({
+        id: groupId,
+        max: keycloakMaxCount
+      });
+      members.forEach(member => {
+        if (member.email) {
+          emailMap[member.email] = true;
+        }
+      });
+    });
+    emails = Object.keys(emailMap);
+  }
+
+  // emailClient
+  const emailClient = new EmailClient({smtpConfig});
+  await BPromise.map(emails, email => {
+    return emailClient.sendMail({
+      to: email,
+      subject: ann.title,
+      content: ann.content.html
+    });
+  }, {
+    concurrency: 5
+  });
+
+  // add emailSent to crd
+  await context.crdClient.announcements.patch(ann.id, {
+    spec: {
+      emailSent: moment.utc().unix()
+    }
+  });
+
+  logger.info({
+    component: logger.components.announcement,
+    type: 'SUCCEED_SENDING_ANNOUNCEMENT',
+    userId: context.userId,
+    username: context.username,
+    id: ann.id,
+    emailCount: emails.length
+  });
 };
 
 /**
@@ -150,7 +251,17 @@ export const create = async (root, args, context: Context) => {
 
   const returnAnn = mapping(res);
   if (res.spec.status === 'published') {
-    onPublish(returnAnn);
+    sendEmail(returnAnn, context)
+      .catch(error => {
+        logger.error({
+          component: logger.components.announcement,
+          type: 'FAIL_SENDING_ANNOUNCEMENT',
+          userId: context.userId,
+          username: context.username,
+          id: res.metadata.name,
+          error
+        });
+      });
   }
 
   context.annCache.clear();
@@ -187,7 +298,17 @@ export const update = async (root, args, context: Context) => {
   // if go from draft to published
   const returnAnn = mapping(res);
   if (ann.spec.status === 'draft' && res.spec.status === 'published') {
-    onPublish(returnAnn);
+    sendEmail(returnAnn, context)
+      .catch(error => {
+        logger.error({
+          component: logger.components.announcement,
+          type: 'FAIL_SENDING_ANNOUNCEMENT',
+          userId: context.userId,
+          username: context.username,
+          id: res.metadata.name,
+          error
+        });
+      });
   }
 
   context.annCache.clear();
@@ -260,14 +381,8 @@ export const queryOne = async (root, args, context: Context) => {
 
 export const typeResolvers = {
   async groups(parent, args, context: Context) {
-    const groupIds = [];
     const labels = get(parent, 'metadata.labels', {});
-    forEach(labels, (_, label) => {
-      if (label.indexOf(LABEL_PREFIX) >= 0 && label !== GLOBAL_LABEL) {
-        groupIds.push(label.split('/')[1]);
-      }
-    });
-
+    const groupIds = getGroupIdsFromLabels(labels);
     const groups = await groupIds.map(groupId =>
       context.kcAdminClient.groups.findOne({id: groupId}));
     return groups.filter(v => v);
