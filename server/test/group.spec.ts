@@ -161,7 +161,7 @@ describe('group graphql', function() {
       }
     });
 
-    expect(prefixData.groups.length).to.be.equals(1);
+    expect(prefixData.groups.length).to.be.least(1);
 
     // postfix
     const postfixData = await this.graphqlRequest(`

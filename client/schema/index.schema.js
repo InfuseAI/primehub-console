@@ -25,7 +25,7 @@ const schema = (
     <Image/>
     <Dataset/>
     <Secret />
-    <Announcement />
+    {/* <Announcement /> */}
   </root>
 )
 if (process.env.NODE_ENV === 'production') {

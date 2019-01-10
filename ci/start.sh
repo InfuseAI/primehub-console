@@ -23,6 +23,16 @@ dockerd \
   --host=tcp://0.0.0.0:2375 \
   &> /var/log/docker.log 2>&1 < /dev/null &
 
+# This is a workaround to fix gitlab-runner hostname is compatible with the k8s resource name regex
+# The original runner hostname is like runner-d6z5egv_-project-7509791-concurrent-0
+echo "Changing hostname: "
+hostname
+echo "gitlab-runner" > /etc/hostname
+hostname gitlab-runner
+echo "172.17.0.2 gitlab-runner" >> /etc/hosts
+echo "Hostname changed:"
+hostname
+
 /minikube start --vm-driver=none --bootstrapper=localkube --cpus 4 --memory 8192  --extra-config=apiserver.Authorization.Mode=RBAC &> /var/log/minikube-start.log 2>&1 < /dev/null
 /minikube addons enable default-storageclass
 /minikube addons enable ingress
