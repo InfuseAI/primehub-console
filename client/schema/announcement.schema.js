@@ -46,12 +46,11 @@ export default () => (
     <string
       keyName="title"
       title="${anno.title}"
-      ui="textarea"
+      packageName="../src/cms-components/customize-string-input"
+      hideTitle
       uiParams={{
-        rows: 1,
-        formatter: str => str.substr(0, 40)
+        maxLength: 40
       }}
-      validation={{maxLength: 40}}
     />
     <object
       keyName="content"
