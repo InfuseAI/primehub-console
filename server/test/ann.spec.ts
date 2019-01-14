@@ -5,7 +5,7 @@ import faker from 'faker';
 import KeycloakAdminClient from 'keycloak-admin';
 import moment from 'moment';
 import { cleanupAnns } from './sandbox';
-import { omit } from 'lodash';
+import { omit, times } from 'lodash';
 import BPromise from 'bluebird';
 
 chai.use(chaiHttp);
@@ -437,5 +437,56 @@ describe('announcement graphql', function() {
     // latest on top
     expect(userQuery.user.announcements[0].id).to.be.equal(groupAnn.id);
     expect(userQuery.user.announcements[1].id).to.be.equal(globalAnn.id);
+  });
+
+  it('should update user announcementReadTimestamp', async () => {
+    // create five global ann
+    await BPromise.mapSeries(
+      times(5, index => {
+        return {
+          title: faker.lorem.slug(),
+          content: {html: `<p>${faker.lorem.sentences()}</p>`},
+          expirationTimestamp: moment.utc().add(1, 'w').add(index + 1, 'd').toISOString(),
+          global: true,
+          status: 'published'
+        };
+      }),
+      async annData => {
+        await this.graphqlRequest(`
+        mutation($data: AnnouncementCreateInput!){
+          createAnnouncement (data: $data) { ${annFields} }
+        }`, {
+          data: annData
+        });
+      }
+    );
+
+    // user ann
+    const {users} = await this.graphqlRequest(`
+    query {
+      users { id }
+    }`);
+
+    const userQuery = await this.graphqlRequest(`
+    query {
+      ${userWithAnn(users[0].id)}
+    }`);
+    expect(userQuery.user.announcements.length).to.be.equal(5);
+
+    // update announcementReadTimestamp to the third one
+    const thirdAnnExpTime = userQuery.user.announcements[2].expirationTimestamp;
+    const request = this.httpRequester.post(`/users/${users[0].id}/last-read-time`);
+    request.set('Authorization', `Bearer ${process.env.SHARED_GRAPHQL_SECRET_KEY}`);
+    const res = await request.send({
+      time: moment.utc(thirdAnnExpTime).unix()
+    });
+    expect(res).to.have.status(200);
+
+    // fetch again
+    const userQueryAgain = await this.graphqlRequest(`
+    query {
+      ${userWithAnn(users[0].id)}
+    }`);
+    expect(userQueryAgain.user.announcements.length).to.be.equal(2);
   });
 });
