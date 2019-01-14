@@ -125,6 +125,7 @@ exports.dict = {
     quotaForNewly: 'It only works for newly created volume.',
     // system
     system: 'System',
+    timezone: 'Timezone',
     name: 'Name',
     logo: 'Logo',
     systemSettings: 'System Settings',
@@ -289,6 +290,7 @@ exports.dict = {
     quotaForNewly: 'It only works for newly created volume.',
     // system
     system: '系統',
+    timezone: '時區',
     name: '名稱',
     logo: '商標',
     systemSettings: '系統設定',
