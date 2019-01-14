@@ -351,7 +351,7 @@ const privateQuery = async (rows: Array<Item<AnnouncementSpec>>, where: any) => 
   mappedRows = filter(mappedRows, where);
 
   // sort by date
-  mappedRows = orderBy(mappedRows, ['createDate'], ['desc']);
+  mappedRows = orderBy(mappedRows, ['expirationTimestamp'], ['asc']);
   return mappedRows;
 };
 
