@@ -142,7 +142,9 @@ export default () => (
       * Fields will be hidden if federated is true
       */}
 
-      <Condition match={(data) => data.federated === false} defaultMode="disabled">
+      <Condition match={(data) => {
+        return data.federated === false;
+      }} defaultMode="disabled">
         <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
           <string keyName="username" title="${username}"
             validation={{
