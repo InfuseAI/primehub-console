@@ -58,9 +58,9 @@ export interface DatasetSpec {
 export interface AnnouncementSpec {
   title?: string;
   content?: string;
-  expiryDate?: number;
+  expirationTimestamp?: string; // ISO8601
   sendEmail?: boolean;
-  emailSent?: number;
+  emailSentTimestamp?: string;  // ISO8601
   status?: string; // published, draft
 }
 

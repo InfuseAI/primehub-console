@@ -17,7 +17,7 @@ const annFields = `
   id
   title
   content {html}
-  expiryDate
+  expirationTimestamp
   sendEmail
   status
   global
@@ -36,13 +36,13 @@ const userWithAnn = (userId: string) => `
       id
       title
       content
-      expiryDate
+      expirationTimestamp
     }
   }
 `;
 
-const parseToUnixAndBack = (isoDate: string) => {
-  return moment.unix(moment(isoDate).unix()).utc().toISOString();
+const parseToDefaultFormat = (isoDate: string) => {
+  return moment.utc(isoDate).format(moment.defaultFormatUtc);
 };
 
 // interface
@@ -105,7 +105,7 @@ describe('announcement graphql', function() {
     const annData = {
       title: faker.lorem.slug(),
       content: {html: `<p>${faker.lorem.sentences()}</p>`},
-      expiryDate: moment.utc().add(1, 'w').toISOString()
+      expirationTimestamp: moment.utc().add(1, 'w').toISOString()
     };
     const data = await this.graphqlRequest(`
     mutation($data: AnnouncementCreateInput!){
@@ -116,7 +116,7 @@ describe('announcement graphql', function() {
 
     expect(data.createAnnouncement).to.be.deep.include({
       ...annData,
-      expiryDate: parseToUnixAndBack(annData.expiryDate),
+      expirationTimestamp: parseToDefaultFormat(annData.expirationTimestamp),
       status: 'draft',
       sendEmail: false,
       global: true,
@@ -158,7 +158,7 @@ describe('announcement graphql', function() {
     const annData = {
       title: faker.lorem.slug(),
       content: {html: `<p>${faker.lorem.sentences()}</p>`},
-      expiryDate: moment.utc().add(1, 'w').toISOString(),
+      expirationTimestamp: moment.utc().add(1, 'w').toISOString(),
       global: true,
       sendEmail: true,
       status: 'published'
@@ -172,7 +172,7 @@ describe('announcement graphql', function() {
 
     expect(data.createAnnouncement).to.be.deep.include({
       ...annData,
-      expiryDate: parseToUnixAndBack(annData.expiryDate),
+      expirationTimestamp: parseToDefaultFormat(annData.expirationTimestamp),
       groups: []
     });
 
@@ -209,7 +209,7 @@ describe('announcement graphql', function() {
       id: data.createAnnouncement.id,
       title: data.createAnnouncement.title,
       content: data.createAnnouncement.content.html,
-      expiryDate: parseToUnixAndBack(data.createAnnouncement.expiryDate)
+      expirationTimestamp: parseToDefaultFormat(data.createAnnouncement.expirationTimestamp)
     });
   });
 
@@ -218,7 +218,7 @@ describe('announcement graphql', function() {
     const annData = {
       title: faker.lorem.slug(),
       content: {html: `<p>${faker.lorem.sentences()}</p>`},
-      expiryDate: moment.utc().add(1, 'w').toISOString(),
+      expirationTimestamp: moment.utc().add(1, 'w').toISOString(),
       sendEmail: true,
       status: 'published',
       groups: {connect: [{id: group.id}]}
@@ -232,7 +232,7 @@ describe('announcement graphql', function() {
 
     expect(data.createAnnouncement).to.be.deep.include({
       ...annData,
-      expiryDate: parseToUnixAndBack(annData.expiryDate),
+      expirationTimestamp: parseToDefaultFormat(annData.expirationTimestamp),
       groups: [{id: group.id, name: group.name}]
     });
   });
@@ -242,7 +242,7 @@ describe('announcement graphql', function() {
     const annData = {
       title: faker.lorem.slug(),
       content: {html: `<p>${faker.lorem.sentences()}</p>`},
-      expiryDate: moment.utc().add(1, 'w').toISOString(),
+      expirationTimestamp: moment.utc().add(1, 'w').toISOString(),
       global: true,
       status: 'draft'
     };
@@ -255,7 +255,7 @@ describe('announcement graphql', function() {
 
     // update
     const delta = {
-      expiryDate: moment.utc().add(2, 'w').toISOString(),
+      expirationTimestamp: moment.utc().add(2, 'w').toISOString(),
       global: false,
       groups: {connect: [{id: group.id}]}
     };
@@ -286,7 +286,7 @@ describe('announcement graphql', function() {
       ...omit(data.createAnnouncement, 'spec'),
       ...delta,
       ...delta2,
-      expiryDate: parseToUnixAndBack(delta.expiryDate),
+      expirationTimestamp: parseToDefaultFormat(delta.expirationTimestamp),
       groups: [{id: group2.id, name: group2.name}]
     };
     const queryOne = await this.graphqlRequest(`
@@ -302,7 +302,7 @@ describe('announcement graphql', function() {
     const annData = {
       title: faker.lorem.slug(),
       content: {html: `<p>${faker.lorem.sentences()}</p>`},
-      expiryDate: moment.utc().add(1, 'w').toISOString(),
+      expirationTimestamp: moment.utc().add(1, 'w').toISOString(),
       global: true,
       status: 'draft'
     };
@@ -333,7 +333,7 @@ describe('announcement graphql', function() {
     const globalAnnData = {
       title: faker.lorem.slug(),
       content: {html: `<p>${faker.lorem.sentences()}</p>`},
-      expiryDate: moment.utc().add(1, 'w').toISOString(),
+      expirationTimestamp: moment.utc().add(1, 'w').toISOString(),
       global: true,
       status: 'published'
     };
@@ -349,7 +349,7 @@ describe('announcement graphql', function() {
     const groupAnnData = {
       title: faker.lorem.slug(),
       content: {html: `<p>${faker.lorem.sentences()}</p>`},
-      expiryDate: moment.utc().add(1, 'w').toISOString(),
+      expirationTimestamp: moment.utc().add(1, 'w').toISOString(),
       status: 'published',
       groups: {connect: [{id: group.id}]}
     };
@@ -380,7 +380,7 @@ describe('announcement graphql', function() {
     const globalAnnData = {
       title: faker.lorem.slug(),
       content: {html: `<p>${faker.lorem.sentences()}</p>`},
-      expiryDate: moment.utc().add(1, 'w').toISOString(),
+      expirationTimestamp: moment.utc().add(1, 'w').toISOString(),
       global: true,
       status: 'published'
     };
@@ -399,7 +399,7 @@ describe('announcement graphql', function() {
     const groupAnnData = {
       title: faker.lorem.slug(),
       content: {html: `<p>${faker.lorem.sentences()}</p>`},
-      expiryDate: moment.utc().add(1, 'w').toISOString(),
+      expirationTimestamp: moment.utc().add(1, 'w').toISOString(),
       status: 'published',
       groups: {connect: [{id: group.id}]}
     };

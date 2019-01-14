@@ -18,7 +18,7 @@ type Announcement {
   id: ID!
   title: String!
   content: Editor!
-  expiryDate: String!
+  expirationTimestamp: String!
   sendEmail: Boolean!
   status: AnnStatus!
   global: Boolean!
@@ -49,15 +49,15 @@ input AnnouncementWhereUniqueInput {
 
 input AnnouncementWhereInput {
   id: ID
-  expiryDate_gt: String
-  expiryDate_lt: String
+  expirationTimestamp_gt: String
+  expirationTimestamp_lt: String
 }
 
 """Mutation input"""
 input AnnouncementCreateInput {
   title: String!
   content: EditorInput!
-  expiryDate: String!
+  expirationTimestamp: String!
   sendEmail: Boolean
   status: AnnStatus
   global: Boolean
@@ -67,7 +67,7 @@ input AnnouncementCreateInput {
 input AnnouncementUpdateInput {
   title: String
   content: EditorInput
-  expiryDate: String
+  expirationTimestamp: String
   sendEmail: Boolean
   status: AnnStatus
   global: Boolean

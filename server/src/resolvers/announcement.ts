@@ -18,8 +18,8 @@ interface AnnResponse {
   id: string;
   title: string;
   content: {html: string};
-  expiryDate: string;
-  createDate: string;
+  expirationTimestamp: string;
+  creationTimestamp: string;
   sendEmail: boolean;
   status: string;
   global: boolean;
@@ -31,8 +31,8 @@ interface AnnResponse {
  * constants
  */
 
-export const LABEL_PREFIX = 'groups.keycloak';
-export const GLOBAL_LABEL = `${LABEL_PREFIX}/global`;
+export const LABEL_PREFIX = 'announcement.primehub.io';
+export const GLOBAL_LABEL = `${LABEL_PREFIX}/everyone`;
 
 /**
  * utility
@@ -55,13 +55,13 @@ export const getGroupIdsFromLabels = (labels: any): string[] => {
 const createMapping = (data: any, name: string) => {
   const labels = {};
   if (data.global) {
-    labels[GLOBAL_LABEL] = 'true';
+    labels[GLOBAL_LABEL] = true;
   }
 
   const groupWhere = get(data, 'groups.connect');
   if (!isEmpty(groupWhere)) {
     groupWhere.forEach(group => {
-      labels[`${LABEL_PREFIX}/${group.id}`] = 'true';
+      labels[`${LABEL_PREFIX}/${group.id}`] = true;
     });
   }
   return {
@@ -72,7 +72,9 @@ const createMapping = (data: any, name: string) => {
     spec: {
       title:  get(data, 'title'),
       content: xss(get(data, 'content.html', `<p></p>`)),
-      expiryDate: isNil(data.expiryDate) ? moment.utc().unix() : moment.utc(data.expiryDate).unix(),
+      expirationTimestamp: isNil(data.expirationTimestamp)
+        ? moment.utc().format(moment.defaultFormatUtc)
+        : moment.utc(data.expirationTimestamp).format(moment.defaultFormatUtc),
       sendEmail: isNil(data.sendEmail) ? undefined : Boolean(data.sendEmail),
       status: isNil(data.status) ? 'draft' : data.status
     }
@@ -84,11 +86,11 @@ const mapping = (item: Item<AnnouncementSpec>): AnnResponse => {
     id: item.metadata.name,
     title: item.spec.title,
     content: {html: item.spec.content},
-    expiryDate: moment.unix(item.spec.expiryDate).utc().toISOString(),
-    createDate: item.metadata.creationTimestamp,
+    expirationTimestamp: moment.utc(item.spec.expirationTimestamp).format(moment.defaultFormatUtc),
+    creationTimestamp: item.metadata.creationTimestamp,
     sendEmail: Boolean(item.spec.sendEmail),
     status: item.spec.status,
-    global: get(item, ['metadata', 'labels', GLOBAL_LABEL]) === 'true',
+    global: get(item, ['metadata', 'labels', GLOBAL_LABEL]) === true,
     metadata: item.metadata,
     spec: item.spec
   };
@@ -97,12 +99,12 @@ const mapping = (item: Item<AnnouncementSpec>): AnnResponse => {
 const updateMapping = (data: any) => {
   const labels = {};
   if (isBoolean(data.global)) {
-    labels[GLOBAL_LABEL] = data.global.toString();
+    labels[GLOBAL_LABEL] = Boolean(data.global);
   }
 
   if (data.groups && data.groups.connect) {
     data.groups.connect.forEach(groupWhere => {
-      labels[`${LABEL_PREFIX}/${groupWhere.id}`] = 'true';
+      labels[`${LABEL_PREFIX}/${groupWhere.id}`] = true;
     });
   }
 
@@ -119,7 +121,9 @@ const updateMapping = (data: any) => {
     spec: {
       title: isNil(get(data, 'title')) ? undefined : get(data, 'title'),
       content: isNil(get(data, 'content.html')) ? undefined : xss(get(data, 'content.html')),
-      expiryDate: isNil(data.expiryDate) ? undefined : moment.utc(data.expiryDate).unix(),
+      expirationTimestamp: isNil(data.expirationTimestamp)
+        ? undefined
+        : moment.utc(data.expirationTimestamp).format(moment.defaultFormatUtc),
       sendEmail: isNil(data.sendEmail) ? undefined : Boolean(data.sendEmail),
       status: isNil(data.status) ? undefined : data.status
     }
@@ -204,7 +208,7 @@ const sendEmail = async (ann: AnnResponse, context: Context) => {
   // add emailSent to crd
   await context.crdClient.announcements.patch(ann.id, {
     spec: {
-      emailSent: moment.utc().unix()
+      emailSentTimestamp: moment.utc().format(moment.defaultFormatUtc)
     }
   });
 
