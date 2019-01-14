@@ -17,13 +17,12 @@ export default () => (
       announcementCustomActions: true,
       removeActions: true,
       columns: [{
-        title: '${anno.content}',
-        dataIndex: 'content',
-        width: 160,
-        render: renderContent
+        title: '${anno.title}',
+        dataIndex: 'title',
+        width: 160
       }, {
-        title: '${anno.expiryDate}',
-        dataIndex: 'expiryDate'
+        title: '${anno.expirationTimestamp}',
+        dataIndex: 'expirationTimestamp'
       }, {
         title: '${anno.global}',
         dataIndex: 'global'
@@ -39,7 +38,7 @@ export default () => (
   >
      <toolbar async>
       <filter component={TabsFilter} defaultFilter={{
-        expiryDate_gt: moment().toISOString()
+        expirationTimestamp_gt: moment().toISOString()
       }}/>
       <pagination />
     </toolbar>
@@ -75,9 +74,9 @@ export default () => (
       }}
     />
     <dateTime
-      keyName="expiryDate"
+      keyName="expirationTimestamp"
       defaultValue={() => moment().toISOString()}
-      title="${anno.expiryDate}" packageName="../src/cms-components/customize-string-date.tsx"
+      title="${anno.expirationTimestamp}" packageName="../src/cms-components/customize-string-date.tsx"
       uiParams={{
         minuteStep: 30
       }}

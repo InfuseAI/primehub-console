@@ -25,7 +25,7 @@ export default class TabsFilter extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    if (!this.props.where || !this.props.where.expiryDate || !this.props.where.expiryDate.gt) {
+    if (!this.props.where || !this.props.where.expirationTimestamp || !this.props.where.expirationTimestamp.gt) {
       this.onChange("0");
     }
   }
@@ -34,14 +34,14 @@ export default class TabsFilter extends React.Component<Props, State> {
     const fields = [{
       title: 'Current',
       condition: {
-        expiryDate: {
+        expirationTimestamp: {
           gt: moment().toISOString()
         }
       }
     }, {
       title: 'Past',
       condition: {
-        expiryDate: {
+        expirationTimestamp: {
           lt: moment().toISOString()
         }
       }
@@ -59,20 +59,20 @@ export default class TabsFilter extends React.Component<Props, State> {
     const fields = [{
       title: 'Current',
       condition: {
-        expiryDate: {
+        expirationTimestamp: {
           gt: moment().toISOString()
         }
       }
     }, {
       title: 'Past',
       condition: {
-        expiryDate: {
+        expirationTimestamp: {
           lt: moment().toISOString()
         }
       }
     }];
     let activeKey = 0;
-    if (where.expiryDate && where.expiryDate.lt) {
+    if (where.expirationTimestamp && where.expirationTimestamp.lt) {
       activeKey = 1;
     }
     return (
