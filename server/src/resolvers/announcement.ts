@@ -175,7 +175,7 @@ const sendEmail = async (ann: AnnResponse, context: Context) => {
   } else {
     const groupIds = getGroupIdsFromLabels(ann.metadata.labels);
     const emailMap = {};
-    BPromise.map(groupIds, async groupId => {
+    await BPromise.map(groupIds, async groupId => {
       const members = await context.kcAdminClient.groups.listMembers({
         id: groupId,
         max: keycloakMaxCount
