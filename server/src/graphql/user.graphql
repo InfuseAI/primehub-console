@@ -16,13 +16,16 @@ type User {
   totp: Boolean
   isAdmin: Boolean
   enabled: Boolean
-  """todo: take this property out when leo has time to implement customize component"""
-  sendEmail: Boolean
   createdTimestamp: Float
   personalDiskQuota: Int
   federated: Boolean
   groups: [Group]
   announcements: [UserAnnouncement]
+
+  """todo: take following properties out when leo has time to implement customize component"""
+  sendEmail: Boolean
+  resetActions: [String]
+  expiresIn: Int
 }
 
 """An edge in a connection."""
@@ -72,11 +75,13 @@ input UserCreateInput {
   totp: Boolean
   isAdmin: Boolean
   enabled: Boolean
-  sendEmail: Boolean
   createdTimestamp: Float
   personalDiskQuota: Int
   federated: Boolean
   groups: GroupCreateManyInput
+  sendEmail: Boolean
+  resetActions: [String]
+  expiresIn: Int
 }
 
 input UserUpdateInput {
@@ -87,7 +92,6 @@ input UserUpdateInput {
   totp: Boolean
   isAdmin: Boolean
   enabled: Boolean
-  sendEmail: Boolean
   createdTimestamp: Float
   personalDiskQuota: Int
   federated: Boolean

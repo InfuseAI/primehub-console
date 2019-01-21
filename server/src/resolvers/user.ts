@@ -17,7 +17,7 @@ import moment from 'moment';
  * utils
  */
 
-const TWELVE_HOURS = 43200;
+const TWENTYFOUR_HOURS = 86400;
 
 export const assignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdminClient) => {
   if (realm === 'master') {
@@ -180,28 +180,37 @@ export const create = async (root, args, context: Context) => {
 
   // send email
   if (payload.sendEmail && user.email) {
+    const expiresIn = get(payload, 'expiresIn', TWENTYFOUR_HOURS);
+    const resetActions = get(payload, 'resetActions',
+      [RequiredActionAlias.VERIFY_EMAIL, RequiredActionAlias.UPDATE_PASSWORD]);
+
     kcAdminClient.users.executeActionsEmail({
       id: user.id,
-      lifespan: TWELVE_HOURS,
-      actions: [RequiredActionAlias.VERIFY_EMAIL]
+      lifespan: expiresIn,
+      actions: resetActions,
     })
     .then(() => {
       logger.info({
         component: logger.components.user,
-        type: 'SEND_ACTIVATION_EMAIL',
+        type: 'SEND_USER_CREATION_EMAIL',
         userId: context.userId,
         username: context.username,
-        email: user.email
+        sentEmail: user.email,
+        realm: context.realm,
+        lifespan: expiresIn,
+        actions: resetActions,
       });
     })
     .catch(err => {
       logger.error({
         component: logger.components.user,
-        type: 'FAIL_SEND_ACTIVATION_EMAIL',
+        type: 'FAIL_SEND_USER_CREATION_EMAIL',
         userId: context.userId,
         username: context.username,
-        email: user.email,
-        realm: context.realm
+        sentEmail: user.email,
+        realm: context.realm,
+        lifespan: expiresIn,
+        actions: resetActions,
       });
     });
   }
