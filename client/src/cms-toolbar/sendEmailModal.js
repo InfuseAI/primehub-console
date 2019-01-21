@@ -113,7 +113,7 @@ export default class EmailForm extends React.Component {
                   {getFieldDecorator('expiresIn', {
                     rules: [],
                     initialValue: {
-                      number: 0,
+                      number: 24,
                       unit: 'hours'
                     }
                   })(

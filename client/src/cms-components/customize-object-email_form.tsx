@@ -115,7 +115,7 @@ class EmailForm extends React.Component<Props> {
                 {getFieldDecorator('expiresIn', {
                   rules: [],
                   initialValue: {
-                    number: 0,
+                    number: 24,
                     unit: 'hours'
                   }
                 })(
