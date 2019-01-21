@@ -197,7 +197,7 @@ export default () => (
           >
             <string />
           </array>
-          <number keyName="expiresIn" title="${user.expiresIn}" packageName="../src/cms-components/customize-number-expires" />
+          <number keyName="expiresIn" title="${user.expiresIn}" defaultValue={() => 24 * 60 * 60} packageName="../src/cms-components/customize-number-expires" />
         </Condition>
       </Condition>
       <Condition match={() => false} defaultMode="hidden">

@@ -7,6 +7,7 @@ interface Props {
   onChange?: any;
   refId?: any;
   isReactComponent?: boolean;
+  value?: any;
 }
 
 interface State {
@@ -23,6 +24,26 @@ export default class Expires extends React.Component<Props, State> {
       number: value.number || 0,
       unit: value.unit || 'hours',
     };
+  }
+
+  componentDidMount() {
+    const {isReactComponent, value} = this.props;
+    if (!isReactComponent) {
+      const minutes = value / 60;
+      let hours = 0;
+      if (minutes >= 60) {
+        hours = minutes / 60;
+        this.setState({
+          number: hours,
+          unit: 'hours'
+        });
+      } else {
+        this.setState({
+          number: minutes,
+          unit: 'minutes'
+        });
+      }
+    }
   }
 
   componentWillReceiveProps(nextProps) {
