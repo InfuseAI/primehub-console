@@ -6,7 +6,7 @@ import {SendEmailTitle, ResetPasswordTitle} from './utils';
 import Tab from '../src/cms-layouts/tab';
 import CustomizeBlock from '../src/cms-layouts/block';
 import ResetPassword from '../src/cms-components/customize-object-password_form';
-import SendEmail from '../src/cms-components/customize-object-email_form';
+import SendEmail from '../src/cms-components/customize-object-email_form.tsx';
 import Layouts from 'canner-layouts';
 import Filter from '../src/cms-toolbar/filter';
 import {GroupRelation} from './utils.schema';
@@ -33,7 +33,7 @@ configure({
               controlDeployAndResetButtons: true,
               cacheActions: true,
               loader: new Promise(resolve => require.ensure([], function(require) {
-                resolve(require('../src/cms-components/customize-object-email_form'));
+                resolve(require('../src/cms-components/customize-object-email_form.tsx'));
               }))
             }],
             hocs: ['containerRouter'],
@@ -191,7 +191,15 @@ export default () => (
 
       <Condition match={(data, operator) => operator === 'create'} defaultMode="hidden">
         <boolean keyName="sendEmail" title="${user.sendEmail}" />
+        <Condition match={(data, operator) => data.sendEmail} defaultMode="hidden">
+          <array keyName="resetActions" title="${user.resetActions}" defaultValue={() => ['VERIFY_EMAIL', 'UPDATE_PASSWORD']}
+            packageName="../src/cms-components/customize-array-reset_actions"
+          >
+            <string />
+          </array>
+          <number keyName="expiresIn" title="${user.expiresIn}" packageName="../src/cms-components/customize-number-expires" />
         </Condition>
+      </Condition>
       <Condition match={() => false} defaultMode="hidden">
         <boolean keyName="federated" />
       </Condition>

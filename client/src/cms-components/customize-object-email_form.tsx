@@ -6,6 +6,8 @@ import gql from "graphql-tag";
 import { Mutation } from "react-apollo";
 import styled from 'styled-components';
 import Spin from './spin';
+import Expires from './customize-number-expires';
+import ResetActions from './customize-array-reset_actions';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -23,8 +25,13 @@ const Title = styled.span`
   color: rgba(0, 0, 0, 0.65);
 `;
 
-@Form.create()
-export default class EmailForm extends React.Component {
+interface Props {
+  form: any;
+  rootValue: any;
+  refId: any;
+}
+
+class EmailForm extends React.Component<Props> {
   state = {
     loading: false
   };
@@ -98,15 +105,7 @@ export default class EmailForm extends React.Component {
                     required: true, message: 'Please select an action.'
                   }]
                 })(
-                  <Select
-                    mode="multiple"
-                    data-testid="reset-actions-select"
-                  >
-                    <Option data-testid={`reset-actions-option-verify-email`} value="VERIFY_EMAIL">Verify Email</Option>
-                    <Option data-testid={`reset-actions-option-update-profile`}  value="UPDATE_PROFILE">Update Profile</Option>
-                    <Option data-testid={`reset-actions-option-configure-otp`}  value="CONFIGURE_TOTP">Configure OTP</Option>
-                    <Option data-testid={`reset-actions-option-update-password`}  value="UPDATE_PASSWORD">Update Password</Option>
-                  </Select>
+                  <ResetActions isReactComponent />
                 )}
               </FormItem>
               <FormItem
@@ -120,7 +119,7 @@ export default class EmailForm extends React.Component {
                     unit: 'hours'
                   }
                 })(
-                  <Expires />
+                  <Expires isReactComponent />
                 )}
               </FormItem>
               <FormItem
@@ -136,80 +135,6 @@ export default class EmailForm extends React.Component {
         )}
       </Mutation>
     )
-  }
-}
-
-class Expires extends React.Component {
-  constructor(props) {
-    super(props);
-
-    const value = props.value || {};
-    this.state = {
-      number: value.number || 0,
-      unit: value.unit || 'hours',
-    };
-  }
-
-  componentWillReceiveProps(nextProps) {
-    // Should be a controlled component.
-    if ('value' in nextProps) {
-      const value = nextProps.value;
-      this.setState(value);
-    }
-  }
-
-  handleNumberChange = (e) => {
-    const number = parseInt(e.target.value || 0, 10);
-    if (isNaN(number)) {
-      return;
-    }
-    if (!('value' in this.props)) {
-      this.setState({ number });
-    }
-    this.triggerChange({ number });
-  }
-
-  handleUnitChange = (unit) => {
-    if (!('value' in this.props)) {
-      this.setState({ unit });
-    }
-    this.triggerChange({ unit });
-  }
-
-  triggerChange = (changedValue) => {
-    // Should provide an event to pass value to Form.
-    const onChange = this.props.onChange;
-    if (onChange) {
-      onChange(Object.assign({}, this.state, changedValue));
-    }
-  }
-
-  render() {
-    const { size } = this.props;
-    const state = this.state;
-    return (
-      <span>
-        <Input
-          data-testid="expires-in-input"
-          type="text"
-          size={size}
-          value={state.number}
-          onChange={this.handleNumberChange}
-          style={{ width: '65%', marginRight: '3%' }}
-          min="0"
-        />
-        <Select
-          data-testid="expires-in-select"
-          value={state.unit}
-          size={size}
-          style={{ width: '32%' }}
-          onChange={this.handleUnitChange}
-        >
-          <Option data-testid="expires-in-option-hours" value="hours">Hours</Option>
-          <Option data-testid="expires-in-option-minutes" value="minutes">Minutes</Option>
-        </Select>
-      </span>
-    );
   }
 }
 
@@ -230,3 +155,5 @@ function getIdFromRootValue({
 }) {
   return get(rootValue, refId.getPathArr().slice(0, 2).concat('id'));
 }
+
+export default Form.create()(EmailForm);
