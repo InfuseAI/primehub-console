@@ -181,7 +181,7 @@ export const create = async (root, args, context: Context) => {
   // send email
   if (payload.sendEmail && user.email) {
     const expiresIn = get(payload, 'expiresIn', TWENTYFOUR_HOURS);
-    const resetActions = get(payload, 'resetActions',
+    const resetActions = get(payload, 'resetActions.set',
       [RequiredActionAlias.VERIFY_EMAIL, RequiredActionAlias.UPDATE_PASSWORD]);
 
     kcAdminClient.users.executeActionsEmail({
