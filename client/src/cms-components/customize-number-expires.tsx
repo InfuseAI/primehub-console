@@ -91,14 +91,14 @@ export default class Expires extends React.Component<Props, State> {
           size={size}
           value={state.number}
           onChange={this.handleNumberChange}
-          style={{ width: '65%', marginRight: '3%' }}
+          style={{ width: '80px', marginRight: '24px' }}
           min="0"
         />
         <Select
           data-testid="expires-in-select"
           value={state.unit}
           size={size}
-          style={{ width: '32%' }}
+          style={{ width: '120px' }}
           onChange={this.handleUnitChange}
         >
           <Option data-testid="expires-in-option-hours" value="hours">Hours</Option>
