@@ -1,4 +1,4 @@
-import timezones from '../utils/timezones';
+import { timezones } from '../utils/timezones';
 
 // constants
 const findTimezone = () => {

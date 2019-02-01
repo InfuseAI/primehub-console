@@ -4,6 +4,7 @@ import { unflatten, flatten } from 'flat';
 import { detaultSystemSettings } from './constant';
 import { Context } from './interface';
 import { parseFromAttr, toAttr, parseDiskQuota, stringifyDiskQuota } from './utils';
+import { findTimezone } from '../utils/timezones';
 const smtpKeyMapping = {
   enableSSL: 'ssl',
   enableStartTLS: 'starttls',
@@ -23,6 +24,8 @@ export const query = async (root, args, context: Context) => {
     return (value && value[0]) || null;
   });
   const fetchedData: any = unflatten(flatData);
+  const timezoneName = get(fetchedData, 'timezone');
+  const timezone = timezoneName ? findTimezone(timezoneName) : detaultSystemSettings.timezone;
   return {
     org: {
       name: get(fetchedData, 'org.name') || detaultSystemSettings.org.name,
@@ -35,11 +38,7 @@ export const query = async (root, args, context: Context) => {
     },
     defaultUserDiskQuota:
       parseDiskQuota(fetchedData.defaultUserDiskQuota || detaultSystemSettings.defaultUserDiskQuota),
-    timezone: {
-      name: get(fetchedData, 'timezone.name') || detaultSystemSettings.timezone.name,
-      offset:
-        parseInt(get(fetchedData, 'timezone.offset') || detaultSystemSettings.timezone.offset, 10)
-    }
+    timezone,
   };
 };
 
@@ -83,16 +82,21 @@ export const update = async (root, args, context) => {
       url: orgLogoUrl
     };
   }
-  const mergedData = {
+  const mergedData: Record<string, any> = {
     org: {
       name: get(payload, 'org.name') || orgName,
       logo: (logo) ? logo : undefined
     },
     defaultUserDiskQuota: payload.defaultUserDiskQuota || defaultUserDiskQuota,
-    timezone: (payload.timezone && payload.timezone.name && !isUndefined(payload.timezone.offset))
-      ? payload.timezone
-      : undefined
   };
+
+  // timezone
+  // if name not found in dataset, do not update
+  const timezoneName = get(payload, 'timezone.name');
+  const timezone = findTimezone(timezoneName);
+  if (timezone) {
+    mergedData.timezone = timezone.name;
+  }
 
   const savedToDB = {
     ...mergedData,
@@ -139,5 +143,11 @@ export const update = async (root, args, context) => {
     });
   }
 
-  return mergedData;
+  // add timezone offset for ui
+  const response = {
+    ...mergedData,
+    timezone: timezone || detaultSystemSettings.timezone,
+  };
+
+  return response;
 };

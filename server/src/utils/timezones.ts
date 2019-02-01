@@ -1,4 +1,4 @@
-export default [
+export const timezones = [
   {
     label: 'Niue',
     name: 'Pacific/Niue',
@@ -1285,3 +1285,7 @@ export default [
     offset: 14,
   },
 ];
+
+export const findTimezone = (name: string) => {
+  return timezones.find(tz => tz.name === name);
+};
