@@ -45,6 +45,9 @@ test:
 
     # install and run test
     - cd server && yarn && KC_MAX_SOCKETS=30 KC_API_BASEURL=http://keycloak.local:8080/auth KC_OIDC_BASEURL=http://keycloak.local:8080/auth npm run test
+    # run e2e
+    - echo "e2e test"
+    - cd server && npm run test:e2e
   after_script:
     - date
 
