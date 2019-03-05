@@ -10,8 +10,42 @@ variables:
 
 stages:
   - test
+  - e2e
   - build
   - release
+
+# require some time to investigate how to set it properly
+# compile:frontend:
+#   stage: test
+#   cache:
+#     key: ${CI_COMMIT_REF_SLUG}
+#     paths:
+#       - client/node_modules/
+#   image:
+#     name: node:carbon-slim
+#   only:
+#     - master
+#   script:
+#     - cd client && yarn && npm run build
+#   artifacts:
+#     paths:
+#       - client/dist/
+
+# compile:backend:
+#   stage: test
+#   cache:
+#     key: ${CI_COMMIT_REF_SLUG}
+#     paths:
+#       - server/node_modules/
+#   image:
+#     name: node:carbon-slim
+#   only:
+#     - master
+#   script:
+#     - cd server && yarn install --ignore-engines
+#   artifacts:
+#     paths:
+#       - server/node_modules/
 
 test:
   services:
@@ -44,12 +78,17 @@ test:
       done
 
     # install and run test
-    - cd server && yarn && KC_MAX_SOCKETS=30 KC_API_BASEURL=http://keycloak.local:8080/auth KC_OIDC_BASEURL=http://keycloak.local:8080/auth npm run test
-    # run e2e
-    - echo "e2e test"
-    - cd server && npm run test:e2e
+    - cd server && yarn install --ignore-engines && KC_MAX_SOCKETS=30 KC_API_BASEURL=http://keycloak.local:8080/auth KC_OIDC_BASEURL=http://keycloak.local:8080/auth npm run test
+    - cd ../client && yarn && npm run build
+    - cd ../server && KC_OIDC_TIMEOUT=6000 KC_MAX_SOCKETS=30 KC_API_BASEURL=http://keycloak.local:8080/auth KC_OIDC_BASEURL=http://keycloak.local:8080/auth npm run test:e2e
   after_script:
     - date
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - server/node_modules/
+      - client/node_modules/
+
 
 build:
   stage: build

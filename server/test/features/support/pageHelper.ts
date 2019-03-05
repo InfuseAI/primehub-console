@@ -1,6 +1,9 @@
 import { Browser, ElementHandle, launch, Page, Response, Cookie } from 'puppeteer';
 import pti from 'puppeteer-to-istanbul';
 import BPromise from 'bluebird';
+import imgur from 'imgur';
+imgur.setClientId('cafcd0f1b01d2c2');
+imgur.setMashapeKey('LFFtftBTWWmshextWvyGKqT3vUkpp1EU2g8jsniUQ6HO8oMYxv');
 
 export class PageHelper {
   private browser: Browser;
@@ -16,16 +19,40 @@ export class PageHelper {
     try {
       this.browser = await launch({
         headless: true,
-        args: ['–no-sandbox', '–disable-setuid-sandbox', '--disable-notifications', '--start-maximized'],
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-notifications',
+          '--start-maximized'
+        ],
         ignoreHTTPSErrors: true,
       });
       this.page = await this.browser.newPage();
-      this.page.setDefaultTimeout(6 * 1000);
+      this.page.setDefaultTimeout(10 * 1000);
       this.page.setDefaultNavigationTimeout(10 * 1000);
       await Promise.all([
         this.page.coverage.startJSCoverage(),
         this.page.coverage.startCSSCoverage(),
       ]);
+      this.page.on('console', msg => {
+        for (let i = 0; i < msg.args().length; ++i) {
+          // tslint:disable-next-line:no-console
+          console.log(`[console] ${i}: ${msg.args()[i]}`);
+        }
+      });
+      this.page.on('pageerror', err => {
+        // tslint:disable-next-line:no-console
+        console.log(`Page error: ${err.toString()}`);
+      });
+      this.page.on('error', err => {
+        // tslint:disable-next-line:no-console
+        console.log(`error: ${err.toString()}`);
+      });
+      this.page.on('requestfailed', request => {
+        // tslint:disable-next-line:no-console
+        console.log(`error: ${request.url()}`);
+      });
       // tslint:disable-next-line:no-console
       this.page.on('load', () => console.log('[Puppeteer] frame loaded: ' + this.page.url()));
     } catch (Exception) {
@@ -34,7 +61,7 @@ export class PageHelper {
   }
 
   public async open(url: string): Promise<Response> {
-    return this.page.goto(url);
+    return this.page.goto(url, {waitUntil: 'networkidle0'});
   }
 
   public async reload(): Promise<void> {
@@ -65,7 +92,7 @@ export class PageHelper {
   public async clickAndNavigate(element: string): Promise<void> {
     await this.page.waitForSelector(element);
     await Promise.all([
-      this.page.waitForNavigation(), // The promise resolves after navigation has finished
+      this.page.waitForNavigation({waitUntil: 'networkidle0'}), // The promise resolves after navigation has finished
       this.page.click(element), // Clicking the link will indirectly cause a navigation
     ]);
   }
@@ -87,7 +114,7 @@ export class PageHelper {
 
     if (handlers.length > 0) {
       await Promise.all([
-        this.page.waitForNavigation(), // The promise resolves after navigation has finished
+        this.page.waitForNavigation({waitUntil: 'networkidle0'}), // The promise resolves after navigation has finished
         handlers[0].click(), // Clicking the link will indirectly cause a navigation
       ]);
     } else {
@@ -167,6 +194,15 @@ export class PageHelper {
 
   public async screenshot(options): Promise<any> {
     return this.page.screenshot(options);
+  }
+
+  public async screenshotToImgur(): Promise<any> {
+    const image = await this.page.screenshot({
+      encoding: 'base64',
+    });
+    const res = await imgur.uploadBase64(image);
+    // tslint:disable-next-line:no-console
+    console.log(res.data.link);
   }
 
   public async close() {

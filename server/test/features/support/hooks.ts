@@ -1,6 +1,8 @@
-import { BeforeAll, AfterAll } from 'cucumber';
+import { BeforeAll, AfterAll, setDefaultTimeout } from 'cucumber';
 import { adminService } from './adminService';
 import { page } from './pageHelper';
+
+setDefaultTimeout(60 * 1000);
 
 BeforeAll({timeout: 60 * 1000}, async () => {
   await adminService.init();

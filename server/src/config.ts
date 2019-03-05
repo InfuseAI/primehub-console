@@ -106,7 +106,7 @@ export const createConfig = (): Config => {
     rolePrefix: process.env.KC_ROLE_PREFIX,
     sharedGraphqlSecretKey: process.env.SHARED_GRAPHQL_SECRET_KEY,
     keycloakRetries: process.env.KC_OIDC_RETRIES,
-    keycloakTimeout: process.env.KC_OIDC_TIMEOUT,
+    keycloakTimeout: process.env.KC_OIDC_TIMEOUT ? parseInt(process.env.KC_OIDC_TIMEOUT, 10) : undefined,
     appPrefix: sanitizePath(process.env.APP_PREFIX),
     apolloTracing: process.env.APOLLO_TRACING,
     graphqlPlayground: process.env.GRAPHQL_PLAYGROUND

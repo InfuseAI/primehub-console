@@ -50,10 +50,13 @@ When('I delete a row with text {string}', async (text: string) => {
   // xpath: //tr[contains(., 'hlb')]//button[@data-testid='edit-button']
   const xpath = `//tr[contains(., '${text}')]//button[@data-testid='delete-button']`;
   await page.clickXPath(xpath);
+  // wait for animation end
+  await BPromise.delay(300);
 
   // press OK button in popup
   const okButtonXPath = `//button[contains(., 'OK')]`;
   await page.clickXPath(okButtonXPath);
+  await BPromise.delay(300);
 });
 
 When('I check boolean input with test-id {string}', async (testId: string) => {
