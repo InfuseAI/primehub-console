@@ -7,9 +7,9 @@ WORKDIR /usr/src/app
 COPY . .
 
 RUN cd server \
-  && yarn install --production=false \
+  && yarn install --ignore-engines --production=false \
   && npm run build:prod \
-  && yarn install --production=true \
+  && yarn install --ignore-engines --production=true \
   && rm -rf server/src \
   && cd ../client \
   && yarn \
