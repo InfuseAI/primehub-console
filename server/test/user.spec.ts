@@ -219,7 +219,7 @@ describe('user graphql', function() {
       }
     });
 
-    expect(postfixData.users.length).to.be.equals(1);
+    expect(postfixData.users.length).to.be.least(1);
 
     // middle
     const middleData = await this.graphqlRequest(`
@@ -231,7 +231,7 @@ describe('user graphql', function() {
       }
     });
 
-    expect(middleData.users.length).to.be.equals(1);
+    expect(middleData.users.length).to.be.least(1);
   });
 
   it('should update an user', async () => {
