@@ -1,5 +1,5 @@
 import KcAdminClient from 'keycloak-admin';
-import { mapValues, isEmpty, get, isUndefined, isNil, reduce } from 'lodash';
+import { mapValues, isEmpty, get, isUndefined, isNil, reduce, isPlainObject } from 'lodash';
 import { unflatten, flatten } from 'flat';
 import { detaultSystemSettings } from './constant';
 import { Context } from './interface';
@@ -24,7 +24,15 @@ export const query = async (root, args, context: Context) => {
     return (value && value[0]) || null;
   });
   const fetchedData: any = unflatten(flatData);
-  const timezoneName = get(fetchedData, 'timezone');
+  let timezoneName = get(fetchedData, 'timezone');
+
+  // https://gitlab.com/infuseai/canner-admin-ui/issues/97
+  // we changed timezone format at #97, so we fallback to read this format
+  if (isPlainObject(timezoneName)) {
+    timezoneName = timezoneName.name;
+  }
+
+  // find the timezone data by its name
   const timezone = timezoneName ? findTimezone(timezoneName) : detaultSystemSettings.timezone;
   return {
     org: {
