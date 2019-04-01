@@ -17,7 +17,10 @@ export const query = async (root, args, context: Context) => {
   const kcAdminClient: KcAdminClient = context.kcAdminClient;
   const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});
   if (isEmpty(attributes)) {
-    return {...detaultSystemSettings, defaultUserDiskQuota: parseDiskQuota(detaultSystemSettings.defaultUserDiskQuota)};
+    return {
+      ...detaultSystemSettings,
+      defaultUserVolumeCapacity: parseDiskQuota(detaultSystemSettings.defaultUserVolumeCapacity)
+    };
   }
 
   const flatData = mapValues(attributes, value => {
@@ -44,8 +47,8 @@ export const query = async (root, args, context: Context) => {
         url: get(fetchedData, 'org.logo.url')
       } : detaultSystemSettings.org.logo
     },
-    defaultUserDiskQuota:
-      parseDiskQuota(fetchedData.defaultUserDiskQuota || detaultSystemSettings.defaultUserDiskQuota),
+    defaultUserVolumeCapacity:
+      parseDiskQuota(fetchedData.defaultUserVolumeCapacity || detaultSystemSettings.defaultUserVolumeCapacity),
     timezone,
   };
 };
@@ -75,7 +78,7 @@ export const update = async (root, args, context) => {
   const orgLogoName = parseFromAttr('org.logo.name', attributes);
   const orgLogoSize = parseFromAttr('org.logo.size', attributes, parseInt);
   const orgLogoUrl = parseFromAttr('org.logo.url', attributes);
-  const defaultUserDiskQuota = parseFromAttr('defaultUserDiskQuota', attributes, parseDiskQuota);
+  const defaultUserVolumeCapacity = parseFromAttr('defaultUserVolumeCapacity', attributes, parseDiskQuota);
 
   // merge with payload
   const payload = args.data;
@@ -95,7 +98,7 @@ export const update = async (root, args, context) => {
       name: get(payload, 'org.name') || orgName,
       logo: (logo) ? logo : undefined
     },
-    defaultUserDiskQuota: payload.defaultUserDiskQuota || defaultUserDiskQuota,
+    defaultUserVolumeCapacity: payload.defaultUserVolumeCapacity || defaultUserVolumeCapacity,
   };
 
   // timezone
@@ -108,8 +111,8 @@ export const update = async (root, args, context) => {
 
   const savedToDB = {
     ...mergedData,
-    defaultUserDiskQuota: mergedData.defaultUserDiskQuota ?
-      stringifyDiskQuota(mergedData.defaultUserDiskQuota) : undefined
+    defaultUserVolumeCapacity: mergedData.defaultUserVolumeCapacity ?
+      stringifyDiskQuota(mergedData.defaultUserVolumeCapacity) : undefined
   };
 
   const flatData = flatten(savedToDB);

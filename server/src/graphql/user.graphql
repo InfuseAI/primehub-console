@@ -17,7 +17,7 @@ type User {
   isAdmin: Boolean
   enabled: Boolean
   createdTimestamp: Float
-  personalDiskQuota: Int
+  volumeCapacity: Int
   federated: Boolean
   groups: [Group]
   announcements: [UserAnnouncement]
@@ -76,7 +76,7 @@ input UserCreateInput {
   isAdmin: Boolean
   enabled: Boolean
   createdTimestamp: Float
-  personalDiskQuota: Int
+  volumeCapacity: Int
   federated: Boolean
   groups: GroupCreateManyInput
   sendEmail: Boolean
@@ -93,7 +93,7 @@ input UserUpdateInput {
   isAdmin: Boolean
   enabled: Boolean
   createdTimestamp: Float
-  personalDiskQuota: Int
+  volumeCapacity: Int
   federated: Boolean
   groups: GroupUpdateManyInput
 }

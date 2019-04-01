@@ -24,7 +24,7 @@ export const detaultSystemSettings = {
     name: 'infuse ai',
     logo: null
   },
-  defaultUserDiskQuota: '20G',
+  defaultUserVolumeCapacity: '20G',
   timezone: DEFAULT_TIMEZONE
 };
 

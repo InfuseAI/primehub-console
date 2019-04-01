@@ -167,6 +167,9 @@ export const mutateRelation = async ({
 
 export const stringifyDiskQuota = (quota: number) => `${quota}G`;
 export const parseDiskQuota = (quotaWithUnit: string) => {
+  if (!quotaWithUnit) {
+    return null;
+  }
   const value = parseInt(quotaWithUnit.slice(0, -1), 10);
   return isNaN(value) ? null : value;
 };

@@ -11,7 +11,7 @@ type Group {
   quotaCpu: Float
   quotaGpu: Int
   quotaMemory: Float
-  quotaDisk: Int
+  userVolumeCapacity: Int
   projectQuotaCpu: Float
   projectQuotaGpu: Int
   projectQuotaMemory: Float
@@ -57,7 +57,7 @@ input GroupCreateInput {
   quotaCpu: Float
   quotaGpu: Int
   quotaMemory: Float
-  quotaDisk: Int
+  userVolumeCapacity: Int
   projectQuotaCpu: Float
   projectQuotaGpu: Int
   projectQuotaMemory: Float
@@ -71,7 +71,7 @@ input GroupUpdateInput {
   quotaCpu: Float
   quotaGpu: Int
   quotaMemory: Float
-  quotaDisk: Int
+  userVolumeCapacity: Int
   projectQuotaCpu: Float
   projectQuotaGpu: Int
   projectQuotaMemory: Float

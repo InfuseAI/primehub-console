@@ -179,12 +179,11 @@ export default () => (
       <Condition match={(data, operator) => operator === 'update'}>
         <boolean keyName="totp" title="${totp}" />
         <boolean keyName="isAdmin" title="${isAdmin}" />
-        <number keyName="personalDiskQuota" title="${personalDiskQuota}"
+        <number keyName="volumeCapacity" title="${volumeCapacity}"
           description="${quotaForNewly}"
           uiParams={{unit: ' GB', step: 1, min: 1, precision: 0}}
-          defaultValue={1}
-          validation={{min: 1}}
-          packageName="../src/cms-components/customize-number-precision"
+          defaultValue={() => null}
+          packageName="../src/cms-components/customize-number-checkbox"
         />
         <GroupRelation />
       </Condition>

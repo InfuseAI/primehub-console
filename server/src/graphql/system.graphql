@@ -28,7 +28,7 @@ type Smtp {
 type System {
   org: Org
   smtp: Smtp
-  defaultUserDiskQuota: Int
+  defaultUserVolumeCapacity: Int
   timezone: Timezone
 }
 
@@ -60,6 +60,6 @@ input OrgUpdateInput {
 input SystemUpdateInput {
   org: OrgUpdateInput
   smtp: SmtpInput
-  defaultUserDiskQuota: Int
+  defaultUserVolumeCapacity: Int
   timezone: TimezoneInput
 }

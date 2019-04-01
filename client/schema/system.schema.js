@@ -16,7 +16,7 @@ export default () => (
         <string keyName="name" title="${name}"/>
         <image keyName="logo" title="${logo}"/>
       </object>
-      <number keyName="defaultUserDiskQuota" title="${defaultUserDiskQuota}"
+      <number keyName="defaultUserVolumeCapacity" title="${defaultUserVolumeCapacity}"
          uiParams={{unit: ' GB', step: 1, min: 1, precision: 0, defaultValue: 1}}
          validation={{min: 1}}
          description="${quotaForNewly}"

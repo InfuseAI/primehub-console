@@ -27,7 +27,7 @@ const groupAttrs = [
   'quotaCpu',
   'quotaGpu',
   'quotaMemory',
-  'quotaDisk',
+  'userVolumeCapacity',
   'projectQuotaGpu',
   'projectQuotaCpu',
   'projectQuotaMemory'
@@ -38,7 +38,7 @@ const attrSchema = {
   quotaCpu: {type: FieldType.float, rename: 'quota-cpu'},
   quotaGpu: {type: FieldType.integer, rename: 'quota-gpu'},
   quotaMemory: {serialize: stringifyMemory, deserialize: parseMemory, rename: 'quota-memory'},
-  quotaDisk: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota, rename: 'quota-disk'},
+  userVolumeCapacity: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota, rename: 'user-volume-capacity'},
   projectQuotaCpu: {type: FieldType.float, rename: 'project-quota-cpu'},
   projectQuotaGpu: {type: FieldType.integer, rename: 'project-quota-gpu'},
   projectQuotaMemory: {serialize: stringifyMemory, deserialize: parseMemory, rename: 'project-quota-memory'}
@@ -52,7 +52,7 @@ export const create = async (root, args, context: Context) => {
   const kcAdminClient = context.kcAdminClient;
 
   // create resource
-  // displayName, canUseGpu, quotaGpu, quotaDisk in attributes
+  // displayName, canUseGpu, quotaGpu, userVolumeCapacity in attributes
   const payload = args.data;
   const attrs = new Attributes({
     data: pick(payload, groupAttrs),
@@ -119,7 +119,7 @@ export const update = async (root, args, context: Context) => {
   });
 
   // merge attrs
-  // displayName, canUseGpu, quotaGpu, quotaDisk in attributes
+  // displayName, canUseGpu, quotaGpu, userVolumeCapacity in attributes
   const attrs = new Attributes({
     keycloakAttr: group.attributes,
     schema: attrSchema
@@ -253,8 +253,8 @@ export const typeResolvers = {
   quotaMemory: async (parent, args, context: Context) =>
     getFromAttr('quota-memory', parent.attributes, null, parseMemory),
 
-  quotaDisk: async (parent, args, context: Context) =>
-    getFromAttr('quota-disk', parent.attributes, 20, parseDiskQuota),
+  userVolumeCapacity: async (parent, args, context: Context) =>
+    getFromAttr('user-volume-capacity', parent.attributes, null, parseDiskQuota),
 
   projectQuotaCpu: async (parent, args, context: Context) =>
     getFromAttr('project-quota-cpu', parent.attributes, null, parseFloat),

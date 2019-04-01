@@ -22,8 +22,8 @@ export const groupColumns = [{
     return text === null ? '∞' : text;
   }
 }, {
-  title: '${quotaDisk}',
-  dataIndex: 'quotaDisk',
+  title: '${userVolumeCapacity}',
+  dataIndex: 'userVolumeCapacity',
   render: text => {
     return text === null ? '∞' : text;
   }
@@ -35,7 +35,7 @@ exports.GroupRelation = () => (
     relation={{
       to: 'group',
       type: 'toMany',
-      fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu', 'quotaDisk']
+      fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu', 'userVolumeCapacity']
     }}
     uiParams={{
       columns: groupColumns 
@@ -51,7 +51,7 @@ exports.GroupRelation = () => (
             displayName
             quotaCpu
             quotaGpu
-            quotaDisk
+            userVolumeCapacity
           }
         }
         pageInfo {

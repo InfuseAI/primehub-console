@@ -17,7 +17,7 @@ const groupFields = `
   quotaCpu
   quotaGpu
   quotaMemory
-  quotaDisk
+  userVolumeCapacity
   projectQuotaGpu
   projectQuotaCpu
   projectQuotaMemory
@@ -31,7 +31,7 @@ const groupFields = `
     isAdmin
     enabled
     createdTimestamp
-    personalDiskQuota
+    volumeCapacity
   }`;
 
 // interface
@@ -80,7 +80,7 @@ describe('group graphql', function() {
       projectQuotaGpu: null,
       projectQuotaCpu: null,
       projectQuotaMemory: null,
-      quotaDisk: 20,
+      userVolumeCapacity: null,
       users: []
     });
     this.currentGroup = data.createGroup;
@@ -96,7 +96,7 @@ describe('group graphql', function() {
       projectQuotaGpu: 10,
       projectQuotaCpu: 1.5,
       projectQuotaMemory: 0.5,
-      quotaDisk: 20
+      userVolumeCapacity: 20
     };
     const data = await this.graphqlRequest(`
     mutation($data: GroupCreateInput!){
@@ -107,9 +107,9 @@ describe('group graphql', function() {
 
     expect(data.createGroup).to.be.deep.include(groupData);
 
-    // check quotaDisk save as 20G in keycloak
+    // check userVolumeCapacity save as 20G in keycloak
     const group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: data.createGroup.id});
-    expect(group.attributes['quota-disk'][0]).to.be.equals('20G');
+    expect(group.attributes['user-volume-capacity'][0]).to.be.equals('20G');
     expect(group.attributes['quota-cpu'][0]).to.be.equals('10.5');
     expect(group.attributes['quota-gpu'][0]).to.be.equals('10');
     expect(group.attributes['quota-memory'][0]).to.be.equals('1.5G');
@@ -217,7 +217,7 @@ describe('group graphql', function() {
       quotaCpu: 20.5,
       quotaGpu: 20,
       projectQuotaGpu: 10,
-      quotaDisk: 30
+      userVolumeCapacity: 30
     };
     await this.graphqlRequest(`
     mutation($where: GroupWhereUniqueInput!, $data: GroupUpdateInput!){
@@ -237,9 +237,9 @@ describe('group graphql', function() {
 
     expect(data.group).to.be.deep.include(updated);
 
-    // check quotaDisk save as 30G in keycloak
+    // check userVolumeCapacity save as 30G in keycloak
     const group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
-    expect(group.attributes['quota-disk'][0]).to.be.equals('30G');
+    expect(group.attributes['user-volume-capacity'][0]).to.be.equals('30G');
     expect(group.attributes['quota-cpu'][0]).to.be.equals('20.5');
     expect(group.attributes['quota-gpu'][0]).to.be.equals('20');
     expect(group.attributes['project-quota-gpu'][0]).to.be.equals('10');
@@ -259,7 +259,7 @@ describe('group graphql', function() {
         projectQuotaGpu: null,
         projectQuotaCpu: 10,
         projectQuotaMemory: null,
-        quotaDisk: 20
+        userVolumeCapacity: 20
       }
     });
     const groupId = create.createGroup.id;
@@ -274,7 +274,7 @@ describe('group graphql', function() {
       projectQuotaGpu: 10,
       projectQuotaCpu: 0.5,
       projectQuotaMemory: 5,
-      quotaDisk: 30
+      userVolumeCapacity: 30
     };
     await this.graphqlRequest(`
     mutation($where: GroupWhereUniqueInput!, $data: GroupUpdateInput!){
@@ -294,9 +294,9 @@ describe('group graphql', function() {
 
     expect(data.group).to.be.deep.include(updated);
 
-    // check quotaDisk save as 30G in keycloak
+    // check userVolumeCapacity save as 30G in keycloak
     let group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
-    expect(group.attributes['quota-disk'][0]).to.be.equals('30G');
+    expect(group.attributes['user-volume-capacity'][0]).to.be.equals('30G');
     expect(group.attributes['quota-cpu'][0]).to.be.equals('20');
     expect(group.attributes['quota-gpu'][0]).to.be.equals('20');
     expect(group.attributes['quota-memory']).to.be.undefined;
@@ -329,9 +329,9 @@ describe('group graphql', function() {
 
     expect(dataAgain.group).to.be.deep.include(updatedAgain);
 
-    // check quotaDisk save as 30G in keycloak
+    // check userVolumeCapacity save as 30G in keycloak
     group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
-    expect(group.attributes['quota-disk'][0]).to.be.equals('30G');
+    expect(group.attributes['user-volume-capacity'][0]).to.be.equals('30G');
     expect(group.attributes['quota-cpu']).to.be.undefined;
     expect(group.attributes['quota-gpu'][0]).to.be.equals('2');
     expect(group.attributes['quota-memory']).to.be.undefined;

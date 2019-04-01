@@ -9,7 +9,7 @@ Feature: System
     Then I should see element with test-id "system/org/name"
     Then input in test-id "system/org/name" should have value "infuse ai"
     Then I should see element with test-id "system/org/logo"
-    Then I should see element with test-id "system/defaultUserDiskQuota"
+    Then I should see element with test-id "system/defaultUserVolumeCapacity"
     Then I should see element with test-id "system/timezone"
     Then I should see element with test-id "system/smtp/host"
     Then I should see element with test-id "system/smtp/port"

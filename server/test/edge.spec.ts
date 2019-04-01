@@ -18,17 +18,15 @@ const userFields = `
   firstName
   lastName
   totp
-  #isAdmin
   enabled
   createdTimestamp
-  #personalDiskQuota
   groups {
     id
     name
     displayName
     quotaCpu
     quotaGpu
-    quotaDisk
+    userVolumeCapacity
   }`;
 
 // interface

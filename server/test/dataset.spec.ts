@@ -27,7 +27,7 @@ const fields = `
     displayName
     quotaCpu
     quotaGpu
-    quotaDisk
+    userVolumeCapacity
     writable
   }`;
 
@@ -555,7 +555,7 @@ describe('dataset graphql', function() {
         displayName: null,
         name: group.name,
         quotaCpu: null,
-        quotaDisk: 20,
+        userVolumeCapacity: null,
         quotaGpu: null,
         writable: false
       }],
@@ -598,7 +598,7 @@ describe('dataset graphql', function() {
       displayName: null,
       name: group.name,
       quotaCpu: null,
-      quotaDisk: 20,
+      userVolumeCapacity: null,
       quotaGpu: null,
       writable: false
     }, {
@@ -606,7 +606,7 @@ describe('dataset graphql', function() {
       displayName: null,
       name: secGroup.name,
       quotaCpu: null,
-      quotaDisk: 20,
+      userVolumeCapacity: null,
       quotaGpu: null,
       writable: true
     }]);
@@ -681,7 +681,7 @@ describe('dataset graphql', function() {
       displayName: null,
       name: group.name,
       quotaCpu: null,
-      quotaDisk: 20,
+      userVolumeCapacity: null,
       quotaGpu: null,
       writable: false
     }, {
@@ -689,7 +689,7 @@ describe('dataset graphql', function() {
       displayName: null,
       name: secGroup.name,
       quotaCpu: null,
-      quotaDisk: 20,
+      userVolumeCapacity: null,
       quotaGpu: null,
       writable: true
     }]);
@@ -807,7 +807,7 @@ describe('dataset graphql', function() {
       displayName: null,
       name: group.name,
       quotaCpu: null,
-      quotaDisk: 20,
+      userVolumeCapacity: null,
       quotaGpu: null,
       writable: false
     }, {
@@ -815,7 +815,7 @@ describe('dataset graphql', function() {
       displayName: null,
       name: secGroup.name,
       quotaCpu: null,
-      quotaDisk: 20,
+      userVolumeCapacity: null,
       quotaGpu: null,
       writable: false
     }]);

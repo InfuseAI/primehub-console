@@ -50,7 +50,7 @@ describe('readonly graphql', function() {
         isAdmin
         enabled
         createdTimestamp
-        personalDiskQuota
+        volumeCapacity
       }
     }`, null, `Bearer ${this.secret}`);
     expect(data.user.id).to.be.eql(this.currentUserId);

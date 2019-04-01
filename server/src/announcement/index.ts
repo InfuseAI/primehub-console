@@ -69,7 +69,7 @@ export class AnnCtrl {
     const attrs = new Attributes({
       keycloakAttr: user.attributes,
       schema: {
-        personalDiskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota},
+        volumeCapacity: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota},
         annLastReadTime: {type: FieldType.integer}
       }
     });

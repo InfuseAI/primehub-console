@@ -19,14 +19,14 @@ const userFields = `
   isAdmin
   enabled
   createdTimestamp
-  personalDiskQuota
+  volumeCapacity
   groups {
     id
     name
     displayName
     quotaCpu
     quotaGpu
-    quotaDisk
+    userVolumeCapacity
   }`;
 
 // interface
@@ -74,18 +74,18 @@ describe('user graphql', function() {
       totp: false,
       isAdmin: false,
       enabled: true,
-      personalDiskQuota: 20,
+      volumeCapacity: null,
       groups: []
     });
     this.currentUser = data.createUser;
   });
 
-  it('should add an user with personalDiskQuota', async () => {
+  it('should add an user with volumeCapacity', async () => {
     const userData = {
       username: faker.internet.userName().toLowerCase(),
       firstName: faker.name.firstName(),
       email: faker.internet.email().toLowerCase(),
-      personalDiskQuota: 50
+      volumeCapacity: 50
     };
     const data = await this.graphqlRequest(`
     mutation($data: UserCreateInput!){
@@ -100,7 +100,7 @@ describe('user graphql', function() {
       totp: false,
       isAdmin: false,
       enabled: true,
-      personalDiskQuota: 50,
+      volumeCapacity: 50,
       groups: []
     });
 
@@ -118,7 +118,7 @@ describe('user graphql', function() {
 
     // check in keycloak
     const user = await this.kcAdminClient.users.findOne({realm: process.env.KC_REALM, id: data.createUser.id});
-    expect(user.attributes.personalDiskQuota[0]).to.be.equals(`${userData.personalDiskQuota}G`);
+    expect(user.attributes.volumeCapacity[0]).to.be.equals(`${userData.volumeCapacity}G`);
   });
 
   it('should add an user with isAdmin = true', async () => {
@@ -239,7 +239,7 @@ describe('user graphql', function() {
     const updateData = {
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
-      personalDiskQuota: 100
+      volumeCapacity: 100
     };
     await this.graphqlRequest(`
     mutation ($where: UserWhereUniqueInput!, $data: UserUpdateInput!){
@@ -269,7 +269,7 @@ describe('user graphql', function() {
 
     // check in keycloak
     const kcUser = await this.kcAdminClient.users.findOne({realm: process.env.KC_REALM, id: user.id});
-    expect(kcUser.attributes.personalDiskQuota[0]).to.be.equals(`${updateData.personalDiskQuota}G`);
+    expect(kcUser.attributes.volumeCapacity[0]).to.be.equals(`${updateData.volumeCapacity}G`);
   });
 
   it('should update an user with isAdmin', async () => {
@@ -317,7 +317,7 @@ describe('user graphql', function() {
     expect(backQuery.user.isAdmin).to.be.equals(false);
   });
 
-  it('should update an user with personalDiskQuota', async () => {
+  it('should update an user with volumeCapacity', async () => {
     const user = this.currentUser;
     await this.graphqlRequest(`
     mutation ($where: UserWhereUniqueInput!, $data: UserUpdateInput!){
@@ -326,7 +326,7 @@ describe('user graphql', function() {
       where: {
         id: user.id
       },
-      data: {personalDiskQuota: 30}
+      data: {volumeCapacity: 30}
     });
     // query
     const query = await this.graphqlRequest(`
@@ -338,7 +338,7 @@ describe('user graphql', function() {
       }
     });
 
-    expect(query.user.personalDiskQuota).to.be.equals(30);
+    expect(query.user.volumeCapacity).to.be.equals(30);
 
     // update back to false
     await this.graphqlRequest(`
@@ -348,7 +348,7 @@ describe('user graphql', function() {
       where: {
         id: user.id
       },
-      data: {personalDiskQuota: 50}
+      data: {volumeCapacity: 50}
     });
     const backQuery = await this.graphqlRequest(`
     query ($where: UserWhereUniqueInput!){
@@ -359,11 +359,11 @@ describe('user graphql', function() {
       }
     });
 
-    expect(backQuery.user.personalDiskQuota).to.be.equals(50);
+    expect(backQuery.user.volumeCapacity).to.be.equals(50);
 
     // check in keycloak
     const kcUser = await this.kcAdminClient.users.findOne({realm: process.env.KC_REALM, id: user.id});
-    expect(kcUser.attributes.personalDiskQuota[0]).to.be.equals('50G');
+    expect(kcUser.attributes.volumeCapacity[0]).to.be.equals('50G');
   });
 
   /**

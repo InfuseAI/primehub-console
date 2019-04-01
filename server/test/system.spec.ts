@@ -41,7 +41,7 @@ const systemFields = `
     username
     password
   }
-  defaultUserDiskQuota
+  defaultUserVolumeCapacity
 `;
 
 describe('system graphql', function() {
@@ -76,18 +76,9 @@ describe('system graphql', function() {
           username: null,
           password: null
         },
-        defaultUserDiskQuota: 20
+        defaultUserVolumeCapacity: 20
       }
     });
-  });
-
-  it('should get user personalDiskQuota from default value', async () => {
-    const query = await this.graphqlRequest(`
-    query {
-      users { id personalDiskQuota}
-    }`);
-
-    expect(query.users[0].personalDiskQuota).to.be.equals(20);
   });
 
   it('should mutate', async () => {
@@ -102,7 +93,7 @@ describe('system graphql', function() {
         host: 'test.canner.io',
         from: 'wwwy3y3@canner.io'
       },
-      defaultUserDiskQuota: 30
+      defaultUserVolumeCapacity: 30
     };
     await this.graphqlRequest(`
     mutation($data: SystemUpdateInput!){
@@ -113,7 +104,7 @@ describe('system graphql', function() {
             url
           }
         }
-        defaultUserDiskQuota
+        defaultUserVolumeCapacity
       }
     }`, {
       data: delta
@@ -149,7 +140,7 @@ describe('system graphql', function() {
           username: null,
           password: null
         },
-        defaultUserDiskQuota: delta.defaultUserDiskQuota
+        defaultUserVolumeCapacity: delta.defaultUserVolumeCapacity
       }
     });
 
@@ -157,7 +148,7 @@ describe('system graphql', function() {
     const group = await this.kcAdminClient.groups.findOne({
       realm: process.env.KC_REALM, id: process.env.KC_EVERYONE_GROUP_ID
     });
-    expect(group.attributes.defaultUserDiskQuota[0]).to.be.equals(`${delta.defaultUserDiskQuota}G`);
+    expect(group.attributes.defaultUserVolumeCapacity[0]).to.be.equals(`${delta.defaultUserVolumeCapacity}G`);
     // should update to realm
     const realm = await this.kcAdminClient.realms.findOne({
       realm: process.env.KC_REALM
@@ -184,7 +175,7 @@ describe('system graphql', function() {
         username: 'wwwy3y3',
         password: 'wwwy3y3'
       },
-      defaultUserDiskQuota: 20
+      defaultUserVolumeCapacity: 20
     };
     await this.graphqlRequest(`
     mutation($data: SystemUpdateInput!){
@@ -196,7 +187,7 @@ describe('system graphql', function() {
             contentType
           }
         }
-        defaultUserDiskQuota
+        defaultUserVolumeCapacity
       }
     }`, {
       data: delta
@@ -232,7 +223,7 @@ describe('system graphql', function() {
           username: delta.smtp.username,
           password: SECRET_VALUE
         },
-        defaultUserDiskQuota: delta.defaultUserDiskQuota
+        defaultUserVolumeCapacity: delta.defaultUserVolumeCapacity
       }
     });
 
@@ -240,6 +231,6 @@ describe('system graphql', function() {
     const group = await this.kcAdminClient.groups.findOne({
       realm: process.env.KC_REALM, id: process.env.KC_EVERYONE_GROUP_ID
     });
-    expect(group.attributes.defaultUserDiskQuota[0]).to.be.equals(`${delta.defaultUserDiskQuota}G`);
+    expect(group.attributes.defaultUserVolumeCapacity[0]).to.be.equals(`${delta.defaultUserVolumeCapacity}G`);
   });
 });

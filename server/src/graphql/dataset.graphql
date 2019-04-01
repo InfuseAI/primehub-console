@@ -69,7 +69,7 @@ input DatasetGroupCreateInput {
   quotaCpu: Float
   quotaGpu: Int
   quotaMemory: Float
-  quotaDisk: Int
+  userVolumeCapacity: Int
   projectQuotaCpu: Float
   projectQuotaGpu: Int
   projectQuotaMemory: Float
@@ -83,7 +83,7 @@ input DatasetGroupUpdateInput {
   quotaCpu: Float
   quotaGpu: Int
   quotaMemory: Float
-  quotaDisk: Int
+  userVolumeCapacity: Int
   projectQuotaCpu: Float
   projectQuotaGpu: Int
   projectQuotaMemory: Float

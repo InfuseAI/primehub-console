@@ -138,10 +138,10 @@ export const create = async (root, args, context: Context) => {
   const payload = args.data;
   const attrs = new Attributes({
     data: {
-      personalDiskQuota: payload.personalDiskQuota
+      volumeCapacity: payload.volumeCapacity
     },
     schema: {
-      personalDiskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
+      volumeCapacity: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
     }
   });
 
@@ -282,11 +282,11 @@ export const update = async (root, args, context: Context) => {
   const attrs = new Attributes({
     keycloakAttr: user.attributes,
     schema: {
-      personalDiskQuota: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
+      volumeCapacity: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
     }
   });
   attrs.mergeWithData({
-    personalDiskQuota: payload.personalDiskQuota
+    volumeCapacity: payload.volumeCapacity
   });
 
   // update
@@ -536,20 +536,12 @@ export const typeResolvers = {
     }
   },
 
-  personalDiskQuota: async (parent, args, context: Context) => {
+  volumeCapacity: async (parent, args, context: Context) => {
     const everyoneGroupId = context.everyoneGroupId;
-    const personalDiskQuota =
-      parent.attributes && parent.attributes.personalDiskQuota && parent.attributes.personalDiskQuota[0];
+    const volumeCapacity =
+      parent.attributes && parent.attributes.volumeCapacity && parent.attributes.volumeCapacity[0];
 
-    // get defaultUserDiskQuota from system
-    if (!personalDiskQuota) {
-      const {attributes} = await context.kcAdminClient.groups.findOne({id: everyoneGroupId});
-      const defaultUserDiskQuota =
-        attributes && attributes.defaultUserDiskQuota && attributes.defaultUserDiskQuota[0];
-      return parseDiskQuota(defaultUserDiskQuota || detaultSystemSettings.defaultUserDiskQuota);
-    }
-
-    return parseDiskQuota(personalDiskQuota);
+    return parseDiskQuota(volumeCapacity);
   },
 
   groups: async (parent, args, context: Context) => {
