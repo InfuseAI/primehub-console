@@ -81,6 +81,14 @@ export class Attributes {
       result[fieldName] = [value];
       return result;
     }, {});
+
+    // having data but all filtered out
+    if (!isEmpty(this.data) && isEmpty(attrs)) {
+      return {};
+    }
+
+    // not having data and empty attrs, will return undefined to remain attrs intact
+    // if attrs require to change, return attrs
     return isEmpty(attrs) ? undefined : attrs;
   }
 

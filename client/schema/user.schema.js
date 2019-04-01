@@ -184,6 +184,7 @@ export default () => (
           uiParams={{unit: ' GB', step: 1, min: 1, precision: 0, disableText: 'not specified'}}
           defaultValue={() => null}
           packageName="../src/cms-components/customize-number-checkbox"
+          nullable
         />
         <GroupRelation />
       </Condition>
