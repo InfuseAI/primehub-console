@@ -25,7 +25,7 @@ export const groupColumns = [{
   title: '${userVolumeCapacity}',
   dataIndex: 'userVolumeCapacity',
   render: text => {
-    return text === null ? '∞' : text;
+    return text === null ? '-' : text;
   }
 }];
 

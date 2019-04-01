@@ -121,7 +121,7 @@ export default () => (
         </Col>
         <Col sm={8} xs={24}>
           <number keyName="userVolumeCapacity" title="${userVolumeCapacity}"
-            uiParams={{min: 1, step: 1, precision: 0, unit: ' GB'}}
+            uiParams={{min: 1, step: 1, precision: 0, unit: ' GB', disableText: 'not specified'}}
             defaultValue={() => null}
             description="${quotaForNewly}"
             packageName="../src/cms-components/customize-number-checkbox"

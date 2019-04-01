@@ -40,7 +40,7 @@ export default class CheckableInputNumber extends PureComponent {
           isNull(value) ? (
             <Input
               disabled
-              value="unlimited"
+              value={uiParams.disableText || "unlimited"}
               style={{width: 'auto'}}
             />
           ) : (
