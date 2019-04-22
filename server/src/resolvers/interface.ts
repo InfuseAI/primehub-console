@@ -15,4 +15,5 @@ export interface Context {
   readOnly?: boolean;
   userId: string;
   username: string;
+  defaultUserVolumeCapacity: string;
 }

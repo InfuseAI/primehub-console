@@ -19,13 +19,13 @@ const findTimezone = () => {
 };
 const DEFAULT_TIMEZONE = findTimezone();
 
-export const detaultSystemSettings = {
+export const createDetaultSystemSettings = (defaultUserVolumeCapacity: string) => ({
   org: {
     name: 'infuse ai',
     logo: null
   },
-  defaultUserVolumeCapacity: '20G',
+  defaultUserVolumeCapacity,
   timezone: DEFAULT_TIMEZONE
-};
+});
 
 export const keycloakMaxCount = 10000;

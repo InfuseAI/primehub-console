@@ -46,6 +46,9 @@ export interface Config {
   appPrefix?: string;
   apolloTracing: boolean;
   graphqlPlayground: boolean;
+
+  // system value
+  defaultUserVolumeCapacity: string;
 }
 
 const defaultConfigs = {
@@ -68,7 +71,8 @@ const defaultConfigs = {
   keycloakRetries: 0,
   keycloakTimeout: 3000,
   apolloTracing: false,
-  graphqlPlayground: true
+  graphqlPlayground: true,
+  defaultUserVolumeCapacity: '20G'
 };
 
 const prodConfigs = {
@@ -109,7 +113,8 @@ export const createConfig = (): Config => {
     keycloakTimeout: process.env.KC_OIDC_TIMEOUT ? parseInt(process.env.KC_OIDC_TIMEOUT, 10) : undefined,
     appPrefix: sanitizePath(process.env.APP_PREFIX),
     apolloTracing: process.env.APOLLO_TRACING,
-    graphqlPlayground: process.env.GRAPHQL_PLAYGROUND
+    graphqlPlayground: process.env.GRAPHQL_PLAYGROUND,
+    defaultUserVolumeCapacity: process.env.DEFAULT_USER_VOLUME_CAPACITY
   });
 
   const env = process.env.NODE_ENV || 'development';

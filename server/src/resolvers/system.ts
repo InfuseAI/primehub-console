@@ -1,7 +1,7 @@
 import KcAdminClient from 'keycloak-admin';
 import { mapValues, isEmpty, get, isUndefined, isNil, reduce, isPlainObject } from 'lodash';
 import { unflatten, flatten } from 'flat';
-import { detaultSystemSettings } from './constant';
+import { createDetaultSystemSettings } from './constant';
 import { Context } from './interface';
 import { parseFromAttr, toAttr, parseDiskQuota, stringifyDiskQuota } from './utils';
 import { findTimezone } from '../utils/timezones';
@@ -16,6 +16,7 @@ export const query = async (root, args, context: Context) => {
   const everyoneGroupId = context.everyoneGroupId;
   const kcAdminClient: KcAdminClient = context.kcAdminClient;
   const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});
+  const detaultSystemSettings = createDetaultSystemSettings(context.defaultUserVolumeCapacity);
   if (isEmpty(attributes)) {
     return {
       ...detaultSystemSettings,
@@ -70,6 +71,7 @@ export const querySmtp = async (root, args, context: Context) => {
 };
 
 export const update = async (root, args, context) => {
+  const detaultSystemSettings = createDetaultSystemSettings(context.defaultUserVolumeCapacity);
   const everyoneGroupId = context.everyoneGroupId;
   const kcAdminClient: KcAdminClient = context.kcAdminClient;
   const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});

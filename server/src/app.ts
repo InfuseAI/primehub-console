@@ -304,7 +304,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         gitSyncSecret,
         readOnly,
         userId,
-        username
+        username,
+        defaultUserVolumeCapacity: config.defaultUserVolumeCapacity
       };
     },
     formatError: error => {
