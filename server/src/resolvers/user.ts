@@ -1,9 +1,9 @@
 import KcAdminClient from 'keycloak-admin';
-import { pick, omit, find, isUndefined, first, sortBy, get, every, isEmpty, reduce, uniq, flatten } from 'lodash';
+import { find, isUndefined, first, sortBy, get, every, isEmpty, reduce, uniq, flatten } from 'lodash';
 import {
-  toRelay, toAttr, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter, paginate, extractPagination
+  toRelay, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter, paginate, extractPagination
 } from './utils';
-import { detaultSystemSettings, keycloakMaxCount } from './constant';
+import { keycloakMaxCount } from './constant';
 import { Attributes, FieldType } from './attr';
 import { Context } from './interface';
 import { ApolloError } from 'apollo-server';
