@@ -181,7 +181,7 @@ export default () => (
         <boolean keyName="isAdmin" title="${isAdmin}" />
         <number keyName="volumeCapacity" title="${volumeCapacity}"
           description="${quotaForNewly}"
-          uiParams={{unit: ' GB', step: 1, min: 1, precision: 0, disableText: 'not specified'}}
+          uiParams={{unit: ' GB', step: 1, min: 1, precision: 0, disableText: 'use default value'}}
           defaultValue={() => null}
           packageName="../src/cms-components/customize-number-checkbox"
           nullable
