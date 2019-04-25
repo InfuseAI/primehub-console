@@ -95,11 +95,19 @@ export const update = async (root, args, context) => {
       url: orgLogoUrl
     };
   }
+
+  // merge timezone
+  // https://gitlab.com/infuseai/canner-admin-ui/issues/97
+  // we changed timezone format at #97, so we fallback to read this format
+  const originTimezone = parseFromAttr('timezone.name', attributes) || parseFromAttr('timezone', attributes);
+
+  // merge data
   const mergedData: Record<string, any> = {
     org: {
       name: get(payload, 'org.name') || orgName,
       logo: (logo) ? logo : undefined
     },
+    timezone: originTimezone,
     defaultUserVolumeCapacity: payload.defaultUserVolumeCapacity || defaultUserVolumeCapacity,
   };
 

@@ -7,7 +7,7 @@ type Org {
 
 type Timezone {
   name: String!
-  offset: Int!
+  offset: Float!
 }
 
 type Smtp {
@@ -34,7 +34,7 @@ type System {
 
 input TimezoneInput {
   name: String
-  offset: Int
+  offset: Float
 }
 
 input SmtpInput {
