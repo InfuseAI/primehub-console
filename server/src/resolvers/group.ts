@@ -129,7 +129,6 @@ export const update = async (root, args, context: Context) => {
   // update
   try {
     await kcAdminClient.groups.update({id: groupId}, {
-      name: payload.name,
       attributes: attrs.toKeycloakAttrs()
     });
   } catch (err) {

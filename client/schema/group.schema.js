@@ -82,16 +82,18 @@ export default () => (
       />
       <pagination />
     </toolbar>
-    <string keyName="name" title="${name}"
-      validation={{
-        validator: (value, cb) => {
-          if (!value.match(/^[A-Za-z0-9]([-A-Za-z0-9_]*[A-Za-z0-9])?(\.[A-Za-z0-9]([-A-Za-z0-9_]*[A-Za-z0-9])?)*$/)) {
-            return cb(`alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character.`);
+    <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
+      <string keyName="name" title="${name}"
+        validation={{
+          validator: (value, cb) => {
+            if (!value.match(/^[A-Za-z0-9]([-A-Za-z0-9_]*[A-Za-z0-9])?(\.[A-Za-z0-9]([-A-Za-z0-9_]*[A-Za-z0-9])?)*$/)) {
+              return cb(`alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character.`);
+            }
           }
-        }
-      }}
-      required
-    />
+        }}
+        required
+      />
+    </Condition>
 
     <string keyName="displayName" title="${displayName}" />
     <Block title="User Quota">

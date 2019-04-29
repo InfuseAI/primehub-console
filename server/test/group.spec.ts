@@ -212,7 +212,6 @@ describe('group graphql', function() {
 
     // update
     const updated = {
-      name: faker.internet.userName().toLowerCase(),
       displayName: faker.internet.userName(),
       quotaCpu: 20.5,
       quotaGpu: 20,
@@ -266,7 +265,6 @@ describe('group graphql', function() {
 
     // update
     const updated = {
-      name: faker.internet.userName().toLowerCase(),
       displayName: faker.internet.userName(),
       quotaCpu: 20,
       quotaGpu: 20,
