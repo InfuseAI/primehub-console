@@ -17,7 +17,6 @@ const ERRORS = {
 };
 
 export class OidcCtrl {
-  private secret: string;
   private clientId: string;
   private cmsHost: string;
   private realm: string;
@@ -25,34 +24,27 @@ export class OidcCtrl {
   private oidcClient: any;
   private redirectUri: string;
   private adminRole: string;
-  private grantType: string;
   private appPrefix?: string;
   private defaultReturnPath: string;
 
   constructor({
-    secret,
     realm,
     clientId,
     cmsHost,
     keycloakBaseUrl,
     oidcClient,
-    grantType,
     appPrefix
   }: {
-    secret: string,
     clientId: string,
     realm: string,
     cmsHost: string,
     keycloakBaseUrl: string,
     oidcClient: any,
-    grantType: string,
     appPrefix?: string
   }) {
-    this.secret = secret;
     this.clientId = clientId;
     this.cmsHost = cmsHost;
     this.realm = realm;
-    this.grantType = grantType;
     this.keycloakBaseUrl = keycloakBaseUrl;
     this.oidcClient = oidcClient;
     this.redirectUri = `${this.cmsHost}${appPrefix || ''}${CALLBACK_PATH}`;
@@ -62,12 +54,6 @@ export class OidcCtrl {
   }
 
   public ensureAdmin = async (ctx: Context, next: any) => {
-    if (this.grantType === 'password') {
-      ctx.state.username = '';
-      ctx.state.thumbnail = '';
-      return next();
-    }
-
     try {
       if (!ctx.cookies.get('accessToken') || !ctx.cookies.get('refreshToken')) {
         throw Boom.forbidden('require token', {code: ERRORS.FORCE_LOGIN});
@@ -214,7 +200,8 @@ export class OidcCtrl {
       username: accessToken.getContent().preferred_username,
       email: accessToken.getContent().email
     });
-    return ctx.redirect(backUrl);
+
+    return ctx.render('login', {accessToken: tokenSet.access_token, redirectUrl: backUrl});
   }
 
   public logout = async (ctx: Context) => {

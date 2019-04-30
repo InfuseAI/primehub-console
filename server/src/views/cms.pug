@@ -3,7 +3,8 @@ extends ./layout.pug
 
 block head
   script.
-    window.LOCALE= '#{locale}';
+    window.LOCALE = '#{locale}';
+    window.graphqlEndpoint = '#{graphqlEndpoint}';
     window.username = "#{username}";
     window.thumbnail = "#{thumbnail}";
     window.refreshTokenExp = #{refreshTokenExp};

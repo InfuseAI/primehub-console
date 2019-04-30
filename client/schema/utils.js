@@ -6,8 +6,10 @@ import {FormattedMessage} from 'react-intl';
 import {Tag, Button, Icon} from 'antd';
 
 exports.graphqlClient = new GraphqlClient({
-  uri: window.APP_PREFIX + "graphql",
-  credentials: "same-origin"
+  uri: window.graphqlEndpoint,
+  headers: {
+    authorization: `Bearer ${window.localStorage.getItem('canner.accessToken')}`
+  }
 });
 
 exports.imageStorage = new ImgurStorage({
