@@ -69,7 +69,20 @@ export class OidcCtrl {
       if (refreshToken.isExpired()) {
         throw Boom.forbidden('refresh token expired', {code: ERRORS.FORCE_LOGIN});
       }
-      ctx.state.refreshTokenExp = parseInt(refreshToken.getContent().exp, 10);
+
+      // get new access token if it's going to expire in 5 sec
+      let accessTokenExp = parseInt(accessToken.getContent().exp, 10);
+      let refreshTokenExp = parseInt(refreshToken.getContent().exp, 10);
+      if (accessToken.isExpiredIn(5000)) {
+        const tokenSet = await this.oidcClient.refresh(refreshToken);
+        ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true});
+        ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true});
+        accessTokenExp = parseInt(new Token(tokenSet.access_token, this.clientId).getContent().exp, 10);
+        refreshTokenExp = parseInt(new Token(tokenSet.refresh_token, this.clientId).getContent().exp, 10);
+      }
+
+      ctx.state.accessTokenExp = accessTokenExp;
+      ctx.state.refreshTokenExp = refreshTokenExp;
       ctx.state.username = ctx.cookies.get('username');
       ctx.state.thumbnail = ctx.cookies.get('thumbnail');
       return next();
@@ -118,7 +131,7 @@ export class OidcCtrl {
     }
   }
 
-  public setRefreshToken = async (ctx: Context) => {
+  public refreshTokenSet = async (ctx: Context) => {
     const refreshToken = ctx.cookies.get('refreshToken', {signed: true});
     if (!refreshToken) {
       throw Boom.forbidden('require token');
@@ -137,8 +150,14 @@ export class OidcCtrl {
       // set refreshToken, accessToken on cookie
       ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true});
       ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true});
-      const newToken = new Token(tokenSet.refresh_token, this.clientId);
-      return ctx.body = {redirectUrl, exp: parseInt(newToken.getContent().exp, 10)};
+      const newAccessToken = new Token(tokenSet.access_token, this.clientId);
+      const newRefreshToken = new Token(tokenSet.refresh_token, this.clientId);
+      return ctx.body = {
+        redirectUrl,
+        accessTokenExp: parseInt(newAccessToken.getContent().exp, 10),
+        refreshTokenExp: parseInt(newRefreshToken.getContent().exp, 10),
+        accessToken: tokenSet.access_token
+      };
     } catch (err) {
       /**
        * Possible errors
@@ -248,6 +267,6 @@ export class OidcCtrl {
 
 export const mount = (rootRouter: Router, oidcCtrl: OidcCtrl) => {
   rootRouter.get(CALLBACK_PATH, oidcCtrl.callback);
-  rootRouter.post('/oidc/refresh-token', oidcCtrl.setRefreshToken);
+  rootRouter.post('/oidc/refresh-token-set', oidcCtrl.refreshTokenSet);
   rootRouter.get('/oidc/logout', oidcCtrl.logout);
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import fetch from "isomorphic-fetch"
 import firebase from 'firebase';
 import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlClient';
 import {ImgurStorage} from '@canner/storage';
@@ -7,9 +8,14 @@ import {Tag, Button, Icon} from 'antd';
 
 exports.graphqlClient = new GraphqlClient({
   uri: window.graphqlEndpoint,
-  headers: {
-    authorization: `Bearer ${window.localStorage.getItem('canner.accessToken')}`
-  }
+  fetch: (uri, options) => {
+    const token = window.localStorage.getItem('canner.accessToken');
+    options.headers = {
+      Authorization: `Bearer ${token}`,
+      ...options.headers || {}
+    };
+    return fetch(uri, options);
+  },
 });
 
 exports.imageStorage = new ImgurStorage({

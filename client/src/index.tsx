@@ -44,8 +44,9 @@ function parseJSON(response) {
 const tokenSyncWorker = new BackgroundTokenSyncer({
   appPrefix: (window as any).APP_PREFIX,
   refreshTokenExp: (window as any).refreshTokenExp,
-  getNewRefreshToken: () => {
-    return fetch(`${(window as any).APP_PREFIX}oidc/refresh-token`, {
+  accessTokenExp: (window as any).accessTokenExp,
+  getNewTokenSet: () => {
+    return fetch(`${(window as any).APP_PREFIX}oidc/refresh-token-set`, {
       method: 'POST'
     })
     .then(checkStatus)

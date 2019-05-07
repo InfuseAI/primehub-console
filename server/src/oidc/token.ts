@@ -37,6 +37,10 @@ export default class Token {
     return ((this.content.exp * 1000) < Date.now());
   }
 
+  public isExpiredIn(time: number): boolean {
+    return ((this.content.exp * 1000) < (Date.now() - time));
+  }
+
   /**
    * Determine if this token has an associated role.
    *
