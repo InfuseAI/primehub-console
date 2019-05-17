@@ -1,5 +1,5 @@
 /** @jsx CannerScript */
-import CannerScript, {Condition} from 'canner-script';
+import CannerScript, {Condition, Default} from 'canner-script';
 
 export default () => (
   <array ui="tableRoute"
@@ -49,5 +49,61 @@ export default () => (
     </Condition>
     <string keyName="displayName" title="${displayName}" />
     <string keyName="secret" title="${secret}" ui="textarea" />
+    <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
+      <enum
+        keyName="type"
+        title="${secret.type}"
+        values={['opaque', 'kubernetes']}
+        uiParams={{
+          options: [{
+            text: 'Opaque',
+            value: 'opaque'
+          }, {
+            text: 'kubernetes.io/dockerconfigjson',
+            value: 'kubernetes'
+          }],
+          style: {width: '400px'}
+        }}
+        style={{width: '400px'}}
+      />
+    </Condition>
+    <Condition defaultMode="hidden" match={data => data.type === 'kubernetes'} >
+      <TypeKubernetesAppendFields />
+    </Condition>
+    
   </array>
 )
+
+
+function TypeKubernetesAppendFields({}) {
+  return (
+    <Default>
+    <string keyName="registryHost" required
+      title="${secret.registryHost}"
+      validation={{
+        validator: (value, reject) => {
+          // write some validations if u want
+        }
+      }}
+    />
+    <string keyName="username" required
+      title="${secret.username}"
+      validation={{
+        validator: (value, reject) => {
+          if (!value.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/)) {
+            return reject(`lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`);
+          }
+        }
+      }}
+    />
+    <string keyName="password" required
+      title="${secret.password}"
+      validation={{
+        validator: (value, reject) => {
+          // write some validations if u want
+        }
+      }}
+    />
+    </Default>
+  )
+}

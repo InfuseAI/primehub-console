@@ -285,7 +285,11 @@ exports.dict = {
     'anno.sendEmailMessage': 'Also send announcement via email.',
 
     // secret
-    secret: 'Secret'
+    secret: 'Secret',
+    'secret.type': 'Type',
+    'secret.registryHost': 'Registry Host',
+    'secret.username': 'Username',
+    'secret.password': 'Password'
   },
   zh: {
     // common
@@ -452,6 +456,10 @@ exports.dict = {
     'anno.sendEmailMessage': 'Also send announcement via email.',
 
     // secret
-    secret: 'Secret'
+    secret: 'Secret',
+    'secret.type': 'Type',
+    'secret.registryHost': 'Registry Host',
+    'secret.username': 'Username',
+    'secret.password': 'Password'
   }
 }
