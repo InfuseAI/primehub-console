@@ -293,7 +293,7 @@ exports.dict = {
 
     // image
     'images.useImagePullSecret': 'Use Image Pull Secret',
-    'image.useImagePullRequest.component.select.placeholder': 'Select Secret'
+    'image.useImagePullSecret.component.select.placeholder': 'Select Secret'
   },
   zh: {
     // common
@@ -468,6 +468,6 @@ exports.dict = {
 
     // image
     'images.useImagePullSecret': 'Use Image Pull Secret',
-    'image.useImagePullRequest.component.select.placeholder': 'Select Secret'
+    'image.useImagePullSecret.component.select.placeholder': 'Select Secret'
   }
 }

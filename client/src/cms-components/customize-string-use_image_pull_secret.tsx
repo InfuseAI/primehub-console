@@ -84,7 +84,7 @@ class Selector extends React.Component<SelectorProps> {
             onChange={onChange}
             placeholder={
               <FormattedMessage
-                id="image.useImagePullRequest.component.select.placeholder"
+                id="image.useImagePullSecret.component.select.placeholder"
                 defaultMessage="Select Secret"
               />
             }
