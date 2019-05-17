@@ -289,7 +289,11 @@ exports.dict = {
     'secret.type': 'Type',
     'secret.registryHost': 'Registry Host',
     'secret.username': 'Username',
-    'secret.password': 'Password'
+    'secret.password': 'Password',
+
+    // image
+    'images.useImagePullSecret': 'Use Image Pull Secret',
+    'image.useImagePullRequest.component.select.placeholder': 'Select Secret'
   },
   zh: {
     // common
@@ -460,6 +464,10 @@ exports.dict = {
     'secret.type': 'Type',
     'secret.registryHost': 'Registry Host',
     'secret.username': 'Username',
-    'secret.password': 'Password'
+    'secret.password': 'Password',
+
+    // image
+    'images.useImagePullSecret': 'Use Image Pull Secret',
+    'image.useImagePullRequest.component.select.placeholder': 'Select Secret'
   }
 }

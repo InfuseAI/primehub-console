@@ -2,7 +2,7 @@
 import builder, {Condition} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 import {Tag} from 'antd';
-import {GroupRelation} from './utils.schema';
+import {GroupRelation, CustomizedStringImagePullSecret} from './utils.schema';
 
 export default () => (
   <array keyName="image"
@@ -74,5 +74,6 @@ export default () => (
     <Condition match={data => !data.global}>
       <GroupRelation />
     </Condition>
+    <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${images.useImagePullSecret}" />
   </array>
 )
