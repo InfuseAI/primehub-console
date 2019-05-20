@@ -51,7 +51,7 @@ import Boom from 'boom';
 // graphql middlewares
 import readOnlyMiddleware from './middlewares/readonly';
 import TokenSyncer from './oidc/syncer';
-import GitSyncSecret from './k8sResource/gitSyncSecret';
+import K8sSecret from './k8sResource/k8sSecret';
 
 // logger
 import * as logger from './logger';
@@ -116,7 +116,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   const staticPath = config.appPrefix ? `${config.appPrefix}/` : '/';
 
   // gitsync secret client
-  const gitSyncSecret = new GitSyncSecret({namespace: config.k8sCrdNamespace});
+  const k8sSecret = new K8sSecret({namespace: config.k8sCrdNamespace});
 
   // construct http agent
   const httpAgent = new Agent({
@@ -301,7 +301,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         getInstanceType: getInstanceType || memGetInstanceType(crdClient),
         getImage: getImage || memGetImage(crdClient),
         getDataset: memGetDataset(crdClient),
-        gitSyncSecret,
+        k8sSecret,
         readOnly,
         userId,
         username,

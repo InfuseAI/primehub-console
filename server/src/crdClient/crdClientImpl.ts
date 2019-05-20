@@ -43,6 +43,7 @@ export interface ImageSpec {
   displayName?: string;
   description?: string;
   url?: string;
+  pullSecret?: string;
 }
 
 export interface DatasetSpec {

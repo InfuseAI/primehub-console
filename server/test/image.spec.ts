@@ -15,6 +15,7 @@ const fields = `
   name
   displayName
   description
+  useImagePullSecret
   url
   global
   spec
@@ -69,6 +70,7 @@ describe('image graphql', function() {
       displayName: data.name,
       description: null,
       url: null,
+      useImagePullSecret: null,
       global: false,
       spec: {
         displayName: data.name,
@@ -90,6 +92,7 @@ describe('image graphql', function() {
       displayName: data.name,
       description: null,
       url: null,
+      useImagePullSecret: null,
       global: false,
       spec: {
         displayName: data.name,

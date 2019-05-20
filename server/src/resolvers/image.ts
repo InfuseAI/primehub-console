@@ -3,7 +3,7 @@ import { Item } from '../crdClient/customResource';
 import { ImageSpec } from '../crdClient/crdClientImpl';
 import { mutateRelation } from './utils';
 import { Crd } from './crd';
-import { isUndefined } from 'lodash';
+import { isUndefined, isNil } from 'lodash';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 
 export const mapping = (item: Item<ImageSpec>) => {
@@ -13,7 +13,8 @@ export const mapping = (item: Item<ImageSpec>) => {
     displayName: item.spec.displayName || item.metadata.name,
     description: item.spec.description,
     url: item.spec.url,
-    spec: item.spec
+    useImagePullSecret: item.spec.pullSecret,
+    spec: item.spec,
   };
 };
 
@@ -116,7 +117,8 @@ export const createMapping = (data: any) => {
     spec: {
       displayName: data.displayName || data.name,
       description: data.description,
-      url: data.url
+      url: data.url,
+      pullSecret: isNil(data.useImagePullSecret) ? null : data.useImagePullSecret
     }
   };
 };
@@ -129,7 +131,8 @@ export const updateMapping = (data: any) => {
     spec: {
       displayName: data.displayName,
       description: data.description,
-      url: data.url
+      url: data.url,
+      pullSecret: isNil(data.useImagePullSecret) ? null : data.useImagePullSecret
     }
   };
 };
