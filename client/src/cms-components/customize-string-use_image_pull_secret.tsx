@@ -65,7 +65,7 @@ type SelectorProps = {
 class Selector extends React.Component<SelectorProps> {
   GET_SECRET = gql`
     {
-    secrets {
+    secrets(where: {ifDockerConfigJson: true}) {
       id
       name
       type

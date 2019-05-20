@@ -74,6 +74,7 @@ describe('image graphql', function() {
       global: false,
       spec: {
         displayName: data.name,
+        pullSecret: null,
       },
       groups: []
     });
@@ -96,6 +97,7 @@ describe('image graphql', function() {
       global: false,
       spec: {
         displayName: data.name,
+        pullSecret: null
       },
       groups: []
     });
@@ -120,7 +122,11 @@ describe('image graphql', function() {
     expect(mutation.createImage).to.be.eql({
       id: data.name,
       groups: [],
-      spec: pick(data, ['displayName', 'description', 'url']),
+      useImagePullSecret: null,
+      spec: {
+        ...pick(data, ['displayName', 'description', 'url']),
+        pullSecret: null
+      },
       ...data
     });
 
@@ -135,7 +141,11 @@ describe('image graphql', function() {
     expect(queryOne.image).to.be.eql({
       id: data.name,
       groups: [],
-      spec: pick(data, ['displayName', 'description', 'url']),
+      useImagePullSecret: null,
+      spec: {
+        ...pick(data, ['displayName', 'description', 'url']),
+        pullSecret: null
+      },
       ...data
     });
   });
@@ -158,7 +168,11 @@ describe('image graphql', function() {
     expect(mutation.createImage).to.be.eql({
       id: data.name,
       groups: [],
-      spec: pick(data, ['displayName', 'description', 'url']),
+      useImagePullSecret: null,
+      spec: {
+        ...pick(data, ['displayName', 'description', 'url']),
+        pullSecret: null
+      },
       ...data
     });
 
@@ -173,7 +187,11 @@ describe('image graphql', function() {
     expect(queryOne.image).to.be.eql({
       id: data.name,
       groups: [],
-      spec: pick(data, ['displayName', 'description', 'url']),
+      useImagePullSecret: null,
+      spec: {
+        ...pick(data, ['displayName', 'description', 'url']),
+        pullSecret: null
+      },
       ...data
     });
   });

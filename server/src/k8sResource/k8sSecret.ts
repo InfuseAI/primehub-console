@@ -1,6 +1,8 @@
 import { client as kubeClient } from '../crdClient/crdClientImpl';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty, isUndefined, isNull } from 'lodash';
 import { ApolloError } from 'apollo-server';
+
+export const PASSWORD_HOLDER = '******';
 
 // type
 export interface ConfigType {
@@ -132,7 +134,7 @@ export default class K8sSecret {
       const originalConfig = this.decodeDockerConfig(get(response, ['data', '.dockerconfigjson']));
       additionalProps = {
         ...originalConfig,
-        password: ''
+        password: PASSWORD_HOLDER
       };
     }
 
@@ -164,16 +166,6 @@ export default class K8sSecret {
     return (type === SECRET_OPAQUE_TYPE) ? this.removeGitSyncPrefix(name) : this.removeImagePrefix(name);
   }
 
-  private getTypeFromName(name: string) {
-    if (name.startsWith(GITSYNC_PREFIX)) {
-      return SECRET_OPAQUE_TYPE;
-    } else if (name.startsWith(IMAGE_PREFIX)) {
-      return SECRET_DOCKER_CONFIG_JSON_TYPE;
-    } else {
-      throw new Error(`cannot get type from ${name}`);
-    }
-  }
-
   private createDataByType = (
     type: string, props: ConfigType, originalResponse?: any) => {
     if (type === SECRET_OPAQUE_TYPE) {
@@ -185,7 +177,8 @@ export default class K8sSecret {
     if (type === SECRET_DOCKER_CONFIG_JSON_TYPE) {
       let registryHost = props.registryHost;
       let username = props.username;
-      let password = props.password;
+      // tslint:disable-next-line:max-line-length
+      let password = (isUndefined(props.password) || isNull(props.password) || props.password === PASSWORD_HOLDER) ? null : props.password;
       if (originalResponse) {
         const originalConfig = this.decodeDockerConfig(get(originalResponse, ['data', '.dockerconfigjson']));
         registryHost = registryHost || originalConfig.registryHost;

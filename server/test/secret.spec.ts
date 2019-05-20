@@ -3,7 +3,7 @@ import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
 import KeycloakAdminClient from 'keycloak-admin';
-import {GITSYNC_PREFIX, IMAGE_PREFIX} from '../src/k8sResource/k8sSecret';
+import {GITSYNC_PREFIX, IMAGE_PREFIX, PASSWORD_HOLDER} from '../src/k8sResource/k8sSecret';
 
 chai.use(chaiHttp);
 
@@ -160,7 +160,7 @@ describe('secret graphql', function() {
     expect(dockerConfigSecrets[0].type).to.be.equals(data.type);
     expect(dockerConfigSecrets[0].registryHost).to.be.equals(data.registryHost);
     expect(dockerConfigSecrets[0].username).to.be.equals(data.username);
-    expect(dockerConfigSecrets[0].password).to.be.eql('');
+    expect(dockerConfigSecrets[0].password).to.be.eql(PASSWORD_HOLDER);
 
     this.currentDockerSecretName = dockerConfigSecrets[0].id;
 
@@ -202,7 +202,7 @@ describe('secret graphql', function() {
     expect(secret.id).to.be.equals(this.currentDockerSecretName);
     expect(secret.type).to.be.equals('kubernetes');
     expect(secret.username).to.be.equals(data.username);
-    expect(secret.password).to.be.eql('');
+    expect(secret.password).to.be.eql(PASSWORD_HOLDER);
     expect(secret.registryHost).to.be.equals(oldRegistryHost);
 
     // test k8s
