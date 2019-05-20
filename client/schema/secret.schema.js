@@ -48,9 +48,6 @@ export default () => (
       />
     </Condition>
     <string keyName="displayName" title="${displayName}" />
-    <Condition match={data => data.type === 'opaque'}>
-      <string keyName="secret" title="${secret}" ui="textarea" />
-    </Condition>
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
       <enum
         keyName="type"
@@ -69,6 +66,9 @@ export default () => (
         }}
         style={{width: '400px'}}
       />
+    </Condition>
+    <Condition match={data => data.type === 'opaque'}>
+      <string keyName="secret" title="${secret}" ui="textarea" />
     </Condition>
     <Condition defaultMode="hidden" match={data => data.type === 'kubernetes'} >
       <TypeKubernetesAppendFields />
