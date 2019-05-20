@@ -48,11 +48,14 @@ export default () => (
       />
     </Condition>
     <string keyName="displayName" title="${displayName}" />
-    <string keyName="secret" title="${secret}" ui="textarea" />
+    <Condition match={data => data.type === 'opaque'}>
+      <string keyName="secret" title="${secret}" ui="textarea" />
+    </Condition>
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
       <enum
         keyName="type"
         title="${secret.type}"
+        defaultValue="opaque"
         values={['opaque', 'kubernetes']}
         uiParams={{
           options: [{
@@ -98,6 +101,7 @@ function TypeKubernetesAppendFields({}) {
     />
     <string keyName="password" required
       title="${secret.password}"
+      uiParams={{type: 'password'}}
       validation={{
         validator: (value, reject) => {
           // write some validations if u want
