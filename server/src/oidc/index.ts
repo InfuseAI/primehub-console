@@ -9,8 +9,11 @@ import { ErrorCodes } from '../errorCodes';
 import { ApolloError } from 'apollo-server-koa';
 import * as logger from '../logger';
 import { get } from 'lodash';
+import { createHash } from 'crypto';
+import UUID from 'uuid';
 
 const CALLBACK_PATH = '/oidc/callback';
+const NONCE_COOKIE = 'oidc.nonce';
 
 const ERRORS = {
   FORCE_LOGIN: 'FORCE_LOGIN'
@@ -95,8 +98,11 @@ export class OidcCtrl {
           type: 'FORCE_LOGIN',
           url: ctx.url
         });
+
+        // require to login
+        const nonce = this.saveNonceSecret(ctx);
         const backUrl = this.buildBackUrl(ctx.href);
-        const loginUrl = this.getLoginUrl(backUrl);
+        const loginUrl = this.getLoginUrl(nonce, backUrl);
         return ctx.redirect(loginUrl);
       }
       throw err;
@@ -108,7 +114,7 @@ export class OidcCtrl {
     const refreshTokenInst = new Token(refreshToken, this.clientId);
 
     if (refreshTokenInst.isExpired()) {
-      throw this.createExpiredError(ctx.header.referer);
+      throw this.createExpiredError(ctx);
     }
 
     // refresh to get token
@@ -125,7 +131,7 @@ export class OidcCtrl {
        *  => for remove user from admin
        */
       if (err.error === 'invalid_grant' || err.error === 'invalid_scope') {
-        throw this.createExpiredError(ctx.header.referer);
+        throw this.createExpiredError(ctx);
       }
 
       throw err;
@@ -139,7 +145,8 @@ export class OidcCtrl {
     }
     const refreshTokenInst = new Token(refreshToken, this.clientId);
     const backUrl = this.buildBackUrl(ctx.header.referer);
-    const redirectUrl = this.getLoginUrl(backUrl);
+    const nonce = this.createNonceFromSecret(ctx);
+    const redirectUrl = this.getLoginUrl(nonce, backUrl);
 
     if (refreshTokenInst.isExpired()) {
       return ctx.body = {redirectUrl};
@@ -169,13 +176,14 @@ export class OidcCtrl {
     }
   }
 
-  public getLoginUrl = (backUrl?: string) => {
+  public getLoginUrl = (nonce: string, backUrl?: string) => {
     let redirectUri = this.redirectUri;
     if (backUrl) {
       redirectUri += `?backUrl=${backUrl}`;
     }
     const loginUrl = this.oidcClient.authorizationUrl({
-      redirect_uri: redirectUri
+      redirect_uri: redirectUri,
+      nonce
     });
     return loginUrl;
   }
@@ -192,7 +200,8 @@ export class OidcCtrl {
     const redirectUri = query.backUrl ?
       `${this.redirectUri}?backUrl=${encodeURIComponent(query.backUrl)}` : this.redirectUri;
 
-    const tokenSet = await this.oidcClient.authorizationCallback(redirectUri, query);
+    const nonce = this.createNonceFromSecret(ctx);
+    const tokenSet = await this.oidcClient.authorizationCallback(redirectUri, query, {nonce});
     const accessToken = new Token(tokenSet.access_token, this.clientId);
     if (!accessToken.hasRole(this.adminRole)) {
       throw Boom.forbidden('only admin can access admin-ui');
@@ -224,6 +233,7 @@ export class OidcCtrl {
     ctx.cookies.set('refreshToken', null);
     ctx.cookies.set('username', null);
     ctx.cookies.set('thumbnail', null);
+    ctx.cookies.set(NONCE_COOKIE, null);
 
     logger.info({
       component: logger.components.user,
@@ -250,12 +260,26 @@ export class OidcCtrl {
     return encodeURIComponent(url.pathname + url.search);
   }
 
-  private createExpiredError = (currentUrl?: string) => {
+  private createExpiredError = (ctx: Context) => {
+    const currentUrl = ctx.header.referer;
     const err = new ApolloError('expired', ErrorCodes.REFRESH_TOKEN_EXPIRED);
     const backUrl = this.buildBackUrl(currentUrl);
-    const loginUrl = this.getLoginUrl(backUrl);
+    const nonce = this.createNonceFromSecret(ctx);
+    const loginUrl = this.getLoginUrl(nonce, backUrl);
     err.extensions.loginUrl = loginUrl;
     return err;
+  }
+
+  private createNonceFromSecret = (ctx: Context) => {
+    const secret = ctx.cookies.get(NONCE_COOKIE, {signed: true});
+    const hash = createHash('sha256').update(secret).digest('hex');
+    return hash;
+  }
+
+  private saveNonceSecret = (ctx: Context) => {
+    const secret = UUID.v1();
+    ctx.cookies.set(NONCE_COOKIE, secret, {signed: true});
+    return createHash('sha256').update(secret).digest('hex');
   }
 }
 
