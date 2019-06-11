@@ -3,7 +3,7 @@ import { Item } from '../crdClient/customResource';
 import { InstanceTypeSpec } from '../crdClient/crdClientImpl';
 import { mutateRelation, parseMemory, stringifyMemory, mergeVariables } from './utils';
 import { Crd } from './crd';
-import { isUndefined, isNil, values, isEmpty, get, omit } from 'lodash';
+import { isUndefined, isNil, values, isEmpty, get, omit, isArray } from 'lodash';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 import Boom from 'boom';
 import { ErrorCodes } from '../errorCodes';
@@ -12,16 +12,29 @@ import { ErrorCodes } from '../errorCodes';
 const EffectNone = 'None';
 const EffectValues = ['NoSchedule', 'PreferNoSchedule', 'NoExecute', EffectNone];
 const OperatorValues = {Equal: 'Equal', Exists: 'Exists'};
-const validateAndMapTolerations =
-  (tolerations: Array<{operator: string, effect?: string, key?: string, value?: string}>, emptyValue: () => any) => {
+// tslint:disable-next-line:max-line-length
+const validateAndMapTolerations = (tolerations: Array<{operator: string, effect?: string, key?: string, value?: string}>, method: 'create' | 'update') => {
+  const emptyValue = method === 'create' ? undefined : null;
 
-  if (isNil(tolerations)) {
-    return emptyValue();
+  // if create method, empty tolerations return undefined
+  if (method === 'create' && isEmpty(tolerations)) {
+    // do nothing
+    return undefined;
+  }
+
+  // if update method and tolerations is empty array, means delete all
+  if (method === 'update' && isArray(tolerations) && isEmpty(tolerations)) {
+    return null;
+  }
+
+  // if update method and tolerations is undefined, return undefined
+  if (method === 'update' && isNil(tolerations)) {
+    return undefined;
   }
 
   return tolerations.map(toleration => {
-    const key = isEmpty(toleration.key) ? emptyValue() : toleration.key;
-    const value = isEmpty(toleration.value) ? emptyValue() : toleration.value;
+    const key = isEmpty(toleration.key) ? emptyValue : toleration.key;
+    const value = isEmpty(toleration.value) ? emptyValue : toleration.value;
 
     if (!OperatorValues[toleration.operator]) {
       throw Boom.badRequest(`operator should be one of [${values(OperatorValues)}], but got ${toleration.operator}`, {
@@ -50,7 +63,7 @@ const validateAndMapTolerations =
       });
     }
 
-    const effect = (toleration.effect === EffectNone) ? emptyValue() : toleration.effect;
+    const effect = (toleration.effect === EffectNone) ? emptyValue : toleration.effect;
     return {
       operator: toleration.operator,
       effect,
@@ -120,7 +133,7 @@ export const createMapping = (data: any) => {
   expectInputNotNilAndLargerThanZero(data.cpuRequest, 'cpuRequest');
   expectInputNotNilAndLargerThanZero(data.memoryRequest, 'memoryRequest');
 
-  const tolerations = validateAndMapTolerations(get(data, 'tolerations.set'), () => undefined);
+  const tolerations = validateAndMapTolerations(get(data, 'tolerations.set'), 'create');
   const nodeSelector = isEmpty(data.nodeSelector) ? undefined : data.nodeSelector;
 
   return {
@@ -147,7 +160,7 @@ export const updateMapping = (data: any) => {
   expectInputLargerThanZero(data.cpuRequest, 'cpuRequest');
   expectInputLargerThanZero(data.memoryRequest, 'memoryRequest');
 
-  const tolerations = validateAndMapTolerations(get(data, 'tolerations.set'), () => null);
+  const tolerations = validateAndMapTolerations(get(data, 'tolerations.set'), 'update');
 
   return {
     metadata: {
