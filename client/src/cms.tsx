@@ -257,6 +257,11 @@ export default class CMSPage extends React.Component<Props, State> {
               }
 
               switch (errorCode) {
+                case 'REQUEST_BODY_INVALID':
+                  message = 'Invalidation Error';
+                  description = 'The requested body is not valid';
+                  break;
+
                 case 'USER_CONFLICT_USERNAME':
                   message = 'Conflict Error';
                   description = 'User exists with same username';
