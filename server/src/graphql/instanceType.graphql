@@ -14,7 +14,7 @@ type InstanceType {
   global: Boolean
   spec: JSON
   groups: [Group]
-  tolerations: [Toleration]
+  tolerations: [Toleration]!
   nodeSelector: JSON
 }
 

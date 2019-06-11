@@ -25,9 +25,9 @@ export class Crd<SpecType> {
   private onDelete?: (data: any) => Promise<any>;
   private customParseNameFromRole?: (roleName: string) => string;
   private customUpdate?: ({
-    name, metadata, spec, customResource, context, getPrefix
+    name, metadata, spec, customResource, context, getPrefix, data
   }: {
-    name: string, metadata: any, spec: any, customResource: any, context: Context, getPrefix: () => string
+    name: string, metadata: any, spec: any, customResource: any, context: Context, getPrefix: () => string, data: any
   }) => Promise<any>;
   private customParseWhere?: (where: any) => any;
   private generateName?: () => string;
@@ -61,9 +61,9 @@ export class Crd<SpecType> {
     onDelete?: (data: any) => Promise<any>,
     customParseNameFromRole?: (roleName: string) => string,
     customUpdate?: ({
-      name, metadata, spec, customResource, context, getPrefix
+      name, metadata, spec, customResource, context, getPrefix, data
     }: {
-      name: string, metadata: any, spec: any, customResource: any, context: Context, getPrefix: () => string
+      name: string, metadata: any, spec: any, customResource: any, context: Context, getPrefix: () => string, data: any
     }) => Promise<any>,
     customParseWhere?: (where: any) => any,
     generateName?: () => string,
@@ -324,7 +324,7 @@ export class Crd<SpecType> {
     const {metadata, spec} = this.updateMapping(args.data);
     const res = (this.customUpdate) ?
     await this.customUpdate({
-      name, metadata, spec, customResource, context, getPrefix: this.getPrefix
+      name, metadata, spec, customResource, context, getPrefix: this.getPrefix, data: args.data
     }) :
     await customResource.patch(name, {
       metadata: omit(metadata, 'name'),
