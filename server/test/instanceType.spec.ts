@@ -555,8 +555,8 @@ describe('instanceType graphql', function() {
           value: 'handsomeBody'
         }]
       },
-      // test with empty object
-      nodeSelector: {}
+      // null indicates remove all
+      nodeSelector: null
     };
 
     const mutation = await this.graphqlRequest(`
@@ -613,6 +613,30 @@ describe('instanceType graphql', function() {
     queryOneAgain.instanceType.tolerations.forEach((toleration, index) => {
       expect(toleration).to.include(deltaAgain.tolerations.set[index]);
     });
+
+    // update again with different nodeSelector
+    const deltaNodeSelector = {
+      nodeSelector: {
+        key2: 'value2'
+      }
+    };
+    await this.graphqlRequest(`
+    mutation($where: InstanceTypeWhereUniqueInput!, $data: InstanceTypeUpdateInput!){
+      updateInstanceType (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: createMutation.createInstanceType.id},
+      data: deltaNodeSelector
+    });
+
+    // query one
+    const queryOneAgainSelector = await this.graphqlRequest(`
+    query($where: InstanceTypeWhereUniqueInput!){
+      instanceType (where: $where) { ${fields} }
+    }`, {
+      where: {id: createMutation.createInstanceType.id}
+    });
+
+    expect(queryOneAgainSelector.instanceType.nodeSelector).to.be.eql(deltaNodeSelector.nodeSelector);
   });
 
   it('should should throw due to invalid effect value (not being None)', async () => {

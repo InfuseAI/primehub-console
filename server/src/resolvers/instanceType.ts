@@ -1,9 +1,9 @@
 import { Context } from './interface';
 import { Item } from '../crdClient/customResource';
 import { InstanceTypeSpec } from '../crdClient/crdClientImpl';
-import { mutateRelation, parseMemory, stringifyMemory } from './utils';
+import { mutateRelation, parseMemory, stringifyMemory, mergeVariables } from './utils';
 import { Crd } from './crd';
-import { isUndefined, isNil, values, isEmpty, get } from 'lodash';
+import { isUndefined, isNil, values, isEmpty, get, omit } from 'lodash';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 import Boom from 'boom';
 import { ErrorCodes } from '../errorCodes';
@@ -148,7 +148,6 @@ export const updateMapping = (data: any) => {
   expectInputLargerThanZero(data.memoryRequest, 'memoryRequest');
 
   const tolerations = validateAndMapTolerations(get(data, 'tolerations.set'), () => null);
-  const nodeSelector = isEmpty(data.nodeSelector) ? null : data.nodeSelector;
 
   return {
     metadata: {
@@ -162,10 +161,28 @@ export const updateMapping = (data: any) => {
       'limits.nvidia.com/gpu': data.gpuLimit,
       'requests.cpu': data.cpuRequest,
       'requests.memory': data.memoryRequest ? stringifyMemory(data.memoryRequest) : undefined,
+      'nodeSelector': data.nodeSelector,
       tolerations,
-      nodeSelector
     }
   };
+};
+
+export const customUpdate = async ({
+  name, metadata, spec, customResource, context, getPrefix, data
+}: {
+  name: string, metadata: any, spec: any, customResource: any, context: Context, getPrefix: () => string, data: any
+}) => {
+  // find original variables first
+  const row = await customResource.get(name);
+  const originalVariables = row.spec.nodeSelector || {};
+  const newVariables = spec.nodeSelector;
+  spec.nodeSelector = mergeVariables(originalVariables, newVariables);
+  const res = await customResource.patch(name, {
+    metadata: omit(metadata, 'name'),
+    spec
+  });
+
+  return res;
 };
 
 export const onCreate = async (
@@ -259,6 +276,7 @@ export const crd = new Crd<InstanceTypeSpec>({
   resourceName: 'instanceType',
   createMapping,
   updateMapping,
+  customUpdate,
   onCreate,
   onUpdate
 });

@@ -124,7 +124,7 @@ export default () => (
       <Default title="Tolerations" keyName="tolerations">
         <Tolerations />
       </Default>
-      <Default title="NodeSelectors" keyName="nodeSelectors">
+      <Default title="NodeSelector" keyName="nodeSelector">
         <NodeSelectors />
       </Default>
     </Tabs>
@@ -133,7 +133,7 @@ export default () => (
 
 function NodeSelectors() {
   return (
-    <json keyName="nodeSelectors"
+    <json keyName="nodeSelector"
       packageName="../src/cms-components/customize-object-dynamic-field"
     />
   );

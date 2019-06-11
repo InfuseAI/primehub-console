@@ -180,6 +180,10 @@ export const parseMemory = (memWithUnit: string) => {
 };
 
 export const mergeVariables = (originalVariables: any, newVariables: any) => {
+  if (isNull(newVariables)) {
+    return null;
+  }
+
   if (isEmpty(newVariables)) {
     return originalVariables;
   }
