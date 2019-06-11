@@ -141,7 +141,23 @@ function NodeSelectors() {
 
 function Tolerations() {
   return (
-    <array keyName="tolerations">
+    <array keyName="tolerations"
+      uiParams={{
+        columns: [{
+          title: 'Key',
+          dataIndex: 'key'
+        }, {
+          title: 'Value',
+          dataIndex: 'value'
+        }, {
+          title: 'Operator',
+          dataIndex: 'operator'
+        }, {
+          title: 'Effect',
+          dataIndex: 'effect'
+        }]
+      }}
+    >
       <string keyName="key" title="Key" />
       <Condition match={data => data.operator === 'Equal'} defaultMode="disabled">
         <string keyName="value" title="Value" />
