@@ -1,6 +1,7 @@
 import React from 'react';
 import {Input, Icon, Button} from 'antd';
 import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
 import {Props} from './types';
 const InputGroup = Input.Group;
 
@@ -22,7 +23,7 @@ export default class DynamicFields extends React.Component<Props, State> {
     this.setState({
       fields: this.state.fields.concat({key: '', value: ''})
     }, () => {
-      onChange(refId, 'update', {...arrayToObject(this.state.fields)});
+      onChange(refId, 'update', arrayToObject(this.state.fields));
     });
   }
 
@@ -33,7 +34,7 @@ export default class DynamicFields extends React.Component<Props, State> {
     this.setState({
       fields
     }, () => {
-      onChange(refId, 'update', {...arrayToObject(this.state.fields)});
+      onChange(refId, 'update', arrayToObject(this.state.fields));
     });
   }
 
@@ -44,7 +45,7 @@ export default class DynamicFields extends React.Component<Props, State> {
     this.setState({
       fields
     }, () => {
-      onChange(refId, 'update', {...arrayToObject(this.state.fields)});
+      onChange(refId, 'update', arrayToObject(this.state.fields));
     });
   }
 
@@ -55,7 +56,7 @@ export default class DynamicFields extends React.Component<Props, State> {
     this.setState({
       fields
     }, () => {
-      onChange(refId, 'update', {...arrayToObject(this.state.fields)});
+      onChange(refId, 'update', arrayToObject(this.state.fields));
     });
   }
 
@@ -109,13 +110,17 @@ function objectToArray(obj) {
 }
 
 function arrayToObject(arr) {
-  return arr.reduce((result, item) => {
+  const result = arr.reduce((result, item) => {
     if (item.key === '__typename') {
       return result;
     } 
     result[item.key] = item.value;
     return result;
   }, {});
+  if (isEmpty(result)) {
+    return null;
+  }
+  return result;
 }
 
 function getRecordValue(rootValue, refId) {
