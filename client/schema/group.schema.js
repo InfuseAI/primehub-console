@@ -1,5 +1,5 @@
 /** @jsx builder */
-import builder, {Condition, Block, Row, Col} from 'canner-script';
+import builder, {Condition, Block, Row, Col, Default} from 'canner-script';
 import {Tag} from 'antd';
 import Filter from '../src/cms-toolbar/filter';
 import {renderRelationField, parseToStepDot5} from './utils';
@@ -15,6 +15,15 @@ export default () => (
       }, {
         title: '${displayName}',
         dataIndex: 'displayName'
+      }, {
+        title: "${group.sharedVolumeCapacity}",
+        dataIndex: 'sharedVolumeCapacity',
+        render: (value) => {
+          if (value) {
+            return `${value}G`
+          }
+          return '-'
+        }
       }, {
         title: '${cpuQuotaListTitle}',
         dataIndex: 'quotaCpu',
@@ -60,6 +69,7 @@ export default () => (
               quotaGpu
               projectQuotaCpu
               projectQuotaGpu
+              sharedVolumeCapacity
             }
           }
           pageInfo {
@@ -96,6 +106,7 @@ export default () => (
     </Condition>
 
     <string keyName="displayName" title="${displayName}" />
+    <ShareVolumn />
     <Block title="User Quota">
       <Row type="flex">
         <Col sm={8} xs={24}>
@@ -191,3 +202,29 @@ export default () => (
     <boolean keyName="writable" hidden />
   </array>
 )
+
+
+function ShareVolumn() {
+  return (
+    <Default>
+      <boolean keyName="enabledSharedVolume" title="${group.enabledSharedVolume}" />
+      <Condition match={data => data.enabledSharedVolume} defaultMode="hidden">
+        <Block title="Shared Volume">
+          <Row type="flex">
+            <Col sm={8} xs={24}>
+              <number keyName="sharedVolumeCapacity"
+                title="${group.sharedVolumeCapacity}"
+                uiParams={{min: 1, step: 1, precision: 0, unit: ' GB'}}
+                packageName="../src/cms-components/customize-number-precision"
+                defaultValue={1}
+              />
+            </Col>
+            <Col sm={8} xs={24}>
+              <boolean keyName="launchGroupOnly" title="${group.launchGroupOnly}" />
+            </Col>
+          </Row>
+        </Block>
+      </Condition>
+    </Default>
+  )
+}
