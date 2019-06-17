@@ -4,7 +4,6 @@ import {Props} from './types';
 import {get} from 'lodash';
 
 export default class EnableSharedVolume extends React.Component<Props> {
-  private disable: boolean;
   private sharedVolumeCapacity: number;
   private launchGroupOnly: boolean;
 
@@ -13,10 +12,11 @@ export default class EnableSharedVolume extends React.Component<Props> {
     const {rootValue, refId, routerParams, value} = props;
     const recordValue = getRecordValue(rootValue, refId);
     // if the origin value is true, the field can't change anymore,
-    // so we have this.disable to check  
-    this.disable = value === true;
-    this.sharedVolumeCapacity = recordValue.sharedVolumeCapacity;
-    this.launchGroupOnly = recordValue.launchGroupOnly;
+    // so we have window.disableEnableSharedVolume to check
+    // NOTE: `window.disableEnableSharedVolume` will also be used in sharedVolumeCapacity component
+    (window as any).disableEnableSharedVolume = value === true;
+    this.sharedVolumeCapacity = recordValue.sharedVolumeCapacity || 1;
+    this.launchGroupOnly = recordValue.launchGroupOnly || false;
     if (routerParams.operator === 'create') {
       this.sharedVolumeCapacity = 1;
       this.launchGroupOnly = true;
@@ -32,7 +32,7 @@ export default class EnableSharedVolume extends React.Component<Props> {
 
   onChange = (checked) => {
     const {onChange, refId, routerParams} = this.props;
-    if (this.disable) {
+    if ((window as any).disableEnableSharedVolume) {
       return;
     }
 
@@ -47,7 +47,7 @@ export default class EnableSharedVolume extends React.Component<Props> {
 
   componentDidMount() {
     const {value, routerParams} = this.props;
-    if (this.disable) {
+    if ((window as any).disableEnableSharedVolume) {
       return;
     }
     if (routerParams.operator === 'create' && value === false) {
@@ -72,7 +72,7 @@ export default class EnableSharedVolume extends React.Component<Props> {
   render() {
     const {value} = this.props;
     return (
-      <Switch onChange={this.onChange} checked={value} disabled={this.disable} />
+      <Switch onChange={this.onChange} checked={value} disabled={(window as any).disableEnableSharedVolume} />
     );
   }
 }

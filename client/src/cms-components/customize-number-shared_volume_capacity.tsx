@@ -3,22 +3,17 @@ import { InputNumber } from "antd";
 import {Props} from './types';
 
 export default class Input extends PureComponent<Props> {
-  private disable: boolean;
   constructor(props) {
     super(props);
     const {value, routerParams: {operator}} = props;
-    // if original value is not null or 0 or undefined
+    // if EnableSharedVolume has been set
     // this field can't update anymore
-    this.disable = operator === 'update' && Boolean(value);
-  }
-  componentDidMount() {
-    const {uiParams} = this.props;
-    this.onChange(uiParams.defaultValue || uiParams.min);
+    // NOTE: this value is created in enableShared component
   }
 
   onChange = (val) => {
     const {onChange, refId, uiParams: {min}} = this.props;
-    if (this.disable) {
+    if ((window as any).disableEnableSharedVolume) {
       return;
     }
     if (val >= min) {
@@ -32,7 +27,7 @@ export default class Input extends PureComponent<Props> {
     return (
       <InputNumber
         style={{width: 'auto'}}
-        disabled={disabled || this.disable}
+        disabled={disabled || (window as any).disableEnableSharedVolume}
         min={uiParams && uiParams.min}
         max={uiParams && uiParams.max}
         step={uiParams && uiParams.step}
