@@ -9,9 +9,10 @@ import {
   stringifyMemory,
   filter,
   paginate,
-  extractPagination
+  extractPagination,
+  parseBoolean
 } from './utils';
-import { pick, first } from 'lodash';
+import { pick, first, isNil } from 'lodash';
 import { crd as instanceTypeResolver } from './instanceType';
 import { crd as datasetResolver } from './dataset';
 import { crd as imageResolver } from './image';
@@ -20,19 +21,9 @@ import { Attributes, FieldType } from './attr';
 import { keycloakMaxCount } from './constant';
 import { ApolloError } from 'apollo-server';
 import * as logger from '../logger';
+import * as Boom from 'boom';
 
 // constants
-const groupAttrs = [
-  'displayName',
-  'quotaCpu',
-  'quotaGpu',
-  'quotaMemory',
-  'userVolumeCapacity',
-  'projectQuotaGpu',
-  'projectQuotaCpu',
-  'projectQuotaMemory'
-];
-
 const attrSchema = {
   displayName: {type: FieldType.string},
   quotaCpu: {type: FieldType.float, rename: 'quota-cpu'},
@@ -41,7 +32,24 @@ const attrSchema = {
   userVolumeCapacity: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota, rename: 'user-volume-capacity'},
   projectQuotaCpu: {type: FieldType.float, rename: 'project-quota-cpu'},
   projectQuotaGpu: {type: FieldType.integer, rename: 'project-quota-gpu'},
-  projectQuotaMemory: {serialize: stringifyMemory, deserialize: parseMemory, rename: 'project-quota-memory'}
+  projectQuotaMemory: {serialize: stringifyMemory, deserialize: parseMemory, rename: 'project-quota-memory'},
+  // shared volume
+  enabledSharedVolume: {type: FieldType.boolean, rename: 'enabled-shared-volume'},
+  sharedVolumeCapacity: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota, rename: 'shared-volume-capacity'},
+  homeSymlink: {type: FieldType.boolean, rename: 'home-symlink'},
+  launchGroupOnly: {type: FieldType.boolean, rename: 'launch-group-only'}
+};
+
+const groupAttrs = Object.keys(attrSchema);
+
+// utils
+const validateSharedVolumeAttrs = (attrs: Attributes) => {
+  const {enabledSharedVolume, sharedVolumeCapacity} = attrs.getData();
+
+  // if a group has sharedVolumeCapacity = null + enabledSharedVolume, it should raise an error.
+  if (enabledSharedVolume && isNil(sharedVolumeCapacity)) {
+    throw Boom.badData('sharedVolumeCapacity should not be null');
+  }
 };
 
 /**
@@ -54,10 +62,18 @@ export const create = async (root, args, context: Context) => {
   // create resource
   // displayName, canUseGpu, quotaGpu, userVolumeCapacity in attributes
   const payload = args.data;
+
   const attrs = new Attributes({
-    data: pick(payload, groupAttrs),
+    data: {
+      ...pick(payload, groupAttrs),
+      // set homeSymlink to true if enabledSharedVolume
+      homeSymlink: payload.enabledSharedVolume ? true : undefined
+    },
     schema: attrSchema
   });
+
+  validateSharedVolumeAttrs(attrs);
+
   try {
     await kcAdminClient.groups.create({
       name: payload.name,
@@ -124,7 +140,17 @@ export const update = async (root, args, context: Context) => {
     keycloakAttr: group.attributes,
     schema: attrSchema
   });
-  attrs.mergeWithData(pick(payload, groupAttrs));
+
+  const data = pick(payload, groupAttrs);
+  // set homeSymlink to true if enabledSharedVolume
+  // if enabledSharedVolume not specified, do not update the homeSymlink field
+  if (payload.enabledSharedVolume) {
+    data.homeSymlink = true;
+  }
+  attrs.mergeWithData(data);
+
+  // validate if a group has sharedVolumeCapacity = null + enabledSharedVolume, it should raise an error.
+  validateSharedVolumeAttrs(attrs);
 
   // update
   try {
@@ -263,6 +289,19 @@ export const typeResolvers = {
 
   projectQuotaMemory: async (parent, args, context: Context) =>
     getFromAttr('project-quota-memory', parent.attributes, null, parseMemory),
+
+  // shared volume
+  enabledSharedVolume: async (parent, args, context: Context) =>
+    getFromAttr('enabled-shared-volume', parent.attributes, false, parseBoolean),
+
+  sharedVolumeCapacity: async (parent, args, context: Context) =>
+    getFromAttr('shared-volume-capacity', parent.attributes, null, parseDiskQuota),
+
+  homeSymlink: async (parent, args, context: Context) =>
+    getFromAttr('home-symlink', parent.attributes, null, parseBoolean),
+
+  launchGroupOnly: async (parent, args, context: Context) =>
+    getFromAttr('launch-group-only', parent.attributes, null, parseBoolean),
 
   displayName: async (parent, args, context: Context) =>
     getFromAttr('displayName', parent.attributes, null),

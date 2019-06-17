@@ -21,6 +21,11 @@ type Group {
   datasets: [Dataset]
   # for relation with dataset
   writable: Boolean
+  # shared volume
+  enabledSharedVolume: Boolean
+  sharedVolumeCapacity: Int
+  homeSymlink: Boolean
+  launchGroupOnly: Boolean
 }
 
 """An edge in a connection."""
@@ -63,6 +68,11 @@ input GroupCreateInput {
   projectQuotaMemory: Float
   users: UserCreateManyInput
   writable: Boolean
+   # shared volume
+  enabledSharedVolume: Boolean
+  sharedVolumeCapacity: Int
+  homeSymlink: Boolean
+  launchGroupOnly: Boolean
 }
 
 input GroupUpdateInput {
@@ -77,6 +87,11 @@ input GroupUpdateInput {
   projectQuotaMemory: Float
   users: UserUpdateManyInput
   writable: Boolean
+   # shared volume
+  enabledSharedVolume: Boolean
+  sharedVolumeCapacity: Int
+  homeSymlink: Boolean
+  launchGroupOnly: Boolean
 }
 
 """Relation input"""

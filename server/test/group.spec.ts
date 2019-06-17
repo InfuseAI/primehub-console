@@ -3,7 +3,6 @@ import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
 import KeycloakAdminClient from 'keycloak-admin';
-import BPromise from 'bluebird';
 
 chai.use(chaiHttp);
 
@@ -21,6 +20,10 @@ const groupFields = `
   projectQuotaGpu
   projectQuotaCpu
   projectQuotaMemory
+  enabledSharedVolume
+  sharedVolumeCapacity
+  homeSymlink
+  launchGroupOnly
   users {
     id
     username
@@ -81,6 +84,10 @@ describe('group graphql', function() {
       projectQuotaCpu: null,
       projectQuotaMemory: null,
       userVolumeCapacity: null,
+      enabledSharedVolume: false,
+      sharedVolumeCapacity: null,
+      homeSymlink: null,
+      launchGroupOnly: null,
       users: []
     });
     this.currentGroup = data.createGroup;
@@ -96,7 +103,10 @@ describe('group graphql', function() {
       projectQuotaGpu: 10,
       projectQuotaCpu: 1.5,
       projectQuotaMemory: 0.5,
-      userVolumeCapacity: 20
+      userVolumeCapacity: 20,
+      enabledSharedVolume: true,
+      sharedVolumeCapacity: 200,
+      launchGroupOnly: true
     };
     const data = await this.graphqlRequest(`
     mutation($data: GroupCreateInput!){
@@ -107,6 +117,9 @@ describe('group graphql', function() {
 
     expect(data.createGroup).to.be.deep.include(groupData);
 
+    // check api-only field homeSymlink as well
+    expect(data.createGroup.homeSymlink).to.be.equal(true);
+
     // check userVolumeCapacity save as 20G in keycloak
     const group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: data.createGroup.id});
     expect(group.attributes['user-volume-capacity'][0]).to.be.equals('20G');
@@ -116,6 +129,12 @@ describe('group graphql', function() {
     expect(group.attributes['project-quota-cpu'][0]).to.be.equals('1.5');
     expect(group.attributes['project-quota-gpu'][0]).to.be.equals('10');
     expect(group.attributes['project-quota-memory'][0]).to.be.equals('0.5G');
+
+    // check shared volume related
+    expect(group.attributes['enabled-shared-volume'][0]).to.be.equals('true');
+    expect(group.attributes['shared-volume-capacity'][0]).to.be.equals('200G');
+    expect(group.attributes['home-symlink'][0]).to.be.equals('true');
+    expect(group.attributes['launch-group-only'][0]).to.be.equals('true');
   });
 
   it('should list groups', async () => {
@@ -216,7 +235,10 @@ describe('group graphql', function() {
       quotaCpu: 20.5,
       quotaGpu: 20,
       projectQuotaGpu: 10,
-      userVolumeCapacity: 30
+      userVolumeCapacity: 30,
+      enabledSharedVolume: true,
+      sharedVolumeCapacity: 200,
+      launchGroupOnly: true
     };
     await this.graphqlRequest(`
     mutation($where: GroupWhereUniqueInput!, $data: GroupUpdateInput!){
@@ -236,12 +258,21 @@ describe('group graphql', function() {
 
     expect(data.group).to.be.deep.include(updated);
 
+    // check api-only field homeSymlink as well
+    expect(data.group.homeSymlink).to.be.equal(true);
+
     // check userVolumeCapacity save as 30G in keycloak
     const group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
     expect(group.attributes['user-volume-capacity'][0]).to.be.equals('30G');
     expect(group.attributes['quota-cpu'][0]).to.be.equals('20.5');
     expect(group.attributes['quota-gpu'][0]).to.be.equals('20');
     expect(group.attributes['project-quota-gpu'][0]).to.be.equals('10');
+
+    // check shared volume related
+    expect(group.attributes['enabled-shared-volume'][0]).to.be.equals('true');
+    expect(group.attributes['shared-volume-capacity'][0]).to.be.equals('200G');
+    expect(group.attributes['home-symlink'][0]).to.be.equals('true');
+    expect(group.attributes['launch-group-only'][0]).to.be.equals('true');
   });
 
   it('should create with all props and update a group', async () => {
@@ -258,7 +289,10 @@ describe('group graphql', function() {
         projectQuotaGpu: null,
         projectQuotaCpu: 10,
         projectQuotaMemory: null,
-        userVolumeCapacity: 20
+        userVolumeCapacity: 20,
+        enabledSharedVolume: true,
+        sharedVolumeCapacity: 200,
+        launchGroupOnly: true
       }
     });
     const groupId = create.createGroup.id;
@@ -272,7 +306,9 @@ describe('group graphql', function() {
       projectQuotaGpu: 10,
       projectQuotaCpu: 0.5,
       projectQuotaMemory: 5,
-      userVolumeCapacity: 30
+      userVolumeCapacity: 30,
+      sharedVolumeCapacity: 300,
+      launchGroupOnly: false
     };
     await this.graphqlRequest(`
     mutation($where: GroupWhereUniqueInput!, $data: GroupUpdateInput!){
@@ -302,12 +338,19 @@ describe('group graphql', function() {
     expect(group.attributes['project-quota-cpu'][0]).to.be.equals('0.5');
     expect(group.attributes['project-quota-memory'][0]).to.be.equals('5G');
 
+    // check shared volume related
+    expect(group.attributes['enabled-shared-volume'][0]).to.be.equals('true');
+    expect(group.attributes['shared-volume-capacity'][0]).to.be.equals('300G');
+    expect(group.attributes['home-symlink'][0]).to.be.equals('true');
+    expect(group.attributes['launch-group-only'][0]).to.be.equals('false');
+
     // update again
     const updatedAgain = {
       quotaCpu: null,
       quotaMemory: null,
       quotaGpu: 2,
       projectQuotaMemory: 0.5,
+      enabledSharedVolume: false
     };
     await this.graphqlRequest(`
     mutation($where: GroupWhereUniqueInput!, $data: GroupUpdateInput!){
@@ -336,6 +379,12 @@ describe('group graphql', function() {
     expect(group.attributes['project-quota-gpu'][0]).to.be.equals('10');
     expect(group.attributes['project-quota-cpu'][0]).to.be.equals('0.5');
     expect(group.attributes['project-quota-memory'][0]).to.be.equals('0.5G');
+
+    // check shared volume related
+    expect(group.attributes['enabled-shared-volume'][0]).to.be.equals('false');
+    expect(group.attributes['shared-volume-capacity'][0]).to.be.equals('300G');
+    expect(group.attributes['home-symlink'][0]).to.be.equals('true');
+    expect(group.attributes['launch-group-only'][0]).to.be.equals('false');
   });
 
   it('should delete a group', async () => {
