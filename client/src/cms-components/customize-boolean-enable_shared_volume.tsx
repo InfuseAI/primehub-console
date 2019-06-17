@@ -4,6 +4,25 @@ import {Props} from './types';
 import {get} from 'lodash';
 
 export default class EnableSharedVolume extends React.Component<Props> {
+  constructor(props) {
+    super(props);
+    const {rootValue, refId, routerParams} = props;
+    const recordValue = getRecordValue(rootValue, refId);
+    this.sharedVolumeCapacity = recordValue.sharedVolumeCapacity;
+    this.launchGroupOnly = recordValue.launchGroupOnly;
+    if (routerParams.operator === 'create') {
+      this.sharedVolumeCapacity = 1;
+      this.launchGroupOnly = true;
+    }
+  }
+
+  componentDidUpdate() {
+    const {rootValue, refId} = this.props;
+    const recordValue = getRecordValue(rootValue, refId);
+    this.sharedVolumeCapacity = recordValue.sharedVolumeCapacity;
+    this.launchGroupOnly = recordValue.launchGroupOnly;
+  }
+
   onChange = (checked) => {
     const {onChange, refId, routerParams} = this.props;
     onChange(refId, 'update', checked);
@@ -12,7 +31,6 @@ export default class EnableSharedVolume extends React.Component<Props> {
     }
     if (checked) {
       this.setDefaultSharedVolumeFields();
-
     }
   }
 
@@ -32,10 +50,10 @@ export default class EnableSharedVolume extends React.Component<Props> {
   }
 
   setDefaultSharedVolumeFields = () => {
-    const {onChange, refId} = this.props;
+    const {onChange, refId, rootValue} = this.props;
     const parentRefId = refId.remove(1);
-    onChange(parentRefId.child('sharedVolumeCapacity'), 'update',  1);
-    onChange(parentRefId.child('launchGroupOnly'), 'update', true);
+    onChange(parentRefId.child('sharedVolumeCapacity'), 'update',  this.sharedVolumeCapacity);
+    onChange(parentRefId.child('launchGroupOnly'), 'update', this.launchGroupOnly);
   }
 
   render() {
@@ -47,5 +65,5 @@ export default class EnableSharedVolume extends React.Component<Props> {
 }
 
 function getRecordValue(rootValue, refId) {
-  return get(rootValue, refId.remove().getPathArr());
+  return get(rootValue, refId.remove().getPathArr(), {});
 }

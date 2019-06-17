@@ -218,6 +218,7 @@ function ShareVolumn() {
                 title="${group.sharedVolumeCapacity}"
                 uiParams={{min: 1, step: 1, precision: 0, unit: ' GB'}}
                 packageName="../src/cms-components/customize-number-precision"
+                description="This volume size will not resize on update. It only work for newly created volume."
               />
             </Col>
             <Col sm={8} xs={24}>
