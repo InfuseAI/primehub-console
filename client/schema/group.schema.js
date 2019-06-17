@@ -210,14 +210,14 @@ function ShareVolumn() {
       <boolean keyName="enabledSharedVolume" title="${group.enabledSharedVolume}" 
         packageName="../src/cms-components/customize-boolean-enable_shared_volume"
       />
-      <Condition keyName="" match={data => data.enabledSharedVolume} defaultMode="hidden">
+      <Condition match={data => data.enabledSharedVolume} defaultMode="hidden">
         <Block title="Shared Volume">
           <Row type="flex">
             <Col sm={8} xs={24}>
               <number keyName="sharedVolumeCapacity"
                 title="${group.sharedVolumeCapacity}"
                 uiParams={{min: 1, step: 1, precision: 0, unit: ' GB'}}
-                packageName="../src/cms-components/customize-number-precision"
+                packageName="../src/cms-components/customize-number-shared_volume_capacity"
                 description="This volume size will not resize on update. It only work for newly created volume."
               />
             </Col>

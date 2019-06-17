@@ -4,10 +4,17 @@ import {Props} from './types';
 import {get} from 'lodash';
 
 export default class EnableSharedVolume extends React.Component<Props> {
+  private disable: boolean;
+  private sharedVolumeCapacity: number;
+  private launchGroupOnly: boolean;
+
   constructor(props) {
     super(props);
-    const {rootValue, refId, routerParams} = props;
+    const {rootValue, refId, routerParams, value} = props;
     const recordValue = getRecordValue(rootValue, refId);
+    // if the origin value is true, the field can't change anymore,
+    // so we have this.disable to check  
+    this.disable = value === true;
     this.sharedVolumeCapacity = recordValue.sharedVolumeCapacity;
     this.launchGroupOnly = recordValue.launchGroupOnly;
     if (routerParams.operator === 'create') {
@@ -25,6 +32,10 @@ export default class EnableSharedVolume extends React.Component<Props> {
 
   onChange = (checked) => {
     const {onChange, refId, routerParams} = this.props;
+    if (this.disable) {
+      return;
+    }
+
     onChange(refId, 'update', checked);
     if (!checked) {
       this.removeSharedVolumeFields();
@@ -36,7 +47,9 @@ export default class EnableSharedVolume extends React.Component<Props> {
 
   componentDidMount() {
     const {value, routerParams} = this.props;
-    console.log(this.props);
+    if (this.disable) {
+      return;
+    }
     if (routerParams.operator === 'create' && value === false) {
       this.removeSharedVolumeFields();
     }
@@ -59,7 +72,7 @@ export default class EnableSharedVolume extends React.Component<Props> {
   render() {
     const {value} = this.props;
     return (
-      <Switch onChange={this.onChange} checked={value} />
+      <Switch onChange={this.onChange} checked={value} disabled={this.disable} />
     );
   }
 }
