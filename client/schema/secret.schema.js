@@ -93,9 +93,9 @@ function TypeKubernetesAppendFields({}) {
       title="${secret.username}"
       validation={{
         validator: (value, reject) => {
-          if (!value.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/)) {
+          {/* if (!value.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/)) {
             return reject(`lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`);
-          }
+          } */}
         }
       }}
     />

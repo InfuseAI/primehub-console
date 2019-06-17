@@ -91,7 +91,7 @@ class Selector extends React.Component<SelectorProps> {
             notFoundContent={loading ? <Spin size="small" /> : null}
           >
             {!loading && data.secrets.map(d => (
-              <Select.Option key={d.name}>{d.name}</Select.Option>
+              <Select.Option key={d.id}>{d.name}</Select.Option>
             ))}
           </Select>
         )}
