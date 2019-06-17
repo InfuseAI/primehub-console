@@ -207,8 +207,10 @@ export default () => (
 function ShareVolumn() {
   return (
     <Default>
-      <boolean keyName="enabledSharedVolume" title="${group.enabledSharedVolume}" />
-      <Condition match={data => data.enabledSharedVolume} defaultMode="hidden">
+      <boolean keyName="enabledSharedVolume" title="${group.enabledSharedVolume}" 
+        packageName="../src/cms-components/customize-boolean-enable_shared_volume"
+      />
+      <Condition keyName="" match={data => data.enabledSharedVolume} defaultMode="hidden">
         <Block title="Shared Volume">
           <Row type="flex">
             <Col sm={8} xs={24}>
@@ -216,11 +218,10 @@ function ShareVolumn() {
                 title="${group.sharedVolumeCapacity}"
                 uiParams={{min: 1, step: 1, precision: 0, unit: ' GB'}}
                 packageName="../src/cms-components/customize-number-precision"
-                defaultValue={1}
               />
             </Col>
             <Col sm={8} xs={24}>
-              <boolean keyName="launchGroupOnly" title="${group.launchGroupOnly}" />
+              <boolean keyName="launchGroupOnly" title="${group.launchGroupOnly}" defaultValue={() => true} />
             </Col>
           </Row>
         </Block>
