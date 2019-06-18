@@ -75,3 +75,10 @@ exports.GroupRelation = () => (
     </toolbar>
   </relation>
 );
+
+exports.CustomizedStringImagePullSecret = ({attributes}) => (
+  <string keyName={attributes.keyName}
+    title={attributes.title}
+    packageName="../src/cms-components/customize-string-use_image_pull_secret"
+  />
+)
