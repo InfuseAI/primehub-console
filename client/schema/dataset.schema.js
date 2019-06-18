@@ -96,7 +96,7 @@ export default () => (
       }}
     />
     <Condition match={data => data.type === 'git'}>
-      <string keyName="url" ui="link" title="${url}"/>
+      <string keyName="url" ui="link" title="${datasetUrl}"/>
       <relation
         title="${secret}"
         keyName="secret"

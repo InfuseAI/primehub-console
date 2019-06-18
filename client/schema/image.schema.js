@@ -69,7 +69,7 @@ export default () => (
     </Condition>
     <string keyName="displayName" title="${displayName}" />
     <string keyName="description" title="${description}" />
-    <string keyName="url" ui="link" title="${url}"/>
+    <string keyName="url" title="${imageUrl}"/>
     <boolean keyName="global" title="${global}" />
     <Condition match={data => !data.global}>
       <GroupRelation />
