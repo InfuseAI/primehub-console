@@ -63,14 +63,14 @@ test:
     - master
   before_script:
     - date
-    # start minikube
+    # start kubernetes
     - sudo bash ci/start.sh &
   script:
      # Check keycloak endpoints
     - date
     - sudo bash ci/keycloak-endpoint.sh
 
-    # Wait for minikube ready
+    # Wait for kubernetes ready
     - >
       JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}';
       until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True";

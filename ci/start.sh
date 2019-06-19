@@ -33,9 +33,23 @@ echo "172.17.0.2 gitlab-runner" >> /etc/hosts
 echo "Hostname changed:"
 hostname
 
-/minikube start --vm-driver=none --bootstrapper=localkube --cpus 4 --memory 8192  --extra-config=apiserver.Authorization.Mode=RBAC &> /var/log/minikube-start.log 2>&1 < /dev/null
-/minikube addons enable default-storageclass
-/minikube addons enable ingress
-echo "$(/minikube ip) id.mycrop.local admin.mycrop.local" >> /etc/hosts
+# minikube couldn't work anymore
 
-kubectl config view --merge=true --flatten=true > /kubeconfig
+# /minikube start --vm-driver=none --bootstrapper=localkube --cpus 4 --memory 8192  --extra-config=apiserver.Authorization.Mode=RBAC &> /var/log/minikube-start.log 2>&1 < /dev/null
+# /minikube addons enable default-storageclass
+# /minikube addons enable ingress
+# echo "$(/minikube ip) id.mycrop.local admin.mycrop.local" >> /etc/hosts
+
+#kubectl config view --merge=true --flatten=true > /kubeconfig
+
+
+# it is time to use kind
+echo "install kind"
+
+curl -sLo kind https://github.com/kubernetes-sigs/kind/releases/download/v0.3.0/kind-linux-amd64 && \
+  chmod a+x kind && \
+  mv kind /usr/local/bin
+kind create cluster --name="kind"
+
+echo "overrite $HOME/.kube/config"
+cp $(kind get kubeconfig-path --name="kind") $HOME/.kube/config
