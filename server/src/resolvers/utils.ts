@@ -178,6 +178,7 @@ export const parseMemory = (memWithUnit: string) => {
   const value = parseFloat(memWithUnit.slice(0, -1));
   return isNaN(value) ? null : value;
 };
+export const parseBoolean = (value: string) => value === 'true';
 
 export const mergeVariables = (originalVariables: any, newVariables: any) => {
   if (isEmpty(newVariables)) {
