@@ -70,10 +70,10 @@ export default () => (
     <string keyName="displayName" title="${displayName}" />
     <string keyName="description" title="${description}" />
     <string keyName="url" title="${imageUrl}"/>
+    <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${images.useImagePullSecret}" />
     <boolean keyName="global" title="${global}" />
     <Condition match={data => !data.global}>
       <GroupRelation />
     </Condition>
-    <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${images.useImagePullSecret}" />
   </array>
 )
