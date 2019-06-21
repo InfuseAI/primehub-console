@@ -247,10 +247,11 @@ export class Crd<SpecType> {
       if (this.resourceName === 'dataset') {
         return context.getDataset(name)
           .then(dataset => {
+            // todo: deal with the complex type cast here
             return {
               roleName,
               ...dataset
-            };
+            } as any;
           });
       }
 
