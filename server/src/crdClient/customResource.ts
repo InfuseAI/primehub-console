@@ -12,6 +12,7 @@ export interface Metadata {
   resourceVersion?: string;
   selfLink?: string;
   uid?: string;
+  annotations?: any;
 }
 
 export interface Item<T> {

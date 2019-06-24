@@ -1,12 +1,26 @@
 import { Item } from '../crdClient/customResource';
 import { DatasetSpec } from '../crdClient/crdClientImpl';
 import { Crd } from './crd';
-import { mutateRelation, mergeVariables } from './utils';
+import { mutateRelation, mergeVariables, parseBoolean } from './utils';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 import { Context } from './interface';
 import { omit, get, isUndefined, last, isNil } from 'lodash';
 import { resolveInDataSet } from './secret';
 import KeycloakAdminClient from 'keycloak-admin';
+
+export const ATTRIBUTE_PREFIX = 'dataset.primehub.io';
+
+// utils
+const addToAnnotation = (data: any, field: string, annotation: any) => {
+  if (isNil(annotation)) {
+    return;
+  }
+
+  const fieldValue = data[field];
+  if (!isNil(fieldValue)) {
+    annotation[`${ATTRIBUTE_PREFIX}/${field}`] = fieldValue.toString();
+  }
+};
 
 const getWritableRole = async ({
   kcAdminClient,
@@ -46,7 +60,14 @@ export const mapping = (item: Item<DatasetSpec>) => {
     volumeName: item.spec.volumeName,
     spec: item.spec,
     writable: (item as any).roleName && (item as any).roleName.indexOf(':rw:') >= 0,
-    secret: get(item, 'spec.gitsync.secret')
+    secret: get(item, 'spec.gitsync.secret'),
+    // default to empty string
+    mountRoot: get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/mountRoot`], ''),
+    // default to false
+    homeSymlink: parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/homeSymlink`], 'false')),
+    // default to false
+    launchGroupOnly:
+      parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/launchGroupOnly`], 'false')),
   };
 };
 
@@ -55,13 +76,21 @@ export const createMapping = (data: any) => {
   const gitSyncProp = gitSyncSecretId
     ? {gitsync: {secret: gitSyncSecretId}}
     : {};
-  const annotations = (data.type === 'git')
-    ? {annotations: {'primehub-gitsync': 'true'}}
+  const annotations: any = (data.type === 'git')
+    ? {'primehub-gitsync': 'true'}
     : {};
+
+  // add mountRoot & launchGroupOnly
+  addToAnnotation(data, 'mountRoot', annotations);
+  addToAnnotation(data, 'launchGroupOnly', annotations);
+  // homeSymlink is fixed to false
+  annotations[`${ATTRIBUTE_PREFIX}/homeSymlink`] = 'false';
+
+  // mappings
   return {
     metadata: {
       name: data.name,
-      ...annotations
+      annotations
     },
     spec: {
       displayName: data.displayName || data.name,
@@ -94,6 +123,14 @@ export const updateMapping = (data: any) => {
     // set to other type
     annotations = {annotations: null};
     gitSyncProp = {gitsync: null};
+  }
+
+  // add launchGroupOnly
+  if (!isNil(data.launchGroupOnly)) {
+    annotations.annotations = {
+      ...annotations.annotations,
+      [`${ATTRIBUTE_PREFIX}/launchGroupOnly`]: data.launchGroupOnly.toString()
+    };
   }
 
   return {
