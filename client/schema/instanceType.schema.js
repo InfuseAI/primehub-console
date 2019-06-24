@@ -4,6 +4,7 @@ import Filter from '../src/cms-toolbar/filter';
 import {parseToStepDot5} from './utils';
 import {Tag} from 'antd';
 import {GroupRelation} from './utils.schema';
+import TolerationLayout from '../src/cms-layouts/toleration';
 
 export default () => (
   <array keyName="instanceType"
@@ -140,6 +141,13 @@ function NodeSelectors() {
 }
 
 function Tolerations() {
+  const validation = {
+    validator: (value, cb) => {
+      if (value && !value.match(/^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/)) {
+        return cb(`alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`);
+      }
+    }
+  }
   return (
     <array keyName="tolerations"
       uiParams={{
@@ -158,43 +166,47 @@ function Tolerations() {
         }]
       }}
     >
-      <string keyName="key" title="Key" />
-      <Condition match={data => data.operator === 'Equal'} defaultMode="disabled">
-        <string keyName="value" title="Value" />
-      </Condition>
-      <string keyName="operator" title="Operator"
-        ui="select"
-        defaultValue="Exists"
-        required
-        uiParams={{
-          options: [{
-            text: 'Equal',
-            value: 'Equal'
-          }, {
-            text: 'Exists',
-            value: 'Exists'
-          }]
-        }}
-      />
-      <string keyName="effect" title="Effect"
-        ui="select"
-        defaultValue="None"
-        uiParams={{
-          options: [{
-            text: 'NoSchedule',
-            value: 'NoSchedule'
-          }, {
-            text: 'PreferNoSchedule',
-            value: 'PreferNoSchedule'
-          }, {
-            text: 'NoExecute',
-            value: 'NoExecute'
-          }, {
-            text: 'None',
-            value: 'None'
-          }]
-        }}
-      />
+      <Layout component={TolerationLayout}>
+        <string keyName="key" title="Key"
+          validation={{...validation, maxLength: 253}}
+        />
+        <string keyName="value" title="Value"
+          validation={{...validation, maxLength: 63}}
+        />
+        <string keyName="operator" title="Operator"
+          ui="select"
+          defaultValue="Exists"
+          required
+          uiParams={{
+            options: [{
+              text: 'Equal',
+              value: 'Equal'
+            }, {
+              text: 'Exists',
+              value: 'Exists'
+            }]
+          }}
+        />
+        <string keyName="effect" title="Effect"
+          ui="select"
+          defaultValue="None"
+          uiParams={{
+            options: [{
+              text: 'NoSchedule',
+              value: 'NoSchedule'
+            }, {
+              text: 'PreferNoSchedule',
+              value: 'PreferNoSchedule'
+            }, {
+              text: 'NoExecute',
+              value: 'NoExecute'
+            }, {
+              text: 'None',
+              value: 'None'
+            }]
+          }}
+        />
+      </Layout>
     </array>
   );
 }
