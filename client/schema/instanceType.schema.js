@@ -164,7 +164,7 @@ function Tolerations() {
           validation={{
             validator: (value, cb) => {
               if (value && !value.match(/^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/)) {
-                return cb(`alphanumeric characters, '-', '.', '/', '-', and must start and end with an alphanumeric character.`);
+                return cb(`alphanumeric characters, '_', '.', '/' or '-', and must start and end with an alphanumeric character.`);
               }
             },
             maxLength: 253
@@ -174,7 +174,7 @@ function Tolerations() {
           validation={{
             validator: (value, cb) => {
               if (value && !value.match(/^[A-Za-z0-9][_.-A-Za-z0-9]+[A-Za-z0-9]$/)) {
-                return cb(`alphanumeric characters, '-', '.', '-', and must start and end with an alphanumeric character.`);
+                return cb(`alphanumeric characters, '_', '.' or '-', and must start and end with an alphanumeric character.`);
               }
             },
             maxLength: 63
