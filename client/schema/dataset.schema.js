@@ -78,6 +78,15 @@ export default () => (
     </Condition>
     <string keyName="displayName" title="${displayName}" />
     <string keyName="description" title="${description}" />
+    <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
+      <string
+        keyName="mountRoot"
+        title="${mountRoot}"
+        defaultValue={'/datasets'}
+        packageName="../src/cms-components/customize-string-mount_root"
+      />
+    </Condition>
+    <boolean keyName="launchGroupOnly" title="${launchGroupOnly}" defaultValue={true} />
     <boolean keyName="global" title="${global}" />
     <string keyName="type" 
       ui="select"
