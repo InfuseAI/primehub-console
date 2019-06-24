@@ -141,13 +141,6 @@ function NodeSelectors() {
 }
 
 function Tolerations() {
-  const validation = {
-    validator: (value, cb) => {
-      if (value && !value.match(/^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/)) {
-        return cb(`alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`);
-      }
-    }
-  }
   return (
     <array keyName="tolerations"
       uiParams={{
@@ -168,10 +161,24 @@ function Tolerations() {
     >
       <Layout component={TolerationLayout}>
         <string keyName="key" title="Key"
-          validation={{...validation, maxLength: 253}}
+          validation={{
+            validator: (value, cb) => {
+              if (value && !value.match(/^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/)) {
+                return cb(`alphanumeric characters, '-', '.', '/', '-', and must start and end with an alphanumeric character.`);
+              }
+            },
+            maxLength: 253
+          }}
         />
         <string keyName="value" title="Value"
-          validation={{...validation, maxLength: 63}}
+          validation={{
+            validator: (value, cb) => {
+              if (value && !value.match(/^[A-Za-z0-9][_.-A-Za-z0-9]+[A-Za-z0-9]$/)) {
+                return cb(`alphanumeric characters, '-', '.', '-', and must start and end with an alphanumeric character.`);
+              }
+            },
+            maxLength: 63
+          }}
         />
         <string keyName="operator" title="Operator"
           ui="select"
