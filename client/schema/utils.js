@@ -177,6 +177,9 @@ exports.dict = {
     // dataset
     dataset: 'Datasets',
     description: 'Description',
+    mountRoot: 'Mount Root',
+    'mountRoot.preview': 'Data can be access at: ',
+    launchGroupOnly: 'Launch Group Only',
     type: 'Type',
     images: 'Images',
     global: 'Global',
@@ -356,6 +359,9 @@ exports.dict = {
     // dataset
     dataset: 'Dataset',
     description: 'Description',
+    mountRoot: 'Mount Root',
+    'mountRoot.preview': 'Data can be access at: ',
+    launchGroupOnly: 'Launch Group Only',
     type: 'Type',
     images: 'Images',
     global: 'Global',
