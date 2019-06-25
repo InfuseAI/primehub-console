@@ -136,6 +136,27 @@ function NodeSelectors() {
   return (
     <json keyName="nodeSelector"
       packageName="../src/cms-components/customize-object-dynamic-field"
+      customizeValidator={(data, cb) => {
+        return Object.keys(data).map((key, index) => {
+          const value = data[key];
+          if (key.length > 253) {
+            return cb(index, `key should NOT be longer than 253 characters`);
+          }
+          if (value.length > 63) {
+            return cb(index, `value should NOT be longer than 63 characters`);
+          }
+          if (key && !key.match(/^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/)) {
+            return cb(index, `"${key}" must be alphanumeric characters, '_', '.', '/' or '-', and start and end with an alphanumeric character.`);
+          }
+          if (value && !value.match(/^[A-Za-z0-9][_.-A-Za-z0-9]+[A-Za-z0-9]$/)) {
+            return cb(index, `"${value}" must be alphanumeric characters, '_', '.' or '-', and start and end with an alphanumeric character.`);
+          }
+          if (!key && !value) {
+            return cb(index, `key and value can't be empty both.`);
+          }
+          return undefined
+        }).filter(err => Boolean(err))[0];
+      }}
     />
   );
 }
@@ -160,26 +181,8 @@ function Tolerations() {
       }}
     >
       <Layout component={TolerationLayout}>
-        <string keyName="key" title="Key"
-          validation={{
-            validator: (value, cb) => {
-              if (value && !value.match(/^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/)) {
-                return cb(`alphanumeric characters, '_', '.', '/' or '-', and must start and end with an alphanumeric character.`);
-              }
-            },
-            maxLength: 253
-          }}
-        />
-        <string keyName="value" title="Value"
-          validation={{
-            validator: (value, cb) => {
-              if (value && !value.match(/^[A-Za-z0-9][_.-A-Za-z0-9]+[A-Za-z0-9]$/)) {
-                return cb(`alphanumeric characters, '_', '.' or '-', and must start and end with an alphanumeric character.`);
-              }
-            },
-            maxLength: 63
-          }}
-        />
+        <string keyName="key" title="Key"/>
+        <string keyName="value" title="Value"/>
         <string keyName="operator" title="Operator"
           ui="select"
           defaultValue="Exists"
