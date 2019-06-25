@@ -78,7 +78,7 @@ export default () => (
     </Condition>
     <string keyName="displayName" title="${displayName}" />
     <string keyName="description" title="${description}" />
-    <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
+    <Condition match={(data, operator) => false} defaultMode="disabled">
       <string
         keyName="mountRoot"
         title="${mountRoot}"
