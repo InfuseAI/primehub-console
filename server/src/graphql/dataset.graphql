@@ -16,6 +16,9 @@ type Dataset {
   spec: JSON
   groups: [Group]
   secret: Secret
+  mountRoot: String
+  homeSymlink: Boolean
+  launchGroupOnly: Boolean
 }
 
 """An edge in a connection."""
@@ -104,6 +107,9 @@ input DatasetCreateInput {
   volumeName: String
   groups: DatasetGroupCreateManyInput
   secret: SecretCreateOneInput
+  mountRoot: String
+  homeSymlink: Boolean
+  launchGroupOnly: Boolean
 }
 
 input DatasetUpdateInput {
@@ -117,4 +123,7 @@ input DatasetUpdateInput {
   volumeName: String
   groups: DatasetGroupUpdateManyInput
   secret: SecretUpdateOneInput
+  mountRoot: String
+  homeSymlink: Boolean
+  launchGroupOnly: Boolean
 }

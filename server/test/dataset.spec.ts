@@ -5,6 +5,8 @@ import faker from 'faker';
 import KeycloakAdminClient from 'keycloak-admin';
 import { cleanupDatasets } from './sandbox';
 import { pick } from 'lodash';
+import CrdClient from '../src/crdClient/crdClientImpl';
+import { ATTRIBUTE_PREFIX } from '../src/resolvers/dataset';
 
 chai.use(chaiHttp);
 
@@ -20,6 +22,9 @@ const fields = `
   type
   url
   variables
+  mountRoot
+  homeSymlink
+  launchGroupOnly
   spec
   groups {
     id
@@ -38,6 +43,7 @@ declare module 'mocha' {
     currentDataset?: any;
     createGroup?: any;
     kcAdminClient?: KeycloakAdminClient;
+    crdClient: CrdClient;
   }
 }
 
@@ -45,6 +51,7 @@ describe('dataset graphql', function() {
   before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;
+    this.crdClient = (global as any).crdClient;
     this.createGroup = async () => {
       const data = await this.graphqlRequest(`
       mutation($data: GroupCreateInput!){
@@ -90,6 +97,9 @@ describe('dataset graphql', function() {
       type: null,
       url: null,
       variables: null,
+      mountRoot: '',
+      homeSymlink: false,
+      launchGroupOnly: false,
       spec: {
         displayName: data.name,
       },
@@ -113,6 +123,9 @@ describe('dataset graphql', function() {
       type: null,
       url: null,
       variables: null,
+      mountRoot: '',
+      homeSymlink: false,
+      launchGroupOnly: false,
       spec: {
         displayName: data.name,
       },
@@ -148,6 +161,9 @@ describe('dataset graphql', function() {
       id: data.name,
       groups: [],
       variables: null,
+      mountRoot: '',
+      homeSymlink: false,
+      launchGroupOnly: false,
       spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
@@ -164,6 +180,9 @@ describe('dataset graphql', function() {
       id: data.name,
       groups: [],
       variables: null,
+      mountRoot: '',
+      homeSymlink: false,
+      launchGroupOnly: false,
       spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
@@ -196,6 +215,9 @@ describe('dataset graphql', function() {
       id: data.name,
       groups: [],
       variables: null,
+      mountRoot: '',
+      homeSymlink: false,
+      launchGroupOnly: false,
       spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
@@ -212,6 +234,9 @@ describe('dataset graphql', function() {
       id: data.name,
       groups: [],
       variables: null,
+      mountRoot: '',
+      homeSymlink: false,
+      launchGroupOnly: false,
       spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
@@ -246,6 +271,9 @@ describe('dataset graphql', function() {
       id: data.name,
       url: null,
       groups: [],
+      mountRoot: '',
+      homeSymlink: false,
+      launchGroupOnly: false,
       spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
       ...data
     });
@@ -833,5 +861,73 @@ describe('dataset graphql', function() {
     });
     expect(secGroupRoles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
     expect(secGroupRoles.find(role => role.name === `ds:rw:${dataset.name}`)).to.be.not.ok;
+  });
+
+  it('should create with dataset options and update', async () => {
+    const data = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      displayName: faker.internet.userName(),
+      description: faker.lorem.sentence(),
+      global: true,
+      url: faker.internet.url(),
+      mountRoot: '/datasets',
+      launchGroupOnly: false
+    };
+
+    const createMutation = await this.graphqlRequest(`
+    mutation($data: DatasetCreateInput!){
+      createDataset (data: $data) { ${fields} }
+    }`, {
+      data
+    });
+
+    // query one
+    const queryOne = await this.graphqlRequest(`
+    query($where: DatasetWhereUniqueInput!){
+      dataset (where: $where) { ${fields} }
+    }`, {
+      where: {id: createMutation.createDataset.id}
+    });
+
+    expect(queryOne.dataset).to.deep.include(data);
+    expect(queryOne.dataset.homeSymlink).to.be.equal(false);
+
+    // check on k8s
+    const dataset = await this.crdClient.datasets.get(data.name);
+    expect(dataset.metadata.annotations[`${ATTRIBUTE_PREFIX}/mountRoot`]).to.be.equals(data.mountRoot);
+    expect(dataset.metadata.annotations[`${ATTRIBUTE_PREFIX}/homeSymlink`]).to.be.equals('false');
+    expect(
+      dataset.metadata.annotations[`${ATTRIBUTE_PREFIX}/launchGroupOnly`])
+      .to.be.equals(data.launchGroupOnly.toString());
+
+    // update
+    const updateData = {
+      launchGroupOnly: true
+    };
+    await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
+      updateDataset (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: createMutation.createDataset.id},
+      data: updateData
+    });
+
+    // query one
+    const queryOneAgain = await this.graphqlRequest(`
+    query($where: DatasetWhereUniqueInput!){
+      dataset (where: $where) { ${fields} }
+    }`, {
+      where: {id: createMutation.createDataset.id}
+    });
+
+    expect(queryOneAgain.dataset).to.deep.include({...data, ...updateData});
+
+    // check on k8s
+    const datasetAgain = await this.crdClient.datasets.get(data.name);
+    expect(datasetAgain.metadata.annotations[`${ATTRIBUTE_PREFIX}/mountRoot`]).to.be.equals(data.mountRoot);
+    expect(datasetAgain.metadata.annotations[`${ATTRIBUTE_PREFIX}/homeSymlink`]).to.be.equals('false');
+    expect(
+      datasetAgain.metadata.annotations[`${ATTRIBUTE_PREFIX}/launchGroupOnly`])
+      .to.be.equals(updateData.launchGroupOnly.toString());
   });
 });
