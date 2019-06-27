@@ -137,7 +137,7 @@ function NodeSelectors() {
     <json keyName="nodeSelector"
       packageName="../src/cms-components/customize-object-dynamic-field"
       customizeValidator={(data, cb) => {
-        return Object.keys(data).map((key, index) => {
+        return Object.keys(data || {}).map((key, index) => {
           const value = data[key];
           if (key.length < 3) {
             return cb(index, `key should NOT be shorter than 3 characters`);
