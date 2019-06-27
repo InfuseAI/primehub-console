@@ -14,6 +14,26 @@ type InstanceType {
   global: Boolean
   spec: JSON
   groups: [Group]
+  tolerations: [Toleration]!
+  nodeSelector: JSON
+}
+
+type Toleration {
+  operator: String!
+  key: String
+  value: String
+  effect: String
+}
+
+input TolerationInput {
+  operator: String!
+  key: String
+  value: String
+  effect: String
+}
+
+input TolerationArrayInput {
+  set: [TolerationInput]
 }
 
 """An edge in a connection."""
@@ -55,6 +75,8 @@ input InstanceTypeCreateInput {
   memoryRequest: Float
   global: Boolean
   groups: GroupCreateManyInput
+  tolerations: TolerationArrayInput
+  nodeSelector: JSON
 }
 
 input InstanceTypeUpdateInput {
@@ -68,4 +90,6 @@ input InstanceTypeUpdateInput {
   memoryRequest: Float
   global: Boolean
   groups: GroupUpdateManyInput
+  tolerations: TolerationArrayInput
+  nodeSelector: JSON
 }

@@ -1,12 +1,79 @@
 import { Context } from './interface';
 import { Item } from '../crdClient/customResource';
 import { InstanceTypeSpec } from '../crdClient/crdClientImpl';
-import { mutateRelation, parseMemory, stringifyMemory } from './utils';
+import { mutateRelation, parseMemory, stringifyMemory, mergeVariables } from './utils';
 import { Crd } from './crd';
-import { isUndefined, isNil } from 'lodash';
+import { isUndefined, isNil, values, isEmpty, get, omit, isArray } from 'lodash';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 import Boom from 'boom';
+import { ErrorCodes } from '../errorCodes';
 
+// utils
+const EffectNone = 'None';
+const EffectValues = ['NoSchedule', 'PreferNoSchedule', 'NoExecute', EffectNone];
+const OperatorValues = {Equal: 'Equal', Exists: 'Exists'};
+// tslint:disable-next-line:max-line-length
+const validateAndMapTolerations = (tolerations: Array<{operator: string, effect?: string, key?: string, value?: string}>, method: 'create' | 'update') => {
+  const emptyValue = method === 'create' ? undefined : null;
+
+  // if create method, empty tolerations return undefined
+  if (method === 'create' && isEmpty(tolerations)) {
+    // do nothing
+    return undefined;
+  }
+
+  // if update method and tolerations is empty array, means delete all
+  if (method === 'update' && isArray(tolerations) && isEmpty(tolerations)) {
+    return null;
+  }
+
+  // if update method and tolerations is undefined, return undefined
+  if (method === 'update' && isNil(tolerations)) {
+    return undefined;
+  }
+
+  return tolerations.map(toleration => {
+    const key = isEmpty(toleration.key) ? emptyValue : toleration.key;
+    const value = isEmpty(toleration.value) ? emptyValue : toleration.value;
+
+    if (!OperatorValues[toleration.operator]) {
+      throw Boom.badRequest(`operator should be one of [${values(OperatorValues)}], but got ${toleration.operator}`, {
+        code: ErrorCodes.REQUEST_BODY_INVALID
+      });
+    }
+
+    // If the operator is Exists, key optional & value should not be specified
+    if (toleration.operator === OperatorValues.Exists && value) {
+      throw Boom.badRequest('If the operator is Exists, value should not be specified', {
+        code: ErrorCodes.REQUEST_BODY_INVALID
+      });
+    }
+
+    // If the operator is Equal, key, value are required
+    if (toleration.operator === OperatorValues.Equal && (!key || !value)) {
+      throw Boom.badRequest('If the operator is Equal, key, value are required', {
+        code: ErrorCodes.REQUEST_BODY_INVALID
+      });
+    }
+
+    // validate and convert effect
+    if (EffectValues.indexOf(toleration.effect) < 0) {
+      throw Boom.badRequest(`effect should be one of [${EffectValues.join()}], but got ${toleration.effect}`, {
+        code: ErrorCodes.REQUEST_BODY_INVALID
+      });
+    }
+
+    const effect = (toleration.effect === EffectNone) ? emptyValue : toleration.effect;
+    return {
+      operator: toleration.operator,
+      effect,
+      key,
+      value
+    };
+  });
+};
+
+// graphql business logics
 export const mapping = (item: Item<InstanceTypeSpec>) => {
   return {
     id: item.metadata.name,
@@ -18,7 +85,15 @@ export const mapping = (item: Item<InstanceTypeSpec>) => {
     gpuLimit: item.spec['limits.nvidia.com/gpu'] || 0,
     memoryLimit: item.spec['limits.memory'] ? parseMemory(item.spec['limits.memory']) : null,
     memoryRequest: item.spec['requests.memory'] ? parseMemory(item.spec['requests.memory']) : null,
-    spec: item.spec
+    spec: item.spec,
+    tolerations: item.spec.tolerations ? item.spec.tolerations.map(toleration => {
+      return {
+        ...toleration,
+        // if it's null, return none
+        effect: toleration.effect ? toleration.effect : EffectNone
+      };
+    }) : [],
+    nodeSelector: item.spec.nodeSelector
   };
 };
 
@@ -58,6 +133,9 @@ export const createMapping = (data: any) => {
   expectInputNotNilAndLargerThanZero(data.cpuRequest, 'cpuRequest');
   expectInputNotNilAndLargerThanZero(data.memoryRequest, 'memoryRequest');
 
+  const tolerations = validateAndMapTolerations(get(data, 'tolerations.set'), 'create');
+  const nodeSelector = isEmpty(data.nodeSelector) ? undefined : data.nodeSelector;
+
   return {
     metadata: {
       name: data.name
@@ -69,7 +147,9 @@ export const createMapping = (data: any) => {
       'limits.memory': data.memoryLimit ? stringifyMemory(data.memoryLimit) : undefined,
       'limits.nvidia.com/gpu': data.gpuLimit,
       'requests.cpu': data.cpuRequest,
-      'requests.memory': data.memoryRequest ? stringifyMemory(data.memoryRequest) : undefined
+      'requests.memory': data.memoryRequest ? stringifyMemory(data.memoryRequest) : undefined,
+      tolerations,
+      nodeSelector
     }
   };
 };
@@ -79,6 +159,8 @@ export const updateMapping = (data: any) => {
   expectInputLargerThanZero(data.memoryLimit, 'memoryLimit');
   expectInputLargerThanZero(data.cpuRequest, 'cpuRequest');
   expectInputLargerThanZero(data.memoryRequest, 'memoryRequest');
+
+  const tolerations = validateAndMapTolerations(get(data, 'tolerations.set'), 'update');
 
   return {
     metadata: {
@@ -91,9 +173,29 @@ export const updateMapping = (data: any) => {
       'limits.memory': data.memoryLimit ? stringifyMemory(data.memoryLimit) : undefined,
       'limits.nvidia.com/gpu': data.gpuLimit,
       'requests.cpu': data.cpuRequest,
-      'requests.memory': data.memoryRequest ? stringifyMemory(data.memoryRequest) : undefined
+      'requests.memory': data.memoryRequest ? stringifyMemory(data.memoryRequest) : undefined,
+      'nodeSelector': data.nodeSelector,
+      tolerations,
     }
   };
+};
+
+export const customUpdate = async ({
+  name, metadata, spec, customResource, context, getPrefix, data
+}: {
+  name: string, metadata: any, spec: any, customResource: any, context: Context, getPrefix: () => string, data: any
+}) => {
+  // find original variables first
+  const row = await customResource.get(name);
+  const originalVariables = row.spec.nodeSelector || {};
+  const newVariables = spec.nodeSelector;
+  spec.nodeSelector = mergeVariables(originalVariables, newVariables);
+  const res = await customResource.patch(name, {
+    metadata: omit(metadata, 'name'),
+    spec
+  });
+
+  return res;
 };
 
 export const onCreate = async (
@@ -187,6 +289,7 @@ export const crd = new Crd<InstanceTypeSpec>({
   resourceName: 'instanceType',
   createMapping,
   updateMapping,
+  customUpdate,
   onCreate,
   onUpdate
 });

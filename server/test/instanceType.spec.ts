@@ -24,6 +24,13 @@ const fields = `
   memoryRequest
   global
   spec
+  tolerations {
+    operator
+    effect
+    key
+    value
+  }
+  nodeSelector
   groups {
     id
     name
@@ -93,6 +100,8 @@ describe('instanceType graphql', function() {
       name: data.name,
       displayName: data.name,
       description: null,
+      nodeSelector: null,
+      tolerations: [],
       gpuLimit: 0,
       global: false,
       spec: pickSpec({
@@ -116,6 +125,8 @@ describe('instanceType graphql', function() {
       name: data.name,
       displayName: data.name,
       description: null,
+      nodeSelector: null,
+      tolerations: [],
       gpuLimit: 0,
       global: false,
       spec: pickSpec({
@@ -399,6 +410,255 @@ describe('instanceType graphql', function() {
     });
 
     expect(queryOne.instanceType.global).to.be.equals(false);
+  });
+
+  it('should create with required fields and update with tolerations and nodeSelector', async () => {
+    const createMutation = await this.graphqlRequest(`
+    mutation($data: InstanceTypeCreateInput!){
+      createInstanceType (data: $data) { ${fields} }
+    }`, {
+      data: {
+        name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+        cpuLimit: 2.5,
+        cpuRequest: 2.5,
+        memoryLimit: 25,
+        memoryRequest: 20
+      }
+    });
+
+    // update
+    const instanceType = createMutation.createInstanceType;
+    const requestBody = {
+      tolerations: {
+        set: [{
+          operator: 'Exists',
+          effect: 'None'
+        }, {
+          operator: 'Exists',
+          effect: 'None',
+          key: 'key'
+        }]
+      },
+      nodeSelector: {
+        gpu: 'v100'
+      }
+    };
+    const mutation = await this.graphqlRequest(`
+    mutation($where: InstanceTypeWhereUniqueInput!, $data: InstanceTypeUpdateInput!){
+      updateInstanceType (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: instanceType.id},
+      data: requestBody
+    });
+
+    // query one
+    const queryOne = await this.graphqlRequest(`
+    query($where: InstanceTypeWhereUniqueInput!){
+      instanceType (where: $where) { ${fields} }
+    }`, {
+      where: {id: instanceType.id}
+    });
+
+    expect(queryOne.instanceType.nodeSelector).to.be.eql(requestBody.nodeSelector);
+    expect(queryOne.instanceType.tolerations[0]).to.include(requestBody.tolerations.set[0]);
+    expect(queryOne.instanceType.tolerations[1]).to.include(requestBody.tolerations.set[1]);
+  });
+
+  it('should create with tolerations and nodeSelector', async () => {
+    const requestBody = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      cpuLimit: 2.5,
+      cpuRequest: 2.5,
+      memoryLimit: 25,
+      memoryRequest: 20,
+      tolerations: {
+        set: [{
+          operator: 'Exists',
+          effect: 'None'
+        }, {
+          operator: 'Exists',
+          effect: 'None',
+          key: 'key'
+        }]
+      },
+      nodeSelector: {
+        gpu: 'v100',
+        cool: 123
+      }
+    };
+    const createMutation = await this.graphqlRequest(`
+    mutation($data: InstanceTypeCreateInput!){
+      createInstanceType (data: $data) { ${fields} }
+    }`, {
+      data: requestBody
+    });
+
+    // query one
+    const queryOne = await this.graphqlRequest(`
+    query($where: InstanceTypeWhereUniqueInput!){
+      instanceType (where: $where) { ${fields} }
+    }`, {
+      where: {id: createMutation.createInstanceType.id}
+    });
+
+    expect(queryOne.instanceType.nodeSelector).to.be.eql(requestBody.nodeSelector);
+    expect(queryOne.instanceType.tolerations[0]).to.include(requestBody.tolerations.set[0]);
+    expect(queryOne.instanceType.tolerations[1]).to.include(requestBody.tolerations.set[1]);
+  });
+
+  it('should create with tolerations and nodeSelector and update', async () => {
+    const requestBody = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      cpuLimit: 2.5,
+      cpuRequest: 2.5,
+      memoryLimit: 25,
+      memoryRequest: 20,
+      tolerations: {
+        set: [{
+          operator: 'Exists',
+          effect: 'None'
+        }, {
+          operator: 'Exists',
+          effect: 'None',
+          key: 'key'
+        }]
+      },
+      nodeSelector: {
+        gpu: 'v100',
+        cool: 123
+      }
+    };
+    const createMutation = await this.graphqlRequest(`
+    mutation($data: InstanceTypeCreateInput!){
+      createInstanceType (data: $data) { ${fields} }
+    }`, {
+      data: requestBody
+    });
+
+    // update
+    const delta = {
+      tolerations: {
+        set: [{
+          operator: 'Exists',
+          effect: 'None'
+        }, {
+          operator: 'Exists',
+          effect: 'None',
+          key: 'key'
+        }, {
+          effect: 'NoExecute',
+          operator: 'Exists'
+        }, {
+          effect: 'NoSchedule',
+          key: 'clkao',
+          operator: 'Equal',
+          value: 'handsomeBody'
+        }]
+      },
+      // null indicates remove all
+      nodeSelector: null
+    };
+
+    const mutation = await this.graphqlRequest(`
+    mutation($where: InstanceTypeWhereUniqueInput!, $data: InstanceTypeUpdateInput!){
+      updateInstanceType (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: createMutation.createInstanceType.id},
+      data: delta
+    });
+
+    // query one
+    const queryOne = await this.graphqlRequest(`
+    query($where: InstanceTypeWhereUniqueInput!){
+      instanceType (where: $where) { ${fields} }
+    }`, {
+      where: {id: createMutation.createInstanceType.id}
+    });
+
+    expect(queryOne.instanceType.nodeSelector).to.be.null;
+    queryOne.instanceType.tolerations.forEach((toleration, index) => {
+      expect(toleration).to.include(delta.tolerations.set[index]);
+    });
+
+    // update again
+    const deltaAgain = {
+      tolerations: {
+        set: [{
+          key: 'key',
+          operator: 'Exists',
+          effect: 'None'
+        }]
+      },
+      nodeSelector: {
+        key: 'value'
+      }
+    };
+    await this.graphqlRequest(`
+    mutation($where: InstanceTypeWhereUniqueInput!, $data: InstanceTypeUpdateInput!){
+      updateInstanceType (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: createMutation.createInstanceType.id},
+      data: deltaAgain
+    });
+
+    // query one
+    const queryOneAgain = await this.graphqlRequest(`
+    query($where: InstanceTypeWhereUniqueInput!){
+      instanceType (where: $where) { ${fields} }
+    }`, {
+      where: {id: createMutation.createInstanceType.id}
+    });
+
+    expect(queryOneAgain.instanceType.nodeSelector).to.be.eql(deltaAgain.nodeSelector);
+    queryOneAgain.instanceType.tolerations.forEach((toleration, index) => {
+      expect(toleration).to.include(deltaAgain.tolerations.set[index]);
+    });
+
+    // update again with different nodeSelector
+    const deltaNodeSelector = {
+      nodeSelector: {
+        key2: 'value2'
+      }
+    };
+    await this.graphqlRequest(`
+    mutation($where: InstanceTypeWhereUniqueInput!, $data: InstanceTypeUpdateInput!){
+      updateInstanceType (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: createMutation.createInstanceType.id},
+      data: deltaNodeSelector
+    });
+
+    // query one
+    const queryOneAgainSelector = await this.graphqlRequest(`
+    query($where: InstanceTypeWhereUniqueInput!){
+      instanceType (where: $where) { ${fields} }
+    }`, {
+      where: {id: createMutation.createInstanceType.id}
+    });
+
+    expect(queryOneAgainSelector.instanceType.nodeSelector).to.be.eql(deltaNodeSelector.nodeSelector);
+  });
+
+  it('should should throw due to invalid effect value (not being None)', async () => {
+    const requestBody = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      cpuLimit: 2.5,
+      cpuRequest: 2.5,
+      memoryLimit: 25,
+      memoryRequest: 20,
+      tolerations: {
+        set: [{
+          operator: 'Exists',
+        }]
+      }
+    };
+    const createMutation = await this.graphqlRequest(`
+    mutation($data: InstanceTypeCreateInput!){
+      createInstanceType (data: $data) { ${fields} }
+    }`, {
+      data: requestBody
+    });
+    expect(createMutation[0].extensions.code).to.be.equal('REQUEST_BODY_INVALID');
   });
 
   it('should delete instanceType', async () => {
