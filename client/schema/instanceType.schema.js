@@ -139,6 +139,12 @@ function NodeSelectors() {
       customizeValidator={(data, cb) => {
         return Object.keys(data).map((key, index) => {
           const value = data[key];
+          if (key.length < 3) {
+            return cb(index, `key should NOT be shorter than 3 characters`);
+          }
+          if (value.length < 3) {
+            return cb(index, `value should NOT be shorter than 3 characters`);
+          }
           if (key.length > 253) {
             return cb(index, `key should NOT be longer than 253 characters`);
           }
