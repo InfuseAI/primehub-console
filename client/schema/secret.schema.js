@@ -54,6 +54,7 @@ export default () => (
         title="${secret.type}"
         defaultValue="opaque"
         values={['opaque', 'kubernetes']}
+        packageName="../src/cms-components/customize-string-select"
         uiParams={{
           options: [{
             text: 'Opaque',
@@ -62,9 +63,10 @@ export default () => (
             text: 'kubernetes.io/dockerconfigjson',
             value: 'kubernetes'
           }],
-          style: {width: '400px'}
+          style: {
+            width: 250
+          }
         }}
-        style={{width: '400px'}}
       />
     </Condition>
     <Condition match={data => data.type === 'opaque'}>
