@@ -1,0 +1,13 @@
+{
+  "command": {
+    "bootstrap": {
+      "npmClientArgs": ["--ignore-engines"]
+    }
+  },
+  "packages": [
+    "packages/*"
+  ],
+  "npmClient": "yarn",
+  "version": "0.0.0",
+  "useWorkspaces": true
+}
