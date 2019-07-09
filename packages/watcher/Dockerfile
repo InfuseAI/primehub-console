@@ -10,9 +10,9 @@ COPY packages/watcher packages/watcher
 
 RUN npx lerna bootstrap --scope=@infuseai/watcher
 
-RUN cd packages/watcher \
+RUN cd packages/graphql-server \
   && npm run build:prod \
-  && cd ../graphql-server \
+  && cd ../watcher \
   && npm run build:prod
 
 RUN npx lerna bootstrap --scope=@infuseai/watcher -- --production
