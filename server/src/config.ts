@@ -1,4 +1,5 @@
 import { pickBy, isEmpty } from 'lodash';
+import { resolve } from 'path';
 
 export interface Config {
   env: string;
@@ -49,6 +50,10 @@ export interface Config {
 
   // system value
   defaultUserVolumeCapacity: string;
+
+  // user portal
+  enableUserPortal: boolean;
+  portalConfigPath: string;
 }
 
 const defaultConfigs = {
@@ -72,7 +77,9 @@ const defaultConfigs = {
   keycloakTimeout: 3000,
   apolloTracing: false,
   graphqlPlayground: true,
-  defaultUserVolumeCapacity: '20G'
+  defaultUserVolumeCapacity: '20G',
+  enableUserPortal: false,
+  portalConfigPath: resolve(__dirname, '../etc/portal-config.yaml')
 };
 
 const prodConfigs = {
@@ -114,7 +121,9 @@ export const createConfig = (): Config => {
     appPrefix: sanitizePath(process.env.APP_PREFIX),
     apolloTracing: process.env.APOLLO_TRACING,
     graphqlPlayground: process.env.GRAPHQL_PLAYGROUND,
-    defaultUserVolumeCapacity: process.env.DEFAULT_USER_VOLUME_CAPACITY
+    defaultUserVolumeCapacity: process.env.DEFAULT_USER_VOLUME_CAPACITY,
+    enableUserPortal: process.env.PRIMEHUB_FEATURE_USER_PORTAL,
+    portalConfigPath: process.env.PORTAL_CONFIG_PATH
   });
 
   const env = process.env.NODE_ENV || 'development';

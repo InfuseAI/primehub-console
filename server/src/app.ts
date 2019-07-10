@@ -26,6 +26,8 @@ import Agent, { HttpsAgent } from 'agentkeepalive';
 import { ErrorCodes } from './errorCodes';
 import basicAuth from 'basic-auth';
 import koaMount from 'koa-mount';
+import yaml from 'js-yaml';
+import fs from 'fs';
 
 // cache
 import {
@@ -153,7 +155,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     keycloakBaseUrl: config.keycloakOidcBaseUrl,
     oidcClient,
     grantType: config.keycloakGrantType,
-    appPrefix: config.appPrefix
+    appPrefix: config.appPrefix,
+    enableUserPortal: config.enableUserPortal,
   });
 
   const createKcAdminClient = () => new KcAdminClient({
@@ -403,8 +406,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
 
   // redirect
+  const home = config.enableUserPortal ? '/landing' : '/cms'; 
   rootRouter.get('/', async (ctx: Context) => {
-    return ctx.redirect(`${config.appPrefix || ''}/cms`);
+    return ctx.redirect(`${config.appPrefix || ''}${home}`);
   });
 
   // favicon
@@ -419,6 +423,25 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   // ctrl
   mountOidc(rootRouter, oidcCtrl);
   mountAnn(rootRouter, annCtrl);
+
+  // landing
+  if (config.enableUserPortal) {
+    // read portal config
+    const portalConfig = yaml.safeLoad(fs.readFileSync(config.portalConfigPath, 'utf8'));
+    rootRouter.get('/landing', oidcCtrl.loggedIn, async ctx => {
+      await ctx.render('landing', {
+        title: 'PrimeHub',
+        staticPath,
+        portal: JSON.stringify({
+          userProfileLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account`,
+          changePasswordLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account/password`,
+          logoutLink: config.appPrefix ? `${config.appPrefix}/oidc/logout` : '/oidc/logout',
+          services: portalConfig.services,
+          welcomeMessage: portalConfig.welcomeMessage
+        })
+      });
+    });
+  }
 
   // cms
   rootRouter.get('/cms', oidcCtrl.ensureAdmin, async ctx => {

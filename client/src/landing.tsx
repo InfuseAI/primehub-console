@@ -1,11 +1,12 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import {Layout, Menu, Row, Col, Card, Avatar} from 'antd';
+import {Layout, Menu, Row, Col, Card, Avatar, notification, Button} from 'antd';
 import styled from 'styled-components';
 // @ts-ignore
 import logo from 'images/primehub-logo.svg';
 // @ts-ignore
 import emptyBox from 'images/empty-box.svg';
+import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 
 const PAGE_PADDING = 64;
 const HEADER_HEIGHT = 64;
@@ -129,7 +130,7 @@ class Landing extends React.Component {
               </Section>
             )
           }
-          <Section title="Getting Started">
+          <Section>
             <div dangerouslySetInnerHTML={{ __html: welcomeMessage}} />
           </Section>
         </Content>
@@ -224,6 +225,52 @@ const ServiceCards = (props: CardsProps) => {
   )
 }
 
+/**
+ * Background worker
+ */
+function checkStatus(response) {
+  if (response.status >= 200 && response.status < 300) {
+    return response;
+  } else {
+    const error = new Error(response.statusText);
+    (error as any).response = response;
+    throw error;
+  }
+}
+
+function parseJSON(response) {
+  return response.json();
+}
+
+const tokenSyncWorker = new BackgroundTokenSyncer({
+  appPrefix: (window as any).APP_PREFIX,
+  refreshTokenExp: (window as any).refreshTokenExp,
+  getNewRefreshToken: () => {
+    return fetch(`${(window as any).APP_PREFIX}oidc/refresh-token`, {
+      method: 'POST'
+    })
+    .then(checkStatus)
+    .then(parseJSON);
+  },
+  reLoginNotify: ({loginUrl}) => {
+    // notify with fixed card
+    notification.warning({
+      message: 'Warning',
+      description: 'In less than 1 minute, you\'re going to be redirected to login page.',
+      placement: 'bottomRight',
+      duration: null,
+      btn: (
+        <Button type="primary" onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
+          Login Again
+        </Button>
+      ),
+      key: 'refreshWarning'
+    });
+  }
+})
+tokenSyncWorker.run().catch(console.error);
+
+// render
 ReactDOM.render(
   <Landing />
 , document.getElementById('root'));

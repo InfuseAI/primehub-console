@@ -33,6 +33,8 @@ Canner CMS
 * APOLLO_TRACING: (boolean) default: false
 * GRAPHQL_PLAYGROUND: (boolean) default: false
 * DEFAULT_USER_VOLUME_CAPACITY: (string) default: `20G`
+* PRIMEHUB_FEATURE_USER_PORTAL: (boolean) default: `false`
+* PORTAL_CONFIG_PATH: (string) default: `<project-dir>/server/etc/portal-config.yaml`
 
 ## Build
 ```sh
