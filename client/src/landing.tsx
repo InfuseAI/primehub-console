@@ -1,4 +1,5 @@
 import * as React from 'react';
+import ReactDOM from 'react-dom';
 import {Layout, Menu, Row, Col, Card, Avatar} from 'antd';
 import styled from 'styled-components';
 // @ts-ignore
@@ -61,7 +62,7 @@ const Empty = (props: {height: number, description?: string}) => (
   </Card>
 )
 
-export default class Landing extends React.Component {
+class Landing extends React.Component {
   onClickMenu = (item: any) => {
     const portal = (window as any).portal || {
       userProfileLink: '',
@@ -223,3 +224,6 @@ const ServiceCards = (props: CardsProps) => {
   )
 }
 
+ReactDOM.render(
+  <Landing />
+, document.getElementById('root'));
