@@ -73,7 +73,7 @@ export class OidcCtrl {
       const accessToken = new Token(ctx.cookies.get('accessToken', {signed: true}), this.clientId);
       const refreshToken = new Token(ctx.cookies.get('refreshToken', {signed: true}), this.clientId);
       if (!accessToken.hasRole(this.adminRole)) {
-        throw Boom.forbidden('require admin user', {code: ERRORS.FORCE_LOGIN});
+        throw Boom.forbidden('require admin user', {message: 'You have to be admin to view this page'});
       }
 
       // if refresh token expired
