@@ -11,7 +11,8 @@ const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
   entry: {
-    index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx']
+    index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
+    landing: './src/landing.tsx'
   },
   output: {
     path: path.join(__dirname, 'dist'),

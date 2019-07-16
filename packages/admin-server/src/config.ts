@@ -1,4 +1,5 @@
 import { pickBy, isEmpty } from 'lodash';
+import { resolve } from 'path';
 
 export interface Config {
   env: string;
@@ -27,6 +28,10 @@ export interface Config {
 
   // standalone graphql endpoint
   graphqlEndpoint: string;
+
+  // user portal
+  enableUserPortal: boolean;
+  portalConfigPath: string;
 }
 
 const defaultConfigs = {
@@ -42,7 +47,9 @@ const defaultConfigs = {
   keycloakMaxFreeSockets: 10,
   keycloakRetries: 0,
   keycloakTimeout: 3000,
-  graphqlEndpoint: 'http://localhost:3001/graphql'
+  graphqlEndpoint: 'http://localhost:3001/graphql',
+  enableUserPortal: false,
+  portalConfigPath: resolve(__dirname, '../etc/portal-config.yaml')
 };
 
 const prodConfigs = {
@@ -73,7 +80,9 @@ export const createConfig = (): Config => {
     keycloakRetries: process.env.KC_OIDC_RETRIES,
     keycloakTimeout: process.env.KC_OIDC_TIMEOUT ? parseInt(process.env.KC_OIDC_TIMEOUT, 10) : undefined,
     appPrefix: sanitizePath(process.env.APP_PREFIX),
-    graphqlEndpoint: process.env.GRAPHQL_ENDPOINT
+    graphqlEndpoint: process.env.GRAPHQL_ENDPOINT,
+    enableUserPortal: process.env.PRIMEHUB_FEATURE_USER_PORTAL,
+    portalConfigPath: process.env.PORTAL_CONFIG_PATH
   });
 
   const env = process.env.NODE_ENV || 'development';

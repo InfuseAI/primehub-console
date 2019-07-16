@@ -8,6 +8,8 @@ import morgan from 'koa-morgan';
 
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import koaMount from 'koa-mount';
+import yaml from 'js-yaml';
+import fs from 'fs';
 
 // controller
 import { OidcCtrl, mount as mountOidc } from './oidc';
@@ -56,7 +58,8 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     cmsHost: config.cmsHost,
     keycloakBaseUrl: config.keycloakOidcBaseUrl,
     oidcClient,
-    appPrefix: config.appPrefix
+    appPrefix: config.appPrefix,
+    enableUserPortal: config.enableUserPortal
   });
 
   // koa
@@ -118,8 +121,9 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   });
 
   // redirect
+  const home = config.enableUserPortal ? '/landing' : '/cms';
   rootRouter.get('/', async (ctx: any) => {
-    return ctx.redirect(`${config.appPrefix || ''}/cms`);
+    return ctx.redirect(`${config.appPrefix || ''}${home}`);
   });
 
   // favicon
@@ -133,6 +137,24 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
 
   // ctrl
   mountOidc(rootRouter, oidcCtrl);
+
+  if (config.enableUserPortal) {
+    // read portal config
+    const portalConfig = yaml.safeLoad(fs.readFileSync(config.portalConfigPath, 'utf8'));
+    rootRouter.get('/landing', oidcCtrl.loggedIn, async ctx => {
+      await ctx.render('landing', {
+        title: 'PrimeHub',
+        staticPath,
+        portal: JSON.stringify({
+          userProfileLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account`,
+          changePasswordLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account/password`,
+          logoutLink: config.appPrefix ? `${config.appPrefix}/oidc/logout` : '/oidc/logout',
+          services: portalConfig.services,
+          welcomeMessage: portalConfig.welcomeMessage
+        })
+      });
+    });
+  }
 
   // cms
   rootRouter.get('/cms', oidcCtrl.ensureAdmin, async ctx => {

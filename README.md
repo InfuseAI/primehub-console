@@ -43,6 +43,9 @@ Canner CMS
 * KC_MAX_FREE_SOCKETS: Maximum number of sockets (per host) to leave open in a free state. Default = 10
 * GRAPHQL_ENDPOINT: graphql endpoint, format: `http://localhost:3001/graphql`
 * APP_PREFIX: ex: `/admin`
+* PRIMEHUB_FEATURE_USER_PORTAL: (boolean) default: `false`
+* PORTAL_CONFIG_PATH: (string) default: `<project-dir>/server/etc/portal-config.yaml`
+
 
 ### watcher
 * KC_API_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. Ex: 'http://127.0.0.1:8080/auth'. For API usage.

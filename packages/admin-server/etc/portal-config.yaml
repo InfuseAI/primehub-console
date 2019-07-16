@@ -1,0 +1,12 @@
+services:
+  - name: JupyterHub
+    uri: "http://localhost:3000/cms"
+    image: ""
+  - name: GitLab
+    uri: "https://gitlab.com"
+  - name: Maintenance Notebook
+    uri: "/maintenance"
+    adminOnly: true
+welcomeMessage: >
+  <h2>Getting Started</h2>
+  <div> Lorem blabla </div>
