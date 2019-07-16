@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "target": "es5",
+    "jsx": "react",
+    "paths": {
+      "utils/*": ["./src/utils/*"],
+      "images/*": ["./src/images/*"],
+      "components/*": ["./src/components/*"],
+      "styledShare/*": ["./src/styled_share/*"]
+    }
+  },
+  "exclude": ["dist", "build", "node_modules"]
+}

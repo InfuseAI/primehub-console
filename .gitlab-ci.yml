@@ -6,7 +6,6 @@ services:
 variables:
   REGISTRY: registry.gitlab.com
   REPOSITORY: "${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
-  IMAGE: admin-ui
 
 stages:
   - test
@@ -78,16 +77,20 @@ test:
       done
 
     # install and run test
-    - cd server && yarn install --ignore-engines && KC_MAX_SOCKETS=30 KC_API_BASEURL=http://keycloak.local:8080/auth KC_OIDC_BASEURL=http://keycloak.local:8080/auth npm run test
-    - cd ../client && yarn && npm run build
-    - cd ../server && KC_OIDC_TIMEOUT=6000 KC_MAX_SOCKETS=30 KC_API_BASEURL=http://keycloak.local:8080/auth KC_OIDC_BASEURL=http://keycloak.local:8080/auth npm run test:e2e
+    - npx lerna bootstrap
+    - cd packages/graphql-server && KC_MAX_SOCKETS=30 KC_API_BASEURL=http://keycloak.local:8080/auth KC_OIDC_BASEURL=http://keycloak.local:8080/auth npm run test
+    # - cd ../client && yarn && npm run build
+    # - cd ../server && KC_OIDC_TIMEOUT=6000 KC_MAX_SOCKETS=30 KC_API_BASEURL=http://keycloak.local:8080/auth KC_OIDC_BASEURL=http://keycloak.local:8080/auth npm run test:e2e
   after_script:
     - date
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
-      - server/node_modules/
-      - client/node_modules/
+      - node_modules/
+      - packages/admin-server/node_modules/
+      - packages/client/node_modules/
+      - packages/graphql-server/node_modules/
+      - packages/watcher/node_modules/
 
 
 build:
@@ -95,9 +98,12 @@ build:
   script:
     - echo "${DOCKER_DRIVER}"
     - docker login -u gitlab-ci-token -p "${CI_BUILD_TOKEN}" "${REGISTRY}"
-    - docker pull "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_BEFORE_SHA:0:7}" || true
-    - docker build -t "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_SHA:0:7}" .
-    - docker push "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_SHA:0:7}"
+    - docker build -t "${REGISTRY}/${REPOSITORY}/admin-server:${CI_COMMIT_SHA:0:7}" -f packages/admin-server/Dockerfile .
+    - docker push "${REGISTRY}/${REPOSITORY}/admin-server:${CI_COMMIT_SHA:0:7}"
+    - docker build -t "${REGISTRY}/${REPOSITORY}/graphql-server:${CI_COMMIT_SHA:0:7}" -f packages/graphql-server/Dockerfile .
+    - docker push "${REGISTRY}/${REPOSITORY}/graphql-server:${CI_COMMIT_SHA:0:7}"
+    - docker build -t "${REGISTRY}/${REPOSITORY}/watcher:${CI_COMMIT_SHA:0:7}" -f packages/watcher/Dockerfile .
+    - docker push "${REGISTRY}/${REPOSITORY}/watcher:${CI_COMMIT_SHA:0:7}"
   only:
     - master
 
@@ -106,8 +112,11 @@ release:tag:
   script:
     - echo "${DOCKER_DRIVER}"
     - docker login -u gitlab-ci-token -p "${CI_BUILD_TOKEN}" "${REGISTRY}"
-    - docker pull "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_SHA:0:7}" || true
-    - docker build -t "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_TAG}" .
-    - docker push "${REGISTRY}/${REPOSITORY}/${IMAGE}:${CI_COMMIT_TAG}"
+    - docker build -t "${REGISTRY}/${REPOSITORY}/admin-server:${CI_COMMIT_SHA:0:7}" -f packages/admin-server/Dockerfile .
+    - docker push "${REGISTRY}/${REPOSITORY}/admin-server:${CI_COMMIT_SHA:0:7}"
+    - docker build -t "${REGISTRY}/${REPOSITORY}/graphql-server:${CI_COMMIT_SHA:0:7}" -f packages/graphql-server/Dockerfile .
+    - docker push "${REGISTRY}/${REPOSITORY}/graphql-server:${CI_COMMIT_SHA:0:7}"
+    - docker build -t "${REGISTRY}/${REPOSITORY}/watcher:${CI_COMMIT_SHA:0:7}" -f packages/watcher/Dockerfile .
+    - docker push "${REGISTRY}/${REPOSITORY}/watcher:${CI_COMMIT_SHA:0:7}"
   only:
     - tags

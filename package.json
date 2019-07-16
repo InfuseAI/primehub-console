@@ -1,0 +1,23 @@
+{
+  "workspaces": [
+    "packages/*"
+  ],
+  "name": "@infuseai/admin",
+  "version": "1.0.0",
+  "description": "Graphql API and hosting cms pages",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Canner/infuseai-canner.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Canner/infuseai-canner/issues"
+  },
+  "homepage": "https://github.com/Canner/infuseai-canner#readme",
+  "devDependencies": {
+    "lerna": "^3.15.0"
+  },
+  "private": true
+}
