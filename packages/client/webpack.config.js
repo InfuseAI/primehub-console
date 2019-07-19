@@ -25,7 +25,12 @@ module.exports = {
   devServer: {
     port: "8090",
     contentBase: path.join(__dirname, 'dist'),
-    historyApiFallback: true,
+    historyApiFallback: {
+      rewrites: [
+        { from: /^landing$/, to: '/landing.html' },
+        { from: /./, to: '/index.html' }
+      ]
+    },
     https: true
   },
   module: {
@@ -78,7 +83,14 @@ module.exports = {
   },
   plugins: [
     new HtmlWebPackPlugin({
-      template: 'docs/index.html'
+      chunks: ['index'],
+      template: 'docs/index.html',
+      filename: 'index.html'
+    }),
+    new HtmlWebPackPlugin({
+      chunks: ['landing'],
+      template: 'docs/index.html',
+      filename: 'landing.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new MiniCssExtractPlugin({
