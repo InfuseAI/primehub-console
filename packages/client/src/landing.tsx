@@ -192,7 +192,8 @@ const ServiceCard = (props: CardProps) => {
       style={{
         fontWeight: 'normal',
         textAlign: 'center',
-        marginTop: 16,
+        marginTop: 8,
+        marginBottom: 20,
         letterSpacing: 1,
         color: '#6a6a6a'
       }}
