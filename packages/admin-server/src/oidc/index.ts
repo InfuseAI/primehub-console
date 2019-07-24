@@ -28,6 +28,7 @@ export class OidcCtrl {
   private adminRole: string;
   private appPrefix?: string;
   private defaultReturnPath: string;
+  private enableUserPortal: boolean;
 
   constructor({
     realm,
@@ -35,14 +36,16 @@ export class OidcCtrl {
     cmsHost,
     keycloakBaseUrl,
     oidcClient,
-    appPrefix
+    appPrefix,
+    enableUserPortal
   }: {
     realm: string,
     clientId: string,
     cmsHost: string,
     keycloakBaseUrl: string,
     oidcClient: any,
-    appPrefix?: string
+    appPrefix?: string,
+    enableUserPortal: boolean,
   }) {
     this.clientId = clientId;
     this.cmsHost = cmsHost;
@@ -50,9 +53,15 @@ export class OidcCtrl {
     this.keycloakBaseUrl = keycloakBaseUrl;
     this.oidcClient = oidcClient;
     this.redirectUri = `${this.cmsHost}${appPrefix || ''}${CALLBACK_PATH}`;
-    this.defaultReturnPath = appPrefix ? `${appPrefix}/cms` : '/cms';
     this.adminRole = (this.realm === 'master') ? 'realm:admin' : 'realm-management:realm-admin';
     this.appPrefix = appPrefix;
+    this.enableUserPortal = enableUserPortal;
+
+    // build default return path
+    const returnPath = enableUserPortal ? '/landing' : '/cms';
+    this.defaultReturnPath = appPrefix ?
+      `${appPrefix}${returnPath}` :
+      returnPath;
   }
 
   public ensureAdmin = async (ctx: Context, next: any) => {
@@ -64,7 +73,7 @@ export class OidcCtrl {
       const accessToken = new Token(ctx.cookies.get('accessToken', {signed: true}), this.clientId);
       const refreshToken = new Token(ctx.cookies.get('refreshToken', {signed: true}), this.clientId);
       if (!accessToken.hasRole(this.adminRole)) {
-        throw Boom.forbidden('require admin user', {code: ERRORS.FORCE_LOGIN});
+        throw Boom.forbidden('require admin user', {message: 'You have to be admin to view this page'});
       }
 
       // if refresh token expired
@@ -91,6 +100,59 @@ export class OidcCtrl {
       ctx.state.refreshTokenExp = refreshTokenExp;
       ctx.state.username = ctx.cookies.get('username');
       ctx.state.thumbnail = ctx.cookies.get('thumbnail');
+      return next();
+    } catch (err) {
+      // redirect to keycloak
+      if (err.data && err.data.code === ERRORS.FORCE_LOGIN) {
+        logger.warn({
+          component: logger.components.authentication,
+          type: 'FORCE_LOGIN',
+          url: ctx.url
+        });
+
+        // require to login
+        const nonce = this.saveNonceSecret(ctx);
+        const backUrl = this.buildBackUrl(ctx.href);
+        const loginUrl = this.getLoginUrl(nonce, backUrl);
+        return ctx.redirect(loginUrl);
+      }
+      throw err;
+    }
+  }
+
+  public loggedIn = async (ctx: Context, next: any) => {
+    try {
+      if (!ctx.cookies.get('accessToken') || !ctx.cookies.get('refreshToken')) {
+        throw Boom.forbidden('require token', {code: ERRORS.FORCE_LOGIN});
+      }
+      const accessToken = new Token(ctx.cookies.get('accessToken', {signed: true}), this.clientId);
+      const refreshToken = new Token(ctx.cookies.get('refreshToken', {signed: true}), this.clientId);
+
+      // if refresh token expired
+      if (refreshToken.isExpired()) {
+        throw Boom.forbidden('refresh token expired', {code: ERRORS.FORCE_LOGIN});
+      }
+
+      let accessTokenExp = parseInt(accessToken.getContent().exp, 10);
+      let refreshTokenExp = parseInt(refreshToken.getContent().exp, 10);
+
+      // get new access token if it's going to expire in 5 sec, or already expired
+      if (accessToken.isExpiredIn(5000)) {
+        const tokenSet = await this.oidcClient.refresh(refreshToken);
+        ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true});
+        ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true});
+        accessTokenExp = parseInt(new Token(tokenSet.access_token, this.clientId).getContent().exp, 10);
+        refreshTokenExp = parseInt(new Token(tokenSet.refresh_token, this.clientId).getContent().exp, 10);
+
+        // notify frontend to change token in localstorage
+        ctx.state.newAccessToken = tokenSet.access_token;
+      }
+
+      ctx.state.accessTokenExp = accessTokenExp;
+      ctx.state.refreshTokenExp = refreshTokenExp;
+      ctx.state.username = ctx.cookies.get('username');
+      ctx.state.thumbnail = ctx.cookies.get('thumbnail');
+      ctx.state.isUserAdmin = accessToken.hasRole(this.adminRole);
       return next();
     } catch (err) {
       // redirect to keycloak
@@ -203,9 +265,6 @@ export class OidcCtrl {
     const nonce = this.createNonceFromSecret(ctx);
     const tokenSet = await this.oidcClient.authorizationCallback(redirectUri, query, {nonce});
     const accessToken = new Token(tokenSet.access_token, this.clientId);
-    if (!accessToken.hasRole(this.adminRole)) {
-      throw Boom.forbidden('only admin can access admin-ui');
-    }
 
     // redirect to frontend
     ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true});
