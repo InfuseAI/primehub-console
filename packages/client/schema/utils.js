@@ -180,7 +180,11 @@ exports.dict = {
     gpuLimit: 'GPU Limit',
     cpuRequest: 'CPU Request',
     memoryRequest: 'Memory Request',
-
+    'instanceType.request.text.title': 'Overcommitting (advanced feature)',
+    'instanceType.request.text.description': `
+      If you want to overcommit computing resources, you can use this feature. 
+      <a href="">More Info</a>
+    `,
     // dataset
     dataset: 'Datasets',
     description: 'Description',
@@ -362,7 +366,11 @@ exports.dict = {
     gpuLimit: 'GPU Limit',
     cpuRequest: 'CPU Request',
     memoryRequest: 'Memory Request',
-
+    'instanceType.request.text.title': 'Overcommitting (advanced feature)',
+    'instanceType.request.text.description': `
+      If you want to overcommit computing resources, you can use this feature. 
+      <a href="">More Info</a>
+    `,
     // dataset
     dataset: 'Dataset',
     description: 'Description',
