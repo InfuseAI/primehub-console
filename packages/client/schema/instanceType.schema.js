@@ -112,14 +112,14 @@ export default () => (
           component={TextBlock}
         >
           <number keyName="cpuRequest" title="${cpuRequest}"
-            uiParams={{unit: ' GB', step: 0.5, min: 0.5, precision: 1, parser: parseToStepDot5, disableText: 'use default value'}}
-            defaultValue={() => 1}
+            uiParams={{unit: ' GB', step: 0.5, min: 0.5, precision: 1, parser: parseToStepDot5, disableText: ' '}}
+            defaultValue={() => null}
             packageName="../src/cms-components/customize-number-checkbox"
             nullable
           />
           <number keyName="memoryRequest" title="${memoryRequest}"
-            uiParams={{unit: ' GB', step: 1, min: 1, precision: 1, disableText: 'use default value'}}
-            defaultValue={() => 1.0}
+            uiParams={{unit: ' GB', step: 1, min: 1, precision: 1, disableText: ' '}}
+            defaultValue={() => null}
             packageName="../src/cms-components/customize-number-checkbox"
             nullable
           />

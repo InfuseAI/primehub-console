@@ -7,6 +7,7 @@ import { isUndefined, isNil, values, isEmpty, get, omit, isArray } from 'lodash'
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 import Boom from 'boom';
 import { ErrorCodes } from '../errorCodes';
+import { isNull } from 'util';
 
 // utils
 const EffectNone = 'None';
@@ -73,6 +74,14 @@ const validateAndMapTolerations = (tolerations: Array<{operator: string, effect?
   });
 };
 
+const requestFieldTransform = (value: any, parseFunction?: (v: any) => any) => {
+  if (isNil(value)) {
+    return null;
+  }
+
+  return parseFunction ? parseFunction(value) : value;
+};
+
 // graphql business logics
 export const mapping = (item: Item<InstanceTypeSpec>) => {
   return {
@@ -81,10 +90,12 @@ export const mapping = (item: Item<InstanceTypeSpec>) => {
     description: item.spec.description,
     displayName: item.spec.displayName || item.metadata.name,
     cpuLimit: item.spec['limits.cpu'] || 0,
-    cpuRequest: item.spec['requests.cpu'] || 0,
     gpuLimit: item.spec['limits.nvidia.com/gpu'] || 0,
     memoryLimit: item.spec['limits.memory'] ? parseMemory(item.spec['limits.memory']) : null,
-    memoryRequest: item.spec['requests.memory'] ? parseMemory(item.spec['requests.memory']) : null,
+
+    // request attributes and be null (disabled field), or number
+    cpuRequest: requestFieldTransform(item.spec['requests.cpu']),
+    memoryRequest: requestFieldTransform(item.spec['requests.memory'], parseMemory),
     spec: item.spec,
     tolerations: item.spec.tolerations ? item.spec.tolerations.map(toleration => {
       return {
@@ -130,11 +141,13 @@ export const createMapping = (data: any) => {
   // validate the request / limit for cpu and memory should always > 0
   expectInputNotNilAndLargerThanZero(data.cpuLimit, 'cpuLimit');
   expectInputNotNilAndLargerThanZero(data.memoryLimit, 'memoryLimit');
-  expectInputNotNilAndLargerThanZero(data.cpuRequest, 'cpuRequest');
-  expectInputNotNilAndLargerThanZero(data.memoryRequest, 'memoryRequest');
 
   const tolerations = validateAndMapTolerations(get(data, 'tolerations.set'), 'create');
   const nodeSelector = isEmpty(data.nodeSelector) ? undefined : data.nodeSelector;
+
+  // request parameters should be assigned with limit parameters if not defined
+  const cpuRequest = get(data, 'cpuRequest', data.cpuLimit);
+  const memoryRequest = get(data, 'memoryRequest', data.memoryLimit);
 
   return {
     metadata: {
@@ -146,19 +159,28 @@ export const createMapping = (data: any) => {
       'limits.cpu': data.cpuLimit,
       'limits.memory': data.memoryLimit ? stringifyMemory(data.memoryLimit) : undefined,
       'limits.nvidia.com/gpu': data.gpuLimit,
-      'requests.cpu': data.cpuRequest,
-      'requests.memory': data.memoryRequest ? stringifyMemory(data.memoryRequest) : undefined,
+      'requests.cpu': cpuRequest,
+      'requests.memory': stringifyMemory(memoryRequest),
       tolerations,
       nodeSelector
     }
   };
 };
 
+// Note: for cpuRequest and memoryRequest fields,
+// assign them to null means disable them
+// undefined means value not change
+const parseRequestField = (value: any, parseFunction: (v: any) => any) => {
+  if (isNull(value) || isUndefined(value)) {
+    return value;
+  }
+
+  return parseFunction(value);
+};
+
 export const updateMapping = (data: any) => {
   expectInputLargerThanZero(data.cpuLimit, 'cpuLimit');
   expectInputLargerThanZero(data.memoryLimit, 'memoryLimit');
-  expectInputLargerThanZero(data.cpuRequest, 'cpuRequest');
-  expectInputLargerThanZero(data.memoryRequest, 'memoryRequest');
 
   const tolerations = validateAndMapTolerations(get(data, 'tolerations.set'), 'update');
 
@@ -173,7 +195,7 @@ export const updateMapping = (data: any) => {
       'limits.memory': data.memoryLimit ? stringifyMemory(data.memoryLimit) : undefined,
       'limits.nvidia.com/gpu': data.gpuLimit,
       'requests.cpu': data.cpuRequest,
-      'requests.memory': data.memoryRequest ? stringifyMemory(data.memoryRequest) : undefined,
+      'requests.memory': parseRequestField(data.memoryRequest, stringifyMemory),
       'nodeSelector': data.nodeSelector,
       tolerations,
     }
