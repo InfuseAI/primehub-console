@@ -175,19 +175,20 @@ const Section = (props: SectionProps) => {
 const ServiceCard = (props: CardProps) => {
   const {service, imageHeight} = props;
   return (<>
-    <Card
-      onClick={() => (window as any).location.href = service.uri}
-      hoverable
-    >
-      <div style={{
-        cursor: 'pointer',
-        backgroundImage: `url(${service.image})`,
-        backgroundSize: 'contain',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        height: imageHeight
-      }} />
-    </Card>
+    <a href={service.uri}>
+      <Card
+        hoverable
+      >
+        <div style={{
+          cursor: 'pointer',
+          backgroundImage: `url(${service.image})`,
+          backgroundSize: 'contain',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          height: imageHeight
+        }} />
+      </Card>
+    </a>
     <h3
       style={{
         fontWeight: 'normal',
