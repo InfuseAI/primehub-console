@@ -1,8 +1,9 @@
 /** @jsx builder */
-import builder, {Condition} from 'canner-script';
+import builder, {Condition, Layout} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 import {Tag} from 'antd';
 import {GroupRelation, CustomizedStringImagePullSecret} from './utils.schema';
+import DisableModeLayout from '../src/cms-layouts/disableMode';
 
 export default () => (
   <array keyName="image"
@@ -55,25 +56,27 @@ export default () => (
       />
       <pagination />
     </toolbar>
-    <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
-      <string keyName="name" title="${name}"
-        validation={{
-          validator: (value, cb) => {
-            if (!value.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/)) {
-              return cb(`lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`);
+    <Layout component={DisableModeLayout}>
+      <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
+        <string keyName="name" title="${name}"
+          validation={{
+            validator: (value, cb) => {
+              if (!value.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/)) {
+                return cb(`lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`);
+              }
             }
-          }
-        }}
-        required
-      />
-    </Condition>
-    <string keyName="displayName" title="${displayName}" />
-    <string keyName="description" title="${description}" />
-    <string keyName="url" title="${imageUrl}"/>
-    <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${images.useImagePullSecret}" />
-    <boolean keyName="global" title="${global}" />
-    <Condition match={data => !data.global}>
-      <GroupRelation />
-    </Condition>
+          }}
+          required
+        />
+      </Condition>
+      <string keyName="displayName" title="${displayName}" />
+      <string keyName="description" title="${description}" />
+      <string keyName="url" title="${imageUrl}"/>
+      <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${images.useImagePullSecret}" />
+      <boolean keyName="global" title="${global}" />
+      <Condition match={data => !data.global}>
+        <GroupRelation />
+      </Condition>
+    </Layout>
   </array>
 )
