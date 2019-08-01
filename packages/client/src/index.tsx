@@ -69,7 +69,6 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
   }
 })
 tokenSyncWorker.run().catch(console.error);
-
 /**
  * UI
  */

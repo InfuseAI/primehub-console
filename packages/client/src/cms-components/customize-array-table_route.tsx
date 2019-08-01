@@ -167,7 +167,7 @@ export default class ArrayBreadcrumb extends Component<Props> {
         render: (text, record) => {
           return (
             <ButtonGroup>
-              <Button icon="edit"
+              <Button icon={disabled === true ? "eye" : "edit"}
                 data-testid="edit-button"
                 onClick={() => this.edit(record.id)}
               />
