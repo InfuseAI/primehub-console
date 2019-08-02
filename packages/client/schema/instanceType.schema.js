@@ -5,6 +5,7 @@ import {parseToStepDot5} from './utils';
 import {Tag} from 'antd';
 import {GroupRelation} from './utils.schema';
 import TolerationLayout from '../src/cms-layouts/toleration';
+import TextBlock from '../src/cms-layouts/text-block';
 
 export default () => (
   <array keyName="instanceType"
@@ -105,18 +106,24 @@ export default () => (
         <number keyName="gpuLimit" title="${gpuLimit}" uiParams={{min: 0, precision: 0, step: 1}}
           packageName="../src/cms-components/customize-number-precision"
         />
-        <number keyName="cpuRequest" title="${cpuRequest}"
-          uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
-          defaultValue={1}
-          required
-          packageName="../src/cms-components/customize-number-precision"
-        />
-        <number keyName="memoryRequest" title="${memoryRequest}"
-          uiParams={{unit: ' GB', step: 1, min: 0.1, precision: 1}}
-          defaultValue={1.0}
-          required
-          packageName="../src/cms-components/customize-number-precision"
-        />
+        <Default keyName="requestWithText"
+          title="${instanceType.request.text.title}"
+          description="${instanceType.request.text.description}"
+          component={TextBlock}
+        >
+          <number keyName="cpuRequest" title="${cpuRequest}"
+            uiParams={{unit: ' GB', step: 0.5, min: 0.5, precision: 1, parser: parseToStepDot5, disableText: ' '}}
+            defaultValue={() => null}
+            packageName="../src/cms-components/customize-number-checkbox"
+            nullable
+          />
+          <number keyName="memoryRequest" title="${memoryRequest}"
+            uiParams={{unit: ' GB', step: 1, min: 1, precision: 1, disableText: ' '}}
+            defaultValue={() => null}
+            packageName="../src/cms-components/customize-number-checkbox"
+            nullable
+          />
+        </Default>
         <boolean keyName="global" title="${global}" />
         <Condition match={data => !data.global}>
           <GroupRelation />

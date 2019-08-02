@@ -126,6 +126,9 @@ exports.parseToStepDot5 = function(value) {
     return `${1 + Number(int)}.0`;
   }
 }
+
+const instanceTypeLink = "https://infuseai.zendesk.com/hc/en-us/articles/360027959911-Instance-Type-Management";
+
 exports.dict = {
   en: {
     // common
@@ -180,7 +183,11 @@ exports.dict = {
     gpuLimit: 'GPU Limit',
     cpuRequest: 'CPU Request',
     memoryRequest: 'Memory Request',
-
+    'instanceType.request.text.title': 'Overcommitting (advanced feature)',
+    'instanceType.request.text.description': `
+      If you want to overcommit computing resources, you can use this feature. 
+      <a href="${instanceTypeLink}">More Info</a>
+    `,
     // dataset
     dataset: 'Datasets',
     description: 'Description',
@@ -362,7 +369,11 @@ exports.dict = {
     gpuLimit: 'GPU Limit',
     cpuRequest: 'CPU Request',
     memoryRequest: 'Memory Request',
-
+    'instanceType.request.text.title': 'Overcommitting (advanced feature)',
+    'instanceType.request.text.description': `
+      If you want to overcommit computing resources, you can use this feature. 
+      <a href="${instanceTypeLink}">More Info</a>
+    `,
     // dataset
     dataset: 'Dataset',
     description: 'Description',

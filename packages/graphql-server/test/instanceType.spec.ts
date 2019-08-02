@@ -83,9 +83,7 @@ describe('instanceType graphql', function() {
     const data = {
       name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
       cpuLimit: 2,
-      memoryLimit: 2,
-      cpuRequest: 2,
-      memoryRequest: 2
+      memoryLimit: 2
     };
     const mutation = await this.graphqlRequest(`
     mutation($data: InstanceTypeCreateInput!){
@@ -100,13 +98,19 @@ describe('instanceType graphql', function() {
       name: data.name,
       displayName: data.name,
       description: null,
+      // request fields would be the same with limits fields
+      cpuRequest: 2,
+      memoryRequest: 2,
       nodeSelector: null,
       tolerations: [],
       gpuLimit: 0,
       global: false,
       spec: pickSpec({
         ...data,
-        displayName: data.name
+        displayName: data.name,
+        // request fields would be the same with limits fields
+        cpuRequest: 2,
+        memoryRequest: 2,
       }),
       groups: [],
     });
@@ -125,6 +129,9 @@ describe('instanceType graphql', function() {
       name: data.name,
       displayName: data.name,
       description: null,
+      // request fields would be the same with limits fields
+      cpuRequest: 2,
+      memoryRequest: 2,
       nodeSelector: null,
       tolerations: [],
       gpuLimit: 0,
@@ -132,6 +139,9 @@ describe('instanceType graphql', function() {
       spec: pickSpec({
         ...data,
         displayName: data.name,
+        // request fields would be the same with limits fields
+        cpuRequest: 2,
+        memoryRequest: 2,
       }),
       groups: []
     });
@@ -678,5 +688,155 @@ describe('instanceType graphql', function() {
     });
 
     expect(data.instanceType).to.be.null;
+  });
+
+  it('should create with request fields and update with null', async () => {
+    const createdData = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      displayName: faker.internet.userName(),
+      description: faker.lorem.sentence(),
+      cpuLimit: 2.5,
+      cpuRequest: 2.5,
+      gpuLimit: 2,
+      memoryLimit: 25,
+      memoryRequest: 20
+    };
+    const createMutation = await this.graphqlRequest(`
+    mutation($data: InstanceTypeCreateInput!){
+      createInstanceType (data: $data) { ${fields} }
+    }`, {
+      data: createdData
+    });
+
+    // update
+    const instanceType = createMutation.createInstanceType;
+    const updatedData = {
+      memoryRequest: null,
+      cpuRequest: null
+    };
+    const mutation = await this.graphqlRequest(`
+    mutation($where: InstanceTypeWhereUniqueInput!, $data: InstanceTypeUpdateInput!){
+      updateInstanceType (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: instanceType.id},
+      data: updatedData
+    });
+    const expectedData = {...createdData, ...updatedData};
+    expect(mutation.updateInstanceType).to.deep.include(expectedData);
+
+    // query one
+    const queryOne = await this.graphqlRequest(`
+    query($where: InstanceTypeWhereUniqueInput!){
+      instanceType (where: $where) { ${fields} }
+    }`, {
+      where: {id: instanceType.id}
+    });
+
+    expect(queryOne.instanceType).to.deep.include(expectedData);
+    // check in k8s
+    const instance = await this.crdClient.instanceTypes.get(instanceType.id);
+    expect(instance.spec['limits.memory']).to.be.equals('25G');
+    expect(instance.spec['requests.memory']).to.be.undefined;
+    expect(instance.spec['limits.cpu']).to.be.equals(2.5);
+    expect(instance.spec['requests.cpu']).to.be.undefined;
+  });
+
+  it('should create with request fields without values and update with value', async () => {
+    const createdData = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      displayName: faker.internet.userName(),
+      description: faker.lorem.sentence(),
+      cpuLimit: 2.5,
+      gpuLimit: 2,
+      memoryLimit: 25,
+    };
+    const createMutation = await this.graphqlRequest(`
+    mutation($data: InstanceTypeCreateInput!){
+      createInstanceType (data: $data) { ${fields} }
+    }`, {
+      data: createdData
+    });
+
+    // update
+    const instanceType = createMutation.createInstanceType;
+    const updatedData = {
+      memoryRequest: 20,
+      cpuRequest: 2.5
+    };
+    const mutation = await this.graphqlRequest(`
+    mutation($where: InstanceTypeWhereUniqueInput!, $data: InstanceTypeUpdateInput!){
+      updateInstanceType (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: instanceType.id},
+      data: updatedData
+    });
+    const expectedData = {...createdData, ...updatedData};
+    expect(mutation.updateInstanceType).to.deep.include(expectedData);
+
+    // query one
+    const queryOne = await this.graphqlRequest(`
+    query($where: InstanceTypeWhereUniqueInput!){
+      instanceType (where: $where) { ${fields} }
+    }`, {
+      where: {id: instanceType.id}
+    });
+
+    expect(queryOne.instanceType).to.deep.include(expectedData);
+    // check in k8s
+    const instance = await this.crdClient.instanceTypes.get(instanceType.id);
+    expect(instance.spec['limits.memory']).to.be.equals('25G');
+    expect(instance.spec['requests.memory']).to.be.equals('20G');
+    expect(instance.spec['limits.cpu']).to.be.equals(2.5);
+    expect(instance.spec['requests.cpu']).to.be.equals(2.5);
+  });
+
+  it('should create with request fields and update without change', async () => {
+    const createdData = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      displayName: faker.internet.userName(),
+      description: faker.lorem.sentence(),
+      cpuLimit: 2.5,
+      cpuRequest: 2.5,
+      gpuLimit: 2,
+      memoryLimit: 25,
+      memoryRequest: 20
+    };
+    const createMutation = await this.graphqlRequest(`
+    mutation($data: InstanceTypeCreateInput!){
+      createInstanceType (data: $data) { ${fields} }
+    }`, {
+      data: createdData
+    });
+
+    // update
+    const instanceType = createMutation.createInstanceType;
+    const updatedData = {
+      description: faker.lorem.sentence(),
+    };
+    const mutation = await this.graphqlRequest(`
+    mutation($where: InstanceTypeWhereUniqueInput!, $data: InstanceTypeUpdateInput!){
+      updateInstanceType (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: instanceType.id},
+      data: updatedData
+    });
+    const expectedData = {...createdData, ...updatedData};
+    expect(mutation.updateInstanceType).to.deep.include(expectedData);
+
+    // query one
+    const queryOne = await this.graphqlRequest(`
+    query($where: InstanceTypeWhereUniqueInput!){
+      instanceType (where: $where) { ${fields} }
+    }`, {
+      where: {id: instanceType.id}
+    });
+
+    expect(queryOne.instanceType).to.deep.include(expectedData);
+    // check in k8s
+    const instance = await this.crdClient.instanceTypes.get(instanceType.id);
+    expect(instance.spec['limits.memory']).to.be.equals('25G');
+    expect(instance.spec['requests.memory']).to.be.equals('20G');
+    expect(instance.spec['limits.cpu']).to.be.equals(2.5);
+    expect(instance.spec['requests.cpu']).to.be.equals(2.5);
   });
 });
