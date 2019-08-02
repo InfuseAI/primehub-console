@@ -45,6 +45,7 @@ Canner CMS
 * APP_PREFIX: ex: `/admin`
 * PRIMEHUB_FEATURE_USER_PORTAL: (boolean) default: `false`
 * PORTAL_CONFIG_PATH: (string) default: `<project-dir>/server/etc/portal-config.yaml`
+* READ_ONLY_ON_INSTANCE_TYPE_AND_IMAGE: (boolean) default false. whether we only allow read operations and group-assignment on instanceType/image form.
 
 
 ### watcher
