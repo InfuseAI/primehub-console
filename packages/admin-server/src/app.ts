@@ -70,6 +70,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   app.use(async (ctx: Context, next) => {
     ctx.state.locale = config.locale;
     ctx.state.graphqlEndpoint = config.graphqlEndpoint;
+    ctx.state.disableMode = config.readOnlyOnInstanceTypeAndImage;
     return next();
   });
 
