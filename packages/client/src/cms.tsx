@@ -188,7 +188,6 @@ export default class CMSPage extends React.Component<Props, State> {
       return <Error/>;
     }
     const {activeKey} = match.params as any;
-    const hideButtons = (activeKey === 'image' || activeKey === 'instanceType') && ((window as any).disableMode || false)
     return (
       <Layout style={{minHeight: '100vh'}}>
         <Sider breakpoint="sm">
@@ -239,7 +238,6 @@ export default class CMSPage extends React.Component<Props, State> {
                 ...myLocales
               }
             }}
-            hideButtons={hideButtons}
             errorHandler={e => {
               console.dir(e);
               // default message and description

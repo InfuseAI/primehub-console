@@ -129,12 +129,16 @@ export default class DynamicFields extends React.Component<Props & {onDeploy: Fu
               <div style={{display: 'flex', alignItems: 'center', marginBottom: 8}}>
                 <div style={{marginRight: 16}}>{i + 1}.</div>
                 <InputGroup compact style={{width: '50%', marginRight: 16}}>
-                  <Input data-testid={`key-input-${i}`} placeholder="key" style={{ width: '40%'}} value={field.key} onChange={e => this.changeKey(e.target.value, i)}/>
-                  <Input data-testid={`value-input-${i}`} placeholder="value" style={{ width: '60%'}} value={field.value} onChange={e => this.changeValue(e.target.value, i)}/>
+                  <Input disabled={disabled} data-testid={`key-input-${i}`} placeholder="key" style={{ width: '40%'}} value={field.key} onChange={e => this.changeKey(e.target.value, i)}/>
+                  <Input disabled={disabled} data-testid={`value-input-${i}`} placeholder="value" style={{ width: '60%'}} value={field.value} onChange={e => this.changeValue(e.target.value, i)}/>
                 </InputGroup>
-                <a href="javascript:;" onClick={() => this.remove(i)}>
-                  <Icon type="close-circle-o"/>
-                </a>
+                {
+                  disabled ? null :(
+                    <a href="javascript:;" onClick={() => this.remove(i)}>
+                      <Icon type="close-circle-o"/>
+                    </a>
+                  )
+                }
               </div>
               {
                 errorIndex === i && (

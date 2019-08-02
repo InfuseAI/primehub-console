@@ -120,13 +120,13 @@ export default () => (
             required
             packageName="../src/cms-components/customize-number-precision"
           />
-          <boolean keyName="global" title="${global}" />
-          <Condition match={data => !data.global}>
-            <GroupRelation />
-          </Condition>
         </Layout>
+        <boolean keyName="global" title="${global}" />
+        <Condition match={data => !data.global}>
+          <GroupRelation />
+        </Condition>
       </Default>
-      <Default title="Tolerations" keyName="tolerations">
+      <Default title="solerations" keyName="tolerations">
         <Tolerations />
       </Default>
       <Default title="NodeSelector" keyName="nodeSelector">
@@ -193,8 +193,8 @@ function Tolerations() {
           }]
         }}
       >
-        <Layout component={TolerationLayout}>
-          <Layout component={DisableModeLayout}>
+        <Layout component={DisableModeLayout}>
+          <Layout component={TolerationLayout}>
             <string keyName="key" title="Key"/>
             <string keyName="value" title="Value"/>
             <string keyName="operator" title="Operator"

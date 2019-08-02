@@ -73,10 +73,10 @@ export default () => (
       <string keyName="description" title="${description}" />
       <string keyName="url" title="${imageUrl}"/>
       <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${images.useImagePullSecret}" />
-      <boolean keyName="global" title="${global}" />
-      <Condition match={data => !data.global}>
-        <GroupRelation />
-      </Condition>
     </Layout>
+    <boolean keyName="global" title="${global}" />
+    <Condition match={data => !data.global}>
+      <GroupRelation />
+    </Condition>
   </array>
 )
