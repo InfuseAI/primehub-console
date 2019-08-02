@@ -126,7 +126,7 @@ export default () => (
           <GroupRelation />
         </Condition>
       </Default>
-      <Default title="solerations" keyName="tolerations">
+      <Default title="Tolerations" keyName="tolerations">
         <Tolerations />
       </Default>
       <Default title="NodeSelector" keyName="nodeSelector">
