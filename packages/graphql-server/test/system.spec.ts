@@ -59,7 +59,7 @@ describe('system graphql', function() {
     expect(data).to.be.eql({
       system: {
         org: {
-          name: 'infuse ai',
+          name: 'InfuseAI',
           logo: null
         },
         smtp: {
