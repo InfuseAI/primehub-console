@@ -172,17 +172,11 @@ export default class ArrayBreadcrumb extends Component<Props> {
                 onClick={() => this.edit(record.id)}
               >
               </Button>
-              {
-                disabled === true ? (
-                  null
-                ) : (
-                  <Button icon="delete"
-                    data-testid="delete-button"
-                    onClick={() => this.remove(record.__index)}
-                  />
-                )
-              }
-              
+              <Button icon="delete"
+                data-testid="delete-button"
+                disabled={disabled === true}
+                onClick={() => this.remove(record.__index)}
+              />
             </ButtonGroup>
           );
         }
@@ -235,10 +229,11 @@ export default class ArrayBreadcrumb extends Component<Props> {
               </Button>
             )
           }
-          {(disabled !== true && (!createKeys || createKeys.length > 0)) && (
+          {(!createKeys || createKeys.length > 0) && (
             <Button
               onClick={this.add}
               data-testid="add-button"
+              disabled={disabled === true}
             >
               <Icon
                 type="plus"
