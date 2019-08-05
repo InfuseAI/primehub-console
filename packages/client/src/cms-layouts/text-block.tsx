@@ -4,7 +4,7 @@ import {Item, Context} from 'canner-helpers';
 export default ({
   title,
   description,
-
+  disabled
 }) => {
   return (
     <div style={{
@@ -21,7 +21,7 @@ export default ({
           {description || null}
         </div>
       </div>
-      <Item />
+      <Item disabled={disabled} />
     </div>
   )
 }

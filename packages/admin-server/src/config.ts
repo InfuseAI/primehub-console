@@ -32,6 +32,9 @@ export interface Config {
   // user portal
   enableUserPortal: boolean;
   portalConfigPath: string;
+
+  // disable create/update/delete operation on instanceType/image ui
+  readOnlyOnInstanceTypeAndImage?: boolean;
 }
 
 const defaultConfigs = {
@@ -49,7 +52,8 @@ const defaultConfigs = {
   keycloakTimeout: 3000,
   graphqlEndpoint: 'http://localhost:3001/graphql',
   enableUserPortal: false,
-  portalConfigPath: resolve(__dirname, '../etc/portal-config.yaml')
+  portalConfigPath: resolve(__dirname, '../etc/portal-config.yaml'),
+  readOnlyOnInstanceTypeAndImage: false
 };
 
 const prodConfigs = {
@@ -82,7 +86,8 @@ export const createConfig = (): Config => {
     appPrefix: sanitizePath(process.env.APP_PREFIX),
     graphqlEndpoint: process.env.GRAPHQL_ENDPOINT,
     enableUserPortal: process.env.PRIMEHUB_FEATURE_USER_PORTAL,
-    portalConfigPath: process.env.PORTAL_CONFIG_PATH
+    portalConfigPath: process.env.PORTAL_CONFIG_PATH,
+    readOnlyOnInstanceTypeAndImage: process.env.READ_ONLY_ON_INSTANCE_TYPE_AND_IMAGE,
   });
 
   const env = process.env.NODE_ENV || 'development';

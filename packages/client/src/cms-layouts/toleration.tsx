@@ -7,6 +7,7 @@ type Props = {
   subscribe: (keyName: string, callback: Function) => Promise<void>,
   refId: RefId,
   onDeploy: (keyName: string, callback: Function) => void,
+  disabled: boolean
 }
 
 type State = {
@@ -47,7 +48,7 @@ export default class TolerationLayout extends React.Component<Props, State> {
     });
   }
   render() {
-    const {refId} = this.props;
+    const {refId, disabled = false} = this.props;
     const {key, value, operator, remount, effect} = this.state;
     return (
       <>
@@ -56,19 +57,22 @@ export default class TolerationLayout extends React.Component<Props, State> {
           // hack, remount when deploying to update error message
           relationValue={remount}
           required={operator === 'Equal' || !value}
+          disabled={disabled}
         />
         <Item
           filter={node => (node.keyName === 'value')}
           // hack, remount when deploying to update error message
           relationValue={remount}
           required={operator === 'Equal'}
-          disabled={operator === 'Exists'}
+          disabled={disabled || operator === 'Exists'}
         />
         <Item
           filter={node => node.keyName === 'operator'}
+          disabled={disabled}
         />
         <Item
           filter={node => node.keyName === 'effect'}
+          disabled={disabled}
         />
       </>
     )

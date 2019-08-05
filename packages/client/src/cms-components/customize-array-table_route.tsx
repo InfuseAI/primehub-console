@@ -8,6 +8,7 @@ import {Props} from './types';
 
 const ButtonGroup = Button.Group;
 const confirm = Modal.confirm;
+const GLOBAL_DISABLE = (window as any).disableMode || false;
 
 @injectIntl
 export default class ArrayBreadcrumb extends Component<Props> {
@@ -117,6 +118,7 @@ export default class ArrayBreadcrumb extends Component<Props> {
       onChange
     } = this.props;
 
+    const disabled = (keyName === 'image' || keyName === 'instanceType') && GLOBAL_DISABLE;
     const {
       selectedRowKeys,
       emailFormVisible
@@ -165,12 +167,14 @@ export default class ArrayBreadcrumb extends Component<Props> {
         render: (text, record) => {
           return (
             <ButtonGroup>
-              <Button icon="edit"
+              <Button icon={"edit"}
                 data-testid="edit-button"
                 onClick={() => this.edit(record.id)}
-              />
+              >
+              </Button>
               <Button icon="delete"
                 data-testid="delete-button"
+                disabled={disabled === true}
                 onClick={() => this.remove(record.__index)}
               />
             </ButtonGroup>
@@ -229,6 +233,7 @@ export default class ArrayBreadcrumb extends Component<Props> {
             <Button
               onClick={this.add}
               data-testid="add-button"
+              disabled={disabled === true}
             >
               <Icon
                 type="plus"

@@ -10,10 +10,12 @@ type Props = {
   onChange: (refId: RefId, actionType: string, value: string) => void;
   value: string;
   title: React.ReactNode;
+  disabled: boolean
 }
 type State = {
   checked: boolean
 }
+
 export default class UseImagePullSecret extends React.Component<Props, State> {
   constructor(props) {
     super(props);
@@ -38,17 +40,17 @@ export default class UseImagePullSecret extends React.Component<Props, State> {
   }
 
   render() {
-    const {value, title} = this.props;
+    const {value, title, disabled} = this.props;
     const {checked} = this.state;
     return (
       <>
-        <Checkbox onChange={this.handleCheck} checked={checked}>
+        <Checkbox disabled={disabled} onChange={this.handleCheck} checked={checked}>
           {title}
         </Checkbox>
         {
           checked && (
             <div style={{marginTop: 16, maxWidth: 400}}>
-              <Selector onChange={this.handleSelect} value={value} />
+              <Selector disabled={disabled} onChange={this.handleSelect} value={value} />
             </div>
           )
         }
@@ -59,6 +61,7 @@ export default class UseImagePullSecret extends React.Component<Props, State> {
 
 type SelectorProps = {
   value: string,
+  disabled: boolean;
   onChange: (value: string) => void
 }
 
@@ -74,11 +77,12 @@ class Selector extends React.Component<SelectorProps> {
   `
 
   render() {
-    const {value, onChange} = this.props;
+    const {value, onChange, disabled} = this.props;
     return (
       <Query query={this.GET_SECRET}>
         {({data, loading}) => (
           <Select
+            disabled={disabled}
             style={{width: '100%'}}
             value={value ? value : undefined}
             onChange={onChange}

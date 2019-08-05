@@ -3,6 +3,8 @@ import {Input, Icon, Button} from 'antd';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import {Props} from './types';
+import {Empty} from '../components/empty';
+
 const InputGroup = Input.Group;
 
 type State = {
@@ -103,7 +105,7 @@ export default class DynamicFields extends React.Component<Props & {onDeploy: Fu
 
   render() {
     const {fields, errorIndex, errorMessage} = this.state;
-    const {rootValue, refId, uiParams, title} = this.props;
+    const {rootValue, refId, uiParams, title, disabled} = this.props;
     const recordValue = getRecordValue(rootValue, refId);
     // hack
     const isHidden = uiParams.isHidden ? uiParams.isHidden(recordValue) : false;
@@ -116,17 +118,27 @@ export default class DynamicFields extends React.Component<Props & {onDeploy: Fu
           uiParams.isHidden && <div style={{marginTop: 16, fontSize: 18}}>{title}</div>
         }
         {
-          fields.map((field, i) => (
+          fields.length === 0 ? (
+            <Empty
+              style={{ width: 'calc(50% + 16px)'}}
+              height={200}
+              description="There is no fields."
+            />
+          ) :fields.map((field, i) => (
             <React.Fragment key={i}>
               <div style={{display: 'flex', alignItems: 'center', marginBottom: 8}}>
                 <div style={{marginRight: 16}}>{i + 1}.</div>
                 <InputGroup compact style={{width: '50%', marginRight: 16}}>
-                  <Input data-testid={`key-input-${i}`} placeholder="key" style={{ width: '40%'}} value={field.key} onChange={e => this.changeKey(e.target.value, i)}/>
-                  <Input data-testid={`value-input-${i}`} placeholder="value" style={{ width: '60%'}} value={field.value} onChange={e => this.changeValue(e.target.value, i)}/>
+                  <Input disabled={disabled} data-testid={`key-input-${i}`} placeholder="key" style={{ width: '40%'}} value={field.key} onChange={e => this.changeKey(e.target.value, i)}/>
+                  <Input disabled={disabled} data-testid={`value-input-${i}`} placeholder="value" style={{ width: '60%'}} value={field.value} onChange={e => this.changeValue(e.target.value, i)}/>
                 </InputGroup>
-                <a href="javascript:;" onClick={() => this.remove(i)}>
-                  <Icon type="close-circle-o"/>
-                </a>
+                {
+                  disabled ? null :(
+                    <a href="javascript:;" onClick={() => this.remove(i)}>
+                      <Icon type="close-circle-o"/>
+                    </a>
+                  )
+                }
               </div>
               {
                 errorIndex === i && (
@@ -138,9 +150,15 @@ export default class DynamicFields extends React.Component<Props & {onDeploy: Fu
             </React.Fragment>
           ))
         }
-        <Button type="dashed" data-testid="add-field-button" onClick={this.add} style={{ width: 'calc(50% + 16px)', marginTop: 16 }}>
-          <Icon type="plus" /> Add field
-        </Button>
+        {
+          disabled === true ? (
+            null
+          ) : (
+            <Button type="dashed" data-testid="add-field-button" onClick={this.add} style={{ width: 'calc(50% + 16px)', marginTop: 16 }}>
+              <Icon type="plus" /> Add field
+            </Button>
+          )
+        }
       </React.Fragment>
     )
   }

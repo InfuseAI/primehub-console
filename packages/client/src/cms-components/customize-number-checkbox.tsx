@@ -35,7 +35,7 @@ export default class CheckableInputNumber extends PureComponent {
     const { value, uiParams, disabled } = this.props;
     return (
       <React.Fragment>
-        <Checkbox onChange={this.onCheck} checked={!isNull(value)} style={{marginRight: 8}}/>
+        <Checkbox onChange={this.onCheck} disabled={disabled} checked={!isNull(value)} style={{marginRight: 8}}/>
         {
           isNull(value) ? (
             <Input

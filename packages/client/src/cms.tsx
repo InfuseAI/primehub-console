@@ -187,6 +187,7 @@ export default class CMSPage extends React.Component<Props, State> {
     if (hasError) {
       return <Error/>;
     }
+    const {activeKey} = match.params as any;
     return (
       <Layout style={{minHeight: '100vh'}}>
         <Sider breakpoint="sm">
