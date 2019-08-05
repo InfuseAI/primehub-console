@@ -246,21 +246,23 @@ describe('image graphql', function() {
   });
 
   it('should create with props and update', async () => {
+    const data = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      displayName: faker.internet.userName(),
+      description: faker.lorem.sentence(),
+      url: faker.internet.url(),
+      useImagePullSecret: 'image-pull-secret'
+    };
     const createMutation = await this.graphqlRequest(`
     mutation($data: ImageCreateInput!){
       createImage (data: $data) { ${fields} }
     }`, {
-      data: {
-        name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
-        displayName: faker.internet.userName(),
-        description: faker.lorem.sentence(),
-        url: faker.internet.url()
-      }
+      data
     });
 
     // update
     const image = createMutation.createImage;
-    const data = {
+    const updateData = {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
       url: faker.internet.url()
@@ -270,10 +272,14 @@ describe('image graphql', function() {
       updateImage (where: $where, data: $data) { ${fields} }
     }`, {
       where: {id: image.id},
-      data
+      data: updateData
     });
 
-    expect(mutation.updateImage).to.deep.include(data);
+    const expectedImageData = {
+      ...data,
+      ...updateData
+    };
+    expect(mutation.updateImage).to.deep.include(expectedImageData);
 
     // query one
     const queryOne = await this.graphqlRequest(`
@@ -283,7 +289,7 @@ describe('image graphql', function() {
       where: {id: image.id}
     });
 
-    expect(queryOne.image).to.deep.include(data);
+    expect(queryOne.image).to.deep.include(expectedImageData);
   });
 
   it('should create with name-only and update global twice', async () => {
