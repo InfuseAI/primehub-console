@@ -21,7 +21,7 @@ const DEFAULT_TIMEZONE = findTimezone();
 
 export const createDetaultSystemSettings = (defaultUserVolumeCapacity: string) => ({
   org: {
-    name: 'infuse ai',
+    name: 'InfuseAI',
     logo: null
   },
   defaultUserVolumeCapacity,
