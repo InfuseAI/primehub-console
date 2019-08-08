@@ -43,7 +43,7 @@
     "@types/react-router-dom": "^4.2.6",
     "antd": "3.10.10",
     "axios": "^0.18.0",
-    "canner": "2.0.50",
+    "canner": "2.0.53",
     "gulp": "^3.9.1",
     "gulp-s3": "^0.11.0",
     "isomorphic-fetch": "^2.2.1",
