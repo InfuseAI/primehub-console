@@ -1,10 +1,10 @@
 import KcAdminClient from 'keycloak-admin';
-import { find, isUndefined, first, sortBy, get, every, isEmpty, reduce, uniq, flatten } from 'lodash';
 import {
-  toRelay, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter, paginate, extractPagination
+  find, isUndefined, first, get, every, isEmpty, reduce, uniq, flatten, isNaN, isNil } from 'lodash';
+import {
+  mutateRelation, parseDiskQuota, stringifyDiskQuota
 } from './utils';
-import { keycloakMaxCount } from './constant';
-import { Attributes, FieldType } from './attr';
+import { Attributes } from './attr';
 import { Context } from './interface';
 import { ApolloError } from 'apollo-server';
 import { RequiredActionAlias } from 'keycloak-admin/lib/defs/requiredActionProviderRepresentation';
@@ -95,23 +95,119 @@ const deassignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdm
  * Query
  */
 
-const listQuery = async (kcAdminClient: KcAdminClient, where: any) => {
-  let users = await kcAdminClient.users.find({
-    max: keycloakMaxCount
-  });
-  users = sortBy(users, 'createdTimestamp');
-  users = filter(users, where);
-  return users;
+const emptyResponse = {
+  edges: [],
+  pageInfo: {
+    hasNextPage: false,
+    hasPreviousPage: false,
+    startCursor: null,
+    endCursor: null,
+  }
+};
+
+const listQuery = async (kcAdminClient: KcAdminClient, args: any): Promise<{
+  edges: any[],
+  pageInfo: {
+    hasNextPage: boolean,
+    hasPreviousPage: boolean,
+    startCursor: string | null,
+    endCursor: string | null,
+  }
+}> => {
+  const specifiedId = get(args, 'where.id');
+  const usernameContains = get(args, 'where.username_contains');
+  const emailContains = get(args, 'where.email_contains');
+  let limit = parseInt(get(args, 'first') || get(args, 'last'), 10);
+  if (isNaN(limit) || isNil(limit)) {
+    // default limit to 10
+    limit = 10;
+  }
+  const page = parseInt(get(args, 'after') || get(args, 'before'), 10);
+
+  // if front-end try to fetch users with limit=0
+  if (limit === 0) {
+    return emptyResponse;
+  }
+
+  // if id specified
+  if (specifiedId) {
+    try {
+      const user = await kcAdminClient.users.findOne({id: specifiedId});
+      return {
+        edges: [{
+          node: user,
+          cursor: user.id,
+        }],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: user.id,
+          endCursor: user.id,
+        }
+      };
+    } catch (e) {
+      return emptyResponse;
+    }
+  }
+
+  const fetchSize = limit + 1;
+  const kcQuery: any = {
+    max: fetchSize,
+  };
+
+  if (usernameContains) {
+    kcQuery.username = usernameContains;
+  }
+
+  if (emailContains) {
+    kcQuery.email = emailContains;
+  }
+
+  const pageNotSpecifiedOrZero = !page;
+  if (!pageNotSpecifiedOrZero) {
+    // how many items to skip
+    // get one more item to see if has next page
+    kcQuery.first = page * limit;
+  }
+
+  let users = await kcAdminClient.users.find(kcQuery);
+  // see if we are at first page
+  const startCursor = pageNotSpecifiedOrZero ? null : page - 1;
+
+  // check if hasNextPage & slice data
+  let hasNextPage;
+  let endCursor;
+  if (users.length === fetchSize) {
+    users = users.slice(0, -1);
+    hasNextPage = true;
+    endCursor = pageNotSpecifiedOrZero ? 1 : page + 1;
+  } else {
+    hasNextPage = false;
+    endCursor = null;
+  }
+
+  // response
+  return {
+    edges: users.map(row => ({
+      cursor: row.id,
+      node: row
+    })),
+    pageInfo: {
+      hasNextPage,
+      hasPreviousPage: startCursor !== null,
+      startCursor: isNil(startCursor) ? null : startCursor.toString(),
+      endCursor: isNil(endCursor) ? null : endCursor.toString(),
+    }
+  };
 };
 
 export const query = async (root, args, context: Context) => {
-  const users = await listQuery(context.kcAdminClient, args && args.where);
-  return paginate(users, extractPagination(args));
+  const response = await listQuery(context.kcAdminClient, args);
+  return response.edges.map(edge => edge.node);
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
-  const users = await listQuery(context.kcAdminClient, args && args.where);
-  return toRelay(users, extractPagination(args));
+  return listQuery(context.kcAdminClient, args);
 };
 
 export const queryOne = async (root, args, context: Context) => {
