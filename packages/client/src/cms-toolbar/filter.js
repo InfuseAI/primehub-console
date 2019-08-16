@@ -36,6 +36,10 @@ class FilterGroup extends React.Component {
     };
   }
 
+  componentWillUnmount() {
+    this.props.changeFilter({});
+  }
+
   onChange = (cond, key) => {
     const condition = {...this.state.condition};
     if (isEmpty(cond)) {

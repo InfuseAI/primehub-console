@@ -90,7 +90,7 @@ export default class RelationTable extends PureComponent {
           style={{marginBottom: 16}}
         />
         {
-          !disabled && <Picker
+          (!disabled && modalVisible) && <Picker
             visible={modalVisible}
             onOk={this.handleOk}
             onCancel={this.handleCancel}
