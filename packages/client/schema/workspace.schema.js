@@ -7,9 +7,6 @@ export default () => (
     keyName="workspace"
     title="${workspace}"
     ui="tableRoute"
-    controlDeployAndResetButtons={true}
-    cacheActions={true}
-    hideButtons={true}
     uiParams={{
       columns: [{
         title: '${workspace.name.title}',
@@ -55,8 +52,8 @@ export default () => (
       <pagination />
     </toolbar> */}
     <Block title="${workspace.block1.title}">
-      <string keyName="name" title="${workspace.name.title}" /> 
-      <string keyName="displayName" title="${workspace.displayName.title}" /> 
+      <string required keyName="name" title="${workspace.name.title}" /> 
+      <string required keyName="displayName" title="${workspace.displayName.title}" /> 
       <string ui="textarea" keyName="description" title="${workspace.description.title}" /> 
     </Block>
 

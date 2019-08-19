@@ -323,7 +323,7 @@ exports.dict = {
     'workspace.name.title': 'Name',
     'workspace.displayName.title': 'Display Name',
     'workspace.description.title': 'Description',
-    'workspace.block2.title': 'Title',
+    'workspace.block2.title': 'Members',
   },
   zh: {
     // common
@@ -518,6 +518,6 @@ exports.dict = {
     'workspace.name.title': 'Name',
     'workspace.displayName.title': 'Display Name',
     'workspace.description.title': 'Description',
-    'workspace.block2.title': 'Title',
+    'workspace.block2.title': 'Members',
   }
 }

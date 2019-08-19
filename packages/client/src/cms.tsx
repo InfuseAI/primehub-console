@@ -2,6 +2,8 @@ import * as React from 'react';
 import {injectIntl, FormattedMessage} from 'react-intl';
 import {Layout, Menu, Icon, notification, Modal, Avatar, Button} from 'antd';
 import Canner from 'canner';
+import gql from 'graphql-tag';
+import {genClient} from 'canner/lib/components/index';
 import Container from '@canner/container';
 import R from '@canner/history-router';
 import ContentHeader from 'components/header';
@@ -13,6 +15,7 @@ import {RouteComponentProps} from 'react-router';
 import schema from '../schema/index.schema.js';
 import myLocales from './utils/locales';
 import get from 'lodash.get';
+import update from 'lodash/update';
 const {Sider} = Layout;
 const confirm = Modal.confirm;
 declare var process: {
@@ -78,21 +81,76 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   fetchWorkspaceList = async () => {
-    return [{
-      displayName: 'Default',
-      isDefault: true,
-      id: 'default'
-    }, {
-      displayName: 'Ws1',
-      isDefault: false,
-      id: 'wsid'
-    }];
+    const client = genClient(schema);
+    const result = await client.query({
+      query: gql`query {
+        workspaces {
+          id
+          name
+          displayName
+        }
+      }`
+    })
+    const workspaceList = result.data.workspaces;
+    return workspaceList;
   }
 
   dataDidChange = (dataChanged: object) => {
     this.setState({
       dataChanged
     });
+  }
+
+  beforeFetch = (key, {query, variables}) => {
+    const {match} = this.props;
+    const {workspaceId} = match.params as any;
+    const whereKey = `${key}Where`;
+    if (key === 'workspace') {
+      return {
+        query,
+        variables
+      };
+    }
+    return {
+      query,
+      variables: update(variables, [whereKey], where => ({
+        ...where,
+        workspaceId
+      }))
+    };
+  }
+
+  beforeDeploy = (key, {mutation, variables}) => {
+    const {match} = this.props;
+    const {workspaceId} = match.params as any;
+    if (key === 'workspace') {
+      return {
+        mutation,
+        variables
+      };
+    }
+    if (mutation.indexOf('$where') >= 0) {
+      // update or delete
+      return {
+        mutation,
+        variables: update(variables, ['where'], where => {
+          return {
+            ...where,
+            workspaceId
+          };
+        })
+      };
+    } else {
+      return {
+        mutation,
+        variables: update(variables, ['payload'], payload => {
+          return {
+            ...payload,
+            workspaceId
+          };
+        })
+      };
+    }
   }
 
   afterDeploy = (data) => {
@@ -285,7 +343,12 @@ export default class CMSPage extends React.Component<Props, State> {
           dataDidChange={this.dataDidChange}
         >
           <Canner
+            // use workspaceId as the key. So, if the workspaceId changed,
+            // the Canner component will re-mount to fetch correct data
+            key={workspaceId}
             afterDeploy={this.afterDeploy}
+            beforeDeploy={this.beforeDeploy}
+            beforeFetch={this.beforeFetch}
             intl={{
               locale: (window as any).LOCALE,
               messages: {
@@ -346,6 +409,7 @@ export default class CMSPage extends React.Component<Props, State> {
                   duration = 20;
                   key = 'REFRESH_TOKEN_EXPIRED';
                   btn = (
+                    //  @ts-ignore
                     <Button type="primary" onClick={() => window.location.replace(loginUrl)}>
                       Login
                     </Button>
