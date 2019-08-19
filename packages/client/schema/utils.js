@@ -314,7 +314,16 @@ exports.dict = {
 
     // image
     'images.useImagePullSecret': 'Use Image Pull Secret',
-    'image.useImagePullSecret.component.select.placeholder': 'Select Secret'
+    'image.useImagePullSecret.component.select.placeholder': 'Select Secret',
+
+    // workspace
+    'workspace': 'Workspace',
+    'workspace.management': 'Manage Workspace',
+    'workspace.block1.title': 'Basic Info',
+    'workspace.name.title': 'Name',
+    'workspace.displayName.title': 'Display Name',
+    'workspace.description.title': 'Description',
+    'workspace.block2.title': 'Title',
   },
   zh: {
     // common
@@ -500,6 +509,15 @@ exports.dict = {
 
     // image
     'images.useImagePullSecret': 'Use Image Pull Secret',
-    'image.useImagePullSecret.component.select.placeholder': 'Select Secret'
+    'image.useImagePullSecret.component.select.placeholder': 'Select Secret',
+
+    // workspace
+    'workspace': 'Workspace',
+    'workspace.management': 'Manage Workspace',
+    'workspace.block1.title': 'Basic Info',
+    'workspace.name.title': 'Name',
+    'workspace.displayName.title': 'Display Name',
+    'workspace.description.title': 'Description',
+    'workspace.block2.title': 'Title',
   }
 }

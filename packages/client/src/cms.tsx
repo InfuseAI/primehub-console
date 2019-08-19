@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {injectIntl} from 'react-intl';
+import {injectIntl, FormattedMessage} from 'react-intl';
 import {Layout, Menu, Icon, notification, Modal, Avatar, Button} from 'antd';
 import Canner from 'canner';
 import Container from '@canner/container';
@@ -15,7 +15,7 @@ import myLocales from './utils/locales';
 import get from 'lodash.get';
 const {Sider} = Layout;
 const confirm = Modal.confirm;
-declare var process : {
+declare var process: {
   env: {
     NODE_ENV: string
   }
@@ -36,6 +36,7 @@ export interface State {
   hasError: boolean;
   deploying: boolean;
   dataChanged: Object;
+  workspaceList: Array<any>
 }
 
 @injectIntl
@@ -45,10 +46,20 @@ export default class CMSPage extends React.Component<Props, State> {
     prepare: false,
     hasError: false,
     deploying: false,
-    dataChanged: {}
-  }
+    dataChanged: {},
+    workspaceList: []
+  };
 
-  container: Container
+  container: Container;
+
+  componentDidMount() {
+    this.fetchWorkspaceList()
+      .then(wss => {
+        this.setState({
+          workspaceList: wss
+        });
+      });
+  }
 
   componentDidUpdate(prevProps: Props) {
     const prevPathname = prevProps.location.pathname;
@@ -64,6 +75,18 @@ export default class CMSPage extends React.Component<Props, State> {
     // Display fallback UI
     this.setState({ hasError: true });
     console.log(error, info);
+  }
+
+  fetchWorkspaceList = async () => {
+    return [{
+      displayName: 'Default',
+      isDefault: true,
+      id: 'default'
+    }, {
+      displayName: 'Ws1',
+      isDefault: false,
+      id: 'wsid'
+    }];
   }
 
   dataDidChange = (dataChanged: object) => {
@@ -141,10 +164,10 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   siderMenuOnClick = (menuItem: {key: string}) => {
-    const {history, intl} = this.props;
-    const {dataChanged} = this.state;
+    const {history, intl, match} = this.props;
+    const {workspaceId} = match.params as any;
+    const {dataChanged, workspaceList} = this.state;
     const {key} = menuItem;
-
     if (dataChanged && Object.keys(dataChanged).length > 0) {
       confirm({
         title: intl.formatMessage({
@@ -168,47 +191,78 @@ export default class CMSPage extends React.Component<Props, State> {
             resolve();
           }).then(this.reset)
             .then(() => {
-              history.push(`${(window as any).APP_PREFIX}cms/${key}`);
+              history.push(`${(window as any).APP_PREFIX}cms/${workspaceId}/${key}`);
             });
         },
-        onCancel: () => {
-        }
+        onCancel: () => undefined
       });
+    } else if (key.indexOf('workspace/') >= 0) {
+      const wsId = key.split('/')[1];
+      const currentWorkspace = workspaceList.find(ws => ws.id === wsId) || {} as any;
+      history.push(`${(window as any).APP_PREFIX}cms/${wsId}/${currentWorkspace.isDefault ? 'system' : 'group'}`);
     } else {
-      history.push(`${(window as any).APP_PREFIX}cms/${key}`);
+      history.push(`${(window as any).APP_PREFIX}cms/${workspaceId}/${key}`);
     }
+  }
+
+  renderMenu = () => {
+    const {workspaceList = []} = this.state;
+    const {match} = this.props;
+    const {activeKey, workspaceId} = match.params as any;
+    const currentWorkspace = workspaceList.find(ws => ws.id === workspaceId) || {};
+    return (
+      <Menu
+        onClick={this.siderMenuOnClick}
+        selectedKeys={[activeKey, `workspace/${workspaceId}`]}
+        theme="dark"
+        mode="vertical"
+      >
+        <Menu.SubMenu
+          key="workspace_list"
+          title={`${currentWorkspace.displayName}`}
+        >
+          {workspaceList.map(ws => (
+            <Menu.Item key={`workspace/${ws.id}`}>
+              {ws.displayName}
+            </Menu.Item>
+          ))}
+          <Menu.Item key="workspace">
+            <FormattedMessage id="workspace.management" />
+          </Menu.Item>
+        </Menu.SubMenu>
+        {
+          Object.keys(schema.schema)
+            .filter(key => {
+              if (
+                !currentWorkspace.isDefault &&
+                (key === 'system' || key === 'user')
+              ) {
+                return false;
+              }
+              return key !== 'workspace';
+            }).map(key => (
+              <Menu.Item key={key}>
+                {schema.schema[key].title}
+              </Menu.Item>
+            ))
+        }
+      </Menu>
+    )
   }
 
   render() {
     const {history, match} = this.props;
-    const {prepare, hasError, deploying, dataChanged} = this.state;
+    const {hasError, deploying, dataChanged} = this.state;
     const hasChanged = !!(dataChanged && Object.keys(dataChanged).length);
-
     if (hasError) {
       return <Error/>;
     }
-    const {activeKey} = match.params as any;
+    const {workspaceId} = match.params as any;
     return (
       <Layout style={{minHeight: '100vh'}}>
         <Sider breakpoint="sm">
           <Logo src={logo}/>
-          <Menu
-            onClick={this.siderMenuOnClick}
-            selectedKeys={[(match.params as any).activeKey]}
-            theme="dark"
-            mode="inline">
-            {/* <Menu.Item key="__cnr_back">
-              <Icon type="left" />
-              Back to dashboard
-            </Menu.Item> */}
-            {
-              Object.keys(schema.schema).map(key => (
-                <Menu.Item key={key}>
-                  {schema.schema[key].title}
-                </Menu.Item>
-              ))
-            }
-          </Menu>
+          {this.renderMenu()}
         </Sider>
         <Container
           schema={schema}
@@ -225,7 +279,7 @@ export default class CMSPage extends React.Component<Props, State> {
           }}
           router={new R({
             history,
-            baseUrl: `${(window as any).APP_PREFIX}cms`
+            baseUrl: `${(window as any).APP_PREFIX}cms/${workspaceId}`
           })}
           ref={container => this.container = container}
           dataDidChange={this.dataDidChange}

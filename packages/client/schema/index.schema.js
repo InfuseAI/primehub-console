@@ -10,6 +10,7 @@ import Image from './image.schema';
 import Dataset from './dataset.schema';
 import Announcement from './announcement.schema';
 import Secret from './secret.schema';
+import Workspaces from './workspace.schema';
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {createFakeData} from 'canner-helpers';
 import {dict, graphqlClient, imageStorage} from './utils';
@@ -19,6 +20,7 @@ const schema = (
     <System/>
     {/* <Idp/> */}
     {/* <UserFederation/> */}
+    <Workspaces />
     <User/>  
     <Group/>
     <InstanceType/>
