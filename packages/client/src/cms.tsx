@@ -285,7 +285,7 @@ export default class CMSPage extends React.Component<Props, State> {
             </Menu.Item>
           ))}
           <Menu.Item key="workspace">
-            <FormattedMessage id="workspace.management" />
+            <Icon type="setting" /> <FormattedMessage id="workspace.management" />
           </Menu.Item>
         </Menu.SubMenu>
         {
