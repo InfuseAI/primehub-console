@@ -13,6 +13,7 @@ import * as GraphQLJSON from 'graphql-type-json';
 import { makeExecutableSchema } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
 import WorkspaceApi from './workspace/api';
+import CurrentWorkspace from './workspace/currentWorkspace';
 
 import CrdClient, { InstanceTypeSpec, ImageSpec } from './crdClient/crdClientImpl';
 import * as system from './resolvers/system';
@@ -290,6 +291,12 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       // cache layer
       addCacheLayerToKc(kcAdminClient);
 
+      // workspace
+      const workspaceApi = new WorkspaceApi({
+        defaultNamespace: config.k8sCrdNamespace,
+        kcAdminClient
+      });
+
       return {
         realm: config.keycloakRealmName,
         everyoneGroupId: config.keycloakEveryoneGroupId,
@@ -303,10 +310,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         userId,
         username,
         defaultUserVolumeCapacity: config.defaultUserVolumeCapacity,
-        workspaceApi: new WorkspaceApi({
-          defaultNamespace: config.k8sCrdNamespace,
-          kcAdminClient
-        })
+        workspaceApi,
       };
     },
     formatError: (error: any) => {
