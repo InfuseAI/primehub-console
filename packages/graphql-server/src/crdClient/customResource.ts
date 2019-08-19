@@ -28,51 +28,55 @@ export default class CustomResource<SpecType = any> {
   private kubeClient: any;
   private watchApi: Watch;
   private crd: any;
-  private resource: Resource;
   private namespace: string;
 
   constructor(kubeClient: any, watch: Watch, crd: any, namespace: string) {
     kubeClient.addCustomResourceDefinition(crd);
-    const {group, version, names: {plural}} = crd.spec;
     this.crd = crd;
     this.namespace = namespace;
     this.watchApi = watch;
     this.kubeClient = kubeClient;
-    this.resource = kubeClient.apis[group][version].namespaces(namespace)[plural];
   }
 
   public getResourcePlural() {
     return this.crd.spec && this.crd.spec.names && this.crd.spec.names.plural;
   }
 
-  public get = async (name: string): Promise<Item<SpecType>> => {
-    const {body} = await this.resource(name).get();
+  public get = async (name: string, namespace?: string): Promise<Item<SpecType>> => {
+    const resource = this.getResource(namespace);
+    const {body} = await resource(name).get();
     return pick(body, ['metadata', 'spec']) as Item<SpecType>;
   }
 
-  public list = async (): Promise<Array<Item<SpecType>>> => {
-    const {body} = await this.resource.get();
+  public list = async (namespace?: string): Promise<Array<Item<SpecType>>> => {
+    const resource = this.getResource(namespace);
+    const {body} = await resource.get();
     return body.items.map(item => pick(item, ['metadata', 'spec']));
   }
 
-  public async create(metadata: Metadata, spec: SpecType): Promise<Item<SpecType>> {
+  public async create(metadata: Metadata, spec: SpecType, namespace?: string): Promise<Item<SpecType>> {
+    const resource = this.getResource(namespace);
     const object = this.prepareCustomObject({metadata, spec});
-    const {body} = await this.resource.post({body: object});
+    const {body} = await resource.post({body: object});
     return pick(body, ['metadata', 'spec']) as Item<SpecType>;
   }
 
   public async patch(
-    name: string, {metadata, spec}: {metadata?: Metadata, spec: SpecType}): Promise<Item<SpecType>> {
+    name: string, {metadata, spec}: {metadata?: Metadata, spec: SpecType},
+    namespace?: string
+  ): Promise<Item<SpecType>> {
+    const resource = this.getResource(namespace);
     const object = this.prepareCustomObject({metadata, spec});
-    const {body} = await this.resource(name).patch({
+    const {body} = await resource(name).patch({
       body: object,
       headers: { 'content-type': 'application/merge-patch+json' }
     });
     return pick(body, ['metadata', 'spec']) as Item<SpecType>;
   }
 
-  public async del(name: string): Promise<void> {
-    await this.resource(name).delete();
+  public async del(name: string, namespace?: string): Promise<void> {
+    const resource = this.getResource(namespace);
+    await resource(name).delete();
   }
 
   public watch(handler: (type: string, object: any) => void, done: (err?: Error) => void) {
@@ -93,5 +97,10 @@ export default class CustomResource<SpecType = any> {
       metadata,
       spec
     };
+  }
+
+  private getResource = (namespace?: string) => {
+    const {group, version, names: {plural}} = this.crd.spec;
+    return this.kubeClient.apis[group][version].namespaces(namespace || this.namespace)[plural];
   }
 }

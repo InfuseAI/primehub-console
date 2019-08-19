@@ -19,6 +19,9 @@ type Dataset {
   mountRoot: String
   homeSymlink: Boolean
   launchGroupOnly: Boolean
+
+  # workspace
+  workspaceId: String
 }
 
 """An edge in a connection."""
@@ -46,12 +49,16 @@ input DatasetWhereInput {
   id: ID
   name_contains: String
   displayName_contains: String
+  # workspace
+  workspaceId: String
 }
 
 """group relation"""
 input DatasetGroupWhereUniqueInput {
   id: ID!
   writable: Boolean
+  # workspace
+  workspaceId: String
 }
 
 input DatasetGroupCreateManyInput {

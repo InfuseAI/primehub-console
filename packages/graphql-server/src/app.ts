@@ -12,12 +12,14 @@ import morgan from 'koa-morgan';
 import * as GraphQLJSON from 'graphql-type-json';
 import { makeExecutableSchema } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
+import WorkspaceApi from './workspace/api';
 
 import CrdClient, { InstanceTypeSpec, ImageSpec } from './crdClient/crdClientImpl';
 import * as system from './resolvers/system';
 import * as user from './resolvers/user';
 import * as group from './resolvers/group';
 import * as secret from './resolvers/secret';
+import * as workspace from './resolvers/workspace';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
@@ -74,6 +76,9 @@ const resolvers = {
     secret: secret.queryOne,
     secrets: secret.query,
     secretsConnection: secret.connectionQuery,
+    workspace: workspace.queryOne,
+    workspaces: workspace.query,
+    workspacesConnection: workspace.connectionQuery,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),
@@ -93,6 +98,9 @@ const resolvers = {
     createSecret: secret.create,
     updateSecret: secret.update,
     deleteSecret: secret.destroy,
+    createWorkspace: workspace.create,
+    updateWorkspace: workspace.update,
+    deleteWorkspace: workspace.destroy,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation(),
@@ -294,7 +302,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         readOnly,
         userId,
         username,
-        defaultUserVolumeCapacity: config.defaultUserVolumeCapacity
+        defaultUserVolumeCapacity: config.defaultUserVolumeCapacity,
+        workspaceApi: new WorkspaceApi({
+          defaultNamespace: config.k8sCrdNamespace,
+          kcAdminClient
+        })
       };
     },
     formatError: (error: any) => {

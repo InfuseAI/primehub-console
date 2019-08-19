@@ -1,0 +1,42 @@
+# import PageInfo from "common.graphql"
+# import User from "./user.graphql"
+# import Group from "./group.graphql"
+
+type Workspace {
+  id: ID!
+  name: String!
+  displayName: String
+  members: [User]
+  groups: [Group]
+}
+
+"""An edge in a connection."""
+type WorkspaceEdge {
+  """The item at the end of the edge."""
+  node: Workspace!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type WorkspaceConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [WorkspaceEdge]!
+}
+
+input WorkspaceWhereUniqueInput {
+  id: ID!
+}
+
+"""Mutation input"""
+input WorkspaceCreateInput {
+  name: String!
+  displayName: String
+}
+
+input WorkspaceUpdateInput {
+  displayName: String
+}

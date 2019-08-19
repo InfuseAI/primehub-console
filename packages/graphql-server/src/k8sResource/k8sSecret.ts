@@ -24,7 +24,6 @@ export const removePrefixFactory = (prefix: string) => (name: string) => name.re
 
 export default class K8sSecret {
   private namespace: string;
-  private resource: any;
   private addGitSyncPrefix = prefixFactory(GITSYNC_PREFIX);
   private addImagePrefix = prefixFactory(IMAGE_PREFIX);
   private removeGitSyncPrefix = removePrefixFactory(GITSYNC_PREFIX);
@@ -36,11 +35,10 @@ export default class K8sSecret {
     namespace: string
   }) {
     this.namespace = namespace || 'default';
-    this.resource = kubeClient.api.v1.namespaces(this.namespace).secrets;
   }
 
-  public find = async (type?: string) => {
-    const {body: {items}} = await this.resource.get();
+  public find = async (type?: string, namespace?: string) => {
+    const {body: {items}} = await this.resource(namespace).get();
     let data = items || [];
     if (type) {
       this.validateType(type);
@@ -55,9 +53,10 @@ export default class K8sSecret {
     return data.map(this.propsMapping);
   }
 
-  public findOne = async (name: string) => {
+  public findOne = async (name: string, namespace: string) => {
     try {
-      const {body} = await this.resource(name).get();
+      const resource = this.resource(namespace);
+      const {body} = await resource(name).get();
       return this.propsMapping(body);
     } catch (e) {
       if (e.statusCode === 404) {
@@ -71,16 +70,18 @@ export default class K8sSecret {
     name,
     displayName,
     type,
-    config
+    config,
+    namespace
   }: {
     name: string,
     displayName: string,
     type: string,
-    config?: ConfigType
+    config?: ConfigType,
+    namespace?: string
   }) => {
     try {
       this.validateType(type);
-      const {body} = await this.resource.post({
+      const {body} = await this.resource(namespace).post({
         body: {
           Kind: 'Secret',
           apiVersion: 'v1',
@@ -104,13 +105,14 @@ export default class K8sSecret {
   }
 
   public update = async (
-    name: string, {displayName, config}: {displayName: string, config?: ConfigType}) => {
+    name: string, {displayName, config}: {displayName: string, config?: ConfigType}, namespace: string) => {
     // api can only update displayName, data in config (ssh, .dockerconfigjson)
-    const {body: originalData} = await this.resource(name).get();
+    const resource = this.resource(namespace);
+    const {body: originalData} = await resource(name).get();
     const type: string = originalData.type;
     const data = isEmpty(config) ? {} : this.createDataByType(type, config, originalData);
     const annotations = displayName ? {displayName} : {};
-    const {body} = await this.resource(name).patch({
+    const {body} = await resource(name).patch({
       body: {
         metadata: {
           annotations
@@ -121,8 +123,9 @@ export default class K8sSecret {
     return this.propsMapping(body);
   }
 
-  public async delete(name: string) {
-    return this.resource(name).delete();
+  public async delete(name: string, namespace: string) {
+    const resource = this.resource(namespace);
+    return resource(name).delete();
   }
 
   private propsMapping = (response: any) => {
@@ -218,5 +221,9 @@ export default class K8sSecret {
 
   private toBase64(str: string) {
     return Buffer.from(str).toString('base64');
+  }
+
+  private resource = (namespace: string) => {
+    return kubeClient.api.v1.namespaces(namespace || this.namespace).secrets;
   }
 }

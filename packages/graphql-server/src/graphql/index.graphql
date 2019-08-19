@@ -6,6 +6,7 @@
 # import Announcement, AnnouncementConnection, AnnouncementWhereInput, AnnouncementWhereUniqueInput, AnnouncementCreateInput, AnnouncementUpdateInput from "./announcement.graphql"
 # import Dataset, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
+# import Workspace, WorkspaceEdge, WorkspaceConnection, WorkspaceWhereUniqueInput, WorkspaceCreateInput, WorkspaceUpdateInput from "./workspace.graphql"
 
 scalar JSON
 
@@ -133,6 +134,21 @@ type Query {
     first: Int
     last: Int
   ): SecretConnection!
+
+  """workspace"""
+  workspace(where: WorkspaceWhereUniqueInput!): Workspace!
+  workspaces(
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [Workspace]!
+  workspacesConnection(
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): WorkspaceConnection!
 }
 
 type Mutation {
@@ -178,4 +194,9 @@ type Mutation {
   createDataset(data: DatasetCreateInput!): Dataset!
   updateDataset(data: DatasetUpdateInput!, where: DatasetWhereUniqueInput!): Dataset
   deleteDataset(where: DatasetWhereUniqueInput!): Dataset
+
+  """Workspace"""
+  createWorkspace(data: WorkspaceCreateInput!): Workspace!
+  updateWorkspace(data: WorkspaceUpdateInput!, where: WorkspaceWhereUniqueInput!): Workspace
+  deleteWorkspace(where: WorkspaceWhereUniqueInput!): Workspace
 }

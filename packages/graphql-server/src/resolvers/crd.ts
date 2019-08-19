@@ -10,6 +10,8 @@ import {createConfig} from '../config';
 import { CrdCache } from '../cache/crdCache';
 const config = createConfig();
 import * as logger from '../logger';
+import WorkspaceApi from '../workspace/api';
+import { defaultWorkspaceId, keycloakMaxCount } from './constant';
 
 export class Crd<SpecType> {
   private cache: CrdCache<SpecType>;
@@ -108,16 +110,18 @@ export class Crd<SpecType> {
       groups: async (parent, args, context: Context) => {
         const resourceId = parent.id;
         // find all groups
-        const groups = await context.kcAdminClient.groups.find();
+        const workspaceId = (!args.where.workspaceId || args.where.workspaceId === defaultWorkspaceId)
+          ? null
+          : args.where.workspaceId;
+        const groups = await this.findAllGroups(context, workspaceId);
         // find each role-mappings
         const groupsWithRole = await Promise.all(
           groups
-          .filter(group => group.id !== context.everyoneGroupId)
           .map(async group => {
             const roles = await context.kcAdminClient.groups.listRealmRoleMappings({
               id: group.id
             });
-            const findRole = roles.find(role => role.name === `${this.getPrefix()}${resourceId}`);
+            const findRole = roles.find(role => role.name === `${this.getPrefix(workspaceId)}${resourceId}`);
             return findRole
               ? context.kcAdminClient.groups.findOne({id: group.id})
               : null;
@@ -155,18 +159,19 @@ export class Crd<SpecType> {
     };
   }
 
-  public parseNameFromRole = (roleName: string) => {
+  public parseNameFromRole = (roleName: string, workspaceId: string) => {
     return this.customParseNameFromRole
       ? this.customParseNameFromRole(roleName)
-      : roleName.slice(this.getPrefix().length);
+      : roleName.slice(this.getPrefix(workspaceId).length);
   }
 
-  public findInGroup = async (groupId: string, resource: string, kcAdminClient: KeycloakAdminClient) => {
+  // tslint:disable-next-line:max-line-length
+  public findInGroup = async (groupId: string, resource: string, kcAdminClient: KeycloakAdminClient, workspaceId: string) => {
     const roles = await kcAdminClient.groups.listRealmRoleMappings({
       id: groupId
     });
     return Boolean(find(roles, role => {
-      const resourceNameFromRole = this.parseNameFromRole(role.name);
+      const resourceNameFromRole = this.parseNameFromRole(role.name, workspaceId);
       return resourceNameFromRole === resource;
     }));
   }
@@ -175,7 +180,7 @@ export class Crd<SpecType> {
     const name = metadata.name;
     const {kcAdminClient} = context;
     // create role on keycloak
-    const roleName = `${this.getPrefix()}${name}`;
+    const roleName = `${this.getPrefix(null)}${name}`;
     await kcAdminClient.roles.create({
       name: roleName
     });
@@ -185,18 +190,21 @@ export class Crd<SpecType> {
     }
   }
 
-  public getPrefix = () => {
-    return (this.rolePrefix)
+  public getPrefix = (workspaceId: string) => {
+    const rolePrefix = (this.rolePrefix)
       ? `${this.rolePrefix}:${this.prefixName}:`
       : `${this.prefixName}:`;
+
+    const workspacePrefix = workspaceId ? `${workspaceId}|` : '';
+    return `${rolePrefix}${workspacePrefix}`;
   }
 
   /**
    * query methods
    */
 
-  private listQuery = async (customResource: CustomResource<SpecType>, where: any) => {
-    const rows = await customResource.list();
+  private listQuery = async (customResource: CustomResource<SpecType>, where: any, workspaceId: string) => {
+    const rows = await customResource.list(workspaceId);
     let mappedRows = rows.map(this.propMapping);
     mappedRows = filter(mappedRows, where);
     return mappedRows;
@@ -208,23 +216,34 @@ export class Crd<SpecType> {
 
   private query = async (root, args, context: Context) => {
     const customResource = context.crdClient[this.customResourceMethod];
-    const where = this.parseWhere(args && args.where);
-    const rows = await this.listQuery(customResource, where);
+    const workspaceId = (!args.where.workspaceId || args.where.workspaceId === defaultWorkspaceId)
+      ? null
+      : args.where.workspaceId;
+    const whereWithoutWorkspaceId = omit(args.where, 'workspaceId');
+    const where = this.parseWhere(whereWithoutWorkspaceId);
+    const rows = await this.listQuery(customResource, where, workspaceId);
     return paginate(rows, extractPagination(args));
   }
 
   private connectionQuery = async (root, args, context: Context) => {
     const customResource = context.crdClient[this.customResourceMethod];
-    const where = this.parseWhere(args && args.where);
-    const rows = await this.listQuery(customResource, where);
+    const workspaceId = (!args.where.workspaceId || args.where.workspaceId === defaultWorkspaceId)
+      ? null
+      : args.where.workspaceId;
+    const whereWithoutWorkspaceId = omit(args.where, 'workspaceId');
+    const where = this.parseWhere(whereWithoutWorkspaceId);
+    const rows = await this.listQuery(customResource, where, workspaceId);
     return toRelay(rows, extractPagination(args));
   }
 
   private queryOne = async (root, args, context: Context) => {
     const id = args.where.id;
+    const workspaceId = (!args.where.workspaceId || args.where.workspaceId === defaultWorkspaceId)
+      ? null
+      : args.where.workspaceId;
     const customResource = context.crdClient[this.customResourceMethod];
     try {
-      const row = await customResource.get(id);
+      const row = await customResource.get(id, workspaceId);
       return this.propMapping(row);
     } catch (e) {
       // if http 404 error
@@ -236,10 +255,13 @@ export class Crd<SpecType> {
     let roles = await context.kcAdminClient.groups.listRealmRoleMappings({
       id: parent.id
     });
-    const prefix = this.getPrefix();
+    const workspaceId = (!args.where.workspaceId || args.where.workspaceId === defaultWorkspaceId)
+      ? null
+      : args.where.workspaceId;
+    const prefix = this.getPrefix(workspaceId);
     roles = roles.filter(role => role.name.startsWith(prefix));
     const namesWithRole = roles.map(role => {
-      return {name: this.parseNameFromRole(role.name), roleName: role.name};
+      return {name: this.parseNameFromRole(role.name, workspaceId), roleName: role.name};
     });
 
     // todo: make this logic better
@@ -275,8 +297,11 @@ export class Crd<SpecType> {
     const name = (this.generateName) ? this.generateName() : get(args, 'data.name');
     const {kcAdminClient, crdClient} = context;
     const customResource = crdClient[this.customResourceMethod];
+    const workspaceId = (!args.data.workspaceId || args.data.workspaceId === defaultWorkspaceId)
+      ? null
+      : args.data.workspaceId;
     // create role on keycloak
-    const roleName = `${this.getPrefix()}${name}`;
+    const roleName = `${this.getPrefix(workspaceId)}${name}`;
     try {
       await kcAdminClient.roles.create({
         name: roleName
@@ -376,5 +401,21 @@ export class Crd<SpecType> {
       id: name
     });
     return this.propMapping(crd);
+  }
+
+  // tslint:disable-next-line:max-line-length
+  private findAllGroups = async (context: Context, workspaceId?: string) => {
+    const {kcAdminClient, workspaceApi} = context;
+    let groups = (!workspaceId || workspaceId === defaultWorkspaceId) ?
+      await kcAdminClient.groups.find({
+        max: keycloakMaxCount
+      }) :
+      await workspaceApi.listGroups(workspaceId);
+    const everyoneGroupId = context.everyoneGroupId;
+    // filter out everyone
+    groups = groups.filter(group => group.id !== everyoneGroupId);
+    // filter workspace groups
+    groups = groups.filter(group => !group.attributes.isWorkspace);
+    return groups;
   }
 }
