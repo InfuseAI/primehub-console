@@ -47,8 +47,12 @@ export default class RelationTable extends PureComponent {
       modalVisible: false
     });
     updateRelationQuery([relation.to], {
-      ...relationArgs,
-      where: {}
+      where: {},
+      after: undefined,
+      before: undefined,
+      first: 10,
+      last: undefined,
+      orderBy: undefined,
     })
   }
 
