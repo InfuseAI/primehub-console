@@ -42,9 +42,14 @@ export default class RelationTable extends PureComponent {
   }
 
   handleCancel = () => {
+    const {updateRelationQuery, relationArgs, relation} = this.props;
     this.setState({
       modalVisible: false
     });
+    updateRelationQuery([relation.to], {
+      ...relationArgs,
+      where: {}
+    })
   }
 
   handleClose = (index) => {

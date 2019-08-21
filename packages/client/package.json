@@ -34,16 +34,16 @@
     "@babel/preset-env": "^7.1.6",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
-    "@types/react": "^16.3.14",
-    "@types/react-router": "^4.0.25",
     "@canner/antd-components": "^0.5.29",
     "@canner/container": "^2.0.37",
     "@canner/history-router": "^2.0.11",
     "@canner/storage": "2.0.11",
+    "@types/react": "^16.3.14",
+    "@types/react-router": "^4.0.25",
     "@types/react-router-dom": "^4.2.6",
     "antd": "3.10.10",
     "axios": "^0.18.0",
-    "canner": "2.0.53",
+    "canner": "2.0.57",
     "gulp": "^3.9.1",
     "gulp-s3": "^0.11.0",
     "isomorphic-fetch": "^2.2.1",
@@ -115,5 +115,8 @@
     "icon-url": "'/font/iconfont'"
   },
   "license": "Apache-2.0",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "canner": "2.0.57"
+  }
 }
