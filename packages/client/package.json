@@ -117,6 +117,6 @@
   "license": "Apache-2.0",
   "private": true,
   "dependencies": {
-    "canner": "2.0.56"
+    "canner": "2.0.57"
   }
 }

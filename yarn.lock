@@ -3327,7 +3327,7 @@ anymatch@^2.0.0:
     micromatch "^3.1.4"
     normalize-path "^2.1.1"
 
-apollo-boost@0.1.22, apollo-boost@^0.1.4:
+apollo-boost@^0.1.4:
   version "0.1.22"
   resolved "https://registry.yarnpkg.com/apollo-boost/-/apollo-boost-0.1.22.tgz#0b6c607fcb02d06894e925010560b3237d1bce86"
   integrity sha512-JOU2MIhJISOfL/2hWkuBqH7sqNs28ZS8wRVjmcMEJ+DjmF5otVsDBtx+IMp9PEReoznrbSfjo3p4ix4AgtbooA==
@@ -3375,7 +3375,7 @@ apollo-cache@^1.1.21, apollo-cache@^1.1.7, apollo-cache@^1.3.2:
     apollo-utilities "^1.3.2"
     tslib "^1.9.3"
 
-apollo-client@2.4.7, apollo-client@^2.2.8, apollo-client@^2.4.7:
+apollo-client@^2.2.8, apollo-client@^2.4.7:
   version "2.4.7"
   resolved "https://registry.yarnpkg.com/apollo-client/-/apollo-client-2.4.7.tgz#b6712fd4c9ba346e3c44cfec7e6868e532b6a957"
   integrity sha512-6aAm+16AFBYZhJF8eKxrup6AbYni01InDiwTfZhMMTP2xaXQWjsQnfaHbI2oE+hd3+AZFy1drkse8RZKghR/WQ==
@@ -4875,10 +4875,10 @@ canner-compiler@2.0.14:
   resolved "https://registry.yarnpkg.com/canner-compiler/-/canner-compiler-2.0.14.tgz#3e7fec66ee4683d5fc3590573326c40d29b0b4f0"
   integrity sha512-ZtVmgDVSU4YcLzZUUXqZrN1vYZOU324HsephsYETZdpo0/hTO+uveRRd4t24BeQf82Qpfh5+5dZkWFpMOmKg+w==
 
-canner-graphql-interface@2.0.25:
-  version "2.0.25"
-  resolved "https://registry.yarnpkg.com/canner-graphql-interface/-/canner-graphql-interface-2.0.25.tgz#050afc57ca000f9800a634ed4b3b937c5071ee75"
-  integrity sha512-HRfJppXeFKFJIvceqLYui7zPRr7Q5AMSulfLvl4auI7Yyo5e7ZI72LNJ0CjADdI/2BlQdcGFG5YF7jEy1avEbg==
+canner-graphql-interface@2.0.52:
+  version "2.0.52"
+  resolved "https://registry.yarnpkg.com/canner-graphql-interface/-/canner-graphql-interface-2.0.52.tgz#fd1e1db3c9f2e6622ed874d688ebe28e5c03e1b1"
+  integrity sha512-YkKhXGLScWjPYNTjXZCypKiaB9DvA+BwC8fHDNoZc8QVPQppmyOMTfmDLziRBPHvoPX16GIO+WuT3KTMPSMhpw==
   dependencies:
     apollo-cache "^1.1.7"
     apollo-cache-inmemory "^1.1.12"
@@ -4888,7 +4888,7 @@ canner-graphql-interface@2.0.25:
     apollo-utilities "^1.0.11"
     canner-graphql-utils "^2.0.5"
     dataloader "^1.4.0"
-    graphql "0.13.0"
+    graphql "^14.1.1"
     graphql-anywhere "^4.1.6"
     graphql-tag "^2.8.0"
     graphql-tools "^2.21.0"
@@ -4961,17 +4961,17 @@ canner-script@2.0.11-alpha.1:
     react-intl "^2.4.0"
     safer-eval "^1.2.3"
 
-canner@2.0.50:
-  version "2.0.50"
-  resolved "https://registry.yarnpkg.com/canner/-/canner-2.0.50.tgz#505ecd9fa1d12452c27a00907420d4dcdcb0c97d"
-  integrity sha512-qyDcbeRNvYGhKse2odMhHg6IyRi7Q9Toq3qDAPapYJgc+bksHAa007VaRCmkd4gkwWyk+kOZeZghhRBbz5Xtow==
+canner@2.0.57:
+  version "2.0.57"
+  resolved "https://registry.yarnpkg.com/canner/-/canner-2.0.57.tgz#0737c10fd7cad5facde91c1ea626f06b43d16ce8"
+  integrity sha512-a55C7/29KSp4JA8LOtm2t0uqH010GXLh1gLgJvjZyehoh5ksnRabNqCF56aaRkn6E23o+/CmE/lX8sWy7IU9kA==
   dependencies:
     "@babel/runtime" "^7.2.0"
     ajv "^6.5.2"
     apollo-boost "^0.1.4"
     bson-objectid "^1.2.2"
     canner-compiler "2.0.14"
-    canner-graphql-interface "2.0.25"
+    canner-graphql-interface "2.0.52"
     canner-helpers "2.0.14"
     canner-layouts "2.0.37"
     canner-ref-id "2.0.14"
@@ -8443,14 +8443,7 @@ graphql-upload@^8.0.2:
     http-errors "^1.7.2"
     object-path "^0.11.4"
 
-graphql@0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/graphql/-/graphql-0.13.0.tgz#d1b44a282279a9ce0a6ec1037329332f4c1079b6"
-  integrity sha512-WlO+ZJT9aY3YrBT+H5Kk+eVb3OVVehB9iRD/xqeHdmrrn4AFl5FIcOpfHz/vnBr6Y6JthGMlnFqU8XRnDjSR7A==
-  dependencies:
-    iterall "1.1.x"
-
-graphql@^14.4.2:
+graphql@^14.1.1, graphql@^14.4.2:
   version "14.4.2"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-14.4.2.tgz#553a7d546d524663eda49ed6df77577be3203ae3"
   integrity sha512-6uQadiRgnpnSS56hdZUSvFrVcQ6OF9y6wkxJfKquFtHlnl7+KSuWwSJsdwiK1vybm1HgcdbpGkCpvhvsVQ0UZQ==
@@ -9897,11 +9890,6 @@ isurl@^1.0.0-alpha5:
   dependencies:
     has-to-string-tag-x "^1.2.0"
     is-object "^1.0.1"
-
-iterall@1.1.x:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/iterall/-/iterall-1.1.4.tgz#0db40d38fdcf53ae14dc8ec674e62ab190d52cfc"
-  integrity sha512-eaDsM/PY8D/X5mYQhecVc5/9xvSHED7yPON+ffQroBeTuqUVm7dfphMkK8NksXuImqZlVRoKtrNfMIVCYIqaUQ==
 
 iterall@^1.1.3, iterall@^1.2.1, iterall@^1.2.2:
   version "1.2.2"

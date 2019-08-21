@@ -61,7 +61,7 @@ export default class RelationTable extends PureComponent {
     const { modalVisible } = this.state;
     let { disabled, value = [], uiParams = {}, refId, relation,
       fetch, fetchRelation, updateQuery, subscribe, intl,
-      schema, Toolbar, relationValue, goTo, rootValue, title, isRelationFetching
+      schema, Toolbar, relationValue, goTo, rootValue, title
     } = this.props;
     const newColumnsRender = renderValue(uiParams.columns, schema[relation.to].items.items);
     const recordValue = getRecordValue(rootValue, refId);
@@ -96,7 +96,6 @@ export default class RelationTable extends PureComponent {
         />
         {
           !disabled && <Picker
-            isFetching={isRelationFetching}
             visible={modalVisible}
             onOk={this.handleOk}
             onCancel={this.handleCancel}
