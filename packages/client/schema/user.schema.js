@@ -114,6 +114,8 @@ export default () => (
         pageInfo {
           hasNextPage
           hasPreviousPage
+          startCursor
+          endCursor
         }
       }
     }
