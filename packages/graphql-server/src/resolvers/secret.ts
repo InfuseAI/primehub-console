@@ -35,6 +35,7 @@ const listQuery = async (k8sSecret: K8sSecret, where: any) => {
 export const query = async (root, args, context: Context) => {
   const {k8sSecret} = context;
   let secrets = await listQuery(k8sSecret, args && args.where);
+  console.log(secrets);
   secrets = secrets.map(transformSecret);
   return paginate(secrets, extractPagination(args));
 };
@@ -68,7 +69,7 @@ export const resolveInDataSet = {
     }
     const {k8sSecret} = context;
     const secret = await k8sSecret.findOne(root.secret);
-    return transformSecret(secret);
+    return secret ? transformSecret(secret) : null;
   }
 };
 
