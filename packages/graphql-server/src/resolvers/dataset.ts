@@ -7,6 +7,7 @@ import { Context } from './interface';
 import { omit, get, isUndefined, last, isNil } from 'lodash';
 import { resolveInDataSet } from './secret';
 import KeycloakAdminClient from 'keycloak-admin';
+import { ResourceRole, ResourceNamePrefix } from './resourceRole';
 
 export const ATTRIBUTE_PREFIX = 'dataset.primehub.io';
 
@@ -432,21 +433,21 @@ export const resolveType = {
   ...resolveInDataSet
 };
 
-export const customParseNameFromRole = (roleName: string) => {
-  return last(roleName.split(':'));
+export const parseNameFromRole = (role: ResourceRole) => {
+  return role.resourceName.replace('rw:', '');
 };
 
 export const crd = new Crd<DatasetSpec>({
   customResourceMethod: 'datasets',
   propMapping: mapping,
-  prefixName: 'ds',
+  prefixName: ResourceNamePrefix.ds,
   resourceName: 'dataset',
   createMapping,
   updateMapping,
   onCreate,
   onUpdate,
   onDelete,
-  customParseNameFromRole,
+  parseNameFromRole,
   resolveType,
   customUpdate
 });

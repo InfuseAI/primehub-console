@@ -5,6 +5,7 @@ import { mutateRelation } from './utils';
 import { Crd } from './crd';
 import { isUndefined, isNil, isNull } from 'lodash';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
+import { ResourceNamePrefix } from './resourceRole';
 
 export const mapping = (item: Item<ImageSpec>) => {
   return {
@@ -141,7 +142,7 @@ export const crd = new Crd<ImageSpec>({
   customResourceMethod: 'images',
   propMapping: mapping,
   resolveType,
-  prefixName: 'img',
+  prefixName: ResourceNamePrefix.img,
   resourceName: 'image',
   createMapping,
   updateMapping,
