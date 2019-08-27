@@ -6,6 +6,7 @@ import { Crd } from './crd';
 import { isUndefined, isNil } from 'lodash';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 import Boom from 'boom';
+import { ResourceNamePrefix } from './resourceRole';
 
 export const mapping = (item: Item<InstanceTypeSpec>) => {
   return {
@@ -183,7 +184,7 @@ export const crd = new Crd<InstanceTypeSpec>({
   customResourceMethod: 'instanceTypes',
   propMapping: mapping,
   resolveType,
-  prefixName: 'it',
+  prefixName: ResourceNamePrefix.it,
   resourceName: 'instanceType',
   createMapping,
   updateMapping,
