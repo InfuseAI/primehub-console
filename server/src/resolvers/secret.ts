@@ -43,6 +43,7 @@ export const resolveInDataSet = {
     if (!root.secret) {
       return null;
     }
+
     const {gitSyncSecret} = context;
     return gitSyncSecret.findOne(root.secret);
   }
