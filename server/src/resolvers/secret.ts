@@ -68,7 +68,7 @@ export const resolveInDataSet = {
     }
     const {k8sSecret} = context;
     const secret = await k8sSecret.findOne(root.secret);
-    return transformSecret(secret);
+    return secret ? transformSecret(secret) : null;
   }
 };
 
