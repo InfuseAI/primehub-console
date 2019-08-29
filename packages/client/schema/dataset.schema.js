@@ -3,6 +3,7 @@ import builder, {Default, Condition} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 import DatasetWrapper from '../src/cms-layouts/datasetWrapper';
 import {groupColumns} from './utils.schema';
+import {renderUploadServerLink} from './utils';
 
 export default () => (
   <array keyName="dataset" title="${dataset}"
@@ -22,6 +23,10 @@ export default () => (
       }, {
         title: '${description}',
         dataIndex: 'description'
+      }, {
+        title: '${uploadServerLink}',
+        dataIndex: 'uploadServerLink',
+        render: renderUploadServerLink
       }]
     }}
     refetch
@@ -38,6 +43,7 @@ export default () => (
               displayName
               description
               type
+              uploadServerLink
             }
           }
           pageInfo {
@@ -65,7 +71,12 @@ export default () => (
       <pagination />
     </toolbar>
     <Default component={DatasetWrapper}>
-
+    <boolean
+      keyName="enableUploadServer"
+      title="${dataset.enableUploadServer}"
+      packageName="../src/cms-components/customize-boolean-enable_upload_server"
+    />
+    <string keyName="uploadServerLink" hidden />
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
       <string keyName="name" title="${name}"
         validation={{

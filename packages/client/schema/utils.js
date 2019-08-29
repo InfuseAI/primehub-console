@@ -27,6 +27,15 @@ exports.renderRelationField = function(text, record) {
   </span>
 }
 
+exports.renderUploadServerLink = function(text, record) {
+  if (text) {
+    return <a href={text} target="_blank">
+      Link
+    </a>
+  }
+  return '-';
+}
+
 exports.renderContent = function(content) {
   var html = content ? content.html : '<p>-</p>';
   var div = document.createElement("div");
@@ -207,6 +216,12 @@ exports.dict = {
     vendor: 'Vendor',
     access: 'Access',
     volumeName: 'Volume Name',
+    uploadServerLink: 'Server Link',
+    'dataset.enableUploadServer': 'Enable Upload Server',
+    'dataset.regenerateSecretModalTitle': 'Regenerate secret successfully, please memorize the secret below',
+    'dataset.enableUploadServerModalTitle': 'Enable upload server successfully, please memorize the secret below.',
+    'dataset.regenerateSecretErrorModalTitle': `Sorry.`,
+    'dataset.regenerateSecretErrorModalContent': `Something went wrong, we cloudn't regenerate secret.`,
     // userfederation
     userFederations: 'User Federations',
     basicInformation: 'Basic Information',
@@ -393,6 +408,13 @@ exports.dict = {
     vendor: 'Vendor',
     access: 'Access',
     volumeName: 'Volume Name',
+    uploadServerLink: 'Server Link',
+    'dataset.enableUploadServer': 'Enable Upload Server',
+    'dataset.regenerateSecretModalTitle': 'Regenerate secret successfully, please memorize the secret below',
+    'dataset.enableUploadServerModalTitle': 'Enable upload server successfully, please memorize the secret below.',
+    'dataset.regenerateSecretErrorModalTitle': `Sorry.`,
+    'dataset.regenerateSecretErrorModalContent': `Something went wrong, we cloudn't regenerate secret.`,
+
     // userfederation
     userFederations: 'User Federations',
     basicInformation: 'Basic Information',

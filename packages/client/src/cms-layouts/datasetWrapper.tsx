@@ -4,6 +4,7 @@ import {Button, Spin, Modal} from 'antd';
 import styled from 'styled-components';
 import {injectIntl} from 'react-intl';
 import {isPlainObject, get} from 'lodash';
+import uploadServerSecretModal from '../cms-components/uploadServerSecretModal';
 
 const ButtonWrapper = styled.div`
   text-align: right;
@@ -15,9 +16,7 @@ export default class DatasetWrapper extends React.Component {
     super(props);
     this.state = {
       loading: false,
-      loadingTip: '',
-      secretModalVisible: true,
-      secret: ''
+      loadingTip: ''
     };
   }
 
@@ -44,26 +43,19 @@ export default class DatasetWrapper extends React.Component {
   }
 
   handleSecretModal = (updateValue) => {
-    const secret = get(updateValue, 'updateDataset.uploadServerSecret', {
-      username: 'USERNAME',
-      password: 'PASSWORD'
-    });
+    const {intl} = this.props;
+    const secret = get(updateValue, 'updateDataset.uploadServerSecret', null);
     if (isPlainObject(secret) && secret.username && secret.password) {
 
       setTimeout(() => {
         this.setState({
           loading: false,
         }, () => {
-          Modal.success({
-            title: 'Enable upload server successfully',
-            content: (
-              <div>
-                <span>Username: </span><p>{secret.username}</p>
-                <span>Password: </span><p>{secret.password}</p>
-              </div>
-            ),
+          uploadServerSecretModal({
+            title: intl.formatMessage({id: 'dataset.enableUploadServerModalTitle'}),
+            secret,
             onOk: this.closeModal
-          })
+          });
         });
       }, 400);
     } else {
