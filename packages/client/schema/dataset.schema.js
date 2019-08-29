@@ -1,6 +1,7 @@
 /** @jsx builder */
 import builder, {Default, Condition} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
+import DatasetWrapper from '../src/cms-layouts/datasetWrapper';
 import {groupColumns} from './utils.schema';
 
 export default () => (
@@ -24,6 +25,7 @@ export default () => (
       }]
     }}
     refetch
+    hideButtons
     graphql={
       `
       query($datasetAfter: String, $datasetBefore: String, $datasetLast: Int, $datasetFirst: Int, $datasetWhere: DatasetWhereInput) {
@@ -62,7 +64,7 @@ export default () => (
       />
       <pagination />
     </toolbar>
-    <Default>
+    <Default component={DatasetWrapper}>
 
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
       <string keyName="name" title="${name}"

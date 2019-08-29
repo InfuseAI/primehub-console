@@ -115,6 +115,12 @@ export default class CMSPage extends React.Component<Props, State> {
       }, 400);
       return ;
     }
+    if (get(data, 'key') === 'dataset' && get(data, 'actions.0.type') === 'UPDATE_ARRAY') {
+      this.setState({
+        deploying: false
+      });
+      return;
+    }
     setTimeout(() => {
       this.setState({
         deploying: false
