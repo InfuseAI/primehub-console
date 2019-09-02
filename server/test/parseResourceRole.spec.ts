@@ -71,6 +71,14 @@ const fixtures: Array<{name: string, role: ResourceRole}> = [{
     resourcePrefix: ResourceNamePrefix.ds,
     resourceName: 'rw:assac'
   }
+}, {
+  name: 'gitlab',
+  role: {
+    rolePrefix: null,
+    originalName: 'gitlab',
+    resourcePrefix: null,
+    resourceName: null
+  }
 }];
 
 describe('observer', () => {
