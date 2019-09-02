@@ -30,17 +30,23 @@ export const parseResourceRole = (keycloakRoleName: string): ResourceRole => {
     };
   }
 
-  // not starts from any words in ResourceNamePrefix
-  // the firstSplit would be rolePrefix
+  // starts from a word in ResourceNamePrefix
+  // the secondSplit would be rolePrefix
   const secondSplit = splits[1];
-  if (!ResourceNamePrefix[secondSplit]) {
-    throw new Error(`cannot parse role from rolename ${keycloakRoleName}`);
+  if (ResourceNamePrefix[secondSplit]) {
+    return {
+      rolePrefix: firstSplit,
+      originalName: keycloakRoleName,
+      resourcePrefix: ResourceNamePrefix[secondSplit],
+      resourceName: splits.slice(2).join(SEPARATOR),
+    };
   }
 
+  // a self-defined keycloak role
   return {
-    rolePrefix: firstSplit,
+    rolePrefix: null,
     originalName: keycloakRoleName,
-    resourcePrefix: ResourceNamePrefix[secondSplit],
-    resourceName: splits.slice(2).join(SEPARATOR),
+    resourcePrefix: null,
+    resourceName: null,
   };
 };
