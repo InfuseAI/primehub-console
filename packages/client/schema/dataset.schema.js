@@ -1,9 +1,9 @@
 /** @jsx builder */
-import builder, {Default, Condition} from 'canner-script';
+import builder, {Default, Condition, Layout} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 import DatasetWrapper from '../src/cms-layouts/datasetWrapper';
+import EnableUploadServer from '../src/cms-layouts/enableUploadServer';
 import {groupColumns} from './utils.schema';
-import {renderUploadServerLink} from './utils';
 
 export default () => (
   <array keyName="dataset" title="${dataset}"
@@ -23,10 +23,6 @@ export default () => (
       }, {
         title: '${description}',
         dataIndex: 'description'
-      }, {
-        title: '${uploadServerLink}',
-        dataIndex: 'uploadServerLink',
-        render: renderUploadServerLink
       }]
     }}
     refetch
@@ -71,12 +67,6 @@ export default () => (
       <pagination />
     </toolbar>
     <Default component={DatasetWrapper}>
-    <boolean
-      keyName="enableUploadServer"
-      title="${dataset.enableUploadServer}"
-      packageName="../src/cms-components/customize-boolean-enable_upload_server"
-    />
-    <string keyName="uploadServerLink" hidden />
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
       <string keyName="name" title="${name}"
         validation={{
@@ -156,7 +146,23 @@ export default () => (
       />
     </Condition>
     <Condition match={data => data.type === 'pv'}>
-      <string keyName="volumeName" title="${volumeName}"/>
+      <Layout component={EnableUploadServer}>
+        <boolean
+          keyName="enableUploadServer"
+          title="${dataset.enableUploadServer}"
+          packageName="../src/cms-components/customize-boolean-enable_upload_server"
+        />
+      </Layout>
+      
+      <string keyName="uploadServerLink" hidden />
+      <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
+        <string keyName="volumeName" title="${volumeName}"/>
+        <number keyName="volumeSize" title="${volumeSize}"
+          uiParams={{unit: ' GB', step: 1, min: 1, precision: 0}}
+          defaultValue={1}
+          packageName="../src/cms-components/customize-number-precision"
+        />
+      </Condition>
     </Condition>
     <Condition match={data => !(data.global && data.type !== 'pv')}>
       <relation keyName="groups"
