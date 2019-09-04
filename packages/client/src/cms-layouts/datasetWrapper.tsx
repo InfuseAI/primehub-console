@@ -44,7 +44,7 @@ export default class DatasetWrapper extends React.Component {
 
   handleSecretModal = (updateValue) => {
     const {intl} = this.props;
-    const secret = get(updateValue, 'updateDataset.uploadServerSecret', null);
+    const secret = get(updateValue, 'updateDataset.uploadServerSecret');
     if (isPlainObject(secret) && secret.username && secret.password) {
 
       setTimeout(() => {
@@ -64,16 +64,10 @@ export default class DatasetWrapper extends React.Component {
   }
 
   success = () => {
-    const {reset, refId} = this.props;
     setTimeout(() => {
       this.setState({
         loading: false
-      }, () => {
-        reset(refId.getPathArr()[0])
-          .then(() => {
-            this.back();
-          })
-      });
+      }, this.back);
     }, 400);
   }
 
@@ -89,9 +83,13 @@ export default class DatasetWrapper extends React.Component {
   }
 
   closeModal = () => {
+    const {reset, refId} = this.props;
     this.setState({
       loading: false,
-    }, this.back);
+    }, () => {
+      reset(refId.getPathArr()[0])
+        .then(this.back);
+    });
   }
 
   render() {
