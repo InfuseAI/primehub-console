@@ -8,7 +8,7 @@ import {get, isPlainObject} from 'lodash';
 import uploadServerSecretModal from './uploadServerSecretModal';
 
 const REGENERATE_UPLOAD_SERVER_SECRET = gql`
-  mutation RegenerateUploadServerSecret($where: DatasetWhereUniqueId!) {
+  mutation RegenerateUploadServerSecret($where: DatasetWhereUniqueInput!) {
     regenerateUploadServerSecret(where: $where) {
       id
       uploadServerSecret {
