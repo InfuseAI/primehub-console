@@ -38,8 +38,9 @@ export default class EnableUploadServer extends React.Component<Props> {
   }
 
   render() {
-    const {value, routerParams, refId, intl} = this.props;
+    const {value, routerParams, refId, intl, rootValue} = this.props;
     const {initialValue} = this.state;
+    const pathArr = refId.getPathArr();
     const disabled = routerParams.op === 'create' || !initialValue || !value;
     return (
       <React.Fragment>
@@ -48,7 +49,7 @@ export default class EnableUploadServer extends React.Component<Props> {
           mutation={REGENERATE_UPLOAD_SERVER_SECRET}
           variables={{
             where: {
-              id: refId.getPathArr()[1]
+              id: get(rootValue, [pathArr[0], pathArr[1], 'id'])
             }
           }}
           onCompleted={data => {
