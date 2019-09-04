@@ -147,11 +147,13 @@ export default () => (
     </Condition>
     <Condition match={data => data.type === 'pv'}>
       <Layout component={EnableUploadServer}>
-        <boolean
-          keyName="enableUploadServer"
-          title="${dataset.enableUploadServer}"
-          packageName="../src/cms-components/customize-boolean-enable_upload_server"
-        />
+        <Condition match={(data, operator) => operator === 'update'} defaultMode="hidden">
+          <boolean
+            keyName="enableUploadServer"
+            title="${dataset.enableUploadServer}"
+            packageName="../src/cms-components/customize-boolean-enable_upload_server"
+          />
+        </Condition>
       </Layout>
       
       <string keyName="uploadServerLink" hidden />
