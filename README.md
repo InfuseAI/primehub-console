@@ -30,6 +30,8 @@ Canner CMS
 * APOLLO_TRACING: (boolean) default: false
 * GRAPHQL_PLAYGROUND: (boolean) default: false
 * DEFAULT_USER_VOLUME_CAPACITY: (string) default: `20G`
+* PRIMEHUB_GROUP_SC: for pvc
+* PRIMEHUB_FEATURE_DATASET_UPLOAD: enable upload feature or not
 
 ### admin-server
 * KC_API_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. Ex: 'http://127.0.0.1:8080/auth'. For API usage.
@@ -46,7 +48,7 @@ Canner CMS
 * PRIMEHUB_FEATURE_USER_PORTAL: (boolean) default: `false`
 * PORTAL_CONFIG_PATH: (string) default: `<project-dir>/server/etc/portal-config.yaml`
 * READ_ONLY_ON_INSTANCE_TYPE_AND_IMAGE: (boolean) default false. whether we only allow read operations and group-assignment on instanceType/image form.
-
+* PRIMEHUB_FEATURE_DATASET_UPLOAD: enable upload feature or not
 
 ### watcher
 * KC_API_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. Ex: 'http://127.0.0.1:8080/auth'. For API usage.
