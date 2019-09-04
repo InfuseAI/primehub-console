@@ -64,10 +64,16 @@ export default class DatasetWrapper extends React.Component {
   }
 
   success = () => {
+    const {reset, refId} = this.props;
     setTimeout(() => {
       this.setState({
         loading: false
-      }, this.back);
+      }, () => {
+        reset(refId.getPathArr()[0])
+          .then(() => {
+            this.back();
+          })
+      });
     }, 400);
   }
 
