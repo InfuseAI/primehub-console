@@ -4,6 +4,8 @@ import {Button, Spin, Modal} from 'antd';
 import styled from 'styled-components';
 import {injectIntl} from 'react-intl';
 import {isPlainObject, get} from 'lodash';
+import {withApollo} from 'react-apollo';
+import gql from 'graphql-tag';
 import uploadServerSecretModal from '../cms-components/uploadServerSecretModal';
 
 const ButtonWrapper = styled.div`
@@ -11,6 +13,7 @@ const ButtonWrapper = styled.div`
 `;
 
 @injectIntl
+@withApollo
 export default class DatasetWrapper extends React.Component {
   constructor(props) {
     super(props);
@@ -46,18 +49,15 @@ export default class DatasetWrapper extends React.Component {
     const {intl} = this.props;
     const secret = get(updateValue, 'updateDataset.uploadServerSecret');
     if (isPlainObject(secret) && secret.username && secret.password) {
-
-      setTimeout(() => {
-        this.setState({
-          loading: false,
-        }, () => {
-          uploadServerSecretModal({
-            title: intl.formatMessage({id: 'dataset.enableUploadServerModalTitle'}),
-            secret,
-            onOk: this.closeModal
-          });
+      this.setState({
+        loading: false,
+      }, () => {
+        uploadServerSecretModal({
+          title: intl.formatMessage({id: 'dataset.enableUploadServerModalTitle'}),
+          secret,
+          onOk: this.closeModal
         });
-      }, 400);
+      });
     } else {
       this.success();
     }
@@ -78,18 +78,29 @@ export default class DatasetWrapper extends React.Component {
   }
 
   back = () => {
-    const {goTo, routes} = this.props;
-    goTo({pathname: routes[0]});
+    const {goTo, routes, client, schema, query} = this.props;
+    // refresh server link
+    client.query({
+      fetchPolicy: 'network-only',
+      query: gql`${schema.dataset.graphql}`,
+      variables: {
+        after: query.variables.$datasetAfter,
+        before: query.variables.$datasetBefore,
+        first: query.variables.$datasetFirst,
+        last: query.variables.$datasetLast,
+        orderBy: query.variables.$datasetOrderBy,
+        where: {...(query.variables.$datasetWhere || {}), id: undefined}
+      }
+    }).then(() => {
+      goTo({pathname: routes[0]});
+    });
   }
 
   closeModal = () => {
     const {reset, refId} = this.props;
     this.setState({
       loading: false,
-    }, () => {
-      reset(refId.getPathArr()[0])
-        .then(this.back);
-    });
+    }, this.back);
   }
 
   render() {
