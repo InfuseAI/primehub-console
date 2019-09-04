@@ -34,8 +34,8 @@ const updateDatasetMutation = `
 `;
 
 const createDatasetMutation = `
-  mutation($payload: DatasetCreateInput!, $where: DatasetWhereUniqueInput!){
-    createDataset(data: $payload,where: $where){
+  mutation($payload: DatasetCreateInput!){
+    createDataset(data: $payload){
       id
       uploadServerSecret {
         username
