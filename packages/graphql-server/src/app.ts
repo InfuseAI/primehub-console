@@ -19,7 +19,7 @@ import * as user from './resolvers/user';
 import * as group from './resolvers/group';
 import * as secret from './resolvers/secret';
 import { crd as instanceType} from './resolvers/instanceType';
-import { crd as dataset} from './resolvers/dataset';
+import { crd as dataset, regenerateUploadSecret} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
 import { crd as ann} from './resolvers/announcement';
 import Agent, { HttpsAgent } from 'agentkeepalive';
@@ -53,10 +53,12 @@ import Boom from 'boom';
 import readOnlyMiddleware from './middlewares/readonly';
 import TokenSyncer from './oidc/syncer';
 import K8sSecret from './k8sResource/k8sSecret';
+import K8sDatasetPvc from './k8sResource/k8sDatasetPvc';
 
 // logger
 import * as logger from './logger';
 import { Item } from './crdClient/customResource';
+import K8sUploadServerSecret from './k8sResource/k8sUploadServerSecret';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -93,6 +95,7 @@ const resolvers = {
     createSecret: secret.create,
     updateSecret: secret.update,
     deleteSecret: secret.destroy,
+    regenerateUploadServerSecret: regenerateUploadSecret,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation(),
@@ -118,6 +121,15 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   // gitsync secret client
   const k8sSecret = new K8sSecret({namespace: config.k8sCrdNamespace});
+  // dataset pvc
+  const datasetPvc = new K8sDatasetPvc({
+    namespace: config.k8sCrdNamespace,
+    primehubGroupSc: config.primehubGroupSc
+  });
+  // K8sUploadServerSecret
+  const k8sUploadServerSecret = new K8sUploadServerSecret({
+    namespace: config.k8sCrdNamespace
+  });
 
   // construct http agent
   const httpAgent = new Agent({
@@ -294,7 +306,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         readOnly,
         userId,
         username,
-        defaultUserVolumeCapacity: config.defaultUserVolumeCapacity
+        defaultUserVolumeCapacity: config.defaultUserVolumeCapacity,
+        k8sDatasetPvc: datasetPvc,
+        k8sUploadServerSecret
       };
     },
     formatError: (error: any) => {

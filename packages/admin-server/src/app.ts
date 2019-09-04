@@ -71,6 +71,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.state.locale = config.locale;
     ctx.state.graphqlEndpoint = config.graphqlEndpoint;
     ctx.state.disableMode = config.readOnlyOnInstanceTypeAndImage;
+    ctx.state.enableDatasetUpload = config.enableDatasetUpload;
     return next();
   });
 

@@ -49,6 +49,10 @@ export interface Config {
 
   // system value
   defaultUserVolumeCapacity: string;
+
+  // pvc
+  primehubGroupSc?: string;
+  enableDatasetUpload: boolean;
 }
 
 const defaultConfigs = {
@@ -72,7 +76,8 @@ const defaultConfigs = {
   keycloakTimeout: 3000,
   apolloTracing: false,
   graphqlPlayground: true,
-  defaultUserVolumeCapacity: '20G'
+  defaultUserVolumeCapacity: '20G',
+  enableDatasetUpload: false
 };
 
 const prodConfigs = {
@@ -114,7 +119,10 @@ export const createConfig = (): Config => {
     appPrefix: sanitizePath(process.env.APP_PREFIX),
     apolloTracing: process.env.APOLLO_TRACING,
     graphqlPlayground: process.env.GRAPHQL_PLAYGROUND,
-    defaultUserVolumeCapacity: process.env.DEFAULT_USER_VOLUME_CAPACITY
+    defaultUserVolumeCapacity: process.env.DEFAULT_USER_VOLUME_CAPACITY,
+    primehubGroupSc: process.env.PRIMEHUB_GROUP_SC,
+    enableDatasetUpload:
+      process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD && process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD.toString() === 'true'
   });
 
   const env = process.env.NODE_ENV || 'development';
