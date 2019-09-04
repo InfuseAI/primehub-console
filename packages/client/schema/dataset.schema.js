@@ -156,7 +156,9 @@ export default () => (
       
       <string keyName="uploadServerLink" hidden />
       <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
-        <string keyName="volumeName" title="${volumeName}"/>
+        <Condition match={(data, operator) => operator === 'update'} defaultMode="hidden">
+          <string keyName="volumeName" title="${volumeName}"/>
+        </Condition>
         <number keyName="volumeSize" title="${volumeSize}"
           uiParams={{unit: ' GB', step: 1, min: 1, precision: 0}}
           defaultValue={1}
