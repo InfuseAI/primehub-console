@@ -44,6 +44,7 @@ export interface Config {
   keycloakTimeout: number;
 
   appPrefix?: string;
+  cmsAppPrefix?: string;
   apolloTracing: boolean;
   graphqlPlayground: boolean;
 
@@ -117,6 +118,7 @@ export const createConfig = (): Config => {
     keycloakRetries: process.env.KC_OIDC_RETRIES,
     keycloakTimeout: process.env.KC_OIDC_TIMEOUT ? parseInt(process.env.KC_OIDC_TIMEOUT, 10) : undefined,
     appPrefix: sanitizePath(process.env.APP_PREFIX),
+    cmsAppPrefix: sanitizePath(process.env.CMS_APP_PREFIX),
     apolloTracing: process.env.APOLLO_TRACING,
     graphqlPlayground: process.env.GRAPHQL_PLAYGROUND,
     defaultUserVolumeCapacity: process.env.DEFAULT_USER_VOLUME_CAPACITY,

@@ -27,6 +27,7 @@ Canner CMS
 * KC_ROLE_PREFIX: Prefix will be append at role when creating custom resource, for example: `cluster-1:ds:dataset` if `KC_ROLE_PREFIX` = `cluster-1`.
 * SHARED_GRAPHQL_SECRET_KEY: secret key to request read-only graphql with. Client should put this shared key in header `Authorization: "Bearer <SHARED_GRAPHQL_SECRET_KEY>"`
 * APP_PREFIX: ex: `/admin`
+* CMS_APP_PREFIX: the `APP_PREFIX` env setup in `admin-server`
 * APOLLO_TRACING: (boolean) default: false
 * GRAPHQL_PLAYGROUND: (boolean) default: false
 * DEFAULT_USER_VOLUME_CAPACITY: (string) default: `20G`

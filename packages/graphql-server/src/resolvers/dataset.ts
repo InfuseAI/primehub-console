@@ -75,7 +75,7 @@ export const mapping = (item: Item<DatasetSpec>) => {
     enableUploadServer,
     uploadServerLink:
       (item.spec.type === 'pv' && enableUploadServer) ?
-        `${config.appPrefix || ''}/dataset/${config.k8sCrdNamespace || 'default'}/${item.metadata.name}/browse`
+        `${config.cmsAppPrefix || ''}/dataset/${config.k8sCrdNamespace || 'default'}/${item.metadata.name}/browse`
         : null,
     uploadServerSecret:
       ((item as any).datasetUploadSecretUsername && (item as any).datasetUploadSecretPassword) ?
