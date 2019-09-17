@@ -158,7 +158,7 @@ export const updateMapping = (data: any) => {
       type: data.type,
       url: data.url,
       variables: data.variables,
-      enableUploadServer: data.enableUploadServer.toString(),
+      enableUploadServer: isNil(data.enableUploadServer) ? 'false' : data.enableUploadServer.toString(),
       ...gitSyncProp
     }
   };
