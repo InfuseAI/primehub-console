@@ -11,7 +11,6 @@ type Dataset {
   type: String
   url: String
   variables: JSON
-  volumeName: String
   writable: Boolean
   spec: JSON
   groups: [Group]
@@ -19,6 +18,20 @@ type Dataset {
   mountRoot: String
   homeSymlink: Boolean
   launchGroupOnly: Boolean
+  volumeName: String
+  volumeSize: Float
+  enableUploadServer: Boolean
+  uploadServerLink: String
+}
+
+type DatasetUploadSecret {
+  username: String
+  password: String
+}
+
+type DatasetMutationResponse {
+  id: ID!
+  uploadServerSecret: DatasetUploadSecret
 }
 
 """An edge in a connection."""
@@ -104,12 +117,15 @@ input DatasetCreateInput {
   type: String
   url: String
   variables: JSON
-  volumeName: String
   groups: DatasetGroupCreateManyInput
   secret: SecretCreateOneInput
   mountRoot: String
   homeSymlink: Boolean
   launchGroupOnly: Boolean
+  volumeName: String
+  volumeSize: Float
+  enableUploadServer: Boolean
+  uploadServerLink: String
 }
 
 input DatasetUpdateInput {
@@ -120,10 +136,13 @@ input DatasetUpdateInput {
   type: String
   url: String
   variables: JSON
-  volumeName: String
   groups: DatasetGroupUpdateManyInput
   secret: SecretUpdateOneInput
   mountRoot: String
   homeSymlink: Boolean
   launchGroupOnly: Boolean
+  volumeName: String
+  volumeSize: Float
+  enableUploadServer: Boolean
+  uploadServerLink: String
 }

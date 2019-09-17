@@ -4,7 +4,7 @@
 # import InstanceType, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput, InstanceTypeCreateInput, InstanceTypeUpdateInput from "./instanceType.graphql"
 # import Image, ImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput from "./image.graphql"
 # import Announcement, AnnouncementConnection, AnnouncementWhereInput, AnnouncementWhereUniqueInput, AnnouncementCreateInput, AnnouncementUpdateInput from "./announcement.graphql"
-# import Dataset, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
+# import Dataset, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
 
 scalar JSON
@@ -175,7 +175,8 @@ type Mutation {
   deleteAnnouncement(where: AnnouncementWhereUniqueInput): Announcement
 
   """Dataset"""
-  createDataset(data: DatasetCreateInput!): Dataset!
-  updateDataset(data: DatasetUpdateInput!, where: DatasetWhereUniqueInput!): Dataset
+  createDataset(data: DatasetCreateInput!): DatasetMutationResponse!
+  updateDataset(data: DatasetUpdateInput!, where: DatasetWhereUniqueInput!): DatasetMutationResponse!
+  regenerateUploadServerSecret(where: DatasetWhereUniqueInput!): DatasetMutationResponse!
   deleteDataset(where: DatasetWhereUniqueInput!): Dataset
 }
