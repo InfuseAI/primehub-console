@@ -21,6 +21,30 @@ declare var process : {
   }
 }
 
+const updateDatasetMutation = `
+  mutation($payload: DatasetUpdateInput!, $where: DatasetWhereUniqueInput!){
+    updateDataset(data: $payload,where: $where){
+      id
+      uploadServerSecret {
+        username
+        password
+      }
+    }
+  }
+`;
+
+const createDatasetMutation = `
+  mutation($payload: DatasetCreateInput!){
+    createDataset(data: $payload){
+      id
+      uploadServerSecret {
+        username
+        password
+      }
+    }
+  }
+`;
+
 export const Logo = styled.img`
   background-color: ${color.darkBlue};
   padding: 20px;
@@ -150,7 +174,7 @@ export default class CMSPage extends React.Component<Props, State> {
         title: intl.formatMessage({
           id: 'deploy.confirm.title',
           defaultMessage: 'Do you want to discard the changes?'
-        }),  
+        }),
         content: intl.formatMessage({
           id: 'deploy.confirm.content',
           defaultMessage: `Your changes will be lost. Are you sure?`
@@ -177,6 +201,16 @@ export default class CMSPage extends React.Component<Props, State> {
     } else {
       history.push(`${(window as any).APP_PREFIX}cms/${key}`);
     }
+  }
+
+  replaceDatasetMutation = mutation => {
+    if (mutation.indexOf('updateDataset') >= 0) {
+      return updateDatasetMutation;
+    }
+    if (mutation.indexOf('createDataset') >= 0) {
+      return createDatasetMutation;
+    }
+    return mutation;
   }
 
   render() {
@@ -232,6 +266,16 @@ export default class CMSPage extends React.Component<Props, State> {
         >
           <Canner
             afterDeploy={this.afterDeploy}
+            beforeDeploy={(key, data) => {
+              if (key === 'dataset') {
+                // we replace the mutation since there will be a external field `uploadServerSecret`
+                return {
+                  ...data,
+                  mutation: this.replaceDatasetMutation(data.mutation)
+                };
+              }
+              return data;
+            }}
             intl={{
               locale: (window as any).LOCALE,
               messages: {

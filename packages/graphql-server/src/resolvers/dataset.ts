@@ -8,8 +8,11 @@ import { omit, get, isUndefined, last, isNil } from 'lodash';
 import { resolveInDataSet } from './secret';
 import KeycloakAdminClient from 'keycloak-admin';
 import { ResourceRole, ResourceNamePrefix } from './resourceRole';
+import {createConfig} from '../config';
 
 export const ATTRIBUTE_PREFIX = 'dataset.primehub.io';
+
+const config = createConfig();
 
 // utils
 const addToAnnotation = (data: any, field: string, annotation: any) => {
@@ -50,6 +53,7 @@ const getWritableRole = async ({
 };
 
 export const mapping = (item: Item<DatasetSpec>) => {
+  const enableUploadServer = parseBoolean(get(item, ['spec', 'enableUploadServer'], 'false'));
   return {
     id: item.metadata.name,
     name: item.metadata.name,
@@ -69,6 +73,15 @@ export const mapping = (item: Item<DatasetSpec>) => {
     // default to false
     launchGroupOnly:
       parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/launchGroupOnly`], 'false')),
+    enableUploadServer,
+    uploadServerLink:
+      (item.spec.type === 'pv' && enableUploadServer) ?
+        `${config.cmsAppPrefix || ''}/dataset/${config.k8sCrdNamespace || 'default'}/${item.metadata.name}/browse`
+        : null,
+    uploadServerSecret:
+      ((item as any).datasetUploadSecretUsername && (item as any).datasetUploadSecretPassword) ?
+        {username: (item as any).datasetUploadSecretUsername, password: (item as any).datasetUploadSecretPassword}
+        : null
   };
 };
 
@@ -99,7 +112,8 @@ export const createMapping = (data: any) => {
       type: data.type,
       url: data.url,
       variables: data.variables,
-      volumeName: data.volumeName,
+      // volumeName = dataset name
+      volumeName: data.name,
       ...gitSyncProp
     }
   };
@@ -145,7 +159,7 @@ export const updateMapping = (data: any) => {
       type: data.type,
       url: data.url,
       variables: data.variables,
-      volumeName: data.volumeName,
+      enableUploadServer: isNil(data.enableUploadServer) ? 'false' : data.enableUploadServer.toString(),
       ...gitSyncProp
     }
   };
@@ -154,6 +168,19 @@ export const updateMapping = (data: any) => {
 export const onCreate = async (
   {role, resource, data, context, getPrefix}:
   {role: RoleRepresentation, resource: any, data: any, context: Context, getPrefix: () => string}) => {
+  // dataset pvc
+  if (data.type === 'pv') {
+    if (isNil(data.volumeSize) || data.volumeSize <= 0) {
+      throw new Error(`invalid dataset volumeSize: ${data.volumeSize}`);
+    }
+    // create pvc
+    await context.k8sDatasetPvc.create({
+      datasetName: data.name,
+      volumeSize: data.volumeSize
+    });
+  }
+
+  // group relation
   const everyoneGroupId = context.everyoneGroupId;
   if (data && data.global) {
     // assign role to everyone
@@ -314,6 +341,9 @@ export const onUpdate = async (
 export const onDelete = async ({
   name, context, getPrefix
 }: {name: string, context: Context, getPrefix: () => string}) => {
+  // delete dataset pvc
+  await context.k8sDatasetPvc.delete(name);
+  await context.k8sUploadServerSecret.delete(name);
   // delete writable as well
   try {
     await context.kcAdminClient.roles.delByName({
@@ -337,6 +367,37 @@ const customUpdate = async ({
   const originalVariables = row.spec.variables || {};
   const newVariables = spec.variables || {};
   spec.variables = mergeVariables(originalVariables, newVariables);
+
+  // if type is pv
+  let datasetUploadSecretUsername;
+  let datasetUploadSecretPassword;
+  if (row.spec.type === 'pv' && !isNil(spec.enableUploadServer)) {
+    const orginalEnabledUploadServer = get(row, 'spec.enableUploadServer', 'false').toString() === 'true';
+    const updatedEnabledUploadServer = spec.enableUploadServer.toString() === 'true';
+    // original enableUploadServer is false and update with enableUploadServer true
+    if (!orginalEnabledUploadServer && updatedEnabledUploadServer) {
+      const secret = await context.k8sUploadServerSecret.create({
+        datasetName: name
+      });
+      datasetUploadSecretUsername = secret.username;
+      datasetUploadSecretPassword = secret.password;
+      metadata.annotations = {
+        ...metadata.annotations,
+        'dataset.primehub.io/uploadServer': 'true',
+        'dataset.primehub.io/uploadServerAuthSecretName': secret.secretName
+      };
+    } else if (orginalEnabledUploadServer && !updatedEnabledUploadServer) {
+      // original enableUploadServer is true and update with enableUploadServer false
+      metadata.annotations = {
+        ...metadata.annotations,
+        'dataset.primehub.io/uploadServer': null,
+        'dataset.primehub.io/uploadServerAuthSecretName': null
+      };
+      // delete secret
+      await context.k8sUploadServerSecret.delete(name);
+    }
+  }
+
   const res = await customResource.patch(name, {
     metadata: omit(metadata, 'name'),
     spec
@@ -390,7 +451,11 @@ const customUpdate = async ({
     );
   }
 
-  return res;
+  return {
+    ...res,
+    datasetUploadSecretUsername,
+    datasetUploadSecretPassword
+  };
 };
 
 export const resolveType = {
@@ -398,6 +463,16 @@ export const resolveType = {
     const {kcAdminClient, everyoneGroupId} = context;
     // find in everyOne group
     return this.findInGroup(everyoneGroupId, parent.id, kcAdminClient);
+  },
+  async volumeSize(parent, args, context: Context) {
+    const {k8sDatasetPvc} = context;
+    const type = parent.type;
+    if (type !== 'pv') {
+      return null;
+    }
+
+    const datasetPvc = await k8sDatasetPvc.findOne(parent.name);
+    return get(datasetPvc, 'volumeSize');
   },
   async groups(parent, args, context: Context) {
     const resourceId = parent.id;
@@ -435,6 +510,18 @@ export const resolveType = {
 
 export const parseNameFromRole = (role: ResourceRole) => {
   return role.resourceName.replace('rw:', '');
+};
+
+export const regenerateUploadSecret = async (root, args, context: Context) => {
+  const datasetName = args.where.id;
+  const secret = await context.k8sUploadServerSecret.regenerateSecret(datasetName);
+  return {
+    id: datasetName,
+    uploadServerSecret: {
+      username: secret.username,
+      password: secret.password
+    }
+  };
 };
 
 export const crd = new Crd<DatasetSpec>({

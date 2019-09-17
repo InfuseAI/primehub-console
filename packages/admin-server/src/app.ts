@@ -71,6 +71,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.state.locale = config.locale;
     ctx.state.graphqlEndpoint = config.graphqlEndpoint;
     ctx.state.disableMode = config.readOnlyOnInstanceTypeAndImage;
+    ctx.state.enableDatasetUpload = config.enableDatasetUpload;
     return next();
   });
 
@@ -147,8 +148,8 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
         title: 'PrimeHub',
         staticPath,
         portal: JSON.stringify({
-          userProfileLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account`,
-          changePasswordLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account/password`,
+          userProfileLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account?referrer=${config.keycloakClientId}&referrer_uri=${config.cmsHost}`,
+          changePasswordLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account/password?referrer=${config.keycloakClientId}&referrer_uri=${config.cmsHost}`,
           logoutLink: config.appPrefix ? `${config.appPrefix}/oidc/logout` : '/oidc/logout',
           services: portalConfig.services,
           welcomeMessage: portalConfig.welcomeMessage
