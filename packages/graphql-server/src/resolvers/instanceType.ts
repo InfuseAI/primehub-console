@@ -8,6 +8,7 @@ import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 import Boom from 'boom';
 import { ErrorCodes } from '../errorCodes';
 import { isNull } from 'util';
+import { ResourceNamePrefix } from './resourceRole';
 
 // utils
 const EffectNone = 'None';
@@ -307,7 +308,7 @@ export const crd = new Crd<InstanceTypeSpec>({
   customResourceMethod: 'instanceTypes',
   propMapping: mapping,
   resolveType,
-  prefixName: 'it',
+  prefixName: ResourceNamePrefix.it,
   resourceName: 'instanceType',
   createMapping,
   updateMapping,
