@@ -148,8 +148,8 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
         title: 'PrimeHub',
         staticPath,
         portal: JSON.stringify({
-          userProfileLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account?referrer=${config.keycloakClientId}&referrer_uri=${config.cmsHost}`,
-          changePasswordLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account/password?referrer=${config.keycloakClientId}&referrer_uri=${config.cmsHost}`,
+          userProfileLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account?referrer=${config.keycloakClientId}&referrer_uri=${config.cmsHost}/admin/landing`,
+          changePasswordLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account/password?referrer=${config.keycloakClientId}&referrer_uri=${config.cmsHost}/admin/landing`,
           logoutLink: config.appPrefix ? `${config.appPrefix}/oidc/logout` : '/oidc/logout',
           services: portalConfig.services,
           welcomeMessage: portalConfig.welcomeMessage
