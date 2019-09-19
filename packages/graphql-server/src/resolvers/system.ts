@@ -126,7 +126,13 @@ export const update = async (root, args, context) => {
   };
 
   const flatData = flatten(savedToDB);
-  const attrs = toAttr(flatData);
+
+  // merge original attributes as well, there might be manually set attribute
+  const attrs = {
+    ...attributes,
+    ...toAttr(flatData),
+  };
+
   await kcAdminClient.groups.update({id: everyoneGroupId}, {
     attributes: attrs
   });
