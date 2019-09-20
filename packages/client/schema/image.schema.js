@@ -86,7 +86,7 @@ export default () => (
             value: 'both'
           }]
         }}
-        defaultValue="cpu"
+        defaultValue="both"
       />
       <string keyName="url" title="${imageUrl}"/>
       <Condition match={data => data.type === 'both'}>
