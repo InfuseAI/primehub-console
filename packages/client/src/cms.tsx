@@ -289,7 +289,7 @@ export default class CMSPage extends React.Component<Props, State> {
             paddingTop: 36,
             paddingBottom: 12
           }}
-          title={currentWorkspace.displayName}
+          title={currentWorkspace.displayName || 'Default'}
         >
           {workspaceList.map(ws => (
             <Menu.Item key={`workspace/${ws.id}`}>
