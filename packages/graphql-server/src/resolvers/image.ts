@@ -115,8 +115,11 @@ const defineUrlAndUrlForGpu = (urlInRequest: string, urlForGpuInRequest: string,
   const url = urlInRequest;
 
   // if `type` is `gpu` or `cpu`, use `url` value
-  // if `type` is `both`, User can add specific image url for gpu instance
-  const urlForGpu = (imageType === ImageType.both) ? urlForGpuInRequest : url;
+  // if type is both , User can add specific image url for gpu instance,
+  // if it's not present, use default url value
+  const urlForGpu = (imageType === ImageType.both) ?
+    urlForGpuInRequest || url
+    : url;
 
   return {url, urlForGpu};
 };
@@ -159,8 +162,11 @@ const customUpdate = async ({
   } else {
     // just changing attribute
     // if not updated, use original values
-    url = spec.url || row.spec.url;
-    urlForGpu = spec.urlForGpu || row.spec.urlForGpu;
+    url = isUndefined(spec.url) ? row.spec.url : spec.url;
+    // if not `both` type, override urlForGpu with url
+    urlForGpu = (row.spec.type !== ImageType.both) ?
+      url
+      : isUndefined(spec.urlForGpu) ? row.spec.urlForGpu : spec.urlForGpu;
   }
 
   spec.url = url;
