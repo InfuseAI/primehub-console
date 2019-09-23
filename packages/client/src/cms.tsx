@@ -349,7 +349,7 @@ export default class CMSPage extends React.Component<Props, State> {
           }}
           router={new R({
             history,
-            baseUrl: `${(window as any).APP_PREFIX}cms/${workspaceId}`
+            baseUrl: `${(window as any).APP_PREFIX || '/'}cms/${workspaceId}`
           })}
           ref={container => this.container = container}
           dataDidChange={this.dataDidChange}

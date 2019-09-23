@@ -79,7 +79,7 @@ ReactDOM.render(
         <React.Fragment>
           <Switch>
             {/* <Route path="/login" component={Login} /> */}
-            <Route exact path={`${(window as any).APP_PREFIX}cms/:workspaceId/:activeKey`} component={CMSPage}/>
+            <Route path={`${(window as any).APP_PREFIX}cms/:workspaceId/:activeKey`} component={CMSPage}/>
             <Redirect to={`${(window as any).APP_PREFIX}cms/default/${firstKey}`}/>
           </Switch>
         </React.Fragment>
