@@ -92,6 +92,7 @@ export default class CMSPage extends React.Component<Props, State> {
       }`
     })
     const workspaceList = result.data.workspaces;
+    workspaceList[0].isDefault = true;
     return workspaceList;
   }
 
