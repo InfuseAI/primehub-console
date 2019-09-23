@@ -275,9 +275,21 @@ export default class CMSPage extends React.Component<Props, State> {
         theme="dark"
         mode="vertical"
       >
+        <span style={{
+          left: '16px',
+          position: 'relative',
+          top: '36px',
+          fontSize: '14px'
+        }}>
+          WORKSPACE
+        </span>
         <Menu.SubMenu
           key="workspace_list"
-          title={`${currentWorkspace.displayName}`}
+          style={{
+            paddingTop: 36,
+            paddingBottom: 12
+          }}
+          title={currentWorkspace.displayName}
         >
           {workspaceList.map(ws => (
             <Menu.Item key={`workspace/${ws.id}`}>
