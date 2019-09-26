@@ -136,6 +136,11 @@ export default class K8sSecret {
         ...originalConfig,
         password: PASSWORD_HOLDER
       };
+    } else if (type === SECRET_OPAQUE_TYPE) {
+      const secret = isEmpty(get(response, ['data', 'ssh'])) ? null : PASSWORD_HOLDER;
+      additionalProps = {
+        secret
+      };
     }
 
     return {

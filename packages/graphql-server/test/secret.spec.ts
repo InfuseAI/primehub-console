@@ -79,7 +79,7 @@ describe('secret graphql', function() {
     expect(secrets[0].name).to.be.equals(data.name);
     expect(secrets[0].displayName).to.be.equals(data.displayName);
     expect(secrets[0].type).to.be.equals(data.type);
-    expect(secrets[0].secret).to.be.null;
+    expect(secrets[0].secret).to.be.eql(PASSWORD_HOLDER);
 
     this.currentOpaqueSecretName = secrets[0].id;
 
@@ -98,7 +98,7 @@ describe('secret graphql', function() {
 
     expect(secret.id).to.be.equals(this.currentOpaqueSecretName);
     expect(secret.type).to.be.equals('opaque');
-    expect(secret.secret).to.be.null;
+    expect(secret.secret).to.be.eql(PASSWORD_HOLDER);
   });
 
   it('should update opaque secret with new secret', async () => {
@@ -116,7 +116,7 @@ describe('secret graphql', function() {
 
     expect(secret.id).to.be.equals(this.currentOpaqueSecretName);
     expect(secret.type).to.be.equals('opaque');
-    expect(secret.secret).to.be.null;
+    expect(secret.secret).to.be.eql(PASSWORD_HOLDER);
 
     // test k8s
     const k8sResource =
