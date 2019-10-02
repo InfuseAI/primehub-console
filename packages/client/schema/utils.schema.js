@@ -82,3 +82,16 @@ exports.CustomizedStringImagePullSecret = ({attributes}) => (
     packageName="../src/cms-components/customize-string-use_image_pull_secret"
   />
 )
+
+exports.CustomizedStringSelectWithCheckbox = ({attributes}) => (
+  <string
+    keyName={attributes.keyName}
+    title={attributes.title}
+    defaultValue={attributes.defaultValue}
+    // hide title since we render title in customize component
+    hideTitle
+    // when it's unchecked the value is null
+    nullable
+    packageName="../src/cms-components/customize-string-input_with_checkbox"
+  />
+)
