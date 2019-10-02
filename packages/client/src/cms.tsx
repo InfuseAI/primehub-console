@@ -225,7 +225,9 @@ export default class CMSPage extends React.Component<Props, State> {
     return (
       <Layout style={{minHeight: '100vh'}}>
         <Sider breakpoint="sm">
-          <Logo src={logo}/>
+          <a href="/">
+            <Logo src={logo}/>
+          </a>
           <Menu
             onClick={this.siderMenuOnClick}
             selectedKeys={[(match.params as any).activeKey]}
