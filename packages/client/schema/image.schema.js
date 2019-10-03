@@ -82,7 +82,7 @@ export default () => (
             text: 'gpu',
             value: 'gpu'
           }, {
-            text: 'both',
+            text: 'universal',
             value: 'both'
           }]
         }}
