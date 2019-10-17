@@ -20,6 +20,20 @@ export default () => (
         title: '${displayName}',
         dataIndex: 'displayName'
       }, {
+        title: '${type}',
+        dataIndex: 'type',
+        render: (value) => {
+          if (!value) {
+              return '-';
+          }
+
+          if (value === 'both') {
+              return 'universal';
+          }
+
+          return value;
+        }
+      },{
         title: '${description}',
         dataIndex: 'description'
       }]
@@ -30,7 +44,7 @@ export default () => (
           edges {
             cursor
             node {
-              id name displayName description
+              id name displayName description type
             }
           }
           pageInfo {
