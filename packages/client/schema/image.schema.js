@@ -21,7 +21,16 @@ export default () => (
         dataIndex: 'displayName'
       }, {
         title: '${type}',
-        dataIndex: 'type'
+        dataIndex: 'type',
+        render: (value) => {
+          if (value) {
+            if (value === 'both') {
+              return 'universal';
+            }
+            return value;
+          }
+          return '-';
+        }
       },{
         title: '${description}',
         dataIndex: 'description'
