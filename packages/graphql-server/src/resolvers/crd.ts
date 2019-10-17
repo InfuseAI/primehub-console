@@ -353,7 +353,7 @@ export class Crd<SpecType> {
     const crd = await customResource.get(name);
     await customResource.del(name);
     if (this.onDelete) {
-      await this.onDelete({name, context, getPrefix: this.getPrefix});
+      await this.onDelete({name, context, resource: crd, getPrefix: this.getPrefix});
     }
     // clear cache
     if (this.cache) {

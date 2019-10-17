@@ -175,7 +175,7 @@ export const onCreate = async (
     }
     // create pvc
     await context.k8sDatasetPvc.create({
-      datasetName: data.name,
+      volumeName: resource.spec.volumeName,
       volumeSize: data.volumeSize
     });
   }
@@ -339,10 +339,10 @@ export const onUpdate = async (
 };
 
 export const onDelete = async ({
-  name, context, getPrefix
-}: {name: string, context: Context, getPrefix: () => string}) => {
+  name, context, resource, getPrefix
+}: {name: string, context: Context, resource: any, getPrefix: () => string}) => {
   // delete dataset pvc
-  await context.k8sDatasetPvc.delete(name);
+  await context.k8sDatasetPvc.delete(resource.spec.volumeName);
   await context.k8sUploadServerSecret.delete(name);
   // delete writable as well
   try {
@@ -471,7 +471,7 @@ export const resolveType = {
       return null;
     }
 
-    const datasetPvc = await k8sDatasetPvc.findOne(parent.name);
+    const datasetPvc = await k8sDatasetPvc.findOne(parent.volumeName);
     return get(datasetPvc, 'volumeSize');
   },
   async groups(parent, args, context: Context) {
