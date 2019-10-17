@@ -6,8 +6,8 @@ import { ApolloError } from 'apollo-server';
 const stringifyVolumeSize = (volumeSize: number) => `${volumeSize}Gi`;
 const parseVolumeSize = (volumeSizeFromK8s: string) => parseFloat(volumeSizeFromK8s.replace('Gi', ''));
 
-export const getPvcName = (datasetName: string) => {
-  return `dataset-${datasetName}`;
+export const getPvcName = (volumeName: string) => {
+  return `dataset-${volumeName}`;
 };
 
 export default class K8sDatasetPvc {
@@ -27,9 +27,9 @@ export default class K8sDatasetPvc {
     this.resource = kubeClient.api.v1.namespaces(this.namespace).persistentvolumeclaims;
   }
 
-  public findOne = async (datasetName: string) => {
+  public findOne = async (volumeName: string) => {
     try {
-      const name = getPvcName(datasetName);
+      const name = getPvcName(volumeName);
       const {body} = await this.resource(name).get();
       return this.propsMapping(body);
     } catch (e) {
@@ -41,14 +41,14 @@ export default class K8sDatasetPvc {
   }
 
   public create = async ({
-    datasetName,
+    volumeName,
     volumeSize
   }: {
-    datasetName: string,
+    volumeName: string,
     volumeSize: number
   }) => {
     try {
-      const pvcName = getPvcName(datasetName);
+      const pvcName = getPvcName(volumeName);
       const {body} = await this.resource.post({
         body: {
           Kind: 'PersistentVolumeClaim',
@@ -87,9 +87,9 @@ export default class K8sDatasetPvc {
     }
   }
 
-  public async delete(datasetName: string) {
+  public async delete(volumeName: string) {
     try {
-      await this.resource(getPvcName(datasetName)).delete();
+      await this.resource(getPvcName(volumeName)).delete();
     } catch (err) {
       if (err.statusCode === 404) {
         return;
@@ -99,7 +99,6 @@ export default class K8sDatasetPvc {
   }
 
   private propsMapping = (response: any) => {
-    // filter out secret
     const name = get(response, 'metadata.name');
     const originVolumeSize = get(response, 'spec.resources.requests.storage');
     const volumeSize = originVolumeSize ? parseVolumeSize(originVolumeSize) : null;
