@@ -23,13 +23,15 @@ export default () => (
         title: '${type}',
         dataIndex: 'type',
         render: (value) => {
-          if (value) {
-            if (value === 'both') {
-              return 'universal';
-            }
-            return value;
+          if (!value) {
+              return '-';
           }
-          return '-';
+
+          if (value === 'both') {
+              return 'universal';
+          }
+
+          return value;
         }
       },{
         title: '${description}',
