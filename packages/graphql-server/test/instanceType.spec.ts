@@ -98,19 +98,15 @@ describe('instanceType graphql', function() {
       name: data.name,
       displayName: data.name,
       description: null,
-      // request fields would be the same with limits fields
-      cpuRequest: 2,
-      memoryRequest: 2,
+      cpuRequest: null,
+      memoryRequest: null,
       nodeSelector: null,
       tolerations: [],
       gpuLimit: 0,
       global: false,
       spec: pickSpec({
         ...data,
-        displayName: data.name,
-        // request fields would be the same with limits fields
-        cpuRequest: 2,
-        memoryRequest: 2,
+        displayName: data.name
       }),
       groups: [],
     });
@@ -129,22 +125,26 @@ describe('instanceType graphql', function() {
       name: data.name,
       displayName: data.name,
       description: null,
-      // request fields would be the same with limits fields
-      cpuRequest: 2,
-      memoryRequest: 2,
+      cpuRequest: null,
+      memoryRequest: null,
       nodeSelector: null,
       tolerations: [],
       gpuLimit: 0,
       global: false,
       spec: pickSpec({
         ...data,
-        displayName: data.name,
-        // request fields would be the same with limits fields
-        cpuRequest: 2,
-        memoryRequest: 2,
+        displayName: data.name
       }),
       groups: []
     });
+
+    // check in k8s
+    const instanceType = await this.crdClient.instanceTypes.get(data.name);
+    expect(instanceType.spec['limits.memory']).to.be.equals('2G');
+    expect(instanceType.spec['limits.cpu']).to.be.equals(2);
+    expect(instanceType.spec['requests.memory']).to.be.undefined;
+    expect(instanceType.spec['requests.cpu']).to.be.undefined;
+
     this.currentInstanceType = queryOne.instanceType;
   });
 
