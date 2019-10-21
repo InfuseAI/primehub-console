@@ -120,7 +120,6 @@ export default class ArrayBreadcrumb extends Component<Props> {
     let dataSource = value;
     if (keyName === 'workspace') {
       dataSource = value.filter(ws => !ws.isDefault);
-      console.log(dataSource, value)
     }
     const disabled = (keyName === 'image' || keyName === 'instanceType') && GLOBAL_DISABLE;
     const {

@@ -77,7 +77,7 @@ class Selector extends React.Component<SelectorProps> {
     const workspaceId = getWorkspaceId();
     this.GET_SECRET = gql`
     {
-      secrets(where: {ifDockerConfigJson: true, workspaceId: ${workspaceId}}) {
+      secrets(where: {ifDockerConfigJson: true, workspaceId: "${workspaceId}"}) {
         id
         name
         type
