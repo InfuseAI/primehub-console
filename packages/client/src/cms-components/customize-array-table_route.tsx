@@ -61,13 +61,17 @@ export default class ArrayBreadcrumb extends Component<Props> {
   }
 
   remove = (index) => {
-    const {onChange, deploy, refId, value, intl} = this.props;
+    const {onChange, deploy, refId, value, intl, keyName} = this.props;
+    let dataSource = value;
+    if (keyName === 'workspace') {
+      dataSource = dataSource.map(dataSource => !dataSource.isDefault);
+    }
     confirm({
       title: intl.formatMessage({ id: "array.table.delete.confirm" }),
       okType: 'danger',
       onOk() {
         onChange(refId.child(index), 'delete').then(() => {
-          deploy(refId.getPathArr()[0], value[index].id);
+          deploy(refId.getPathArr()[0], dataSource[index].id);
         });
       }
     });
