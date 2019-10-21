@@ -53,7 +53,6 @@ export default () => (
     <Block title="${workspace.block1.title}">
       <string required keyName="name" title="${workspace.name.title}" /> 
       <string required keyName="displayName" title="${workspace.displayName.title}" /> 
-      <string ui="textarea" keyName="description" title="${workspace.description.title}" /> 
     </Block>
 
     <Block title="${workspace.block2.title}">
