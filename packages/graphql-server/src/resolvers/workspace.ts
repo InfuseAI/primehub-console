@@ -45,13 +45,9 @@ export const create = async (root, args, context: Context) => {
   // add users
   try {
     await mutateRelation({
-      resource: data.users,
+      resource: data.members,
       connect: async where => {
-        // add user to group
-        await kcAdminClient.users.addToGroup({
-          id: where.id,
-          groupId: created.keycloakGroupId
-        });
+        await workspaceApi.addMember(created.id, where.id);
       }
     });
   } catch (e) {
@@ -96,30 +92,13 @@ export const update = async (root, args, context: Context) => {
   // connect to users
   try {
     await mutateRelation({
-      resource: data.users,
-      connect: async where => {
+      resource: data.members,
+      connect: where => {
         // add user to group
-        await kcAdminClient.users.addToGroup({
-          id: where.id,
-          groupId: workspace.keycloakGroupId
-        });
+        return workspaceApi.addMember(workspace.id, where.id);
       },
-      disconnect: async where => {
-        // del user from workspace
-        // remove from all sub-groups
-        const group = await kcAdminClient.groups.findOne({id: workspace.keycloakGroupId});
-        await Promise.all((group.subGroups || []).map(subgroup => {
-          return kcAdminClient.users.delFromGroup({
-            id: where.id,
-            groupId: subgroup.id
-          });
-        }));
-
-        // remove from parent group
-        await kcAdminClient.users.delFromGroup({
-          id: where.id,
-          groupId: workspace.keycloakGroupId
-        });
+      disconnect: where => {
+        return workspaceApi.delMember(workspace.id, where.id);
       }
     });
   } catch (e) {
@@ -151,4 +130,20 @@ export const destroy = async (root, args, context: Context) => {
     id,
     name: id
   };
+};
+
+export const typeResolvers = {
+  members: async (parent, args, context: Context) => {
+    try {
+      if (!parent.keycloakGroupId) {
+        return [];
+      }
+
+      return context.kcAdminClient.groups.listMembers({
+        id: parent.keycloakGroupId
+      });
+    } catch (err) {
+      return [];
+    }
+  },
 };

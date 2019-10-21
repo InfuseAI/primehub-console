@@ -62,4 +62,6 @@ input SystemUpdateInput {
   smtp: SmtpInput
   defaultUserVolumeCapacity: Int
   timezone: TimezoneInput
+  # workspace
+  workspaceId: String
 }

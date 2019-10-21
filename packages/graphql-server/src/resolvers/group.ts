@@ -22,6 +22,8 @@ import { keycloakMaxCount, defaultWorkspaceId } from './constant';
 import { ApolloError } from 'apollo-server';
 import * as logger from '../logger';
 import * as Boom from 'boom';
+import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspace';
+import { isKeycloakGroupNameWorkspace } from '../workspace/api';
 
 // constants
 const attrSchema = {
@@ -58,8 +60,8 @@ const validateSharedVolumeAttrs = (attrs: Attributes) => {
 
 export const create = async (root, args, context: Context) => {
   const kcAdminClient = context.kcAdminClient;
-  const workspaceId = args.data.workspaceId;
   const workspaceApi = context.workspaceApi;
+  const currentWorkspace = createInResolver(root, args, context);
 
   // create resource
   // displayName, canUseGpu, quotaGpu, userVolumeCapacity in attributes
@@ -78,7 +80,7 @@ export const create = async (root, args, context: Context) => {
 
   let groupId: string;
   try {
-    if (!workspaceId || workspaceId === defaultWorkspaceId) {
+    if (currentWorkspace.checkIsDefault()) {
       const response = await kcAdminClient.groups.create({
         name: payload.name,
         attributes: attrs.toKeycloakAttrs()
@@ -86,7 +88,7 @@ export const create = async (root, args, context: Context) => {
       groupId = response.id;
     } else {
       groupId = await workspaceApi.createGroup({
-        workspaceId,
+        workspaceId: currentWorkspace.getWorkspaceId(),
         name: payload.name,
         attributes: attrs.toKeycloakAttrs()
       });
@@ -130,7 +132,7 @@ export const create = async (root, args, context: Context) => {
     userId: context.userId,
     username: context.username,
     id: group.id,
-    workspaceId
+    workspaceId: currentWorkspace.getWorkspaceId()
   });
 
   return group;
@@ -138,7 +140,7 @@ export const create = async (root, args, context: Context) => {
 
 export const update = async (root, args, context: Context) => {
   const groupId = args.where.id;
-  const workspaceId = args.where.workspaceId;
+  const currentWorkspace = createInResolver(root, args, context);
   const kcAdminClient = context.kcAdminClient;
 
   // update resource
@@ -213,7 +215,7 @@ export const update = async (root, args, context: Context) => {
     userId: context.userId,
     username: context.username,
     id: group.id,
-    workspaceId
+    workspaceId: currentWorkspace.getWorkspaceId()
   });
 
   return group;
@@ -221,7 +223,7 @@ export const update = async (root, args, context: Context) => {
 
 export const destroy = async (root, args, context: Context) => {
   const groupId = args.where.id;
-  const workspaceId = args.where.workspaceId;
+  const currentWorkspace = createInResolver(root, args, context);
   const kcAdminClient = context.kcAdminClient;
   const group = await kcAdminClient.groups.findOne({
     id: groupId
@@ -236,7 +238,7 @@ export const destroy = async (root, args, context: Context) => {
     userId: context.userId,
     username: context.username,
     id: group.id,
-    workspaceId
+    workspaceId: currentWorkspace.getWorkspaceId()
   });
 
   return group;
@@ -246,40 +248,42 @@ export const destroy = async (root, args, context: Context) => {
  * Query
  */
 
-const listQuery = async (kcAdminClient: KcAdminClient, where: any, context: Context) => {
-  const workspaceId = where.workspaceId;
+const listQuery = async (
+  kcAdminClient: KcAdminClient, where: any, currentWorkspace: CurrentWorkspace, context: Context) => {
   const whereWithoutWorkspace = omit(where, 'workspaceId');
   const workspaceApi = context.workspaceApi;
-  let groups = (!workspaceId || workspaceId === defaultWorkspaceId) ?
+  let groups = (currentWorkspace.checkIsDefault()) ?
     await kcAdminClient.groups.find({
       max: keycloakMaxCount
     }) :
-    await workspaceApi.listGroups(workspaceId);
+    await workspaceApi.listGroups(currentWorkspace.getWorkspaceId());
   const everyoneGroupId = context.everyoneGroupId;
   // filter out everyone
   groups = groups.filter(group => group.id !== everyoneGroupId);
   // filter workspace groups
-  groups = groups.filter(group => !group.attributes.isWorkspace);
+  groups = groups.filter(group => !isKeycloakGroupNameWorkspace(group.name));
   groups = filter(groups, whereWithoutWorkspace);
   return groups;
 };
 
 export const query = async (root, args, context: Context) => {
-  const groups = await listQuery(context.kcAdminClient, args && args.where, context);
+  const currentWorkspace = createInResolver(root, args, context);
+  const groups = await listQuery(context.kcAdminClient, args && args.where, currentWorkspace, context);
   const paginatedGroups = paginate(groups, extractPagination(args));
   const fetchedGroups = await Promise.all(
     paginatedGroups.map(group => context.kcAdminClient.groups.findOne({id: group.id})));
-  return fetchedGroups;
+  return {...fetchedGroups, currentWorkspace};
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
-  const groups = await listQuery(context.kcAdminClient, args && args.where, context);
+  const currentWorkspace = createInResolver(root, args, context);
+  const groups = await listQuery(context.kcAdminClient, args && args.where, currentWorkspace, context);
   const relayResponse = toRelay(groups, extractPagination(args));
   relayResponse.edges = await Promise.all(relayResponse.edges.map(
     async edge => {
       return {
         cursor: edge.cursor,
-        node: await context.kcAdminClient.groups.findOne({id: edge.node.id})
+        node: {...await context.kcAdminClient.groups.findOne({id: edge.node.id}), currentWorkspace}
       };
     })
   );
@@ -287,10 +291,11 @@ export const connectionQuery = async (root, args, context: Context) => {
 };
 
 export const queryOne = async (root, args, context: Context) => {
+  const currentWorkspace = createInResolver(root, args, context);
   const groupId = args.where.id;
   const kcAdminClient = context.kcAdminClient;
   const group = await kcAdminClient.groups.findOne({id: groupId});
-  return group;
+  return {...group, currentWorkspace};
 };
 
 export const typeResolvers = {

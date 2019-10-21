@@ -4,6 +4,7 @@ import K8sSecret, {SECRET_DOCKER_CONFIG_JSON_TYPE, SECRET_OPAQUE_TYPE} from '../
 import * as logger from '../logger';
 import { get, pick } from 'lodash';
 import { defaultWorkspaceId } from './constant';
+import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspace';
 
 export const serializeType = (type: string) => {
   return (type === 'kubernetes') ? SECRET_DOCKER_CONFIG_JSON_TYPE : SECRET_OPAQUE_TYPE;
@@ -24,31 +25,27 @@ const transformSecret = (secret: any) => {
  * Query
  */
 
-const listQuery = async (k8sSecret: K8sSecret, where: any, workspaceId: string) => {
+const listQuery = async (k8sSecret: K8sSecret, where: any, currentWorkspace: CurrentWorkspace) => {
   // filter ifDockerConfigJson
   const ifDockerConfigJson = get(where, 'ifDockerConfigJson', false);
   const secrets = ifDockerConfigJson ?
-    await k8sSecret.find(SECRET_DOCKER_CONFIG_JSON_TYPE, workspaceId) :
-    await k8sSecret.find(null, workspaceId);
+    await k8sSecret.find(SECRET_DOCKER_CONFIG_JSON_TYPE, currentWorkspace.getK8sNamespace()) :
+    await k8sSecret.find(null, currentWorkspace.getK8sNamespace());
   return filter(secrets, where);
 };
 
 export const query = async (root, args, context: Context) => {
   const {k8sSecret} = context;
-  const workspaceId = (!args.where.workspaceId || args.where.workspaceId === defaultWorkspaceId)
-    ? null
-    : args.where.workspaceId;
-  let secrets = await listQuery(k8sSecret, args && args.where, workspaceId);
+  const currentWorkspace = createInResolver(root, args, context);
+  let secrets = await listQuery(k8sSecret, args && args.where, currentWorkspace);
   secrets = secrets.map(transformSecret);
   return paginate(secrets, extractPagination(args));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
   const {k8sSecret} = context;
-  const workspaceId = (!args.where.workspaceId || args.where.workspaceId === defaultWorkspaceId)
-    ? null
-    : args.where.workspaceId;
-  let secrets = await listQuery(k8sSecret, args && args.where, workspaceId);
+  const currentWorkspace = createInResolver(root, args, context);
+  let secrets = await listQuery(k8sSecret, args && args.where, currentWorkspace);
   secrets = secrets.map(transformSecret);
   return toRelay(secrets, extractPagination(args));
 };
@@ -56,11 +53,9 @@ export const connectionQuery = async (root, args, context: Context) => {
 export const queryOne = async (root, args, context: Context) => {
   const id = args.where.id;
   const {k8sSecret} = context;
-  const workspaceId = (!args.where.workspaceId || args.where.workspaceId === defaultWorkspaceId)
-    ? null
-    : args.where.workspaceId;
+  const currentWorkspace = createInResolver(root, args, context);
   try {
-    const secret = await k8sSecret.findOne(id, workspaceId);
+    const secret = await k8sSecret.findOne(id, currentWorkspace.getK8sNamespace());
     return transformSecret(secret);
   } catch (e) {
     return null;
@@ -77,10 +72,8 @@ export const resolveInDataSet = {
       return null;
     }
     const {k8sSecret} = context;
-    const workspaceId = (!args.where.workspaceId || args.where.workspaceId === defaultWorkspaceId)
-      ? null
-      : args.where.workspaceId;
-    const secret = await k8sSecret.findOne(root.secret, workspaceId);
+    const currentWorkspace: CurrentWorkspace = root.currentWorkspace;
+    const secret = await k8sSecret.findOne(root.secret, currentWorkspace.getK8sNamespace());
     return transformSecret(secret);
   }
 };
@@ -92,12 +85,10 @@ export const resolveInDataSet = {
 export const create = async (root, args, context: Context) => {
   const data = args.data;
   const {k8sSecret} = context;
-  const workspaceId = (!args.data.workspaceId || args.data.workspaceId === defaultWorkspaceId)
-    ? null
-    : args.data.workspaceId;
+  const currentWorkspace = createInResolver(root, args, context);
 
   const created = await k8sSecret.create({
-    namespace: workspaceId,
+    namespace: currentWorkspace.getK8sNamespace(),
     name: data.name,
     type: serializeType(data.type),
     displayName: data.displayName || data.name,
@@ -110,7 +101,7 @@ export const create = async (root, args, context: Context) => {
     userId: context.userId,
     username: context.username,
     id: created.id,
-    workspaceId
+    workspaceId: currentWorkspace.getWorkspaceId()
   });
 
   return transformSecret(created);
@@ -120,9 +111,7 @@ export const update = async (root, args, context: Context) => {
   const id = args.where.id;
   const data = args.data;
   const {k8sSecret} = context;
-  const workspaceId = (!args.where.workspaceId || args.where.workspaceId === defaultWorkspaceId)
-    ? null
-    : args.where.workspaceId;
+  const currentWorkspace = createInResolver(root, args, context);
 
   logger.info({
     component: logger.components.secret,
@@ -130,23 +119,21 @@ export const update = async (root, args, context: Context) => {
     userId: context.userId,
     username: context.username,
     id,
-    workspaceId
+    workspaceId: currentWorkspace.getWorkspaceId()
   });
 
   const secret = await k8sSecret.update(id, {
     displayName: data.displayName,
     config: pick(data, ['secret', 'registryHost', 'username', 'password'])
-  }, workspaceId);
+  }, currentWorkspace.getK8sNamespace());
   return transformSecret(secret);
 };
 
 export const destroy = async (root, args, context: Context) => {
   const id = args.where.id;
   const {k8sSecret} = context;
-  const workspaceId = (!args.where.workspaceId || args.where.workspaceId === defaultWorkspaceId)
-    ? null
-    : args.where.workspaceId;
-  await k8sSecret.delete(id, workspaceId);
+  const currentWorkspace = createInResolver(root, args, context);
+  await k8sSecret.delete(id, currentWorkspace.getK8sNamespace());
 
   logger.info({
     component: logger.components.secret,
@@ -154,7 +141,7 @@ export const destroy = async (root, args, context: Context) => {
     userId: context.userId,
     username: context.username,
     id,
-    workspaceId
+    workspaceId: currentWorkspace.getWorkspaceId()
   });
 
   return {

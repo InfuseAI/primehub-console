@@ -117,6 +117,8 @@ input DatasetCreateInput {
   mountRoot: String
   homeSymlink: Boolean
   launchGroupOnly: Boolean
+  # workspace
+  workspaceId: String
 }
 
 input DatasetUpdateInput {

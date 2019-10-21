@@ -13,7 +13,6 @@ import * as GraphQLJSON from 'graphql-type-json';
 import { makeExecutableSchema } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
 import WorkspaceApi from './workspace/api';
-import CurrentWorkspace from './workspace/currentWorkspace';
 
 import CrdClient, { InstanceTypeSpec, ImageSpec } from './crdClient/crdClientImpl';
 import * as system from './resolvers/system';
@@ -112,6 +111,7 @@ const resolvers = {
   },
   User: user.typeResolvers,
   Group: group.typeResolvers,
+  Workspace: workspace.typeResolvers,
   ...instanceType.typeResolver(),
   ...dataset.typeResolver(),
   ...image.typeResolver(),
@@ -311,6 +311,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         username,
         defaultUserVolumeCapacity: config.defaultUserVolumeCapacity,
         workspaceApi,
+        crdNamespace: config.k8sCrdNamespace
       };
     },
     formatError: (error: any) => {

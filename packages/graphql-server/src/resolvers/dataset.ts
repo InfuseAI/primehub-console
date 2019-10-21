@@ -69,7 +69,7 @@ export const mapping = (item: Item<DatasetSpec>) => {
     homeSymlink: parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/homeSymlink`], 'false')),
     // default to false
     launchGroupOnly:
-      parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/launchGroupOnly`], 'false')),
+      parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/launchGroupOnly`], 'false'))
   };
 };
 
@@ -423,15 +423,15 @@ const customUpdate = async ({
 export const resolveType = {
   async global(parent, args, context: Context) {
     const {kcAdminClient} = context;
-    const currentWorkspace = parent.currentWorkspace;
+    const currentWorkspace: CurrentWorkspace = parent.currentWorkspace;
     // find in everyOne group
-    const everyoneGroupId = currentWorkspace.getEveryoneGroupId();
-    return this.findInGroup(everyoneGroupId, parent.id, kcAdminClient);
+    const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
+    return this.findInGroup(everyoneGroupId, parent.id, kcAdminClient, currentWorkspace);
   },
   async groups(parent, args, context: Context) {
     const resourceId = parent.id;
     // find all groups
-    const currentWorkspace = parent.currentWorkspace;
+    const currentWorkspace: CurrentWorkspace = parent.currentWorkspace;
     const groups = (currentWorkspace.checkIsDefault()) ?
       await context.kcAdminClient.groups.find({
         max: keycloakMaxCount
@@ -449,7 +449,8 @@ export const resolveType = {
 
         // find roles with prefix:ds && prefix:rw:ds
         const findRole = roles.find(role =>
-            role.name === `${this.getPrefix()}${resourceId}` || role.name === `${this.getPrefix('rw:')}${resourceId}`);
+            role.name === `${this.getPrefix(currentWorkspace)}${resourceId}`
+            || role.name === `${this.getPrefix(currentWorkspace, 'rw:')}${resourceId}`);
 
         // no role
         if (!findRole) {
@@ -468,8 +469,11 @@ export const resolveType = {
   ...resolveInDataSet
 };
 
-export const customParseNameFromRole = (roleName: string) => {
-  return last(roleName.split(':'));
+export const customParseNameFromRole = (roleName: string, currentWorkspace: CurrentWorkspace) => {
+  // todo: fix this with dataset role prefix bug in other branch
+  const lastSplit = last(roleName.split(':'));
+  const workspaceSplit = last(lastSplit.split('|'));
+  return workspaceSplit;
 };
 
 export const crd = new Crd<DatasetSpec>({

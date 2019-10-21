@@ -1,11 +1,12 @@
 # import PageInfo from "common.graphql"
-# import User from "./user.graphql"
+# import User, UserCreateManyInput, UserUpdateManyInput from "user.graphql"
 # import Group from "./group.graphql"
 
 type Workspace {
   id: ID!
   name: String!
   displayName: String
+  isDefault: Boolean
   members: [User]
   groups: [Group]
 }
@@ -31,12 +32,18 @@ input WorkspaceWhereUniqueInput {
   id: ID!
 }
 
+input WorkspaceWhereInput {
+  id: ID
+}
+
 """Mutation input"""
 input WorkspaceCreateInput {
   name: String!
   displayName: String
+  members: UserCreateManyInput
 }
 
 input WorkspaceUpdateInput {
   displayName: String
+  members: UserUpdateManyInput
 }

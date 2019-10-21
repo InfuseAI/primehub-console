@@ -47,12 +47,16 @@ type GroupConnection {
 
 input GroupWhereUniqueInput {
   id: ID!
+  # workspace
+  workspaceId: String
 }
 
 input GroupWhereInput {
   id: ID
   name_contains: String
   displayName_contains: String
+  # workspace
+  workspaceId: String
 }
 
 """Mutation input"""
@@ -73,6 +77,8 @@ input GroupCreateInput {
   sharedVolumeCapacity: Int
   homeSymlink: Boolean
   launchGroupOnly: Boolean
+  # workspace
+  workspaceId: String
 }
 
 input GroupUpdateInput {

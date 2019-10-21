@@ -2,6 +2,7 @@ import K8sNamespace, { K8sNamespaceResponse } from '../k8sResource/k8sNamespace'
 import KcAdminClient from 'keycloak-admin';
 import GroupRepresentation from 'keycloak-admin/lib/defs/groupRepresentation';
 import { defaultWorkspaceId } from '../resolvers/constant';
+import UserRepresentation from 'keycloak-admin/lib/defs/userRepresentation';
 
 export interface Workspace {
   id: string;
@@ -10,6 +11,10 @@ export interface Workspace {
   displayName: string;
   keycloakGroupId: string;
 }
+
+export const isKeycloakGroupNameWorkspace = (name: string) => {
+  return name && name.startsWith('primehub-');
+};
 
 export default class WorkspaceApi {
   private defaultWorkspace: Workspace;
@@ -65,7 +70,7 @@ export default class WorkspaceApi {
       name: `primehub-${name}`,
       attributes: {
         isWorkspace: ['true'],
-        namespace: namespaceName
+        namespace: [namespaceName]
       }
     });
 
@@ -82,6 +87,7 @@ export default class WorkspaceApi {
     if (id === this.defaultWorkspace.id) {
       throw new Error('you cannot update default workspace');
     }
+
     const namespace = await this.k8sNamespace.update(id, data);
     return this.transformNamespace(namespace);
   }
@@ -96,6 +102,56 @@ export default class WorkspaceApi {
     await this.k8sNamespace.delete(namespace.id);
   }
 
+  public addMember = async (id: string, userId: string): Promise<void> => {
+    if (id === this.defaultWorkspace.id) {
+      throw new Error('you cannot update default workspace');
+    }
+
+    const namespace = await this.k8sNamespace.findOne(id);
+    const keycloakGroupId = namespace.keycloakGroupId;
+    await this.kcAdminClient.users.addToGroup({
+      id: userId,
+      groupId: keycloakGroupId
+    });
+  }
+
+  public listMembers = async (id: string): Promise<UserRepresentation[]> => {
+    if (id === this.defaultWorkspace.id) {
+      throw new Error('you cannot update default workspace');
+    }
+
+    const namespace = await this.k8sNamespace.findOne(id);
+    const keycloakGroupId = namespace.keycloakGroupId;
+    return this.kcAdminClient.groups.listMembers({
+      id: keycloakGroupId
+    });
+  }
+
+  public delMember = async (id: string, userId: string): Promise<void> => {
+    if (id === this.defaultWorkspace.id) {
+      throw new Error('you cannot update default workspace');
+    }
+
+    const namespace = await this.k8sNamespace.findOne(id);
+    const keycloakGroupId = namespace.keycloakGroupId;
+    const group = await this.kcAdminClient.groups.findOne({id});
+
+    // remove from all children groups first
+    const subGroups = group.subGroups || [];
+    await Promise.all(subGroups.map(async (subGroup: GroupRepresentation) => {
+      return this.kcAdminClient.users.delFromGroup({
+        id: userId,
+        groupId: subGroup.id
+      });
+    }));
+
+    // remove from workspace group
+    await this.kcAdminClient.users.delFromGroup({
+      id: userId,
+      groupId: keycloakGroupId
+    });
+  }
+
   public createGroup = async ({
     workspaceId,
     name,
@@ -105,6 +161,10 @@ export default class WorkspaceApi {
     name: string,
     attributes: any
   }): Promise<string> => {
+    if (workspaceId === this.defaultWorkspace.id) {
+      throw new Error('you cannot update default workspace');
+    }
+
     const namespace = await this.k8sNamespace.findOne(workspaceId);
     const group = await this.kcAdminClient.groups.setOrCreateChild({
         id: namespace.keycloakGroupId
@@ -116,6 +176,10 @@ export default class WorkspaceApi {
   }
 
   public listGroups = async (workspaceId: string): Promise<GroupRepresentation[]> => {
+    if (workspaceId === this.defaultWorkspace.id) {
+      throw new Error('you cannot update default workspace');
+    }
+
     const namespace = await this.k8sNamespace.findOne(workspaceId);
     const groups = await this.kcAdminClient.groups.findOne({id: namespace.keycloakGroupId});
     return groups.subGroups;

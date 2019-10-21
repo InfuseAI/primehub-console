@@ -8,25 +8,33 @@ export const createInResolver = (root: any, args: any, context: Context): Curren
   const workspaceIdInWhere: string = get(args, 'where.workspaceId');
   const workspaceId = workspaceIdInWhere || workspaceIdInData;
   if (!workspaceId || workspaceId === defaultWorkspaceId) {
-    return new CurrentWorkspace(defaultWorkspaceId, context.workspaceApi, context.everyoneGroupId);
+    return new CurrentWorkspace(
+      context.workspaceApi, context.everyoneGroupId, true, defaultWorkspaceId, context.crdNamespace);
   }
 
-  return new CurrentWorkspace(workspaceId, context.workspaceApi, context.everyoneGroupId);
+  return new CurrentWorkspace(
+    context.workspaceApi, context.everyoneGroupId, false, workspaceId, context.crdNamespace);
 };
 
 export default class CurrentWorkspace {
-  private workspaceId: string;
   private isDefault: boolean;
   private workspaceApi: WorkspaceApi;
   private everyoneGroupId: string;
-  private defaultNamespace: string;
+  private workspaceId: string;
+  private crdNamespace: string;
 
-  constructor(workspaceId: string, workspaceApi: WorkspaceApi, everyoneGroupId: string, defaultNamespace: string) {
-    this.workspaceId = workspaceId;
-    this.isDefault = (workspaceId === defaultWorkspaceId);
+  constructor(
+    workspaceApi: WorkspaceApi,
+    everyoneGroupId: string,
+    isDefault: boolean,
+    workspaceId: string,
+    crdNamespace: string
+  ) {
+    this.isDefault = isDefault;
     this.workspaceApi = workspaceApi;
     this.everyoneGroupId = everyoneGroupId;
-    this.defaultNamespace = defaultNamespace;
+    this.workspaceId = workspaceId;
+    this.crdNamespace = crdNamespace;
   }
 
   public checkIsDefault = (): boolean => {
@@ -46,6 +54,6 @@ export default class CurrentWorkspace {
   }
 
   public getK8sNamespace = (): string => {
-    return this.isDefault ? this.defaultNamespace : this.workspaceId;
+    return this.isDefault ? this.crdNamespace : this.workspaceId;
   }
 }

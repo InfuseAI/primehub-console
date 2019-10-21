@@ -6,7 +6,7 @@
 # import Announcement, AnnouncementConnection, AnnouncementWhereInput, AnnouncementWhereUniqueInput, AnnouncementCreateInput, AnnouncementUpdateInput from "./announcement.graphql"
 # import Dataset, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
-# import Workspace, WorkspaceEdge, WorkspaceConnection, WorkspaceWhereUniqueInput, WorkspaceCreateInput, WorkspaceUpdateInput from "./workspace.graphql"
+# import Workspace, WorkspaceEdge, WorkspaceConnection, WorkspaceWhereInput, WorkspaceWhereUniqueInput, WorkspaceCreateInput, WorkspaceUpdateInput from "./workspace.graphql"
 
 scalar JSON
 
@@ -144,6 +144,7 @@ type Query {
     last: Int
   ): [Workspace]!
   workspacesConnection(
+    where: WorkspaceWhereInput
     before: String
     after: String
     first: Int

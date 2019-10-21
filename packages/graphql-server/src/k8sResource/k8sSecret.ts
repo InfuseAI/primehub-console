@@ -53,7 +53,7 @@ export default class K8sSecret {
     return data.map(this.propsMapping);
   }
 
-  public findOne = async (name: string, namespace: string) => {
+  public findOne = async (name: string, namespace?: string) => {
     try {
       const resource = this.resource(namespace);
       const {body} = await resource(name).get();
@@ -105,7 +105,7 @@ export default class K8sSecret {
   }
 
   public update = async (
-    name: string, {displayName, config}: {displayName: string, config?: ConfigType}, namespace: string) => {
+    name: string, {displayName, config}: {displayName: string, config?: ConfigType}, namespace?: string) => {
     // api can only update displayName, data in config (ssh, .dockerconfigjson)
     const resource = this.resource(namespace);
     const {body: originalData} = await resource(name).get();
@@ -123,7 +123,7 @@ export default class K8sSecret {
     return this.propsMapping(body);
   }
 
-  public async delete(name: string, namespace: string) {
+  public async delete(name: string, namespace?: string) {
     const resource = this.resource(namespace);
     return resource(name).delete();
   }
@@ -223,7 +223,7 @@ export default class K8sSecret {
     return Buffer.from(str).toString('base64');
   }
 
-  private resource = (namespace: string) => {
+  private resource = (namespace?: string) => {
     return kubeClient.api.v1.namespaces(namespace || this.namespace).secrets;
   }
 }
