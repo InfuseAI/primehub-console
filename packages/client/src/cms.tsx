@@ -92,7 +92,6 @@ export default class CMSPage extends React.Component<Props, State> {
       }`
     })
     const workspaceList = result.data.workspaces;
-    workspaceList[0].isDefault = true;
     return workspaceList;
   }
 
@@ -282,7 +281,7 @@ export default class CMSPage extends React.Component<Props, State> {
       const currentWorkspace = workspaceList.find(ws => ws.id === wsId) || {} as any;
       history.push(`${(window as any).APP_PREFIX}cms/${wsId}/${currentWorkspace.isDefault ? 'system' : 'group'}`);
     } else if (key === 'workspace') {
-      const defaultWorkspaceId = workspaceList.find(ws => ws.isDefault).id;
+      const defaultWorkspaceId = (workspaceList.find(ws => ws.isDefault) || {}).id || 'default';
       history.push(`${(window as any).APP_PREFIX}cms/${defaultWorkspaceId}/${key}`);
     } else {
       history.push(`${(window as any).APP_PREFIX}cms/${workspaceId}/${key}`);
