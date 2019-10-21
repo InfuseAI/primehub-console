@@ -92,7 +92,6 @@ export default class CMSPage extends React.Component<Props, State> {
       }`
     })
     const workspaceList = result.data.workspaces;
-    workspaceList[0].isDefault = true;
     return workspaceList;
   }
 
@@ -113,11 +112,7 @@ export default class CMSPage extends React.Component<Props, State> {
         variables
       };
     }
-    console.log(workspaceId, key);
-    console.log(update(variables, [whereKey], where => ({
-      ...where,
-      workspaceId
-    })));
+
     return {
       query,
       variables: update(variables, [whereKey], where => ({
@@ -163,6 +158,16 @@ export default class CMSPage extends React.Component<Props, State> {
   afterDeploy = (data) => {
     const {intl, history, match} = this.props;
     const {workspaceId} = match.params as any;
+    if (get(data, 'actions.0.type') === 'DELETE_ARRAY') {
+      if (data.key === 'workspace') {
+        this.fetchWorkspaceList()
+          .then(wss => {
+            this.setState({
+              workspaceList: wss
+            });
+          });
+      }
+    }
     if (get(data, 'actions.0.type') === 'CREATE_ARRAY') {
       let link = `${(window as any).APP_PREFIX}cms/${workspaceId}/${data.key}/${getCreateId(data.result)}`;
       if (data.key === 'workspace') {
@@ -276,7 +281,7 @@ export default class CMSPage extends React.Component<Props, State> {
       const currentWorkspace = workspaceList.find(ws => ws.id === wsId) || {} as any;
       history.push(`${(window as any).APP_PREFIX}cms/${wsId}/${currentWorkspace.isDefault ? 'system' : 'group'}`);
     } else if (key === 'workspace') {
-      const defaultWorkspaceId = workspaceList.find(ws => ws.isDefault).id;
+      const defaultWorkspaceId = (workspaceList.find(ws => ws.isDefault) || {}).id || 'default';
       history.push(`${(window as any).APP_PREFIX}cms/${defaultWorkspaceId}/${key}`);
     } else {
       history.push(`${(window as any).APP_PREFIX}cms/${workspaceId}/${key}`);
