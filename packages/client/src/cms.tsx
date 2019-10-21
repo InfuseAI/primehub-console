@@ -166,6 +166,12 @@ export default class CMSPage extends React.Component<Props, State> {
     if (get(data, 'actions.0.type') === 'CREATE_ARRAY') {
       let link = `${(window as any).APP_PREFIX}cms/${workspaceId}/${data.key}/${getCreateId(data.result)}`;
       if (data.key === 'workspace') {
+        this.fetchWorkspaceList()
+          .then(wss => {
+            this.setState({
+              workspaceList: wss
+            });
+          });
         link = `${(window as any).APP_PREFIX}cms/${workspaceId}/${data.key}/${getCreateId(data.result)}`;
       }
       setTimeout(() => {
@@ -305,7 +311,7 @@ export default class CMSPage extends React.Component<Props, State> {
           }}
           title={currentWorkspace.displayName || 'Default'}
         >
-          {workspaceList.filter(ws => !ws.isDefault).map(ws => (
+          {workspaceList.map(ws => (
             <Menu.Item key={`workspace/${ws.id}`}>
               {ws.displayName}
             </Menu.Item>
