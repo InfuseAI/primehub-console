@@ -115,9 +115,13 @@ export default class ArrayBreadcrumb extends Component<Props> {
       reset,
       deploy,
       refId,
-      onChange
+      onChange,
     } = this.props;
-
+    let dataSource = value;
+    if (keyName === 'workspace') {
+      dataSource = value.filter(ws => !ws.isDefault);
+      console.log(dataSource, value)
+    }
     const disabled = (keyName === 'image' || keyName === 'instanceType') && GLOBAL_DISABLE;
     const {
       selectedRowKeys,
@@ -249,7 +253,7 @@ export default class ArrayBreadcrumb extends Component<Props> {
         </ButtonGroup>
         <Table
           pagination={showPagination}
-          dataSource={value.map((datum, i) => {
+          dataSource={dataSource.map((datum, i) => {
             return {...datum, __index: i, key: datum.key || i};
           })}
           columns={newColumnsRender}

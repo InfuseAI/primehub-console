@@ -3327,7 +3327,7 @@ anymatch@^2.0.0:
     micromatch "^3.1.4"
     normalize-path "^2.1.1"
 
-apollo-boost@0.1.22, apollo-boost@^0.1.4:
+apollo-boost@^0.1.4:
   version "0.1.22"
   resolved "https://registry.yarnpkg.com/apollo-boost/-/apollo-boost-0.1.22.tgz#0b6c607fcb02d06894e925010560b3237d1bce86"
   integrity sha512-JOU2MIhJISOfL/2hWkuBqH7sqNs28ZS8wRVjmcMEJ+DjmF5otVsDBtx+IMp9PEReoznrbSfjo3p4ix4AgtbooA==
@@ -3375,7 +3375,7 @@ apollo-cache@^1.1.21, apollo-cache@^1.1.7, apollo-cache@^1.3.2:
     apollo-utilities "^1.3.2"
     tslib "^1.9.3"
 
-apollo-client@2.4.7, apollo-client@^2.2.8, apollo-client@^2.4.7:
+apollo-client@^2.2.8, apollo-client@^2.4.7:
   version "2.4.7"
   resolved "https://registry.yarnpkg.com/apollo-client/-/apollo-client-2.4.7.tgz#b6712fd4c9ba346e3c44cfec7e6868e532b6a957"
   integrity sha512-6aAm+16AFBYZhJF8eKxrup6AbYni01InDiwTfZhMMTP2xaXQWjsQnfaHbI2oE+hd3+AZFy1drkse8RZKghR/WQ==
@@ -4961,10 +4961,10 @@ canner-script@2.0.11-alpha.1:
     react-intl "^2.4.0"
     safer-eval "^1.2.3"
 
-canner@2.0.55:
-  version "2.0.55"
-  resolved "https://registry.yarnpkg.com/canner/-/canner-2.0.55.tgz#c0d04ce9341cb50018682981201d5c83980ffffd"
-  integrity sha512-3Lj6MdWJXevSZ5wkCcVjBZuyQpdFA3gZ/ScK2qgpfIoCCnXYftrAnMIRJsBrO+mLwnXtqQ+Pka90IhcskFVYNw==
+canner@2.0.60:
+  version "2.0.60"
+  resolved "https://registry.yarnpkg.com/canner/-/canner-2.0.60.tgz#baeea58aec463b36d8dd8435e40e704f8a4032d8"
+  integrity sha512-KinvjdI2Yrn47J/oSwKRQkUInv4xcFjO1PdbYFQJkNkPV2QFL1roSO1UHSSeMoNCRt8y1WC8b9S+a+95tMfefw==
   dependencies:
     "@babel/runtime" "^7.2.0"
     ajv "^6.5.2"
