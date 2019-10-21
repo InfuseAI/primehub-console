@@ -6,7 +6,9 @@ export default () => (
   <array
     keyName="workspace"
     title="${workspace}"
-    ui="tableRoute"
+    controlDeployAndResetButtons={true}
+    cacheActions={true}
+    packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
         title: '${workspace.name.title}',
@@ -14,9 +16,6 @@ export default () => (
       }, {
         title: '${workspace.displayName.title}',
         dataIndex: 'displayName'
-      }, {
-        title: '${workspace.description.title}',
-        dataIndex: 'description'
       }]
     }}
     graphql={`
@@ -28,7 +27,7 @@ export default () => (
               id
               name
               displayName
-              description
+              isDefault
             }
           }
           pageInfo {

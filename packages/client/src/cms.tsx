@@ -106,12 +106,18 @@ export default class CMSPage extends React.Component<Props, State> {
     const {match} = this.props;
     const {workspaceId} = match.params as any;
     const whereKey = `${key}Where`;
+
     if (key === 'workspace') {
       return {
         query,
         variables
       };
     }
+    console.log(workspaceId, key);
+    console.log(update(variables, [whereKey], where => ({
+      ...where,
+      workspaceId
+    })));
     return {
       query,
       variables: update(variables, [whereKey], where => ({
@@ -155,9 +161,13 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   afterDeploy = (data) => {
-    const {intl, history} = this.props;
+    const {intl, history, match} = this.props;
+    const {workspaceId} = match.params as any;
     if (get(data, 'actions.0.type') === 'CREATE_ARRAY') {
-      const link = `${(window as any).APP_PREFIX}cms/${data.key}/${getCreateId(data.result)}`;
+      let link = `${(window as any).APP_PREFIX}cms/${workspaceId}/${data.key}/${getCreateId(data.result)}`;
+      if (data.key === 'workspace') {
+        link = `${(window as any).APP_PREFIX}cms/${workspaceId}/${data.key}/${getCreateId(data.result)}`;
+      }
       setTimeout(() => {
         this.setState({
           deploying: false
@@ -259,6 +269,9 @@ export default class CMSPage extends React.Component<Props, State> {
       const wsId = key.split('/')[1];
       const currentWorkspace = workspaceList.find(ws => ws.id === wsId) || {} as any;
       history.push(`${(window as any).APP_PREFIX}cms/${wsId}/${currentWorkspace.isDefault ? 'system' : 'group'}`);
+    } else if (key === 'workspace') {
+      const defaultWorkspaceId = workspaceList.find(ws => ws.isDefault).id;
+      history.push(`${(window as any).APP_PREFIX}cms/${defaultWorkspaceId}/${key}`);
     } else {
       history.push(`${(window as any).APP_PREFIX}cms/${workspaceId}/${key}`);
     }
@@ -292,7 +305,7 @@ export default class CMSPage extends React.Component<Props, State> {
           }}
           title={currentWorkspace.displayName || 'Default'}
         >
-          {workspaceList.map(ws => (
+          {workspaceList.filter(ws => !ws.isDefault).map(ws => (
             <Menu.Item key={`workspace/${ws.id}`}>
               {ws.displayName}
             </Menu.Item>
