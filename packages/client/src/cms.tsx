@@ -88,6 +88,7 @@ export default class CMSPage extends React.Component<Props, State> {
           id
           name
           displayName
+          isDefault
         }
       }`
     })
