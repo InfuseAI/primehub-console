@@ -113,11 +113,7 @@ export default class CMSPage extends React.Component<Props, State> {
         variables
       };
     }
-    console.log(workspaceId, key);
-    console.log(update(variables, [whereKey], where => ({
-      ...where,
-      workspaceId
-    })));
+
     return {
       query,
       variables: update(variables, [whereKey], where => ({
@@ -163,6 +159,16 @@ export default class CMSPage extends React.Component<Props, State> {
   afterDeploy = (data) => {
     const {intl, history, match} = this.props;
     const {workspaceId} = match.params as any;
+    if (get(data, 'actions.0.type') === 'DELETE_ARRAY') {
+      if (data.key === 'workspace') {
+        this.fetchWorkspaceList()
+          .then(wss => {
+            this.setState({
+              workspaceList: wss
+            });
+          });
+      }
+    }
     if (get(data, 'actions.0.type') === 'CREATE_ARRAY') {
       let link = `${(window as any).APP_PREFIX}cms/${workspaceId}/${data.key}/${getCreateId(data.result)}`;
       if (data.key === 'workspace') {
