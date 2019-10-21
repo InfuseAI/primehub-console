@@ -111,6 +111,7 @@ const resolvers = {
   },
   User: user.typeResolvers,
   Group: group.typeResolvers,
+  Workspace: workspace.typeResolvers,
   ...instanceType.typeResolver(),
   ...dataset.typeResolver(),
   ...image.typeResolver(),
@@ -290,6 +291,12 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       // cache layer
       addCacheLayerToKc(kcAdminClient);
 
+      // workspace
+      const workspaceApi = new WorkspaceApi({
+        defaultNamespace: config.k8sCrdNamespace,
+        kcAdminClient
+      });
+
       return {
         realm: config.keycloakRealmName,
         everyoneGroupId: config.keycloakEveryoneGroupId,
@@ -303,10 +310,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         userId,
         username,
         defaultUserVolumeCapacity: config.defaultUserVolumeCapacity,
-        workspaceApi: new WorkspaceApi({
-          defaultNamespace: config.k8sCrdNamespace,
-          kcAdminClient
-        })
+        workspaceApi,
+        crdNamespace: config.k8sCrdNamespace
       };
     },
     formatError: (error: any) => {

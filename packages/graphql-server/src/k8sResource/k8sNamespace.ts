@@ -54,10 +54,6 @@ export default class K8sNamespace {
     keycloakGroupId: string
   }): Promise<K8sNamespaceResponse> => {
     try {
-      // validate first
-      const {body: queryBody} = await this.resource(name).get();
-      this.validateLabels(queryBody);
-
       // create
       const {body} = await this.resource.post({
         body: {
@@ -65,6 +61,7 @@ export default class K8sNamespace {
           apiVersion: 'v1',
           metadata: {
             name,
+            labels: this.labels,
             annotations: {
               displayName,
               kcGroupId: keycloakGroupId

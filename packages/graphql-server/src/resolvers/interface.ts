@@ -18,4 +18,5 @@ export interface Context {
   username: string;
   defaultUserVolumeCapacity: string;
   workspaceApi: WorkspaceApi;
+  crdNamespace: string;
 }

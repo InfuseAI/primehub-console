@@ -1,5 +1,5 @@
 import KcAdminClient from 'keycloak-admin';
-import { find, isUndefined, first, sortBy, get, every, isEmpty, reduce, uniq, flatten } from 'lodash';
+import { find, isUndefined, first, sortBy, get, every, isEmpty, reduce, uniq, flatten, omit } from 'lodash';
 import {
   toRelay, mutateRelation, parseDiskQuota, stringifyDiskQuota, filter, paginate, extractPagination
 } from './utils';
@@ -12,6 +12,7 @@ import BPromise from 'bluebird';
 import * as logger from '../logger';
 import { crd as annCrdResolver } from '../resolvers/announcement';
 import moment from 'moment';
+import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspace';
 
 /**
  * utils
@@ -95,22 +96,29 @@ const deassignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdm
  * Query
  */
 
-const listQuery = async (kcAdminClient: KcAdminClient, where: any) => {
-  let users = await kcAdminClient.users.find({
-    max: keycloakMaxCount
-  });
+const listQuery = async (
+  kcAdminClient: KcAdminClient, where: any, currentWorkspace: CurrentWorkspace, context: Context) => {
+  const whereWithoutWorkspace = omit(where, 'workspaceId');
+  const workspaceApi = context.workspaceApi;
+  let users = currentWorkspace.checkIsDefault() ?
+    await kcAdminClient.users.find({
+      max: keycloakMaxCount
+    }) :
+    await workspaceApi.listMembers(currentWorkspace.getWorkspaceId());
   users = sortBy(users, 'createdTimestamp');
-  users = filter(users, where);
+  users = filter(users, whereWithoutWorkspace);
   return users;
 };
 
 export const query = async (root, args, context: Context) => {
-  const users = await listQuery(context.kcAdminClient, args && args.where);
+  const currentWorkspace = createInResolver(root, args, context);
+  const users = await listQuery(context.kcAdminClient, args && args.where, currentWorkspace, context);
   return paginate(users, extractPagination(args));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
-  const users = await listQuery(context.kcAdminClient, args && args.where);
+  const currentWorkspace = createInResolver(root, args, context);
+  const users = await listQuery(context.kcAdminClient, args && args.where, currentWorkspace, context);
   return toRelay(users, extractPagination(args));
 };
 
@@ -587,7 +595,8 @@ export const typeResolvers = {
         return [];
       }
 
-      const prefix = annCrdResolver.getPrefix();
+      const currentWorkspace = createInResolver(parent, args, context);
+      const prefix = annCrdResolver.getPrefix(currentWorkspace);
       const annMap = reduce(filteredAnn, (result, ann) => {
         result[`${prefix}${ann.id}`] = ann;
         return result;
