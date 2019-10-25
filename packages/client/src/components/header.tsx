@@ -61,7 +61,9 @@ export default class HeaderContainer extends React.Component<Props, {}> {
     const thumbnail = (window as any).thumbnail;
     return (
       <Header pagePadding={pagePadding}>
-        <Logo />
+        <a href="/" style={{display: "flex"}}>
+          <Logo />
+        </a>
         <Menu
           onClick={this.onClickMenu}
           theme="light"
