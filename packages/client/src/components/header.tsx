@@ -36,22 +36,22 @@ export interface Props {
 
 export default class HeaderContainer extends React.Component<Props, {}> {
   onClickMenu = (item: any) => {
-    const portal = (window as any).portal || {
+    const links = (window as any).links || {
       userProfileLink: '',
       changePasswordLink: '',
       logoutLink: '',
     }
     switch (item.key) {
       case 'userProfile': {
-        (window as any).location.href = portal.userProfileLink;
+        (window as any).location.href = links.userProfileLink;
         break;
       }
       case 'changePassword': {
-        (window as any).location.href = portal.changePasswordLink;
+        (window as any).location.href = links.changePasswordLink;
         break;
       }
       case 'logout': {
-        (window as any).location.href = portal.logoutLink;
+        (window as any).location.href = links.logoutLink;
       }
     }
   }

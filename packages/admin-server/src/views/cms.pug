@@ -4,6 +4,7 @@ extends ./layout.pug
 block head
   script.
     window.LOCALE = '#{locale}';
+    window.links = !{links};
     window.graphqlEndpoint = '#{graphqlEndpoint}';
     window.username = "#{username}";
     window.thumbnail = "#{thumbnail}";
