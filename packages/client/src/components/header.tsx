@@ -1,79 +1,88 @@
 import * as React from 'react';
-import {Menu, Icon, Badge, Avatar} from 'antd';
+import {Menu, Layout, Avatar} from 'antd';
+import {LayoutProps} from 'antd/lib/layout';
 import styled from 'styled-components';
-import firebase from 'firebase';
-const SubMenu = Menu.SubMenu;
+import logo from 'images/primehub-logo.svg';
 
-const ItemContent = styled.div`
-  a {
-    color: #FFF !important;
-  }
+const HEADER_HEIGHT = 64;
+const PAGE_PADDING = 64;
 
-  .ant-badge {
-    color: #FFF;
+const Logo = styled.div`
+  background-image: url(${logo});
+  background-size: contain;
+  background-position: left;
+  background-repeat: no-repeat;
+  width: 200px;
+  margin: 8px 0;
+` as any;
+const Header = styled<Props & LayoutProps>(Layout.Header)`
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  .ant-menu-item .anticon, .ant-menu-submenu-title .anticon {
+    margin: 0;
   }
-`
-
-const MenuText = styled.span`
-  color: rgba(255, 255, 255, .65);
-  &:hover {
-    color: #fff;
-  }
-`;
+  height: ${HEADER_HEIGHT}px;
+  padding: 0 ${props => props.pagePadding ? props.pagePadding : PAGE_PADDING}px;
+  border-bottom: 1px solid #f0f0f0;
+  position: fixed;
+  z-index: 1;
+  width: 100%;
+` as any;
 
 export interface Props {
-  appUrl: any;
-  deploying: boolean;
-  hasChanged: boolean;
-  subMenuTitle: any;
+  pagePadding?: number;
 }
 
 export default class HeaderContainer extends React.Component<Props, {}> {
-
-
-  headerMenuOnClick = (menuItem: {key: string}) => {
-    if(menuItem.key === 'logout') {
-      // firebase.auth().signOut();
-      location.href = `${(window as any).APP_PREFIX}oidc/logout`;
+  onClickMenu = (item: any) => {
+    const portal = (window as any).portal || {
+      userProfileLink: '',
+      changePasswordLink: '',
+      logoutLink: '',
+    }
+    switch (item.key) {
+      case 'userProfile': {
+        (window as any).location.href = portal.userProfileLink;
+        break;
+      }
+      case 'changePassword': {
+        (window as any).location.href = portal.changePasswordLink;
+        break;
+      }
+      case 'logout': {
+        (window as any).location.href = portal.logoutLink;
+      }
     }
   }
 
   render() {
-    const {
-      appUrl,
-      deploying,
-      hasChanged,
-      subMenuTitle
-    } = this.props;
-
-    const spinIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
-    
+    const {pagePadding} = this.props;
+    const thumbnail = (window as any).thumbnail;
     return (
-      <div style={{float: "right"}}>
+      <Header pagePadding={pagePadding}>
+        <Logo />
         <Menu
-          theme="dark"
+          onClick={this.onClickMenu}
+          theme="light"
           mode="horizontal"
-          style={{ lineHeight: '64px', width: '100%' }}
-          onClick={this.headerMenuOnClick}
-          selectedKeys={[]}
+          style={{ lineHeight: '64px', border: 0}}
+        >
+          <Menu.SubMenu
+            title={<Avatar src={thumbnail} icon="user"/>}
           >
-          <SubMenu title={subMenuTitle}>
-            <Menu.Item data-e2e="logout-button" theme="light" key="logout">
-              <ItemContent>
-                <Icon type="poweroff" /> Logout
-              </ItemContent>
+            <Menu.Item key="userProfile">
+              User Profile
             </Menu.Item>
-          </SubMenu>
-          {/* <Menu.Item>
-            <ItemContent>
-              <a href={`https://www.canner.io/home/apps/${appUrl}/overview`}>
-                <Icon type="home" />
-                Dashboard
-              </a>
-            </ItemContent>
-          </Menu.Item> */}
+            <Menu.Item key="changePassword">
+              Change Password
+            </Menu.Item>
+            <Menu.Item key="logout" style={{borderTop: '1px solid #f1f1f1'}}>
+              Logout
+            </Menu.Item>
+          </Menu.SubMenu>
         </Menu>
-      </div>
+      </Header>
     );
   }
 }
