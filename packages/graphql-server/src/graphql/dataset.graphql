@@ -43,6 +43,8 @@ type DatasetConnection {
 
 input DatasetWhereUniqueInput {
   id: ID!
+  # workspace
+  workspaceId: String
 }
 
 input DatasetWhereInput {
