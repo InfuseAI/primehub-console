@@ -4,6 +4,8 @@ import K8sSecret, {SECRET_DOCKER_CONFIG_JSON_TYPE, SECRET_OPAQUE_TYPE} from '../
 import * as logger from '../logger';
 import { get, pick } from 'lodash';
 
+const SECRET_PLACEHOLDER = '******';
+
 export const serializeType = (type: string) => {
   return (type === 'kubernetes') ? SECRET_DOCKER_CONFIG_JSON_TYPE : SECRET_OPAQUE_TYPE;
 };

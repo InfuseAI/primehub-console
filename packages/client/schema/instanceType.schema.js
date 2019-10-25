@@ -115,7 +115,7 @@ export default () => (
             component={TextBlock}
           >
             <number keyName="cpuRequest" title="${cpuRequest}"
-              uiParams={{unit: ' GB', step: 0.5, min: 0.5, precision: 1, parser: parseToStepDot5, disableText: ' '}}
+              uiParams={{step: 0.5, min: 0.5, precision: 1, parser: parseToStepDot5, disableText: ' '}}
               defaultValue={() => null}
               packageName="../src/cms-components/customize-number-checkbox"
               nullable

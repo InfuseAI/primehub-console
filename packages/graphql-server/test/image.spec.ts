@@ -16,7 +16,9 @@ const fields = `
   displayName
   description
   useImagePullSecret
+  type
   url
+  urlForGpu
   global
   spec
   groups {
@@ -69,10 +71,13 @@ describe('image graphql', function() {
       name: data.name,
       displayName: data.name,
       description: null,
+      type: 'both',
       url: null,
+      urlForGpu: null,
       useImagePullSecret: null,
       global: false,
       spec: {
+        type: 'both',
         displayName: data.name,
         pullSecret: null,
       },
@@ -92,10 +97,13 @@ describe('image graphql', function() {
       name: data.name,
       displayName: data.name,
       description: null,
+      type: 'both',
       url: null,
+      urlForGpu: null,
       useImagePullSecret: null,
       global: false,
       spec: {
+        type: 'both',
         displayName: data.name,
         pullSecret: null
       },
@@ -125,8 +133,12 @@ describe('image graphql', function() {
       useImagePullSecret: null,
       spec: {
         ...pick(data, ['displayName', 'description', 'url']),
-        pullSecret: null
+        pullSecret: null,
+        type: 'both',
+        urlForGpu: data.url
       },
+      type: 'both',
+      urlForGpu: data.url,
       ...data
     });
 
@@ -144,8 +156,12 @@ describe('image graphql', function() {
       useImagePullSecret: null,
       spec: {
         ...pick(data, ['displayName', 'description', 'url']),
-        pullSecret: null
+        pullSecret: null,
+        type: 'both',
+        urlForGpu: data.url
       },
+      type: 'both',
+      urlForGpu: data.url,
       ...data
     });
   });
@@ -171,8 +187,12 @@ describe('image graphql', function() {
       useImagePullSecret: null,
       spec: {
         ...pick(data, ['displayName', 'description', 'url']),
+        type: 'both',
+        urlForGpu: data.url,
         pullSecret: null
       },
+      type: 'both',
+      urlForGpu: data.url,
       ...data
     });
 
@@ -190,8 +210,12 @@ describe('image graphql', function() {
       useImagePullSecret: null,
       spec: {
         ...pick(data, ['displayName', 'description', 'url']),
+        type: 'both',
+        urlForGpu: data.url,
         pullSecret: null
       },
+      type: 'both',
+      urlForGpu: data.url,
       ...data
     });
   });
@@ -352,6 +376,312 @@ describe('image graphql', function() {
     });
 
     expect(queryOne.image.global).to.be.equals(false);
+  });
+
+  it('should test creating images with three different types', async () => {
+    // both
+    const createBothTypeMutation = await this.graphqlRequest(`
+    mutation($data: ImageCreateInput!){
+      createImage (data: $data) { ${fields} }
+    }`, {
+      data: {
+        name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+        type: 'both',
+        url: 'test'
+      }
+    });
+
+    // query one
+    const queryOne = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${fields} }
+    }`, {
+      where: {id: createBothTypeMutation.createImage.id}
+    });
+
+    expect(queryOne.image).to.be.include({
+      type: 'both',
+      url: 'test',
+      urlForGpu: 'test'
+    });
+
+    // both with urlForGpu
+    const createBothWithUrlTypeMutation = await this.graphqlRequest(`
+    mutation($data: ImageCreateInput!){
+      createImage (data: $data) { ${fields} }
+    }`, {
+      data: {
+        name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+        type: 'both',
+        url: 'test',
+        urlForGpu: 'gpu'
+      }
+    });
+
+    // query one
+    const queryOneWithGpu = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${fields} }
+    }`, {
+      where: {id: createBothWithUrlTypeMutation.createImage.id}
+    });
+
+    expect(queryOneWithGpu.image).to.be.include({
+      type: 'both',
+      url: 'test',
+      urlForGpu: 'gpu'
+    });
+
+    // cpu
+    const createCpuTypeMutation = await this.graphqlRequest(`
+    mutation($data: ImageCreateInput!){
+      createImage (data: $data) { ${fields} }
+    }`, {
+      data: {
+        name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+        type: 'cpu',
+        url: 'test'
+      }
+    });
+
+    // query one
+    const queryOneWithCpu = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${fields} }
+    }`, {
+      where: {id: createCpuTypeMutation.createImage.id}
+    });
+
+    expect(queryOneWithCpu.image).to.be.include({
+      type: 'cpu',
+      url: 'test',
+      urlForGpu: 'test'
+    });
+
+    // gpu
+    const createGpuTypeMutation = await this.graphqlRequest(`
+    mutation($data: ImageCreateInput!){
+      createImage (data: $data) { ${fields} }
+    }`, {
+      data: {
+        name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+        type: 'gpu',
+        url: 'gpu'
+      }
+    });
+
+    // query one
+    const queryOneWithGpuOnly = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${fields} }
+    }`, {
+      where: {id: createGpuTypeMutation.createImage.id}
+    });
+
+    expect(queryOneWithGpuOnly.image).to.be.include({
+      type: 'gpu',
+      url: 'gpu',
+      urlForGpu: 'gpu'
+    });
+  });
+
+  it('should test creating image with both type and update it', async () => {
+    // both
+    const createBothTypeMutation = await this.graphqlRequest(`
+    mutation($data: ImageCreateInput!){
+      createImage (data: $data) { ${fields} }
+    }`, {
+      data: {
+        name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+        type: 'both',
+        url: 'test'
+      }
+    });
+
+    await this.graphqlRequest(`
+    mutation($where: ImageWhereUniqueInput!, $data: ImageUpdateInput!){
+      updateImage (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: createBothTypeMutation.createImage.id},
+      data: {url: 'test2'}
+    });
+
+    // query one
+    const queryOne = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${fields} }
+    }`, {
+      where: {id: createBothTypeMutation.createImage.id}
+    });
+
+    expect(queryOne.image).to.be.include({
+      type: 'both',
+      url: 'test2',
+      urlForGpu: 'test'
+    });
+
+    // update null to urlForGpu
+    await this.graphqlRequest(`
+    mutation($where: ImageWhereUniqueInput!, $data: ImageUpdateInput!){
+      updateImage (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: createBothTypeMutation.createImage.id},
+      data: {urlForGpu: null}
+    });
+
+    // query one
+    const secondQueryOne = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${fields} }
+    }`, {
+      where: {id: createBothTypeMutation.createImage.id}
+    });
+
+    expect(secondQueryOne.image).to.be.include({
+      type: 'both',
+      url: 'test2',
+      urlForGpu: null
+    });
+
+    // change to gpu
+    await this.graphqlRequest(`
+    mutation($where: ImageWhereUniqueInput!, $data: ImageUpdateInput!){
+      updateImage (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: createBothTypeMutation.createImage.id},
+      data: {type: 'gpu'}
+    });
+
+    // query one
+    const thirdQueryOne = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${fields} }
+    }`, {
+      where: {id: createBothTypeMutation.createImage.id}
+    });
+
+    expect(thirdQueryOne.image).to.be.include({
+      type: 'gpu',
+      url: 'test2'
+    });
+  });
+
+  it('should test creating image with gpu type and update it', async () => {
+    // both
+    const createMutation = await this.graphqlRequest(`
+    mutation($data: ImageCreateInput!){
+      createImage (data: $data) { ${fields} }
+    }`, {
+      data: {
+        name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+        type: 'gpu',
+        url: 'gpu-url'
+      }
+    });
+
+    await this.graphqlRequest(`
+    mutation($where: ImageWhereUniqueInput!, $data: ImageUpdateInput!){
+      updateImage (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: createMutation.createImage.id},
+      data: {url: 'gpu-url2'}
+    });
+
+    // query one
+    const queryOne = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${fields} }
+    }`, {
+      where: {id: createMutation.createImage.id}
+    });
+
+    expect(queryOne.image).to.be.include({
+      type: 'gpu',
+      url: 'gpu-url2',
+      urlForGpu: 'gpu-url2'
+    });
+
+    // update to both
+    await this.graphqlRequest(`
+    mutation($where: ImageWhereUniqueInput!, $data: ImageUpdateInput!){
+      updateImage (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: createMutation.createImage.id},
+      data: {type: 'both', url: 'url-for-cpu', urlForGpu: 'url-for-gpu'}
+    });
+
+    // query one
+    const secondQueryOne = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${fields} }
+    }`, {
+      where: {id: createMutation.createImage.id}
+    });
+
+    expect(secondQueryOne.image).to.be.include({
+      type: 'both',
+      url: 'url-for-cpu',
+      urlForGpu: 'url-for-gpu'
+    });
+  });
+
+  it('should test creating image with cpu type and update it', async () => {
+    // cpu
+    const createMutation = await this.graphqlRequest(`
+    mutation($data: ImageCreateInput!){
+      createImage (data: $data) { ${fields} }
+    }`, {
+      data: {
+        name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+        type: 'cpu',
+        url: 'cpu-url'
+      }
+    });
+
+    await this.graphqlRequest(`
+    mutation($where: ImageWhereUniqueInput!, $data: ImageUpdateInput!){
+      updateImage (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: createMutation.createImage.id},
+      data: {url: 'cpu-url2'}
+    });
+
+    // query one
+    const queryOne = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${fields} }
+    }`, {
+      where: {id: createMutation.createImage.id}
+    });
+
+    expect(queryOne.image).to.be.include({
+      type: 'cpu',
+      url: 'cpu-url2',
+      urlForGpu: 'cpu-url2'
+    });
+
+    // update to both without other parameters
+    await this.graphqlRequest(`
+    mutation($where: ImageWhereUniqueInput!, $data: ImageUpdateInput!){
+      updateImage (where: $where, data: $data) { ${fields} }
+    }`, {
+      where: {id: createMutation.createImage.id},
+      data: {type: 'both'}
+    });
+
+    // query one
+    const secondQueryOne = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${fields} }
+    }`, {
+      where: {id: createMutation.createImage.id}
+    });
+
+    expect(secondQueryOne.image).to.be.include({
+      type: 'both',
+      url: 'cpu-url2',
+      urlForGpu: 'cpu-url2'
+    });
   });
 
   it('should delete image', async () => {

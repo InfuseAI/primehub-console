@@ -2,7 +2,7 @@
 import builder, {Condition, Layout} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 import {Tag} from 'antd';
-import {GroupRelation, CustomizedStringImagePullSecret} from './utils.schema';
+import {GroupRelation, CustomizedStringImagePullSecret, CustomizedStringSelectWithCheckbox} from './utils.schema';
 import DisableModeLayout from '../src/cms-layouts/disableMode';
 
 export default () => (
@@ -20,6 +20,20 @@ export default () => (
         title: '${displayName}',
         dataIndex: 'displayName'
       }, {
+        title: '${type}',
+        dataIndex: 'type',
+        render: (value) => {
+          if (!value) {
+              return '-';
+          }
+
+          if (value === 'both') {
+              return 'universal';
+          }
+
+          return value;
+        }
+      },{
         title: '${description}',
         dataIndex: 'description'
       }]
@@ -30,7 +44,7 @@ export default () => (
           edges {
             cursor
             node {
-              id name displayName description
+              id name displayName description type
             }
           }
           pageInfo {
@@ -71,7 +85,27 @@ export default () => (
       </Condition>
       <string keyName="displayName" title="${displayName}" />
       <string keyName="description" title="${description}" />
+      <string keyName="type" 
+        ui="select"
+        title="${type}"
+        uiParams={{
+          options: [{
+            text: 'cpu',
+            value: 'cpu'
+          }, {
+            text: 'gpu',
+            value: 'gpu'
+          }, {
+            text: 'universal',
+            value: 'both'
+          }]
+        }}
+        defaultValue="both"
+      />
       <string keyName="url" title="${imageUrl}"/>
+      <Condition match={data => data.type === 'both'}>
+        <CustomizedStringSelectWithCheckbox keyName="urlForGpu" title="${images.urlForGpu}" defaultValue={() => null} />
+      </Condition>
       <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${images.useImagePullSecret}" />
     </Layout>
     <boolean keyName="global" title="${global}" />

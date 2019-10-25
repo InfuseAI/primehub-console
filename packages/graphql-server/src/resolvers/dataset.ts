@@ -7,6 +7,7 @@ import { Context } from './interface';
 import { omit, get, isUndefined, last, isNil } from 'lodash';
 import { resolveInDataSet } from './secret';
 import KeycloakAdminClient from 'keycloak-admin';
+import { ResourceRole, ResourceNamePrefix } from './resourceRole';
 import {createConfig} from '../config';
 
 export const ATTRIBUTE_PREFIX = 'dataset.primehub.io';
@@ -174,7 +175,7 @@ export const onCreate = async (
     }
     // create pvc
     await context.k8sDatasetPvc.create({
-      datasetName: data.name,
+      volumeName: resource.spec.volumeName,
       volumeSize: data.volumeSize
     });
   }
@@ -338,10 +339,10 @@ export const onUpdate = async (
 };
 
 export const onDelete = async ({
-  name, context, getPrefix
-}: {name: string, context: Context, getPrefix: () => string}) => {
+  name, context, resource, getPrefix
+}: {name: string, context: Context, resource: any, getPrefix: () => string}) => {
   // delete dataset pvc
-  await context.k8sDatasetPvc.delete(name);
+  await context.k8sDatasetPvc.delete(resource.spec.volumeName);
   await context.k8sUploadServerSecret.delete(name);
   // delete writable as well
   try {
@@ -470,7 +471,7 @@ export const resolveType = {
       return null;
     }
 
-    const datasetPvc = await k8sDatasetPvc.findOne(parent.name);
+    const datasetPvc = await k8sDatasetPvc.findOne(parent.volumeName);
     return get(datasetPvc, 'volumeSize');
   },
   async groups(parent, args, context: Context) {
@@ -507,8 +508,8 @@ export const resolveType = {
   ...resolveInDataSet
 };
 
-export const customParseNameFromRole = (roleName: string) => {
-  return last(roleName.split(':'));
+export const parseNameFromRole = (role: ResourceRole) => {
+  return role.resourceName.replace('rw:', '');
 };
 
 export const regenerateUploadSecret = async (root, args, context: Context) => {
@@ -526,14 +527,14 @@ export const regenerateUploadSecret = async (root, args, context: Context) => {
 export const crd = new Crd<DatasetSpec>({
   customResourceMethod: 'datasets',
   propMapping: mapping,
-  prefixName: 'ds',
+  prefixName: ResourceNamePrefix.ds,
   resourceName: 'dataset',
   createMapping,
   updateMapping,
   onCreate,
   onUpdate,
   onDelete,
-  customParseNameFromRole,
+  parseNameFromRole,
   resolveType,
   customUpdate
 });

@@ -41,11 +41,19 @@ export interface InstanceTypeSpec {
   nodeSelector?: Record<string, any>;
 }
 
+export enum ImageType {
+  cpu = 'cpu',
+  gpu = 'gpu',
+  both = 'both'
+}
+
 export interface ImageSpec {
   displayName?: string;
   description?: string;
   url?: string;
   pullSecret?: string;
+  type?: ImageType;
+  urlForGpu?: string;
 }
 
 export interface DatasetSpec {

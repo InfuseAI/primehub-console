@@ -2,14 +2,18 @@ import { Context } from './interface';
 import { toRelay, paginate, extractPagination, filter } from './utils';
 import CustomResource, { Item } from '../crdClient/customResource';
 import pluralize from 'pluralize';
-import { isEmpty, omit, mapValues, find, get } from 'lodash';
+import { isEmpty, omit, mapValues, find, get, isNil } from 'lodash';
 import KeycloakAdminClient from 'keycloak-admin';
 import { ApolloError } from 'apollo-server';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
 import {createConfig} from '../config';
 import { CrdCache } from '../cache/crdCache';
-const config = createConfig();
 import * as logger from '../logger';
+import { parseResourceRole, ResourceNamePrefix, ResourceRole } from './resourceRole';
+
+// utils
+const config = createConfig();
+const defaultParseNameFromRole = (role: ResourceRole) => role.resourceName;
 
 export class Crd<SpecType> {
   private cache: CrdCache<SpecType>;
@@ -23,7 +27,7 @@ export class Crd<SpecType> {
   private onCreate?: (data: any) => Promise<any>;
   private onUpdate?: (data: any) => Promise<any>;
   private onDelete?: (data: any) => Promise<any>;
-  private customParseNameFromRole?: (roleName: string) => string;
+  private parseNameFromRole?: (role: ResourceRole) => string;
   private customUpdate?: ({
     name, metadata, spec, customResource, context, getPrefix, data
   }: {
@@ -44,7 +48,7 @@ export class Crd<SpecType> {
     onCreate,
     onUpdate,
     onDelete,
-    customParseNameFromRole,
+    parseNameFromRole,
     customUpdate,
     customParseWhere,
     generateName
@@ -59,7 +63,7 @@ export class Crd<SpecType> {
     onCreate?: (data: any) => Promise<any>,
     onUpdate?: (data: any) => Promise<any>,
     onDelete?: (data: any) => Promise<any>,
-    customParseNameFromRole?: (roleName: string) => string,
+    parseNameFromRole?: (role: ResourceRole) => string,
     customUpdate?: ({
       name, metadata, spec, customResource, context, getPrefix, data
     }: {
@@ -79,7 +83,7 @@ export class Crd<SpecType> {
     this.onUpdate = onUpdate;
     this.onDelete = onDelete;
     this.customUpdate = customUpdate;
-    this.customParseNameFromRole = customParseNameFromRole;
+    this.parseNameFromRole = parseNameFromRole || defaultParseNameFromRole;
     this.rolePrefix = config.rolePrefix;
     this.customParseWhere = customParseWhere;
     this.generateName = generateName;
@@ -155,18 +159,10 @@ export class Crd<SpecType> {
     };
   }
 
-  public parseNameFromRole = (roleName: string) => {
-    return this.customParseNameFromRole
-      ? this.customParseNameFromRole(roleName)
-      : roleName.slice(this.getPrefix().length);
-  }
-
   public findInGroup = async (groupId: string, resource: string, kcAdminClient: KeycloakAdminClient) => {
-    const roles = await kcAdminClient.groups.listRealmRoleMappings({
-      id: groupId
-    });
+    const roles = await this.listGroupRealmRoles(kcAdminClient, groupId);
     return Boolean(find(roles, role => {
-      const resourceNameFromRole = this.parseNameFromRole(role.name);
+      const resourceNameFromRole = this.parseNameFromRole(role);
       return resourceNameFromRole === resource;
     }));
   }
@@ -233,13 +229,9 @@ export class Crd<SpecType> {
   }
 
   private queryByGroup = async (parent, args, context: Context) => {
-    let roles = await context.kcAdminClient.groups.listRealmRoleMappings({
-      id: parent.id
-    });
-    const prefix = this.getPrefix();
-    roles = roles.filter(role => role.name.startsWith(prefix));
+    const roles = await this.listGroupRealmRoles(context.kcAdminClient, parent.id);
     const namesWithRole = roles.map(role => {
-      return {name: this.parseNameFromRole(role.name), roleName: role.name};
+      return {name: this.parseNameFromRole(role), roleName: role.originalName};
     });
 
     // todo: make this logic better
@@ -361,7 +353,7 @@ export class Crd<SpecType> {
     const crd = await customResource.get(name);
     await customResource.del(name);
     if (this.onDelete) {
-      await this.onDelete({name, context, getPrefix: this.getPrefix});
+      await this.onDelete({name, context, resource: crd, getPrefix: this.getPrefix});
     }
     // clear cache
     if (this.cache) {
@@ -376,5 +368,21 @@ export class Crd<SpecType> {
       id: name
     });
     return this.propMapping(crd);
+  }
+
+  private listGroupRealmRoles =
+    async (kcAdminClient: KeycloakAdminClient, groupId: string): Promise<ResourceRole[]> => {
+      const groupRoles = await kcAdminClient.groups.listRealmRoleMappings({
+        id: groupId
+      });
+
+      let roles = groupRoles.map(role => parseResourceRole(role.name));
+      roles = roles.filter(role => role.resourcePrefix === this.prefixName);
+
+      // if rolePrefix not exist, filter only roles without rolePrefix
+      // else, filter only roles with rolePrefix
+      return this.rolePrefix ?
+        roles.filter(role => role.rolePrefix === this.rolePrefix) :
+        roles.filter(role => isNil(role.rolePrefix));
   }
 }

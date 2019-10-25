@@ -8,6 +8,7 @@ import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 import Boom from 'boom';
 import { ErrorCodes } from '../errorCodes';
 import { isNull } from 'util';
+import { ResourceNamePrefix } from './resourceRole';
 
 // utils
 const EffectNone = 'None';
@@ -145,9 +146,8 @@ export const createMapping = (data: any) => {
   const tolerations = validateAndMapTolerations(get(data, 'tolerations.set'), 'create');
   const nodeSelector = isEmpty(data.nodeSelector) ? undefined : data.nodeSelector;
 
-  // request parameters should be assigned with limit parameters if not defined
-  const cpuRequest = get(data, 'cpuRequest', data.cpuLimit);
-  const memoryRequest = get(data, 'memoryRequest', data.memoryLimit);
+  const cpuRequest = data.cpuRequest;
+  const memoryRequest = data.memoryRequest;
 
   return {
     metadata: {
@@ -159,8 +159,10 @@ export const createMapping = (data: any) => {
       'limits.cpu': data.cpuLimit,
       'limits.memory': data.memoryLimit ? stringifyMemory(data.memoryLimit) : undefined,
       'limits.nvidia.com/gpu': data.gpuLimit,
+
+      // requests fields should be left empty if not defined by user
       'requests.cpu': cpuRequest,
-      'requests.memory': stringifyMemory(memoryRequest),
+      'requests.memory': memoryRequest ? stringifyMemory(memoryRequest) : undefined,
       tolerations,
       nodeSelector
     }
@@ -307,7 +309,7 @@ export const crd = new Crd<InstanceTypeSpec>({
   customResourceMethod: 'instanceTypes',
   propMapping: mapping,
   resolveType,
-  prefixName: 'it',
+  prefixName: ResourceNamePrefix.it,
   resourceName: 'instanceType',
   createMapping,
   updateMapping,

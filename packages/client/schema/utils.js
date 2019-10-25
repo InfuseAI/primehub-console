@@ -207,6 +207,7 @@ exports.dict = {
     images: 'Images',
     global: 'Global',
     imageUrl: 'Container image url',
+    imageUrl: 'Container image url',
     datasetUrl: 'Url',
     variables: 'Variables',
     config: 'Config',
@@ -329,6 +330,7 @@ exports.dict = {
     'secret.password': 'Password',
 
     // image
+    'images.urlForGpu': 'Specific container image url for GPU',
     'images.useImagePullSecret': 'Use Image Pull Secret',
     'image.useImagePullSecret.component.select.placeholder': 'Select Secret'
   },
@@ -523,6 +525,7 @@ exports.dict = {
     'secret.password': 'Password',
 
     // image
+    'images.urlForGpu': 'Specific container image url for GPU',
     'images.useImagePullSecret': 'Use Image Pull Secret',
     'image.useImagePullSecret.component.select.placeholder': 'Select Secret'
   }
