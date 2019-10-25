@@ -125,7 +125,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   // redirect
   const home = config.enableUserPortal ? '/landing' : '/cms';
   rootRouter.get('/', async (ctx: any) => {
-    return ctx.redirect(`${config.appPrefix || ''}${home}`);
+    return ctx.redirect(`${config.cmsHost}${config.appPrefix || ''}${home}`);
   });
 
   // favicon
