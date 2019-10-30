@@ -24,7 +24,7 @@ const Header = styled<Props & LayoutProps>(Layout.Header)`
   }
   height: ${HEADER_HEIGHT}px;
   padding: 0 ${props => props.pagePadding ? props.pagePadding : PAGE_PADDING}px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #dcdcdc;
   position: fixed;
   z-index: 1;
   width: 100%;
