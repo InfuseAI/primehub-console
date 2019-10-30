@@ -72,6 +72,16 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.state.graphqlEndpoint = config.graphqlEndpoint;
     ctx.state.disableMode = config.readOnlyOnInstanceTypeAndImage;
     ctx.state.enableDatasetUpload = config.enableDatasetUpload;
+
+    // referrer
+    const referrer = `${config.cmsHost}${ctx.path}`;
+    ctx.state.links = JSON.stringify({
+      // tslint:disable-next-line:max-line-length
+      userProfileLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account?referrer=${config.keycloakClientId}&referrer_uri=${referrer}`,
+      // tslint:disable-next-line:max-line-length
+      changePasswordLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account/password?referrer=${config.keycloakClientId}&referrer_uri=${referrer}`,
+      logoutLink: config.appPrefix ? `${config.appPrefix}/oidc/logout` : '/oidc/logout',
+    });
     return next();
   });
 
@@ -148,9 +158,6 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
         title: 'PrimeHub',
         staticPath,
         portal: JSON.stringify({
-          userProfileLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account?referrer=${config.keycloakClientId}&referrer_uri=${config.cmsHost}/admin/landing`,
-          changePasswordLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account/password?referrer=${config.keycloakClientId}&referrer_uri=${config.cmsHost}/admin/landing`,
-          logoutLink: config.appPrefix ? `${config.appPrefix}/oidc/logout` : '/oidc/logout',
           services: portalConfig.services,
           welcomeMessage: portalConfig.welcomeMessage
         })
