@@ -6,7 +6,7 @@ import Container from '@canner/container';
 import R from '@canner/history-router';
 import ContentHeader from 'components/header';
 import Error from 'components/error';
-import styled, {StyledComponentClass} from 'styled-components';
+import styled, {StyledComponentClass, keyframes} from 'styled-components';
 import color from 'styledShare/color';
 import logo from 'images/primehub-logo-w.png';
 import {RouteComponentProps} from 'react-router';
@@ -221,14 +221,14 @@ export default class CMSPage extends React.Component<Props, State> {
     if (hasError) {
       return <Error/>;
     }
-    const {activeKey} = match.params as any;
+    let {activeKey} = match.params as any;
     return (
       <Layout style={{minHeight: '100vh'}}>
         <Sider breakpoint="sm">
           <Logo src={logo}/>
           <Menu
             onClick={this.siderMenuOnClick}
-            selectedKeys={[(match.params as any).activeKey]}
+            selectedKeys={[activeKey].concat(activeKey === 'buildImageJob' ? 'buildImage' : '')}
             theme="dark"
             mode="inline">
             {/* <Menu.Item key="__cnr_back">
@@ -236,11 +236,13 @@ export default class CMSPage extends React.Component<Props, State> {
               Back to dashboard
             </Menu.Item> */}
             {
-              Object.keys(schema.schema).map(key => (
-                <Menu.Item key={key}>
-                  {schema.schema[key].title}
-                </Menu.Item>
-              ))
+              Object.keys(schema.schema)
+                .filter(key => key !== 'buildImageJob')
+                .map(key => (
+                  <Menu.Item key={key}>
+                    {schema.schema[key].title}
+                  </Menu.Item>
+                ))
             }
           </Menu>
         </Sider>
