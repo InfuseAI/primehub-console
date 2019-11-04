@@ -424,7 +424,7 @@ exports.dict = {
     'buildImageJob.apt': 'APT',
     'buildImageJob.pip': 'Pip',
     'buildImageJob.conda': 'Conda',
-    'buildImageJob.jobLogEndpoint': 'Logs'
+    'buildImageJob.logEndPoint': 'Logs'
   },
   zh: {
     // common
@@ -643,6 +643,6 @@ exports.dict = {
     'buildImageJob.apt': 'APT',
     'buildImageJob.pip': 'Pip',
     'buildImageJob.conda': 'Conda',
-    'buildImageJob.jobLogEndpoint': 'Logs'
+    'buildImageJob.logEndPoint': 'Logs'
   }
 }

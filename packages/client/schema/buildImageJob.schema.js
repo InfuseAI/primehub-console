@@ -73,7 +73,14 @@ export default () => (
           maxlength: 20
         }}
       />
-      <string keyName="jobLogEndpoint" title="${buildImageJob.jobLogEndpoint}" ui="textarea"/> 
+      <string
+        keyName="logEndPoint"
+        title="${buildImageJob.logEndPoint}"
+        packageName="../src/cms-components/customize-string-log"
+        uiParams={{
+          rows: 30
+        }}
+      /> 
     </Condition>
   </array>
 )
