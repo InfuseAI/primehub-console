@@ -6,7 +6,7 @@ import Container from '@canner/container';
 import R from '@canner/history-router';
 import ContentHeader from 'components/header';
 import Error from 'components/error';
-import styled, {StyledComponentClass} from 'styled-components';
+import styled, {StyledComponentClass, keyframes} from 'styled-components';
 import color from 'styledShare/color';
 import logo from 'images/primehub-logo-w.png';
 import {RouteComponentProps} from 'react-router';
@@ -221,7 +221,8 @@ export default class CMSPage extends React.Component<Props, State> {
     if (hasError) {
       return <Error/>;
     }
-    const {activeKey} = match.params as any;
+
+    let {activeKey} = match.params as any;
     const router = new R({
       history,
       baseUrl: `${(window as any).APP_PREFIX}cms`
@@ -234,6 +235,7 @@ export default class CMSPage extends React.Component<Props, State> {
       sort: router.getSort(),
       pagination: router.getPagination()
     };
+
     return (
       <Layout style={{minHeight: '100vh'}}>
         <ContentHeader pagePadding={24}/>
@@ -246,7 +248,7 @@ export default class CMSPage extends React.Component<Props, State> {
           >
             <Menu
               onClick={this.siderMenuOnClick}
-              selectedKeys={[(match.params as any).activeKey]}
+              selectedKeys={[activeKey].concat(activeKey === 'buildImageJob' ? 'buildImage' : '')}
               theme="dark"
               mode="inline">
               {/* <Menu.Item key="__cnr_back">
@@ -254,7 +256,9 @@ export default class CMSPage extends React.Component<Props, State> {
                 Back to dashboard
               </Menu.Item> */}
               {
-                Object.keys(schema.schema).map(key => (
+                Object.keys(schema.schema)
+                .filter(key => key !== 'buildImageJob')
+                .map(key => (
                   <Menu.Item key={key}>
                     {schema.schema[key].title}
                   </Menu.Item>
@@ -360,7 +364,7 @@ export default class CMSPage extends React.Component<Props, State> {
           </Content>
         </Layout>
       </Layout>
-    )
+    );
   }
 }
 

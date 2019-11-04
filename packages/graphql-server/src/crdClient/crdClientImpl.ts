@@ -73,6 +73,24 @@ export interface AnnouncementSpec {
   status: string; // published, draft
 }
 
+export interface ImageSpecSpec {
+  baseImage?: string;
+  pullSecret?: string;
+  packages?: {
+    apt?: string[];
+    pip?: string[];
+    conda?: string[];
+  };
+  // iso8601
+  updateTime?: string;
+}
+
+export interface ImageSpecStatus {
+  phase: string;
+  image: string;
+  jobName: string;
+}
+
 /**
  * CRD
  */
@@ -88,6 +106,7 @@ export default class CrdClientImpl {
   public instanceTypes: CustomResource<InstanceTypeSpec>;
   public datasets: CustomResource<DatasetSpec>;
   public images: CustomResource<ImageSpec>;
+  public imageSpecs: CustomResource<ImageSpecSpec, ImageSpecStatus>;
   public announcements: CustomResource<AnnouncementSpec>;
   private namespace: string;
 
@@ -109,6 +128,12 @@ export default class CrdClientImpl {
       client,
       watch,
       loadCrd('image'),
+      this.namespace
+    );
+    this.imageSpecs = new CustomResource<ImageSpecSpec, ImageSpecStatus>(
+      client,
+      watch,
+      loadCrd('imageSpec'),
       this.namespace
     );
     this.announcements = new CustomResource<AnnouncementSpec>(
