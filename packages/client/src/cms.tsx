@@ -213,6 +213,12 @@ export default class CMSPage extends React.Component<Props, State> {
     return mutation;
   }
 
+  removeBuildImageJobs = variables => {
+    delete variables.payload.buildImageJobs;
+    console.log(variables);
+    return variables;
+  }
+
   render() {
     const {history, match} = this.props;
     const {prepare, hasError, deploying, dataChanged} = this.state;
@@ -282,6 +288,12 @@ export default class CMSPage extends React.Component<Props, State> {
                     ...data,
                     mutation: this.replaceDatasetMutation(data.mutation)
                   };
+                }
+                if (key === 'buildImage') {
+                  return {
+                    ...data,
+                    variables: this.removeBuildImageJobs(data.variables)
+                  }
                 }
                 return data;
               }}
