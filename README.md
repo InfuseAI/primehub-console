@@ -33,6 +33,7 @@ Canner CMS
 * DEFAULT_USER_VOLUME_CAPACITY: (string) default: `20G`
 * PRIMEHUB_GROUP_SC: for pvc
 * PRIMEHUB_FEATURE_DATASET_UPLOAD: enable upload feature or not
+* GRAPHQL_HOST: graphql public host, ex: `https://test.graphql.com:8080`
 
 ### admin-server
 * KC_API_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. Ex: 'http://127.0.0.1:8080/auth'. For API usage.
