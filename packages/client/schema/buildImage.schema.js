@@ -19,11 +19,11 @@ export default () => (
       }, {
         title: '${buildImage.name}',
         dataIndex: 'name',
-        render: renderCopyableText,
+        render: renderCopyableText
       }]
     }}
     graphql={
-      `query($buildImageAfter: String, $buildImageBefore: String, $buildImageLast: Int, $buildImageFirst: Int,$buildImageWhere: buildImageWhereInput) {
+      `query($buildImageAfter: String, $buildImageBefore: String, $buildImageLast: Int, $buildImageFirst: Int, $buildImageWhere: BuildImageWhereInput) {
         buildImage: buildImagesConnection(after: $buildImageAfter, before: $buildImageBefore, last: $buildImageLast, first: $buildImageFirst,where: $buildImageWhere) {
           edges {
             cursor
@@ -63,7 +63,7 @@ export default () => (
           }}
           required
         />
-        <string keyName="url" title="${buildImage.url}"/>
+        <string keyName="baseImage" title="${buildImage.baseImage}"/>
         <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${buildImage.useImagePullSecret}" />
         <ImagePackages
           apt={{
@@ -91,15 +91,16 @@ export default () => (
       </Default>
       <Default keyName="jobs" title="${buildImage.tabs.jobs}">
         <array
-          keyName="buildImageJob"
+          keyName="buildImageJobs"
           packageName="../src/cms-components/customize-array-nested_job"
           uiParams={{
             columns: [{
               title: '${buildImageJob.imageRevision}',
-              dataIndex: 'imageRevision'
+              dataIndex: 'imageRevision',
+              render: renderCopyableText
             }, {
-              title: '${buildImageJob.updatedAt}',
-              dataIndex: 'updatedAt'
+              title: '${buildImageJob.updateTime}',
+              dataIndex: 'updateTime'
             }]
           }}
         >
@@ -109,8 +110,8 @@ export default () => (
           <string keyName="id" hidden/>
           <string keyName="imageRevision" title="${buildImageJob.imageRevision" />
           <dateTime
-            keyName="updatedAt"
-            title="${buildImageJob.updatedAt}" packageName="../src/cms-components/customize-string-date.tsx"
+            keyName="updateTime"
+            title="${buildImageJob.updateTime}" packageName="../src/cms-components/customize-string-date.tsx"
           />
         </array>
       </Default>

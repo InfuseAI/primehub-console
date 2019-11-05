@@ -51,8 +51,8 @@ export default class CustomResource<SpecType = any, StatusType = any> {
     return pick(body, ['metadata', 'spec', 'status']) as Item<SpecType, StatusType>;
   }
 
-  public list = async (): Promise<Array<Item<SpecType, StatusType>>> => {
-    const {body} = await this.resource.get();
+  public list = async (qs?: any): Promise<Array<Item<SpecType, StatusType>>> => {
+    const {body} = await this.resource.get({qs});
     return body.items.map(item => pick(item, ['metadata', 'spec', 'status']));
   }
 

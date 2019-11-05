@@ -91,6 +91,19 @@ export interface ImageSpecStatus {
   jobName: string;
 }
 
+export interface ImageSpecJobSpec {
+  baseImage?: string;
+  pullSecret?: string;
+  packages?: {
+    apt?: string[];
+    pip?: string[];
+    conda?: string[];
+  };
+  targetImage?: string;
+  // iso8601
+  updateTime?: string;
+}
+
 /**
  * CRD
  */
@@ -108,6 +121,7 @@ export default class CrdClientImpl {
   public images: CustomResource<ImageSpec>;
   public imageSpecs: CustomResource<ImageSpecSpec, ImageSpecStatus>;
   public announcements: CustomResource<AnnouncementSpec>;
+  public imageSpecJobs: CustomResource<ImageSpecJobSpec>;
   private namespace: string;
 
   constructor(args?: CrdArgs) {
@@ -134,6 +148,12 @@ export default class CrdClientImpl {
       client,
       watch,
       loadCrd('imageSpec'),
+      this.namespace
+    );
+    this.imageSpecJobs = new CustomResource<ImageSpecJobSpec>(
+      client,
+      watch,
+      loadCrd('imageSpecJob'),
       this.namespace
     );
     this.announcements = new CustomResource<AnnouncementSpec>(

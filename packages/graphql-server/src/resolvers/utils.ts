@@ -203,3 +203,13 @@ export const mergeVariables = (originalVariables: any, newVariables: any) => {
   });
   return mergedVariables;
 };
+
+const NEW_LINE = '\\n';
+
+export const stringifyPackageField = (pkgs: string[]): string => {
+  return pkgs && pkgs.join(NEW_LINE);
+};
+
+export const parsePackageField = (pkgs: string): string[] => {
+  return pkgs.split(NEW_LINE).filter(v => v);
+};
