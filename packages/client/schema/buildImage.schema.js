@@ -54,16 +54,18 @@ export default () => (
           <pagination />
         </toolbar>
         <string keyName="status" title="${buildImage.status}" hidden/>
-        <string keyName="name" title="${buildImage.name}"
-          validation={{
-            validator: (value, cb) => {
-              if (!value.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/)) {
-                return cb(`lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`);
+        <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
+          <string keyName="name" title="${buildImage.name}"
+            validation={{
+              validator: (value, cb) => {
+                if (!value.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/)) {
+                  return cb(`lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`);
+                }
               }
-            }
-          }}
-          required
-        />
+            }}
+            required
+          />
+        </Condition>
         <string required keyName="baseImage" title="${buildImage.baseImage}"/>
         <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${buildImage.useImagePullSecret}" />
         <ImagePackages

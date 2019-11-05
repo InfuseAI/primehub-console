@@ -10,9 +10,15 @@ export default class Logs extends React.Component {
   }
 
   componentDidMount() {
+    const token = window.localStorage.getItem('canner.accessToken');
     const {value} = this.props;
     const that = this;
-    fetch(value)
+    fetch(value, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      },
+    })
       .then(res => {
         const reader = res.body.getReader();
 
