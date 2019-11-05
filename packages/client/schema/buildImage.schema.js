@@ -4,6 +4,7 @@ import Filter from '../src/cms-toolbar/filter';
 import {Tag} from 'antd';
 import {renderCopyableText} from './utils';
 import {CustomizedStringImagePullSecret, ImagePackages} from './utils.schema';
+import BuildImageTab from '../src/cms-layouts/buildImageTab';
 
 export default () => (
   <array keyName="buildImage"
@@ -39,7 +40,7 @@ export default () => (
       }`
     }
   >
-    <Tabs>
+    <Tabs component={BuildImageTab}>
       <Default keyName="info" title="${buildImage.tabs.info}">
         <toolbar async>
           <filter
@@ -63,7 +64,7 @@ export default () => (
           }}
           required
         />
-        <string keyName="baseImage" title="${buildImage.baseImage}"/>
+        <string required keyName="baseImage" title="${buildImage.baseImage}"/>
         <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${buildImage.useImagePullSecret}" />
         <ImagePackages
           apt={{
