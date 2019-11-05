@@ -2,7 +2,7 @@ import { Context } from './interface';
 import { toRelay, filter, paginate, extractPagination, stringifyPackageField } from './utils';
 import { get } from 'lodash';
 import CustomResource, { Item } from '../crdClient/customResource';
-import { ImageSpecJobSpec } from '../crdClient/crdClientImpl';
+import { ImageSpecJobSpec, ImageSpecJobStatus } from '../crdClient/crdClientImpl';
 import { IMAGE_SPEC_JOB_HASH_ANNOTATION, IMAGE_SPEC_JOB_NAME_LABEL } from './constant';
 
 export interface BuildImageJob {
@@ -11,6 +11,7 @@ export interface BuildImageJob {
   status: string;
   baseImage: string;
   imageRevision: string;
+  targetImage: string;
   useImagePullSecret: string;
   packages: {
     apt: string;
@@ -21,21 +22,23 @@ export interface BuildImageJob {
   updateTime: string;
 }
 
-export const transform = (item: Item<ImageSpecJobSpec>): BuildImageJob => {
+// tslint:disable-next-line:max-line-length
+export const transform = (item: Item<ImageSpecJobSpec, ImageSpecJobStatus>, namespace: string, graphqlHost: string): BuildImageJob => {
   return {
     id: item.metadata.name,
     name: item.metadata.name,
     status: item.status.phase,
     baseImage: item.spec.baseImage,
     // tslint:disable-next-line:max-line-length
-    imageRevision: `${get(item, ['metadata', 'annotations', IMAGE_SPEC_JOB_NAME_LABEL])}:${get(item, ['metadata', 'labels', IMAGE_SPEC_JOB_HASH_ANNOTATION])}`,
+    imageRevision: `${get(item, ['metadata', 'labels', IMAGE_SPEC_JOB_NAME_LABEL])}:${get(item, ['metadata', 'annotations', IMAGE_SPEC_JOB_HASH_ANNOTATION])}`,
+    targetImage: item.spec.targetImage,
     useImagePullSecret: item.spec.pullSecret,
     packages: {
       apt: stringifyPackageField(get(item, 'spec.packages.apt')),
       pip: stringifyPackageField(get(item, 'spec.packages.pip')),
       conda: stringifyPackageField(get(item, 'spec.packages.conda'))
     },
-    logEndpoint: null,
+    logEndpoint: `${graphqlHost}/logs/namespaces/${namespace}/jobs/${item.metadata.name}`,
     updateTime: item.spec.updateTime
   };
 };
@@ -45,26 +48,28 @@ export const transform = (item: Item<ImageSpecJobSpec>): BuildImageJob => {
  */
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<ImageSpecJobSpec>, where: any): Promise<BuildImageJob[]> => {
+const listQuery = async (client: CustomResource<ImageSpecJobSpec>, where: any, namespace: string, graphqlHost: string): Promise<BuildImageJob[]> => {
   if (where.id) {
     const imageSpecJob = await client.get(where.id);
-    return [transform(imageSpecJob)];
+    return [transform(imageSpecJob, namespace, graphqlHost)];
   }
 
   const imageSpecJobs = await client.list();
-  const transformedimageSpecJobs = imageSpecJobs.map(transform);
+  const transformedimageSpecJobs = imageSpecJobs.map(job => transform(job, namespace, graphqlHost));
   return filter(transformedimageSpecJobs, where);
 };
 
 export const query = async (root, args, context: Context) => {
   const {crdClient} = context;
-  const imageSpecJobs = await listQuery(crdClient.imageSpecJobs, args && args.where);
+  // tslint:disable-next-line:max-line-length
+  const imageSpecJobs = await listQuery(crdClient.imageSpecJobs, args && args.where, context.namespace, context.graphqlHost);
   return paginate(imageSpecJobs, extractPagination(args));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
   const {crdClient} = context;
-  const imageSpecJobs = await listQuery(crdClient.imageSpecJobs, args && args.where);
+  // tslint:disable-next-line:max-line-length
+  const imageSpecJobs = await listQuery(crdClient.imageSpecJobs, args && args.where, context.namespace, context.graphqlHost);
   return toRelay(imageSpecJobs, extractPagination(args));
 };
 
@@ -73,7 +78,7 @@ export const queryOne = async (root, args, context: Context) => {
   const {crdClient} = context;
   try {
     const imageSpec = await crdClient.imageSpecJobs.get(id);
-    return transform(imageSpec);
+    return transform(imageSpec, context.namespace, context.graphqlHost);
   } catch (e) {
     return null;
   }

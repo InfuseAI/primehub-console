@@ -14,7 +14,7 @@ export default class Logs extends React.Component {
     const {value} = this.props;
     const that = this;
     fetch(value, {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Authorization': 'Bearer ' + token
       },

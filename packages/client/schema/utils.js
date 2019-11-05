@@ -83,7 +83,7 @@ class CopyableText extends React.Component {
             outline: 'none',
             border: 0,
             background: 'transparent',
-            width: '200px'
+            width: '250px'
           }}
           value={children}
           ref={text => this.textRef = text}
@@ -407,8 +407,9 @@ exports.dict = {
     'buildImage': 'Build Image',
     'buildImage.tabs.info': 'Info',
     'buildImage.tabs.jobs': 'Jobs',
-    'buildImage.name': 'Image Name',
+    'buildImage.name': 'Name',
     'buildImage.status': 'Status',
+    'buildImage.image': 'Image',
     'buildImage.baseImage': 'Base Image',
     'buildImage.useImagePullSecret': 'Use Image PullSecret',
     'buildImage.packages': 'Packages',
@@ -419,6 +420,8 @@ exports.dict = {
     'buildImage.packages.pip.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
     'buildImage.packages.conda.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
     'buildImageJob': 'Build Image Job',
+    'buildImageJob.baseImage': 'Base Image',
+    'buildImageJob.targetImage': 'Image',
     'buildImageJob.imageRevision': 'Image Revision',
     'buildImageJob.updateTime': 'Updated At',
     'buildImageJob.packages': 'Packages',
@@ -426,7 +429,7 @@ exports.dict = {
     'buildImageJob.apt': 'APT',
     'buildImageJob.pip': 'Pip',
     'buildImageJob.conda': 'Conda',
-    'buildImageJob.logEndPoint': 'Logs'
+    'buildImageJob.logEndpoint': 'Logs'
   },
   zh: {
     // common
@@ -627,9 +630,10 @@ exports.dict = {
     'buildImage': 'Build Image',
     'buildImage.tabs.info': 'Info',
     'buildImage.tabs.jobs': 'Jobs',
-    'buildImage.name': 'Image Name',
+    'buildImage.name': 'Name',
     'buildImage.status': 'Status',
-    'buildImage.url': 'Base Image Url',
+    'buildImage.image': 'Image',
+    'buildImage.baseImage': 'Base Image',
     'buildImage.useImagePullSecret': 'Use Image PullSecret',
     'buildImage.packages': 'Packages',
     'buildImage.apt': 'APT',
@@ -639,13 +643,15 @@ exports.dict = {
     'buildImage.packages.pip.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
     'buildImage.packages.conda.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
     'buildImageJob': 'Build Image Job',
+    'buildImageJob.baseImage': 'Base Image',
+    'buildImageJob.targetImage': 'Image',
     'buildImageJob.imageRevision': 'Image Revision',
-    'buildImageJob.updatedAt': 'Updated At',
+    'buildImageJob.updateTime': 'Updated At',
     'buildImageJob.packages': 'Packages',
     'buildImageJob.status': 'Status',
     'buildImageJob.apt': 'APT',
     'buildImageJob.pip': 'Pip',
     'buildImageJob.conda': 'Conda',
-    'buildImageJob.logEndPoint': 'Logs'
+    'buildImageJob.logEndpoint': 'Logs'
   }
 }

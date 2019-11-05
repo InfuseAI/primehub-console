@@ -14,6 +14,7 @@ export default () => (
   >
     <Condition match={(data, operator) => false} defaultMode="disabled">
       <string keyName="imageRevision" title="${buildImageJob.imageRevision}" />
+      <string keyName="baseImage" title="${buildImageJob.baseImage}" />
       <dateTime
         keyName="updateTime"
         title="${buildImageJob.updateTime}"
@@ -48,8 +49,8 @@ export default () => (
         }}
       />
       <string
-        keyName="logEndPoint"
-        title="${buildImageJob.logEndPoint}"
+        keyName="logEndpoint"
+        title="${buildImageJob.logEndpoint}"
         packageName="../src/cms-components/customize-string-log"
         uiParams={{
           rows: 30

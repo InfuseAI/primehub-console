@@ -20,4 +20,6 @@ export interface Context {
   defaultUserVolumeCapacity: string;
   k8sDatasetPvc: K8sDatasetPvc;
   k8sUploadServerSecret: K8sUploadServerSecret;
+  namespace: string;
+  graphqlHost: string;
 }
