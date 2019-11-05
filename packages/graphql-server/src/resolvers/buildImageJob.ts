@@ -46,6 +46,11 @@ export const transform = (item: Item<ImageSpecJobSpec>): BuildImageJob => {
 
 // tslint:disable-next-line:max-line-length
 const listQuery = async (client: CustomResource<ImageSpecJobSpec>, where: any): Promise<BuildImageJob[]> => {
+  if (where.id) {
+    const imageSpecJob = await client.get(where.id);
+    return [transform(imageSpecJob)];
+  }
+
   const imageSpecJobs = await client.list();
   const transformedimageSpecJobs = imageSpecJobs.map(transform);
   return filter(transformedimageSpecJobs, where);
