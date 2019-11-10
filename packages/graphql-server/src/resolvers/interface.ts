@@ -3,6 +3,8 @@ import CrdClient, { InstanceTypeSpec, ImageSpec, DatasetSpec } from '../crdClien
 import K8sSecret from '../k8sResource/k8sSecret';
 import { Item } from '../crdClient/customResource';
 import WorkspaceApi from '../workspace/api';
+import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
+import K8sUploadServerSecret from '../k8sResource/k8sUploadServerSecret';
 
 export interface Context {
   realm: string;
@@ -19,4 +21,6 @@ export interface Context {
   defaultUserVolumeCapacity: string;
   workspaceApi: WorkspaceApi;
   crdNamespace: string;
+  k8sDatasetPvc: K8sDatasetPvc;
+  k8sUploadServerSecret: K8sUploadServerSecret;
 }

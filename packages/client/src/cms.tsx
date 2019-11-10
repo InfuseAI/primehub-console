@@ -15,14 +15,42 @@ import {RouteComponentProps} from 'react-router';
 import schema from '../schema/index.schema.js';
 import myLocales from './utils/locales';
 import get from 'lodash.get';
+<<<<<<< HEAD
 import update from 'lodash/update';
 const {Sider} = Layout;
+=======
+const {Sider, Content} = Layout;
+>>>>>>> develop
 const confirm = Modal.confirm;
 declare var process: {
   env: {
     NODE_ENV: string
   }
 }
+
+const updateDatasetMutation = `
+  mutation($payload: DatasetUpdateInput!, $where: DatasetWhereUniqueInput!){
+    updateDataset(data: $payload,where: $where){
+      id
+      uploadServerSecret {
+        username
+        password
+      }
+    }
+  }
+`;
+
+const createDatasetMutation = `
+  mutation($payload: DatasetCreateInput!){
+    createDataset(data: $payload){
+      id
+      uploadServerSecret {
+        username
+        password
+      }
+    }
+  }
+`;
 
 export const Logo = styled.img`
   background-color: ${color.darkBlue};
@@ -53,6 +81,7 @@ export default class CMSPage extends React.Component<Props, State> {
     workspaceList: []
   };
 
+<<<<<<< HEAD
   container: Container;
 
   componentDidMount() {
@@ -63,6 +92,9 @@ export default class CMSPage extends React.Component<Props, State> {
         });
       });
   }
+=======
+  cannerRef: any
+>>>>>>> develop
 
   componentDidUpdate(prevProps: Props) {
     const prevPathname = prevProps.location.pathname;
@@ -238,8 +270,8 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   reset = () => {
-    if (this.container) {
-      return this.container.cannerRef.current.reset();
+    if (this.cannerRef) {
+      return this.cannerRef.current.reset();
     }
     return Promise.resolve();
   }
@@ -254,7 +286,7 @@ export default class CMSPage extends React.Component<Props, State> {
         title: intl.formatMessage({
           id: 'deploy.confirm.title',
           defaultMessage: 'Do you want to discard the changes?'
-        }),  
+        }),
         content: intl.formatMessage({
           id: 'deploy.confirm.content',
           defaultMessage: `Your changes will be lost. Are you sure?`
@@ -289,6 +321,7 @@ export default class CMSPage extends React.Component<Props, State> {
     }
   }
 
+<<<<<<< HEAD
   renderMenu = () => {
     const {workspaceList = []} = this.state;
     const {match} = this.props;
@@ -344,6 +377,16 @@ export default class CMSPage extends React.Component<Props, State> {
         }
       </Menu>
     )
+=======
+  replaceDatasetMutation = mutation => {
+    if (mutation.indexOf('updateDataset') >= 0) {
+      return updateDatasetMutation;
+    }
+    if (mutation.indexOf('createDataset') >= 0) {
+      return createDatasetMutation;
+    }
+    return mutation;
+>>>>>>> develop
   }
 
   render() {
@@ -353,6 +396,7 @@ export default class CMSPage extends React.Component<Props, State> {
     if (hasError) {
       return <Error/>;
     }
+<<<<<<< HEAD
     const {workspaceId} = match.params as any;
     return (
       <Layout style={{minHeight: '100vh'}}>
@@ -392,52 +436,115 @@ export default class CMSPage extends React.Component<Props, State> {
               messages: {
                 ...myLocales
               }
+=======
+    const {activeKey} = match.params as any;
+    const router = new R({
+      history,
+      baseUrl: `${(window as any).APP_PREFIX}cms`
+    });
+    const routes = router.getRoutes();
+    const routerParams = {
+      operator: router.getOperator(),
+      payload: router.getPayload(),
+      where: router.getWhere(),
+      sort: router.getSort(),
+      pagination: router.getPagination()
+    };
+    return (
+      <Layout style={{minHeight: '100vh'}}>
+        <ContentHeader pagePadding={24}/>
+        <Layout style={{marginTop: 64}}>
+          <Sider breakpoint="sm"
+            style={{
+              position: "fixed",
+              height: "100%"
+>>>>>>> develop
             }}
-            errorHandler={e => {
-              console.dir(e);
-              // default message and description
-              let message = e.message || 'Error';
-              let description = '';
-              let btn;
-              let key;
-              let duration;
-
-              // get the first error
-              let errorCode;
-              // from networkError
-              if (e.networkError) {
-                errorCode = get(e, 'networkError.result.errors.0.extensions.code');
-              } else {
-                // from graphQLErrors
-                errorCode = get(e, 'graphQLErrors.0.extensions.code');
+          >
+            <Menu
+              onClick={this.siderMenuOnClick}
+              selectedKeys={[(match.params as any).activeKey]}
+              theme="dark"
+              mode="inline">
+              {/* <Menu.Item key="__cnr_back">
+                <Icon type="left" />
+                Back to dashboard
+              </Menu.Item> */}
+              {
+                Object.keys(schema.schema).map(key => (
+                  <Menu.Item key={key}>
+                    {schema.schema[key].title}
+                  </Menu.Item>
+                ))
               }
+            </Menu>
+          </Sider>
+          <Content style={{marginLeft: 200}}>
+            <Canner
+              schema={schema}
+              goTo={router.goTo}
+              routes={routes}
+              ref={canner => this.cannerRef = canner}
+              routerParams={routerParams}
+              dataDidChange={this.dataDidChange}
+              afterDeploy={this.afterDeploy}
+              beforeDeploy={(key, data) => {
+                if (key === 'dataset') {
+                  // we replace the mutation since there will be a external field `uploadServerSecret`
+                  return {
+                    ...data,
+                    mutation: this.replaceDatasetMutation(data.mutation)
+                  };
+                }
+                return data;
+              }}
+              intl={{
+                locale: (window as any).LOCALE,
+                messages: {
+                  ...myLocales
+                }
+              }}
+              errorHandler={e => {
+                console.dir(e);
+                // default message and description
+                let message = e.message || 'Error';
+                let description = '';
+                let btn;
+                let key;
+                let duration;
 
-              switch (errorCode) {
-                case 'REQUEST_BODY_INVALID':
-                  message = 'Invalidation Error';
-                  description = 'The requested body is not valid';
-                  break;
+                // get the first error
+                let errorCode;
+                // from networkError
+                if (e.networkError) {
+                  errorCode = get(e, 'networkError.result.errors.0.extensions.code');
+                } else {
+                  // from graphQLErrors
+                  errorCode = get(e, 'graphQLErrors.0.extensions.code');
+                }
 
-                case 'USER_CONFLICT_USERNAME':
-                  message = 'Conflict Error';
-                  description = 'User exists with same username';
-                  break;
+                switch (errorCode) {
+                  case 'REQUEST_BODY_INVALID':
+                    message = 'Invalidation Error';
+                    description = 'The requested body is not valid';
+                    break;
 
-                case 'USER_CONFLICT_EMAIL':
-                  message = 'Conflict Error';
-                  description = 'User exists with same email';
-                  break;
+                  case 'USER_CONFLICT_USERNAME':
+                    message = 'Conflict Error';
+                    description = 'User exists with same username';
+                    break;
 
-                case 'GROUP_CONFLICT_NAME':
-                  message = 'Conflict Error';
-                  description = 'Group exists with same name';
-                  break;
+                  case 'USER_CONFLICT_EMAIL':
+                    message = 'Conflict Error';
+                    description = 'User exists with same email';
+                    break;
 
-                case 'RESOURCE_CONFLICT':
-                  message = 'Conflict Error';
-                  description = 'Resource name already exist';
-                  break;
+                  case 'GROUP_CONFLICT_NAME':
+                    message = 'Conflict Error';
+                    description = 'Group exists with same name';
+                    break;
 
+<<<<<<< HEAD
                 case 'REFRESH_TOKEN_EXPIRED':
                   // show notification with button
                   message = 'Token Expired or Invalid';
@@ -465,6 +572,40 @@ export default class CMSPage extends React.Component<Props, State> {
             }}
           />
         </Container>
+=======
+                  case 'RESOURCE_CONFLICT':
+                    message = 'Conflict Error';
+                    description = 'Resource name already exist';
+                    break;
+
+                  case 'REFRESH_TOKEN_EXPIRED':
+                    // show notification with button
+                    message = 'Token Expired or Invalid';
+                    description = 'Please login again';
+                    const loginUrl = get(e, 'networkError.result.errors.0.loginUrl');
+                    // add current location to redirect_uri
+                    duration = 20;
+                    key = 'REFRESH_TOKEN_EXPIRED';
+                    btn = (
+                      <Button type="primary" onClick={() => window.location.replace(loginUrl)}>
+                        Login
+                      </Button>
+                    );
+                    break;
+                }
+                return notification.error({
+                  message,
+                  description,
+                  placement: 'bottomRight',
+                  duration,
+                  btn,
+                  key
+                });
+              }}
+            />
+          </Content>
+        </Layout>
+>>>>>>> develop
       </Layout>
     )
   }

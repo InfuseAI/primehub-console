@@ -9,8 +9,12 @@ import { resolveInDataSet } from './secret';
 import KeycloakAdminClient from 'keycloak-admin';
 import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspace';
 import { keycloakMaxCount } from './constant';
+import { ResourceRole, ResourceNamePrefix } from './resourceRole';
+import {createConfig} from '../config';
 
 export const ATTRIBUTE_PREFIX = 'dataset.primehub.io';
+
+const config = createConfig();
 
 // utils
 const addToAnnotation = (data: any, field: string, annotation: any) => {
@@ -51,6 +55,7 @@ const getWritableRole = async ({
 };
 
 export const mapping = (item: Item<DatasetSpec>) => {
+  const enableUploadServer = parseBoolean(get(item, ['spec', 'enableUploadServer'], 'false'));
   return {
     id: item.metadata.name,
     name: item.metadata.name,
@@ -69,7 +74,16 @@ export const mapping = (item: Item<DatasetSpec>) => {
     homeSymlink: parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/homeSymlink`], 'false')),
     // default to false
     launchGroupOnly:
-      parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/launchGroupOnly`], 'false'))
+      parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/launchGroupOnly`], 'false')),
+    enableUploadServer,
+    uploadServerLink:
+      (item.spec.type === 'pv' && enableUploadServer) ?
+        `${config.cmsAppPrefix || ''}/dataset/${config.k8sCrdNamespace || 'default'}/${item.metadata.name}/browse`
+        : null,
+    uploadServerSecret:
+      ((item as any).datasetUploadSecretUsername && (item as any).datasetUploadSecretPassword) ?
+        {username: (item as any).datasetUploadSecretUsername, password: (item as any).datasetUploadSecretPassword}
+        : null
   };
 };
 
@@ -100,7 +114,8 @@ export const createMapping = (data: any) => {
       type: data.type,
       url: data.url,
       variables: data.variables,
-      volumeName: data.volumeName,
+      // volumeName = dataset name
+      volumeName: data.name,
       ...gitSyncProp
     }
   };
@@ -146,7 +161,7 @@ export const updateMapping = (data: any) => {
       type: data.type,
       url: data.url,
       variables: data.variables,
-      volumeName: data.volumeName,
+      enableUploadServer: isNil(data.enableUploadServer) ? 'false' : data.enableUploadServer.toString(),
       ...gitSyncProp
     }
   };
@@ -163,6 +178,18 @@ export const onCreate = async (
     currentWorkspace: CurrentWorkspace
   }) => {
   const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
+  // dataset pvc
+  if (data.type === 'pv') {
+    if (isNil(data.volumeSize) || data.volumeSize <= 0) {
+      throw new Error(`invalid dataset volumeSize: ${data.volumeSize}`);
+    }
+    // create pvc
+    await context.k8sDatasetPvc.create({
+      volumeName: resource.spec.volumeName,
+      volumeSize: data.volumeSize
+    });
+  }
+
   if (data && data.global) {
     // assign role to everyone
     await context.kcAdminClient.groups.addRealmRoleMappings({
@@ -327,8 +354,12 @@ export const onUpdate = async (
 };
 
 export const onDelete = async ({
-  name, context, getPrefix
-}: {name: string, context: Context, getPrefix: (customizePrefix?: string) => string}) => {
+  name, context, resource, getPrefix
+}: {name: string, context: Context, resource: any, getPrefix: (customizePrefix?: string) => string}) => {
+  // delete dataset pvc
+  await context.k8sDatasetPvc.delete(resource.spec.volumeName);
+  await context.k8sUploadServerSecret.delete(name);
+
   // delete writable as well
   try {
     await context.kcAdminClient.roles.delByName({
@@ -358,6 +389,37 @@ const customUpdate = async ({
   const originalVariables = row.spec.variables || {};
   const newVariables = spec.variables || {};
   spec.variables = mergeVariables(originalVariables, newVariables);
+
+  // if type is pv
+  let datasetUploadSecretUsername;
+  let datasetUploadSecretPassword;
+  if (row.spec.type === 'pv' && !isNil(spec.enableUploadServer)) {
+    const orginalEnabledUploadServer = get(row, 'spec.enableUploadServer', 'false').toString() === 'true';
+    const updatedEnabledUploadServer = spec.enableUploadServer.toString() === 'true';
+    // original enableUploadServer is false and update with enableUploadServer true
+    if (!orginalEnabledUploadServer && updatedEnabledUploadServer) {
+      const secret = await context.k8sUploadServerSecret.create({
+        datasetName: name
+      });
+      datasetUploadSecretUsername = secret.username;
+      datasetUploadSecretPassword = secret.password;
+      metadata.annotations = {
+        ...metadata.annotations,
+        'dataset.primehub.io/uploadServer': 'true',
+        'dataset.primehub.io/uploadServerAuthSecretName': secret.secretName
+      };
+    } else if (orginalEnabledUploadServer && !updatedEnabledUploadServer) {
+      // original enableUploadServer is true and update with enableUploadServer false
+      metadata.annotations = {
+        ...metadata.annotations,
+        'dataset.primehub.io/uploadServer': null,
+        'dataset.primehub.io/uploadServerAuthSecretName': null
+      };
+      // delete secret
+      await context.k8sUploadServerSecret.delete(name);
+    }
+  }
+
   const res = await customResource.patch(name, {
     metadata: omit(metadata, 'name'),
     spec
@@ -417,7 +479,11 @@ const customUpdate = async ({
     );
   }
 
-  return res;
+  return {
+    ...res,
+    datasetUploadSecretUsername,
+    datasetUploadSecretPassword
+  };
 };
 
 export const resolveType = {
@@ -427,6 +493,16 @@ export const resolveType = {
     // find in everyOne group
     const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
     return this.findInGroup(everyoneGroupId, parent.id, kcAdminClient, currentWorkspace);
+  },
+  async volumeSize(parent, args, context: Context) {
+    const {k8sDatasetPvc} = context;
+    const type = parent.type;
+    if (type !== 'pv') {
+      return null;
+    }
+
+    const datasetPvc = await k8sDatasetPvc.findOne(parent.volumeName);
+    return get(datasetPvc, 'volumeSize');
   },
   async groups(parent, args, context: Context) {
     const resourceId = parent.id;
@@ -469,24 +545,28 @@ export const resolveType = {
   ...resolveInDataSet
 };
 
-export const customParseNameFromRole = (roleName: string, currentWorkspace: CurrentWorkspace) => {
-  // todo: fix this with dataset role prefix bug in other branch
-  const lastSplit = last(roleName.split(':'));
-  const workspaceSplit = last(lastSplit.split('|'));
-  return workspaceSplit;
+export const regenerateUploadSecret = async (root, args, context: Context) => {
+  const datasetName = args.where.id;
+  const secret = await context.k8sUploadServerSecret.regenerateSecret(datasetName);
+  return {
+    id: datasetName,
+    uploadServerSecret: {
+      username: secret.username,
+      password: secret.password
+    }
+  };
 };
 
 export const crd = new Crd<DatasetSpec>({
   customResourceMethod: 'datasets',
   propMapping: mapping,
-  prefixName: 'ds',
+  prefixName: ResourceNamePrefix.ds,
   resourceName: 'dataset',
   createMapping,
   updateMapping,
   onCreate,
   onUpdate,
   onDelete,
-  customParseNameFromRole,
   resolveType,
   customUpdate
 });

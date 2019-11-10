@@ -3,7 +3,6 @@ import { toRelay, filter, paginate, extractPagination } from './utils';
 import K8sSecret, {SECRET_DOCKER_CONFIG_JSON_TYPE, SECRET_OPAQUE_TYPE} from '../k8sResource/k8sSecret';
 import * as logger from '../logger';
 import { get, pick } from 'lodash';
-import { defaultWorkspaceId } from './constant';
 import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspace';
 
 export const serializeType = (type: string) => {
@@ -74,7 +73,7 @@ export const resolveInDataSet = {
     const {k8sSecret} = context;
     const currentWorkspace: CurrentWorkspace = root.currentWorkspace;
     const secret = await k8sSecret.findOne(root.secret, currentWorkspace.getK8sNamespace());
-    return transformSecret(secret);
+    return secret ? transformSecret(secret) : null;
   }
 };
 

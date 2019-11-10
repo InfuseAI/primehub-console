@@ -4,12 +4,14 @@ extends ./layout.pug
 block head
   script.
     window.LOCALE = '#{locale}';
+    window.links = !{links};
     window.graphqlEndpoint = '#{graphqlEndpoint}';
     window.username = "#{username}";
     window.thumbnail = "#{thumbnail}";
     window.accessTokenExp = #{accessTokenExp};
     window.refreshTokenExp = #{refreshTokenExp};
     window.disableMode = #{disableMode};
+    window.enableUploadServer = #{enableDatasetUpload};
     window.newAccessToken = "#{newAccessToken}";
 
     if (window.newAccessToken) {

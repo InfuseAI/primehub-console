@@ -22,6 +22,7 @@ export class BackgroundTokenSyncer {
   private appPrefix: string;
   private requestOnFly: boolean = false;
   private accessTokenCantExtend: boolean = false;
+  private initialTokenValidation: boolean = true;
 
   constructor({
     interval,
@@ -81,7 +82,8 @@ export class BackgroundTokenSyncer {
     // check if access token expired or close to expired
     // if so, exchange new token set
     const timeDiff = this.accessTokenExp - nowInSecond;
-    if (timeDiff <= ONE_MINUTE && !this.ifSkipExchanging()) {
+
+    if ((this.initialTokenValidation || timeDiff <= ONE_MINUTE) && !this.ifSkipExchanging()) {
       try {
         const newTokenResponse = await this.refreshTokenSet();
         if (!newTokenResponse.accessTokenExp && !newTokenResponse.refreshTokenExp) {
@@ -131,6 +133,10 @@ export class BackgroundTokenSyncer {
 
   private refreshTokenSet = async () => {
     this.requestOnFly = true;
+    if (this.initialTokenValidation) {
+      this.initialTokenValidation = false;
+    }
+
     return this.getNewTokenSet();
   }
 }

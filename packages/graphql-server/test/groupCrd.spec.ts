@@ -68,7 +68,7 @@ describe('group resource relation graphql', function() {
           } : {};
         const mutation = await this.graphqlRequest(`
         mutation($data: ${resource.pascal}CreateInput!){
-          create${resource.pascal} (data: $data) { id name groups {id name} }
+          create${resource.pascal} (data: $data) { id }
         }`, {
           data: {
             name: resourceName,
@@ -80,11 +80,7 @@ describe('group resource relation graphql', function() {
         });
 
         // check mutation result
-        expect(mutation[`create${resource.pascal}`]).to.deep.include({
-          id: resourceName,
-          name: resourceName,
-          groups: [{id: group.id, name: group.name}]
-        });
+        expect(mutation[`create${resource.pascal}`].id).to.equal(resourceName);
 
         // query one and check
         const query = await this.graphqlRequest(`
@@ -133,7 +129,7 @@ describe('group resource relation graphql', function() {
           } : {};
         await this.graphqlRequest(`
         mutation($data: ${resource.pascal}CreateInput!){
-          create${resource.pascal} (data: $data) { id name groups {id name} }
+          create${resource.pascal} (data: $data) { id }
         }`, {
           data: {
             name: resourceName,
@@ -148,7 +144,7 @@ describe('group resource relation graphql', function() {
         const secGroup = await this.createGroup();
         const updateMutation = await this.graphqlRequest(`
         mutation($where: ${resource.pascal}WhereUniqueInput!, $data: ${resource.pascal}UpdateInput!){
-          update${resource.pascal} (where: $where, data: $data) { id name groups {id name} }
+          update${resource.pascal} (where: $where, data: $data) { id }
         }`, {
           where: {
             id: resourceName
@@ -162,11 +158,7 @@ describe('group resource relation graphql', function() {
         });
 
         // check mutation result
-        expect(updateMutation[`update${resource.pascal}`]).to.deep.include({
-          id: resourceName,
-          name: resourceName,
-          groups: [{id: secGroup.id, name: secGroup.name}]
-        });
+        expect(updateMutation[`update${resource.pascal}`].id).to.equal(resourceName);
 
         // query and check
         const query = await this.graphqlRequest(`
@@ -194,7 +186,7 @@ describe('group resource relation graphql', function() {
           } : {};
         await this.graphqlRequest(`
         mutation($data: ${resource.pascal}CreateInput!){
-          create${resource.pascal} (data: $data) { id name groups {id name} }
+          create${resource.pascal} (data: $data) { id }
         }`, {
           data: {
             name: resourceName,

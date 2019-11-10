@@ -37,7 +37,11 @@ if (process.env.NODE_ENV === 'production') {
   fakeData.workspace[0].id = 'default';
   fakeData.workspace[0].displayName = 'Default';
   schema.connector = new LocalStorageConnector({
+<<<<<<< HEAD
     defaultData: fakeData,
+=======
+    defaultData: createFakeData(schema.schema, 12),
+>>>>>>> develop
     localStorageKey: 'infuse'
   })
 }

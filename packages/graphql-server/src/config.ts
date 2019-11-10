@@ -44,11 +44,16 @@ export interface Config {
   keycloakTimeout: number;
 
   appPrefix?: string;
+  cmsAppPrefix?: string;
   apolloTracing: boolean;
   graphqlPlayground: boolean;
 
   // system value
   defaultUserVolumeCapacity: string;
+
+  // pvc
+  primehubGroupSc?: string;
+  enableDatasetUpload: boolean;
 }
 
 const defaultConfigs = {
@@ -72,7 +77,8 @@ const defaultConfigs = {
   keycloakTimeout: 3000,
   apolloTracing: false,
   graphqlPlayground: true,
-  defaultUserVolumeCapacity: '20G'
+  defaultUserVolumeCapacity: '20G',
+  enableDatasetUpload: false
 };
 
 const prodConfigs = {
@@ -112,9 +118,13 @@ export const createConfig = (): Config => {
     keycloakRetries: process.env.KC_OIDC_RETRIES,
     keycloakTimeout: process.env.KC_OIDC_TIMEOUT ? parseInt(process.env.KC_OIDC_TIMEOUT, 10) : undefined,
     appPrefix: sanitizePath(process.env.APP_PREFIX),
+    cmsAppPrefix: sanitizePath(process.env.CMS_APP_PREFIX),
     apolloTracing: process.env.APOLLO_TRACING,
     graphqlPlayground: process.env.GRAPHQL_PLAYGROUND,
-    defaultUserVolumeCapacity: process.env.DEFAULT_USER_VOLUME_CAPACITY
+    defaultUserVolumeCapacity: process.env.DEFAULT_USER_VOLUME_CAPACITY,
+    primehubGroupSc: process.env.PRIMEHUB_GROUP_SC,
+    enableDatasetUpload:
+      process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD && process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD.toString() === 'true'
   });
 
   const env = process.env.NODE_ENV || 'development';

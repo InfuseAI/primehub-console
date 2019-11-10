@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from "react-intl";
 import defaultMessage, {renderValue} from "@canner/antd-locales";
 import EmailForm from '../cms-toolbar/sendEmailModal';
+import {renderUploadServerLink} from '../../schema/utils';
 import {Props} from './types';
 
 const ButtonGroup = Button.Group;
@@ -166,6 +167,14 @@ export default class ArrayBreadcrumb extends Component<Props> {
       uiParams,
       intl
     });
+    if (keyName === 'dataset' && (window as any).enableUploadServer) {
+      newColumnsRender.push({
+        title: intl.formatMessage({ id: 'uploadServerLink' }),
+        dataIndex: 'uploadServerLink',
+        key: 'uploadServerLink',
+        render: renderUploadServerLink
+      });
+    }
     if (!removeActions) {
       newColumnsRender.push({
         title: intl.formatMessage({ id: "array.table.actions" }),

@@ -2,17 +2,20 @@ import { Context } from './interface';
 import { toRelay, paginate, extractPagination, filter } from './utils';
 import CustomResource, { Item } from '../crdClient/customResource';
 import pluralize from 'pluralize';
-import { isEmpty, omit, mapValues, find, get } from 'lodash';
+import { isEmpty, omit, mapValues, find, get, isNil } from 'lodash';
 import KeycloakAdminClient from 'keycloak-admin';
 import { ApolloError } from 'apollo-server';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
 import {createConfig} from '../config';
 import { CrdCache } from '../cache/crdCache';
-const config = createConfig();
 import * as logger from '../logger';
 import WorkspaceApi from '../workspace/api';
 import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspace';
 import { defaultWorkspaceId, keycloakMaxCount } from './constant';
+import { parseResourceRole, ResourceNamePrefix, ResourceRole } from './resourceRole';
+
+// utils
+const config = createConfig();
 
 export class Crd<SpecType> {
   private cache: CrdCache<SpecType>;
@@ -26,7 +29,6 @@ export class Crd<SpecType> {
   private onCreate?: (data: any) => Promise<any>;
   private onUpdate?: (data: any) => Promise<any>;
   private onDelete?: (data: any) => Promise<any>;
-  private customParseNameFromRole?: (roleName: string, currentWorkspace: CurrentWorkspace) => string;
   private customUpdate?: ({
     name, metadata, spec, customResource, context, getPrefix, data, currentWorkspace
   }: {
@@ -54,7 +56,6 @@ export class Crd<SpecType> {
     onCreate,
     onUpdate,
     onDelete,
-    customParseNameFromRole,
     customUpdate,
     customParseWhere,
     generateName
@@ -69,7 +70,6 @@ export class Crd<SpecType> {
     onCreate?: (data: any) => Promise<any>,
     onUpdate?: (data: any) => Promise<any>,
     onDelete?: (data: any) => Promise<any>,
-    customParseNameFromRole?: (roleName: string, currentWorkspace: CurrentWorkspace) => string,
     customUpdate?: ({
       name, metadata, spec, customResource, context, getPrefix, data, currentWorkspace
     }: {
@@ -96,7 +96,6 @@ export class Crd<SpecType> {
     this.onUpdate = onUpdate;
     this.onDelete = onDelete;
     this.customUpdate = customUpdate;
-    this.customParseNameFromRole = customParseNameFromRole;
     this.rolePrefix = config.rolePrefix;
     this.customParseWhere = customParseWhere;
     this.generateName = generateName;
@@ -172,20 +171,11 @@ export class Crd<SpecType> {
     };
   }
 
-  public parseNameFromRole = (roleName: string, currentWorkspace: CurrentWorkspace) => {
-    return this.customParseNameFromRole
-      ? this.customParseNameFromRole(roleName, currentWorkspace)
-      : roleName.slice(this.getPrefix(currentWorkspace).length);
-  }
-
   // tslint:disable-next-line:max-line-length
   public findInGroup = async (groupId: string, resource: string, kcAdminClient: KeycloakAdminClient, currentWorkspace: CurrentWorkspace) => {
-    const roles = await kcAdminClient.groups.listRealmRoleMappings({
-      id: groupId
-    });
+    const roles = await this.listGroupRealmRoles(kcAdminClient, groupId, currentWorkspace);
     return Boolean(find(roles, role => {
-      const resourceNameFromRole = this.parseNameFromRole(role.name, currentWorkspace);
-      return resourceNameFromRole === resource;
+      return role.resourceName === resource;
     }));
   }
 
@@ -281,36 +271,28 @@ export class Crd<SpecType> {
   }
 
   private queryByGroup = async (parent, args, context: Context) => {
-    let roles = await context.kcAdminClient.groups.listRealmRoleMappings({
-      id: parent.id
-    });
-
     const currentWorkspace = parent.currentWorkspace;
-    const prefix = this.getPrefix(currentWorkspace);
-    roles = roles.filter(role => role.name.startsWith(prefix));
-    const namesWithRole = roles.map(role => {
-      return {name: this.parseNameFromRole(role.name, currentWorkspace), roleName: role.name};
-    });
+    const roles = await this.listGroupRealmRoles(context.kcAdminClient, parent.id, currentWorkspace);
 
     // todo: make this logic better
-    const rows = await Promise.all(namesWithRole.map(({name, roleName}) => {
+    const rows = await Promise.all(roles.map(role => {
       if (this.resourceName === 'dataset') {
-        return context.getDataset(name)
+        return context.getDataset(role.resourceName)
           .then(dataset => {
             // todo: deal with the complex type cast here
             return {
-              roleName,
+              roleName: role.originalName,
               ...dataset
             } as any;
           });
       }
 
       if (this.resourceName === 'image') {
-        return context.getImage(name);
+        return context.getImage(role.resourceName);
       }
 
       if (this.resourceName === 'instanceType') {
-        return context.getInstanceType(name);
+        return context.getInstanceType(role.resourceName);
       }
       // return context.crdClient[this.customResourceMethod].get(name);
     }));
@@ -419,7 +401,7 @@ export class Crd<SpecType> {
     const crd = await customResource.get(name, currentWorkspace.getK8sNamespace());
     await customResource.del(name, currentWorkspace.getK8sNamespace());
     if (this.onDelete) {
-      await this.onDelete({name, context, getPrefix: onDestroyGetPrefix, currentWorkspace});
+      await this.onDelete({name, context, resource: crd, getPrefix: onDestroyGetPrefix, currentWorkspace});
     }
     // clear cache
     if (this.cache) {
@@ -457,5 +439,26 @@ export class Crd<SpecType> {
       ...this.propMapping(row),
       currentWorkspace
     };
+  }
+
+  private listGroupRealmRoles = async (
+    kcAdminClient: KeycloakAdminClient,
+    groupId: string,
+    currentWorkspace: CurrentWorkspace
+  ): Promise<ResourceRole[]> => {
+      const groupRoles = await kcAdminClient.groups.listRealmRoleMappings({
+        id: groupId
+      });
+
+      let roles = groupRoles.map(role => parseResourceRole(role.name));
+      roles = roles.filter(role =>
+          role.resourcePrefix === this.prefixName &&
+          currentWorkspace.getWorkspaceId() === role.workspaceId);
+
+      // if rolePrefix not exist, filter only roles without rolePrefix
+      // else, filter only roles with rolePrefix
+      return this.rolePrefix ?
+        roles.filter(role => role.rolePrefix === this.rolePrefix) :
+        roles.filter(role => isNil(role.rolePrefix));
   }
 }

@@ -28,12 +28,12 @@ export default class TextFilter extends Component {
   }
 
   render() {
-    const {label, intl, search, placeholder, name} = this.props;
-    
+    const {label, intl, search, placeholder, name, defaultValue} = this.props;
     return (
       <FilterPlugin>
         <Label>{i18n(label, intl)}</Label>
         <Input
+          defaultValue={defaultValue}
           style={{width: '150px'}}
           placeholder={i18n(placeholder, intl)}
           onChange={this.onInput}

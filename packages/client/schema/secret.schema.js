@@ -70,7 +70,15 @@ export default () => (
       />
     </Condition>
     <Condition match={data => data.type === 'opaque'}>
-      <string keyName="secret" title="${secret}" ui="textarea" />
+      <string
+        keyName="secret"
+        title="${secret}"
+        ui="textarea"
+        packageName="../src/cms-components/customize-string-secret_textarea"
+        uiParams={{
+          placeholder: 'Paste a secret to replace it.'
+        }}
+      />
     </Condition>
     <Condition defaultMode="hidden" match={data => data.type === 'kubernetes'} >
       <TypeKubernetesAppendFields />

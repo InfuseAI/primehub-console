@@ -26,6 +26,7 @@ const fields = `
   homeSymlink
   launchGroupOnly
   spec
+  volumeSize
   groups {
     id
     name
@@ -83,28 +84,12 @@ describe('dataset graphql', function() {
     };
     const mutation = await this.graphqlRequest(`
     mutation($data: DatasetCreateInput!){
-      createDataset (data: $data) { ${fields} }
+      createDataset (data: $data) { id }
     }`, {
       data
     });
 
-    expect(mutation.createDataset).to.be.eql({
-      id: data.name,
-      name: data.name,
-      displayName: data.name,
-      description: null,
-      global: false,
-      type: null,
-      url: null,
-      variables: null,
-      mountRoot: '',
-      homeSymlink: false,
-      launchGroupOnly: false,
-      spec: {
-        displayName: data.name,
-      },
-      groups: []
-    });
+    expect(mutation.createDataset.id).to.be.equal(data.name);
 
     // get one
     const queryOne = await this.graphqlRequest(`
@@ -119,6 +104,7 @@ describe('dataset graphql', function() {
       name: data.name,
       displayName: data.name,
       description: null,
+      volumeSize: null,
       global: false,
       type: null,
       url: null,
@@ -128,6 +114,7 @@ describe('dataset graphql', function() {
       launchGroupOnly: false,
       spec: {
         displayName: data.name,
+        volumeName: data.name
       },
       groups: []
     });
@@ -152,21 +139,12 @@ describe('dataset graphql', function() {
     };
     const mutation = await this.graphqlRequest(`
     mutation($data: DatasetCreateInput!){
-      createDataset (data: $data) { ${fields} }
+      createDataset (data: $data) { id }
     }`, {
       data
     });
 
-    expect(mutation.createDataset).to.be.eql({
-      id: data.name,
-      groups: [],
-      variables: null,
-      mountRoot: '',
-      homeSymlink: false,
-      launchGroupOnly: false,
-      spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
-      ...data
-    });
+    expect(mutation.createDataset.id).to.be.equal(data.name);
 
     // get one
     const queryOne = await this.graphqlRequest(`
@@ -179,11 +157,15 @@ describe('dataset graphql', function() {
     expect(queryOne.dataset).to.be.eql({
       id: data.name,
       groups: [],
+      volumeSize: null,
       variables: null,
       mountRoot: '',
       homeSymlink: false,
       launchGroupOnly: false,
-      spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
+      spec: {
+        ...pick(data, ['displayName', 'description', 'type', 'url', 'variables']),
+        volumeName: data.name
+      },
       ...data
     });
 
@@ -206,21 +188,12 @@ describe('dataset graphql', function() {
     };
     const mutation = await this.graphqlRequest(`
     mutation($data: DatasetCreateInput!){
-      createDataset (data: $data) { ${fields} }
+      createDataset (data: $data) { id }
     }`, {
       data
     });
 
-    expect(mutation.createDataset).to.be.eql({
-      id: data.name,
-      groups: [],
-      variables: null,
-      mountRoot: '',
-      homeSymlink: false,
-      launchGroupOnly: false,
-      spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
-      ...data
-    });
+    expect(mutation.createDataset.id).to.be.equal(data.name);
 
     // get one
     const queryOne = await this.graphqlRequest(`
@@ -233,11 +206,15 @@ describe('dataset graphql', function() {
     expect(queryOne.dataset).to.be.eql({
       id: data.name,
       groups: [],
+      volumeSize: null,
       variables: null,
       mountRoot: '',
       homeSymlink: false,
       launchGroupOnly: false,
-      spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
+      spec: {
+        ...pick(data, ['displayName', 'description', 'type', 'url', 'variables']),
+        volumeName: data.name
+      },
       ...data
     });
 
@@ -262,29 +239,20 @@ describe('dataset graphql', function() {
     };
     const mutation = await this.graphqlRequest(`
     mutation($data: DatasetCreateInput!){
-      createDataset (data: $data) { ${fields} }
+      createDataset (data: $data) { id }
     }`, {
       data
     });
 
-    expect(mutation.createDataset).to.be.deep.equal({
-      id: data.name,
-      url: null,
-      groups: [],
-      mountRoot: '',
-      homeSymlink: false,
-      launchGroupOnly: false,
-      spec: pick(data, ['displayName', 'description', 'type', 'url', 'variables', 'volumeName']),
-      ...data
-    });
-    const dataset = mutation.createDataset;
+    expect(mutation.createDataset.id).to.be.equal(data.name);
+    const datasetId = mutation.createDataset.id;
 
     // add member to variables
     await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { ${fields} }
+      updateDataset (where: $where, data: $data) { id }
     }`, {
-      where: {id: dataset.id},
+      where: {id: datasetId},
       data: {
         variables: {
           first: 'first',
@@ -298,7 +266,7 @@ describe('dataset graphql', function() {
     query($where: DatasetWhereUniqueInput!){
       dataset (where: $where) { id variables }
     }`, {
-      where: {id: dataset.id}
+      where: {id: datasetId}
     });
 
     expect(queryOne.dataset.variables).to.be.eql({
@@ -309,9 +277,9 @@ describe('dataset graphql', function() {
     // delete one member, update one and add one
     await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { ${fields} }
+      updateDataset (where: $where, data: $data) { id }
     }`, {
-      where: {id: dataset.id},
+      where: {id: datasetId},
       data: {
         variables: {
           second: 'second-second',
@@ -325,7 +293,7 @@ describe('dataset graphql', function() {
     query($where: DatasetWhereUniqueInput!){
       dataset (where: $where) { id variables }
     }`, {
-      where: {id: dataset.id}
+      where: {id: datasetId}
     });
 
     expect(queryTwo.dataset.variables).to.be.eql({
@@ -348,7 +316,7 @@ describe('dataset graphql', function() {
   it('should create with name-only and update', async () => {
     const createMutation = await this.graphqlRequest(`
     mutation($data: DatasetCreateInput!){
-      createDataset (data: $data) { ${fields} }
+      createDataset (data: $data) { id }
     }`, {
       data: {
         name: faker.internet.userName().toLowerCase().replace(/_/g, '-')
@@ -356,7 +324,7 @@ describe('dataset graphql', function() {
     });
 
     // update
-    const dataset = createMutation.createDataset;
+    const datasetId = createMutation.createDataset.id;
     const data = {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
@@ -366,20 +334,20 @@ describe('dataset graphql', function() {
     };
     const mutation = await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { ${fields} }
+      updateDataset (where: $where, data: $data) { id }
     }`, {
-      where: {id: dataset.id},
+      where: {id: datasetId},
       data
     });
 
-    expect(mutation.updateDataset).to.deep.include(data);
+    expect(mutation.updateDataset.id).to.equal(datasetId);
 
     // query one
     const queryOne = await this.graphqlRequest(`
     query($where: DatasetWhereUniqueInput!){
       dataset (where: $where) { ${fields} }
     }`, {
-      where: {id: dataset.id}
+      where: {id: datasetId}
     });
 
     expect(queryOne.dataset).to.deep.include(data);
@@ -389,13 +357,13 @@ describe('dataset graphql', function() {
       realm: process.env.KC_REALM,
       id: process.env.KC_EVERYONE_GROUP_ID
     });
-    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
+    expect(roles.find(role => role.name === `ds:${datasetId}`)).to.be.ok;
   });
 
   it('should create with props and update', async () => {
     const createMutation = await this.graphqlRequest(`
     mutation($data: DatasetCreateInput!){
-      createDataset (data: $data) { ${fields} }
+      createDataset (data: $data) { id }
     }`, {
       data: {
         name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
@@ -408,7 +376,7 @@ describe('dataset graphql', function() {
     });
 
     // update
-    const dataset = createMutation.createDataset;
+    const datasetId = createMutation.createDataset.id;
     const data = {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
@@ -418,20 +386,20 @@ describe('dataset graphql', function() {
     };
     const mutation = await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { ${fields} }
+      updateDataset (where: $where, data: $data) { id }
     }`, {
-      where: {id: dataset.id},
+      where: {id: datasetId},
       data
     });
 
-    expect(mutation.updateDataset).to.deep.include(data);
+    expect(mutation.updateDataset.id).to.equal(datasetId);
 
     // query one
     const queryOne = await this.graphqlRequest(`
     query($where: DatasetWhereUniqueInput!){
       dataset (where: $where) { ${fields} }
     }`, {
-      where: {id: dataset.id}
+      where: {id: datasetId}
     });
 
     expect(queryOne.dataset).to.deep.include(data);
@@ -441,13 +409,13 @@ describe('dataset graphql', function() {
       realm: process.env.KC_REALM,
       id: process.env.KC_EVERYONE_GROUP_ID
     });
-    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.not.ok;
+    expect(roles.find(role => role.name === `ds:${datasetId}`)).to.be.not.ok;
   });
 
   it('should update dataset global multiple times', async () => {
     const createMutation = await this.graphqlRequest(`
     mutation($data: DatasetCreateInput!){
-      createDataset (data: $data) { ${fields} }
+      createDataset (data: $data) { id }
     }`, {
       data: {
         name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
@@ -460,15 +428,15 @@ describe('dataset graphql', function() {
     });
 
     // update global to false
-    const dataset = createMutation.createDataset;
+    const datasetId = createMutation.createDataset.id;
     const data = {
       global: false
     };
-    const mutation = await this.graphqlRequest(`
+    await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { ${fields} }
+      updateDataset (where: $where, data: $data) { id }
     }`, {
-      where: {id: dataset.id},
+      where: {id: datasetId},
       data
     });
 
@@ -477,14 +445,14 @@ describe('dataset graphql', function() {
       realm: process.env.KC_REALM,
       id: process.env.KC_EVERYONE_GROUP_ID
     });
-    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.not.ok;
+    expect(roles.find(role => role.name === `ds:${datasetId}`)).to.be.not.ok;
 
     // update global to true
     await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { ${fields} }
+      updateDataset (where: $where, data: $data) { id }
     }`, {
-      where: {id: dataset.id},
+      where: {id: datasetId},
       data: {
         global: true
       }
@@ -495,14 +463,14 @@ describe('dataset graphql', function() {
       realm: process.env.KC_REALM,
       id: process.env.KC_EVERYONE_GROUP_ID
     });
-    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
+    expect(roles.find(role => role.name === `ds:${datasetId}`)).to.be.ok;
 
     // update to true
     await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { ${fields} }
+      updateDataset (where: $where, data: $data) { id }
     }`, {
-      where: {id: dataset.id},
+      where: {id: datasetId},
       data: {
         global: true
       }
@@ -513,11 +481,11 @@ describe('dataset graphql', function() {
       realm: process.env.KC_REALM,
       id: process.env.KC_EVERYONE_GROUP_ID
     });
-    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
+    expect(roles.find(role => role.name === `ds:${datasetId}`)).to.be.ok;
   });
 
   it('should delete dataset', async () => {
-    const mutation = await this.graphqlRequest(`
+    await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!){
       deleteDataset (where: $where) { id }
     }`, {
@@ -542,23 +510,24 @@ describe('dataset graphql', function() {
       description: faker.lorem.sentence(),
       global: false,
       type: 'pv',
+      volumeSize: 1,
       url: faker.internet.url()
     };
     const createMutation = await this.graphqlRequest(`
     mutation($data: DatasetCreateInput!){
-      createDataset (data: $data) { ${fields} }
+      createDataset (data: $data) { id }
     }`, {
       data
     });
 
     // update with connect
     const group = await this.createGroup();
-    const dataset = createMutation.createDataset;
+    const datasetId = createMutation.createDataset.id;
     await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { ${fields} }
+      updateDataset (where: $where, data: $data) { id }
     }`, {
-      where: {id: dataset.id},
+      where: {id: datasetId},
       data: {
         groups: {
           connect: [{
@@ -573,7 +542,7 @@ describe('dataset graphql', function() {
     query($where: DatasetWhereUniqueInput!){
       dataset (where: $where) { ${fields} }
     }`, {
-      where: {id: dataset.id}
+      where: {id: datasetId}
     });
 
     expect(queryOne.dataset).to.be.deep.include({
@@ -596,9 +565,9 @@ describe('dataset graphql', function() {
     // update with writable
     await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { ${fields} }
+      updateDataset (where: $where, data: $data) { id }
     }`, {
-      where: {id: dataset.id},
+      where: {id: datasetId},
       data: {
         groups: {
           connect: [{
@@ -614,7 +583,7 @@ describe('dataset graphql', function() {
     query($where: DatasetWhereUniqueInput!){
       dataset (where: $where) { ${fields} }
     }`, {
-      where: {id: dataset.id}
+      where: {id: datasetId}
     });
 
     expect(queryOneAgain.dataset).to.be.deep.include({
@@ -644,14 +613,14 @@ describe('dataset graphql', function() {
       realm: process.env.KC_REALM,
       id: group.id
     });
-    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
-    expect(roles.find(role => role.name === `ds:rw:${dataset.name}`)).to.be.not.ok;
+    expect(roles.find(role => role.name === `ds:${datasetId}`)).to.be.ok;
+    expect(roles.find(role => role.name === `ds:rw:${datasetId}`)).to.be.not.ok;
     const secGroupRoles = await this.kcAdminClient.groups.listRealmRoleMappings({
       realm: process.env.KC_REALM,
       id: secGroup.id
     });
-    expect(secGroupRoles.find(role => role.name === `ds:${dataset.name}`)).to.be.not.ok;
-    expect(secGroupRoles.find(role => role.name === `ds:rw:${dataset.name}`)).to.be.ok;
+    expect(secGroupRoles.find(role => role.name === `ds:${datasetId}`)).to.be.not.ok;
+    expect(secGroupRoles.find(role => role.name === `ds:rw:${datasetId}`)).to.be.ok;
   });
 
   it('add a pv dataset and connect with writable groups, then disconnect', async () => {
@@ -661,11 +630,12 @@ describe('dataset graphql', function() {
       description: faker.lorem.sentence(),
       global: false,
       type: 'pv',
+      volumeSize: 1,
       url: faker.internet.url()
     };
     const createMutation = await this.graphqlRequest(`
     mutation($data: DatasetCreateInput!){
-      createDataset (data: $data) { ${fields} }
+      createDataset (data: $data) { id }
     }`, {
       data
     });
@@ -673,12 +643,12 @@ describe('dataset graphql', function() {
     // update with connect
     const group = await this.createGroup();
     const secGroup = await this.createGroup();
-    const dataset = createMutation.createDataset;
+    const datasetId = createMutation.createDataset.id;
     await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { ${fields} }
+      updateDataset (where: $where, data: $data) { id }
     }`, {
-      where: {id: dataset.id},
+      where: {id: datasetId},
       data: {
         groups: {
           connect: [{
@@ -697,7 +667,7 @@ describe('dataset graphql', function() {
     query($where: DatasetWhereUniqueInput!){
       dataset (where: $where) { ${fields} }
     }`, {
-      where: {id: dataset.id}
+      where: {id: datasetId}
     });
 
     expect(queryOne.dataset).to.be.deep.include({
@@ -727,21 +697,21 @@ describe('dataset graphql', function() {
       realm: process.env.KC_REALM,
       id: group.id
     });
-    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
-    expect(roles.find(role => role.name === `ds:rw:${dataset.name}`)).to.be.not.ok;
+    expect(roles.find(role => role.name === `ds:${datasetId}`)).to.be.ok;
+    expect(roles.find(role => role.name === `ds:rw:${datasetId}`)).to.be.not.ok;
     const secGroupRoles = await this.kcAdminClient.groups.listRealmRoleMappings({
       realm: process.env.KC_REALM,
       id: secGroup.id
     });
-    expect(secGroupRoles.find(role => role.name === `ds:${dataset.name}`)).to.be.not.ok;
-    expect(secGroupRoles.find(role => role.name === `ds:rw:${dataset.name}`)).to.be.ok;
+    expect(secGroupRoles.find(role => role.name === `ds:${datasetId}`)).to.be.not.ok;
+    expect(secGroupRoles.find(role => role.name === `ds:rw:${datasetId}`)).to.be.ok;
 
     // disconnect
     await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { ${fields} }
+      updateDataset (where: $where, data: $data) { id }
     }`, {
-      where: {id: dataset.id},
+      where: {id: datasetId},
       data: {
         groups: {
           disconnect: [{
@@ -758,7 +728,7 @@ describe('dataset graphql', function() {
     query($where: DatasetWhereUniqueInput!){
       dataset (where: $where) { ${fields} }
     }`, {
-      where: {id: dataset.id}
+      where: {id: datasetId}
     });
 
     expect(queryOneAgain.dataset).to.be.deep.include({
@@ -775,11 +745,12 @@ describe('dataset graphql', function() {
       description: faker.lorem.sentence(),
       global: false,
       type: 'pv',
+      volumeSize: 1,
       url: faker.internet.url()
     };
     const createMutation = await this.graphqlRequest(`
     mutation($data: DatasetCreateInput!){
-      createDataset (data: $data) { ${fields} }
+      createDataset (data: $data) { id }
     }`, {
       data
     });
@@ -787,12 +758,12 @@ describe('dataset graphql', function() {
     // update with connect
     const group = await this.createGroup();
     const secGroup = await this.createGroup();
-    const dataset = createMutation.createDataset;
+    const datasetId = createMutation.createDataset.id;
     await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { ${fields} }
+      updateDataset (where: $where, data: $data) { id }
     }`, {
-      where: {id: dataset.id},
+      where: {id: datasetId},
       data: {
         groups: {
           connect: [{
@@ -809,9 +780,9 @@ describe('dataset graphql', function() {
     // change type
     await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { ${fields} }
+      updateDataset (where: $where, data: $data) { id }
     }`, {
-      where: {id: dataset.id},
+      where: {id: datasetId},
       data: {
         type: 'git'
       }
@@ -822,12 +793,13 @@ describe('dataset graphql', function() {
     query($where: DatasetWhereUniqueInput!){
       dataset (where: $where) { ${fields} }
     }`, {
-      where: {id: dataset.id}
+      where: {id: datasetId}
     });
 
     expect(queryOne.dataset).to.be.deep.include({
       id: data.name,
       ...data,
+      volumeSize: null,
       type: 'git'
     });
     expect(queryOne.dataset.groups).to.deep.include.members([{
@@ -853,14 +825,14 @@ describe('dataset graphql', function() {
       realm: process.env.KC_REALM,
       id: group.id
     });
-    expect(roles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
-    expect(roles.find(role => role.name === `ds:rw:${dataset.name}`)).to.be.not.ok;
+    expect(roles.find(role => role.name === `ds:${datasetId}`)).to.be.ok;
+    expect(roles.find(role => role.name === `ds:rw:${datasetId}`)).to.be.not.ok;
     const secGroupRoles = await this.kcAdminClient.groups.listRealmRoleMappings({
       realm: process.env.KC_REALM,
       id: secGroup.id
     });
-    expect(secGroupRoles.find(role => role.name === `ds:${dataset.name}`)).to.be.ok;
-    expect(secGroupRoles.find(role => role.name === `ds:rw:${dataset.name}`)).to.be.not.ok;
+    expect(secGroupRoles.find(role => role.name === `ds:${datasetId}`)).to.be.ok;
+    expect(secGroupRoles.find(role => role.name === `ds:rw:${datasetId}`)).to.be.not.ok;
   });
 
   it('should create with dataset options and update', async () => {
@@ -876,7 +848,7 @@ describe('dataset graphql', function() {
 
     const createMutation = await this.graphqlRequest(`
     mutation($data: DatasetCreateInput!){
-      createDataset (data: $data) { ${fields} }
+      createDataset (data: $data) { id }
     }`, {
       data
     });
@@ -906,7 +878,7 @@ describe('dataset graphql', function() {
     };
     await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { ${fields} }
+      updateDataset (where: $where, data: $data) { id }
     }`, {
       where: {id: createMutation.createDataset.id},
       data: updateData
