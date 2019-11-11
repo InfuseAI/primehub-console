@@ -50,6 +50,7 @@ export default () => (
       />
       <pagination />
     </toolbar> */}
+    <boolean keyName="isDefault" hidden />
     <Block title="${workspace.block1.title}">
       <string required keyName="name" title="${workspace.name.title}" /> 
       <string required keyName="displayName" title="${workspace.displayName.title}" /> 
