@@ -41,9 +41,13 @@ input WorkspaceCreateInput {
   name: String!
   displayName: String
   members: UserCreateManyInput
+  # hack
+  isDefault: Boolean
 }
 
 input WorkspaceUpdateInput {
   displayName: String
   members: UserUpdateManyInput
+  # hack
+  isDefault: Boolean
 }
