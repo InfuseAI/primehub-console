@@ -802,6 +802,7 @@ describe('dataset graphql', function() {
       volumeSize: null,
       type: 'git'
     });
+
     expect(queryOne.dataset.groups).to.deep.include.members([{
       id: group.id,
       displayName: null,

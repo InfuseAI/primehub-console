@@ -56,7 +56,7 @@ const fixtures: Array<{name: string, role: ResourceRole}> = [{
     workspaceId: defaultWorkspaceId,
     originalName: 'ds:rw:assac',
     resourcePrefix: ResourceNamePrefix.ds,
-    resourceName: 'rw:assac'
+    resourceName: 'assac'
   }
 }, {
   name: 'ds:rw:ws|assac',

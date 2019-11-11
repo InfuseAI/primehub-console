@@ -517,7 +517,7 @@ export const resolveType = {
     const groupsWithRole = await Promise.all(
       groups
       .filter(group => group.id !== context.everyoneGroupId)
-      .filter(group => !group.attributes.isWorkspace)
+      .filter(group => !group.attributes || !group.attributes.isWorkspace)
       .map(async group => {
         const roles = await context.kcAdminClient.groups.listRealmRoleMappings({
           id: group.id

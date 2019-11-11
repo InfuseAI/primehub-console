@@ -24,6 +24,7 @@ import * as logger from '../logger';
 import * as Boom from 'boom';
 import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspace';
 import { isKeycloakGroupNameWorkspace } from '../workspace/api';
+import GroupRepresentation from 'keycloak-admin/lib/defs/groupRepresentation';
 
 // constants
 const attrSchema = {
@@ -52,6 +53,13 @@ const validateSharedVolumeAttrs = (attrs: Attributes) => {
   if (enabledSharedVolume && isNil(sharedVolumeCapacity)) {
     throw Boom.badData('sharedVolumeCapacity should not be null');
   }
+};
+
+const injectWorkspace = (group: GroupRepresentation, currentWorkspace: CurrentWorkspace) => {
+  return {
+    ...group,
+    currentWorkspace
+  };
 };
 
 /**
@@ -135,7 +143,7 @@ export const create = async (root, args, context: Context) => {
     workspaceId: currentWorkspace.getWorkspaceId()
   });
 
-  return group;
+  return injectWorkspace(group, currentWorkspace);
 };
 
 export const update = async (root, args, context: Context) => {
@@ -218,7 +226,7 @@ export const update = async (root, args, context: Context) => {
     workspaceId: currentWorkspace.getWorkspaceId()
   });
 
-  return group;
+  return injectWorkspace(group, currentWorkspace);
 };
 
 export const destroy = async (root, args, context: Context) => {
@@ -241,7 +249,7 @@ export const destroy = async (root, args, context: Context) => {
     workspaceId: currentWorkspace.getWorkspaceId()
   });
 
-  return group;
+  return injectWorkspace(group, currentWorkspace);
 };
 
 /**
@@ -263,7 +271,7 @@ const listQuery = async (
   // filter workspace groups
   groups = groups.filter(group => !isKeycloakGroupNameWorkspace(group.name));
   groups = filter(groups, whereWithoutWorkspace);
-  return groups;
+  return groups.map(group => injectWorkspace(group, currentWorkspace));
 };
 
 export const query = async (root, args, context: Context) => {
@@ -272,7 +280,7 @@ export const query = async (root, args, context: Context) => {
   const paginatedGroups = paginate(groups, extractPagination(args));
   const fetchedGroups = await Promise.all(
     paginatedGroups.map(group => context.kcAdminClient.groups.findOne({id: group.id})));
-  return {...fetchedGroups, currentWorkspace};
+  return fetchedGroups.map(group => injectWorkspace(group, currentWorkspace));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
@@ -281,9 +289,10 @@ export const connectionQuery = async (root, args, context: Context) => {
   const relayResponse = toRelay(groups, extractPagination(args));
   relayResponse.edges = await Promise.all(relayResponse.edges.map(
     async edge => {
+      const group = await context.kcAdminClient.groups.findOne({id: edge.node.id});
       return {
         cursor: edge.cursor,
-        node: {...await context.kcAdminClient.groups.findOne({id: edge.node.id}), currentWorkspace}
+        node: injectWorkspace(group, currentWorkspace)
       };
     })
   );
@@ -295,7 +304,7 @@ export const queryOne = async (root, args, context: Context) => {
   const groupId = args.where.id;
   const kcAdminClient = context.kcAdminClient;
   const group = await kcAdminClient.groups.findOne({id: groupId});
-  return {...group, currentWorkspace};
+  return group ? injectWorkspace(group, currentWorkspace) : null;
 };
 
 export const typeResolvers = {
