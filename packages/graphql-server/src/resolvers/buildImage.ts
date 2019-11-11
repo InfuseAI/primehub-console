@@ -179,7 +179,8 @@ export const typeResolvers = {
     const buildImageName = parent.id;
     const jobs =
       await context.crdClient.imageSpecJobs.list({labelSelector: `${IMAGE_SPEC_JOB_NAME_LABEL}=${buildImageName}`});
-    const transformedJobs = (jobs || []).map(job => transformJob(job, context.namespace, context.graphqlHost));
+    // tslint:disable-next-line:max-line-length
+    const transformedJobs = (jobs || []).map(job => transformJob(job, context.namespace, context.graphqlHost, context.jobLogCtrl));
     return orderBy(transformedJobs, 'updateDate', 'desc');
   }
 };

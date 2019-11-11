@@ -4,6 +4,7 @@ import K8sSecret from '../k8sResource/k8sSecret';
 import { Item } from '../crdClient/customResource';
 import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
 import K8sUploadServerSecret from '../k8sResource/k8sUploadServerSecret';
+import { JobLogCtrl } from '../controllers/jobLogCtrl';
 
 export interface Context {
   realm: string;
@@ -22,4 +23,5 @@ export interface Context {
   k8sUploadServerSecret: K8sUploadServerSecret;
   namespace: string;
   graphqlHost: string;
+  jobLogCtrl: JobLogCtrl;
 }

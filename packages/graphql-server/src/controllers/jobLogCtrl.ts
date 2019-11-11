@@ -7,17 +7,21 @@ export class JobLogCtrl {
   private namespace: string;
   private kubeClient: any;
   private crdClient: CrdClientImpl;
+  private appPrefix: string;
 
   constructor({
     namespace,
-    crdClient
+    crdClient,
+    appPrefix
   }: {
     namespace: string,
-    crdClient: CrdClientImpl
+    crdClient: CrdClientImpl,
+    appPrefix?: string
   }) {
     this.namespace = namespace || 'default';
     this.kubeClient = kubeClient;
     this.crdClient = crdClient;
+    this.appPrefix = appPrefix;
   }
 
   public streamLogs = async (ctx: ParameterizedContext) => {
@@ -28,11 +32,19 @@ export class JobLogCtrl {
     ctx.body = this.getStream(namespace, podName);
   }
 
+  public getRoute = () => {
+    return '/logs/namespaces/:namespace/jobs/:jobId';
+  }
+
+  public getEndpoint = (namespace: string, jobId: string) => {
+    return `${this.appPrefix || ''}/logs/namespaces/${namespace}/jobs/${jobId}`;
+  }
+
   private getStream = (namespace: string, podName: string): Stream => {
     return this.kubeClient.api.v1.namespaces(namespace).pods(podName).log.getStream({ qs: { follow: true } });
   }
 }
 
 export const mount = (rootRouter: Router, middleware: any, ctrl: JobLogCtrl) => {
-  rootRouter.get('/logs/namespaces/:namespace/jobs/:jobId', middleware, ctrl.streamLogs);
+  rootRouter.get(ctrl.getRoute(), middleware, ctrl.streamLogs);
 };

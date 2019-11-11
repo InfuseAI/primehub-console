@@ -203,7 +203,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   // log
   const logCtrl = new JobLogCtrl({
     namespace: config.k8sCrdNamespace,
-    crdClient
+    crdClient,
+    appPrefix: config.appPrefix
   });
 
   // ann
@@ -329,7 +330,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         k8sDatasetPvc: datasetPvc,
         k8sUploadServerSecret,
         namespace: config.k8sCrdNamespace,
-        graphqlHost: config.graphqlHost
+        graphqlHost: config.graphqlHost,
+        jobLogCtrl: logCtrl
       };
     },
     formatError: (error: any) => {
