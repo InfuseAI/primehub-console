@@ -33,15 +33,11 @@ const schema = (
 if (process.env.NODE_ENV === 'production') {
   schema.graphqlClient = graphqlClient;
 } else {
-  const fakeData = createFakeData(schema.schema, 10);
+  const fakeData = createFakeData(schema.schema, 12);
   fakeData.workspace[0].id = 'default';
   fakeData.workspace[0].displayName = 'Default';
   schema.connector = new LocalStorageConnector({
-<<<<<<< HEAD
     defaultData: fakeData,
-=======
-    defaultData: createFakeData(schema.schema, 12),
->>>>>>> develop
     localStorageKey: 'infuse'
   })
 }

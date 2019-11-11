@@ -1,26 +1,20 @@
 import * as React from 'react';
 import {injectIntl, FormattedMessage} from 'react-intl';
-import {Layout, Menu, Icon, notification, Modal, Avatar, Button} from 'antd';
+import {Layout, Menu, Icon, notification, Modal, Button} from 'antd';
 import Canner from 'canner';
 import gql from 'graphql-tag';
 import {genClient} from 'canner/lib/components/index';
-import Container from '@canner/container';
 import R from '@canner/history-router';
 import ContentHeader from 'components/header';
 import Error from 'components/error';
-import styled, {StyledComponentClass} from 'styled-components';
+import styled from 'styled-components';
 import color from 'styledShare/color';
-import logo from 'images/primehub-logo-w.png';
 import {RouteComponentProps} from 'react-router';
 import schema from '../schema/index.schema.js';
 import myLocales from './utils/locales';
 import get from 'lodash.get';
-<<<<<<< HEAD
 import update from 'lodash/update';
-const {Sider} = Layout;
-=======
 const {Sider, Content} = Layout;
->>>>>>> develop
 const confirm = Modal.confirm;
 declare var process: {
   env: {
@@ -81,8 +75,7 @@ export default class CMSPage extends React.Component<Props, State> {
     workspaceList: []
   };
 
-<<<<<<< HEAD
-  container: Container;
+  cannerRef: any
 
   componentDidMount() {
     this.fetchWorkspaceList()
@@ -92,9 +85,6 @@ export default class CMSPage extends React.Component<Props, State> {
         });
       });
   }
-=======
-  cannerRef: any
->>>>>>> develop
 
   componentDidUpdate(prevProps: Props) {
     const prevPathname = prevProps.location.pathname;
@@ -191,7 +181,8 @@ export default class CMSPage extends React.Component<Props, State> {
   afterDeploy = (data) => {
     const {intl, history, match} = this.props;
     const {workspaceId} = match.params as any;
-    if (get(data, 'actions.0.type') === 'DELETE_ARRAY') {
+    const actionType = get(data, 'actions.0.type');
+    if (actionType === 'DELETE_ARRAY' || actionType === 'UPDATE_ARRAY') {
       if (data.key === 'workspace') {
         this.fetchWorkspaceList()
           .then(wss => {
@@ -200,8 +191,7 @@ export default class CMSPage extends React.Component<Props, State> {
             });
           });
       }
-    }
-    if (get(data, 'actions.0.type') === 'CREATE_ARRAY') {
+    } else if (actionType === 'CREATE_ARRAY') {
       let link = `${(window as any).APP_PREFIX}cms/${workspaceId}/${data.key}/${getCreateId(data.result)}`;
       if (data.key === 'workspace') {
         this.fetchWorkspaceList()
@@ -321,7 +311,6 @@ export default class CMSPage extends React.Component<Props, State> {
     }
   }
 
-<<<<<<< HEAD
   renderMenu = () => {
     const {workspaceList = []} = this.state;
     const {match} = this.props;
@@ -376,8 +365,9 @@ export default class CMSPage extends React.Component<Props, State> {
             ))
         }
       </Menu>
-    )
-=======
+    );
+  }
+
   replaceDatasetMutation = mutation => {
     if (mutation.indexOf('updateDataset') >= 0) {
       return updateDatasetMutation;
@@ -386,61 +376,20 @@ export default class CMSPage extends React.Component<Props, State> {
       return createDatasetMutation;
     }
     return mutation;
->>>>>>> develop
   }
 
   render() {
     const {history, match} = this.props;
-    const {hasError, deploying, dataChanged} = this.state;
-    const hasChanged = !!(dataChanged && Object.keys(dataChanged).length);
+    const {hasError} = this.state;
     if (hasError) {
       return <Error/>;
     }
-<<<<<<< HEAD
     const {workspaceId} = match.params as any;
-    return (
-      <Layout style={{minHeight: '100vh'}}>
-        <Sider breakpoint="sm">
-          <Logo src={logo}/>
-          {this.renderMenu()}
-        </Sider>
-        <Container
-          schema={schema}
-          sidebarConfig={{
-            menuConfig: false
-          }}
-          navbarConfig={{
-            renderMenu: () => <ContentHeader
-              appUrl={''}
-              deploying={deploying}
-              hasChanged={hasChanged}
-              subMenuTitle={<span><Avatar src={(window as any).thumbnail} style={{marginRight: '10px'}}/>Hi, {(window as any).username}</span>}
-            />
-          }}
-          router={new R({
-            history,
-            baseUrl: `${(window as any).APP_PREFIX || '/'}cms/${workspaceId}`
-          })}
-          ref={container => this.container = container}
-          dataDidChange={this.dataDidChange}
-        >
-          <Canner
-            // use workspaceId as the key. So, if the workspaceId changed,
-            // the Canner component will re-mount to fetch correct data
-            key={workspaceId}
-            afterDeploy={this.afterDeploy}
-            beforeDeploy={this.beforeDeploy}
-            beforeFetch={this.beforeFetch}
-            intl={{
-              locale: (window as any).LOCALE,
-              messages: {
-                ...myLocales
-              }
-=======
+
     const {activeKey} = match.params as any;
     const router = new R({
       history,
-      baseUrl: `${(window as any).APP_PREFIX}cms`
+      baseUrl: `${(window as any).APP_PREFIX || '/'}cms/${workspaceId}`
     });
     const routes = router.getRoutes();
     const routerParams = {
@@ -458,29 +407,15 @@ export default class CMSPage extends React.Component<Props, State> {
             style={{
               position: "fixed",
               height: "100%"
->>>>>>> develop
             }}
           >
-            <Menu
-              onClick={this.siderMenuOnClick}
-              selectedKeys={[(match.params as any).activeKey]}
-              theme="dark"
-              mode="inline">
-              {/* <Menu.Item key="__cnr_back">
-                <Icon type="left" />
-                Back to dashboard
-              </Menu.Item> */}
-              {
-                Object.keys(schema.schema).map(key => (
-                  <Menu.Item key={key}>
-                    {schema.schema[key].title}
-                  </Menu.Item>
-                ))
-              }
-            </Menu>
+            {this.renderMenu()}
           </Sider>
           <Content style={{marginLeft: 200}}>
             <Canner
+              // use workspaceId as the key. So, if the workspaceId changed,
+              // the Canner component will re-mount to fetch correct data
+              key={workspaceId}
               schema={schema}
               goTo={router.goTo}
               routes={routes}
@@ -544,35 +479,6 @@ export default class CMSPage extends React.Component<Props, State> {
                     description = 'Group exists with same name';
                     break;
 
-<<<<<<< HEAD
-                case 'REFRESH_TOKEN_EXPIRED':
-                  // show notification with button
-                  message = 'Token Expired or Invalid';
-                  description = 'Please login again';
-                  const loginUrl = get(e, 'networkError.result.errors.0.loginUrl');
-                  // add current location to redirect_uri
-                  duration = 20;
-                  key = 'REFRESH_TOKEN_EXPIRED';
-                  btn = (
-                    //  @ts-ignore
-                    <Button type="primary" onClick={() => window.location.replace(loginUrl)}>
-                      Login
-                    </Button>
-                  );
-                  break;
-              }
-              return notification.error({
-                message,
-                description,
-                placement: 'bottomRight',
-                duration,
-                btn,
-                key
-              });
-            }}
-          />
-        </Container>
-=======
                   case 'RESOURCE_CONFLICT':
                     message = 'Conflict Error';
                     description = 'Resource name already exist';
@@ -605,7 +511,6 @@ export default class CMSPage extends React.Component<Props, State> {
             />
           </Content>
         </Layout>
->>>>>>> develop
       </Layout>
     )
   }
