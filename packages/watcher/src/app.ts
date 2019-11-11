@@ -72,7 +72,8 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     crdClient,
     keycloakAdmin: kcAdminClientForObserver as any,
     everyoneGroupId: config.keycloakEveryoneGroupId,
-    getAccessToken: async () => tokenSyncer.getAccessToken()
+    getAccessToken: async () => tokenSyncer.getAccessToken(),
+    k8sCrdNamespace: config.k8sCrdNamespace
   });
   observer.observe();
 
