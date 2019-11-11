@@ -443,6 +443,7 @@ export default class CMSPage extends React.Component<Props, State> {
                   ...myLocales
                 }
               }}
+              beforeFetch={this.beforeFetch}
               errorHandler={e => {
                 console.dir(e);
                 // default message and description
