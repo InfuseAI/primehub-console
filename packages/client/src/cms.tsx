@@ -7,7 +7,7 @@ import {genClient} from 'canner/lib/components/index';
 import R from '@canner/history-router';
 import ContentHeader from 'components/header';
 import Error from 'components/error';
-import styled from 'styled-components';
+import styled, {injectGlobal} from 'styled-components';
 import color from 'styledShare/color';
 import {RouteComponentProps} from 'react-router';
 import schema from '../schema/index.schema.js';
@@ -50,7 +50,13 @@ export const Logo = styled.img`
   background-color: ${color.darkBlue};
   padding: 20px;
   width: 100%;
-`
+`;
+
+injectGlobal`
+  .ant-menu-dark.ant-menu-submenu-popup {
+    position: fixed;
+  }
+`;
 
 export interface Props extends RouteComponentProps<void> {
   intl: any;
@@ -385,8 +391,6 @@ export default class CMSPage extends React.Component<Props, State> {
       return <Error/>;
     }
     const {workspaceId} = match.params as any;
-
-    const {activeKey} = match.params as any;
     const router = new R({
       history,
       baseUrl: `${(window as any).APP_PREFIX || '/'}cms/${workspaceId}`
