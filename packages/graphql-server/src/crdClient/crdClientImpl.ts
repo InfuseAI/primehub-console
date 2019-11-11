@@ -104,6 +104,13 @@ export interface ImageSpecJobSpec {
   updateTime?: string;
 }
 
+export interface ImageSpecJobStatus {
+  startTime: string;
+  finishTime: string;
+  phase: string;
+  podName: string;
+}
+
 /**
  * CRD
  */
@@ -121,7 +128,7 @@ export default class CrdClientImpl {
   public images: CustomResource<ImageSpec>;
   public imageSpecs: CustomResource<ImageSpecSpec, ImageSpecStatus>;
   public announcements: CustomResource<AnnouncementSpec>;
-  public imageSpecJobs: CustomResource<ImageSpecJobSpec>;
+  public imageSpecJobs: CustomResource<ImageSpecJobSpec, ImageSpecJobStatus>;
   private namespace: string;
 
   constructor(args?: CrdArgs) {
@@ -150,7 +157,7 @@ export default class CrdClientImpl {
       loadCrd('imageSpec'),
       this.namespace
     );
-    this.imageSpecJobs = new CustomResource<ImageSpecJobSpec>(
+    this.imageSpecJobs = new CustomResource<ImageSpecJobSpec, ImageSpecJobStatus>(
       client,
       watch,
       loadCrd('imageSpecJob'),

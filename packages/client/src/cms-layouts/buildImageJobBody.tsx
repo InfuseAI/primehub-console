@@ -67,7 +67,7 @@ export default class Body extends React.Component {
         minHeight: '100vh'
       }}>
         <Button onClick={this.backToBuildImage} style={{marginBottom: 16}}>
-          <Icon type="arrow-left" /> Back to buildImage
+          <Icon type="arrow-left" /> Back to build image
         </Button>
         <Item />
       </div>

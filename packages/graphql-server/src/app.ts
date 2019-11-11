@@ -30,6 +30,7 @@ import basicAuth from 'basic-auth';
 import koaMount from 'koa-mount';
 import { OidcTokenVerifier } from './oidc/oidcTokenVerifier';
 import cors from '@koa/cors';
+import { JobLogCtrl, mount as mountJobLogCtrl } from './controllers/jobLogCtrl';
 
 // cache
 import {
@@ -199,6 +200,13 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
   await tokenSyncer.start();
 
+  // log
+  const logCtrl = new JobLogCtrl({
+    namespace: config.k8sCrdNamespace,
+    crdClient,
+    appPrefix: config.appPrefix
+  });
+
   // ann
   const annCtrl = new AnnCtrl({
     createKcAdminClient,
@@ -320,7 +328,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         username,
         defaultUserVolumeCapacity: config.defaultUserVolumeCapacity,
         k8sDatasetPvc: datasetPvc,
-        k8sUploadServerSecret
+        k8sUploadServerSecret,
+        namespace: config.k8sCrdNamespace,
+        graphqlHost: config.graphqlHost,
+        jobLogCtrl: logCtrl
       };
     },
     formatError: (error: any) => {
@@ -428,7 +439,24 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
 
   // ctrl
+  const authenticateMiddleware = async (ctx: Koa.ParameterizedContext, next: any) => {
+    const {authorization = ''}: {authorization: string} = ctx.header;
+
+    if (authorization.indexOf('Bearer') < 0) {
+      throw Boom.forbidden('request not authorized');
+    }
+
+    const apiToken = authorization.replace('Bearer ', '');
+
+    if (!isEmpty(config.sharedGraphqlSecretKey) && config.sharedGraphqlSecretKey === apiToken) {
+      return next();
+    } else {
+      await oidcTokenVerifier.verify(apiToken);
+      return next();
+    }
+  };
   mountAnn(rootRouter, annCtrl);
+  mountJobLogCtrl(rootRouter, authenticateMiddleware, logCtrl);
 
   // health check
   rootRouter.get('/health', async ctx => {

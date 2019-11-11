@@ -13,7 +13,7 @@ export interface BuildImage {
   name: string;
   status: string;
   baseImage: string;
-  targetImage: string;
+  image: string;
   useImagePullSecret: string;
   packages: {
     apt: string;
@@ -39,9 +39,9 @@ const transform = (item: Item<ImageSpecSpec, ImageSpecStatus>): BuildImage => {
   return {
     id: item.metadata.name,
     name: item.metadata.name,
-    status: item.status.phase,
+    status: get(item, 'status.phase'),
     baseImage: item.spec.baseImage,
-    targetImage: item.status.image,
+    image: get(item, 'status.image'),
     useImagePullSecret: item.spec.pullSecret,
     packages: {
       apt: stringifyPackageField(get(item, 'spec.packages.apt')),
@@ -179,7 +179,8 @@ export const typeResolvers = {
     const buildImageName = parent.id;
     const jobs =
       await context.crdClient.imageSpecJobs.list({labelSelector: `${IMAGE_SPEC_JOB_NAME_LABEL}=${buildImageName}`});
-    const transformedJobs = (jobs || []).map(transformJob);
+    // tslint:disable-next-line:max-line-length
+    const transformedJobs = (jobs || []).map(job => transformJob(job, context.namespace, context.graphqlHost, context.jobLogCtrl));
     return orderBy(transformedJobs, 'updateDate', 'desc');
   }
 };

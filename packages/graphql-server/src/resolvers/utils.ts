@@ -12,6 +12,7 @@ import {
   isNaN
 } from 'lodash';
 import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
+import { EOL } from 'os';
 
 export interface Pagination {
   last?: number;
@@ -204,12 +205,10 @@ export const mergeVariables = (originalVariables: any, newVariables: any) => {
   return mergedVariables;
 };
 
-const NEW_LINE = '\\n';
-
 export const stringifyPackageField = (pkgs: string[]): string => {
-  return pkgs && pkgs.join(NEW_LINE);
+  return pkgs && pkgs.join(EOL);
 };
 
 export const parsePackageField = (pkgs: string): string[] => {
-  return pkgs.split(NEW_LINE).filter(v => v);
+  return pkgs.split(EOL).filter(v => v);
 };

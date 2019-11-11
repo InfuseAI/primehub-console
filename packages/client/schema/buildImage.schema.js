@@ -15,11 +15,14 @@ export default () => (
     packageName="../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
+        title: '${buildImage.name}',
+        dataIndex: 'name'
+      }, {
         title: '${buildImage.status}',
         dataIndex: 'status',
       }, {
-        title: '${buildImage.name}',
-        dataIndex: 'name',
+        title: '${buildImage.image}',
+        dataIndex: 'image',
         render: renderCopyableText
       }]
     }}
@@ -29,7 +32,7 @@ export default () => (
           edges {
             cursor
             node {
-              id name status
+              id name image status
             }
           }
           pageInfo {
@@ -98,12 +101,21 @@ export default () => (
           packageName="../src/cms-components/customize-array-nested_job"
           uiParams={{
             columns: [{
-              title: '${buildImageJob.imageRevision}',
-              dataIndex: 'imageRevision',
-              render: renderCopyableText
-            }, {
               title: '${buildImageJob.updateTime}',
-              dataIndex: 'updateTime'
+              dataIndex: 'updateTime',
+              render: text => {
+                return text ? moment(text).format('YYYY/MM/DD HH:mm') : '-'
+              }
+            }, {
+              title: '${buildImageJob.imageRevision}',
+              dataIndex: 'imageRevision'
+            }, {
+              title: '${buildImageJob.status}',
+              dataIndex: 'status'
+            }, {
+              title: '${buildImageJob.targetImage}',
+              dataIndex: 'targetImage',
+              render: renderCopyableText
             }]
           }}
         >
@@ -112,6 +124,8 @@ export default () => (
           </toolbar>
           <string keyName="id" hidden/>
           <string keyName="imageRevision" title="${buildImageJob.imageRevision" />
+          <string keyName="status" title="${buildImageJob.status" />
+          <string keyName="targetImage" title="${buildImageJob.targetImage" />
           <dateTime
             keyName="updateTime"
             title="${buildImageJob.updateTime}" packageName="../src/cms-components/customize-string-date.tsx"
