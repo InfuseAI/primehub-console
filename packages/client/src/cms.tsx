@@ -154,12 +154,19 @@ export default class CMSPage extends React.Component<Props, State> {
   beforeDeploy = (key, {mutation, variables}) => {
     const {match} = this.props;
     const {workspaceId} = match.params as any;
+
     if (key === 'workspace') {
       return {
         mutation,
         variables
       };
     }
+
+    if (key === 'dataset') {
+      // we replace the mutation since there will be a external field `uploadServerSecret`
+      mutation = this.replaceDatasetMutation(mutation)
+    }
+
     if (mutation.indexOf('$where') >= 0) {
       // update or delete
       return {
@@ -172,6 +179,7 @@ export default class CMSPage extends React.Component<Props, State> {
         })
       };
     } else {
+      // create
       return {
         mutation,
         variables: update(variables, ['payload'], payload => {
@@ -427,16 +435,7 @@ export default class CMSPage extends React.Component<Props, State> {
               routerParams={routerParams}
               dataDidChange={this.dataDidChange}
               afterDeploy={this.afterDeploy}
-              beforeDeploy={(key, data) => {
-                if (key === 'dataset') {
-                  // we replace the mutation since there will be a external field `uploadServerSecret`
-                  return {
-                    ...data,
-                    mutation: this.replaceDatasetMutation(data.mutation)
-                  };
-                }
-                return data;
-              }}
+              beforeDeploy={this.beforeDeploy}
               intl={{
                 locale: (window as any).LOCALE,
                 messages: {
