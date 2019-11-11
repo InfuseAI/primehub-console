@@ -39,7 +39,7 @@ export default class Textarea extends PureComponent<Props> {
   };
 
   render() {
-    const { value, disabled, intl } = this.props;
+    const { value, disabled, intl, routes } = this.props;
     const { uiParams } = this.props;
     let placeholder = '';
     if (uiParams.placeholder) {
@@ -50,7 +50,9 @@ export default class Textarea extends PureComponent<Props> {
         id: uiParams.placeholderTemplate,
         defaultMessage: defaultMessage.en[uiParams.placeholderTemplate]
       });
-
+    }
+    if (routes[0] === 'buildImageJob') {
+      placeholder = '';
     }
 
     return (
