@@ -159,7 +159,7 @@ export default class CMSPage extends React.Component<Props, State> {
 
   reset = () => {
     if (this.cannerRef) {
-      return this.cannerRef.current.reset();
+      return this.cannerRef.reset();
     }
     return Promise.resolve();
   }
