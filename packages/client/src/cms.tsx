@@ -52,6 +52,8 @@ export const Logo = styled.img`
   width: 100%;
 `;
 
+const ENABLE_WORKSPACE = (window as any).PRIMEHUB_FEATURE_ENABLE_WORKSPACE;
+
 injectGlobal`
   .ant-menu-dark.ant-menu-submenu-popup {
     position: fixed;
@@ -84,6 +86,7 @@ export default class CMSPage extends React.Component<Props, State> {
   cannerRef: any
 
   componentDidMount() {
+    if (!ENABLE_WORKSPACE) return;
     this.fetchWorkspaceList()
       .then(wss => {
         this.setState({
@@ -330,6 +333,25 @@ export default class CMSPage extends React.Component<Props, State> {
     const {match} = this.props;
     const {activeKey, workspaceId} = match.params as any;
     const currentWorkspace = workspaceList.find(ws => ws.id === workspaceId) || {};
+    const workspaceMenu = (
+      <Menu.SubMenu
+        key="workspace_list"
+        style={{
+          paddingTop: 36,
+          paddingBottom: 12
+        }}
+        title={currentWorkspace.displayName || 'Default'}
+      >
+        {workspaceList.map(ws => (
+          <Menu.Item key={`workspace/${ws.id}`}>
+            {ws.displayName}
+          </Menu.Item>
+        ))}
+        <Menu.Item key="workspace">
+          <Icon type="setting" /> <FormattedMessage id="workspace.management" />
+        </Menu.Item>
+      </Menu.SubMenu>
+    );
     return (
       <Menu
         onClick={this.siderMenuOnClick}
@@ -337,34 +359,21 @@ export default class CMSPage extends React.Component<Props, State> {
         theme="dark"
         mode="vertical"
       >
-        <span style={{
-          left: '16px',
-          position: 'relative',
-          top: '36px',
-          fontSize: '14px'
-        }}>
-          WORKSPACE
-        </span>
-        <Menu.SubMenu
-          key="workspace_list"
-          style={{
-            paddingTop: 36,
-            paddingBottom: 12
-          }}
-          title={currentWorkspace.displayName || 'Default'}
-        >
-          {workspaceList.map(ws => (
-            <Menu.Item key={`workspace/${ws.id}`}>
-              {ws.displayName}
-            </Menu.Item>
-          ))}
-          <Menu.Item key="workspace">
-            <Icon type="setting" /> <FormattedMessage id="workspace.management" />
-          </Menu.Item>
-        </Menu.SubMenu>
+        {ENABLE_WORKSPACE && (
+          <span style={{
+            left: '16px',
+            position: 'relative',
+            top: '36px',
+            fontSize: '14px'
+          }}>
+            WORKSPACE
+          </span>
+        )}
+        {ENABLE_WORKSPACE && workspaceMenu}
         {
           Object.keys(schema.schema)
             .filter(key => {
+              if (!ENABLE_WORKSPACE) return true;
               if (
                 !currentWorkspace.isDefault &&
                 (key === 'system' || key === 'user')
