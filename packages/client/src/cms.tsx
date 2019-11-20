@@ -215,7 +215,6 @@ export default class CMSPage extends React.Component<Props, State> {
 
   removeBuildImageJobs = variables => {
     delete variables.payload.buildImageJobs;
-    console.log(variables);
     return variables;
   }
 
