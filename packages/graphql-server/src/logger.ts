@@ -21,6 +21,7 @@ export enum components {
   image = 'Image',
   instanceType = 'InstanceType',
   secret = 'Secret',
+  buildImage = 'BuildImage'
 }
 
 export const log = (levelType: level = level.info, payload?: any) => {

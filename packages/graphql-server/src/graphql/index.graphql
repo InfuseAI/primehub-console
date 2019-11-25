@@ -6,6 +6,7 @@
 # import Announcement, AnnouncementConnection, AnnouncementWhereInput, AnnouncementWhereUniqueInput, AnnouncementCreateInput, AnnouncementUpdateInput from "./announcement.graphql"
 # import Dataset, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
+# import BuildImageJob, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql" 
 
 scalar JSON
 
@@ -133,6 +134,40 @@ type Query {
     first: Int
     last: Int
   ): SecretConnection!
+
+  """BuildImage"""
+  buildImage(where: BuildImageWhereUniqueInput!): BuildImage!
+  buildImages(
+    where: BuildImageWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [BuildImage]!
+  buildImagesConnection(
+    where: BuildImageWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): BuildImageConnection!
+
+  """BuildImageJob"""
+  buildImageJob(where: BuildImageJobWhereUniqueInput!): BuildImageJob!
+  buildImageJobs(
+    where: BuildImageJobWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [BuildImageJob]!
+  buildImageJobsConnection(
+    where: BuildImageJobWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): BuildImageJobConnection!
 }
 
 type Mutation {
@@ -179,4 +214,9 @@ type Mutation {
   updateDataset(data: DatasetUpdateInput!, where: DatasetWhereUniqueInput!): DatasetMutationResponse!
   regenerateUploadServerSecret(where: DatasetWhereUniqueInput!): DatasetMutationResponse!
   deleteDataset(where: DatasetWhereUniqueInput!): Dataset
+
+  """BuildImage"""
+  createBuildImage(data: BuildImageCreateInput!): BuildImage!
+  updateBuildImage(data: BuildImageUpdateInput!, where: BuildImageWhereUniqueInput!): BuildImage
+  deleteBuildImage(where: BuildImageWhereUniqueInput!): BuildImage
 }

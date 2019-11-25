@@ -18,6 +18,8 @@ import * as system from './resolvers/system';
 import * as user from './resolvers/user';
 import * as group from './resolvers/group';
 import * as secret from './resolvers/secret';
+import * as buildImage from './resolvers/buildImage';
+import * as buildImageJob from './resolvers/buildImageJob';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset, regenerateUploadSecret} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
@@ -28,6 +30,7 @@ import basicAuth from 'basic-auth';
 import koaMount from 'koa-mount';
 import { OidcTokenVerifier } from './oidc/oidcTokenVerifier';
 import cors from '@koa/cors';
+import { JobLogCtrl, mount as mountJobLogCtrl } from './controllers/jobLogCtrl';
 
 // cache
 import {
@@ -76,6 +79,12 @@ const resolvers = {
     secret: secret.queryOne,
     secrets: secret.query,
     secretsConnection: secret.connectionQuery,
+    buildImage: buildImage.queryOne,
+    buildImages: buildImage.query,
+    buildImagesConnection: buildImage.connectionQuery,
+    buildImageJob: buildImageJob.queryOne,
+    buildImageJobs: buildImageJob.query,
+    buildImageJobsConnection: buildImageJob.connectionQuery,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),
@@ -96,6 +105,9 @@ const resolvers = {
     updateSecret: secret.update,
     deleteSecret: secret.destroy,
     regenerateUploadServerSecret: regenerateUploadSecret,
+    createBuildImage: buildImage.create,
+    updateBuildImage: buildImage.update,
+    deleteBuildImage: buildImage.destroy,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation(),
@@ -106,6 +118,7 @@ const resolvers = {
   },
   User: user.typeResolvers,
   Group: group.typeResolvers,
+  BuildImage: buildImage.typeResolvers,
   ...instanceType.typeResolver(),
   ...dataset.typeResolver(),
   ...image.typeResolver(),
@@ -186,6 +199,13 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     clientId: config.keycloakClientId
   });
   await tokenSyncer.start();
+
+  // log
+  const logCtrl = new JobLogCtrl({
+    namespace: config.k8sCrdNamespace,
+    crdClient,
+    appPrefix: config.appPrefix
+  });
 
   // ann
   const annCtrl = new AnnCtrl({
@@ -308,7 +328,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         username,
         defaultUserVolumeCapacity: config.defaultUserVolumeCapacity,
         k8sDatasetPvc: datasetPvc,
-        k8sUploadServerSecret
+        k8sUploadServerSecret,
+        namespace: config.k8sCrdNamespace,
+        graphqlHost: config.graphqlHost,
+        jobLogCtrl: logCtrl
       };
     },
     formatError: (error: any) => {
@@ -416,7 +439,24 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
 
   // ctrl
+  const authenticateMiddleware = async (ctx: Koa.ParameterizedContext, next: any) => {
+    const {authorization = ''}: {authorization: string} = ctx.header;
+
+    if (authorization.indexOf('Bearer') < 0) {
+      throw Boom.forbidden('request not authorized');
+    }
+
+    const apiToken = authorization.replace('Bearer ', '');
+
+    if (!isEmpty(config.sharedGraphqlSecretKey) && config.sharedGraphqlSecretKey === apiToken) {
+      return next();
+    } else {
+      await oidcTokenVerifier.verify(apiToken);
+      return next();
+    }
+  };
   mountAnn(rootRouter, annCtrl);
+  mountJobLogCtrl(rootRouter, authenticateMiddleware, logCtrl);
 
   // health check
   rootRouter.get('/health', async ctx => {
