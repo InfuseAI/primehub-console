@@ -36,6 +36,9 @@ export interface Config {
   // disable create/update/delete operation on instanceType/image ui
   readOnlyOnInstanceTypeAndImage?: boolean;
   enableDatasetUpload: boolean;
+
+  // workspace feature
+  enableWorkspace: boolean;
 }
 
 const defaultConfigs = {
@@ -55,7 +58,8 @@ const defaultConfigs = {
   enableUserPortal: false,
   portalConfigPath: resolve(__dirname, '../etc/portal-config.yaml'),
   readOnlyOnInstanceTypeAndImage: false,
-  enableDatasetUpload: false
+  enableDatasetUpload: false,
+  enableWorkspace: false
 };
 
 const prodConfigs = {
@@ -91,7 +95,10 @@ export const createConfig = (): Config => {
     portalConfigPath: process.env.PORTAL_CONFIG_PATH,
     readOnlyOnInstanceTypeAndImage: process.env.READ_ONLY_ON_INSTANCE_TYPE_AND_IMAGE,
     enableDatasetUpload:
-      process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD && process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD.toString() === 'true'
+      process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD && process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD.toString() === 'true',
+    enableWorkspace:
+      process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE &&
+      process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE.toString() === 'true',
   });
 
   const env = process.env.NODE_ENV || 'development';

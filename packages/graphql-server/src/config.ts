@@ -54,6 +54,9 @@ export interface Config {
   // pvc
   primehubGroupSc?: string;
   enableDatasetUpload: boolean;
+
+  // workspace feature
+  enableWorkspace: boolean;
 }
 
 const defaultConfigs = {
@@ -78,7 +81,8 @@ const defaultConfigs = {
   apolloTracing: false,
   graphqlPlayground: true,
   defaultUserVolumeCapacity: '20G',
-  enableDatasetUpload: false
+  enableDatasetUpload: false,
+  enableWorkspace: false
 };
 
 const prodConfigs = {
@@ -124,7 +128,10 @@ export const createConfig = (): Config => {
     defaultUserVolumeCapacity: process.env.DEFAULT_USER_VOLUME_CAPACITY,
     primehubGroupSc: process.env.PRIMEHUB_GROUP_SC,
     enableDatasetUpload:
-      process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD && process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD.toString() === 'true'
+      process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD && process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD.toString() === 'true',
+    enableWorkspace:
+      process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE &&
+      process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE.toString() === 'true',
   });
 
   const env = process.env.NODE_ENV || 'development';

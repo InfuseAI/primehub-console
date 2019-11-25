@@ -52,7 +52,7 @@ export const Logo = styled.img`
   width: 100%;
 `;
 
-const ENABLE_WORKSPACE = (window as any).PRIMEHUB_FEATURE_ENABLE_WORKSPACE;
+const ENABLE_WORKSPACE = (window as any).enableWorkspace;
 
 injectGlobal`
   .ant-menu-dark.ant-menu-submenu-popup {
@@ -373,7 +373,7 @@ export default class CMSPage extends React.Component<Props, State> {
         {
           Object.keys(schema.schema)
             .filter(key => {
-              if (!ENABLE_WORKSPACE) return true;
+              if (!ENABLE_WORKSPACE && key !== 'workspace') return true;
               if (
                 !currentWorkspace.isDefault &&
                 (key === 'system' || key === 'user')

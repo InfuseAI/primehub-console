@@ -306,6 +306,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       // workspace
       const workspaceApi = new WorkspaceApi({
         defaultNamespace: config.k8sCrdNamespace,
+        enableWorkspace: config.enableWorkspace,
         kcAdminClient
       });
 

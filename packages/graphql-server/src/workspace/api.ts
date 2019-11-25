@@ -24,12 +24,15 @@ export default class WorkspaceApi {
     }
   });
   private kcAdminClient: KcAdminClient;
+  private enableWorkspace: boolean;
 
   constructor({
     defaultNamespace,
+    enableWorkspace,
     kcAdminClient
   }: {
     defaultNamespace: string,
+    enableWorkspace: boolean,
     kcAdminClient: KcAdminClient
   }) {
     this.defaultWorkspace = {
@@ -39,18 +42,23 @@ export default class WorkspaceApi {
       displayName: 'default',
       keycloakGroupId: null
     };
+    this.enableWorkspace = enableWorkspace;
     this.kcAdminClient = kcAdminClient;
   }
 
   public find = async (): Promise<Workspace[]> => {
     const userCreatedNamespaces = await this.k8sNamespace.find();
     const workspaces = userCreatedNamespaces.map(this.transformNamespace);
-    return [this.defaultWorkspace, ...workspaces];
+    return this.enableWorkspace ? [this.defaultWorkspace, ...workspaces] : [this.defaultWorkspace];
   }
 
   public findOne = async (workspaceId: string): Promise<Workspace> => {
     if (workspaceId === this.defaultWorkspace.id) {
       return this.defaultWorkspace;
+    }
+
+    if (!this.enableWorkspace) {
+      throw new Error(`workspace not enabled`);
     }
 
     const namespace = await this.k8sNamespace.findOne(workspaceId);
@@ -64,6 +72,10 @@ export default class WorkspaceApi {
     name: string;
     displayName: string;
   }): Promise<Workspace> => {
+    if (!this.enableWorkspace) {
+      throw new Error(`workspace not enabled`);
+    }
+
     const namespaceName = `primehub-${name}`;
     // create keycloak group
     const group = await this.kcAdminClient.groups.create({
@@ -84,6 +96,10 @@ export default class WorkspaceApi {
   }
 
   public update = async (id: string, data: {displayName: string}): Promise<Workspace> => {
+    if (!this.enableWorkspace) {
+      throw new Error(`workspace not enabled`);
+    }
+
     if (id === this.defaultWorkspace.id) {
       throw new Error('you cannot update default workspace');
     }
@@ -93,6 +109,10 @@ export default class WorkspaceApi {
   }
 
   public destroy = async (id: string): Promise<void> => {
+    if (!this.enableWorkspace) {
+      throw new Error(`workspace not enabled`);
+    }
+
     if (id === this.defaultWorkspace.id) {
       throw new Error('you cannot delete default workspace');
     }
@@ -103,8 +123,12 @@ export default class WorkspaceApi {
   }
 
   public addMember = async (id: string, userId: string): Promise<void> => {
+    if (!this.enableWorkspace) {
+      throw new Error(`workspace not enabled`);
+    }
+
     if (id === this.defaultWorkspace.id) {
-      throw new Error('you cannot update default workspace');
+      throw new Error('you cannot addMember in default workspace');
     }
 
     const namespace = await this.k8sNamespace.findOne(id);
@@ -116,8 +140,12 @@ export default class WorkspaceApi {
   }
 
   public listMembers = async (id: string): Promise<UserRepresentation[]> => {
+    if (!this.enableWorkspace) {
+      throw new Error(`workspace not enabled`);
+    }
+
     if (id === this.defaultWorkspace.id) {
-      throw new Error('you cannot update default workspace');
+      throw new Error('you cannot listMembers in default workspace');
     }
 
     const namespace = await this.k8sNamespace.findOne(id);
@@ -128,8 +156,12 @@ export default class WorkspaceApi {
   }
 
   public delMember = async (id: string, userId: string): Promise<void> => {
+    if (!this.enableWorkspace) {
+      throw new Error(`workspace not enabled`);
+    }
+
     if (id === this.defaultWorkspace.id) {
-      throw new Error('you cannot update default workspace');
+      throw new Error('you cannot delMember in default workspace');
     }
 
     const namespace = await this.k8sNamespace.findOne(id);
@@ -161,8 +193,12 @@ export default class WorkspaceApi {
     name: string,
     attributes: any
   }): Promise<string> => {
+    if (!this.enableWorkspace) {
+      throw new Error(`workspace not enabled`);
+    }
+
     if (workspaceId === this.defaultWorkspace.id) {
-      throw new Error('you cannot update default workspace');
+      throw new Error('you cannot createGroup in default workspace');
     }
 
     const namespace = await this.k8sNamespace.findOne(workspaceId);
@@ -176,8 +212,12 @@ export default class WorkspaceApi {
   }
 
   public listGroups = async (workspaceId: string): Promise<GroupRepresentation[]> => {
+    if (!this.enableWorkspace) {
+      throw new Error(`workspace not enabled`);
+    }
+
     if (workspaceId === this.defaultWorkspace.id) {
-      throw new Error('you cannot update default workspace');
+      throw new Error('you cannot listGroups in default workspace');
     }
 
     const namespace = await this.k8sNamespace.findOne(workspaceId);
