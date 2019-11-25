@@ -1,5 +1,5 @@
 import KcAdminClient from 'keycloak-admin';
-import { mapValues, isEmpty, get, isUndefined, isNil, reduce, isPlainObject } from 'lodash';
+import { mapValues, isEmpty, get, isUndefined, isNil, reduce, isPlainObject, isNull } from 'lodash';
 import { unflatten, flatten } from 'flat';
 import { createDetaultSystemSettings } from './constant';
 import { Context } from './interface';
@@ -144,7 +144,7 @@ export const update = async (root, args, context) => {
       displayNameHtml: get(payload, 'org.logo.url') ?
         // tslint:disable-next-line:max-line-length
         `<img src="${get(payload, 'org.logo.url')}" alt="${get(payload, 'org.name') ? get(payload, 'org.name') : ''}" width="500" >` :
-        undefined
+        ''
     });
   }
 
