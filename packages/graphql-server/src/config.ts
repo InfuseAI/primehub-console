@@ -44,7 +44,7 @@ export interface Config {
   keycloakTimeout: number;
 
   appPrefix?: string;
-  cmsAppPrefix?: string;
+  datasetEndpoint?: string;
   apolloTracing: boolean;
   graphqlPlayground: boolean;
 
@@ -95,6 +95,19 @@ const sanitizePath = (path: string) => {
   return path;
 };
 
+const sanitizeUrl = (url: string, name: string) => {
+  if (isEmpty(url)) {
+    return null;
+  }
+
+  if (!url.startsWith('http') || !url.startsWith('https')) {
+    throw new Error(`env ${name} should start with http|https`);
+  }
+
+  url = url.endsWith('/') ? url.slice(0, -1) : url;
+  return url;
+};
+
 export const createConfig = (): Config => {
   const envConfigs = pickBy({
     locale: process.env.CANNER_LOCALE,
@@ -118,7 +131,7 @@ export const createConfig = (): Config => {
     keycloakRetries: process.env.KC_OIDC_RETRIES,
     keycloakTimeout: process.env.KC_OIDC_TIMEOUT ? parseInt(process.env.KC_OIDC_TIMEOUT, 10) : undefined,
     appPrefix: sanitizePath(process.env.APP_PREFIX),
-    cmsAppPrefix: sanitizePath(process.env.CMS_APP_PREFIX),
+    datasetEndpoint: sanitizeUrl(process.env.DATASET_ENDPOINT, 'datasetEndpoint'),
     apolloTracing: process.env.APOLLO_TRACING,
     graphqlPlayground: process.env.GRAPHQL_PLAYGROUND,
     defaultUserVolumeCapacity: process.env.DEFAULT_USER_VOLUME_CAPACITY,
