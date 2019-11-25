@@ -45,7 +45,8 @@ export default class Watcher<T> {
     this.k8sCrdNamespace = k8sCrdNamespace;
     this.workspaceApi = new WorkspaceApi({
       defaultNamespace: k8sCrdNamespace,
-      kcAdminClient: keycloakAdmin
+      kcAdminClient: keycloakAdmin,
+      enableWorkspace: false
     });
     this.currentWorkspace = new CurrentWorkspace(
       this.workspaceApi, this.everyoneGroupId, true, defaultWorkspaceId, k8sCrdNamespace);
