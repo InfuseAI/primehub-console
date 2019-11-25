@@ -1,6 +1,6 @@
 /** @jsx builder */
 
-import builder from 'canner-script';
+import builder, {Block, Row, Col} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 
 export const groupColumns = [{
@@ -94,4 +94,47 @@ exports.CustomizedStringSelectWithCheckbox = ({attributes}) => (
     nullable
     packageName="../src/cms-components/customize-string-input_with_checkbox"
   />
+)
+
+exports.ImagePackages = ({attributes}) => (
+  <object
+    keyName="packages"
+    title="${buildImage.packages}"
+    validation={{
+      validator: (value, cb) => {
+        if (!value.apt && !value.pip && !value.conda) {
+          return cb('At least one of packages is not empty');
+        }
+      }
+    }}
+  >
+    <Block>
+      <Row gutter={16}>
+        <Col span={8}>
+          <string
+            keyName="apt"
+            title="${buildImage.apt}"
+            uiParams={attributes.apt || {}}
+            packageName="../src/cms-components/customize-string-textarea"
+          />
+        </Col>
+        <Col span={8}>
+          <string
+            keyName="pip"
+            title="${buildImage.pip}"
+            uiParams={attributes.pip || {}}
+            packageName="../src/cms-components/customize-string-textarea"
+          />
+        </Col>
+        <Col span={8}>
+          <string
+            keyName="conda"
+            title="${buildImage.conda}"
+            uiParams={attributes.conda || {}}
+            packageName="../src/cms-components/customize-string-textarea"
+          />
+        </Col>
+      </Row>
+    </Block>
+  </object>
 )

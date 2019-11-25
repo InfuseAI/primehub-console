@@ -15,16 +15,17 @@ export interface Metadata {
   annotations?: any;
 }
 
-export interface Item<T> {
+export interface Item<SpecType, StatusType = any> {
   metadata: Metadata;
-  spec: T;
+  spec: SpecType;
+  status: StatusType;
 }
 
 // constants
 // WATCH_TIMEOUT_SECONDS: 10 minutes
 const WATCH_TIMEOUT_SECONDS = 60 * 10;
 
-export default class CustomResource<SpecType = any> {
+export default class CustomResource<SpecType = any, StatusType = any> {
   private kubeClient: any;
   private watchApi: Watch;
   private crd: any;
@@ -45,30 +46,30 @@ export default class CustomResource<SpecType = any> {
     return this.crd.spec && this.crd.spec.names && this.crd.spec.names.plural;
   }
 
-  public get = async (name: string): Promise<Item<SpecType>> => {
+  public get = async (name: string): Promise<Item<SpecType, StatusType>> => {
     const {body} = await this.resource(name).get();
-    return pick(body, ['metadata', 'spec']) as Item<SpecType>;
+    return pick(body, ['metadata', 'spec', 'status']) as Item<SpecType, StatusType>;
   }
 
-  public list = async (): Promise<Array<Item<SpecType>>> => {
-    const {body} = await this.resource.get();
-    return body.items.map(item => pick(item, ['metadata', 'spec']));
+  public list = async (qs?: any): Promise<Array<Item<SpecType, StatusType>>> => {
+    const {body} = await this.resource.get({qs});
+    return body.items.map(item => pick(item, ['metadata', 'spec', 'status']));
   }
 
-  public async create(metadata: Metadata, spec: SpecType): Promise<Item<SpecType>> {
+  public async create(metadata: Metadata, spec: SpecType): Promise<Item<SpecType, StatusType>> {
     const object = this.prepareCustomObject({metadata, spec});
     const {body} = await this.resource.post({body: object});
-    return pick(body, ['metadata', 'spec']) as Item<SpecType>;
+    return pick(body, ['metadata', 'spec', 'status']) as Item<SpecType>;
   }
 
   public async patch(
-    name: string, {metadata, spec}: {metadata?: Metadata, spec: SpecType}): Promise<Item<SpecType>> {
+    name: string, {metadata, spec}: {metadata?: Metadata, spec: SpecType}): Promise<Item<SpecType, StatusType>> {
     const object = this.prepareCustomObject({metadata, spec});
     const {body} = await this.resource(name).patch({
       body: object,
       headers: { 'content-type': 'application/merge-patch+json' }
     });
-    return pick(body, ['metadata', 'spec']) as Item<SpecType>;
+    return pick(body, ['metadata', 'spec', 'status']) as Item<SpecType>;
   }
 
   public async del(name: string): Promise<void> {

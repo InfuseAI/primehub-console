@@ -1,5 +1,5 @@
 /** @jsx builder */
-import builder from 'canner-script';
+import builder, {Body} from 'canner-script';
 import System from './system.schema';
 import Idp from './idp/identityProvider.schema';
 import UserFederation from './userFederation.schema';
@@ -10,9 +10,12 @@ import Image from './image.schema';
 import Dataset from './dataset.schema';
 import Announcement from './announcement.schema';
 import Secret from './secret.schema';
+import BuildImage from './buildImage.schema';
+import BuildImageJob from './buildImageJob.schema';
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {createFakeData} from 'canner-helpers';
 import {dict, graphqlClient, imageStorage} from './utils';
+import BuildImageJobBody from '../src/cms-layouts/buildImageJobBody';
 
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
@@ -23,6 +26,10 @@ const schema = (
     <Group/>
     <InstanceType/>
     <Image/>
+    <BuildImage />
+    <Body component={BuildImageJobBody}>
+      <BuildImageJob />
+    </Body>
     <Dataset/>
     <Secret />
     {/* <Announcement /> */}

@@ -3,7 +3,7 @@ import firebase from 'firebase';
 import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlClient';
 import {ImgurStorage} from '@canner/storage';
 import {FormattedMessage} from 'react-intl';
-import {Tag, Button, Icon} from 'antd';
+import {Tag, Button, Icon, Tooltip} from 'antd';
 
 exports.graphqlClient = new GraphqlClient({
   uri: window.graphqlEndpoint,
@@ -32,6 +32,75 @@ exports.renderUploadServerLink = function(text, record) {
     return <a href={text} target="_blank">
       Link
     </a>
+  }
+  return '-';
+}
+
+class CopyableText extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tooltipVisible: false
+    }
+  }
+
+  copy = () => {
+    this.textRef.select();
+
+    try {
+      let status = document.execCommand("Copy");
+      if(!status) {
+        console.log('Cannot copy text');
+        this.setState({
+          tooltipVisible: false
+        });
+      } else {
+        this.setState({
+          tooltipVisible: true
+        });
+        setTimeout(() => {
+          this.setState({
+            tooltipVisible: false
+          });
+        }, 1000)
+        
+      }
+    } catch(err) {
+      this.setState({
+        tooltipVisible: false
+      });
+      console.log('Could not copy');
+    }
+  }
+
+  render() {
+    const {children} = this.props;
+    const {tooltipVisible} = this.state;
+    return (
+      <>
+        <input
+          style={{
+            outline: 'none',
+            border: 0,
+            background: 'transparent',
+            width: '250px'
+          }}
+          value={children}
+          ref={text => this.textRef = text}
+        />
+        <Tooltip placement="top" title={"copied"} visible={tooltipVisible}>
+          <Button icon="copy" onClick={this.copy}></Button>
+        </Tooltip>
+      </>
+    )
+  }
+}
+
+exports.renderCopyableText = function(text, record) {
+  if (text) {
+    return <CopyableText>
+      {text}
+    </CopyableText>
   }
   return '-';
 }
@@ -332,7 +401,35 @@ exports.dict = {
     // image
     'images.urlForGpu': 'Specific container image url for GPU',
     'images.useImagePullSecret': 'Use Image Pull Secret',
-    'image.useImagePullSecret.component.select.placeholder': 'Select Secret'
+    'image.useImagePullSecret.component.select.placeholder': 'Select Secret',
+
+    // buildImage
+    'buildImage': 'Build Image',
+    'buildImage.tabs.info': 'Info',
+    'buildImage.tabs.jobs': 'Jobs',
+    'buildImage.name': 'Name',
+    'buildImage.status': 'Status',
+    'buildImage.image': 'Image',
+    'buildImage.baseImage': 'Base Image',
+    'buildImage.useImagePullSecret': 'Use Image PullSecret',
+    'buildImage.packages': 'Packages',
+    'buildImage.apt': 'APT',
+    'buildImage.pip': 'Pip',
+    'buildImage.conda': 'Conda',
+    'buildImage.packages.apt.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
+    'buildImage.packages.pip.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
+    'buildImage.packages.conda.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
+    'buildImageJob': 'Build Image Job',
+    'buildImageJob.baseImage': 'Base Image',
+    'buildImageJob.targetImage': 'Image',
+    'buildImageJob.imageRevision': 'Image Revision',
+    'buildImageJob.updateTime': 'Updated At',
+    'buildImageJob.packages': 'Packages',
+    'buildImageJob.status': 'Status',
+    'buildImageJob.apt': 'APT',
+    'buildImageJob.pip': 'Pip',
+    'buildImageJob.conda': 'Conda',
+    'buildImageJob.logEndpoint': 'Logs'
   },
   zh: {
     // common
@@ -527,6 +624,34 @@ exports.dict = {
     // image
     'images.urlForGpu': 'Specific container image url for GPU',
     'images.useImagePullSecret': 'Use Image Pull Secret',
-    'image.useImagePullSecret.component.select.placeholder': 'Select Secret'
+    'image.useImagePullSecret.component.select.placeholder': 'Select Secret',
+
+    // buildImage
+    'buildImage': 'Build Image',
+    'buildImage.tabs.info': 'Info',
+    'buildImage.tabs.jobs': 'Jobs',
+    'buildImage.name': 'Name',
+    'buildImage.status': 'Status',
+    'buildImage.image': 'Image',
+    'buildImage.baseImage': 'Base Image',
+    'buildImage.useImagePullSecret': 'Use Image PullSecret',
+    'buildImage.packages': 'Packages',
+    'buildImage.apt': 'APT',
+    'buildImage.pip': 'Pip',
+    'buildImage.conda': 'Conda',
+    'buildImage.packages.apt.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
+    'buildImage.packages.pip.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
+    'buildImage.packages.conda.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
+    'buildImageJob': 'Build Image Job',
+    'buildImageJob.baseImage': 'Base Image',
+    'buildImageJob.targetImage': 'Image',
+    'buildImageJob.imageRevision': 'Image Revision',
+    'buildImageJob.updateTime': 'Updated At',
+    'buildImageJob.packages': 'Packages',
+    'buildImageJob.status': 'Status',
+    'buildImageJob.apt': 'APT',
+    'buildImageJob.pip': 'Pip',
+    'buildImageJob.conda': 'Conda',
+    'buildImageJob.logEndpoint': 'Logs'
   }
 }
