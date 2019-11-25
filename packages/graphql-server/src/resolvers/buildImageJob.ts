@@ -32,7 +32,7 @@ export const transform = (item: Item<ImageSpecJobSpec, ImageSpecJobStatus>, name
     baseImage: item.spec.baseImage,
     // tslint:disable-next-line:max-line-length
     imageRevision: `${get(item, ['metadata', 'labels', IMAGE_SPEC_JOB_NAME_LABEL])}:${get(item, ['metadata', 'annotations', IMAGE_SPEC_JOB_HASH_ANNOTATION])}`,
-    targetImage: item.spec.targetImage,
+    targetImage: `${item.spec.repoPrefix}/${item.spec.targetImage}`,
     useImagePullSecret: item.spec.pullSecret,
     packages: {
       apt: stringifyPackageField(get(item, 'spec.packages.apt')),

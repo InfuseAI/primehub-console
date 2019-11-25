@@ -100,6 +100,7 @@ export interface ImageSpecJobSpec {
     conda?: string[];
   };
   targetImage?: string;
+  repoPrefix?: string;
   // iso8601
   updateTime?: string;
 }
