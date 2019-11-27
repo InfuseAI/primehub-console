@@ -104,7 +104,7 @@ const sanitizeUrl = (url: string, name: string) => {
     return null;
   }
 
-  if (!url.startsWith('http') || !url.startsWith('https')) {
+  if (!url.startsWith('http') && !url.startsWith('https')) {
     throw new Error(`env ${name} should start with http|https`);
   }
 
