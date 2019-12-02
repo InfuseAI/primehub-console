@@ -76,22 +76,31 @@ export default () => (
             rows: 5,
             cols: 30,
             placeholderTemplate: 'buildImage.packages.apt.placeholder',
-            minlength: 10,
-            maxlength: 20
+            validator: (value, cb) => {
+              if (value.match(/[;|#\"'`"]/)) {
+                return cb(`Invalid characters: ;, |, #, \\, ", ', \``);
+              }
+            }
           }}
           pip={{
             rows: 5,
             cols: 30,
             placeholderTemplate: 'buildImage.packages.pip.placeholder',
-            minlength: 10,
-            maxlength: 20
+            validator: (value, cb) => {
+              if (value.match(/[;|#\"'`"]/)) {
+                return cb(`Invalid characters: ;, |, #, \\, ", ', \``);
+              }
+            }
           }}
           conda={{
             rows: 5,
             cols: 30,
             placeholderTemplate: 'buildImage.packages.conda.placeholder',
-            minlength: 10,
-            maxlength: 20
+            validator: (value, cb) => {
+              if (value.match(/[;|#\"'`"]/)) {
+                return cb(`Invalid characters: ;, |, #, \\, ", ', \``);
+              }
+            }
           }}
         />
       </Default>

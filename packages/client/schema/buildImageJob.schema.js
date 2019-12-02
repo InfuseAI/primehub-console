@@ -31,24 +31,33 @@ export default () => (
             cols: 30,
             disabled: true,
             placeholderTemplate: 'buildImage.packages.apt.placeholder',
-            minlength: 10,
-            maxlength: 20
+            validator: (value, cb) => {
+              if (value.match(/[;|#\"'`"]/)) {
+                return cb(`Invalid characters: ;, |, #, \\, ", ', \``);
+              }
+            }
           }}
           pip={{
             rows: 5,
             cols: 30,
             disabled: true,
             placeholderTemplate: 'buildImage.packages.pip.placeholder',
-            minlength: 10,
-            maxlength: 20
+            validator: (value, cb) => {
+              if (value.match(/[;|#\"'`"]/)) {
+                return cb(`Invalid characters: ;, |, #, \\, ", ', \``);
+              }
+            }
           }}
           conda={{
             rows: 5,
             cols: 30,
             disabled: true,
             placeholderTemplate: 'buildImage.packages.conda.placeholder',
-            minlength: 10,
-            maxlength: 20
+            validator: (value, cb) => {
+              if (value.match(/[;|#\"'`"]/)) {
+                return cb(`Invalid characters: ;, |, #, \\, ", ', \``);
+              }
+            }
           }}
         />
         <string
