@@ -70,9 +70,21 @@ export default class CMSPage extends React.Component<Props, State> {
     hasError: false,
     deploying: false,
     dataChanged: {}
+  };
+
+  cannerRef: any;
+
+  constructor(props) {
+    super(props);
+    this.process(schema);
   }
 
-  cannerRef: any
+  process = (schema) => {
+    if (!(window as any).enableCustomImage) {
+      delete schema.schema.buildImage;
+      delete schema.schema.buildImageJob;
+    }
+  }
 
   componentDidUpdate(prevProps: Props) {
     const prevPathname = prevProps.location.pathname;
