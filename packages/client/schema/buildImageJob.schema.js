@@ -1,6 +1,7 @@
 /** @jsx builder */
 import builder, {Condition, Layout, Block, Row, Col, Default} from 'canner-script';
 import {Tag} from 'antd';
+import {InvalidChRrror} from './utils';
 import {ImagePackages} from './utils.schema';
 import BuilImageJobRefetchHelper from '../src/cms-layouts/buildImageJobRefetchHelper';
 
@@ -33,7 +34,7 @@ export default () => (
             placeholderTemplate: 'buildImage.packages.apt.placeholder',
             validator: (value, cb) => {
               if (value.match(/[;|#\"'`"]/)) {
-                return cb(`Invalid characters: ;, |, #, \\, ", ', \``);
+                return cb(InvalidChRrror);
               }
             }
           }}
@@ -44,7 +45,7 @@ export default () => (
             placeholderTemplate: 'buildImage.packages.pip.placeholder',
             validator: (value, cb) => {
               if (value.match(/[;|#\"'`"]/)) {
-                return cb(`Invalid characters: ;, |, #, \\, ", ', \``);
+                return cb(InvalidChRrror);
               }
             }
           }}
@@ -55,7 +56,7 @@ export default () => (
             placeholderTemplate: 'buildImage.packages.conda.placeholder',
             validator: (value, cb) => {
               if (value.match(/[;|#\"'`"]/)) {
-                return cb(`Invalid characters: ;, |, #, \\, ", ', \``);
+                return cb(InvalidChRrror);
               }
             }
           }}

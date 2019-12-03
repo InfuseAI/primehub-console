@@ -2,7 +2,7 @@
 import builder, {Condition, Layout, Tabs, Default, Row, Col, Block} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 import {Tag} from 'antd';
-import {renderCopyableText} from './utils';
+import {renderCopyableText, InvalidChRrror} from './utils';
 import {CustomizedStringImagePullSecret, ImagePackages} from './utils.schema';
 import BuildImageTab from '../src/cms-layouts/buildImageTab';
 
@@ -78,7 +78,7 @@ export default () => (
             placeholderTemplate: 'buildImage.packages.apt.placeholder',
             validator: (value, cb) => {
               if (value.match(/[;|#\"'`"]/)) {
-                return cb(`Invalid characters: ;, |, #, \\, ", ', \``);
+                return cb(InvalidChRrror);
               }
             }
           }}
@@ -88,7 +88,7 @@ export default () => (
             placeholderTemplate: 'buildImage.packages.pip.placeholder',
             validator: (value, cb) => {
               if (value.match(/[;|#\"'`"]/)) {
-                return cb(`Invalid characters: ;, |, #, \\, ", ', \``);
+                return cb(InvalidChRrror);
               }
             }
           }}
@@ -98,7 +98,7 @@ export default () => (
             placeholderTemplate: 'buildImage.packages.conda.placeholder',
             validator: (value, cb) => {
               if (value.match(/[;|#\"'`"]/)) {
-                return cb(`Invalid characters: ;, |, #, \\, ", ', \``);
+                return cb(InvalidChRrror);
               }
             }
           }}
