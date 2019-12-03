@@ -72,6 +72,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.state.graphqlEndpoint = config.graphqlEndpoint;
     ctx.state.disableMode = config.readOnlyOnInstanceTypeAndImage;
     ctx.state.enableDatasetUpload = config.enableDatasetUpload;
+    ctx.state.enableCustomImage = config.enableCustomImage;
 
     // referrer
     const referrer = `${config.cmsHost}${ctx.path}`;
