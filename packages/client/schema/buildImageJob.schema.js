@@ -33,7 +33,7 @@ export default () => (
             disabled: true,
             placeholderTemplate: 'buildImage.packages.apt.placeholder',
             validator: (value, cb) => {
-              if (value.match(/[;|#\"'`"]/)) {
+              if (value && value.match(/[;|#\"'`"]/)) {
                 return cb(InvalidChRrror);
               }
             }
@@ -44,7 +44,7 @@ export default () => (
             disabled: true,
             placeholderTemplate: 'buildImage.packages.pip.placeholder',
             validator: (value, cb) => {
-              if (value.match(/[;|#\"'`"]/)) {
+              if (value && value.match(/[;|#\"'`"]/)) {
                 return cb(InvalidChRrror);
               }
             }
@@ -55,7 +55,7 @@ export default () => (
             disabled: true,
             placeholderTemplate: 'buildImage.packages.conda.placeholder',
             validator: (value, cb) => {
-              if (value.match(/[;|#\"'`"]/)) {
+              if (value && value.match(/[;|#\"'`"]/)) {
                 return cb(InvalidChRrror);
               }
             }

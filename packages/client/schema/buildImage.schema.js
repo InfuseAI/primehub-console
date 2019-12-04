@@ -77,7 +77,7 @@ export default () => (
             cols: 30,
             placeholderTemplate: 'buildImage.packages.apt.placeholder',
             validator: (value, cb) => {
-              if (value.match(/[;|#\"'`"]/)) {
+              if (value && value.match(/[;|#\"'`"]/)) {
                 return cb(InvalidChRrror);
               }
             }
@@ -87,7 +87,7 @@ export default () => (
             cols: 30,
             placeholderTemplate: 'buildImage.packages.pip.placeholder',
             validator: (value, cb) => {
-              if (value.match(/[;|#\"'`"]/)) {
+              if (value && value.match(/[;|#\"'`"]/)) {
                 return cb(InvalidChRrror);
               }
             }
@@ -97,7 +97,7 @@ export default () => (
             cols: 30,
             placeholderTemplate: 'buildImage.packages.conda.placeholder',
             validator: (value, cb) => {
-              if (value.match(/[;|#\"'`"]/)) {
+              if (value && value.match(/[;|#\"'`"]/)) {
                 return cb(InvalidChRrror);
               }
             }
