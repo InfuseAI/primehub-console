@@ -2,7 +2,7 @@
 import builder, {Condition, Layout, Tabs, Default, Row, Col, Block} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 import {Tag} from 'antd';
-import {renderCopyableText} from './utils';
+import {renderCopyableText, InvalidChRrror} from './utils';
 import {CustomizedStringImagePullSecret, ImagePackages} from './utils.schema';
 import BuildImageTab from '../src/cms-layouts/buildImageTab';
 
@@ -76,22 +76,31 @@ export default () => (
             rows: 5,
             cols: 30,
             placeholderTemplate: 'buildImage.packages.apt.placeholder',
-            minlength: 10,
-            maxlength: 20
+            validator: (value, cb) => {
+              if (value && value.match(/[;|#\"'`"]/)) {
+                return cb(InvalidChRrror);
+              }
+            }
           }}
           pip={{
             rows: 5,
             cols: 30,
             placeholderTemplate: 'buildImage.packages.pip.placeholder',
-            minlength: 10,
-            maxlength: 20
+            validator: (value, cb) => {
+              if (value && value.match(/[;|#\"'`"]/)) {
+                return cb(InvalidChRrror);
+              }
+            }
           }}
           conda={{
             rows: 5,
             cols: 30,
             placeholderTemplate: 'buildImage.packages.conda.placeholder',
-            minlength: 10,
-            maxlength: 20
+            validator: (value, cb) => {
+              if (value && value.match(/[;|#\"'`"]/)) {
+                return cb(InvalidChRrror);
+              }
+            }
           }}
         />
       </Default>

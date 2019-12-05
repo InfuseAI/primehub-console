@@ -181,6 +181,6 @@ export const typeResolvers = {
       await context.crdClient.imageSpecJobs.list({labelSelector: `${IMAGE_SPEC_JOB_NAME_LABEL}=${buildImageName}`});
     // tslint:disable-next-line:max-line-length
     const transformedJobs = (jobs || []).map(job => transformJob(job, context.namespace, context.graphqlHost, context.jobLogCtrl));
-    return orderBy(transformedJobs, 'updateDate', 'desc');
+    return orderBy(transformedJobs, 'updateTime', 'desc');
   }
 };

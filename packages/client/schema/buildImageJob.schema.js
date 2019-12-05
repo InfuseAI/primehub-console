@@ -1,6 +1,7 @@
 /** @jsx builder */
 import builder, {Condition, Layout, Block, Row, Col, Default} from 'canner-script';
 import {Tag} from 'antd';
+import {InvalidChRrror} from './utils';
 import {ImagePackages} from './utils.schema';
 import BuilImageJobRefetchHelper from '../src/cms-layouts/buildImageJobRefetchHelper';
 
@@ -31,24 +32,33 @@ export default () => (
             cols: 30,
             disabled: true,
             placeholderTemplate: 'buildImage.packages.apt.placeholder',
-            minlength: 10,
-            maxlength: 20
+            validator: (value, cb) => {
+              if (value && value.match(/[;|#\"'`"]/)) {
+                return cb(InvalidChRrror);
+              }
+            }
           }}
           pip={{
             rows: 5,
             cols: 30,
             disabled: true,
             placeholderTemplate: 'buildImage.packages.pip.placeholder',
-            minlength: 10,
-            maxlength: 20
+            validator: (value, cb) => {
+              if (value && value.match(/[;|#\"'`"]/)) {
+                return cb(InvalidChRrror);
+              }
+            }
           }}
           conda={{
             rows: 5,
             cols: 30,
             disabled: true,
             placeholderTemplate: 'buildImage.packages.conda.placeholder',
-            minlength: 10,
-            maxlength: 20
+            validator: (value, cb) => {
+              if (value && value.match(/[;|#\"'`"]/)) {
+                return cb(InvalidChRrror);
+              }
+            }
           }}
         />
         <string

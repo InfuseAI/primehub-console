@@ -5,6 +5,17 @@ import {ImgurStorage} from '@canner/storage';
 import {FormattedMessage} from 'react-intl';
 import {Tag, Button, Icon, Tooltip} from 'antd';
 
+exports.InvalidChRrror = <React.Fragment>
+  Invalid characters: &nbsp;
+  <Tag color="red">;</Tag>
+  <Tag color="red">|</Tag>
+  <Tag color="red">#</Tag>
+  <Tag color="red">\</Tag>
+  <Tag color="red">"</Tag>
+  <Tag color="red">'</Tag>
+  <Tag color="red">`</Tag>
+</React.Fragment>
+
 exports.graphqlClient = new GraphqlClient({
   uri: window.graphqlEndpoint,
   fetch: (uri, options) => {

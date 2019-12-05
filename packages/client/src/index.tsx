@@ -23,7 +23,6 @@ const locales = {
 (window as any).LOCALE = (window as any).LOCALE || 'en';
 (window as any).APP_PREFIX = (window as any).APP_PREFIX || '/';
 const locale = (window as any).LOCALE;
-
 /**
  * Background worker
  */
