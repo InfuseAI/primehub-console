@@ -116,6 +116,9 @@ exports.ImagePackages = ({attributes}) => (
             title="${buildImage.apt}"
             uiParams={attributes.apt || {}}
             packageName="../src/cms-components/customize-string-textarea"
+            validation={{
+              validator: attributes.apt.validator
+            }}
           />
         </Col>
         <Col span={8}>
@@ -124,6 +127,9 @@ exports.ImagePackages = ({attributes}) => (
             title="${buildImage.pip}"
             uiParams={attributes.pip || {}}
             packageName="../src/cms-components/customize-string-textarea"
+            validation={{
+              validator: attributes.pip.validator
+            }}
           />
         </Col>
         <Col span={8}>
@@ -132,6 +138,9 @@ exports.ImagePackages = ({attributes}) => (
             title="${buildImage.conda}"
             uiParams={attributes.conda || {}}
             packageName="../src/cms-components/customize-string-textarea"
+            validation={{
+              validator: attributes.conda.validator
+            }}
           />
         </Col>
       </Row>
