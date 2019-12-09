@@ -72,7 +72,7 @@ export default compose(
       return {
         variables: {
           where: {
-            group_in: props.groups.map(group => group.id)
+            groupId_in: props.groups.map(group => group.id)
           }
         },
       }

@@ -108,7 +108,7 @@ export default class JobList extends React.Component<Props> {
       ...jobsVariables,
       where: {
         ...jobsVariables.where,
-        group_in: selectedGroups,
+        groupId_in: selectedGroups,
         mine: submittedByMe,
       }
     };
@@ -161,7 +161,7 @@ export default class JobList extends React.Component<Props> {
         <Col span={6}>
           <Filter
             groups={groups}
-            selectedGroups={get(jobsVariables, 'where.group_in', [])}
+            selectedGroups={get(jobsVariables, 'where.groupId_in', [])}
             submittedByMe={get(jobsVariables, 'where.mine', false)}
             onChange={this.changeFilter}
           />
