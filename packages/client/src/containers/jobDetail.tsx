@@ -15,7 +15,7 @@ type Props = {
 }>;
 
 export const GET_PH_JOB = gql`
-  query phJob($where: PhJobWhereUniqueInput) {
+  query phJob($where: PhJobWhereUniqueInput!) {
     phJob(where: $where) {
       ...PhJobInfo
     }
