@@ -174,6 +174,13 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     });
   });
 
+  rootRouter.get('/job/:jobId', oidcCtrl.loggedIn, async ctx => {
+    await ctx.render('job', {
+      title: 'PrimeHub Job Submission',
+      staticPath
+    });
+  });
+
   // cms
   rootRouter.get('/cms', oidcCtrl.ensureAdmin, async ctx => {
     await ctx.render('cms', {title: 'PrimeHub', staticPath});

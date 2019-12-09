@@ -116,7 +116,8 @@ export interface PhJobSpec {
   cancel: boolean;
   command: string;
   displayName: string;
-  group: string;
+  groupId: string;
+  groupName: string;
   image: string;
   instanceType: string;
   userId: string;
@@ -197,7 +198,7 @@ export default class CrdClientImpl {
     this.phJobs = new CustomResource<PhJobSpec, PhJobStatus>(
       client,
       watch,
-      loadCrd('instance-type'),
+      loadCrd('phJob'),
       this.namespace
     );
     this.announcements = new CustomResource<AnnouncementSpec>(

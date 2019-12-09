@@ -5,10 +5,10 @@ metadata:
   name: phjobs.primehub.io
 spec:
   additionalPrinterColumns:
-  - JSONPath: .spec.user
+  - JSONPath: .spec.userName
     name: User
     type: string
-  - JSONPath: .spec.group
+  - JSONPath: .spec.groupName
     name: Group
     type: string
   - JSONPath: .status.phase
@@ -54,7 +54,9 @@ spec:
               description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
                 Important: Run "make" to regenerate code after modifying this file'
               type: string
-            group:
+            groupId:
+              type: string
+            groupName:
               type: string
             image:
               type: string
@@ -67,7 +69,7 @@ spec:
           required:
           - command
           - displayName
-          - group
+          - groupId
           - image
           - instanceType
           - userId

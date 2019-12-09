@@ -10,7 +10,8 @@ export interface PhJob {
   displayName: string;
   cancel: boolean;
   command: string;
-  group: string;
+  groupId: string;
+  groupName: string;
   image: string;
   instanceType: string;
   userId: string;
@@ -29,7 +30,8 @@ export const transform = (item: Item<PhJobSpec, PhJobStatus>, namespace: string,
     displayName: item.spec.displayName,
     cancel: item.spec.cancel,
     command: item.spec.command,
-    group: item.spec.group,
+    groupId: item.spec.groupId,
+    groupName: item.spec.groupName,
     image: item.spec.image,
     instanceType: item.spec.instanceType,
     userId: item.spec.userId,
@@ -48,7 +50,7 @@ export const transform = (item: Item<PhJobSpec, PhJobStatus>, namespace: string,
 
 // tslint:disable-next-line:max-line-length
 const listQuery = async (client: CustomResource<PhJobSpec>, where: any, namespace: string, graphqlHost: string, jobLogCtrl: JobLogCtrl, currentUserId: string): Promise<PhJob[]> => {
-  if (where.id) {
+  if (where && where.id) {
     const phJob = await client.get(where.id);
     return [transform(phJob, namespace, graphqlHost, jobLogCtrl)];
   }
@@ -56,8 +58,8 @@ const listQuery = async (client: CustomResource<PhJobSpec>, where: any, namespac
   const phJobs = await client.list();
   let transformedPhJobs = phJobs.map(job => transform(job, namespace, graphqlHost, jobLogCtrl));
 
-  if (where.mine) {
-    where.userId = currentUserId;
+  if (where && where.mine) {
+    where.userId_eq = currentUserId;
   }
 
   // sort by startTime

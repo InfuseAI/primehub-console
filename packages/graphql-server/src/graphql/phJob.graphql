@@ -5,7 +5,8 @@ type PhJob {
   displayName: String
   cancel: Boolean
   command: String
-  group: String
+  groupId: String
+  groupName: String
   image: String
   instanceType: String
   userId: String
@@ -40,7 +41,7 @@ input PhJobWhereUniqueInput {
 
 input PhJobWhereInput {
   id: ID
-  group_in: [String]
+  groupId_in: [String]
   mine: Boolean
 }
 

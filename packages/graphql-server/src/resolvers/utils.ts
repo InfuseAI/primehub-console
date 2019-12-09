@@ -107,6 +107,10 @@ export const filter = (rows: any[], where?: any) => {
       const fieldName = field.replace('_lt', '');
       const value = where[field];
       rows = rows.filter(row => row[fieldName] && row[fieldName] < value);
+    } else if (field.indexOf('_eq') >= 0) {
+      const fieldName = field.replace('_eq', '');
+      const value = where[field];
+      rows = rows.filter(row => row[fieldName] && row[fieldName] === value);
     }
   });
   return rows;
