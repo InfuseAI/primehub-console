@@ -70,7 +70,7 @@ type Props = {
 export default class JobList extends React.Component<Props> {
   componentDidUpdate(prevProps) {
     const {jobsRefetch, jobsVariables, groupsLoading, groupsError, groups} = this.props;
-    if (prevProps.groupsLoading && !groupsLoading && !groupsError && jobsVariables.first === 0) {
+    if (!groupsLoading && !groupsError && jobsVariables.first === 0) {
       jobsRefetch({
         where: {
           group_in: groups.map(group => group.id)
