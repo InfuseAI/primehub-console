@@ -152,6 +152,8 @@ export default class JobList extends React.Component<Props> {
             dataSource={jobsConnection.edges.map(edge => edge.node)}
             columns={columns}
             rowKey="id"
+            pagination={"test"}
+
           />
         </Col>
       </Row>

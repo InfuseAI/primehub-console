@@ -49,7 +49,10 @@ export const GET_PH_JOB_CONNECTION = gql`
         hasPreviousPage
       }
       edges {
-        ...PhJobInfo
+        cursor
+        node {
+          ...PhJobInfo
+        }
       }
     }
   }
@@ -57,8 +60,7 @@ export const GET_PH_JOB_CONNECTION = gql`
 `;
 
 const defaultVariables = {
-  first: 10,
-  where: {}
+  first: 0,
 };
 
 const job = {
@@ -87,20 +89,6 @@ const jobsConnection = {
   }]
 };
 
-const groups = [{
-  displayName: 'dev-group',
-  id: 'group1'
-}, {
-  displayName: 'dev-group2',
-  id: 'group2'
-}, {
-  displayName: 'dev-group3',
-  id: 'group3'
-}, {
-  displayName: 'dev-group4',
-  id: 'group4'
-}];
-
 type Props = {
   getPhJobConnection: any;
   getGroups: any;
@@ -118,7 +106,7 @@ class JobListContainer extends React.Component<Props> {
         jobsRefetch={getPhJobConnection.refetch}
         groupsLoading={getGroups.loading}
         groupsError={getGroups.error}
-        groups={getGroups.groups || groups}
+        groups={getGroups.groups || []}
       />
     );
   }

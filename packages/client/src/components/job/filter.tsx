@@ -55,10 +55,14 @@ export default class Filter extends React.Component<Props, State> {
         <Title>
           Filter by Group
         </Title>
-        <GroupFilter
-          groups={groups}
-          onChange={this.handleSelectedGroupsChange}
-        />
+        {
+          groups.length && (
+            <GroupFilter
+              groups={groups}
+              onChange={this.handleSelectedGroupsChange}
+            />
+          ) 
+        }
         <Title>
           Filter by Submitted
         </Title>
