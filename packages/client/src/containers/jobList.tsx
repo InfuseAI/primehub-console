@@ -69,35 +69,9 @@ const defaultVariables = {
   first: 0,
 };
 
-const job = {
-  id: 'y23456',
-  displayName: 'train_123 model by using yyy_pretrained_model',
-  cancel: false,
-  command: 'command',
-  group: 'dev-group',
-  userId: 'userId',
-  userName: 'userName',
-  phase: Phase.Succedded,
-  reasion: 'resione',
-  startTime: new Date().toString(),
-  finsihTime: new Date().toString(),
-  logEndpoint: '/'
-};
-
-const jobsConnection = {
-  pageInfo: {
-    hasNextPage: true,
-    hasPreviousPage: true
-  },
-  edges: [{
-    cursor: 'id',
-    node: job
-  }]
-};
-
 type Props = {
   getPhJobConnection: any;
-  getGroups: any;
+  getMyGroups: any;
 }
 
 class JobListContainer extends React.Component<Props> {
@@ -107,7 +81,7 @@ class JobListContainer extends React.Component<Props> {
       <JobList
         jobsLoading={getPhJobConnection.loading}
         jobsError={getPhJobConnection.error}
-        jobsConnection={getPhJobConnection.phJobsConnection || jobsConnection}
+        jobsConnection={getPhJobConnection.phJobsConnection || {pageInfo: {}, edges: []}}
         jobsVariables={getPhJobConnection.variables}
         jobsRefetch={getPhJobConnection.refetch}
         groupsLoading={getMyGroups.loading}

@@ -23,21 +23,6 @@ export const GET_PH_JOB = gql`
   ${PhJobFragement}
 `;
 
-const job = {
-  id: 'y23456',
-  displayName: 'train_123 model by using yyy_pretrained_model',
-  cancel: false,
-  command: 'command',
-  group: 'dev-group',
-  userId: 'userId',
-  userName: 'userName',
-  phase: Phase.Succedded,
-  reasion: 'resione',
-  startTime: new Date().toString(),
-  finishTime: new Date().toString(),
-  logEndpoint: '/'
-}
-
 class JobDetailContainer extends React.Component<Props> {
   render() {
     const {getPhJob, history} = this.props;
@@ -53,7 +38,7 @@ class JobDetailContainer extends React.Component<Props> {
           Back
         </Button>
         <JobDetail
-          job={job}
+          job={getPhJob.phJob}
         />
       </React.Fragment>
     );

@@ -18,13 +18,11 @@ type Props = {
 
 type State = {
   indeterminate: boolean;
-  selectAll: boolean
 }
 
 export default class GroupFilter extends React.Component<Props, State> {
   state = {
     indeterminate: false,
-    selectAll: false
   };
 
   onChange = selectedGroups => {
@@ -32,7 +30,6 @@ export default class GroupFilter extends React.Component<Props, State> {
     onChange(selectedGroups);
     this.setState({
       indeterminate: !!selectedGroups.length && selectedGroups.length < groups.length,
-      selectAll: selectedGroups.length === groups.length
     });
   };
 
@@ -42,14 +39,12 @@ export default class GroupFilter extends React.Component<Props, State> {
     onChange(selectedGroups);
     this.setState({
       indeterminate: false,
-      selectAll: e.target.checked,
     });
   };
 
   render() {
     const {
       indeterminate,
-      selectAll
     } = this.state;
     const {
       groups,
@@ -61,7 +56,7 @@ export default class GroupFilter extends React.Component<Props, State> {
           <Checkbox
             indeterminate={indeterminate}
             onChange={this.onSelectAllChange}
-            checked={selectAll}
+            checked={selectedGroups.length === groups.length}
           >
             Select all
           </Checkbox>
