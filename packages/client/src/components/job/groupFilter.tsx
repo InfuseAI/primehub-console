@@ -26,6 +26,12 @@ export default class GroupFilter extends React.Component<Props, State> {
     selectedGroups: []
   };
 
+  componentDidMount() {
+    const {groups} = this.props;
+    const selectedGroups = groups.map(group => group.id);
+    this.onChange(selectedGroups);
+  }
+
   onChange = selectedGroups => {
     const {groups, onChange} = this.props;
     onChange(selectedGroups);
