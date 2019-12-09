@@ -80,7 +80,9 @@ export default class JobList extends React.Component<Props> {
     const newVariables = {
       where: jobsVariables.where,
       after,
-      first: 10
+      first: 10,
+      last: undefined,
+      before: undefined
     };
     jobsRefetch(newVariables);
   }
@@ -91,7 +93,9 @@ export default class JobList extends React.Component<Props> {
     const newVariables = {
       where: jobsVariables.where,
       before,
-      last: 10
+      last: 10,
+      first: undefined,
+      after: undefined,
     };
     jobsRefetch(newVariables);
   }
