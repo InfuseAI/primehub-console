@@ -44,7 +44,7 @@ export const GET_GROUPS = gql`
 export const GET_PH_JOB_CONNECTION = gql`
   query phJobsConnection($where: PhJobWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
     phJobsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
-      pagInfo {
+      pageInfo {
         hasNextPage
         hasPreviousPage
       }

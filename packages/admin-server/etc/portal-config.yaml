@@ -2,6 +2,8 @@ services:
   - name: JupyterHub
     uri: "http://localhost:3000/cms"
     image: ""
+  - name: Job
+    uri: "http://localhost:3000/job"
   - name: GitLab
     uri: "https://gitlab.com"
   - name: Maintenance Notebook

@@ -172,15 +172,15 @@ type Query {
   ): BuildImageJobConnection!
 
   """PhJob"""
-  PhJob(where: PhJobWhereUniqueInput!): PhJob!
-  PhJobs(
+  phJob(where: PhJobWhereUniqueInput!): PhJob!
+  phJobs(
     where: PhJobWhereInput
     before: String
     after: String
     first: Int
     last: Int
   ): [PhJob]!
-  PhJobsConnection(
+  phJobsConnection(
     where: PhJobWhereInput
     before: String
     after: String
