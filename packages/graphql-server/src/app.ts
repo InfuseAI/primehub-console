@@ -20,6 +20,7 @@ import * as group from './resolvers/group';
 import * as secret from './resolvers/secret';
 import * as buildImage from './resolvers/buildImage';
 import * as buildImageJob from './resolvers/buildImageJob';
+import * as phJob from './resolvers/phJob';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset, regenerateUploadSecret} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
@@ -85,6 +86,9 @@ const resolvers = {
     buildImageJob: buildImageJob.queryOne,
     buildImageJobs: buildImageJob.query,
     buildImageJobsConnection: buildImageJob.connectionQuery,
+    phJob: phJob.queryOne,
+    phJobs: phJob.query,
+    phJobsConnection: phJob.connectionQuery,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),

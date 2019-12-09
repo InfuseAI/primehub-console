@@ -6,7 +6,8 @@
 # import Announcement, AnnouncementConnection, AnnouncementWhereInput, AnnouncementWhereUniqueInput, AnnouncementCreateInput, AnnouncementUpdateInput from "./announcement.graphql"
 # import Dataset, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
-# import BuildImageJob, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql" 
+# import BuildImageJob, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql"
+# import PhJob, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput from "./phJob.graphql"
 
 scalar JSON
 
@@ -168,6 +169,23 @@ type Query {
     first: Int
     last: Int
   ): BuildImageJobConnection!
+
+  """PhJob"""
+  PhJob(where: PhJobWhereUniqueInput!): PhJob!
+  PhJobs(
+    where: PhJobWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [PhJob]!
+  PhJobsConnection(
+    where: PhJobWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): PhJobConnection!
 }
 
 type Mutation {

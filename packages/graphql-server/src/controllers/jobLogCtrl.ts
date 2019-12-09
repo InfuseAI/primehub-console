@@ -32,12 +32,28 @@ export class JobLogCtrl {
     ctx.body = this.getStream(namespace, podName);
   }
 
+  public streamPhJobLogs = async (ctx: ParameterizedContext) => {
+    const namespace = ctx.params.namespace || this.namespace;
+    const jobId = ctx.params.jobId;
+    const phjob = await this.crdClient.phJobs.get(jobId);
+    const podName = phjob.status.podName;
+    ctx.body = this.getStream(namespace, podName);
+  }
+
   public getRoute = () => {
     return '/logs/namespaces/:namespace/jobs/:jobId';
   }
 
+  public getPhJobRoute = () => {
+    return '/logs/namespaces/:namespace/phjobs/:jobId';
+  }
+
   public getEndpoint = (namespace: string, jobId: string) => {
     return `${this.appPrefix || ''}/logs/namespaces/${namespace}/jobs/${jobId}`;
+  }
+
+  public getPhJobEndpoint = (namespace: string, jobId: string) => {
+    return `${this.appPrefix || ''}/logs/namespaces/${namespace}/phjobs/${jobId}`;
   }
 
   private getStream = (namespace: string, podName: string): Stream => {
@@ -47,4 +63,5 @@ export class JobLogCtrl {
 
 export const mount = (rootRouter: Router, middleware: any, ctrl: JobLogCtrl) => {
   rootRouter.get(ctrl.getRoute(), middleware, ctrl.streamLogs);
+  rootRouter.get(ctrl.getPhJobRoute(), middleware, ctrl.streamPhJobLogs);
 };

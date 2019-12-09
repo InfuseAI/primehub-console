@@ -95,6 +95,10 @@ export const filter = (rows: any[], where?: any) => {
       const fieldName = field.replace('_contains', '');
       const value = where[field];
       rows = rows.filter(row => row[fieldName] && row[fieldName].includes && row[fieldName].includes(value));
+    } else if (field.indexOf('_in') >= 0) {
+      const fieldName = field.replace('_in', '');
+      const list: string[] = where[field] || [];
+      rows = rows.filter(row => row[fieldName] && list.indexOf(row[fieldName]) >= 0);
     } else if (field.indexOf('gt') >= 0) {
       const fieldName = field.replace('_gt', '');
       const value = where[field];
