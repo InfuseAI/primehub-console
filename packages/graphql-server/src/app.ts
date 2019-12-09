@@ -71,6 +71,7 @@ const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graph
 const resolvers = {
   Query: {
     system: system.query,
+    me: user.me,
     user: user.queryOne,
     users: user.query,
     usersConnection: user.connectionQuery,

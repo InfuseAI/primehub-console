@@ -16,6 +16,7 @@ type Query {
   system: System!
 
   """User"""
+  me: User
   user(where: UserWhereUniqueInput!): User
   users(
     where: UserWhereInput
