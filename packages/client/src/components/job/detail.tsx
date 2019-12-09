@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Button, Tabs, Form, Card} from 'antd';
 import styled from 'styled-components';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import Log from './log';
 import {getActionByPhase, Phase} from 'components/job/phase';
 
@@ -70,7 +70,7 @@ export default class Detail extends React.Component<Props> {
                 {finishMoment.format('DD/MM/YYYY HH:mm:ss')}
               </Form.Item>
               <Form.Item label="Duration" {...formItemLayout}>
-                {moment.duration(finishMoment.diff(startMoment)).minutes()} minutes
+                {computeDuration(startMoment, finishMoment)}
               </Form.Item>
             </Form>
           </TabPane>
@@ -81,4 +81,12 @@ export default class Detail extends React.Component<Props> {
       </Card>
     )
   }
+}
+
+function computeDuration(start: Moment, finish: Moment) {
+  const duration = moment.duration(finish.diff(start));
+  const hour = duration.hours();
+  const minutes = duration.minutes();
+  const seconds = duration.seconds();
+  return `${hour}:${minutes}:${seconds}`;
 }

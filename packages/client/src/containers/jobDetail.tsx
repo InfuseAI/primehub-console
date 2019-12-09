@@ -6,7 +6,6 @@ import {RouteComponentProps} from 'react-router-dom';
 import {compose} from 'recompose';
 import JobDetail from 'components/job/detail';
 import {PhJobFragement} from './jobList';
-import {Phase} from 'components/job/phase';
 
 type Props = {
   getPhJob: any;
