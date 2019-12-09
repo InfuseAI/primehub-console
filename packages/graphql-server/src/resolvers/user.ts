@@ -1,8 +1,22 @@
 import KcAdminClient from 'keycloak-admin';
 import {
-  find, isUndefined, first, get, every, isEmpty, reduce, uniq, flatten, isNaN, isNil } from 'lodash';
+  find,
+  isUndefined,
+  first,
+  get,
+  every,
+  isEmpty,
+  reduce,
+  uniq,
+  flatten,
+  isNaN,
+  isNil,
+  omit,
+  sortBy,
+  filter
+} from 'lodash';
 import {
-  mutateRelation, parseDiskQuota, stringifyDiskQuota
+  mutateRelation, parseDiskQuota, stringifyDiskQuota, paginate, extractPagination, toRelay
 } from './utils';
 import { Attributes } from './attr';
 import { Context } from './interface';
@@ -12,6 +26,8 @@ import BPromise from 'bluebird';
 import * as logger from '../logger';
 import { crd as annCrdResolver } from '../resolvers/announcement';
 import moment from 'moment';
+import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspace';
+import UserRepresentation from 'keycloak-admin/lib/defs/userRepresentation';
 
 /**
  * utils
@@ -91,8 +107,39 @@ const deassignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdm
   }
 };
 
+const injectWorkspace = (user: UserRepresentation, currentWorkspace: CurrentWorkspace) => {
+  return {
+    ...user,
+    currentWorkspace
+  };
+};
+
 /**
- * Query
+ * Workspace User Query
+ */
+
+const listWorkspaceUsers = async (
+  kcAdminClient: KcAdminClient, where: any, currentWorkspace: CurrentWorkspace, context: Context) => {
+  const whereWithoutWorkspace = omit(where, 'workspaceId');
+  const workspaceApi = context.workspaceApi;
+  let users = await workspaceApi.listMembers(currentWorkspace.getWorkspaceId());
+  users = sortBy(users, 'createdTimestamp');
+  users = filter(users, whereWithoutWorkspace) as any;
+  return users.map(user => injectWorkspace(user, currentWorkspace));
+};
+
+const workspaceUserQuery = async (root, args, context: Context, currentWorkspace: CurrentWorkspace) => {
+  const users = await listWorkspaceUsers(context.kcAdminClient, args && args.where, currentWorkspace, context);
+  return paginate(users, extractPagination(args));
+};
+
+const workspaceUserConnectionQuery = async (root, args, context: Context, currentWorkspace: CurrentWorkspace) => {
+  const users = await listWorkspaceUsers(context.kcAdminClient, args && args.where, currentWorkspace, context);
+  return toRelay(users, extractPagination(args));
+};
+
+/**
+ * Default Workspace User Query
  */
 
 const emptyResponse = {
@@ -105,7 +152,7 @@ const emptyResponse = {
   }
 };
 
-const listQuery = async (kcAdminClient: KcAdminClient, args: any): Promise<{
+const listQuery = async (kcAdminClient: KcAdminClient, args: any, currentWorkspace: CurrentWorkspace): Promise<{
   edges: any[],
   pageInfo: {
     hasNextPage: boolean,
@@ -190,7 +237,7 @@ const listQuery = async (kcAdminClient: KcAdminClient, args: any): Promise<{
   return {
     edges: users.map(row => ({
       cursor: row.id,
-      node: row
+      node: injectWorkspace(row, currentWorkspace)
     })),
     pageInfo: {
       hasNextPage,
@@ -202,20 +249,31 @@ const listQuery = async (kcAdminClient: KcAdminClient, args: any): Promise<{
 };
 
 export const query = async (root, args, context: Context) => {
-  const response = await listQuery(context.kcAdminClient, args);
+  const currentWorkspace = createInResolver(root, args, context);
+  if (!currentWorkspace.checkIsDefault) {
+    return workspaceUserQuery(root, args, context, currentWorkspace);
+  }
+
+  const response = await listQuery(context.kcAdminClient, args, currentWorkspace);
   return response.edges.map(edge => edge.node);
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
-  return listQuery(context.kcAdminClient, args);
+  const currentWorkspace = createInResolver(root, args, context);
+  if (!currentWorkspace.checkIsDefault) {
+    return workspaceUserConnectionQuery(root, args, context, currentWorkspace);
+  }
+
+  return listQuery(context.kcAdminClient, args, currentWorkspace);
 };
 
 export const queryOne = async (root, args, context: Context) => {
   const userId = args.where.id;
   const kcAdminClient = context.kcAdminClient;
+  const currentWorkspace = createInResolver(root, args, context);
   try {
     const user = await kcAdminClient.users.findOne({id: userId});
-    return user;
+    return user ? injectWorkspace(user, currentWorkspace) : null;
   } catch (e) {
     return null;
   }
@@ -227,6 +285,7 @@ export const queryOne = async (root, args, context: Context) => {
 
 export const create = async (root, args, context: Context) => {
   const kcAdminClient = context.kcAdminClient;
+  const currentWorkspace = createInResolver(root, args, context);
 
   // create resource
   // totp, createdTimestamp will be ignored
@@ -359,12 +418,13 @@ export const create = async (root, args, context: Context) => {
     id: user.id
   });
 
-  return user;
+  return injectWorkspace(user, currentWorkspace);
 };
 
 export const update = async (root, args, context: Context) => {
   const userId = args.where.id;
   const kcAdminClient = context.kcAdminClient;
+  const currentWorkspace = createInResolver(root, args, context);
 
   // update resource
   const payload = args.data;
@@ -479,10 +539,11 @@ export const update = async (root, args, context: Context) => {
     id: user.id
   });
 
-  return user;
+  return injectWorkspace(user, currentWorkspace);
 };
 
 export const destroy = async (root, args, context: Context) => {
+  const currentWorkspace = createInResolver(root, args, context);
   const userId = args.where.id;
   const kcAdminClient = context.kcAdminClient;
   const user = await kcAdminClient.users.findOne({
@@ -499,7 +560,8 @@ export const destroy = async (root, args, context: Context) => {
     username: context.username,
     id: userId
   });
-  return user;
+
+  return injectWorkspace(user, currentWorkspace);
 };
 
 /**
@@ -645,8 +707,12 @@ export const typeResolvers = {
       const groups = await context.kcAdminClient.users.listGroups({
         id: parent.id
       });
-      return Promise.all(groups.map(async group => {
+      const fetchedGroups = await Promise.all(groups.map(async group => {
         return context.kcAdminClient.groups.findOne({id: group.id});
+      }));
+      return fetchedGroups.map(group => ({
+        ...group,
+        currentWorkspace: parent.currentWorkspace
       }));
     } catch (err) {
       return [];
@@ -683,7 +749,8 @@ export const typeResolvers = {
         return [];
       }
 
-      const prefix = annCrdResolver.getPrefix();
+      const currentWorkspace = createInResolver(parent, args, context);
+      const prefix = annCrdResolver.getPrefix(currentWorkspace);
       const annMap = reduce(filteredAnn, (result, ann) => {
         result[`${prefix}${ann.id}`] = ann;
         return result;

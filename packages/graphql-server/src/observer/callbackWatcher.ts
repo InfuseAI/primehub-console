@@ -24,7 +24,6 @@ export default class CallbackWatcher<T> {
   }
 
   public watch = (options?: {rewatch?: boolean}) => {
-    const prefix = this.crd.getPrefix();
     logger.info({
       component: logger.components.watcher,
       type: 'START',

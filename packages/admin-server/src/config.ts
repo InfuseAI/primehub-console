@@ -37,6 +37,8 @@ export interface Config {
   readOnlyOnInstanceTypeAndImage?: boolean;
   enableDatasetUpload: boolean;
 
+  // workspace feature
+  enableWorkspace: boolean;
   // custom image
   enableCustomImage: boolean;
 }
@@ -59,6 +61,7 @@ const defaultConfigs = {
   portalConfigPath: resolve(__dirname, '../etc/portal-config.yaml'),
   readOnlyOnInstanceTypeAndImage: false,
   enableDatasetUpload: false,
+  enableWorkspace: false,
   enableCustomImage: false,
 };
 
@@ -96,6 +99,9 @@ export const createConfig = (): Config => {
     readOnlyOnInstanceTypeAndImage: process.env.READ_ONLY_ON_INSTANCE_TYPE_AND_IMAGE,
     enableDatasetUpload:
       process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD && process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD.toString() === 'true',
+    enableWorkspace:
+      process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE &&
+      process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE.toString() === 'true',
     enableCustomImage:
       process.env.PRIMEHUB_FEATURE_CUSTOM_IMAGE && process.env.PRIMEHUB_FEATURE_CUSTOM_IMAGE.toString() === 'true'
   });

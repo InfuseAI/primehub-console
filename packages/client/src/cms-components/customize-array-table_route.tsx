@@ -62,13 +62,20 @@ export default class ArrayBreadcrumb extends Component<Props> {
   }
 
   remove = (index) => {
-    const {onChange, deploy, refId, value, intl} = this.props;
+    const {onChange, deploy, refId, value, intl, keyName} = this.props;
+    let recordId = value[index].id;
+    let actualIndex = index;
+    if (keyName === 'workspace') {
+      const dataSource = value.filter(dataSource => !dataSource.isDefault);
+      recordId = dataSource[index].id;
+      actualIndex = value.findIndex(record => record.id === recordId);
+    }
     confirm({
       title: intl.formatMessage({ id: "array.table.delete.confirm" }),
       okType: 'danger',
       onOk() {
-        onChange(refId.child(index), 'delete').then(() => {
-          deploy(refId.getPathArr()[0], value[index].id);
+        onChange(refId.child(actualIndex), 'delete').then(() => {
+          deploy(refId.getPathArr()[0], recordId);
         });
       }
     });
@@ -116,9 +123,12 @@ export default class ArrayBreadcrumb extends Component<Props> {
       reset,
       deploy,
       refId,
-      onChange
+      onChange,
     } = this.props;
-
+    let dataSource = value;
+    if (keyName === 'workspace') {
+      dataSource = value.filter(ws => !ws.isDefault);
+    }
     const disabled = (keyName === 'image' || keyName === 'instanceType') && GLOBAL_DISABLE;
     const {
       selectedRowKeys,
@@ -258,7 +268,7 @@ export default class ArrayBreadcrumb extends Component<Props> {
         </ButtonGroup>
         <Table
           pagination={showPagination}
-          dataSource={value.map((datum, i) => {
+          dataSource={dataSource.map((datum, i) => {
             return {...datum, __index: i, key: datum.key || i};
           })}
           columns={newColumnsRender}

@@ -55,6 +55,9 @@ export interface Config {
   primehubGroupSc?: string;
   enableDatasetUpload: boolean;
 
+  // workspace feature
+  enableWorkspace: boolean;
+
   // graphql host
   graphqlHost: string;
 }
@@ -82,6 +85,7 @@ const defaultConfigs = {
   graphqlPlayground: true,
   defaultUserVolumeCapacity: '20G',
   enableDatasetUpload: false,
+  enableWorkspace: false,
   graphqlHost: 'http://localhost:3001'
 };
 
@@ -142,6 +146,9 @@ export const createConfig = (): Config => {
     primehubGroupSc: process.env.PRIMEHUB_GROUP_SC,
     enableDatasetUpload:
       process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD && process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD.toString() === 'true',
+    enableWorkspace:
+      process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE &&
+      process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE.toString() === 'true',
     graphqlHost: process.env.GRAPHQL_HOST
   });
 

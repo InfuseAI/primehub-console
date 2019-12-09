@@ -59,6 +59,12 @@ export default class UseImagePullSecret extends React.Component<Props, State> {
   }
 }
 
+function getWorkspaceId() {
+  const prefix = window.APP_PREFIX + 'cms/';
+  const path = window.location.pathname.substr(prefix.length);
+  return path.split('/')[0];
+}
+
 type SelectorProps = {
   value: string,
   disabled: boolean;
@@ -66,15 +72,19 @@ type SelectorProps = {
 }
 
 class Selector extends React.Component<SelectorProps> {
-  GET_SECRET = gql`
+  constructor(props) {
+    super(props);
+    const workspaceId = getWorkspaceId();
+    this.GET_SECRET = gql`
     {
-    secrets(where: {ifDockerConfigJson: true}) {
-      id
-      name
-      type
+      secrets(where: {ifDockerConfigJson: true, workspaceId: "${workspaceId}"}) {
+        id
+        name
+        type
+      }
     }
+    `
   }
-  `
 
   render() {
     const {value, onChange, disabled} = this.props;

@@ -90,7 +90,7 @@ describe('jupyterHub stress test', function() {
 
       await this.graphqlRequestWithAuth(`
         mutation($data: DatasetCreateInput!){
-          createDataset (data: $data) { id name groups {id name} }
+          createDataset (data: $data) { id }
         }`, {
           data: {
             name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
