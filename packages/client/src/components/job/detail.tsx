@@ -115,8 +115,13 @@ function computeDuration(start: Moment | '', finish: Moment | '') {
     return '-';
   }
   const duration = moment.duration(finish.diff(start));
-  const hour = duration.hours();
-  const minutes = duration.minutes();
-  const seconds = duration.seconds();
+  const hour = ensureFormat(duration.hours());
+  const minutes = ensureFormat(duration.minutes());
+  const seconds = ensureFormat(duration.seconds());
   return `${hour}:${minutes}:${seconds}`;
+}
+
+function ensureFormat(str) {
+  str = String(str);
+  return str.length === 1 ? `0${str}` : str;
 }

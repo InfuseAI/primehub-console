@@ -73,7 +73,8 @@ export default compose(
         variables: {
           where: {
             groupId_in: props.groups.map(group => group.id)
-          }
+          },
+          first: 10,
         },
       }
     },
