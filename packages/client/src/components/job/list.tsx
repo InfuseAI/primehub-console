@@ -89,9 +89,7 @@ export default class JobList extends React.Component<Props> {
         mine: submittedByMe,
       }
     };
-    jobsRefetch({
-      variables: newVariables
-    });
+    jobsRefetch(newVariables);
   }
 
   render() {
@@ -152,9 +150,16 @@ export default class JobList extends React.Component<Props> {
             dataSource={jobsConnection.edges.map(edge => edge.node)}
             columns={columns}
             rowKey="id"
-            pagination={"test"}
-
+            pagination={false}
           />
+          {/* <Pagination
+            hasNextPage={jobsConnection.pageInfo.hasNextpage}
+            hasPreviousPage={jobsConnection.pageInfo.hasPreviousPage}
+            first={jobsVariables.first}
+            last={jobsVariables.last}
+            before={jobsVariables.before}
+            after={jobsVariables.after}
+          /> */}
         </Col>
       </Row>
     )
