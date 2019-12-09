@@ -1,8 +1,9 @@
 import * as React from 'react';
-import {Button, Tabs, Form} from 'antd';
+import {Button, Tabs, Form, Card} from 'antd';
 import styled from 'styled-components';
-import {STATUS} from './list';
 import moment from 'moment';
+import Log from './log';
+import {getActionByPhase} from 'components/job/phase';
 
 const TabPane = Tabs.TabPane;
 
@@ -25,65 +26,62 @@ const formItemLayout = {
   },
 };
 
-export default class Detail extends React.Component {
-  render() {
-    const {match} = this.props;
+type Props = {
+  job: any;
+}
 
-    const job = {
-      id: 'y23456',
-      status: STATUS.SUCCEED,
-      name: 'train_123 model by using yyy_pretrained_model',
-      user: {
-        username: 'Alice'
-      },
-      group: {
-        displayName: 'dev-group'
-      },
-      duration: '0:05:13',
-      createTime: new Date().toString()
-    }
-    console.log(this.props)
+export default class Detail extends React.Component<Props> {
+  handleClick = () => {
+    const {
+      id
+    } = this.props.job;
+  }
+
+  render() {
+    const {job} = this.props;
+    const startMoment = moment(job.startTime);
+    const finishMoment = moment(job.finishTime);
     return (
-      <React.Fragment>
+      <Card>
         <TitleContainer>
           <Title>
             Job: {job.name}
           </Title>
-          <Button>
-            Cancel
+          <Button onClick={this.handleClick}>
+            {getActionByPhase(job.phase)}
           </Button>
         </TitleContainer>
         <Tabs>
           <TabPane key="information" tab="Information">
             <Form {...formItemLayout}>
               <Form.Item label="Status:">
-                Running
+                {job.phase}
               </Form.Item>
               <Form.Item label="Job ID:">
                 {job.id}
               </Form.Item>
               <Form.Item label="Job name">
-                {job.name}
+                {job.displayName}
               </Form.Item>
               <Form.Item label="User:">
-                {job.user.username}
-              </Form.Item>
-              <Form.Item label="Create Time:">
-                {moment(job.createTime).format('DD/MM/YYYY HH:mm:ss')}
+                {job.userName}
               </Form.Item>
               <Form.Item label="Start Time:">
-                {moment(job.createTime).format('DD/MM/YYYY HH:mm:ss')}
+                {startMoment.format('DD/MM/YYYY HH:mm:ss')}
+              </Form.Item>
+              <Form.Item label="Finish Time:">
+                {finishMoment.format('DD/MM/YYYY HH:mm:ss')}
               </Form.Item>
               <Form.Item label="Duration">
-                {job.duration}
+                {moment.duration(finishMoment.diff(startMoment)).minutes()} minutes
               </Form.Item>
             </Form>
           </TabPane>
           <TabPane key="logs" tab="Logs">
-            <div style={{background: 'black', color: 'white'}} />
+            <Log value={job.logEndpoint}/>
           </TabPane>
         </Tabs>
-      </React.Fragment>
+      </Card>
     )
   }
 }

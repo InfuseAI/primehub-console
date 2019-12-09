@@ -1,12 +1,15 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
+import {ApolloProvider} from 'react-apollo';
+import {genClient} from 'canner/lib/components/index';
+import schema from '../schema/index.schema.js';
 import {Layout, notification, Button} from 'antd';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import Header from 'components/header';
 import styled from 'styled-components';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
-import JobList from 'components/job/list';
-import JobDetail from 'components/job/detail';
+import JobListContainer from 'containers/jobList';
+import JobDetailContainer from 'containers/jobDetail';
 
 const PAGE_PADDING = 64;
 const HEADER_HEIGHT = 64;
@@ -17,6 +20,8 @@ const Content = styled(Layout.Content)`
   min-height: calc(100vh - 64px);
 `;
 
+const client = genClient(schema);
+
 class Job extends React.Component {
   render() {
     return (
@@ -24,16 +29,18 @@ class Job extends React.Component {
         <Header />
         <Content>
           <BrowserRouter>
-            <Switch>
-              <Route path="/job" exact>
-                <JobList/>
-              </Route>
-              <Route
-                path="/job/:jobId"
-                exact
-                component={JobDetail}
-              />
-            </Switch>
+            <ApolloProvider client={client}>
+              <Switch>
+                <Route path="/job" exact>
+                  <JobListContainer/>
+                </Route>
+                <Route
+                  path="/job/:jobId"
+                  exact
+                  component={JobDetailContainer}
+                />
+              </Switch>
+            </ApolloProvider>
           </BrowserRouter>
         </Content>
       </Layout>
