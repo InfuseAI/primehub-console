@@ -2,9 +2,8 @@ import * as React from 'react';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
-import {get} from 'lodash';
 import JobList from 'components/job/list';
-import {Phase} from 'components/job/phase';
+import {Group} from 'components/job/groupFilter';
 
 export const PhJobFragement = gql`
   fragment PhJobInfo on PhJob {
@@ -12,7 +11,8 @@ export const PhJobFragement = gql`
     displayName
     cancel
     command
-    group
+    groupId
+    groupName
     image
     instanceType
     userId
@@ -23,26 +23,6 @@ export const PhJobFragement = gql`
     finishTime
     logEndpoint
  }
-`
-
-export const GroupFragment = gql`
-  fragment GroupInfo on Group {
-    id
-    displayName
-    name
-  }
-`;
-
-export const GET_MY_GROUPS = gql`
-  query me {
-    me {
-      id
-      groups {
-        ...GroupInfo
-      }
-    }
-  }
-  ${GroupFragment}
 `
 
 export const GET_PH_JOB_CONNECTION = gql`
@@ -65,18 +45,14 @@ export const GET_PH_JOB_CONNECTION = gql`
   ${PhJobFragement}
 `;
 
-const defaultVariables = {
-  first: 0,
-};
-
 type Props = {
-  getPhJobConnection: any;
-  getMyGroups: any;
+  getPhJobConnection?: any;
+  groups: Array<Group>;
 }
 
 class JobListContainer extends React.Component<Props> {
   render() {
-    const {getPhJobConnection, getMyGroups} = this.props;
+    const {getPhJobConnection, groups} = this.props;
     return (
       <JobList
         jobsLoading={getPhJobConnection.loading}
@@ -84,9 +60,7 @@ class JobListContainer extends React.Component<Props> {
         jobsConnection={getPhJobConnection.phJobsConnection || {pageInfo: {}, edges: []}}
         jobsVariables={getPhJobConnection.variables}
         jobsRefetch={getPhJobConnection.refetch}
-        groupsLoading={getMyGroups.loading}
-        groupsError={getMyGroups.error}
-        groups={get(getMyGroups, 'me.groups', [])}
+        groups={groups}
       />
     );
   }
@@ -94,12 +68,15 @@ class JobListContainer extends React.Component<Props> {
 
 export default compose(
   graphql(GET_PH_JOB_CONNECTION, {
-    options: {
-      variables: defaultVariables,
+    options: (props: Props) => {
+      return {
+        variables: {
+          where: {
+            group_in: props.groups.map(group => group.id)
+          }
+        },
+      }
     },
     name: 'getPhJobConnection'
-  }),
-  graphql(GET_MY_GROUPS, {
-    name: 'getMyGroups'
   })
 )(JobListContainer)

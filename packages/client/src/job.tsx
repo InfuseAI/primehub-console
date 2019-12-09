@@ -8,7 +8,7 @@ import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import Header from 'components/header';
 import styled from 'styled-components';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
-import JobListContainer from 'containers/jobList';
+import JobContainer from 'containers/job';
 import JobDetailContainer from 'containers/jobDetail';
 
 const PAGE_PADDING = 64;
@@ -32,7 +32,7 @@ class Job extends React.Component {
             <ApolloProvider client={client}>
               <Switch>
                 <Route path="/job" exact>
-                  <JobListContainer/>
+                  <JobContainer/>
                 </Route>
                 <Route
                   path="/job/:jobId"

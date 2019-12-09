@@ -37,7 +37,7 @@ class JobDetailContainer extends React.Component<Props> {
           Back
         </Button>
         <JobDetail
-          job={getPhJob.phJob}
+          job={getPhJob.phJob || {id: 'test'}}
         />
       </React.Fragment>
     );

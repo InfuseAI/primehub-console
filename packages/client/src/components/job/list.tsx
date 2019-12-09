@@ -63,23 +63,9 @@ type Props = {
   jobsConnection: JobsConnection;
   jobsVariables: any;
   jobsRefetch: Function;
-  groupsLoading: boolean;
-  groupsError: any
 };
 
 export default class JobList extends React.Component<Props> {
-  componentDidUpdate(prevProps) {
-    const {jobsRefetch, jobsVariables, groupsLoading, groupsError, groups} = this.props;
-    if (!groupsLoading && !groupsError && jobsVariables.first === 0) {
-      jobsRefetch({
-        where: {
-          group_in: groups.map(group => group.id)
-        },
-        first: 10
-      });
-    }
-  }
-
   handleCancel = (id: string) => {
 
   }
@@ -146,7 +132,7 @@ export default class JobList extends React.Component<Props> {
       )
     }
     const columns = [{
-      title: 'Phase',
+      title: 'Status',
       dataIndex: 'phase',
       key: 'phase',
       render: text => startCase(text)
@@ -159,7 +145,7 @@ export default class JobList extends React.Component<Props> {
       dataIndex: 'userName'
     }, {
       title: 'Group',
-      dataIndex: 'group'
+      dataIndex: 'groupName'
     }, {
       title: 'Timing',
       dataIndex: 'createDate',

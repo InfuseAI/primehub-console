@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, Tabs, Form, Card} from 'antd';
+import {Button, Tabs, Form, Card, Input} from 'antd';
 import styled from 'styled-components';
 import moment, { Moment } from 'moment';
 import Log from './log';
@@ -30,14 +30,22 @@ type Props = {
   job: any;
 }
 
+const blockStyle = {
+  marginBottom: 36
+}
+
+const formItemStyle = {
+  marginBottom: 0
+}
+
 export default class Detail extends React.Component<Props> {
   handleClick = () => {
   }
 
   render() {
     const {job} = this.props;
-    const startMoment = moment(job.startTime);
-    const finishMoment = moment(job.finishTime);
+    const startTime = job.startTime ? moment(job.startTime) : '';
+    const finishTime = job.finishTime ? moment(job.finishTime) : '';
     return (
       <Card>
         <TitleContainer>
@@ -51,26 +59,45 @@ export default class Detail extends React.Component<Props> {
         <Tabs>
           <TabPane key="information" tab="Information">
             <Form>
-              <Form.Item label="Phase:" {...formItemLayout}>
+              <Form.Item style={blockStyle} label="Status:" {...formItemLayout}>
                 {job.phase}
               </Form.Item>
-              <Form.Item label="Job ID:" {...formItemLayout}>
+              <Form.Item  style={formItemStyle} label="Job ID:" {...formItemLayout}>
                 {job.id}
               </Form.Item>
-              <Form.Item label="Job name" {...formItemLayout}>
-                {job.displayName}
+              <Form.Item  style={formItemStyle} label="Job name" {...formItemLayout}>
+                {job.displayName || '-'}
               </Form.Item>
-              <Form.Item label="User:" {...formItemLayout}>
-                {job.userName}
+              <Form.Item  style={formItemStyle} label="User:" {...formItemLayout}>
+                {job.userName || '-'}
               </Form.Item>
-              <Form.Item label="Start Time:" {...formItemLayout}>
-                {startMoment.format('DD/MM/YYYY HH:mm:ss')}
+              <Form.Item  style={formItemStyle} label="Start Time:" {...formItemLayout}>
+                {startTime ? startTime.format('DD/MM/YYYY HH:mm:ss') : '-'}
               </Form.Item>
-              <Form.Item label="Finish Time:" {...formItemLayout}>
-                {finishMoment.format('DD/MM/YYYY HH:mm:ss')}
+              <Form.Item  style={formItemStyle} label="Finish Time:" {...formItemLayout}>
+                {finishTime ? finishTime.format('DD/MM/YYYY HH:mm:ss') : '-'}
               </Form.Item>
-              <Form.Item label="Duration" {...formItemLayout}>
-                {computeDuration(startMoment, finishMoment)}
+              <Form.Item  style={blockStyle} label="Duration" {...formItemLayout}>
+                {computeDuration(startTime, finishTime)}
+              </Form.Item>
+              <Form.Item  style={formItemStyle} label="Group:" {...formItemLayout}>
+                {job.groupName || '-'}
+              </Form.Item>
+              <Form.Item  style={formItemStyle} label="Instance type:" {...formItemLayout}>
+                {job.instanceType || '-'}
+              </Form.Item>
+              <Form.Item  style={blockStyle} label="Image:" {...formItemLayout}>
+                {job.image || '-'}
+              </Form.Item>
+              <Form.Item  style={formItemStyle} label="Command:"  {...formItemLayout}>
+                <Input.TextArea
+                  style={{
+                    background: 'black',
+                    color: '#ddd'
+                  }}
+                  rows={1}
+                  value={job.command}
+                />
               </Form.Item>
             </Form>
           </TabPane>
@@ -83,7 +110,10 @@ export default class Detail extends React.Component<Props> {
   }
 }
 
-function computeDuration(start: Moment, finish: Moment) {
+function computeDuration(start: Moment | '', finish: Moment | '') {
+  if (!start || !finish) {
+    return '-';
+  }
   const duration = moment.duration(finish.diff(start));
   const hour = duration.hours();
   const minutes = duration.minutes();
