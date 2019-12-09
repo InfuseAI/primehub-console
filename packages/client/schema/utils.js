@@ -414,6 +414,14 @@ exports.dict = {
     'images.useImagePullSecret': 'Use Image Pull Secret',
     'image.useImagePullSecret.component.select.placeholder': 'Select Secret',
 
+    // workspace
+    'workspace': 'Workspace',
+    'workspace.management': 'Manage Workspace',
+    'workspace.block1.title': 'Basic Info',
+    'workspace.name.title': 'Name',
+    'workspace.displayName.title': 'Display Name',
+    'workspace.description.title': 'Description',
+    'workspace.block2.title': 'Members',
     // buildImage
     'buildImage': 'Build Image',
     'buildImage.tabs.info': 'Info',
@@ -637,6 +645,14 @@ exports.dict = {
     'images.useImagePullSecret': 'Use Image Pull Secret',
     'image.useImagePullSecret.component.select.placeholder': 'Select Secret',
 
+    // workspace
+    'workspace': 'Workspace',
+    'workspace.management': 'Manage Workspace',
+    'workspace.block1.title': 'Basic Info',
+    'workspace.name.title': 'Name',
+    'workspace.displayName.title': 'Display Name',
+    'workspace.description.title': 'Description',
+    'workspace.block2.title': 'Members',
     // buildImage
     'buildImage': 'Build Image',
     'buildImage.tabs.info': 'Info',

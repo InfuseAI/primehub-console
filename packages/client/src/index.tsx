@@ -12,7 +12,6 @@ import 'moment/locale/zh-tw';
 addLocaleData([...en, ...zh])
 import CMSPage from './cms';
 import schema from '../schema/index.schema.js';
-import Login from './login';
 import myLocales from './utils/locales';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 const firstKey = Object.keys(schema.schema)[0];
@@ -78,8 +77,8 @@ ReactDOM.render(
         <React.Fragment>
           <Switch>
             {/* <Route path="/login" component={Login} /> */}
-            <Route path={`${(window as any).APP_PREFIX}cms/:activeKey`} component={CMSPage}/>
-            <Redirect to={`${(window as any).APP_PREFIX}cms/${firstKey}`}/>
+            <Route path={`${(window as any).APP_PREFIX}cms/:workspaceId/:activeKey`} component={CMSPage}/>
+            <Redirect to={`${(window as any).APP_PREFIX}cms/default/${firstKey}`}/>
           </Switch>
         </React.Fragment>
       </Router>

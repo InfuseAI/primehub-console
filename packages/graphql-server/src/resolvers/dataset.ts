@@ -7,6 +7,8 @@ import { Context } from './interface';
 import { omit, get, isUndefined, last, isNil } from 'lodash';
 import { resolveInDataSet } from './secret';
 import KeycloakAdminClient from 'keycloak-admin';
+import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspace';
+import { keycloakMaxCount } from './constant';
 import { ResourceRole, ResourceNamePrefix } from './resourceRole';
 import {createConfig} from '../config';
 
@@ -33,10 +35,10 @@ const getWritableRole = async ({
 }: {
   kcAdminClient: KeycloakAdminClient,
   datasetId: string,
-  getPrefix: () => string
+  getPrefix: (customizePrefix?: string) => string
 }): Promise<RoleRepresentation> => {
   // make sure the writable role exists
-  const roleName = `${getPrefix()}rw:${datasetId}`;
+  const roleName = `${getPrefix('rw:')}${datasetId}`;
   const role = await kcAdminClient.roles.findOneByName({name: roleName});
   if (!role) {
     try {
@@ -166,8 +168,16 @@ export const updateMapping = (data: any) => {
 };
 
 export const onCreate = async (
-  {role, resource, data, context, getPrefix}:
-  {role: RoleRepresentation, resource: any, data: any, context: Context, getPrefix: () => string}) => {
+  {role, resource, data, context, getPrefix, currentWorkspace}:
+  {
+    role: RoleRepresentation,
+    resource: any,
+    data: any,
+    context: Context,
+    getPrefix: (customizePrefix?: string) => string,
+    currentWorkspace: CurrentWorkspace
+  }) => {
+  const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
   // dataset pvc
   if (data.type === 'pv') {
     if (isNil(data.volumeSize) || data.volumeSize <= 0) {
@@ -180,8 +190,6 @@ export const onCreate = async (
     });
   }
 
-  // group relation
-  const everyoneGroupId = context.everyoneGroupId;
   if (data && data.global) {
     // assign role to everyone
     await context.kcAdminClient.groups.addRealmRoleMappings({
@@ -221,13 +229,20 @@ export const onCreate = async (
 };
 
 export const onUpdate = async (
-  {role, resource, data, context, getPrefix}:
-  {role: RoleRepresentation, resource: any, data: any, context: Context, getPrefix: () => string}) => {
+  {role, resource, data, context, getPrefix, currentWorkspace}:
+  {
+    role: RoleRepresentation,
+    resource: any,
+    data: any,
+    context: Context,
+    getPrefix: (customizePrefix?: string) => string,
+    currentWorkspace: CurrentWorkspace
+  }) => {
   if (!data) {
     return;
   }
 
-  const everyoneGroupId = context.everyoneGroupId;
+  const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
   if (data && !isUndefined(data.global)) {
     if (data.global) {
       // assign role to everyone
@@ -340,14 +355,15 @@ export const onUpdate = async (
 
 export const onDelete = async ({
   name, context, resource, getPrefix
-}: {name: string, context: Context, resource: any, getPrefix: () => string}) => {
+}: {name: string, context: Context, resource: any, getPrefix: (customizePrefix?: string) => string}) => {
   // delete dataset pvc
   await context.k8sDatasetPvc.delete(resource.spec.volumeName);
   await context.k8sUploadServerSecret.delete(name);
+
   // delete writable as well
   try {
     await context.kcAdminClient.roles.delByName({
-      name: `${getPrefix()}rw:${name}`
+      name: `${getPrefix('rw:')}${name}`
     });
   } catch (e) {
     if (e.response && e.response.status === 404) {
@@ -358,12 +374,18 @@ export const onDelete = async ({
 };
 
 const customUpdate = async ({
-  name, metadata, spec, customResource, context, getPrefix
+  name, metadata, spec, customResource, context, getPrefix, currentWorkspace
 }: {
-  name: string, metadata: any, spec: any, customResource: any, context: Context, getPrefix: () => string
+  name: string,
+  metadata: any,
+  spec: any,
+  customResource: any,
+  context: Context,
+  getPrefix: (customizePrefix?: string) => string,
+  currentWorkspace: CurrentWorkspace
 }) => {
   // find original variables first
-  const row = await customResource.get(name);
+  const row = await customResource.get(name, currentWorkspace.getK8sNamespace());
   const originalVariables = row.spec.variables || {};
   const newVariables = spec.variables || {};
   spec.variables = mergeVariables(originalVariables, newVariables);
@@ -401,7 +423,7 @@ const customUpdate = async ({
   const res = await customResource.patch(name, {
     metadata: omit(metadata, 'name'),
     spec
-  });
+  }, currentWorkspace.getK8sNamespace());
 
   // if changing from pv to other types
   // change all rw roles to normal roles
@@ -409,11 +431,17 @@ const customUpdate = async ({
   const changedType = res.spec.type;
   if (originType !== changedType && originType === 'pv') {
     // find all groups with this role and change them
-    const groups = await context.kcAdminClient.groups.find();
+    const groups = (currentWorkspace.checkIsDefault()) ?
+      await context.kcAdminClient.groups.find({
+        max: keycloakMaxCount
+      }) :
+      await context.workspaceApi.listGroups(currentWorkspace.getWorkspaceId());
     // find each role-mappings
     await Promise.all(
       groups
+      // list groups from workspace will not have everyoneGroupId anyway
       .filter(group => group.id !== context.everyoneGroupId)
+      .filter(group => !group.attributes.isWorkspace)
       .map(async group => {
         const roles = await context.kcAdminClient.groups.listRealmRoleMappings({
           id: group.id
@@ -421,7 +449,7 @@ const customUpdate = async ({
 
         // find roles with rw
         const writableRole = roles.find(role =>
-            role.name === `${getPrefix()}rw:${name}`);
+            role.name === `${getPrefix('rw:')}${name}`);
 
         // no role
         if (!writableRole) {
@@ -460,9 +488,11 @@ const customUpdate = async ({
 
 export const resolveType = {
   async global(parent, args, context: Context) {
-    const {kcAdminClient, everyoneGroupId} = context;
+    const {kcAdminClient} = context;
+    const currentWorkspace: CurrentWorkspace = parent.currentWorkspace;
     // find in everyOne group
-    return this.findInGroup(everyoneGroupId, parent.id, kcAdminClient);
+    const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
+    return this.findInGroup(everyoneGroupId, parent.id, kcAdminClient, currentWorkspace);
   },
   async volumeSize(parent, args, context: Context) {
     const {k8sDatasetPvc} = context;
@@ -477,11 +507,17 @@ export const resolveType = {
   async groups(parent, args, context: Context) {
     const resourceId = parent.id;
     // find all groups
-    const groups = await context.kcAdminClient.groups.find();
+    const currentWorkspace: CurrentWorkspace = parent.currentWorkspace;
+    const groups = (currentWorkspace.checkIsDefault()) ?
+      await context.kcAdminClient.groups.find({
+        max: keycloakMaxCount
+      }) :
+      await context.workspaceApi.listGroups(currentWorkspace.getWorkspaceId());
     // find each role-mappings
     const groupsWithRole = await Promise.all(
       groups
       .filter(group => group.id !== context.everyoneGroupId)
+      .filter(group => !group.attributes || !group.attributes.isWorkspace)
       .map(async group => {
         const roles = await context.kcAdminClient.groups.listRealmRoleMappings({
           id: group.id
@@ -489,7 +525,8 @@ export const resolveType = {
 
         // find roles with prefix:ds && prefix:rw:ds
         const findRole = roles.find(role =>
-            role.name === `${this.getPrefix()}${resourceId}` || role.name === `${this.getPrefix()}rw:${resourceId}`);
+            role.name === `${this.getPrefix(currentWorkspace)}${resourceId}`
+            || role.name === `${this.getPrefix(currentWorkspace, 'rw:')}${resourceId}`);
 
         // no role
         if (!findRole) {
@@ -506,10 +543,6 @@ export const resolveType = {
     return groupsWithRole.filter(v => v);
   },
   ...resolveInDataSet
-};
-
-export const parseNameFromRole = (role: ResourceRole) => {
-  return role.resourceName.replace('rw:', '');
 };
 
 export const regenerateUploadSecret = async (root, args, context: Context) => {
@@ -534,7 +567,6 @@ export const crd = new Crd<DatasetSpec>({
   onCreate,
   onUpdate,
   onDelete,
-  parseNameFromRole,
   resolveType,
   customUpdate
 });

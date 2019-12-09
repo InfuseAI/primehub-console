@@ -15,12 +15,14 @@ export default class Observer {
     crdClient,
     keycloakAdmin,
     everyoneGroupId,
-    getAccessToken
+    getAccessToken,
+    k8sCrdNamespace
   }: {
     crdClient: CrdClient,
     keycloakAdmin: KeycloakAdmin,
     everyoneGroupId: string,
     getAccessToken: () => Promise<string>;
+    k8sCrdNamespace: string
   }) {
     this.datasetWatcher = new Watcher<DatasetSpec>({
       crd: dataset,
@@ -28,7 +30,8 @@ export default class Observer {
       keycloakAdmin,
       defaultCreateData: object => ({global: false}),
       everyoneGroupId,
-      getAccessToken
+      getAccessToken,
+      k8sCrdNamespace
     });
 
     this.imageWatcher = new Watcher<ImageSpec>({
@@ -37,7 +40,8 @@ export default class Observer {
       keycloakAdmin,
       defaultCreateData: object => ({global: false}),
       everyoneGroupId,
-      getAccessToken
+      getAccessToken,
+      k8sCrdNamespace
     });
 
     this.instanceTypeWatcher = new Watcher<ImageSpec>({
@@ -46,7 +50,8 @@ export default class Observer {
       keycloakAdmin,
       defaultCreateData: object => ({global: false}),
       everyoneGroupId,
-      getAccessToken
+      getAccessToken,
+      k8sCrdNamespace
     });
   }
 
