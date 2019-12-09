@@ -64,7 +64,9 @@ export default compose(
   graphql(GET_PH_JOB, {
     options: (props: Props) => ({
       variables: {
-        where: props.match.params.jobId
+        where: {
+          id: props.match.params.jobId
+        }
       },
     }),
     name: 'getPhJob'
