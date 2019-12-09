@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {Checkbox, Row, Col} from 'antd';
-import {isEmpty} from 'lodash';
 
 const CheckboxGroup = Checkbox.Group;
 
@@ -65,8 +64,9 @@ export default class GroupFilter extends React.Component<Props, State> {
         <CheckboxGroup
           value={selectedGroups}
           onChange={this.onChange}
+          style={{width: '100%'}}
         >
-          <Row>
+          <Row type="flex">
             {groups.map(group => (
               <Col key={group.id} span={12}>
                 <Checkbox value={group.id}>{group.displayName || group.name}</Checkbox>
