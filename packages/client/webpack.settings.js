@@ -20,7 +20,8 @@ module.exports = {
       styledShare: path.resolve(__dirname, 'src/styled_share'),
       utils: path.resolve(__dirname, 'src/utils'),
       images: path.resolve(__dirname, 'src/images'),
-      components: path.resolve(__dirname, 'src/components')
+      components: path.resolve(__dirname, 'src/components'),
+      containers: path.resolve(__dirname, 'src/containers'),
     }
   }
 }

@@ -12,7 +12,8 @@ const CompressionPlugin = require('compression-webpack-plugin');
 module.exports = {
   entry: {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
-    landing: './src/landing.tsx'
+    landing: './src/landing.tsx',
+    job: './src/job.tsx'
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -27,7 +28,8 @@ module.exports = {
     contentBase: path.join(__dirname, 'dist'),
     historyApiFallback: {
       rewrites: [
-        { from: /^landing$/, to: '/landing.html' },
+        { from: /^\/job/, to: '/job.html' },
+        { from: /^\/landing$/, to: '/landing.html' },
         { from: /./, to: '/index.html' }
       ]
     },
@@ -91,6 +93,11 @@ module.exports = {
       chunks: ['landing'],
       template: 'docs/index.html',
       filename: 'landing.html'
+    }),
+    new HtmlWebPackPlugin({
+      chunks: ['job'],
+      template: 'docs/index.html',
+      filename: 'job.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new MiniCssExtractPlugin({
