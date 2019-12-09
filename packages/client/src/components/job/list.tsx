@@ -1,11 +1,12 @@
 import * as React from 'react';
 import {Button, Tooltip, Table as AntTable, Row, Col} from 'antd';
 import {Link} from 'react-router-dom';
-import {startCase} from 'lodash';
+import {startCase, get} from 'lodash';
 import styled from 'styled-components';
 import Filter from 'components/job/filter';
 import moment from 'moment';
 import {Group} from 'components/job/groupFilter';
+import Pagination from 'components/job/pagination';
 import { Phase, getActionByPhase } from './phase';
 
 const Title = styled.h2`
@@ -44,8 +45,10 @@ const renderTiming = text => (
 
 type JobsConnection = {
   pageInfo: {
-    hasNextpage: boolean;
+    hasNextPage: boolean;
     hasPreviousPage: boolean;
+    startCursor: string;
+    endCursor: string;
   },
   edges: Array<{
     cursor: string;
@@ -65,12 +68,46 @@ type Props = {
 };
 
 export default class JobList extends React.Component<Props> {
+  componentDidUpdate(prevProps) {
+    const {jobsRefetch, jobsVariables, groupsLoading, groupsError, groups} = this.props;
+    if (prevProps.groupsLoading && !groupsLoading && !groupsError && jobsVariables.first === 0) {
+      jobsRefetch({
+        where: {
+          group_in: groups.map(group => group.id)
+        },
+        first: 10
+      });
+    }
+  }
+
   handleCancel = (id: string) => {
 
   }
 
   handleRerun = (id: string) => {
 
+  }
+
+  nextPage = () => {
+    const {jobsVariables, jobsRefetch, jobsConnection} = this.props;
+    const after = jobsConnection.pageInfo.endCursor;
+    const newVariables = {
+      where: jobsVariables.where,
+      after,
+      first: 10
+    };
+    jobsRefetch(newVariables);
+  }
+
+  previousPage = () => {
+    const {jobsVariables, jobsRefetch, jobsConnection} = this.props;
+    const before = jobsConnection.pageInfo.startCursor;
+    const newVariables = {
+      where: jobsVariables.where,
+      before,
+      last: 10
+    };
+    jobsRefetch(newVariables);
   }
 
   changeFilter = ({
@@ -93,7 +130,7 @@ export default class JobList extends React.Component<Props> {
   }
 
   render() {
-    const {groups, jobsConnection} = this.props;
+    const {groups, jobsConnection, jobsVariables} = this.props;
     const renderAction = (phase: Phase, record) => {
       const action = getActionByPhase(phase);
       const id = record.id;
@@ -138,6 +175,8 @@ export default class JobList extends React.Component<Props> {
         <Col span={6}>
           <Filter
             groups={groups}
+            selectedGroups={get(jobsVariables, 'where.group_in', [])}
+            submittedByMe={get(jobsVariables, 'where.mine', false)}
             onChange={this.changeFilter}
           />
         </Col>
@@ -152,14 +191,12 @@ export default class JobList extends React.Component<Props> {
             rowKey="id"
             pagination={false}
           />
-          {/* <Pagination
-            hasNextPage={jobsConnection.pageInfo.hasNextpage}
+          <Pagination
+            hasNextPage={jobsConnection.pageInfo.hasNextPage}
             hasPreviousPage={jobsConnection.pageInfo.hasPreviousPage}
-            first={jobsVariables.first}
-            last={jobsVariables.last}
-            before={jobsVariables.before}
-            after={jobsVariables.after}
-          /> */}
+            nextPage={this.nextPage}
+            previousPage={this.previousPage}
+          />
         </Col>
       </Row>
     )

@@ -2,6 +2,7 @@ import * as React from 'react';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
+import {get} from 'lodash';
 import JobList from 'components/job/list';
 import {Phase} from 'components/job/phase';
 
@@ -32,10 +33,13 @@ export const GroupFragment = gql`
   }
 `;
 
-export const GET_GROUPS = gql`
-  query groups {
-    groups {
-      ...GroupInfo
+export const GET_MY_GROUPS = gql`
+  query me {
+    me {
+      id
+      groups {
+        ...GroupInfo
+      }
     }
   }
   ${GroupFragment}
@@ -47,6 +51,8 @@ export const GET_PH_JOB_CONNECTION = gql`
       pageInfo {
         hasNextPage
         hasPreviousPage
+        startCursor
+        endCursor
       }
       edges {
         cursor
@@ -96,7 +102,7 @@ type Props = {
 
 class JobListContainer extends React.Component<Props> {
   render() {
-    const {getPhJobConnection, getGroups} = this.props;
+    const {getPhJobConnection, getMyGroups} = this.props;
     return (
       <JobList
         jobsLoading={getPhJobConnection.loading}
@@ -104,9 +110,9 @@ class JobListContainer extends React.Component<Props> {
         jobsConnection={getPhJobConnection.phJobsConnection || jobsConnection}
         jobsVariables={getPhJobConnection.variables}
         jobsRefetch={getPhJobConnection.refetch}
-        groupsLoading={getGroups.loading}
-        groupsError={getGroups.error}
-        groups={getGroups.groups || []}
+        groupsLoading={getMyGroups.loading}
+        groupsError={getMyGroups.error}
+        groups={get(getMyGroups, 'me.groups', [])}
       />
     );
   }
@@ -119,7 +125,7 @@ export default compose(
     },
     name: 'getPhJobConnection'
   }),
-  graphql(GET_GROUPS, {
-    name: 'getGroups'
+  graphql(GET_MY_GROUPS, {
+    name: 'getMyGroups'
   })
 )(JobListContainer)

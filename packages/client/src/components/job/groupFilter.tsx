@@ -1,44 +1,38 @@
 import * as React from 'react';
-import { Checkbox, Row, Col } from 'antd';
+import {Checkbox, Row, Col} from 'antd';
+import {isEmpty} from 'lodash';
 
 const CheckboxGroup = Checkbox.Group;
 
 export type Group = {
   id: string;
   displayName: string;
+  name: string;
 }
 
 type Props = {
   groups: Group[];
+  selectedGroups: Array<string>;
   onChange: (groupIds: string[]) => void;
 }
 
 type State = {
   indeterminate: boolean;
-  selectAll: boolean;
-  selectedGroups: string[];
+  selectAll: boolean
 }
 
 export default class GroupFilter extends React.Component<Props, State> {
   state = {
     indeterminate: false,
-    selectAll: false,
-    selectedGroups: []
+    selectAll: false
   };
-
-  componentDidMount() {
-    const {groups} = this.props;
-    const selectedGroups = groups.map(group => group.id);
-    this.onChange(selectedGroups);
-  }
 
   onChange = selectedGroups => {
     const {groups, onChange} = this.props;
     onChange(selectedGroups);
     this.setState({
       indeterminate: !!selectedGroups.length && selectedGroups.length < groups.length,
-      selectAll: selectedGroups.length === groups.length,
-      selectedGroups
+      selectAll: selectedGroups.length === groups.length
     });
   };
 
@@ -47,7 +41,6 @@ export default class GroupFilter extends React.Component<Props, State> {
     const selectedGroups = e.target.checked ? groups.map(group => group.id) : [];
     onChange(selectedGroups);
     this.setState({
-      selectedGroups,
       indeterminate: false,
       selectAll: e.target.checked,
     });
@@ -56,11 +49,11 @@ export default class GroupFilter extends React.Component<Props, State> {
   render() {
     const {
       indeterminate,
-      selectAll,
-      selectedGroups,
+      selectAll
     } = this.state;
     const {
-      groups
+      groups,
+      selectedGroups
     } = this.props;
     return (
       <div>
@@ -82,7 +75,7 @@ export default class GroupFilter extends React.Component<Props, State> {
             {groups.map(group => (
               <Col key={group.id} span={12}>
                 <Checkbox value={group.id}>
-                  {group.displayName}
+                  {isEmpty(group.displayName) ? group.name : group.displayName}
                 </Checkbox>
               </Col>
             ))}

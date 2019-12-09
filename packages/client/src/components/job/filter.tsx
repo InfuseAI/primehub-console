@@ -5,6 +5,8 @@ import GroupFilter, {Group} from 'components/job/groupFilter';
 
 type Props = {
   groups: Group[];
+  selectedGroups: Array<string>;
+  submittedByMe: boolean;
   onChange: ({
     selectedGroups,
     submittedByMe
@@ -14,59 +16,44 @@ type Props = {
   }) => void;
 };
 
-type State = {
-  selectedGroups: Array<string>;
-  submittedByMe: boolean;
-}
-
 const Title = styled.h3`
   margin-top: 36px;
 `;
 
-export default class Filter extends React.Component<Props, State> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedGroups: [],
-      submittedByMe: false
-    }
-  }
-
+export default class Filter extends React.Component<Props> {
   handleSubmittedByMeChange = e => {
-    const {onChange} = this.props
-    this.setState({
-      submittedByMe: e.target.checked
-    }, () => {
-      onChange(this.state);
+    const {onChange, selectedGroups} = this.props
+    onChange({
+      submittedByMe: e.target.checked,
+      selectedGroups
     });
   }
 
   handleSelectedGroupsChange = (groupIds: string[]) => {
-    const {onChange} = this.props
-    this.setState({selectedGroups: groupIds}, () => {
-      onChange(this.state);
+    const {onChange, submittedByMe} = this.props
+    onChange({
+      submittedByMe,
+      selectedGroups: groupIds
     });
   }
 
   render() {
-    const {groups} = this.props;
+    const {groups, selectedGroups, submittedByMe} = this.props;
     return (
       <React.Fragment>
         <Title>
           Filter by Group
         </Title>
-        {
-          groups.length && (
-            <GroupFilter
-              groups={groups}
-              onChange={this.handleSelectedGroupsChange}
-            />
-          ) 
-        }
+        <GroupFilter
+          groups={groups}
+          selectedGroups={selectedGroups}
+          onChange={this.handleSelectedGroupsChange}
+        />
         <Title>
           Filter by Submitted
         </Title>
         <Checkbox
+          checked={submittedByMe}
           onChange={this.handleSubmittedByMeChange}
         >
           Submitted By Me

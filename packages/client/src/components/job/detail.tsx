@@ -3,7 +3,7 @@ import {Button, Tabs, Form, Card} from 'antd';
 import styled from 'styled-components';
 import moment from 'moment';
 import Log from './log';
-import {getActionByPhase} from 'components/job/phase';
+import {getActionByPhase, Phase} from 'components/job/phase';
 
 const TabPane = Tabs.TabPane;
 
@@ -18,11 +18,11 @@ const TitleContainer = styled.div`
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
-    sm: { span: 6 },
+    sm: { span: 4 },
   },
   wrapperCol: {
     xs: { span: 24 },
-    sm: { span: 12 },
+    sm: { span: 20 },
   },
 };
 
@@ -32,9 +32,6 @@ type Props = {
 
 export default class Detail extends React.Component<Props> {
   handleClick = () => {
-    const {
-      id
-    } = this.props.job;
   }
 
   render() {
@@ -53,31 +50,31 @@ export default class Detail extends React.Component<Props> {
         </TitleContainer>
         <Tabs>
           <TabPane key="information" tab="Information">
-            <Form {...formItemLayout}>
-              <Form.Item label="Status:">
+            <Form>
+              <Form.Item label="Phase:" {...formItemLayout}>
                 {job.phase}
               </Form.Item>
-              <Form.Item label="Job ID:">
+              <Form.Item label="Job ID:" {...formItemLayout}>
                 {job.id}
               </Form.Item>
-              <Form.Item label="Job name">
+              <Form.Item label="Job name" {...formItemLayout}>
                 {job.displayName}
               </Form.Item>
-              <Form.Item label="User:">
+              <Form.Item label="User:" {...formItemLayout}>
                 {job.userName}
               </Form.Item>
-              <Form.Item label="Start Time:">
+              <Form.Item label="Start Time:" {...formItemLayout}>
                 {startMoment.format('DD/MM/YYYY HH:mm:ss')}
               </Form.Item>
-              <Form.Item label="Finish Time:">
+              <Form.Item label="Finish Time:" {...formItemLayout}>
                 {finishMoment.format('DD/MM/YYYY HH:mm:ss')}
               </Form.Item>
-              <Form.Item label="Duration">
+              <Form.Item label="Duration" {...formItemLayout}>
                 {moment.duration(finishMoment.diff(startMoment)).minutes()} minutes
               </Form.Item>
             </Form>
           </TabPane>
-          <TabPane key="logs" tab="Logs">
+          <TabPane key="logs" tab="Logs" disabled={job.phase === Phase.Pending || !job.logEndpoint}>
             <Log value={job.logEndpoint}/>
           </TabPane>
         </Tabs>
