@@ -1,11 +1,12 @@
 import * as React from 'react';
-import {Button, Tooltip, Table as AntTable, Row, Col} from 'antd';
+import {Button, Tooltip, Table as AntTable, Row, Col, Icon} from 'antd';
 import {Link} from 'react-router-dom';
 import {startCase, get} from 'lodash';
 import styled from 'styled-components';
 import Filter from 'components/job/filter';
 import moment from 'moment';
 import {Group} from 'components/job/groupFilter';
+import {computeDuration} from 'components/job/detail';
 import Pagination from 'components/job/pagination';
 import { Phase, getActionByPhase } from './phase';
 
@@ -39,9 +40,14 @@ const renderTiming = (text, record) => (
     placement="top"
     title={`Create time:\n ${moment(record.createTime).format('DD/MM/YYYY HH:mm:ss')}`}
   >
-    {moment(text).fromNow()}
+    {text ? moment(text).fromNow() : '-'}
     <br/>
-    {moment(text).format('HH:mm:ss')}
+    {text ? (
+      <>
+        <Icon type="clock-circle" style={{marginRight: 4, position: 'relative', top: 1}} />
+        {computeDuration(moment(text), moment(record.finishTime))}
+      </>
+    ): '-'}
   </Tooltip>
 );
 

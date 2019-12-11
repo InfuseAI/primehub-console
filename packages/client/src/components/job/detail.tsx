@@ -110,7 +110,7 @@ export default class Detail extends React.Component<Props> {
   }
 }
 
-function computeDuration(start: Moment | '', finish: Moment | '') {
+export function computeDuration(start: Moment | '', finish: Moment | '') {
   if (!start || !finish) {
     return '-';
   }
