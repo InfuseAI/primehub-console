@@ -95,7 +95,7 @@ export default class Detail extends React.Component<Props> {
                     background: 'black',
                     color: '#ddd'
                   }}
-                  rows={1}
+                  rows={5}
                   value={job.command}
                 />
               </Form.Item>

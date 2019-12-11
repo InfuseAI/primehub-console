@@ -22,7 +22,6 @@ const Content = styled(Layout.Content)`
 
 const client = genClient(schema);
 const appPrefix = (window as any).APP_PREFIX || '/';
-
 class Job extends React.Component {
   render() {
     return (

@@ -21,12 +21,14 @@ const Table = styled(AntTable as any)`
   }
 `;
 
+const appPrefix = (window as any).APP_PREFIX || '/';
+
 const renderJobName = (text, record) => (
   <Tooltip
     placement="top"
     title={`Job ID: ${record.id}`}
   >
-    <Link to={`/job/${record.id}`}>
+    <Link to={`${appPrefix}job/${record.id}`}>
       {text}
     </Link>
   </Tooltip>

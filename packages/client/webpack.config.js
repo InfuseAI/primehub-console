@@ -13,7 +13,7 @@ module.exports = {
   entry: {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
-    job: './src/job.tsx'
+    job: devMode ? './src/job.tsx' : ['./src/public-import.js', './src/job.tsx']
   },
   output: {
     path: path.join(__dirname, 'dist'),

@@ -22,6 +22,8 @@ export const GET_PH_JOB = gql`
   ${PhJobFragement}
 `;
 
+const appPrefix = (window as any).APP_PREFIX || '/';
+
 class JobDetailContainer extends React.Component<Props> {
   render() {
     const {getPhJob, history} = this.props;
@@ -31,7 +33,7 @@ class JobDetailContainer extends React.Component<Props> {
       <React.Fragment>
         <Button
           icon="left"
-          onClick={() => history.goBack()}
+          onClick={() => history.push(`${appPrefix}job`)}
           style={{marginBottom: 16}}
         >
           Back
