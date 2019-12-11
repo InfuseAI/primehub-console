@@ -18,6 +18,7 @@ export interface PhJob {
   userName: string;
   phase: PhJobPhase;
   reason?: string;
+  createTime: string;
   startTime: string;
   finishTime?: string;
   logEndpoint: string;
@@ -38,6 +39,7 @@ export const transform = (item: Item<PhJobSpec, PhJobStatus>, namespace: string,
     userName: item.spec.userName,
     phase: item.status.phase,
     reason: item.status.reason,
+    createTime: item.metadata.creationTimestamp,
     startTime: item.status.startTime,
     finishTime: item.status.finishTime,
     logEndpoint: `${graphqlHost}${jobLogCtrl.getPhJobEndpoint(namespace, item.metadata.name)}`
@@ -62,8 +64,8 @@ const listQuery = async (client: CustomResource<PhJobSpec>, where: any, namespac
     where.userId_eq = currentUserId;
   }
 
-  // sort by startTime
-  transformedPhJobs = orderBy(transformedPhJobs, 'startTime', 'desc');
+  // sort by createTime
+  transformedPhJobs = orderBy(transformedPhJobs, 'createTime', 'desc');
   return filter(transformedPhJobs, omit(where, 'mine'));
 };
 
