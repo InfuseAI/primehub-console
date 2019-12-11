@@ -34,10 +34,10 @@ const renderJobName = (text, record) => (
   </Tooltip>
 );
 
-const renderTiming = text => (
+const renderTiming = (text, record) => (
   <Tooltip
     placement="top"
-    title={`Create time:\n ${moment(text).format('DD/MM/YYYY HH:mm:ss')}`}
+    title={`Create time:\n ${moment(record.createTime).format('DD/MM/YYYY HH:mm:ss')}`}
   >
     {moment(text).fromNow()}
     <br/>
@@ -154,7 +154,7 @@ export default class JobList extends React.Component<Props> {
       dataIndex: 'groupName'
     }, {
       title: 'Timing',
-      dataIndex: 'createDate',
+      dataIndex: 'startTime',
       render: renderTiming
     }, {
       title: 'Action',

@@ -19,6 +19,7 @@ export const PhJobFragement = gql`
     userName
     phase
     reason
+    createTime
     startTime
     finishTime
     logEndpoint
