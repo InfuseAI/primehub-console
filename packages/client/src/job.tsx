@@ -21,6 +21,7 @@ const Content = styled(Layout.Content)`
 `;
 
 const client = genClient(schema);
+const appPrefix = (window as any).APP_PREFIX || '/';
 
 class Job extends React.Component {
   render() {
@@ -31,11 +32,11 @@ class Job extends React.Component {
           <BrowserRouter>
             <ApolloProvider client={client}>
               <Switch>
-                <Route path="/job" exact>
+                <Route path={`${appPrefix}job`} exact>
                   <JobContainer/>
                 </Route>
                 <Route
-                  path="/job/:jobId"
+                  path={`${appPrefix}job/:jobId`}
                   exact
                   component={JobDetailContainer}
                 />
