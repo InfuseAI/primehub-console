@@ -45,7 +45,7 @@ const renderTiming = (text, record) => (
     {text ? (
       <>
         <Icon type="clock-circle" style={{marginRight: 4, position: 'relative', top: 1}} />
-        {computeDuration(moment(text), moment(record.finishTime))}
+        {computeDuration(text ? moment(text) : '', record.finishTime ? moment(record.finishTime) : '')}
       </>
     ): '-'}
   </Tooltip>
