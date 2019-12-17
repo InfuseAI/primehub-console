@@ -1,0 +1,48 @@
+# import PageInfo from "common.graphql"
+
+type PhJob {
+  id: ID!
+  displayName: String
+  cancel: Boolean
+  command: String
+  groupId: String
+  groupName: String
+  image: String
+  instanceType: String
+  userId: String
+  userName: String
+  phase: String
+  reason: String
+  createTime: String
+  startTime: String
+  finishTime: String
+  logEndpoint: String
+}
+
+"""An edge in a connection."""
+type PhJobEdge {
+  """The item at the end of the edge."""
+  node: PhJob!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type PhJobConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [PhJobEdge]!
+}
+
+input PhJobWhereUniqueInput {
+  id: ID!
+}
+
+input PhJobWhereInput {
+  id: ID
+  groupId_in: [String]
+  mine: Boolean
+}
+

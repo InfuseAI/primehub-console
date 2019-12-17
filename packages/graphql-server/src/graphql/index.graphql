@@ -8,6 +8,7 @@
 # import Secret, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
 # import Workspace, WorkspaceEdge, WorkspaceConnection, WorkspaceWhereInput, WorkspaceWhereUniqueInput, WorkspaceCreateInput, WorkspaceUpdateInput from "./workspace.graphql"
 # import BuildImageJob, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql" 
+# import PhJob, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput from "./phJob.graphql"
 
 scalar JSON
 
@@ -16,6 +17,7 @@ type Query {
   system: System!
 
   """User"""
+  me: User
   user(where: UserWhereUniqueInput!): User
   users(
     where: UserWhereInput
@@ -185,6 +187,23 @@ type Query {
     first: Int
     last: Int
   ): BuildImageJobConnection!
+
+  """PhJob"""
+  phJob(where: PhJobWhereUniqueInput!): PhJob!
+  phJobs(
+    where: PhJobWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [PhJob]!
+  phJobsConnection(
+    where: PhJobWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): PhJobConnection!
 }
 
 type Mutation {

@@ -8,6 +8,7 @@
       "utils/*": ["./src/utils/*"],
       "images/*": ["./src/images/*"],
       "components/*": ["./src/components/*"],
+      "containers/*": ["./src/containers/*"],
       "styledShare/*": ["./src/styled_share/*"]
     }
   },
