@@ -279,6 +279,17 @@ export const queryOne = async (root, args, context: Context) => {
   }
 };
 
+export const me = async (root, args, context: Context) => {
+  const userId = context.userId;
+  const kcAdminClient = context.kcAdminClient;
+  try {
+    const user = await kcAdminClient.users.findOne({id: userId});
+    return user;
+  } catch (e) {
+    return null;
+  }
+};
+
 /**
  * Mutation
  */

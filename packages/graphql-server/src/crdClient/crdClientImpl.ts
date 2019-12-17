@@ -112,6 +112,36 @@ export interface ImageSpecJobStatus {
   podName: string;
 }
 
+export interface PhJobSpec {
+  cancel: boolean;
+  command: string;
+  displayName: string;
+  groupId: string;
+  groupName: string;
+  image: string;
+  instanceType: string;
+  userId: string;
+  userName: string;
+}
+
+export enum PhJobPhase {
+  Pending = 'Pending',
+  Ready = 'Ready',
+  Running = 'Running',
+  Succeeded = 'Succeeded',
+  Failed = 'Failed',
+  Cancelled = 'Cancelled',
+  Unknown = 'Unknown'
+}
+
+export interface PhJobStatus {
+  phase: PhJobPhase;
+  podName: string;
+  reason?: string;
+  startTime: string;
+  finishTime?: string;
+}
+
 /**
  * CRD
  */
@@ -130,6 +160,7 @@ export default class CrdClientImpl {
   public imageSpecs: CustomResource<ImageSpecSpec, ImageSpecStatus>;
   public announcements: CustomResource<AnnouncementSpec>;
   public imageSpecJobs: CustomResource<ImageSpecJobSpec, ImageSpecJobStatus>;
+  public phJobs: CustomResource<PhJobSpec, PhJobStatus>;
   private namespace: string;
 
   constructor(args?: CrdArgs) {
@@ -162,6 +193,12 @@ export default class CrdClientImpl {
       client,
       watch,
       loadCrd('imageSpecJob'),
+      this.namespace
+    );
+    this.phJobs = new CustomResource<PhJobSpec, PhJobStatus>(
+      client,
+      watch,
+      loadCrd('phJob'),
       this.namespace
     );
     this.announcements = new CustomResource<AnnouncementSpec>(

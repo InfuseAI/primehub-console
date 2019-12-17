@@ -22,6 +22,7 @@ import * as secret from './resolvers/secret';
 import * as workspace from './resolvers/workspace';
 import * as buildImage from './resolvers/buildImage';
 import * as buildImageJob from './resolvers/buildImageJob';
+import * as phJob from './resolvers/phJob';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset, regenerateUploadSecret} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
@@ -72,6 +73,7 @@ const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graph
 const resolvers = {
   Query: {
     system: system.query,
+    me: user.me,
     user: user.queryOne,
     users: user.query,
     usersConnection: user.connectionQuery,
@@ -90,6 +92,9 @@ const resolvers = {
     buildImageJob: buildImageJob.queryOne,
     buildImageJobs: buildImageJob.query,
     buildImageJobsConnection: buildImageJob.connectionQuery,
+    phJob: phJob.queryOne,
+    phJobs: phJob.query,
+    phJobsConnection: phJob.connectionQuery,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),
