@@ -9,6 +9,9 @@ export interface Config {
   keycloakRealmName: string;
   keycloakClientId: string;
 
+  // use https or not, should only be tested in dev
+  secure: boolean;
+
   // for grant type = authorization_code
   keycloakClientSecret?: string;
   cookieSignedKey: string;
@@ -45,6 +48,7 @@ export interface Config {
 
 const defaultConfigs = {
   env: 'development',
+  secure: false,
   locale: 'en',
   keycloakApiBaseUrl: 'http://127.0.0.1:8080/auth',
   keycloakOidcBaseUrl: 'http://127.0.0.1:8080/auth',
@@ -80,6 +84,8 @@ const sanitizePath = (path: string) => {
 
 export const createConfig = (): Config => {
   const envConfigs = pickBy({
+    secure:
+      process.env.DEV_SECURE && process.env.DEV_SECURE.toString() === 'true',
     locale: process.env.CANNER_LOCALE,
     keycloakApiBaseUrl: process.env.KC_API_BASEURL,
     keycloakOidcBaseUrl: process.env.KC_OIDC_BASEURL,
