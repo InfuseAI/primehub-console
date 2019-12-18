@@ -86,8 +86,9 @@ export class OidcCtrl {
       // get new access token if it's going to expire in 5 sec, or already expired
       if (accessToken.isExpiredIn(5000)) {
         const tokenSet = await this.oidcClient.refresh(refreshToken);
-        ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true});
-        ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true});
+        const secureRequest = ctx.request.secure;
+        ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true, secure: secureRequest});
+        ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true, secure: secureRequest});
         accessTokenExp = parseInt(new Token(tokenSet.access_token, this.clientId).getContent().exp, 10);
         refreshTokenExp = parseInt(new Token(tokenSet.refresh_token, this.clientId).getContent().exp, 10);
 
@@ -138,8 +139,9 @@ export class OidcCtrl {
       // get new access token if it's going to expire in 5 sec, or already expired
       if (accessToken.isExpiredIn(5000)) {
         const tokenSet = await this.oidcClient.refresh(refreshToken);
-        ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true});
-        ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true});
+        const secureRequest = ctx.request.secure;
+        ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true, secure: secureRequest});
+        ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true, secure: secureRequest});
         accessTokenExp = parseInt(new Token(tokenSet.access_token, this.clientId).getContent().exp, 10);
         refreshTokenExp = parseInt(new Token(tokenSet.refresh_token, this.clientId).getContent().exp, 10);
 
@@ -196,8 +198,9 @@ export class OidcCtrl {
 
       const tokenSet = await this.oidcClient.refresh(refreshToken);
       // set refreshToken, accessToken on cookie
-      ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true});
-      ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true});
+      const secureRequest = ctx.request.secure;
+      ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true, secure: secureRequest});
+      ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true, secure: secureRequest});
       const newAccessToken = new Token(tokenSet.access_token, this.clientId);
       const newRefreshToken = new Token(tokenSet.refresh_token, this.clientId);
 
@@ -260,11 +263,14 @@ export class OidcCtrl {
     const accessToken = new Token(tokenSet.access_token, this.clientId);
 
     // redirect to frontend
-    ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true});
-    ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true});
-    ctx.cookies.set('username', accessToken.getContent().preferred_username, {signed: true});
+    const secureRequest = ctx.request.secure;
+    ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true, secure: secureRequest});
+    ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true, secure: secureRequest});
+    ctx.cookies.set('username', accessToken.getContent().preferred_username, {signed: true, secure: secureRequest});
     ctx.cookies.set('thumbnail',
-      accessToken.getContent().email ? gravatar.url(accessToken.getContent().email) : '', {signed: true});
+      accessToken.getContent().email ?
+      gravatar.url(accessToken.getContent().email)
+      : '', {signed: true, secure: secureRequest});
 
     const backUrl = query.backUrl || this.defaultReturnPath;
 
@@ -320,7 +326,8 @@ export class OidcCtrl {
 
   private saveNonceSecret = (ctx: Context) => {
     const secret = UUID.v1();
-    ctx.cookies.set(NONCE_COOKIE, secret, {signed: true});
+    const secureRequest = ctx.request.secure;
+    ctx.cookies.set(NONCE_COOKIE, secret, {signed: true, secure: secureRequest});
     return createHash('sha256').update(secret).digest('hex');
   }
 

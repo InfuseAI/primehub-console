@@ -66,6 +66,9 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   const app = new Koa() as any;
   app.keys = [config.cookieSignedKey];
 
+  // set proxy=true to support https behind proxy
+  app.proxy = true;
+
   // setup
   app.use(async (ctx: Context, next) => {
     ctx.state.locale = config.locale;
