@@ -32,6 +32,8 @@ type Props = {
   job: any;
   rerunPhJob: Function;
   cancelPhJob: Function;
+  cancelPhJobResult: any;
+  rerunPhJobResult: any;
 }
 
 const blockStyle = {
@@ -75,7 +77,7 @@ export default class Detail extends React.Component<Props> {
   }
 
   render() {
-    const {job} = this.props;
+    const {job, rerunPhJobResult, cancelPhJobResult} = this.props;
     const startTime = job.startTime ? moment(job.startTime) : '';
     const finishTime = job.finishTime ? moment(job.finishTime) : '';
     const action = getActionByPhase(job.phase);
@@ -85,7 +87,10 @@ export default class Detail extends React.Component<Props> {
           <Title>
             Job: {job.name}
           </Title>
-          <Button onClick={() => this.handleClick(action)}>
+          <Button
+            onClick={() => this.handleClick(action)}
+            loading={rerunPhJobResult.loading || cancelPhJobResult.loading}
+          >
             {action}
           </Button>
         </TitleContainer>

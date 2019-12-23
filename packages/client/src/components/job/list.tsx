@@ -72,12 +72,19 @@ type Props = RouteComponentProps & {
   jobsRefetch: Function;
   rerunPhJob: Function;
   cancelPhJob: Function;
+  rerunPhJobResult: any;
+  cancelPhJobResult: any;
 };
 
 class JobList extends React.Component<Props> {
+  state = {
+    currentId: null
+  };
+
   handleCancel = (id: string) => {
     const {jobsConnection, cancelPhJob} = this.props;
     const job = jobsConnection.edges.find(edge => edge.node.id === id).node;
+    this.setState({currentId: id});
     confirm({
       title: `Cancel`,
       content: `Do you want to cancel '${job.displayName || job.name}'?`,
@@ -96,6 +103,7 @@ class JobList extends React.Component<Props> {
   handleRerun = (id: string) => {
     const {jobsConnection, rerunPhJob} = this.props;
     const job = jobsConnection.edges.find(edge => edge.node.id === id).node;
+    this.setState({currentId: id});
     confirm({
       title: `Rerun`,
       content: `Do you want to rerun '${job.displayName || job.name}'?`,
@@ -113,6 +121,18 @@ class JobList extends React.Component<Props> {
   createPhJob = () => {
     const {history} = this.props;
     history.push(`${appPrefix}job/create`);
+  }
+
+  refresh = () => {
+    const {jobsVariables, jobsRefetch} = this.props;
+    const newVariables = {
+      where: jobsVariables.where,
+      before: undefined,
+      first: 10,
+      last: undefined,
+      after: undefined,
+    };
+    jobsRefetch(newVariables);
   }
 
   nextPage = () => {
@@ -161,7 +181,8 @@ class JobList extends React.Component<Props> {
   }
 
   render() {
-    const {groups, jobsConnection, jobsVariables} = this.props;
+    const {groups, jobsConnection, jobsVariables, cancelPhJobResult, rerunPhJobResult} = this.props;
+    const {currentId} = this.state;
     const renderAction = (phase: Phase, record) => {
       const action = getActionByPhase(phase);
       const id = record.id;
@@ -171,8 +192,9 @@ class JobList extends React.Component<Props> {
       } else {
         onClick = () => this.handleRerun(id);
       }
+      const loading = cancelPhJobResult.loading && rerunPhJobResult.loading && id === currentId;
       return (
-        <Button onClick={onClick}>
+        <Button onClick={onClick} loading={loading}>
           {action}
         </Button>
       )
@@ -216,6 +238,9 @@ class JobList extends React.Component<Props> {
           <Title>Jobs</Title>
           <Button onClick={this.createPhJob}>
             Create Job
+          </Button>
+          <Button onClick={this.refresh} style={{marginLeft: 16}}>
+            Refresh
           </Button>
           <Table
             dataSource={jobsConnection.edges.map(edge => edge.node)}

@@ -29,7 +29,7 @@ const appPrefix = (window as any).APP_PREFIX || '/';
 
 class JobDetailContainer extends React.Component<Props> {
   render() {
-    const {getPhJob, history, rerunPhJob, cancelPhJob} = this.props;
+    const {getPhJob, history, rerunPhJob, cancelPhJob, rerunPhJobResult, cancelPhJobResult} = this.props;
     if (getPhJob.loading) return null;
     if (getPhJob.error) return 'Error';
     return (
@@ -44,6 +44,8 @@ class JobDetailContainer extends React.Component<Props> {
         <JobDetail
           rerunPhJob={rerunPhJob}
           cancelPhJob={cancelPhJob}
+          rerunPhJobResult={rerunPhJobResult}
+          cancelPhJobResult={cancelPhJobResult}
           job={getPhJob.phJob || {id: 'test'}}
         />
       </React.Fragment>
@@ -63,6 +65,11 @@ export default compose(
     name: 'getPhJob'
   }),
   graphql(RERUN_JOB, {
+    options: {
+      refetchQueries: [{
+        query: GET_PH_JOB
+      }]
+    },
     name: 'rerunPhJob'
   }),
   graphql(CANCEL_JOB, {
