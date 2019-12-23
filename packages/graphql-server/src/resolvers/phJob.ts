@@ -3,7 +3,7 @@ import { toRelay, filter, paginate, extractPagination, stringifyPackageField } f
 import { PhJobPhase, PhJobSpec, PhJobStatus } from '../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../crdClient/customResource';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
-import { orderBy, omit } from 'lodash';
+import { orderBy, omit, get } from 'lodash';
 import * as moment from 'moment';
 
 const NEW_LINE = '\n';
@@ -37,35 +37,28 @@ export interface PhJobCreateInput {
 
 // tslint:disable-next-line:max-line-length
 export const transform = (item: Item<PhJobSpec, PhJobStatus>, namespace: string, graphqlHost: string, jobLogCtrl: JobLogCtrl): PhJob => {
+  const phase = item.spec.cancel ? PhJobPhase.Cancelled : get(item, 'status.phase', PhJobPhase.Pending);
   return {
     id: item.metadata.name,
     displayName: item.spec.displayName,
     cancel: item.spec.cancel,
-    command: deserializeCommand(item.spec.command),
+    command: item.spec.command,
     groupId: item.spec.groupId,
     groupName: item.spec.groupName,
     image: item.spec.image,
     instanceType: item.spec.instanceType,
     userId: item.spec.userId,
     userName: item.spec.userName,
-    phase: item.status.phase,
-    reason: item.status.reason,
+    phase,
+    reason: get(item, 'status.reason'),
     createTime: item.metadata.creationTimestamp,
-    startTime: item.status.startTime,
-    finishTime: item.status.finishTime,
+    startTime: get(item, 'status.startTime'),
+    finishTime: get(item, 'status.finishTime'),
     logEndpoint: `${graphqlHost}${jobLogCtrl.getPhJobEndpoint(namespace, item.metadata.name)}`
   };
 };
 
 // utils
-const serializeCommand = (inputCommand: string): string[] => {
-  return inputCommand.split(NEW_LINE);
-};
-
-const deserializeCommand = (command: string[]): string => {
-  return command.join(NEW_LINE);
-};
-
 const createJobName = () => {
   // generate string like: 201912301200-gxzhaz
   return `job-${moment.utc().format('YYYYMMDDHHmm')}-${Math.random().toString(36).slice(2, 8)}`;
@@ -78,8 +71,8 @@ const createJob = async (context: Context, data: PhJobCreateInput) => {
   const metadata = {
     name,
     labels: {
-      'primehub-group': data.groupId,
-      'primehub-user': userId
+      'primehub-group': group.name,
+      'primehub-user': username
     }
   };
   const spec = {
@@ -88,14 +81,14 @@ const createJob = async (context: Context, data: PhJobCreateInput) => {
     userName: username,
 
     // merge from user input
-    command: serializeCommand(data.command),
+    command: data.command,
     displayName: data.displayName,
     groupId: data.groupId,
     groupName: group.name,
     image: data.image,
     instanceType: data.instanceType,
   };
-  return crdClient.phJobs.create(metadata, spec, {phase: PhJobPhase.Pending} as any);
+  return crdClient.phJobs.create(metadata, spec);
 };
 
 /**
@@ -167,7 +160,7 @@ export const rerun = async (root, args, context: Context) => {
     instanceType: phJob.spec.instanceType,
     image: phJob.spec.image,
     // todo: use builder pattern, instead of ser and deser like this
-    command: deserializeCommand(phJob.spec.command)
+    command: phJob.spec.command
   });
 
   return transform(rerunPhJob, context.namespace, context.graphqlHost, context.jobLogCtrl);

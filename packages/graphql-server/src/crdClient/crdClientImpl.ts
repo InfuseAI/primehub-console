@@ -114,7 +114,7 @@ export interface ImageSpecJobStatus {
 
 export interface PhJobSpec {
   cancel: boolean;
-  command: string[];
+  command: string;
   displayName: string;
   groupId: string;
   groupName: string;

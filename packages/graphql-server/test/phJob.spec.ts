@@ -131,8 +131,5 @@ describe('instanceType graphql', function() {
     expect(queryOne.phJob.id).to.exist;
 
     this.currentPhJob = queryOne.phJob;
-
-    const phJob = await this.crdClient.phJobs.get(mutation.createPhJob.id);
-    expect(phJob.spec.command).to.be.eql(data.command.split('\n'));
   });
 });

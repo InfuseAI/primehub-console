@@ -56,9 +56,9 @@ export default class CustomResource<SpecType = any, StatusType = any> {
   }
 
   // tslint:disable-next-line:max-line-length
-  public create = async (metadata: Metadata, spec: SpecType, status?: StatusType, namespace?: string): Promise<Item<SpecType, StatusType>> => {
+  public create = async (metadata: Metadata, spec: SpecType, namespace?: string): Promise<Item<SpecType, StatusType>> => {
     const resource = this.getResource(namespace);
-    const object = this.prepareCustomObject({metadata, spec, status});
+    const object = this.prepareCustomObject({metadata, spec});
     const {body} = await resource.post({body: object});
     return pick(body, ['metadata', 'spec', 'status']) as Item<SpecType>;
   }
@@ -92,14 +92,13 @@ export default class CustomResource<SpecType = any, StatusType = any> {
   }
 
   private prepareCustomObject = (
-    {metadata, spec, status}: {metadata?: Metadata, spec: SpecType, status?: StatusType}) => {
+    {metadata, spec}: {metadata?: Metadata, spec: SpecType}) => {
     const {group, version, names: {kind}} = this.crd.spec;
     return {
       apiVersion: `${group}/${version}`,
       kind,
       metadata,
-      spec,
-      status
+      spec
     };
   }
 
