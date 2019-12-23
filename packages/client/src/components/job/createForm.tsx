@@ -214,7 +214,7 @@ class CreateForm extends React.Component<Props> {
 export default Form.create<Props>({
   mapPropsToFields(props) {
     return {
-      group: Form.createFormField({
+      groupId: Form.createFormField({
         value: props.selectedGroup,
       })
     };
