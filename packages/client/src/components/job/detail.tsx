@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, Tabs, Form, Card, Input} from 'antd';
+import {Button, Tabs, Form, Card, Input, Modal} from 'antd';
 import styled from 'styled-components';
 import moment, { Moment } from 'moment';
 import Log from './log';
@@ -26,8 +26,12 @@ const formItemLayout = {
   },
 };
 
+const {confirm} = Modal;
+
 type Props = {
   job: any;
+  rerunPhJob: Function;
+  cancelPhJob: Function;
 }
 
 const blockStyle = {
@@ -39,21 +43,50 @@ const formItemStyle = {
 }
 
 export default class Detail extends React.Component<Props> {
-  handleClick = () => {
+  handleClick = (action: 'Cancel' | 'Rerun') => {
+    const {job, rerunPhJob, cancelPhJob} = this.props;
+    const {id} = job;
+    if (action === 'Cancel') 
+      return confirm({
+        title: `Cancel`,
+        content: `Do you want to cancel '${job.displayName || job.name}'?`,
+        okText: 'Yes',
+        okType: 'danger',
+        cancelText: 'No',
+        onOk() {
+          return cancelPhJob({variables: {where: {id}}});
+        },
+        onCancel() {
+          console.log('Cancel');
+        },
+      });
+    return confirm({
+      title: `Rerun`,
+      content: `Do you want to rerun '${job.displayName || job.name}'?`,
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk() {
+        return rerunPhJob({variables: {where: {id}}});
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
   }
 
   render() {
     const {job} = this.props;
     const startTime = job.startTime ? moment(job.startTime) : '';
     const finishTime = job.finishTime ? moment(job.finishTime) : '';
+    const action = getActionByPhase(job.phase);
     return (
       <Card>
         <TitleContainer>
           <Title>
             Job: {job.name}
           </Title>
-          <Button onClick={this.handleClick}>
-            {getActionByPhase(job.phase)}
+          <Button onClick={() => this.handleClick(action)}>
+            {action}
           </Button>
         </TitleContainer>
         <Tabs>

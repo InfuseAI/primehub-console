@@ -6,9 +6,12 @@ import {RouteComponentProps} from 'react-router-dom';
 import {compose} from 'recompose';
 import JobDetail from 'components/job/detail';
 import {PhJobFragement} from './jobList';
+import {RERUN_JOB, CANCEL_JOB} from 'containers/jobList';
 
 type Props = {
   getPhJob: any;
+  rerunPhJob: Function;
+  cancelPhJob: Function;
 } & RouteComponentProps<{
   jobId: string;
 }>;
@@ -26,7 +29,7 @@ const appPrefix = (window as any).APP_PREFIX || '/';
 
 class JobDetailContainer extends React.Component<Props> {
   render() {
-    const {getPhJob, history} = this.props;
+    const {getPhJob, history, rerunPhJob, cancelPhJob} = this.props;
     if (getPhJob.loading) return null;
     if (getPhJob.error) return 'Error';
     return (
@@ -39,6 +42,8 @@ class JobDetailContainer extends React.Component<Props> {
           Back
         </Button>
         <JobDetail
+          rerunPhJob={rerunPhJob}
+          cancelPhJob={cancelPhJob}
           job={getPhJob.phJob || {id: 'test'}}
         />
       </React.Fragment>
@@ -57,4 +62,10 @@ export default compose(
     }),
     name: 'getPhJob'
   }),
+  graphql(RERUN_JOB, {
+    name: 'rerunPhJob'
+  }),
+  graphql(CANCEL_JOB, {
+    name: 'cancelPhJob'
+  })
 )(JobDetailContainer)
