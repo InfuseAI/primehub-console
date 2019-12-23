@@ -44,6 +44,14 @@ const transformImages = (images, currentInstancetype) => {
   })
 }
 
+const commandPlaceHolder = `echo "Start training"
+python /project/group-a/train.py \\
+  --dataset /datasets/dataset-a/train.txt \\
+  --output /workingdir/output \\
+  --parameter_1 value_1 \\
+  --parameter_1 value_2 \\
+`;
+
 class CreateForm extends React.Component<Props> {
   state = {
     selectedInstanceType: null
@@ -193,6 +201,7 @@ class CreateForm extends React.Component<Props> {
                   rules: [{ required: true, message: 'Please input commands!' }],
                 })(
                   <Input.TextArea
+                    placeholder={commandPlaceHolder}
                     rows={10}
                   />
                 )}
