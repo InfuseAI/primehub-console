@@ -108,7 +108,7 @@ describe('instanceType graphql', function() {
       groupId: group.id,
       instanceType: instanceTypeId,
       image: imageId,
-      command: '/bin/bash -c "echo hello"'
+      command: `/bin/bash\n-c "echo hello"`
     };
     const mutation = await this.graphqlRequest(`
     mutation($data: PhJobCreateInput!){
@@ -131,5 +131,8 @@ describe('instanceType graphql', function() {
     expect(queryOne.phJob.id).to.exist;
 
     this.currentPhJob = queryOne.phJob;
+
+    const phJob = await this.crdClient.phJobs.get(mutation.createPhJob.id);
+    expect(phJob.spec.command).to.be.eql(data.command.split('\n'));
   });
 });

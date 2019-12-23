@@ -6,6 +6,8 @@ import { JobLogCtrl } from '../controllers/jobLogCtrl';
 import { orderBy, omit } from 'lodash';
 import * as moment from 'moment';
 
+const NEW_LINE = '\n';
+
 export interface PhJob {
   id: string;
   displayName: string;
@@ -39,7 +41,7 @@ export const transform = (item: Item<PhJobSpec, PhJobStatus>, namespace: string,
     id: item.metadata.name,
     displayName: item.spec.displayName,
     cancel: item.spec.cancel,
-    command: item.spec.command,
+    command: deserializeCommand(item.spec.command),
     groupId: item.spec.groupId,
     groupName: item.spec.groupName,
     image: item.spec.image,
@@ -56,6 +58,14 @@ export const transform = (item: Item<PhJobSpec, PhJobStatus>, namespace: string,
 };
 
 // utils
+const serializeCommand = (inputCommand: string): string[] => {
+  return inputCommand.split(NEW_LINE);
+};
+
+const deserializeCommand = (command: string[]): string => {
+  return command.join(NEW_LINE);
+};
+
 const createJobName = () => {
   // generate string like: 201912301200-gxzhaz
   return `job-${moment.utc().format('YYYYMMDDHHmm')}-${Math.random().toString(36).slice(2, 8)}`;
@@ -78,7 +88,7 @@ const createJob = async (context: Context, data: PhJobCreateInput) => {
     userName: username,
 
     // merge from user input
-    command: data.command,
+    command: serializeCommand(data.command),
     displayName: data.displayName,
     groupId: data.groupId,
     groupName: group.name,
@@ -156,7 +166,8 @@ export const rerun = async (root, args, context: Context) => {
     groupId: phJob.spec.groupId,
     instanceType: phJob.spec.instanceType,
     image: phJob.spec.image,
-    command: phJob.spec.command
+    // todo: use builder pattern, instead of ser and deser like this
+    command: deserializeCommand(phJob.spec.command)
   });
 
   return transform(rerunPhJob, context.namespace, context.graphqlHost, context.jobLogCtrl);
