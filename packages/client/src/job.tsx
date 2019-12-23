@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import JobContainer from 'containers/job';
 import JobDetailContainer from 'containers/jobDetail';
+import JobCreatePage from 'containers/jobCreatePage';
 
 const PAGE_PADDING = 64;
 const HEADER_HEIGHT = 64;
@@ -33,6 +34,9 @@ class Job extends React.Component {
               <Switch>
                 <Route path={`${appPrefix}job`} exact>
                   <JobContainer/>
+                </Route>
+                <Route path={`${appPrefix}job/create`} exact>
+                  <JobCreatePage />
                 </Route>
                 <Route
                   path={`${appPrefix}job/:jobId`}

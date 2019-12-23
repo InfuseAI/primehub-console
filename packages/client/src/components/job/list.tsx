@@ -1,6 +1,7 @@
 import * as React from 'react';
-import {Button, Tooltip, Table as AntTable, Row, Col, Icon} from 'antd';
-import {Link} from 'react-router-dom';
+import {Button, Tooltip, Table as AntTable, Row, Col, Icon, Modal} from 'antd';
+import {RouteComponentProps} from 'react-router';
+import {Link, withRouter} from 'react-router-dom';
 import {startCase, get} from 'lodash';
 import styled from 'styled-components';
 import Filter from 'components/job/filter';
@@ -8,12 +9,10 @@ import moment from 'moment';
 import {Group} from 'components/job/groupFilter';
 import {computeDuration} from 'components/job/detail';
 import Pagination from 'components/job/pagination';
+import Title from 'components/job/title';
 import { Phase, getActionByPhase } from './phase';
 
-const Title = styled.h2`
-  display: inline-block;
-  margin-right: 24px;
-`;
+const {confirm} = Modal;
 
 const Table = styled(AntTable as any)`
   background: white;
@@ -64,22 +63,56 @@ type JobsConnection = {
   }>
 }
 
-type Props = {
+type Props = RouteComponentProps & {
   groups: Array<Group>;
   jobsLoading: boolean;
   jobsError: any;
   jobsConnection: JobsConnection;
   jobsVariables: any;
   jobsRefetch: Function;
+  rerunPhJob: Function;
+  cancelPhJob: Function;
 };
 
-export default class JobList extends React.Component<Props> {
+class JobList extends React.Component<Props> {
   handleCancel = (id: string) => {
-
+    const {jobsConnection, cancelPhJob} = this.props;
+    const job = jobsConnection.edges.find(edge => edge.node.id === id).node;
+    confirm({
+      title: `Cancel`,
+      content: `Do you want to cancel '${job.displayName || job.name}'?`,
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        return cancelPhJob({variables: {where: {id}}});
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
   }
 
   handleRerun = (id: string) => {
+    const {jobsConnection, rerunPhJob} = this.props;
+    const job = jobsConnection.edges.find(edge => edge.node.id === id).node;
+    confirm({
+      title: `Rerun`,
+      content: `Do you want to rerun '${job.displayName || job.name}'?`,
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk() {
+        return rerunPhJob({variables: {where: {id}}});
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  }
 
+  createPhJob = () => {
+    const {history} = this.props;
+    history.push(`${appPrefix}job/create`);
   }
 
   nextPage = () => {
@@ -135,8 +168,9 @@ export default class JobList extends React.Component<Props> {
       let onClick = () => {}
       if (action.toLowerCase() === 'cancel') {
         onClick = () => this.handleCancel(id);
+      } else {
+        onClick = () => this.handleRerun(id);
       }
-      onClick = () => this.handleRerun(id);
       return (
         <Button onClick={onClick}>
           {action}
@@ -180,7 +214,7 @@ export default class JobList extends React.Component<Props> {
         </Col>
         <Col span={18}>
           <Title>Jobs</Title>
-          <Button>
+          <Button onClick={this.createPhJob}>
             Create Job
           </Button>
           <Table
@@ -200,3 +234,5 @@ export default class JobList extends React.Component<Props> {
     )
   }
 }
+
+export default withRouter(JobList);

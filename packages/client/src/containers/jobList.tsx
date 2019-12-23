@@ -46,21 +46,51 @@ export const GET_PH_JOB_CONNECTION = gql`
   ${PhJobFragement}
 `;
 
+export const RERUN_JOB = gql`
+  mutation rerunPhJob($where: PhJobWhereUniqueInput!) {
+    rerunPhJob(where: $where) {
+      ...PhJobInfo
+    }
+  }
+  ${PhJobFragement}
+`;
+
+export const CANCEL_JOB = gql`
+  mutation cancelPhJob($where: PhJobWhereUniqueInput!) {
+    cancelPhJob(where: $where) {
+      ...PhJobInfo
+    }
+  }
+  ${PhJobFragement}
+`;
+
 type Props = {
   getPhJobConnection?: any;
   groups: Array<Group>;
+  rerunPhJob: any;
+  cancelPhJob: any;
 }
 
 class JobListContainer extends React.Component<Props> {
   render() {
-    const {getPhJobConnection, groups} = this.props;
+    const {getPhJobConnection, groups, rerunPhJob, cancelPhJob} = this.props;
+    console.log(this.props)
     return (
       <JobList
         jobsLoading={getPhJobConnection.loading}
         jobsError={getPhJobConnection.error}
-        jobsConnection={getPhJobConnection.phJobsConnection || {pageInfo: {}, edges: []}}
+        jobsConnection={getPhJobConnection.phJobsConnection || {pageInfo: {}, edges: [{
+          node: {
+            id: 'id1',
+            name: 'fdsf',
+            displayName: 'fsdfds',
+            phase: 'Running',
+          }
+        }]}}
         jobsVariables={getPhJobConnection.variables}
         jobsRefetch={getPhJobConnection.refetch}
+        rerunPhJob={rerunPhJob}
+        cancelPhJob={cancelPhJob}
         groups={groups}
       />
     );
@@ -80,5 +110,11 @@ export default compose(
       }
     },
     name: 'getPhJobConnection'
+  }),
+  graphql(RERUN_JOB, {
+    name: 'rerunPhJob'
+  }),
+  graphql(CANCEL_JOB, {
+    name: 'cancelPhJob'
   })
 )(JobListContainer)
