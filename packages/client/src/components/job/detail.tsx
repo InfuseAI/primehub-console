@@ -52,9 +52,16 @@ export default class Detail extends React.Component<Props> {
       return confirm({
         title: `Cancel`,
         content: `Do you want to cancel '${job.displayName || job.name}'?`,
+        iconType: 'info-circle',
         okText: 'Yes',
         okType: 'danger',
         cancelText: 'No',
+        okButtonProps: {
+          style: {
+            float: 'left',
+            marginRight: '8px'
+          }
+        },
         onOk() {
           return cancelPhJob({variables: {where: {id}}});
         },
@@ -65,8 +72,15 @@ export default class Detail extends React.Component<Props> {
     return confirm({
       title: `Rerun`,
       content: `Do you want to rerun '${job.displayName || job.name}'?`,
+      iconType: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
+      okButtonProps: {
+        style: {
+          float: 'left',
+          marginRight: '8px'
+        }
+      },
       onOk() {
         return rerunPhJob({variables: {where: {id}}});
       },
