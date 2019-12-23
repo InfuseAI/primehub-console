@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
+import {get} from 'lodash';
 
 const { Option } = Select;
 
@@ -48,6 +49,13 @@ class CreateForm extends React.Component<Props> {
     selectedInstanceType: null
   };
 
+  componentDidMount() {
+    const {onSelectGroup, selectedGroup, groups} = this.props;
+    if (!selectedGroup) {
+      onSelectGroup(get(groups[0], 'id', null));
+    }
+  }
+
   submit = (e) => {
     const {form, onSubmit} = this.props;
     e.preventDefault();
@@ -85,7 +93,7 @@ class CreateForm extends React.Component<Props> {
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
           <Col xs={24} sm={8} lg={8}>
-            <Card loading={loading}>
+            <Card loading={loading || creatingJob}>
               <h3>Select your notebook setting</h3>
               <Divider />
               {
@@ -152,7 +160,7 @@ class CreateForm extends React.Component<Props> {
                     </Radio.Group>
                   ) : (
                     <Card>
-                      No instance in this group.
+                      No image in this group.
                     </Card>
                   )
                 )}
@@ -171,7 +179,7 @@ class CreateForm extends React.Component<Props> {
               </Form.Item>
               <Form.Item label={(
                 <span>
-                  Nickname&nbsp;
+                  Command&nbsp;
                   <Tooltip title={(
                     <React.Fragment>
                       <h4 style={{color: 'white'}}>Information</h4>

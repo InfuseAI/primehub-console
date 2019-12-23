@@ -16,8 +16,8 @@ export const GET_MY_GROUPS = gql`
       id
       groups {
         ...GroupInfo
-        instanceTypes { name displayName description spec global }
-        images { name displayName description spec global }
+        instanceTypes { id name displayName description spec global }
+        images { id name displayName description spec global }
       }
     }
   }
