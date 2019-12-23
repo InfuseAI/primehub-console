@@ -58,7 +58,7 @@ export const RERUN_JOB = gql`
 export const CANCEL_JOB = gql`
   mutation cancelPhJob($where: PhJobWhereUniqueInput!) {
     cancelPhJob(where: $where) {
-      ...PhJobInfo
+      id
     }
   }
   ${PhJobFragement}
@@ -115,6 +115,11 @@ export default compose(
     name: 'rerunPhJob'
   }),
   graphql(CANCEL_JOB, {
+    options: {
+      refetchQueries: [{
+        query: GET_PH_JOB_CONNECTION
+      }]
+    },
     name: 'cancelPhJob'
   })
 )(JobListContainer)
