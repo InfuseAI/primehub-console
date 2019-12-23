@@ -53,16 +53,10 @@ class JobCreatePage extends React.Component<Props, State> {
   }
 
   onSubmit = (payload) => {
-    const {createPhJob, history} = this.props;
+    const {createPhJob} = this.props;
     createPhJob({
       variables: {
         data: payload
-      },
-      onCompleted: () => {
-        history.push(`${appPrefix}job`);
-      },
-      onError: e => {
-        console.error(e);
       }
     });
   }
@@ -99,15 +93,22 @@ class JobCreatePage extends React.Component<Props, State> {
 }
 
 export default compose(
+  withRouter,
   graphql(GET_MY_GROUPS, {
     name: 'getGroups'
   }),
   graphql(CREATE_JOB, {
-    options: {
+    options: (props: Props) => ({
       refetchQueries: [{
         query: GET_MY_GROUPS
-      }]
-    },
+      }],
+      onCompleted: () => {
+        props.history.push(`${appPrefix}job`);
+      },
+      onError: e => {
+        console.error(e);
+      }
+    }),
     name: 'createPhJob'
   })
-)(withRouter(JobCreatePage))
+)(JobCreatePage)

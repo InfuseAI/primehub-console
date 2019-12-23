@@ -61,7 +61,6 @@ export const CANCEL_JOB = gql`
       id
     }
   }
-  ${PhJobFragement}
 `;
 
 type Props = {
