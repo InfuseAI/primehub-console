@@ -9,7 +9,6 @@ import Title from 'components/job/title';
 import JobCreateForm from 'components/job/createForm';
 import {GroupFragment} from 'containers/job';
 
-
 export const GET_MY_GROUPS = gql`
   query me {
     me {
@@ -99,9 +98,6 @@ export default compose(
   }),
   graphql(CREATE_JOB, {
     options: (props: Props) => ({
-      refetchQueries: [{
-        query: GET_MY_GROUPS
-      }],
       onCompleted: () => {
         props.history.push(`${appPrefix}job`);
       },

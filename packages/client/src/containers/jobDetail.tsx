@@ -6,12 +6,14 @@ import {RouteComponentProps} from 'react-router-dom';
 import {compose} from 'recompose';
 import JobDetail from 'components/job/detail';
 import {PhJobFragement} from './jobList';
-import {RERUN_JOB, CANCEL_JOB} from 'containers/jobList';
+import {RERUN_JOB, CANCEL_JOB, GET_PH_JOB_CONNECTION} from 'containers/jobList';
 
 type Props = {
   getPhJob: any;
   rerunPhJob: Function;
   cancelPhJob: Function;
+  rerunPhJobResult: any;
+  cancelPhJobResult: any;
 } & RouteComponentProps<{
   jobId: string;
 }>;
@@ -61,18 +63,32 @@ export default compose(
           id: props.match.params.jobId
         }
       },
+      fetchPolicy: 'cache-and-network'
     }),
     name: 'getPhJob'
   }),
   graphql(RERUN_JOB, {
-    options: {
+    options: (props: Props) => ({
       refetchQueries: [{
-        query: GET_PH_JOB
-      }]
-    },
+        query: GET_PH_JOB,
+        variables: {where: {id: props.match.params.jobId}}
+      }],
+      onCompleted: () => {
+        props.history.push(`${appPrefix}job`);
+      },
+    }),
     name: 'rerunPhJob'
   }),
   graphql(CANCEL_JOB, {
+    options: (props: Props) => ({
+      refetchQueries: [{
+        query: GET_PH_JOB,
+        variables: {where: {id: props.match.params.jobId}}
+      }],
+      onCompleted: () => {
+        props.history.push(`${appPrefix}job`);
+      },
+    }),
     name: 'cancelPhJob'
   })
 )(JobDetailContainer)
