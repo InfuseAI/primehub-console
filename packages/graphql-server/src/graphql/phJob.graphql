@@ -19,6 +19,10 @@ type PhJob {
   logEndpoint: String
 }
 
+type PhJobCancelResponse {
+  id: ID!
+}
+
 """An edge in a connection."""
 type PhJobEdge {
   """The item at the end of the edge."""
@@ -46,3 +50,11 @@ input PhJobWhereInput {
   mine: Boolean
 }
 
+"""Mutation input"""
+input PhJobCreateInput {
+  displayName: String
+  groupId: String
+  instanceType: String
+  image: String
+  command: String
+}

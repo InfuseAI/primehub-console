@@ -4,6 +4,7 @@ import { PhJobPhase, PhJobSpec, PhJobStatus } from '../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../crdClient/customResource';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
 import { orderBy, omit } from 'lodash';
+import * as moment from 'moment';
 
 export interface PhJob {
   id: string;
@@ -22,6 +23,14 @@ export interface PhJob {
   startTime: string;
   finishTime?: string;
   logEndpoint: string;
+}
+
+export interface PhJobCreateInput {
+  displayName: string;
+  groupId: string;
+  instanceType: string;
+  image: string;
+  command: string;
 }
 
 // tslint:disable-next-line:max-line-length
@@ -44,6 +53,39 @@ export const transform = (item: Item<PhJobSpec, PhJobStatus>, namespace: string,
     finishTime: item.status.finishTime,
     logEndpoint: `${graphqlHost}${jobLogCtrl.getPhJobEndpoint(namespace, item.metadata.name)}`
   };
+};
+
+// utils
+const createJobName = () => {
+  // generate string like: 201912301200-gxzhaz
+  return `job-${moment.utc().format('YYYYMMDDHHmm')}-${Math.random().toString(36).slice(2, 8)}`;
+};
+
+const createJob = async (context: Context, data: PhJobCreateInput) => {
+  const {crdClient, kcAdminClient, userId, username} = context;
+  const group = await kcAdminClient.groups.findOne({id: data.groupId});
+  const name = createJobName();
+  const metadata = {
+    name,
+    labels: {
+      'primehub-group': data.groupId,
+      'primehub-user': userId
+    }
+  };
+  const spec = {
+    cancel: false,
+    userId,
+    userName: username,
+
+    // merge from user input
+    command: data.command,
+    displayName: data.displayName,
+    groupId: data.groupId,
+    groupName: group.name,
+    image: data.image,
+    instanceType: data.instanceType,
+  };
+  return crdClient.phJobs.create(metadata, spec, {phase: PhJobPhase.Pending} as any);
 };
 
 /**
@@ -92,4 +134,38 @@ export const queryOne = async (root, args, context: Context) => {
   } catch (e) {
     return null;
   }
+};
+
+export const create = async (root, args, context: Context) => {
+  const data: PhJobCreateInput = args.data;
+  const phJob = await createJob(context, data);
+  return transform(phJob, context.namespace, context.graphqlHost, context.jobLogCtrl);
+};
+
+export const rerun = async (root, args, context: Context) => {
+  const {id} = args.where;
+  const phJob = await context.crdClient.phJobs.get(id);
+
+  if (!phJob) {
+    return null;
+  }
+
+  // rerun found job
+  const rerunPhJob = await createJob(context, {
+    displayName: phJob.spec.displayName,
+    groupId: phJob.spec.groupId,
+    instanceType: phJob.spec.instanceType,
+    image: phJob.spec.image,
+    command: phJob.spec.command
+  });
+
+  return transform(rerunPhJob, context.namespace, context.graphqlHost, context.jobLogCtrl);
+};
+
+export const cancel = async (root, args, context: Context) => {
+  const {id} = args.where;
+  await context.crdClient.phJobs.patch(id, {
+    spec: {cancel: true} as any
+  });
+  return {id};
 };

@@ -121,6 +121,9 @@ const resolvers = {
     createBuildImage: buildImage.create,
     updateBuildImage: buildImage.update,
     deleteBuildImage: buildImage.destroy,
+    createPhJob: phJob.create,
+    rerunPhJob: phJob.rerun,
+    cancelPhJob: phJob.cancel,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation(),
@@ -276,6 +279,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
       const kcAdminClient = createKcAdminClient();
       const {authorization = ''}: {authorization: string} = ctx.header;
+      const useCache = ctx.headers['x-primehub-use-cache'];
 
       // if a token is brought in bearer
       // the request could come from jupyterHub or cms
@@ -300,6 +304,14 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           kcAdminClient.setAccessToken(apiToken);
           userId = tokenPayload.sub;
           username = tokenPayload.preferred_username;
+
+          // if request comes from /jobs or other pages not cms
+          // performance would be important.
+          // We'll use cache here
+          if (useCache) {
+            getInstanceType = instCache.get;
+            getImage = imageCache.get;
+          }
         }
       } else if (config.keycloakGrantType === 'password'
           && authorization.indexOf('Basic') >= 0

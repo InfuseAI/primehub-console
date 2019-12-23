@@ -327,7 +327,7 @@ export class Crd<SpecType> {
 
     // create crd on k8s
     const {metadata, spec} = this.createMapping(args.data, name);
-    const res = await customResource.create(metadata, spec, currentWorkspace.getK8sNamespace());
+    const res = await customResource.create(metadata, spec, undefined, currentWorkspace.getK8sNamespace());
     if (this.onCreate) {
       const onCreateGetPrefix = (customizePrefix?: string) => this.getPrefix(currentWorkspace, customizePrefix);
       await this.onCreate({
