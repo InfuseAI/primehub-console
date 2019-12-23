@@ -74,19 +74,11 @@ type Props = {
 class JobListContainer extends React.Component<Props> {
   render() {
     const {getPhJobConnection, groups, rerunPhJob, cancelPhJob} = this.props;
-    console.log(this.props)
     return (
       <JobList
         jobsLoading={getPhJobConnection.loading}
         jobsError={getPhJobConnection.error}
-        jobsConnection={getPhJobConnection.phJobsConnection || {pageInfo: {}, edges: [{
-          node: {
-            id: 'id1',
-            name: 'fdsf',
-            displayName: 'fsdfds',
-            phase: 'Running',
-          }
-        }]}}
+        jobsConnection={getPhJobConnection.phJobsConnection || {pageInfo: {}, edges: []}}
         jobsVariables={getPhJobConnection.variables}
         jobsRefetch={getPhJobConnection.refetch}
         rerunPhJob={rerunPhJob}
