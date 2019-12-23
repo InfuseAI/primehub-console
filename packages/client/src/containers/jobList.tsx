@@ -68,11 +68,13 @@ type Props = {
   groups: Array<Group>;
   rerunPhJob: any;
   cancelPhJob: any;
+  rerunPhJobResult: any;
+  cancelPhJobResult: any;
 }
 
 class JobListContainer extends React.Component<Props> {
   render() {
-    const {getPhJobConnection, groups, rerunPhJob, cancelPhJob} = this.props;
+    const {getPhJobConnection, groups, rerunPhJob, cancelPhJob, rerunPhJobResult, cancelPhJobResult} = this.props;
     return (
       <JobList
         jobsLoading={getPhJobConnection.loading}
@@ -81,6 +83,8 @@ class JobListContainer extends React.Component<Props> {
         jobsVariables={getPhJobConnection.variables}
         jobsRefetch={getPhJobConnection.refetch}
         rerunPhJob={rerunPhJob}
+        rerunPhJobResult={rerunPhJobResult}
+        cancelPhJobResult={cancelPhJobResult}
         cancelPhJob={cancelPhJob}
         groups={groups}
       />
@@ -103,6 +107,11 @@ export default compose(
     name: 'getPhJobConnection'
   }),
   graphql(RERUN_JOB, {
+    options: {
+      refetchQueries: [{
+        query: GET_PH_JOB_CONNECTION
+      }]
+    },
     name: 'rerunPhJob'
   }),
   graphql(CANCEL_JOB, {
