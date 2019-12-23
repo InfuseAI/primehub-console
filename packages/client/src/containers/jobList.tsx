@@ -2,6 +2,8 @@ import * as React from 'react';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
+import {withRouter} from 'react-router-dom';
+import {RouteComponentProps} from 'react-router';
 import JobList from 'components/job/list';
 import {Group} from 'components/job/groupFilter';
 
@@ -70,7 +72,9 @@ type Props = {
   cancelPhJob: any;
   rerunPhJobResult: any;
   cancelPhJobResult: any;
-}
+} & RouteComponentProps;
+
+const appPrefix = (window as any).APP_PREFIX || '/';
 
 class JobListContainer extends React.Component<Props> {
   render() {
@@ -93,6 +97,7 @@ class JobListContainer extends React.Component<Props> {
 }
 
 export default compose(
+  withRouter,
   graphql(GET_PH_JOB_CONNECTION, {
     options: (props: Props) => {
       return {
@@ -102,24 +107,33 @@ export default compose(
           },
           first: 10,
         },
+        fetchPolicy: 'cache-and-network'
       }
     },
     name: 'getPhJobConnection'
   }),
   graphql(RERUN_JOB, {
-    options: {
+    options: (props: Props) => ({
       refetchQueries: [{
-        query: GET_PH_JOB_CONNECTION
-      }]
-    },
+        query: GET_PH_JOB_CONNECTION,
+        variables: props.getPhJobConnection.variables,
+      }],
+      onCompleted: () => {
+        props.history.push(`${appPrefix}job`);
+      },
+    }),
     name: 'rerunPhJob'
   }),
   graphql(CANCEL_JOB, {
-    options: {
+    options: (props: Props) => ({
       refetchQueries: [{
-        query: GET_PH_JOB_CONNECTION
-      }]
-    },
+        query: GET_PH_JOB_CONNECTION,
+        variables: props.getPhJobConnection.variables
+      }],
+      onCompleted: () => {
+        props.history.push(`${appPrefix}job`);
+      },
+    }),
     name: 'cancelPhJob'
   })
 )(JobListContainer)
