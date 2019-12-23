@@ -45,7 +45,7 @@ const appPrefix = (window as any).APP_PREFIX || '/';
 
 class JobCreatePage extends React.Component<Props, State> {
   state = {
-    selectedGroup: null,
+    selectedGroup: 'groupId',
   };
 
   onChangeGroup = (id: string) => {
@@ -69,7 +69,38 @@ class JobCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {getGroups, createPhJobResult} = this.props;
+    const {createPhJobResult} = this.props;
+    const getGroups = {
+      me: {
+        groups: [{
+          id: 'groupId',
+          displayName: 'displayName',
+          instanceTypes: [{
+            id: 'instanceTypeId',
+            displayName: 'd',
+            description: 'dd'
+          }],
+          images: [{
+            id: 'imageId',
+            displayName: 'image',
+            description: 'dd'
+          }]
+        }, {
+          id: 'groupId2',
+          displayName: 'displayName',
+          instanceTypes: [{
+            id: 'instanceTypeId',
+            displayName: 'd',
+            description: 'dd'
+          }],
+          images: [{
+            id: 'imageId',
+            displayName: 'image',
+            description: 'dd'
+          }]
+        }],
+      }
+    }
     const group = get(getGroups, 'me.groups', []).find(group => group.id === selectedGroup);
     const instanceTypes = get(group, 'instanceTypes', []);
     const images = get(group, 'images', []);
