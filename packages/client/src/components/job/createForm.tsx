@@ -152,7 +152,7 @@ class CreateForm extends React.Component<Props> {
                     </Radio.Group>
                   ) : (
                     <Card>
-                      No instance in this group.
+                      No image in this group.
                     </Card>
                   )
                 )}
