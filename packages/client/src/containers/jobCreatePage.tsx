@@ -68,27 +68,8 @@ class JobCreatePage extends React.Component<Props, State> {
   }
 
   render() {
-    // const {selectedGroup} = this.state;
-    const {createPhJobResult, history} = this.props;
-    const selectedGroup = '123'
-    const getGroups = {
-      me: {
-        groups: [{
-          id: '123',
-          name: 'fdsfds',
-          instanceTypes: [{
-            id: '432',
-            name: 'fdsfsd',
-            description: 'fsdfds'
-          }],
-          images: [{
-            id: '432',
-            name: 'fdsfds',
-            description: '43fds'
-          }]
-        }]
-      }
-    }
+    const {selectedGroup} = this.state;
+    const {getGroups, createPhJobResult} = this.props;
     const group = get(getGroups, 'me.groups', []).find(group => group.id === selectedGroup);
     const instanceTypes = get(group, 'instanceTypes', []);
     const images = get(group, 'images', []);
