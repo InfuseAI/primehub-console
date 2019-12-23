@@ -62,7 +62,6 @@ class CreateForm extends React.Component<Props> {
 
     form.validateFields(async (err, values) => {
       if (err) return;
-      console.log(values);
       onSubmit(values);
     });
   }
@@ -99,7 +98,7 @@ class CreateForm extends React.Component<Props> {
               {
                 groups.length ? (
                   <Form.Item label="Group">
-                    {form.getFieldDecorator('group', {
+                    {form.getFieldDecorator('groupId', {
                       rules: [{ required: true, message: 'Please select a group!' }],
                     })(
                       <Select placeholder="Please select a group" onChange={id => onSelectGroup(id)}>
@@ -171,7 +170,7 @@ class CreateForm extends React.Component<Props> {
           <Col xs={24} sm={16} lg={16}>
             <Card>
               <Form.Item label="Job name">
-                {form.getFieldDecorator('name', {
+                {form.getFieldDecorator('displayName', {
                   rules: [{ required: true, message: 'Please input a name!' }],
                 })(
                   <Input />
