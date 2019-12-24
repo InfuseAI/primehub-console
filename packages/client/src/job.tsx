@@ -2,7 +2,8 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 import {ApolloProvider} from 'react-apollo';
 import {genClient} from 'canner/lib/components/index';
-import schema from '../schema/index.schema.js';
+import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlClient';
+import {LocalStorageConnector} from 'canner-graphql-interface';
 import {Layout, notification, Button} from 'antd';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import Header from 'components/header';
@@ -21,7 +22,25 @@ const Content = styled(Layout.Content)`
   min-height: calc(100vh - 64px);
 `;
 
-const client = genClient(schema);
+const graphqlClient = new GraphqlClient({
+  uri: (window as any).graphqlEndpoint,
+  fetch: (uri, options) => {
+    const token = window.localStorage.getItem('canner.accessToken');
+    options.headers = {
+      Authorization: `Bearer ${token}`,
+      'x-primehub-use-cache': true,
+      ...options.headers || {}
+    };
+    return fetch(uri, options);
+  },
+});
+
+const connector = new LocalStorageConnector({
+  defaultData: {me: {groups: []}, jobs: []},
+  localStorageKey: 'infuse-job'
+})
+
+const client = genClient(process.env.NODE_ENV === 'production' ? {graphqlClient} : {connector, schema: {}});
 const appPrefix = (window as any).APP_PREFIX || '/';
 class Job extends React.Component {
   render() {
