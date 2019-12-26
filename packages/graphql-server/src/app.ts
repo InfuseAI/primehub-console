@@ -57,6 +57,7 @@ import Boom from 'boom';
 
 // graphql middlewares
 import readOnlyMiddleware from './middlewares/readonly';
+import { permissions as authMiddleware } from './middlewares/auth';
 import TokenSyncer from './oidc/syncer';
 import K8sSecret from './k8sResource/k8sSecret';
 import K8sDatasetPvc from './k8sResource/k8sDatasetPvc';
@@ -65,6 +66,7 @@ import K8sDatasetPvc from './k8sResource/k8sDatasetPvc';
 import * as logger from './logger';
 import { Item } from './crdClient/customResource';
 import K8sUploadServerSecret from './k8sResource/k8sUploadServerSecret';
+import { Role } from './resolvers/interface';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -264,7 +266,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     typeDefs: typeDefs as any,
     resolvers
   });
-  const schemaWithMiddleware = applyMiddleware(schema, readOnlyMiddleware);
+  const schemaWithMiddleware = applyMiddleware(schema, readOnlyMiddleware, authMiddleware);
   const server = new ApolloServer({
     playground: config.graphqlPlayground,
     tracing: config.apolloTracing,
@@ -274,12 +276,14 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       let readOnly = false;
       let userId: string;
       let username: string;
+      let role: Role = Role.NOT_AUTH;
       let getInstanceType: (name: string) => Promise<Item<InstanceTypeSpec>>;
       let getImage: (name: string) => Promise<Item<ImageSpec>>;
 
       const kcAdminClient = createKcAdminClient();
       const {authorization = ''}: {authorization: string} = ctx.header;
       const useCache = ctx.headers['x-primehub-use-cache'];
+      const isJobClient = ctx.headers['x-primehub-job'];
 
       // if a token is brought in bearer
       // the request could come from jupyterHub or cms
@@ -297,20 +301,32 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           getImage = imageCache.get;
           readOnly = true;
           username = userId = 'jupyterHub';
+          role = Role.JUPYTER_USER;
         } else {
           // Either config.sharedGraphqlSecretKey not set, or not a sharedGraphqlSecretKey request
           // we verify the token with oidc public key
           const tokenPayload = await oidcTokenVerifier.verify(apiToken);
-          kcAdminClient.setAccessToken(apiToken);
           userId = tokenPayload.sub;
           username = tokenPayload.preferred_username;
 
-          // if request comes from /jobs or other pages not cms
-          // performance would be important.
-          // We'll use cache here
-          if (useCache) {
+          // check if user is admin
+          const roles = get(tokenPayload, ['resource_access', 'realm-management', 'roles'], []);
+          if (roles.indexOf('realm-admin') >= 0) {
+            role = Role.ADMIN;
+            kcAdminClient.setAccessToken(apiToken);
+          } else if (isJobClient || useCache) {
+            // if request comes from /jobs or other pages not cms
+            // performance would be important.
+            // We'll use cache here
+            role = Role.JOB_USER;
             getInstanceType = instCache.get;
             getImage = imageCache.get;
+
+            // also, we need admin token to access keycloak api
+            // this part rely on authMiddleware to control the permission
+            // todo: maybe we can use other api to access personal account data?
+            const accessToken = await tokenSyncer.getAccessToken();
+            kcAdminClient.setAccessToken(accessToken);
           }
         }
       } else if (config.keycloakGrantType === 'password'
@@ -324,6 +340,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         }
 
         username = userId = credentials.name;
+        role = Role.ADMIN;
 
         // use password grant type if specified, or basic auth provided
         await kcAdminClient.auth({
@@ -359,6 +376,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         readOnly,
         userId,
         username,
+        role,
         defaultUserVolumeCapacity: config.defaultUserVolumeCapacity,
         workspaceApi,
         crdNamespace: config.k8sCrdNamespace,
@@ -412,7 +430,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   // cors
   app.use(cors({
-    allowHeaders: ['content-type', 'authorization']
+    allowHeaders: ['content-type', 'authorization', 'x-primehub-use-cache', 'x-primehub-job']
   }));
 
   // setup
