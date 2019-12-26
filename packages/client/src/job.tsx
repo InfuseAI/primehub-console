@@ -28,7 +28,7 @@ const graphqlClient = new GraphqlClient({
     const token = window.localStorage.getItem('canner.accessToken');
     options.headers = {
       Authorization: `Bearer ${token}`,
-      'x-primehub-use-cache': true,
+      'x-primehub-job': true,
       ...options.headers || {}
     };
     return fetch(uri, options);
