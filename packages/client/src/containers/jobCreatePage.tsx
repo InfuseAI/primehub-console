@@ -1,12 +1,13 @@
 import * as React from 'react';
-import {Button} from 'antd';
+import {Button, notification} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
-import {get} from 'lodash';
+import {get, unionBy} from 'lodash';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import Title from 'components/job/title';
+import {errorHandler} from 'components/job/errorHandler';
 import JobCreateForm from 'components/job/createForm';
 import {GroupFragment} from 'containers/job';
 
@@ -16,8 +17,8 @@ export const GET_MY_GROUPS = gql`
       id
       groups {
         ...GroupInfo
-        instanceTypes { id name displayName description spec global }
-        images { id name displayName description spec global }
+        instanceTypes { id name displayName description spec global gpuLimit }
+        images { id name displayName description spec global type }
       }
     }
   }
@@ -42,7 +43,6 @@ type State = {
 }
 
 const appPrefix = (window as any).APP_PREFIX || '/';
-
 class JobCreatePage extends React.Component<Props, State> {
   state = {
     selectedGroup: null,
@@ -64,9 +64,22 @@ class JobCreatePage extends React.Component<Props, State> {
   render() {
     const {selectedGroup} = this.state;
     const {getGroups, createPhJobResult, history} = this.props;
-    const group = get(getGroups, 'me.groups', []).find(group => group.id === selectedGroup);
-    const instanceTypes = get(group, 'instanceTypes', []);
-    const images = get(group, 'images', []);
+    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+    const allGroups = get(getGroups, 'me.groups', []);
+    const groups = allGroups.filter(group => group.id !== everyoneGroupId);
+    const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
+    const group = groups
+      .find(group => group.id === selectedGroup);
+    const instanceTypes = unionBy(
+      get(group, 'instanceTypes', []),
+      get(everyoneGroup, 'instanceTypes', []),
+      'id'
+    );
+    const images = unionBy(
+      get(group, 'images', []),
+      get(everyoneGroup, 'images', []),
+      'id'
+    );
     return (
       <React.Fragment>
         <Button
@@ -80,7 +93,7 @@ class JobCreatePage extends React.Component<Props, State> {
         <JobCreateForm
           onSelectGroup={this.onChangeGroup}
           selectedGroup={selectedGroup}
-          groups={get(getGroups, 'me.groups', [])}
+          groups={groups}
           instanceTypes={instanceTypes}
           images={images}
           onSubmit={this.onSubmit}
@@ -102,9 +115,7 @@ export default compose(
       onCompleted: () => {
         props.history.push(`${appPrefix}job`);
       },
-      onError: e => {
-        console.error(e);
-      }
+      onError: errorHandler
     }),
     name: 'createPhJob'
   })

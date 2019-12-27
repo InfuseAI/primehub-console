@@ -1,10 +1,10 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
-import {Button} from 'antd';
 import {graphql} from 'react-apollo';
 import {RouteComponentProps} from 'react-router-dom';
 import {compose} from 'recompose';
 import JobDetail from 'components/job/detail';
+import {errorHandler} from 'components/job/errorHandler';
 import {PhJobFragement} from './jobList';
 import {RERUN_JOB, CANCEL_JOB} from 'containers/jobList';
 
@@ -69,6 +69,7 @@ export default compose(
       onCompleted: () => {
         props.history.push(`${appPrefix}job`);
       },
+      onError: errorHandler
     }),
     name: 'rerunPhJob'
   }),
@@ -81,6 +82,7 @@ export default compose(
       onCompleted: () => {
         props.history.push(`${appPrefix}job`);
       },
+      onError: errorHandler
     }),
     name: 'cancelPhJob'
   })

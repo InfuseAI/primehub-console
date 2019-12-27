@@ -40,10 +40,6 @@ const renderTiming = record => {
   const finishTime = record.finishTime || new Date().toISOString();
   const duration = computeDuration(moment(startTime), moment(finishTime));
   const running = record.phase === Phase.Running;
-  console.log({
-    running,
-    
-  })
   return (
     <>
       <Tooltip

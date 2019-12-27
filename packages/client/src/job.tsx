@@ -38,18 +38,63 @@ const graphqlClient = new GraphqlClient({
 const fakeData = {
   me: {
     groups: [{
-      id: 'groupId',
+      id: 'groupId1',
+      name: 'Group',
+      displayName: 'Group 1',
+      instanceTypes: [{
+        id: 'g-it1',
+        name: 'IT1',
+        displayName: 'group1 it'
+      }],
+      images: [{
+        id: 'g-it1',
+        name: 'IT1',
+        displayName: 'group1 im',
+      }]
+    }, {
+      id: 'groupId2',
+      name: 'Group',
+      displayName: 'Group 2',
+      instanceTypes: [{
+        id: 'ggit1',
+        name: 'IT1',
+        displayName: 'group2 it'
+      }],
+      images: [{
+        id: 'ggit2',
+        name: 'IT1',
+        displayName: 'group2 im',
+      }]
+    }, {
+      id: 'everyone',
       name: 'Group',
       displayName: 'Group DisplayName',
       instanceTypes: [{
-        id: 'it1',
-        name: 'IT1',
-        displayName: 'IT1'
+        id: 'everyone-it',
+        name: 'it',
+        displayName: 'gpu0',
+        gpuLimit: 0
+      }, {
+        id: 'everyone-it2',
+        name: 'it',
+        displayName: 'gpu1',
+        gpuLimit: 1
       }],
       images: [{
-        id: 'it1',
-        name: 'IT1',
-        displayName: 'IT1',
+        id: 'everyone-image',
+        name: 'cpu',
+        displayName: 'cpu',
+        type: 'cpu'
+      }, {
+        id: 'everyone-image2',
+        name: 'gpu',
+        displayName: 'gpu',
+        type: 'gpu'
+      }, {
+        id: 'everyone-image3',
+        name: 'img',
+        displayName: 'img',
+        type: 'only'
       }]
     }]
   },
