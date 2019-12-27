@@ -42,6 +42,13 @@ const renderMessage = (job: Record<string, any>) => {
     default:
       return '-';
   }
+};
+
+const renderFinishTime = (job: Record<string, any>) => {
+  if (job.phase === Phase.Running) return '-'
+  return job.finishTime ?
+    moment(job.finishTime).format('YYYY-MM-DD HH:mm:ss') :
+    '-';
 }
 
 type Props = {
@@ -157,8 +164,8 @@ export default class Detail extends React.Component<Props> {
                 <Form.Item  style={formItemStyle} label="Start Time:" {...formItemLayout}>
                   {startTime ? startTime.format('YYYY-MM-DD HH:mm:ss') : '-'}
                 </Form.Item>
-                <Form.Item  style={formItemStyle} label="Finish Time:" {...formItemLayout}>
-                  {finishTime ? finishTime.format('YYYY-MM-DD HH:mm:ss') : '-'}
+                <Form.Item  style={formItemStyle} label="Finished Time:" {...formItemLayout}>
+                  {renderFinishTime(job)}
                 </Form.Item>
                 <Form.Item  style={blockStyle} label="Duration" {...formItemLayout}>
                   {computeDuration(startTime, finishTime)}
