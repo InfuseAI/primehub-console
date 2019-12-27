@@ -273,13 +273,17 @@ class JobList extends React.Component<Props> {
           />
         </Col>
         <Col span={18}>
-          <Title>Jobs</Title>
-          <Button onClick={this.createPhJob}>
-            Create Job
-          </Button>
-          <Button onClick={this.refresh} style={{marginLeft: 16}}>
-            Refresh
-          </Button>
+          <div style={{display: 'flex', justifyContent: 'space-between'}}>
+            <Title>Jobs</Title>
+            <div>
+              <Button onClick={this.createPhJob}>
+                Create Job
+              </Button>
+              <Button onClick={this.refresh} style={{marginLeft: 16}}>
+                Refresh
+              </Button>
+            </div>
+          </div>
           <Table
             dataSource={jobsConnection.edges.map(edge => edge.node)}
             columns={columns}

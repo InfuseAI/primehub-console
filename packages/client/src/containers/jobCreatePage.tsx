@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {Button} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -62,19 +63,19 @@ class JobCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {getGroups, createPhJobResult} = this.props;
+    const {getGroups, createPhJobResult, history} = this.props;
     const group = get(getGroups, 'me.groups', []).find(group => group.id === selectedGroup);
     const instanceTypes = get(group, 'instanceTypes', []);
     const images = get(group, 'images', []);
     return (
       <React.Fragment>
-        {/* <Button
+        <Button
           icon="left"
           onClick={() => history.push(`${appPrefix}job`)}
-          style={{marginBottom: 16}}
+          style={{marginRight: 16, verticalAlign: 'top'}}
         >
           Back
-        </Button> */}
+        </Button>
         <Title>Create Job</Title>
         <JobCreateForm
           onSelectGroup={this.onChangeGroup}

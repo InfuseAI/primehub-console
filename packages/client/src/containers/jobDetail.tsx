@@ -35,22 +35,15 @@ class JobDetailContainer extends React.Component<Props> {
     if (getPhJob.loading) return null;
     if (getPhJob.error) return 'Error';
     return (
-      <React.Fragment>
-        <Button
-          icon="left"
-          onClick={() => history.push(`${appPrefix}job`)}
-          style={{marginBottom: 16}}
-        >
-          Back
-        </Button>
-        <JobDetail
-          rerunPhJob={rerunPhJob}
-          cancelPhJob={cancelPhJob}
-          rerunPhJobResult={rerunPhJobResult}
-          cancelPhJobResult={cancelPhJobResult}
-          job={getPhJob.phJob || {id: 'test'}}
-        />
-      </React.Fragment>
+      <JobDetail
+        rerunPhJob={rerunPhJob}
+        cancelPhJob={cancelPhJob}
+        rerunPhJobResult={rerunPhJobResult}
+        cancelPhJobResult={cancelPhJobResult}
+        job={getPhJob.phJob || {id: 'test'}}
+        appPrefix={appPrefix}
+        history={history}
+      />
     );
   }
 }
