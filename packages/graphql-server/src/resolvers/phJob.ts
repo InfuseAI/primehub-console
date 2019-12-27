@@ -113,39 +113,39 @@ const validateQuota = async (context: Context, data: PhJobCreateInput) => {
     instanceType.spec['limits.memory'] ? parseMemory(instanceType.spec['limits.memory']) : null;
 
   // gpu quota not defined, but used in instanceType
-  if (isUndefined(quotaGpu) && isUndefined(projectQuotaGpu) && !isUndefined(instanceTypeGpuLimit)) {
+  if (isNil(quotaGpu) && isNil(projectQuotaGpu) && !isNil(instanceTypeGpuLimit)) {
     throw new ApolloError('Gpu Quota not set', EXCEED_QUOTA_ERROR);
   }
 
   // check if gpu quota exceed
-  if (!isUndefined(instanceTypeGpuLimit)) {
-    if (!isUndefined(quotaGpu) && instanceTypeGpuLimit > quotaGpu) {
+  if (!isNil(instanceTypeGpuLimit)) {
+    if (!isNil(quotaGpu) && instanceTypeGpuLimit > quotaGpu) {
       throw new ApolloError('User Gpu Quota exceeded', EXCEED_QUOTA_ERROR);
     }
 
-    if (!isUndefined(projectQuotaGpu) && instanceTypeGpuLimit > projectQuotaGpu) {
+    if (!isNil(projectQuotaGpu) && instanceTypeGpuLimit > projectQuotaGpu) {
       throw new ApolloError('Group Gpu Quota exceeded', EXCEED_QUOTA_ERROR);
     }
   }
 
   // check if cpu quota exceed
-  if (!isUndefined(instanceTypeCpuLimit)) {
-    if (!isUndefined(quotaCpu) && instanceTypeCpuLimit > quotaCpu) {
-      throw new ApolloError('User Gpu Quota exceeded', EXCEED_QUOTA_ERROR);
+  if (!isNil(instanceTypeCpuLimit)) {
+    if (!isNil(quotaCpu) && instanceTypeCpuLimit > quotaCpu) {
+      throw new ApolloError('User Cpu Quota exceeded', EXCEED_QUOTA_ERROR);
     }
 
-    if (!isUndefined(projectQuotaCpu) && instanceTypeCpuLimit > projectQuotaCpu) {
-      throw new ApolloError('Group Gpu Quota exceeded', EXCEED_QUOTA_ERROR);
+    if (!isNil(projectQuotaCpu) && instanceTypeCpuLimit > projectQuotaCpu) {
+      throw new ApolloError('Group Cpu Quota exceeded', EXCEED_QUOTA_ERROR);
     }
   }
 
   // check if memory quota exceed
   if (!isNil(instanceTypeMemoryLimit)) {
-    if (!isUndefined(quotaMemory) && instanceTypeMemoryLimit > quotaMemory) {
+    if (!isNil(quotaMemory) && instanceTypeMemoryLimit > quotaMemory) {
       throw new ApolloError('User Memory exceeded', EXCEED_QUOTA_ERROR);
     }
 
-    if (!isUndefined(projectQuotaMemory) && instanceTypeMemoryLimit > projectQuotaMemory) {
+    if (!isNil(projectQuotaMemory) && instanceTypeMemoryLimit > projectQuotaMemory) {
       throw new ApolloError('Group Memory exceeded', EXCEED_QUOTA_ERROR);
     }
   }

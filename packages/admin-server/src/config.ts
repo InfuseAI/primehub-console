@@ -8,6 +8,7 @@ export interface Config {
   keycloakOidcBaseUrl: string;
   keycloakRealmName: string;
   keycloakClientId: string;
+  keycloakEveryoneGroupId: string;
 
   // use https or not, should only be tested in dev
   secure: boolean;
@@ -55,6 +56,7 @@ const defaultConfigs = {
   keycloakRealmName: 'master',
   keycloakClientId: 'admin-cli',
   cookieSignedKey: 'cannerSignedCookie',
+  keycloakEveryoneGroupId: '',
   cmsHost: 'http://localhost:3000',
   keycloakMaxSockets: 80,
   keycloakMaxFreeSockets: 10,
@@ -92,6 +94,7 @@ export const createConfig = (): Config => {
     keycloakRealmName: process.env.KC_REALM,
     keycloakClientSecret: process.env.KC_CLIENT_SECRET,
     keycloakClientId: process.env.KC_CLIENT_ID,
+    keycloakEveryoneGroupId: process.env.KC_EVERYONE_GROUP_ID,
     cookieSignedKey: process.env.COOKIE_SIGNED_KEY,
     cmsHost: process.env.CANNER_CMS_HOST,
     keycloakMaxSockets: process.env.KC_MAX_SOCKETS,
