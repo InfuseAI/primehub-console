@@ -81,6 +81,7 @@ const appPrefix = (window as any).APP_PREFIX || '/';
 class JobListContainer extends React.Component<Props> {
   render() {
     const {getPhJobConnection, groups, rerunPhJob, cancelPhJob, rerunPhJobResult, cancelPhJobResult} = this.props;
+
     return (
       <JobList
         jobsLoading={getPhJobConnection.loading}
