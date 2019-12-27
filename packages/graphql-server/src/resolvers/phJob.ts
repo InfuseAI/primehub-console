@@ -22,6 +22,7 @@ export interface PhJob {
   userName: string;
   phase: PhJobPhase;
   reason?: string;
+  message?: string;
   createTime: string;
   startTime: string;
   finishTime?: string;
@@ -52,6 +53,7 @@ export const transform = (item: Item<PhJobSpec, PhJobStatus>, namespace: string,
     userName: item.spec.userName,
     phase,
     reason: get(item, 'status.reason'),
+    message: get(item, 'status.message'),
     createTime: item.metadata.creationTimestamp,
     startTime: get(item, 'status.startTime'),
     finishTime: get(item, 'status.finishTime'),

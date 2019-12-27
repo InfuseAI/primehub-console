@@ -13,6 +13,7 @@ type PhJob {
   userName: String
   phase: String
   reason: String
+  message: String
   createTime: String
   startTime: String
   finishTime: String
