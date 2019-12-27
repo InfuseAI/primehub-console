@@ -34,21 +34,42 @@ const renderJobName = (text, record) => (
   </Tooltip>
 );
 
-const renderTiming = (text, record) => (
-  <Tooltip
-    placement="top"
-    title={`Create time:\n ${moment(record.createTime).format('DD/MM/YYYY HH:mm:ss')}`}
-  >
-    {text ? moment(text).fromNow() : '-'}
-    <br/>
-    {text ? (
-      <>
-        <Icon type="clock-circle" style={{marginRight: 4, position: 'relative', top: 1}} />
-        {computeDuration(text ? moment(text) : '', record.finishTime ? moment(record.finishTime) : '')}
-      </>
-    ): '-'}
-  </Tooltip>
-);
+const renderTiming = record => {
+  const createTime = record.createTime;
+  const startTime = record.startTime;
+  const finishTime = record.finishTime || new Date().toISOString();
+  const duration = computeDuration(moment(startTime), moment(finishTime));
+  const running = record.phase === Phase.Running;
+  return (
+    <>
+      <Tooltip
+        placement="top"
+        title={`Create time: ${moment(createTime).format('YYYY-MM-DD HH:mm:ss')}`}
+      >
+        {createTime ? moment(createTime).fromNow() : '-'}
+        <br/>
+      </Tooltip>
+      <Tooltip
+        overlayStyle={{maxWidth: 300}}
+        placement="top"
+        title={
+          <>
+            Start time: {moment(startTime).format('YYYY-MM-DD HH:mm:ss')}
+            <br/>
+            Finished time: {running ? '-' : moment(finishTime).format('YYYY-MM-DD HH:mm:ss')}
+          </>
+        }
+      >
+        {startTime ? (
+          <div>
+            <Icon type="clock-circle" style={{marginRight: 4, position: 'relative', top: 1}} />
+            {duration}
+          </div>
+        ): '-'}
+      </Tooltip>
+    </>
+  );
+}
 
 type JobsConnection = {
   pageInfo: {
@@ -229,7 +250,7 @@ class JobList extends React.Component<Props> {
       dataIndex: 'groupName'
     }, {
       title: 'Timing',
-      dataIndex: 'startTime',
+      key: 'timing',
       render: renderTiming
     }, {
       title: 'Action',
@@ -248,13 +269,17 @@ class JobList extends React.Component<Props> {
           />
         </Col>
         <Col span={18}>
-          <Title>Jobs</Title>
-          <Button onClick={this.createPhJob}>
-            Create Job
-          </Button>
-          <Button onClick={this.refresh} style={{marginLeft: 16}}>
-            Refresh
-          </Button>
+          <div style={{display: 'flex', justifyContent: 'space-between'}}>
+            <Title>Jobs</Title>
+            <div>
+              <Button onClick={this.createPhJob}>
+                Create Job
+              </Button>
+              <Button onClick={this.refresh} style={{marginLeft: 16}}>
+                Refresh
+              </Button>
+            </div>
+          </div>
           <Table
             dataSource={jobsConnection.edges.map(edge => edge.node)}
             columns={columns}

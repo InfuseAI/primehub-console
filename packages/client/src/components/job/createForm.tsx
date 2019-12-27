@@ -35,13 +35,12 @@ const radioGroupStyle = {
   border: '1px solid #e8e8e8',
 }
 
-const transformImages = (images, currentInstancetype) => {
-  return images.map(image => {
-    return {
-      ...image,
-      disables: false
-    };
-  })
+const transformImages = (images, instanceType) => {
+  const gpuInstance = Boolean(instanceType && instanceType.gpuLimit);
+  return images.map(image => ({
+    ...image,
+    disabled: !gpuInstance && (image.type || '').toLowerCase() === 'gpu'
+  }))
 }
 
 const commandPlaceHolder = `echo "Start training"
@@ -53,15 +52,39 @@ python /project/group-a/train.py \\
 `;
 
 class CreateForm extends React.Component<Props> {
-  state = {
-    selectedInstanceType: null
-  };
-
   componentDidMount() {
+    this.autoSelectFirstGroup();
+    this.autoSelectFirstInstanceType();
+    this.autoSelectFirstImage();
+  }
+
+  componentDidUpdate() {
+    this.autoSelectFirstGroup();
+    this.autoSelectFirstInstanceType();
+    this.autoSelectFirstImage();
+  }
+
+  autoSelectFirstGroup = () => {
     const {onSelectGroup, selectedGroup, groups} = this.props;
-    if (!selectedGroup) {
-      onSelectGroup(get(groups[0], 'id', null));
+    if (!selectedGroup && groups.length) onSelectGroup(get(groups[0], 'id', null));
+  }
+
+  autoSelectFirstInstanceType = () => {
+    const {instanceTypes, form} = this.props;
+    if (!form.getFieldValue('instanceType') && instanceTypes.length) {
+      form.setFieldsValue({instanceType: instanceTypes[0].id});
     }
+  }
+
+  autoSelectFirstImage = () => {
+    const {images, instanceTypes, form} = this.props;
+    const instanceTypeId = form.getFieldValue('instanceType');
+    const imageId = form.getFieldValue('image');
+    const instanceType = instanceTypes.find(it => it.id === instanceTypeId);
+    const transformedImages = transformImages(images, instanceType);
+    const availableImages = transformedImages.filter(image => !image.disabled);
+    if (imageId && availableImages.some(image => image.id === imageId)) return;
+    if (availableImages.length) form.setFieldsValue({image: availableImages[0].id});
   }
 
   submit = (e) => {
@@ -71,12 +94,6 @@ class CreateForm extends React.Component<Props> {
     form.validateFields(async (err, values) => {
       if (err) return;
       onSubmit(values);
-    });
-  }
-
-  onSelectInstanceTpye = (e) => {
-    this.setState({
-      selectedInstanceType: e.target.value
     });
   }
 
@@ -91,11 +108,7 @@ class CreateForm extends React.Component<Props> {
       form
     } = this.props;
 
-    const {
-      selectedInstanceType
-    } = this.state;
-
-    const instanceType = instanceTypes.find(instanceType => instanceType.id === selectedInstanceType);
+    const instanceType = instanceTypes.find(instanceType => instanceType.id === form.getFieldValue('instanceType'));
     return (
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
@@ -132,7 +145,7 @@ class CreateForm extends React.Component<Props> {
                   rules: [{ required: true, message: 'Please select a instance type!' }],
                 })(
                   instanceTypes.length ? (
-                    <Radio.Group style={radioGroupStyle} onChange={this.onSelectInstanceTpye}>
+                    <Radio.Group style={radioGroupStyle} onChange={this.autoSelectFirstImage}>
                       {instanceTypes.map(instanceType => (
                         <Radio style={radioStyle} value={instanceType.id}>
                           <div style={radioContentStyle}>

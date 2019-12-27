@@ -1,12 +1,12 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
-import {Button} from 'antd';
 import {graphql} from 'react-apollo';
 import {RouteComponentProps} from 'react-router-dom';
 import {compose} from 'recompose';
 import JobDetail from 'components/job/detail';
+import {errorHandler} from 'components/job/errorHandler';
 import {PhJobFragement} from './jobList';
-import {RERUN_JOB, CANCEL_JOB, GET_PH_JOB_CONNECTION} from 'containers/jobList';
+import {RERUN_JOB, CANCEL_JOB} from 'containers/jobList';
 
 type Props = {
   getPhJob: any;
@@ -35,22 +35,15 @@ class JobDetailContainer extends React.Component<Props> {
     if (getPhJob.loading) return null;
     if (getPhJob.error) return 'Error';
     return (
-      <React.Fragment>
-        <Button
-          icon="left"
-          onClick={() => history.push(`${appPrefix}job`)}
-          style={{marginBottom: 16}}
-        >
-          Back
-        </Button>
-        <JobDetail
-          rerunPhJob={rerunPhJob}
-          cancelPhJob={cancelPhJob}
-          rerunPhJobResult={rerunPhJobResult}
-          cancelPhJobResult={cancelPhJobResult}
-          job={getPhJob.phJob || {id: 'test'}}
-        />
-      </React.Fragment>
+      <JobDetail
+        rerunPhJob={rerunPhJob}
+        cancelPhJob={cancelPhJob}
+        rerunPhJobResult={rerunPhJobResult}
+        cancelPhJobResult={cancelPhJobResult}
+        job={getPhJob.phJob || {id: 'test'}}
+        appPrefix={appPrefix}
+        history={history}
+      />
     );
   }
 }
@@ -76,6 +69,7 @@ export default compose(
       onCompleted: () => {
         props.history.push(`${appPrefix}job`);
       },
+      onError: errorHandler
     }),
     name: 'rerunPhJob'
   }),
@@ -88,6 +82,7 @@ export default compose(
       onCompleted: () => {
         props.history.push(`${appPrefix}job`);
       },
+      onError: errorHandler
     }),
     name: 'cancelPhJob'
   })

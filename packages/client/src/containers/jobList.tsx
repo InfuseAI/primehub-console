@@ -5,6 +5,7 @@ import {compose} from 'recompose';
 import {withRouter} from 'react-router-dom';
 import {RouteComponentProps} from 'react-router';
 import JobList from 'components/job/list';
+import {errorHandler} from 'components/job/errorHandler';
 import {Group} from 'components/job/groupFilter';
 
 export const PhJobFragement = gql`
@@ -21,6 +22,7 @@ export const PhJobFragement = gql`
     userName
     phase
     reason
+    message
     createTime
     startTime
     finishTime
@@ -121,6 +123,7 @@ export default compose(
       onCompleted: () => {
         props.history.push(`${appPrefix}job`);
       },
+      onError: errorHandler
     }),
     name: 'rerunPhJob'
   }),
@@ -133,6 +136,7 @@ export default compose(
       onCompleted: () => {
         props.history.push(`${appPrefix}job`);
       },
+      onError: errorHandler
     }),
     name: 'cancelPhJob'
   })
