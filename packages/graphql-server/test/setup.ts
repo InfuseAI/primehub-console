@@ -4,6 +4,9 @@
 
 import chai from 'chai';
 import http from 'http';
+import chaiHttp = require('chai-http');
+
+chai.use(chaiHttp);
 
 const expect = chai.expect;
 

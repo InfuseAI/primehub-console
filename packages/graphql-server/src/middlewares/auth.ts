@@ -15,7 +15,6 @@ const isJupyterUser = rule({ cache: 'contextual' })(
 
 const isJobUser = rule({ cache: 'contextual' })(
   async (parent, args, ctx, info) => {
-    console.log(ctx);
     return ctx.role === Role.JOB_USER;
   },
 );

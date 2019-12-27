@@ -5,6 +5,7 @@ import CustomResource, { Item } from '../crdClient/customResource';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
 import { orderBy, omit, get } from 'lodash';
 import * as moment from 'moment';
+import { escapeToPrimehubLabel } from '../utils/escapism';
 
 const NEW_LINE = '\n';
 
@@ -71,8 +72,8 @@ const createJob = async (context: Context, data: PhJobCreateInput) => {
   const metadata = {
     name,
     labels: {
-      'primehub-group': group.name,
-      'primehub-user': username
+      'primehub-group': escapeToPrimehubLabel(group.name),
+      'primehub-user': escapeToPrimehubLabel(username)
     }
   };
   const spec = {
