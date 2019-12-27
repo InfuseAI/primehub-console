@@ -28,6 +28,23 @@ const formItemLayout = {
 
 const {confirm} = Modal;
 
+const maxMessageLength = 60;
+
+const renderMessage = (job: Record<string, any>) => {
+  switch (job.phase) {
+    case 'Succeeded':
+      return 'Job Complete';
+    case 'Failed':
+      if (!job.message) return <span><b>[System Error]</b> {job.reason}</span>;
+      const lastLine = (job.message || '').split('\n').pop();
+      if (lastLine.length < maxMessageLength)
+        return <span><b>[Runtime Error]</b> {lastLine}</span>;
+      return <span><b>[Runtime Error]</b> {lastLine.substr(0, maxMessageLength)}... Find more info in <b>logs</b> tab</span>
+    default:
+      return '-';
+  }
+}
+
 type Props = {
   job: any;
   rerunPhJob: Function;
@@ -111,8 +128,11 @@ export default class Detail extends React.Component<Props> {
         <Tabs>
           <TabPane key="information" tab="Information">
             <Form>
-              <Form.Item style={blockStyle} label="Status:" {...formItemLayout}>
+              <Form.Item style={formItemStyle} label="Status:" {...formItemLayout}>
                 {job.phase}
+              </Form.Item>
+              <Form.Item style={blockStyle} label="Message:" {...formItemLayout}>
+                {renderMessage(job)}
               </Form.Item>
               <Form.Item  style={formItemStyle} label="Job ID:" {...formItemLayout}>
                 {job.id}
@@ -124,10 +144,10 @@ export default class Detail extends React.Component<Props> {
                 {job.userName || '-'}
               </Form.Item>
               <Form.Item  style={formItemStyle} label="Start Time:" {...formItemLayout}>
-                {startTime ? startTime.format('DD/MM/YYYY HH:mm:ss') : '-'}
+                {startTime ? startTime.format('YYYY-MM-DD HH:mm:ss') : '-'}
               </Form.Item>
               <Form.Item  style={formItemStyle} label="Finish Time:" {...formItemLayout}>
-                {finishTime ? finishTime.format('DD/MM/YYYY HH:mm:ss') : '-'}
+                {finishTime ? finishTime.format('YYYY-MM-DD HH:mm:ss') : '-'}
               </Form.Item>
               <Form.Item  style={blockStyle} label="Duration" {...formItemLayout}>
                 {computeDuration(startTime, finishTime)}
@@ -163,9 +183,7 @@ export default class Detail extends React.Component<Props> {
 }
 
 export function computeDuration(start: Moment | '', finish: Moment | '') {
-  if (!start || !finish) {
-    return '-';
-  }
+  if (!start || !finish) return '-';
   const duration = moment.duration(finish.diff(start));
   const hour = ensureFormat(duration.hours());
   const minutes = ensureFormat(duration.minutes());
@@ -174,6 +192,7 @@ export function computeDuration(start: Moment | '', finish: Moment | '') {
 }
 
 function ensureFormat(str) {
+  str = str < 0 ? 0 : str;
   str = String(str);
   return str.length === 1 ? `0${str}` : str;
 }

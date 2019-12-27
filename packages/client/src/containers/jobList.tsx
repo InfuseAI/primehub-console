@@ -21,6 +21,7 @@ export const PhJobFragement = gql`
     userName
     phase
     reason
+    message
     createTime
     startTime
     finishTime

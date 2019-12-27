@@ -6,7 +6,7 @@ import {RouteComponentProps} from 'react-router-dom';
 import {compose} from 'recompose';
 import JobDetail from 'components/job/detail';
 import {PhJobFragement} from './jobList';
-import {RERUN_JOB, CANCEL_JOB, GET_PH_JOB_CONNECTION} from 'containers/jobList';
+import {RERUN_JOB, CANCEL_JOB} from 'containers/jobList';
 
 type Props = {
   getPhJob: any;
