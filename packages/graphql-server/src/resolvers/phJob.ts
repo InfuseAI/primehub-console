@@ -1,13 +1,14 @@
 import { Context } from './interface';
-import { toRelay, filter, paginate, extractPagination, stringifyPackageField } from './utils';
+import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory } from './utils';
 import { PhJobPhase, PhJobSpec, PhJobStatus } from '../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../crdClient/customResource';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
-import { orderBy, omit, get } from 'lodash';
+import { orderBy, omit, get, isUndefined, isNil } from 'lodash';
 import * as moment from 'moment';
 import { escapeToPrimehubLabel } from '../utils/escapism';
+import { ApolloError } from 'apollo-server';
 
-const NEW_LINE = '\n';
+const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 
 export interface PhJob {
   id: string;
@@ -94,6 +95,62 @@ const createJob = async (context: Context, data: PhJobCreateInput) => {
   return crdClient.phJobs.create(metadata, spec);
 };
 
+const validateQuota = async (context: Context, data: PhJobCreateInput) => {
+  const {groupId, instanceType: instanceTypeId} = data;
+  const group = await context.kcAdminClient.groups.findOne({id: groupId});
+  const quotaCpu: number = getFromAttr('quota-cpu', group.attributes, null, parseFloat);
+  const quotaGpu: number = getFromAttr('quota-gpu', group.attributes, null, parseInt);
+  const quotaMemory: number = getFromAttr('quota-memory', group.attributes, null, parseMemory);
+  const projectQuotaCpu: number = getFromAttr('project-quota-memory', group.attributes, null, parseFloat);
+  const projectQuotaGpu: number = getFromAttr('project-quota-gpu', group.attributes, null, parseInt);
+  const projectQuotaMemory: number = getFromAttr('project-quota-memory', group.attributes, null, parseMemory);
+
+  // validate
+  const instanceType = await context.getInstanceType(instanceTypeId);
+  const instanceTypeCpuLimit = instanceType.spec['limits.cpu'];
+  const instanceTypeGpuLimit = instanceType.spec['limits.nvidia.com/gpu'];
+  const instanceTypeMemoryLimit =
+    instanceType.spec['limits.memory'] ? parseMemory(instanceType.spec['limits.memory']) : null;
+
+  // gpu quota not defined, but used in instanceType
+  if (isUndefined(quotaGpu) && isUndefined(projectQuotaGpu) && !isUndefined(instanceTypeGpuLimit)) {
+    throw new ApolloError('Gpu Quota not set', EXCEED_QUOTA_ERROR);
+  }
+
+  // check if gpu quota exceed
+  if (!isUndefined(instanceTypeGpuLimit)) {
+    if (!isUndefined(quotaGpu) && instanceTypeGpuLimit > quotaGpu) {
+      throw new ApolloError('User Gpu Quota exceeded', EXCEED_QUOTA_ERROR);
+    }
+
+    if (!isUndefined(projectQuotaGpu) && instanceTypeGpuLimit > projectQuotaGpu) {
+      throw new ApolloError('Group Gpu Quota exceeded', EXCEED_QUOTA_ERROR);
+    }
+  }
+
+  // check if cpu quota exceed
+  if (!isUndefined(instanceTypeCpuLimit)) {
+    if (!isUndefined(quotaCpu) && instanceTypeCpuLimit > quotaCpu) {
+      throw new ApolloError('User Gpu Quota exceeded', EXCEED_QUOTA_ERROR);
+    }
+
+    if (!isUndefined(projectQuotaCpu) && instanceTypeCpuLimit > projectQuotaCpu) {
+      throw new ApolloError('Group Gpu Quota exceeded', EXCEED_QUOTA_ERROR);
+    }
+  }
+
+  // check if memory quota exceed
+  if (!isNil(instanceTypeMemoryLimit)) {
+    if (!isUndefined(quotaMemory) && instanceTypeMemoryLimit > quotaMemory) {
+      throw new ApolloError('User Memory exceeded', EXCEED_QUOTA_ERROR);
+    }
+
+    if (!isUndefined(projectQuotaMemory) && instanceTypeMemoryLimit > projectQuotaMemory) {
+      throw new ApolloError('Group Memory exceeded', EXCEED_QUOTA_ERROR);
+    }
+  }
+};
+
 /**
  * Query
  */
@@ -144,6 +201,7 @@ export const queryOne = async (root, args, context: Context) => {
 
 export const create = async (root, args, context: Context) => {
   const data: PhJobCreateInput = args.data;
+  await validateQuota(context, data);
   const phJob = await createJob(context, data);
   return transform(phJob, context.namespace, context.graphqlHost, context.jobLogCtrl);
 };
