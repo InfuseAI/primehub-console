@@ -28,15 +28,19 @@ export const GET_MY_GROUPS = gql`
 type Props = {
   getMyGroups: any;
 }
-
 class JobContainer extends React.Component<Props> {
   render() {
     const {getMyGroups} = this.props;
+    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     if (getMyGroups.loading) return null;
     if (getMyGroups.error) return 'Error';
+
+    const groups = get(getMyGroups, 'me.groups', [])
+      .filter(group => group.id !== everyoneGroupId);
+
     return (
       <JobListContainer
-        groups={get(getMyGroups, 'me.groups', [])}
+        groups={groups}
       />
     );
   }

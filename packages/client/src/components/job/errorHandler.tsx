@@ -9,16 +9,20 @@ export function errorHandler (e) {
   // from networkError
   if (e.networkError) {
     errorCode = get(e, 'networkError.result.errors.0.extensions.code');
+    description =  get(e, 'networkError.result.errors.0.message');
   } else {
     // from graphQLErrors
     errorCode = get(e, 'graphQLErrors.0.extensions.code');
+    description =  get(e, 'graphQLErrors.0.message');
   }
+
   switch (errorCode) {
     case 'EXCEED_QUOTA':
       message = 'Runtime Error';
-      description = 'The quota exceeded';
+      description = description || 'The quota exceeded';
       break;
   };
+
   notification.error({
     message,
     description,
