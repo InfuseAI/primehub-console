@@ -35,7 +35,7 @@ const renderMessage = (job: Record<string, any>) => {
       return 'Job Complete';
     case 'Failed':
       if (!job.message) return <span><b>[System Error]</b> {job.reason}</span>;
-      const lastLine = (job.message || '').split('\n').pop();
+      const lastLine = (job.message || '').replace(/\n$/, '').split('\n').pop();
       if (lastLine.length < maxMessageLength)
         return <span><b>[Runtime Error]</b> {lastLine}</span>;
       return <span><b>[Runtime Error]</b> {lastLine.substr(0, maxMessageLength)}... Find more info in <b>logs</b> tab</span>
