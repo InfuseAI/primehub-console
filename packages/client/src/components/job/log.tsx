@@ -31,7 +31,7 @@ export default class Logs extends React.Component<Props, State> {
         'Authorization': 'Bearer ' + token
       },
     }).then(res => {
-      if (res.status > 400)
+      if (res.status >= 400)
         return res.json().then(content => {
           const reason = get(content, 'message', 'of internal error');
           that.setState(() => ({
