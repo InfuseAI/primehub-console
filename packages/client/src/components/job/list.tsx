@@ -34,12 +34,44 @@ const renderJobName = (text, record) => (
   </Tooltip>
 );
 
+const renderTimeIfValid = time => {
+  if (!time) {
+    return '-'
+  }
+
+  const momentTime = moment(time);
+  return momentTime.isValid() ? momentTime.format('YYYY-MM-DD HH:mm:ss') : '-';
+}
+
+const getCreateTimeAndFinishTime = (startTime, finishTime, phase: Phase) => {
+  switch (phase) {
+    case Phase.Pending:
+    case Phase.Ready:
+      return {
+        startTime: '-',
+        finishTime: '-'
+      };
+
+    case Phase.Running:
+      return {
+        startTime: renderTimeIfValid(startTime),
+        finishTime: '-'
+      };
+  
+    default:
+      return {
+        startTime: renderTimeIfValid(startTime),
+        finishTime: renderTimeIfValid(finishTime)
+      };
+  }
+}
+
 const renderTiming = record => {
   const createTime = record.createTime;
   const startTime = record.startTime;
-  const finishTime = record.finishTime || new Date().toISOString();
-  const duration = computeDuration(moment(startTime), moment(finishTime));
-  const running = record.phase === Phase.Running;
+  const finishTime = record.finishTime;
+  const duration = computeDuration(moment(startTime), moment(finishTime || new Date().toISOString()));
+  const {startTime: startTimeText, finishTime: finishTimeText} = getCreateTimeAndFinishTime(startTime, finishTime, record.phase);
   return (
     <>
       <Tooltip
@@ -54,9 +86,9 @@ const renderTiming = record => {
         placement="top"
         title={
           <>
-            Start time: {moment(startTime).format('YYYY-MM-DD HH:mm:ss')}
+            Start time: {startTimeText}
             <br/>
-            Finished time: {running ? '-' : moment(finishTime).format('YYYY-MM-DD HH:mm:ss')}
+            Finished time: {finishTimeText}
           </>
         }
       >

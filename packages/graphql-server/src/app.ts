@@ -301,7 +301,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           getImage = imageCache.get;
           readOnly = true;
           username = userId = 'jupyterHub';
-          role = Role.JUPYTER_USER;
+          role = Role.CLIENT;
         } else {
           // Either config.sharedGraphqlSecretKey not set, or not a sharedGraphqlSecretKey request
           // we verify the token with oidc public key

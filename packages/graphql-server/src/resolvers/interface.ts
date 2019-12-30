@@ -8,7 +8,7 @@ import K8sUploadServerSecret from '../k8sResource/k8sUploadServerSecret';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
 
 export enum Role {
-  JUPYTER_USER = 'JUPYTER_USER',
+  CLIENT = 'CLIENT',
   JOB_USER = 'JOB_USER',
   ADMIN = 'ADMIN',
   NOT_AUTH = 'NOT_AUTH'

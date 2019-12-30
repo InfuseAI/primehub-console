@@ -7,6 +7,7 @@ import { orderBy, omit, get, isUndefined, isNil } from 'lodash';
 import * as moment from 'moment';
 import { escapeToPrimehubLabel } from '../utils/escapism';
 import { ApolloError } from 'apollo-server';
+import KeycloakAdminClient from 'keycloak-admin';
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 
@@ -39,15 +40,17 @@ export interface PhJobCreateInput {
 }
 
 // tslint:disable-next-line:max-line-length
-export const transform = (item: Item<PhJobSpec, PhJobStatus>, namespace: string, graphqlHost: string, jobLogCtrl: JobLogCtrl): PhJob => {
+export const transform = async (item: Item<PhJobSpec, PhJobStatus>, namespace: string, graphqlHost: string, jobLogCtrl: JobLogCtrl, kcAdminClient: KeycloakAdminClient): Promise<PhJob> => {
   const phase = item.spec.cancel ? PhJobPhase.Cancelled : get(item, 'status.phase', PhJobPhase.Pending);
+  const group = item.spec.groupId ? await kcAdminClient.groups.findOne({id: item.spec.groupId}) : null;
+  const groupName = get(group, 'attributes.displayName.0') || get(group, 'name');
   return {
     id: item.metadata.name,
     displayName: item.spec.displayName,
     cancel: item.spec.cancel,
     command: item.spec.command,
     groupId: item.spec.groupId,
-    groupName: item.spec.groupName,
+    groupName,
     image: item.spec.image,
     instanceType: item.spec.instanceType,
     userId: item.spec.userId,
@@ -156,14 +159,16 @@ const validateQuota = async (context: Context, data: PhJobCreateInput) => {
  */
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhJobSpec>, where: any, namespace: string, graphqlHost: string, jobLogCtrl: JobLogCtrl, currentUserId: string): Promise<PhJob[]> => {
+const listQuery = async (client: CustomResource<PhJobSpec>, where: any, namespace: string, graphqlHost: string, jobLogCtrl: JobLogCtrl, currentUserId: string, kcAdminClient: KeycloakAdminClient): Promise<PhJob[]> => {
   if (where && where.id) {
     const phJob = await client.get(where.id);
-    return [transform(phJob, namespace, graphqlHost, jobLogCtrl)];
+    const transformed = await transform(phJob, namespace, graphqlHost, jobLogCtrl, kcAdminClient);
+    return [transformed];
   }
 
   const phJobs = await client.list();
-  let transformedPhJobs = phJobs.map(job => transform(job, namespace, graphqlHost, jobLogCtrl));
+  let transformedPhJobs = await Promise.all(
+    phJobs.map(job => transform(job, namespace, graphqlHost, jobLogCtrl, kcAdminClient)));
 
   if (where && where.mine) {
     where.userId_eq = currentUserId;
@@ -177,14 +182,14 @@ const listQuery = async (client: CustomResource<PhJobSpec>, where: any, namespac
 export const query = async (root, args, context: Context) => {
   const {crdClient} = context;
   // tslint:disable-next-line:max-line-length
-  const phJobs = await listQuery(crdClient.phJobs, args && args.where, context.namespace, context.graphqlHost, context.jobLogCtrl, context.userId);
+  const phJobs = await listQuery(crdClient.phJobs, args && args.where, context.namespace, context.graphqlHost, context.jobLogCtrl, context.userId, context.kcAdminClient);
   return paginate(phJobs, extractPagination(args));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
   const {crdClient} = context;
   // tslint:disable-next-line:max-line-length
-  const phJobs = await listQuery(crdClient.phJobs, args && args.where, context.namespace, context.graphqlHost, context.jobLogCtrl, context.userId);
+  const phJobs = await listQuery(crdClient.phJobs, args && args.where, context.namespace, context.graphqlHost, context.jobLogCtrl, context.userId, context.kcAdminClient);
   return toRelay(phJobs, extractPagination(args));
 };
 
@@ -193,7 +198,7 @@ export const queryOne = async (root, args, context: Context) => {
   const {crdClient} = context;
   try {
     const phJob = await crdClient.phJobs.get(id);
-    return transform(phJob, context.namespace, context.graphqlHost, context.jobLogCtrl);
+    return transform(phJob, context.namespace, context.graphqlHost, context.jobLogCtrl, context.kcAdminClient);
   } catch (e) {
     return null;
   }
@@ -203,7 +208,7 @@ export const create = async (root, args, context: Context) => {
   const data: PhJobCreateInput = args.data;
   await validateQuota(context, data);
   const phJob = await createJob(context, data);
-  return transform(phJob, context.namespace, context.graphqlHost, context.jobLogCtrl);
+  return transform(phJob, context.namespace, context.graphqlHost, context.jobLogCtrl, context.kcAdminClient);
 };
 
 export const rerun = async (root, args, context: Context) => {
@@ -224,7 +229,7 @@ export const rerun = async (root, args, context: Context) => {
     command: phJob.spec.command
   });
 
-  return transform(rerunPhJob, context.namespace, context.graphqlHost, context.jobLogCtrl);
+  return transform(rerunPhJob, context.namespace, context.graphqlHost, context.jobLogCtrl, context.kcAdminClient);
 };
 
 export const cancel = async (root, args, context: Context) => {

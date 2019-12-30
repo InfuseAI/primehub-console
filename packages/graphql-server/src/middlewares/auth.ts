@@ -7,23 +7,27 @@ const isAdmin = rule({ cache: 'contextual' })(
   },
 );
 
-const isJupyterUser = rule({ cache: 'contextual' })(
-  async (parent, args, ctx, info) => {
-    return ctx.role === Role.JUPYTER_USER;
-  },
-);
-
 const isJobUser = rule({ cache: 'contextual' })(
   async (parent, args, ctx, info) => {
     return ctx.role === Role.JOB_USER;
   },
 );
 
+// from phJob or jupyter client that use secret token
+const isClient = rule({ cache: 'contextual' })(
+  async (parent, args, ctx, info) => {
+    return ctx.role === Role.CLIENT;
+  },
+);
+
 export const permissions = shield({
   Query: {
     '*': isAdmin,
+    'system': or(isAdmin, isClient),
     'me': or(isAdmin, isJobUser),
-    'user': or(isAdmin, isJupyterUser),
+    'user': or(isAdmin, isClient),
+    'group': or(isAdmin, isClient),
+    'instanceType': or(isAdmin, isClient),
     'phJob': or(isAdmin, isJobUser),
     'phJobs': or(isAdmin, isJobUser),
     'phJobsConnection': or(isAdmin, isJobUser)

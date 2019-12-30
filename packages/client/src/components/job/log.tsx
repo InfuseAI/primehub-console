@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Input } from 'antd';
+import {get} from 'lodash';
 
 type Props = {
   value: string;
@@ -32,8 +33,9 @@ export default class Logs extends React.Component<Props, State> {
     }).then(res => {
       if (res.status > 400)
         return res.json().then(content => {
+          const reason = get(content, 'message', 'of internal error');
           that.setState(() => ({
-            log: `Error: cannot get log. Because ${JSON.stringify(content || {}, null, 2)}`
+            log: `Error: cannot get log because ${reason}`
           }));
         });
       const reader = res.body.getReader();
