@@ -29,31 +29,36 @@ export default class Logs extends React.Component<Props, State> {
       headers: {
         'Authorization': 'Bearer ' + token
       },
-    })
-      .then(res => {
-        const reader = res.body.getReader();
+    }).then(res => {
+      if (res.status > 400)
+        return res.json().then(content => {
+          that.setState(() => ({
+            log: `Error: cannot get log. Because ${JSON.stringify(content || {}, null, 2)}`
+          }));
+        });
+      const reader = res.body.getReader();
 
-        return readChunk();
+      return readChunk();
 
-        function readChunk() {
-          return reader.read().then(appendChunks);
+      function readChunk() {
+        return reader.read().then(appendChunks);
+      }
+
+      function appendChunks(result) {
+        if (!result.done){
+          const chunk = new TextDecoder().decode(result.value.buffer);
+          that.setState((prevState: any) => ({
+            log: prevState.log + chunk
+          }));
         }
 
-        function appendChunks(result) {
-          if (!result.done){
-            const chunk = new TextDecoder().decode(result.value.buffer);
-            that.setState((prevState: any) => ({
-              log: prevState.log + chunk
-            }));
-          }
-
-          if (result.done) {
-            return 'done';
-          } else {
-            return readChunk();
-          }
+        if (result.done) {
+          return 'done';
+        } else {
+          return readChunk();
         }
-      });
+      }
+    });
   }
 
   render() {
