@@ -27,6 +27,7 @@ export const permissions = shield({
     'me': or(isAdmin, isJobUser),
     'user': or(isAdmin, isClient),
     'group': or(isAdmin, isClient),
+    'groups': or(isAdmin, isClient),
     'instanceType': or(isAdmin, isClient),
     'phJob': or(isAdmin, isJobUser),
     'phJobs': or(isAdmin, isJobUser),
