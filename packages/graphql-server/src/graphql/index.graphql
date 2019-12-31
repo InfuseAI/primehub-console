@@ -8,7 +8,7 @@
 # import Secret, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
 # import Workspace, WorkspaceEdge, WorkspaceConnection, WorkspaceWhereInput, WorkspaceWhereUniqueInput, WorkspaceCreateInput, WorkspaceUpdateInput from "./workspace.graphql"
 # import BuildImageJob, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql" 
-# import PhJob, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput from "./phJob.graphql"
+# import PhJob, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput, PhJobCreateInput, PhJobCancelResponse from "./phJob.graphql"
 
 scalar JSON
 
@@ -260,4 +260,9 @@ type Mutation {
   createBuildImage(data: BuildImageCreateInput!): BuildImage!
   updateBuildImage(data: BuildImageUpdateInput!, where: BuildImageWhereUniqueInput!): BuildImage
   deleteBuildImage(where: BuildImageWhereUniqueInput!): BuildImage
+
+  """PhJob"""
+  createPhJob(data: PhJobCreateInput!): PhJob!
+  rerunPhJob(where: PhJobWhereUniqueInput!): PhJob!
+  cancelPhJob(where: PhJobWhereUniqueInput!): PhJobCancelResponse!
 }

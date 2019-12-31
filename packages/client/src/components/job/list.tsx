@@ -1,6 +1,7 @@
 import * as React from 'react';
-import {Button, Tooltip, Table as AntTable, Row, Col, Icon} from 'antd';
-import {Link} from 'react-router-dom';
+import {Button, Tooltip, Table as AntTable, Row, Col, Icon, Modal} from 'antd';
+import {RouteComponentProps} from 'react-router';
+import {Link, withRouter} from 'react-router-dom';
 import {startCase, get} from 'lodash';
 import styled from 'styled-components';
 import Filter from 'components/job/filter';
@@ -8,12 +9,10 @@ import moment from 'moment';
 import {Group} from 'components/job/groupFilter';
 import {computeDuration} from 'components/job/detail';
 import Pagination from 'components/job/pagination';
+import Title from 'components/job/title';
 import { Phase, getActionByPhase } from './phase';
 
-const Title = styled.h2`
-  display: inline-block;
-  margin-right: 24px;
-`;
+const {confirm} = Modal;
 
 const Table = styled(AntTable as any)`
   background: white;
@@ -35,21 +34,74 @@ const renderJobName = (text, record) => (
   </Tooltip>
 );
 
-const renderTiming = (text, record) => (
-  <Tooltip
-    placement="top"
-    title={`Create time:\n ${moment(record.createTime).format('DD/MM/YYYY HH:mm:ss')}`}
-  >
-    {text ? moment(text).fromNow() : '-'}
-    <br/>
-    {text ? (
-      <>
-        <Icon type="clock-circle" style={{marginRight: 4, position: 'relative', top: 1}} />
-        {computeDuration(text ? moment(text) : '', record.finishTime ? moment(record.finishTime) : '')}
-      </>
-    ): '-'}
-  </Tooltip>
-);
+const renderTimeIfValid = time => {
+  if (!time) {
+    return '-'
+  }
+
+  const momentTime = moment(time);
+  return momentTime.isValid() ? momentTime.format('YYYY-MM-DD HH:mm:ss') : '-';
+}
+
+const getCreateTimeAndFinishTime = (startTime, finishTime, phase: Phase) => {
+  switch (phase) {
+    case Phase.Pending:
+    case Phase.Ready:
+      return {
+        startTime: '-',
+        finishTime: '-'
+      };
+
+    case Phase.Running:
+      return {
+        startTime: renderTimeIfValid(startTime),
+        finishTime: '-'
+      };
+  
+    default:
+      return {
+        startTime: renderTimeIfValid(startTime),
+        finishTime: renderTimeIfValid(finishTime)
+      };
+  }
+}
+
+const renderTiming = record => {
+  const createTime = record.createTime;
+  const startTime = record.startTime;
+  const finishTime = record.finishTime;
+  const duration = computeDuration(moment(startTime), moment(finishTime || new Date().toISOString()));
+  const {startTime: startTimeText, finishTime: finishTimeText} = getCreateTimeAndFinishTime(startTime, finishTime, record.phase);
+  return (
+    <>
+      <Tooltip
+        placement="top"
+        title={`Create time: ${moment(createTime).format('YYYY-MM-DD HH:mm:ss')}`}
+      >
+        {createTime ? moment(createTime).fromNow() : '-'}
+        <br/>
+      </Tooltip>
+      <Tooltip
+        overlayStyle={{maxWidth: 300}}
+        placement="top"
+        title={
+          <>
+            Start time: {startTimeText}
+            <br/>
+            Finished time: {finishTimeText}
+          </>
+        }
+      >
+        {startTime ? (
+          <div>
+            <Icon type="clock-circle" style={{marginRight: 4, position: 'relative', top: 1}} />
+            {duration}
+          </div>
+        ): '-'}
+      </Tooltip>
+    </>
+  );
+}
 
 type JobsConnection = {
   pageInfo: {
@@ -64,22 +116,89 @@ type JobsConnection = {
   }>
 }
 
-type Props = {
+type Props = RouteComponentProps & {
   groups: Array<Group>;
   jobsLoading: boolean;
   jobsError: any;
   jobsConnection: JobsConnection;
   jobsVariables: any;
   jobsRefetch: Function;
+  rerunPhJob: Function;
+  cancelPhJob: Function;
+  rerunPhJobResult: any;
+  cancelPhJobResult: any;
 };
 
-export default class JobList extends React.Component<Props> {
-  handleCancel = (id: string) => {
+class JobList extends React.Component<Props> {
+  state = {
+    currentId: null
+  };
 
+  handleCancel = (id: string) => {
+    const {jobsConnection, cancelPhJob} = this.props;
+    const job = jobsConnection.edges.find(edge => edge.node.id === id).node;
+    this.setState({currentId: id});
+    confirm({
+      title: `Cancel`,
+      content: `Do you want to cancel '${job.displayName || job.name}'?`,
+      iconType: 'info-circle',
+      okText: 'Yes',
+      cancelText: 'No',
+      okButtonProps: {
+        style: {
+          float: 'left',
+          marginRight: '8px'
+        }
+      },
+      onOk() {
+        return cancelPhJob({variables: {where: {id}}});
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
   }
 
   handleRerun = (id: string) => {
+    const {jobsConnection, rerunPhJob} = this.props;
+    const job = jobsConnection.edges.find(edge => edge.node.id === id).node;
+    this.setState({currentId: id});
+    confirm({
+      title: `Rerun`,
+      content: `Do you want to rerun '${job.displayName || job.name}'?`,
+      iconType: 'info-circle',
+      okText: 'Yes',
+      cancelText: 'No',
+      okButtonProps: {
+        style: {
+          float: 'left',
+          marginRight: '8px'
+        }
+      },
+      onOk() {
+        return rerunPhJob({variables: {where: {id}}});
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  }
 
+  createPhJob = () => {
+    const {history} = this.props;
+    history.push(`${appPrefix}job/create`);
+  }
+
+  refresh = () => {
+    const {jobsVariables, jobsRefetch} = this.props;
+    const newVariables = {
+      where: jobsVariables.where,
+      before: undefined,
+      first: 10,
+      last: undefined,
+      after: undefined,
+    };
+    jobsRefetch(newVariables);
   }
 
   nextPage = () => {
@@ -128,17 +247,20 @@ export default class JobList extends React.Component<Props> {
   }
 
   render() {
-    const {groups, jobsConnection, jobsVariables} = this.props;
+    const {groups, jobsConnection, jobsVariables, cancelPhJobResult, rerunPhJobResult} = this.props;
+    const {currentId} = this.state;
     const renderAction = (phase: Phase, record) => {
       const action = getActionByPhase(phase);
       const id = record.id;
       let onClick = () => {}
       if (action.toLowerCase() === 'cancel') {
         onClick = () => this.handleCancel(id);
+      } else {
+        onClick = () => this.handleRerun(id);
       }
-      onClick = () => this.handleRerun(id);
+      const loading = cancelPhJobResult.loading && rerunPhJobResult.loading && id === currentId;
       return (
-        <Button onClick={onClick}>
+        <Button onClick={onClick} loading={loading}>
           {action}
         </Button>
       )
@@ -160,7 +282,7 @@ export default class JobList extends React.Component<Props> {
       dataIndex: 'groupName'
     }, {
       title: 'Timing',
-      dataIndex: 'startTime',
+      key: 'timing',
       render: renderTiming
     }, {
       title: 'Action',
@@ -179,10 +301,17 @@ export default class JobList extends React.Component<Props> {
           />
         </Col>
         <Col span={18}>
-          <Title>Jobs</Title>
-          <Button>
-            Create Job
-          </Button>
+          <div style={{display: 'flex', justifyContent: 'space-between'}}>
+            <Title>Jobs</Title>
+            <div>
+              <Button onClick={this.createPhJob}>
+                Create Job
+              </Button>
+              <Button onClick={this.refresh} style={{marginLeft: 16}}>
+                Refresh
+              </Button>
+            </div>
+          </div>
           <Table
             dataSource={jobsConnection.edges.map(edge => edge.node)}
             columns={columns}
@@ -200,3 +329,5 @@ export default class JobList extends React.Component<Props> {
     )
   }
 }
+
+export default withRouter(JobList);

@@ -138,6 +138,7 @@ export interface PhJobStatus {
   phase: PhJobPhase;
   podName: string;
   reason?: string;
+  message?: string;
   startTime: string;
   finishTime?: string;
 }

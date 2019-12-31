@@ -91,7 +91,8 @@ export default class CustomResource<SpecType = any, StatusType = any> {
       done);
   }
 
-  private prepareCustomObject = ({metadata, spec}: {metadata?: Metadata, spec: SpecType}) => {
+  private prepareCustomObject = (
+    {metadata, spec}: {metadata?: Metadata, spec: SpecType}) => {
     const {group, version, names: {kind}} = this.crd.spec;
     return {
       apiVersion: `${group}/${version}`,
