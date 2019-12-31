@@ -42,6 +42,7 @@ Canner CMS
 * KC_REALM: the realm name of keycloak
 * KC_CLIENT_SECRET: client secret
 * KC_CLIENT_ID: client id
+* KC_EVERYONE_GROUP_ID: the everyone group id in keycloak
 * CANNER_LOCALE: language of cms, default to `en`
 * CANNER_CMS_HOST: cms host, default to `http://localhost:3000`, DO NOT postfix with a slash.
 * KC_MAX_SOCKETS: Maximum number of sockets to allow per host. Default = 80

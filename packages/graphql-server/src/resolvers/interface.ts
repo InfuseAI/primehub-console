@@ -7,6 +7,13 @@ import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
 import K8sUploadServerSecret from '../k8sResource/k8sUploadServerSecret';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
 
+export enum Role {
+  CLIENT = 'CLIENT',
+  JOB_USER = 'JOB_USER',
+  ADMIN = 'ADMIN',
+  NOT_AUTH = 'NOT_AUTH'
+}
+
 export interface Context {
   realm: string;
   everyoneGroupId: string;
@@ -19,6 +26,7 @@ export interface Context {
   readOnly?: boolean;
   userId: string;
   username: string;
+  role: Role;
   defaultUserVolumeCapacity: string;
   workspaceApi: WorkspaceApi;
   crdNamespace: string;

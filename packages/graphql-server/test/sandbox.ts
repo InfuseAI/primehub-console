@@ -18,6 +18,7 @@ const loadCrd = (name: string) =>
 const datasetCrd = loadCrd('dataset');
 const instanceTypeCrd = loadCrd('instance-type');
 const imageCrd = loadCrd('image');
+const phJobCrd = loadCrd('phJob');
 
 const masterRealmCred = {
   username: 'wwwy3y3',
@@ -83,6 +84,13 @@ export const cleanupInstanceTypes = async () => {
   }));
 };
 
+export const cleanupPhJobs = async () => {
+  const phJobs = await crdClient.phJobs.list();
+  await Promise.all(phJobs.map(async phJob => {
+    await crdClient.phJobs.del(phJob.metadata.name);
+  }));
+};
+
 export const cleaupAllCrd = async () => {
   await cleanupDatasets();
   await cleanupImages();
@@ -96,6 +104,7 @@ export const createSandbox = async () => {
   await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: datasetCrd });
   await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: instanceTypeCrd });
   await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: imageCrd });
+  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phJobCrd });
 
   /**
    * Keycloak
@@ -253,6 +262,7 @@ export const destroySandbox = async () => {
     await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(datasetCrd.metadata.name);
     await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(instanceTypeCrd.metadata.name);
     await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(imageCrd.metadata.name);
+    await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(phJobCrd.metadata.name);
   } catch (e) {
     // tslint:disable-next-line:no-console
     console.log(e);

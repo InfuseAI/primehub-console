@@ -10,8 +10,48 @@ chai.use(chaiHttp);
 
 const expect = chai.expect;
 
+const instanceTypesQuery = `
+query {
+  instanceTypes{
+    id
+  }
+}
+`;
+
+const groupsQuery = `
+query {
+  groups {
+    id
+  }
+}
+`;
+
+const phJobQuery = (groupId: string, instanceTypeId: string) => `
+query {
+  group(where: {id: "${groupId}"}) {
+    name
+    id
+    quotaCpu
+    quotaGpu
+    quotaMemory
+    projectQuotaCpu
+    projectQuotaGpu
+    projectQuotaMemory
+  }
+
+  instanceType(where: {id: "${instanceTypeId}"}) {
+    name
+    id
+    description
+    spec
+    global
+  }
+}
+`;
+
 const jhQuery = (id: string) => `
 query {
+  system { defaultUserVolumeCapacity }
   user (where: { id: "${id}" }) {
     id
     username
@@ -38,6 +78,8 @@ declare module 'mocha' {
     graphqlRequestWithAuth?: (query: string, variables?: any, auth?: any) => Promise<any>;
     kcAdminClient?: KeycloakAdminClient;
     currentUserId?: string;
+    createdGroupId?: string;
+    createdInstanceTypeId?: string;
     secret?: string;
   }
 }
@@ -119,10 +161,22 @@ describe('jupyterHub stress test', function() {
     await Promise.all(range(10).map(async () => {
       await createGroupWithCrd(this.currentUserId);
     }));
+
+    const {groups} = await this.graphqlRequestWithAuth(groupsQuery);
+    this.createdGroupId = groups[0].id;
+    const {instanceTypes} = await this.graphqlRequestWithAuth(instanceTypesQuery);
+    this.createdInstanceTypeId = instanceTypes[0].id;
   });
 
   after(async () => {
     await cleaupAllCrd();
+  });
+
+  it('should query group & instanceType with shared-token', async () => {
+    const query = phJobQuery(this.createdGroupId, this.createdInstanceTypeId);
+    const data = await this.graphqlRequestWithAuth(query, null, `Bearer ${this.secret}`);
+    expect(data.group.id).to.be.equal(this.createdGroupId);
+    expect(data.instanceType.id).to.be.equal(this.createdInstanceTypeId);
   });
 
   it('should query with shared-token', async () => {

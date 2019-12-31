@@ -282,9 +282,10 @@ export const queryOne = async (root, args, context: Context) => {
 export const me = async (root, args, context: Context) => {
   const userId = context.userId;
   const kcAdminClient = context.kcAdminClient;
+  const currentWorkspace = createInResolver(root, args, context);
   try {
     const user = await kcAdminClient.users.findOne({id: userId});
-    return user;
+    return user ? injectWorkspace(user, currentWorkspace) : null;
   } catch (e) {
     return null;
   }
