@@ -45,6 +45,8 @@ export interface Config {
   enableWorkspace: boolean;
   // custom image
   enableCustomImage: boolean;
+  // maximux group
+  maxGroup: number;
 }
 
 const defaultConfigs = {
@@ -69,6 +71,7 @@ const defaultConfigs = {
   enableDatasetUpload: false,
   enableWorkspace: false,
   enableCustomImage: false,
+  maxGroup: 999
 };
 
 const prodConfigs = {
@@ -112,7 +115,8 @@ export const createConfig = (): Config => {
       process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE &&
       process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE.toString() === 'true',
     enableCustomImage:
-      process.env.PRIMEHUB_FEATURE_CUSTOM_IMAGE && process.env.PRIMEHUB_FEATURE_CUSTOM_IMAGE.toString() === 'true'
+      process.env.PRIMEHUB_FEATURE_CUSTOM_IMAGE && process.env.PRIMEHUB_FEATURE_CUSTOM_IMAGE.toString() === 'true',
+    maxGroup: process.env.MAX_GROUP
   });
 
   const env = process.env.NODE_ENV || 'development';
