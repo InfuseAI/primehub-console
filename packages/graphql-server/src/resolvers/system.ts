@@ -1,7 +1,7 @@
 import KcAdminClient from 'keycloak-admin';
 import { mapValues, isEmpty, get, isUndefined, isNil, reduce, isPlainObject, isNull } from 'lodash';
 import { unflatten, flatten } from 'flat';
-import { createDetaultSystemSettings } from './constant';
+import { createDefaultSystemSettings } from './constant';
 import { Context } from './interface';
 import { parseFromAttr, toAttr, parseDiskQuota, stringifyDiskQuota } from './utils';
 import { findTimezone } from '../utils/timezones';
@@ -16,11 +16,11 @@ export const query = async (root, args, context: Context) => {
   const everyoneGroupId = context.everyoneGroupId;
   const kcAdminClient: KcAdminClient = context.kcAdminClient;
   const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});
-  const detaultSystemSettings = createDetaultSystemSettings(context.defaultUserVolumeCapacity);
+  const defaultSystemSettings = createDefaultSystemSettings(context.defaultUserVolumeCapacity);
   if (isEmpty(attributes)) {
     return {
-      ...detaultSystemSettings,
-      defaultUserVolumeCapacity: parseDiskQuota(detaultSystemSettings.defaultUserVolumeCapacity)
+      ...defaultSystemSettings,
+      defaultUserVolumeCapacity: parseDiskQuota(defaultSystemSettings.defaultUserVolumeCapacity)
     };
   }
 
@@ -37,19 +37,19 @@ export const query = async (root, args, context: Context) => {
   }
 
   // find the timezone data by its name
-  const timezone = timezoneName ? findTimezone(timezoneName) : detaultSystemSettings.timezone;
+  const timezone = timezoneName ? findTimezone(timezoneName) : defaultSystemSettings.timezone;
   return {
     org: {
-      name: get(fetchedData, 'org.name') || detaultSystemSettings.org.name,
+      name: get(fetchedData, 'org.name') || defaultSystemSettings.org.name,
       logo: get(fetchedData, 'org.logo') ? {
         contentType: get(fetchedData, 'org.logo.contentType'),
         name: get(fetchedData, 'org.logo.name'),
         size: parseInt(get(fetchedData, 'org.logo.size'), 10),
         url: get(fetchedData, 'org.logo.url')
-      } : detaultSystemSettings.org.logo
+      } : defaultSystemSettings.org.logo
     },
     defaultUserVolumeCapacity:
-      parseDiskQuota(fetchedData.defaultUserVolumeCapacity || detaultSystemSettings.defaultUserVolumeCapacity),
+      parseDiskQuota(fetchedData.defaultUserVolumeCapacity || defaultSystemSettings.defaultUserVolumeCapacity),
     timezone,
   };
 };
@@ -71,7 +71,7 @@ export const querySmtp = async (root, args, context: Context) => {
 };
 
 export const update = async (root, args, context) => {
-  const detaultSystemSettings = createDetaultSystemSettings(context.defaultUserVolumeCapacity);
+  const defaultSystemSettings = createDefaultSystemSettings(context.defaultUserVolumeCapacity);
   const everyoneGroupId = context.everyoneGroupId;
   const kcAdminClient: KcAdminClient = context.kcAdminClient;
   const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});
@@ -173,7 +173,7 @@ export const update = async (root, args, context) => {
   // add timezone offset for ui
   const response = {
     ...mergedData,
-    timezone: timezone || detaultSystemSettings.timezone,
+    timezone: timezone || defaultSystemSettings.timezone,
   };
 
   return response;
