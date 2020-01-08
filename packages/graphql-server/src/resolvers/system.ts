@@ -5,6 +5,10 @@ import { createDefaultSystemSettings } from './constant';
 import { Context } from './interface';
 import { parseFromAttr, toAttr, parseDiskQuota, stringifyDiskQuota } from './utils';
 import { findTimezone } from '../utils/timezones';
+import {createConfig} from '../config';
+
+const config = createConfig();
+
 const smtpKeyMapping = {
   enableSSL: 'ssl',
   enableStartTLS: 'starttls',
@@ -23,6 +27,14 @@ export const query = async (root, args, context: Context) => {
       defaultUserVolumeCapacity: parseDiskQuota(defaultSystemSettings.defaultUserVolumeCapacity)
     };
   }
+
+  const license = {
+    licenseTo: config.licenseTo,
+    enableGroup: config.enableGroup,
+    startedAt: config.startedAt,
+    expiredAt: config.expiredAt,
+    maxGroups: config.maxGroups
+  };
 
   const flatData = mapValues(attributes, value => {
     return (value && value[0]) || null;
@@ -51,6 +63,7 @@ export const query = async (root, args, context: Context) => {
     defaultUserVolumeCapacity:
       parseDiskQuota(fetchedData.defaultUserVolumeCapacity || defaultSystemSettings.defaultUserVolumeCapacity),
     timezone,
+    license
   };
 };
 
