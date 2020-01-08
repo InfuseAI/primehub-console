@@ -10,6 +10,14 @@ type Timezone {
   offset: Float!
 }
 
+type License {
+  licenseTo: String
+  startedAt: String
+  expiredAt: String
+  maxGroups: Int
+  enableGroup: Boolean
+}
+
 type Smtp {
   host: String
   port: Int
@@ -30,6 +38,7 @@ type System {
   smtp: Smtp
   defaultUserVolumeCapacity: Int
   timezone: Timezone
+  license: License
 }
 
 input TimezoneInput {
