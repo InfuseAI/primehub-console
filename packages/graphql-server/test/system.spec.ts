@@ -47,7 +47,7 @@ const systemFields = `
     startedAt
     expiredAt
     enableGroup
-    maxGroups
+    maxGroup
   }
 `;
 
@@ -89,7 +89,7 @@ describe('system graphql', function() {
           startedAt: null,
           expiredAt: null,
           enableGroup: true,
-          maxGroups: 999
+          maxGroup: 999
         }
       }
     });

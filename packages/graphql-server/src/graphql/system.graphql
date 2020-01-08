@@ -12,9 +12,10 @@ type Timezone {
 
 type License {
   licenseTo: String
+  licenseStatus: String
   startedAt: String
   expiredAt: String
-  maxGroups: Int
+  maxGroup: Int
   enableGroup: Boolean
 }
 

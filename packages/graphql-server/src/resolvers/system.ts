@@ -30,10 +30,11 @@ export const query = async (root, args, context: Context) => {
 
   const license = {
     licenseTo: config.licenseTo,
+    licenseStatus: config.licenseStatus,
     enableGroup: config.enableGroup,
     startedAt: config.startedAt,
     expiredAt: config.expiredAt,
-    maxGroups: config.maxGroups
+    maxGroup: config.maxGroup
   };
 
   const flatData = mapValues(attributes, value => {
