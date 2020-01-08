@@ -14,8 +14,8 @@ export default () => (
   <object keyName="system" title="${system}" >
     <Block title="${primehubLicense}">
       <object keyName="license">
-        <string keyName="licenseStatus" title="${licenseStatus}" packageName="../src/cms-components/customize-string-tag"/>
-        <dateTime keyName="expiredAt" title="${expirationDate}"/>
+        <string title="${licenseStatus}" uiParams={{data: 'Invalid'}} value="Invalid" packageName="../src/cms-components/customize-string-license-status"/>
+        <dateTime keyName="expiredAt" title="${expirationDate}" format={(text) => moment(text).format('YYYY/MM/DD HH:mm')} packageName="../src/cms-components/customize-string-readonly"/>
         <string keyName="licenseTo" title="${licenseTo}" packageName="../src/cms-components/customize-string-readonly"/>
       </object>
     </Block>

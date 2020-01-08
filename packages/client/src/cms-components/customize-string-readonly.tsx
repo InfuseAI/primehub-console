@@ -6,7 +6,7 @@ export default class Logs extends React.Component {
   }
 
   render() {
-    const {value} = this.props;
-    return <span>{value}</span>;
+    const {value, format=(text) => text} = this.props;
+    return <span>{format(value)}</span>;
   }
 }
