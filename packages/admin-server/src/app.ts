@@ -77,7 +77,8 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.state.enableDatasetUpload = config.enableDatasetUpload;
     ctx.state.enableWorkspace = config.enableWorkspace;
     ctx.state.enableCustomImage = config.enableCustomImage;
-    ctx.state.enableGroup = config.maxGroup > 0;
+    ctx.state.enableLicenseCheck = config.enableLicenseCheck;
+    ctx.state.enableGroup = config.enableLicenseCheck ? config.maxGroup > 0 : true;
     ctx.state.everyoneGroupId = config.keycloakEveryoneGroupId;
 
     // referrer

@@ -95,9 +95,6 @@ export default class CMSPage extends React.Component<Props, State> {
       delete schema.schema.buildImage;
       delete schema.schema.buildImageJob;
     }
-    if (!(window as any).enableGroup) {
-      delete schema.schema.group;
-    }
   }
 
   componentDidMount() {
