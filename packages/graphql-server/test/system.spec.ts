@@ -46,7 +46,6 @@ const systemFields = `
     licenseTo
     startedAt
     expiredAt
-    enableGroup
     maxGroup
   }
 `;
@@ -88,7 +87,6 @@ describe('system graphql', function() {
           licenseTo: null,
           startedAt: null,
           expiredAt: null,
-          enableGroup: true,
           maxGroup: 999
         }
       }

@@ -16,7 +16,6 @@ type License {
   startedAt: String
   expiredAt: String
   maxGroup: Int
-  enableGroup: Boolean
 }
 
 type Smtp {

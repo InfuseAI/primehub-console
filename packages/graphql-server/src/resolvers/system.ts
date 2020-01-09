@@ -31,7 +31,6 @@ export const query = async (root, args, context: Context) => {
   const license = {
     licenseTo: config.licenseTo,
     licenseStatus: config.licenseStatus,
-    enableGroup: config.enableGroup,
     startedAt: config.startedAt,
     expiredAt: config.expiredAt,
     maxGroup: config.maxGroup

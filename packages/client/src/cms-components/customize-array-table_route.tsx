@@ -10,7 +10,7 @@ import {Props} from './types';
 const ButtonGroup = Button.Group;
 const confirm = Modal.confirm;
 const GLOBAL_DISABLE = (window as any).disableMode || false;
-const DISABLE_GROUP = (window as any).enableGroup ? !(window as any).enableGroup : false;
+const DISABLE_GROUP = (window as any).disableGroup || false;
 
 @injectIntl
 export default class ArrayBreadcrumb extends Component<Props> {
