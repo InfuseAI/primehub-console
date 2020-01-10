@@ -19,7 +19,7 @@ const findTimezone = () => {
 };
 const DEFAULT_TIMEZONE = findTimezone();
 
-export const createDetaultSystemSettings = (defaultUserVolumeCapacity: string) => ({
+export const createDefaultSystemSettings = (defaultUserVolumeCapacity: string) => ({
   org: {
     name: 'InfuseAI',
     logo: null
