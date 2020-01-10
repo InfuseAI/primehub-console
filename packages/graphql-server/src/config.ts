@@ -60,6 +60,14 @@ export interface Config {
 
   // graphql host
   graphqlHost: string;
+
+  // license management stuffs
+  enableGroup: boolean;
+  maxGroup: number;
+  licenseStatus: string;
+  licenseTo?: string;
+  startedAt?: string;
+  expiredAt?: string;
 }
 
 const defaultConfigs = {
@@ -86,6 +94,9 @@ const defaultConfigs = {
   defaultUserVolumeCapacity: '20G',
   enableDatasetUpload: false,
   enableWorkspace: false,
+  enableGroup: false,
+  licenseStatus: 'invalid',
+  maxGroup: 999,
   graphqlHost: 'http://localhost:3001'
 };
 
@@ -149,7 +160,13 @@ export const createConfig = (): Config => {
     enableWorkspace:
       process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE &&
       process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE.toString() === 'true',
-    graphqlHost: process.env.GRAPHQL_HOST
+    graphqlHost: process.env.GRAPHQL_HOST,
+    enableGroup: process.env.MAX_GROUP && parseInt(process.env.MAX_GROUP, 10) > 0,
+    maxGroup: process.env.MAX_GROUP,
+    licenseTo: process.env.LICENSE_TO,
+    startedAt: process.env.STARTED_AT,
+    expiredAt: process.env.EXPIRED_AT,
+    licenseStatus: process.env.EXPIRED
   });
 
   const env = process.env.NODE_ENV || 'development';

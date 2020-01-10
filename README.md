@@ -35,6 +35,11 @@ Canner CMS
 * PRIMEHUB_FEATURE_DATASET_UPLOAD: enable upload feature or not
 * PRIMEHUB_FEATURE_ENABLE_WORKSPACE: enable workspace or not
 * GRAPHQL_HOST: graphql public host, ex: `https://test.graphql.com:8080`
+* MAX_GROUP: (int) default: 999, Maximum number of user group
+* EXPIRED: (string) default: invalid
+* LICENSE_TO: (string) License destination
+* STARTED_AT: (string) License started time
+* EXPIRED_AT: (string) License end time
 
 ### admin-server
 * KC_API_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. Ex: 'http://127.0.0.1:8080/auth'. For API usage.
