@@ -61,6 +61,7 @@ import { permissions as authMiddleware } from './middlewares/auth';
 import TokenSyncer from './oidc/syncer';
 import K8sSecret from './k8sResource/k8sSecret';
 import K8sDatasetPvc from './k8sResource/k8sDatasetPvc';
+import K8sGroupPvc from './k8sResource/k8sGroupPvc';
 
 // logger
 import * as logger from './logger';
@@ -157,6 +158,12 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   const datasetPvc = new K8sDatasetPvc({
     namespace: config.k8sCrdNamespace,
     primehubGroupSc: config.primehubGroupSc
+  });
+  // group pvc
+  const groupPvc = new K8sGroupPvc({
+    namespace: config.k8sCrdNamespace,
+    primehubGroupSc: config.primehubGroupSc,
+    groupVolumeStorageClass: config.groupVolumeStorageClass
   });
   // K8sUploadServerSecret
   const k8sUploadServerSecret = new K8sUploadServerSecret({
@@ -381,6 +388,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         workspaceApi,
         crdNamespace: config.k8sCrdNamespace,
         k8sDatasetPvc: datasetPvc,
+        k8sGroupPvc: groupPvc,
         k8sUploadServerSecret,
         namespace: config.k8sCrdNamespace,
         graphqlHost: config.graphqlHost,

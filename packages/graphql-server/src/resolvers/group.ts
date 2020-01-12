@@ -113,6 +113,14 @@ export const create = async (root, args, context: Context) => {
     id: groupId
   });
 
+  // create pvc
+  if (payload.enabledSharedVolume && payload.sharedVolumeCapacity >= 0) {
+    await context.k8sGroupPvc.create({
+      groupName: group.name,
+      volumeSize: payload.sharedVolumeCapacity
+    });
+  }
+
   // add users
   try {
     await mutateRelation({
@@ -239,6 +247,7 @@ export const destroy = async (root, args, context: Context) => {
   await kcAdminClient.groups.del({
     id: groupId
   });
+  await context.k8sGroupPvc.delete(group.name);
 
   logger.info({
     component: logger.components.group,
