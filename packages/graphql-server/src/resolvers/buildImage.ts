@@ -58,7 +58,7 @@ const transform = (item: Item<ImageSpecSpec, ImageSpecStatus>): BuildImage => {
 
 // tslint:disable-next-line:max-line-length
 const listQuery = async (imageSpecClient: CustomResource<ImageSpecSpec, ImageSpecStatus>, where: any): Promise<BuildImage[]> => {
-  if (where.id) {
+  if (where && where.id) {
     const imageSpec = await imageSpecClient.get(where.id);
     return [transform(imageSpec)];
   }
@@ -105,7 +105,7 @@ export const create = async (root, args, context: Context) => {
 
   const spec = {
     baseImage: data.baseImage,
-    pullSecret: isNil(data.useImagePullSecret) ? null : data.useImagePullSecret,
+    pullSecret: isEmpty(data.useImagePullSecret) ? undefined : data.useImagePullSecret,
     packages: {
       apt: isNil(get(data, 'packages.apt')) ? undefined : parsePackageField(get(data, 'packages.apt')),
       pip: isNil(get(data, 'packages.pip')) ? undefined : parsePackageField(get(data, 'packages.pip')),
@@ -144,9 +144,14 @@ export const update = async (root, args, context: Context) => {
     id
   });
 
+  // if it's null, assign null to remove this field
+  const useImagePullSecret = isNull(data.useImagePullSecret) ? null
+  // if it's empty string, other than a specified string, we don't change this value
+    : isEmpty(data.useImagePullSecret) ? undefined : data.useImagePullSecret;
+
   const spec = {
     baseImage: data.baseImage,
-    pullSecret: isNull(data.useImagePullSecret) ? null : data.useImagePullSecret,
+    pullSecret: useImagePullSecret,
     packages: {
       apt: updatePackageField(get(data, 'packages.apt')),
       pip: updatePackageField(get(data, 'packages.pip')),
