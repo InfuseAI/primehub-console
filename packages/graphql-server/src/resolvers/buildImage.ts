@@ -58,8 +58,16 @@ const transform = (item: Item<ImageSpecSpec, ImageSpecStatus>): BuildImage => {
 
 // tslint:disable-next-line:max-line-length
 const listQuery = async (imageSpecClient: CustomResource<ImageSpecSpec, ImageSpecStatus>, where: any): Promise<BuildImage[]> => {
+  if (where.id) {
+    const imageSpec = await imageSpecClient.get(where.id);
+    return [transform(imageSpec)];
+  }
+
   const imageSpecs = await imageSpecClient.list();
-  const transformedImageSpecs = imageSpecs.map(transform);
+  let transformedImageSpecs = imageSpecs.map(transform);
+
+  // sort by updateTime in desc
+  transformedImageSpecs = orderBy(transformedImageSpecs, 'updateTime', 'desc');
   return filter(transformedImageSpecs, where);
 };
 
