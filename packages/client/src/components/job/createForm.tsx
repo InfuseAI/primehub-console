@@ -207,7 +207,7 @@ class CreateForm extends React.Component<Props> {
                       {transformImages(images, instanceType).map(image => (
                         <Radio style={radioStyle} value={image.id} disabled={image.disabled}>
                           <div style={radioContentStyle}>
-                            <h4>{image.displayName || image.name}({getImageType(image)})</h4>
+                            <h4>{image.displayName || image.name} ({getImageType(image)})</h4>
                             {image.description}
                           </div>
                         </Radio>
