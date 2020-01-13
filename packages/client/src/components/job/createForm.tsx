@@ -35,14 +35,49 @@ const radioGroupStyle = {
   border: '1px solid #e8e8e8',
 }
 
+const compareByAlphabetical = (prev, next) => {
+  if(prev < next) return -1;
+  if(prev > next) return 1;
+  return 0;
+}
+
+const sortGroups = (groups) => {
+  const copiedGroups = groups.slice();
+  copiedGroups
+    .sort((prev, next) => {
+      const prevName = prev.displayName || prev.name;
+      const nextName = next.displayName || next.name;
+      return compareByAlphabetical(prevName, nextName);
+    });
+  return copiedGroups;
+}
+
+const sortInstanceTypes = (instanceTypes) => {
+  const copiedInstanceTypes = instanceTypes.slice();
+  copiedInstanceTypes
+    .sort((prev, next) => {
+      const prevName = prev.displayName || prev.name;
+      const nextName = next.displayName || next.name;
+      return compareByAlphabetical(prevName, nextName);
+    });
+  return copiedInstanceTypes;
+}
+
 const transformImages = (images, instanceType) => {
   const gpuInstance = Boolean(instanceType && instanceType.gpuLimit);
-  return images.map(image => {
+  const transformedImages = images.map(image => {
     return {
       ...image,
       __disabled: !gpuInstance && (image.type || '').toLowerCase() === 'gpu'
     };
   });
+  transformedImages
+    .sort((prev, next) => {
+      const prevName = prev.displayName || prev.name;
+      const nextName = next.displayName || next.name;
+      return compareByAlphabetical(prevName, nextName);
+    });
+  return transformedImages;
 }
 
 const getImageType = (image) => {
@@ -58,6 +93,8 @@ const getImageType = (image) => {
       return 'Unknown';
   }
 }
+
+const dashOrNumber = value => value === null ? '-' : value;
 
 const commandPlaceHolder = `echo "Start training"
 python /project/group-a/train.py \\
@@ -139,7 +176,7 @@ class CreateForm extends React.Component<Props> {
                       rules: [{ required: true, message: 'Please select a group!' }],
                     })(
                       <Select placeholder="Please select a group" onChange={id => onSelectGroup(id)}>
-                        {groups.map(group => (
+                        {sortGroups(groups).map(group => (
                           <Option key={group.id} value={group.id}>
                             {group.displayName || group.name}
                           </Option>
@@ -162,13 +199,13 @@ class CreateForm extends React.Component<Props> {
                 })(
                   instanceTypes.length ? (
                     <Radio.Group style={radioGroupStyle} onChange={this.autoSelectFirstImage}>
-                      {instanceTypes.map(instanceType => (
+                      {sortInstanceTypes(instanceTypes).map(instanceType => (
                         <Radio style={radioStyle} value={instanceType.id}>
                           <div style={radioContentStyle}>
                             <h4>
                               {instanceType.displayName || instanceType.name}
                               <Tooltip
-                                title={`CPU: ${instanceType.cpuRequest || '-'}/Memory: ${instanceType.memoryRequest || '-'} GB/GPU: ${instanceType.gpuLimit || '-'}`}
+                                title={`CPU: ${dashOrNumber(instanceType.cpuRequest)} / Memory: ${dashOrNumber(instanceType.memoryRequest)} G / GPU: ${dashOrNumber(instanceType.gpuLimit)}`}
                               >
                                 <Icon
                                   type="info-circle"
