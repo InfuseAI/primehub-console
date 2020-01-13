@@ -132,7 +132,7 @@ export default class Detail extends React.Component<Props> {
               Back
             </Button>
             <Title>
-              Job: {job.name}
+              Job: {job.displayName || job.name}
             </Title>
           </div>
           <Button
