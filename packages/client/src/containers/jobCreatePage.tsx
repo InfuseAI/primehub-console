@@ -33,6 +33,23 @@ export const CREATE_JOB = gql`
   }
 `
 
+const compareByAlphabetical = (prev, next) => {
+  if(prev < next) return -1;
+  if(prev > next) return 1;
+  return 0;
+}
+
+const sortItems = (items) => {
+  const copiedItems = items.slice();
+  copiedItems
+    .sort((prev, next) => {
+      const prevName = prev.displayName || prev.name;
+      const nextName = next.displayName || next.name;
+      return compareByAlphabetical(prevName, nextName);
+    });
+  return copiedItems;
+}
+
 type Props = RouteComponentProps & {
   getGroups: any; 
   createPhJob: any;
@@ -93,9 +110,9 @@ class JobCreatePage extends React.Component<Props, State> {
         <JobCreateForm
           onSelectGroup={this.onChangeGroup}
           selectedGroup={selectedGroup}
-          groups={groups}
-          instanceTypes={instanceTypes}
-          images={images}
+          groups={sortItems(groups)}
+          instanceTypes={sortItems(instanceTypes)}
+          images={sortItems(images)}
           onSubmit={this.onSubmit}
           creatingJob={createPhJobResult.loading || false}
           loading={getGroups.loading}

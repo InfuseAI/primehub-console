@@ -35,49 +35,14 @@ const radioGroupStyle = {
   border: '1px solid #e8e8e8',
 }
 
-const compareByAlphabetical = (prev, next) => {
-  if(prev < next) return -1;
-  if(prev > next) return 1;
-  return 0;
-}
-
-const sortGroups = (groups) => {
-  const copiedGroups = groups.slice();
-  copiedGroups
-    .sort((prev, next) => {
-      const prevName = prev.displayName || prev.name;
-      const nextName = next.displayName || next.name;
-      return compareByAlphabetical(prevName, nextName);
-    });
-  return copiedGroups;
-}
-
-const sortInstanceTypes = (instanceTypes) => {
-  const copiedInstanceTypes = instanceTypes.slice();
-  copiedInstanceTypes
-    .sort((prev, next) => {
-      const prevName = prev.displayName || prev.name;
-      const nextName = next.displayName || next.name;
-      return compareByAlphabetical(prevName, nextName);
-    });
-  return copiedInstanceTypes;
-}
-
 const transformImages = (images, instanceType) => {
   const gpuInstance = Boolean(instanceType && instanceType.gpuLimit);
-  const transformedImages = images.map(image => {
+  return images.map(image => {
     return {
       ...image,
       __disabled: !gpuInstance && (image.type || '').toLowerCase() === 'gpu'
     };
   });
-  transformedImages
-    .sort((prev, next) => {
-      const prevName = prev.displayName || prev.name;
-      const nextName = next.displayName || next.name;
-      return compareByAlphabetical(prevName, nextName);
-    });
-  return transformedImages;
 }
 
 const getImageType = (image) => {
@@ -118,13 +83,19 @@ class CreateForm extends React.Component<Props> {
   }
 
   autoSelectFirstGroup = () => {
-    const {onSelectGroup, selectedGroup, groups} = this.props;
-    if (!selectedGroup && groups.length) onSelectGroup(get(groups[0], 'id', null));
+    const {onSelectGroup, selectedGroup, groups, form} = this.props;
+    if (!selectedGroup && groups.length) {
+      const id = get(groups[0], 'id', null);
+      onSelectGroup(id);
+      form.setFieldsValue({groupId: id});
+    }
   }
 
   autoSelectFirstInstanceType = () => {
     const {instanceTypes, form} = this.props;
-    if (!form.getFieldValue('instanceType') && instanceTypes.length) {
+    const currentInstanceType = form.getFieldValue('instanceType');
+    const validInstanceType = instanceTypes.some(instanceType => instanceType.id === currentInstanceType);
+    if ((!form.getFieldValue('instanceType') || !validInstanceType) && instanceTypes.length) {
       form.setFieldsValue({instanceType: instanceTypes[0].id});
     }
   }
@@ -176,7 +147,7 @@ class CreateForm extends React.Component<Props> {
                       rules: [{ required: true, message: 'Please select a group!' }],
                     })(
                       <Select placeholder="Please select a group" onChange={id => onSelectGroup(id)}>
-                        {sortGroups(groups).map(group => (
+                        {groups.map(group => (
                           <Option key={group.id} value={group.id}>
                             {group.displayName || group.name}
                           </Option>
@@ -199,7 +170,7 @@ class CreateForm extends React.Component<Props> {
                 })(
                   instanceTypes.length ? (
                     <Radio.Group style={radioGroupStyle} onChange={this.autoSelectFirstImage}>
-                      {sortInstanceTypes(instanceTypes).map(instanceType => (
+                      {instanceTypes.map(instanceType => (
                         <Radio style={radioStyle} value={instanceType.id}>
                           <div style={radioContentStyle}>
                             <h4>
@@ -297,12 +268,4 @@ class CreateForm extends React.Component<Props> {
 }
 
 
-export default Form.create<Props>({
-  mapPropsToFields(props) {
-    return {
-      groupId: Form.createFormField({
-        value: props.selectedGroup,
-      })
-    };
-  },
-})(CreateForm);
+export default Form.create<Props>()(CreateForm);
