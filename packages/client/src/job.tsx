@@ -74,8 +74,8 @@ const fakeData = {
         name: 'it',
         displayName: 'gpu0',
         gpuLimit: 0,
-        cpuRequest: 0.5,
-        memoryRequest: 4,
+        cpuLimit: 0.5,
+        memoryLimit: 4,
       }, {
         id: 'everyone-it2',
         name: 'it',

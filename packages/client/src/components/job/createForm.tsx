@@ -176,7 +176,7 @@ class CreateForm extends React.Component<Props> {
                             <h4>
                               {instanceType.displayName || instanceType.name}
                               <Tooltip
-                                title={`CPU: ${dashOrNumber(instanceType.cpuRequest)} / Memory: ${dashOrNumber(instanceType.memoryRequest)} G / GPU: ${dashOrNumber(instanceType.gpuLimit)}`}
+                                title={`CPU: ${dashOrNumber(instanceType.cpuLimit)} / Memory: ${dashOrNumber(instanceType.memoryLimit)} G / GPU: ${dashOrNumber(instanceType.gpuLimit)}`}
                               >
                                 <Icon
                                   type="info-circle"

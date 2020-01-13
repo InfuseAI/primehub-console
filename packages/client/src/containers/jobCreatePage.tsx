@@ -17,7 +17,7 @@ export const GET_MY_GROUPS = gql`
       id
       groups {
         ...GroupInfo
-        instanceTypes { id name displayName description spec global gpuLimit memoryRequest cpuRequest }
+        instanceTypes { id name displayName description spec global gpuLimit memoryLimit cpuLimit }
         images { id name displayName description spec global type }
       }
     }
