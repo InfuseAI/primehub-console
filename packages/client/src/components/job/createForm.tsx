@@ -37,10 +37,26 @@ const radioGroupStyle = {
 
 const transformImages = (images, instanceType) => {
   const gpuInstance = Boolean(instanceType && instanceType.gpuLimit);
-  return images.map(image => ({
-    ...image,
-    disabled: !gpuInstance && (image.type || '').toLowerCase() === 'gpu'
-  }))
+  return images.map(image => {
+    return {
+      ...image,
+      __disabled: !gpuInstance && (image.type || '').toLowerCase() === 'gpu'
+    };
+  });
+}
+
+const getImageType = (image) => {
+  const imageType = (image.type || '').toLowerCase();
+  switch (imageType) {
+    case 'gpu':
+      return 'GPU';
+    case 'cpu':
+      return 'CPU';
+    case 'both':
+      return 'Universal'
+    default:
+      return 'Unknown';
+  }
 }
 
 const commandPlaceHolder = `echo "Start training"
@@ -149,7 +165,18 @@ class CreateForm extends React.Component<Props> {
                       {instanceTypes.map(instanceType => (
                         <Radio style={radioStyle} value={instanceType.id}>
                           <div style={radioContentStyle}>
-                            <h4>{instanceType.displayName || instanceType.name}</h4>
+                            <h4>
+                              {instanceType.displayName || instanceType.name}
+                              <Tooltip
+                                title={`CPU: ${instanceType.cpuRequest || '-'}/Memory: ${instanceType.memoryRequest || '-'} GB/GPU: ${instanceType.gpuLimit || '-'}`}
+                              >
+                                <Icon
+                                  type="info-circle"
+                                  theme="filled"
+                                  style={{marginLeft: 8}}
+                                />
+                              </Tooltip>
+                            </h4>
                             {instanceType.description}
                           </div>
                         </Radio>
@@ -172,7 +199,7 @@ class CreateForm extends React.Component<Props> {
                       {transformImages(images, instanceType).map(image => (
                         <Radio style={radioStyle} value={image.id} disabled={image.disabled}>
                           <div style={radioContentStyle}>
-                            <h4>{image.displayName || image.name}</h4>
+                            <h4>{image.displayName || image.name}({getImageType(image)})</h4>
                             {image.description}
                           </div>
                         </Radio>
