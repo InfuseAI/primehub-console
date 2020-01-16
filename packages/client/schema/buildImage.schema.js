@@ -42,7 +42,6 @@ export default () => (
         }
       }`
     }
-    refetch
     fetchPolicy="network-only"
   >
     <Tabs component={BuildImageTab}>
