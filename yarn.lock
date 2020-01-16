@@ -4971,10 +4971,10 @@ canner-script@2.0.11-alpha.1:
     react-intl "^2.4.0"
     safer-eval "^1.2.3"
 
-canner@2.0.60:
-  version "2.0.60"
-  resolved "https://registry.yarnpkg.com/canner/-/canner-2.0.60.tgz#baeea58aec463b36d8dd8435e40e704f8a4032d8"
-  integrity sha512-KinvjdI2Yrn47J/oSwKRQkUInv4xcFjO1PdbYFQJkNkPV2QFL1roSO1UHSSeMoNCRt8y1WC8b9S+a+95tMfefw==
+canner@2.0.62:
+  version "2.0.62"
+  resolved "https://registry.yarnpkg.com/canner/-/canner-2.0.62.tgz#fae133a06005d44055c2db6c4989ac7e72759cc3"
+  integrity sha512-wEjbC0/R8pJbYPNifA9eEYMirp/GkdB+LmGqmL8Jt7ViBFln23tZFIUIUviLDnrh8FwgCsXqQSz8J7oYc/DImQ==
   dependencies:
     "@babel/runtime" "^7.2.0"
     ajv "^6.5.2"
