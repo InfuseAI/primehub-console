@@ -16,12 +16,13 @@ type State = {
 export default class Logs extends React.Component<Props, State> {
   constructor(props) {
     super(props);
+    this.retryCount = 0;
     this.state = {
       log: ''
     };
   }
 
-  componentDidMount() {
+  fetchLog = () => {
     const token = window.localStorage.getItem('canner.accessToken');
     const {value} = this.props;
     const that = this;
@@ -31,6 +32,7 @@ export default class Logs extends React.Component<Props, State> {
         'Authorization': 'Bearer ' + token
       },
     }).then(res => {
+      this.retryCount = 0;
       if (res.status >= 400)
         return res.json().then(content => {
           const reason = get(content, 'message', 'of internal error');
@@ -40,10 +42,18 @@ export default class Logs extends React.Component<Props, State> {
         });
       const reader = res.body.getReader();
 
+      // cleanup logs
+      that.setState({
+        log: ''
+      });
+
       return readChunk();
 
       function readChunk() {
-        return reader.read().then(appendChunks);
+        return reader.read().then(appendChunks).catch(err => {
+          console.log(err);
+          that.fetchLog();
+        });
       }
 
       function appendChunks(result) {
@@ -60,7 +70,22 @@ export default class Logs extends React.Component<Props, State> {
           return readChunk();
         }
       }
+    })
+    .catch(err => {
+      console.log(err);
+      setTimeout(() => {
+        if (this.retryCount <= 5) {
+          this.retryCount += 1;
+          that.fetchLog();
+        } else {
+          console.log(`stop retrying fetching logs`);
+        }
+      }, 1000 * (this.retryCount + 1));
     });
+  }
+
+  componentDidMount() {
+    this.fetchLog();
   }
 
   render() {
