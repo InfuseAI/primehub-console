@@ -246,6 +246,7 @@ exports.dict = {
     // group
     groups: 'Groups',
     group: 'Groups',
+    "groups.datasets.writable": "Permissions",
     "group.enabledSharedVolume": "Shared Volume",
     "group.sharedVolumeCapacity": "Shared Volume Capacity",
     "group.launchGroupOnly": "Launch Group Only",
@@ -479,6 +480,7 @@ exports.dict = {
     readOnlyGroups: 'Readonly Groups',
     writableGroups: 'Writable Groups',
     group: 'Groups',
+    "groups.datasets.writable": "Permissions",
     "group.enabledSharedVolume": "Shared Volume",
     "group.sharedVolumeCapacity": "Shared Volume Capacity",
     "group.launchGroupOnly": "Launch Group Only",
