@@ -40,6 +40,7 @@ Canner CMS
 * LICENSE_TO: (string) License destination
 * STARTED_AT: (string) License started time
 * EXPIRED_AT: (string) License end time
+* PRIMEHUB_GROUP_VOLUME_STORAGE_CLASS: storageClass of group pvc
 
 ### admin-server
 * KC_API_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. Ex: 'http://127.0.0.1:8080/auth'. For API usage.

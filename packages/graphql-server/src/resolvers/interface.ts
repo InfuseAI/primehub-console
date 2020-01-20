@@ -6,6 +6,7 @@ import WorkspaceApi from '../workspace/api';
 import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
 import K8sUploadServerSecret from '../k8sResource/k8sUploadServerSecret';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
+import K8sGroupPvc from '../k8sResource/k8sGroupPvc';
 
 export enum Role {
   CLIENT = 'CLIENT',
@@ -32,6 +33,7 @@ export interface Context {
   crdNamespace: string;
   k8sDatasetPvc: K8sDatasetPvc;
   k8sUploadServerSecret: K8sUploadServerSecret;
+  k8sGroupPvc: K8sGroupPvc;
   namespace: string;
   graphqlHost: string;
   jobLogCtrl: JobLogCtrl;
