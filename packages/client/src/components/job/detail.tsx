@@ -192,7 +192,7 @@ export default class Detail extends React.Component<Props> {
               </Form>
             </TabPane>
             <TabPane key="logs" tab="Logs" disabled={job.phase === Phase.Pending || !job.logEndpoint}>
-              <Log value={job.logEndpoint}/>
+              <Log endpoint={job.logEndpoint}/>
             </TabPane>
           </Tabs>
         </Card>

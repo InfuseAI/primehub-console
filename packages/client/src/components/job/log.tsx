@@ -1,12 +1,10 @@
 import * as React from 'react';
-import { Input } from 'antd';
+import {Input} from 'antd';
 import {get} from 'lodash';
 
 type Props = {
-  value: string;
-  uiParams?: {
-    rows?: number
-  }
+  endpoint: string;
+  rows?: number
 }
 
 type State = {
@@ -14,6 +12,8 @@ type State = {
 }
 
 export default class Logs extends React.Component<Props, State> {
+  retryCount: number;
+
   constructor(props) {
     super(props);
     this.retryCount = 0;
@@ -22,11 +22,29 @@ export default class Logs extends React.Component<Props, State> {
     };
   }
 
+  componentDidMount() {
+    this.fetchLog()
+      .then(() => {
+        this.retryCount = 0;
+      })
+      .catch(err => {
+        console.log(err);
+        setTimeout(() => {
+          if (this.retryCount <= 5) {
+            this.retryCount += 1;
+            this.fetchLog();
+          } else {
+            console.log(`stop retrying fetching logs`);
+          }
+        }, 1000 * (this.retryCount + 1));
+      });
+  }
+
   fetchLog = () => {
     const token = window.localStorage.getItem('canner.accessToken');
-    const {value} = this.props;
+    const {endpoint} = this.props;
     const that = this;
-    fetch(value, {
+    return fetch(endpoint, {
       method: 'GET',
       headers: {
         'Authorization': 'Bearer ' + token
@@ -37,18 +55,13 @@ export default class Logs extends React.Component<Props, State> {
         return res.json().then(content => {
           const reason = get(content, 'message', 'of internal error');
           that.setState(() => ({
-            log: `Error: cannot get log because ${reason}`
+            log: `Error: cannot get log due to ${reason}`
           }));
         });
+      
+      that.setState({log: ''});
       const reader = res.body.getReader();
-
-      // cleanup logs
-      that.setState({
-        log: ''
-      });
-
-      return readChunk();
-
+      
       function readChunk() {
         return reader.read().then(appendChunks).catch(err => {
           console.log(err);
@@ -57,41 +70,22 @@ export default class Logs extends React.Component<Props, State> {
       }
 
       function appendChunks(result) {
-        if (!result.done){
-          const chunk = new TextDecoder().decode(result.value.buffer);
-          that.setState((prevState: any) => ({
-            log: prevState.log + chunk
-          }));
-        }
-
-        if (result.done) {
+        if (result.done)
           return 'done';
-        } else {
-          return readChunk();
-        }
+        const chunk = new TextDecoder().decode(result.value.buffer);
+        that.setState((prevState: any) => ({
+          log: prevState.log + chunk
+        }));
+        return readChunk();
       }
-    })
-    .catch(err => {
-      console.log(err);
-      setTimeout(() => {
-        if (this.retryCount <= 5) {
-          this.retryCount += 1;
-          that.fetchLog();
-        } else {
-          console.log(`stop retrying fetching logs`);
-        }
-      }, 1000 * (this.retryCount + 1));
-    });
-  }
 
-  componentDidMount() {
-    this.fetchLog();
+      return readChunk();
+    })
   }
 
   render() {
-    const {uiParams = {}} = this.props;
+    const {rows = 40} = this.props;
     const {log} = this.state;
-    const {rows} = uiParams;
     return <Input.TextArea
       style={{
         background: 'black',
