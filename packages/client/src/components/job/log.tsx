@@ -23,21 +23,7 @@ export default class Logs extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.fetchLog()
-      .then(() => {
-        this.retryCount = 0;
-      })
-      .catch(err => {
-        console.log(err);
-        setTimeout(() => {
-          if (this.retryCount <= 5) {
-            this.retryCount += 1;
-            this.fetchLog();
-          } else {
-            console.log(`stop retrying fetching logs`);
-          }
-        }, 1000 * (this.retryCount + 1));
-      });
+    this.fetchLog();
   }
 
   fetchLog = () => {
@@ -63,10 +49,7 @@ export default class Logs extends React.Component<Props, State> {
       const reader = res.body.getReader();
       
       function readChunk() {
-        return reader.read().then(appendChunks).catch(err => {
-          console.log(err);
-          that.fetchLog();
-        });
+        return reader.read().then(appendChunks);
       }
 
       function appendChunks(result) {
@@ -81,6 +64,17 @@ export default class Logs extends React.Component<Props, State> {
 
       return readChunk();
     })
+    .catch(err => {
+      console.log(err);
+      setTimeout(() => {
+        if (this.retryCount <= 5) {
+          this.retryCount += 1;
+          this.fetchLog();
+        } else {
+          console.log(`stop retrying fetching logs`);
+        }
+      }, 1000 * (this.retryCount + 1));
+    });
   }
 
   render() {
