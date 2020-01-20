@@ -120,8 +120,8 @@ export default compose(
           where: JSON.parse(params.where as string || '{}'),
           after: params.after || undefined,
           before: params.before || undefined,
-          first: params.first || undefined,
-          last: params.last || undefined,
+          first: params.first ? parseInt(params.first as string, 10) : undefined,
+          last: params.last ? parseInt(params.last as string, 10) : undefined
         },
         fetchPolicy: 'cache-and-network'
       }
