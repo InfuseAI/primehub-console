@@ -12,6 +12,7 @@ import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import JobContainer from 'containers/job';
 import JobDetailContainer from 'containers/jobDetail';
 import JobCreatePage from 'containers/jobCreatePage';
+import {FilterPayload} from 'containers/types';
 
 const PAGE_PADDING = 64;
 const HEADER_HEIGHT = 64;
@@ -154,8 +155,31 @@ const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
   {connector, schema: {me: {type: 'object'}, phJobs: {type: 'array',items: {type: 'object'}}}});
 const appPrefix = (window as any).APP_PREFIX || '/';
-class Job extends React.Component {
+
+type State = FilterPayload
+
+class Job extends React.Component<{}, State> {
+  state = {
+    where: {},
+    after: undefined,
+    before: undefined,
+    last: undefined,
+    first: 10
+  }
+
+  changeFilter = (payload) => {
+    this.setState({...payload});
+  }
+
   render() {
+    const {
+      where = {},
+      after,
+      before,
+      last,
+      first
+    } = this.state;
+
     return (
       <Layout>
         <Header />
@@ -164,7 +188,14 @@ class Job extends React.Component {
             <ApolloProvider client={client}>
               <Switch>
                 <Route path={`${appPrefix}job`} exact>
-                  <JobContainer/>
+                  <JobContainer
+                    changeFilter={this.changeFilter}
+                    where={where}
+                    first={first}
+                    before={before}
+                    last={last}
+                    after={after}
+                  />
                 </Route>
                 <Route path={`${appPrefix}job/create`} exact>
                   <JobCreatePage />

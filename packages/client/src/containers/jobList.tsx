@@ -3,10 +3,12 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {withRouter} from 'react-router-dom';
+import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import JobList from 'components/job/list';
 import {errorHandler} from 'components/job/errorHandler';
 import {Group} from 'components/job/groupFilter';
+import {FilterPayload} from 'containers/types';
 
 export const PhJobFragement = gql`
   fragment PhJobInfo on PhJob {
@@ -74,13 +76,23 @@ type Props = {
   cancelPhJob: any;
   rerunPhJobResult: any;
   cancelPhJobResult: any;
-} & RouteComponentProps;
+  changeFilter: (payload: FilterPayload) => void;
+} & RouteComponentProps
+  & FilterPayload;
 
 const appPrefix = (window as any).APP_PREFIX || '/';
 
 class JobListContainer extends React.Component<Props> {
   render() {
-    const {getPhJobConnection, groups, rerunPhJob, cancelPhJob, rerunPhJobResult, cancelPhJobResult} = this.props;
+    const {
+      getPhJobConnection,
+      groups,
+      rerunPhJob,
+      cancelPhJob,
+      rerunPhJobResult,
+      cancelPhJobResult,
+      changeFilter,
+    } = this.props;
 
     return (
       <JobList
@@ -88,7 +100,7 @@ class JobListContainer extends React.Component<Props> {
         jobsError={getPhJobConnection.error}
         jobsConnection={getPhJobConnection.phJobsConnection || {pageInfo: {}, edges: []}}
         jobsVariables={getPhJobConnection.variables}
-        jobsRefetch={getPhJobConnection.refetch}
+        jobsRefetch={changeFilter}
         rerunPhJob={rerunPhJob}
         rerunPhJobResult={rerunPhJobResult}
         cancelPhJobResult={cancelPhJobResult}
@@ -105,10 +117,11 @@ export default compose(
     options: (props: Props) => {
       return {
         variables: {
-          where: {
-            groupId_in: props.groups.map(group => group.id)
-          },
-          first: 10,
+          where: props.where,
+          after: props.after,
+          before: props.before,
+          first: props.first,
+          last: props.last,
         },
         fetchPolicy: 'cache-and-network'
       }
