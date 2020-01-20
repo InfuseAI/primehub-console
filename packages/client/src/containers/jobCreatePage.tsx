@@ -4,6 +4,7 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {get, unionBy} from 'lodash';
+import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import Title from 'components/job/title';
@@ -84,7 +85,7 @@ class JobCreatePage extends React.Component<Props, State> {
       <React.Fragment>
         <Button
           icon="left"
-          onClick={() => history.push(`${appPrefix}job`)}
+          onClick={() => history.goBack()}
           style={{marginRight: 16, verticalAlign: 'top'}}
         >
           Back
@@ -113,7 +114,14 @@ export default compose(
   graphql(CREATE_JOB, {
     options: (props: Props) => ({
       onCompleted: () => {
-        props.history.push(`${appPrefix}job`);
+        const groups = get(props.getGroups, 'me.groups', []);
+        const where = JSON.stringify({
+          groupId_in: groups.map(group => group.id)
+        });
+        props.history.push({
+          pathname: `${appPrefix}job`,
+          search: queryString.stringify({where})
+        });
       },
       onError: errorHandler
     }),

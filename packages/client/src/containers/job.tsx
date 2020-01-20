@@ -3,8 +3,10 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {get} from 'lodash';
+import queryString from 'querystring';
 import JobListContainer from 'containers/jobList';
-import {FilterPayload} from 'containers/types';
+import {withRouter} from 'react-router';
+import {RouteComponentProps} from 'react-router-dom';
 
 export const GroupFragment = gql`
   fragment GroupInfo on Group {
@@ -28,18 +30,14 @@ export const GET_MY_GROUPS = gql`
 
 type Props = {
   getMyGroups: any;
-  changeFilter: (payload: FilterPayload) => void;
-} & FilterPayload;
+} & RouteComponentProps;
+
+const appPrefix = (window as any).APP_PREFIX || '/';
+
 class JobContainer extends React.Component<Props> {
   render() {
     const {
       getMyGroups,
-      changeFilter,
-      where,
-      after,
-      before,
-      last,
-      first
     } = this.props;
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     if (getMyGroups.loading) return null;
@@ -51,27 +49,26 @@ class JobContainer extends React.Component<Props> {
     return (
       <JobListContainer
         groups={groups}
-        changeFilter={changeFilter}
-        where={where}
-        after={after}
-        before={before}
-        last={last}
-        first={first}
       />
     );
   }
 }
 
 export default compose(
+  withRouter,
   graphql(GET_MY_GROUPS, {
     name: 'getMyGroups',
     options: (props: Props) => ({
       onCompleted: data => {
         // default select all groups
         const groups = get(data, 'me.groups', []);
-        props.changeFilter({where: {
+        const where = JSON.stringify({
           groupId_in: groups.map(group => group.id)
-        }});
+        });
+        props.history.push({
+          pathname: `${appPrefix}job`,
+          search: queryString.stringify({where})
+        });
       }
     })
   })
