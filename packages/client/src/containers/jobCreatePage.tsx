@@ -120,7 +120,7 @@ export default compose(
         });
         props.history.push({
           pathname: `${appPrefix}job`,
-          search: queryString.stringify({where})
+          search: queryString.stringify({where, first: 10})
         });
       },
       onError: errorHandler

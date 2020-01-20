@@ -60,14 +60,14 @@ export default compose(
     name: 'getMyGroups',
     options: (props: Props) => ({
       onCompleted: data => {
-        // default select all groups
+        // default select all groups and first=10
         const groups = get(data, 'me.groups', []);
         const where = JSON.stringify({
           groupId_in: groups.map(group => group.id)
         });
         props.history.push({
           pathname: `${appPrefix}job`,
-          search: queryString.stringify({where})
+          search: queryString.stringify({where, first: 10})
         });
       }
     })
