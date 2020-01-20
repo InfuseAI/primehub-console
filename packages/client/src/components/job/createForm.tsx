@@ -48,7 +48,7 @@ python /project/group-a/train.py \\
   --dataset /datasets/dataset-a/train.txt \\
   --output /workingdir/output \\
   --parameter_1 value_1 \\
-  --parameter_1 value_2 \\
+  --parameter_2 value_2
 `;
 
 class CreateForm extends React.Component<Props> {
