@@ -18,7 +18,7 @@ export function errorHandler (e) {
 
   switch (errorCode) {
     case 'EXCEED_QUOTA':
-      message = 'Runtime Error';
+      message = 'System Error';
       description = description || 'The quota exceeded';
       break;
   };

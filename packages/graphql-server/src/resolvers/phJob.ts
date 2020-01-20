@@ -78,8 +78,8 @@ const createJob = async (context: Context, data: PhJobCreateInput) => {
   const metadata = {
     name,
     labels: {
-      'primehub-group': escapeToPrimehubLabel(group.name),
-      'primehub-user': escapeToPrimehubLabel(username)
+      'primehub.io/group': escapeToPrimehubLabel(group.name),
+      'primehub.io/user': escapeToPrimehubLabel(username)
     }
   };
   const spec = {
@@ -114,11 +114,6 @@ const validateQuota = async (context: Context, data: PhJobCreateInput) => {
   const instanceTypeGpuLimit = instanceType.spec['limits.nvidia.com/gpu'];
   const instanceTypeMemoryLimit =
     instanceType.spec['limits.memory'] ? parseMemory(instanceType.spec['limits.memory']) : null;
-
-  // gpu quota not defined, but used in instanceType
-  if (isNil(quotaGpu) && isNil(projectQuotaGpu) && !isNil(instanceTypeGpuLimit)) {
-    throw new ApolloError('Gpu Quota not set', EXCEED_QUOTA_ERROR);
-  }
 
   // check if gpu quota exceed
   if (!isNil(instanceTypeGpuLimit)) {
