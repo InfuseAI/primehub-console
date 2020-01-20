@@ -192,7 +192,9 @@ class CreateForm extends React.Component<Props> {
             <Card>
               <Form.Item label="Job name">
                 {form.getFieldDecorator('displayName', {
-                  rules: [{ required: true, message: 'Please input a name!' }],
+                  rules: [
+                    { whitespace: true, required: true, message: 'Please input a name!' },
+                  ],
                 })(
                   <Input />
                 )}
