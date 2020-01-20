@@ -106,7 +106,7 @@ const fakeData = {
     message: 'Job Complete',
     createTime: '2019-10-04T14:48:00.000Z',
     startTime: '2019-10-04T14:48:00.000Z',
-    finishTime: '2019-10-04T15:47:00.000Z',
+    finishTime: '2019-10-04T15:48:00.000Z',
   }, {
     id: 'it2',
     name: 'IT2',

@@ -204,7 +204,7 @@ export default class Detail extends React.Component<Props> {
 export function computeDuration(start: Moment | '', finish: Moment | '') {
   if (!start || !finish) return '-';
   const duration = moment.duration(finish.diff(start));
-  const hour = ensureFormat(duration.hours());
+  const hour = ensureFormat(Math.floor(duration.asHours()));
   const minutes = ensureFormat(duration.minutes());
   const seconds = ensureFormat(duration.seconds());
   return `${hour}:${minutes}:${seconds}`;
