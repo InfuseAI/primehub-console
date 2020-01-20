@@ -100,10 +100,11 @@ exports.ImagePackages = ({attributes}) => (
   <object
     keyName="packages"
     title="${buildImage.packages}"
+    required
     validation={{
       validator: (value, cb) => {
         if (!value.apt && !value.pip && !value.conda) {
-          return cb('At least one of packages is not empty');
+          return cb('You must input at least one package.');
         }
       }
     }}
