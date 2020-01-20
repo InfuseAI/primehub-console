@@ -66,7 +66,7 @@ export default class EnableSharedVolume extends React.Component<Props> {
     const {onChange, refId, rootValue} = this.props;
     const parentRefId = refId.remove(1);
     onChange(parentRefId.child('sharedVolumeCapacity'), 'update',  this.sharedVolumeCapacity);
-    onChange(parentRefId.child('launchGroupOnly'), 'update', this.launchGroupOnly);
+    onChange(parentRefId.child('launchGroupOnly'), 'update', true);
   }
 
   render() {
