@@ -13,6 +13,7 @@ type State = {
 
 export default class Logs extends React.Component<Props, State> {
   retryCount: number;
+  myRef: React.Ref<HTMLTextAreaElement>;
 
   constructor(props) {
     super(props);
@@ -20,10 +21,20 @@ export default class Logs extends React.Component<Props, State> {
     this.state = {
       log: ''
     };
+    this.myRef = React.createRef();
   }
 
   componentDidMount() {
     this.fetchLog();
+  }
+
+  componentDidUpdate(_prevProps, prevState) {
+    // scroll log box to bottom
+    if (this.state.log !== prevState.log && this.myRef) {
+      //https://github.com/ant-design/ant-design/issues/10527
+      // @ts-ignore
+      this.myRef.current.textAreaRef.scrollTop = this.myRef.current.textAreaRef.scrollHeight;
+    }
   }
 
   fetchLog = () => {
@@ -87,6 +98,8 @@ export default class Logs extends React.Component<Props, State> {
       }}
       rows={rows || 40}
       value={log}
+      // @ts-ignore
+      ref={this.myRef}
     />;
   }
 }
