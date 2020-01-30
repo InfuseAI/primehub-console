@@ -81,14 +81,20 @@ const appPrefix = (window as any).APP_PREFIX || '/';
 
 class JobListContainer extends React.Component<Props> {
   changeFilter = (payload) => {
-    if (payload.where)
-      payload.where = JSON.stringify(payload.where);
+    const payloadWithStringWhere = {...payload};
+    if (payloadWithStringWhere.where)
+      payloadWithStringWhere.where = JSON.stringify(payload.where);
 
-    const {history} = this.props;
-    history.push({
-      pathname: `${appPrefix}job`,
-      search: queryString.stringify(payload)
-    });
+    const {history, getPhJobConnection} = this.props;
+    const search = queryString.stringify(payloadWithStringWhere);
+    if (history.location.search === `?${search}`) {
+      getPhJobConnection.refetch(payload);
+    } else {
+      history.push({
+        pathname: `${appPrefix}job`,
+        search
+      });
+    }
   }
 
   render() {
