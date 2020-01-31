@@ -126,7 +126,7 @@ export default class Detail extends React.Component<Props> {
           <div>
             <Button
               icon="left"
-              onClick={() => history.push(`${appPrefix}job`)}
+              onClick={() => history.goBack()}
               style={{marginRight: 16, verticalAlign: 'top'}}
             >
               Back
@@ -192,7 +192,7 @@ export default class Detail extends React.Component<Props> {
               </Form>
             </TabPane>
             <TabPane key="logs" tab="Logs" disabled={job.phase === Phase.Pending || !job.logEndpoint}>
-              <Log value={job.logEndpoint}/>
+              <Log endpoint={job.logEndpoint}/>
             </TabPane>
           </Tabs>
         </Card>
@@ -204,7 +204,7 @@ export default class Detail extends React.Component<Props> {
 export function computeDuration(start: Moment | '', finish: Moment | '') {
   if (!start || !finish) return '-';
   const duration = moment.duration(finish.diff(start));
-  const hour = ensureFormat(duration.hours());
+  const hour = ensureFormat(Math.floor(duration.asHours()));
   const minutes = ensureFormat(duration.minutes());
   const seconds = ensureFormat(duration.seconds());
   return `${hour}:${minutes}:${seconds}`;

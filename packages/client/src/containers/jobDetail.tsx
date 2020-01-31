@@ -67,7 +67,7 @@ export default compose(
         variables: {where: {id: props.match.params.jobId}}
       }],
       onCompleted: () => {
-        props.history.push(`${appPrefix}job`);
+        props.history.goBack();
       },
       onError: errorHandler
     }),
@@ -80,7 +80,7 @@ export default compose(
         variables: {where: {id: props.match.params.jobId}}
       }],
       onCompleted: () => {
-        props.history.push(`${appPrefix}job`);
+        props.history.goBack();
       },
       onError: errorHandler
     }),

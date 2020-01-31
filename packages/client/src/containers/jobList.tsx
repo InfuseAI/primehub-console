@@ -3,6 +3,7 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {withRouter} from 'react-router-dom';
+import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import JobList from 'components/job/list';
 import {errorHandler} from 'components/job/errorHandler';
@@ -79,16 +80,32 @@ type Props = {
 const appPrefix = (window as any).APP_PREFIX || '/';
 
 class JobListContainer extends React.Component<Props> {
-  render() {
-    const {getPhJobConnection, groups, rerunPhJob, cancelPhJob, rerunPhJobResult, cancelPhJobResult} = this.props;
+  changeFilter = (payload) => {
+    const payloadWithStringWhere = {...payload};
+    if (payloadWithStringWhere.where)
+      payloadWithStringWhere.where = JSON.stringify(payload.where);
 
+    const {history, getPhJobConnection} = this.props;
+    const search = queryString.stringify(payloadWithStringWhere);
+    if (history.location.search === `?${search}`) {
+      getPhJobConnection.refetch(payload);
+    } else {
+      history.push({
+        pathname: `${appPrefix}job`,
+        search
+      });
+    }
+  }
+
+  render() {
+    const {getPhJobConnection, rerunPhJob, rerunPhJobResult,cancelPhJobResult, cancelPhJob, groups } = this.props;
     return (
       <JobList
         jobsLoading={getPhJobConnection.loading}
         jobsError={getPhJobConnection.error}
         jobsConnection={getPhJobConnection.phJobsConnection || {pageInfo: {}, edges: []}}
         jobsVariables={getPhJobConnection.variables}
-        jobsRefetch={getPhJobConnection.refetch}
+        jobsRefetch={this.changeFilter}
         rerunPhJob={rerunPhJob}
         rerunPhJobResult={rerunPhJobResult}
         cancelPhJobResult={cancelPhJobResult}
@@ -103,12 +120,14 @@ export default compose(
   withRouter,
   graphql(GET_PH_JOB_CONNECTION, {
     options: (props: Props) => {
+      const params = queryString.parse(props.location.search.replace(/^\?/, ''));
       return {
         variables: {
-          where: {
-            groupId_in: props.groups.map(group => group.id)
-          },
-          first: 10,
+          where: JSON.parse(params.where as string || '{}'),
+          after: params.after || undefined,
+          before: params.before || undefined,
+          first: params.first ? parseInt(params.first as string, 10) : undefined,
+          last: params.last ? parseInt(params.last as string, 10) : undefined
         },
         fetchPolicy: 'cache-and-network'
       }
@@ -121,9 +140,6 @@ export default compose(
         query: GET_PH_JOB_CONNECTION,
         variables: props.getPhJobConnection.variables,
       }],
-      onCompleted: () => {
-        props.history.push(`${appPrefix}job`);
-      },
       onError: errorHandler
     }),
     name: 'rerunPhJob'
@@ -134,9 +150,6 @@ export default compose(
         query: GET_PH_JOB_CONNECTION,
         variables: props.getPhJobConnection.variables
       }],
-      onCompleted: () => {
-        props.history.push(`${appPrefix}job`);
-      },
       onError: errorHandler
     }),
     name: 'cancelPhJob'
