@@ -1,61 +1,20 @@
 import * as React from 'react';
 import { Input } from 'antd';
+import Log from 'components/job/log';
 
-export default class Logs extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      log: ''
-    };
-  }
-
-  componentDidMount() {
-    const token = window.localStorage.getItem('canner.accessToken');
-    const {value} = this.props;
-    const that = this;
-    fetch(value, {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer ' + token
-      },
-    })
-      .then(res => {
-        const reader = res.body.getReader();
-
-        return readChunk();
-
-        function readChunk() {
-          return reader.read().then(appendChunks);
-        }
-
-        function appendChunks(result) {
-          if (!result.done){
-            const chunk = new TextDecoder().decode(result.value.buffer);
-            that.setState((prevState: any) => ({
-              log: prevState.log + chunk
-            }));
-          }
-
-          if (result.done) {
-            return 'done';
-          } else {
-            return readChunk();
-          }
-        }
-      });
-  }
-
+type Props = {
+  uiParams: {
+    rows?: number
+  },
+  value: string
+}
+export default class Logs extends React.Component<Props> {
   render() {
-    const {uiParams} = this.props;
-    const {log} = this.state;
+    const {uiParams, value} = this.props;
     const {rows} = uiParams;
-    return <Input.TextArea
-      style={{
-        background: 'black',
-        color: '#ddd'
-      }}
+    return <Log
+      endpoint={value}
       rows={rows}
-      value={log}
     />;
   }
 }

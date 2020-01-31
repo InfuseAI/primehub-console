@@ -108,7 +108,7 @@ const fakeData = {
     message: 'Job Complete',
     createTime: '2019-10-04T14:48:00.000Z',
     startTime: '2019-10-04T14:48:00.000Z',
-    finishTime: '2019-10-04T15:47:00.000Z',
+    finishTime: '2019-10-04T15:48:00.000Z',
   }, {
     id: 'it2',
     name: 'IT2',
@@ -156,6 +156,7 @@ const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
   {connector, schema: {me: {type: 'object'}, phJobs: {type: 'array',items: {type: 'object'}}}});
 const appPrefix = (window as any).APP_PREFIX || '/';
+
 class Job extends React.Component {
   render() {
     return (
@@ -166,7 +167,7 @@ class Job extends React.Component {
             <ApolloProvider client={client}>
               <Switch>
                 <Route path={`${appPrefix}job`} exact>
-                  <JobContainer/>
+                  <JobContainer />
                 </Route>
                 <Route path={`${appPrefix}job/create`} exact>
                   <JobCreatePage />
