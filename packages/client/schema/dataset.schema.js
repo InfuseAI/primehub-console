@@ -10,6 +10,7 @@ export default () => (
     controlDeployAndResetButtons={true}
     cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
+    hideBackButton={true}
     uiParams={{
       columns: [{
         title: '${name}',

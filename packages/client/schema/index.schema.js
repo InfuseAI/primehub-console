@@ -17,6 +17,7 @@ import {LocalStorageConnector} from 'canner-graphql-interface';
 import {createFakeData} from 'canner-helpers';
 import {dict, graphqlClient, imageStorage} from './utils';
 import BuildImageJobBody from '../src/cms-layouts/buildImageJobBody';
+import DatasetBody from '../src/cms-layouts/datasetBody';
 
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
@@ -32,7 +33,9 @@ const schema = (
     <Body component={BuildImageJobBody}>
       <BuildImageJob />
     </Body>
-    <Dataset/>
+    <Body component={DatasetBody}>
+      <Dataset/>
+    </Body>
     <Secret />
     {/* <Announcement /> */}
   </root>
