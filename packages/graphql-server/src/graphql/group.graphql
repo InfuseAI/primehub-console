@@ -59,6 +59,10 @@ input GroupWhereInput {
   workspaceId: String
 }
 
+input DatasetPlaceHolder {
+  set: [String]
+}
+
 """Mutation input"""
 input GroupCreateInput {
   name: String!
@@ -79,6 +83,8 @@ input GroupCreateInput {
   launchGroupOnly: Boolean
   # workspace
   workspaceId: String
+  # dataset placeholder
+  datasets: DatasetPlaceHolder
 }
 
 input GroupUpdateInput {
@@ -98,6 +104,8 @@ input GroupUpdateInput {
   sharedVolumeCapacity: Int
   homeSymlink: Boolean
   launchGroupOnly: Boolean
+  # dataset placeholder
+  datasets: DatasetPlaceHolder
 }
 
 """Relation input"""

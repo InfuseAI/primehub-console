@@ -79,6 +79,7 @@ export default () => (
         }
       }
     `}
+    fetchPolicy="network-only"
   >
      <toolbar async>
       <filter
@@ -169,6 +170,51 @@ export default () => (
           />
         </Col>
       </Row>
+    </Block>
+    <Block title="${dataset}">
+      <array keyName="datasets"
+        packageName="../src/cms-components/customize-array-table_route"
+        uiParams={{
+          createKeys: [],
+          datasetsInGroupsActions: true,
+          removeActions: true,
+          columns: [{
+            title: '${displayName}',
+            dataIndex: 'displayName'
+          }, {
+            title: '${type}',
+            dataIndex: 'type'
+          }, {
+            title: '${description}',
+            dataIndex: 'description'
+          }, {
+            title: '${groups.datasets.writable}',
+            dataIndex: 'writable',
+            render: writable => writable ? 'Write' : 'Read Only'
+          }]
+        }}
+      >
+        <string keyName="id" />
+        <string keyName="displayName" title="${displayName}" />
+        <string keyName="type"
+          ui="select"
+          title="${type}"
+          uiParams={{
+            options: [{
+              text: 'git',
+              value: 'git'
+            }, {
+              text: 'env',
+              value: 'env'
+            }, {
+              text: 'pv',
+              value: 'pv'
+            }]
+          }}
+        />
+        <string keyName="description" title="${description}" />
+        <boolean keyName="writable" title="${groups.datasets.writable}" />
+      </array>
     </Block>
     <Block title="${users}">
       <relation keyName="users"

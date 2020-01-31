@@ -10,7 +10,6 @@ import {Props} from './types';
 const ButtonGroup = Button.Group;
 const confirm = Modal.confirm;
 const GLOBAL_DISABLE = (window as any).disableMode || false;
-
 @injectIntl
 export default class ArrayBreadcrumb extends Component<Props> {
   static defaultProps = {
@@ -124,6 +123,7 @@ export default class ArrayBreadcrumb extends Component<Props> {
       deploy,
       refId,
       onChange,
+      routes
     } = this.props;
     let dataSource = value;
     if (keyName === 'workspace') {
@@ -158,7 +158,8 @@ export default class ArrayBreadcrumb extends Component<Props> {
       createKeys,
       columns = [],
       removeActions,
-      announcementCustomActions
+      announcementCustomActions,
+      datasetsInGroupsActions
     } = uiParams;
 
     const newColumnsRender = renderValue(columns, items.items, {
@@ -218,6 +219,26 @@ export default class ArrayBreadcrumb extends Component<Props> {
             </Button.Group>
           </React.Fragment>
         )
+      })
+    }
+
+    if (datasetsInGroupsActions) {
+      newColumnsRender.push({
+        title: intl.formatMessage({ id: "array.table.actions" }),
+        dataIndex: 'id',
+        render: id => {
+          return (
+            <Button icon={"edit"}
+              data-testid="edit-button"
+              onClick={() => goTo({
+                pathname: `dataset/${id}`,
+                payload: {
+                  backToGroup: routes[1]
+                }
+              })}
+            />
+          )
+        }
       })
     }
 
