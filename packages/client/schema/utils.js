@@ -5,7 +5,7 @@ import {ImgurStorage} from '@canner/storage';
 import {FormattedMessage} from 'react-intl';
 import {Tag, Button, Icon, Tooltip} from 'antd';
 
-exports.InvalidChRrror = <React.Fragment>
+exports.InvalidChError = <React.Fragment>
   Invalid characters: &nbsp;
   <Tag color="red">;</Tag>
   <Tag color="red">|</Tag>
@@ -431,7 +431,7 @@ exports.dict = {
     'buildImage.image': 'Image',
     'buildImage.baseImage': 'Base Image',
     'buildImage.useImagePullSecret': 'Use Image PullSecret',
-    'buildImage.packages': 'Packages',
+    'buildImage.packages': 'Package(s)',
     'buildImage.apt': 'APT',
     'buildImage.pip': 'Pip',
     'buildImage.conda': 'Conda',
@@ -662,7 +662,7 @@ exports.dict = {
     'buildImage.image': 'Image',
     'buildImage.baseImage': 'Base Image',
     'buildImage.useImagePullSecret': 'Use Image PullSecret',
-    'buildImage.packages': 'Packages',
+    'buildImage.packages': 'Package(s)',
     'buildImage.apt': 'APT',
     'buildImage.pip': 'Pip',
     'buildImage.conda': 'Conda',
