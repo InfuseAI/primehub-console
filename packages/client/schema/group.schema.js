@@ -79,6 +79,7 @@ export default () => (
         }
       }
     `}
+    fetchPolicy="network-only"
   >
      <toolbar async>
       <filter
