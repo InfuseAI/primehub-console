@@ -3,6 +3,7 @@ import builder, {Default, Condition, Layout} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
 import DatasetWrapper from '../src/cms-layouts/datasetWrapper';
 import EnableUploadServer from '../src/cms-layouts/enableUploadServer';
+import DatasetGroupWrapper from '../src/cms-layouts/datasetGroupsWrapper';
 import {groupColumns} from './utils.schema';
 
 export default () => (
@@ -91,7 +92,9 @@ export default () => (
       />
     </Condition>
     <boolean keyName="global" title="${global}" />
-    <boolean keyName="launchGroupOnly" title="${launchGroupOnly}" defaultValue={true} />
+    <Condition match={(data, operator) => !data.global} defaultMode="hidden">
+      <boolean keyName="launchGroupOnly" title="${launchGroupOnly}" defaultValue={true} />
+    </Condition>
     <string keyName="type" 
       ui="select"
       title="${type}"
@@ -170,51 +173,53 @@ export default () => (
       </Condition>
     </Condition>
     <Condition match={data => !(data.global && data.type !== 'pv')}>
-      <relation keyName="groups"
-        packageName='../src/cms-components/customize-relation-dataset_groups_table'
-        relation={{
-          to: 'group',
-          type: 'toMany',
-          fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu', 'userVolumeCapacity', 'writable']
-        }}
-        uiParams={{
-          columns: groupColumns
-        }}
-        graphql={`
-        query($groupAfter: String, $groupBefore: String, $groupLast: Int, $groupFirst: Int,$groupWhere: GroupWhereInput) {
-          group: groupsConnection(after: $groupAfter, before: $groupBefore, last: $groupLast, first: $groupFirst,where: $groupWhere) {
-            edges {
-              cursor
-              node {
-                id
-                name
-                displayName
-                quotaCpu
-                quotaGpu
-                userVolumeCapacity
+      <Layout component={DatasetGroupWrapper}>
+        <relation keyName="groups"
+          packageName='../src/cms-components/customize-relation-dataset_groups_table'
+          relation={{
+            to: 'group',
+            type: 'toMany',
+            fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu', 'userVolumeCapacity', 'writable']
+          }}
+          uiParams={{
+            columns: groupColumns
+          }}
+          graphql={`
+          query($groupAfter: String, $groupBefore: String, $groupLast: Int, $groupFirst: Int,$groupWhere: GroupWhereInput) {
+            group: groupsConnection(after: $groupAfter, before: $groupBefore, last: $groupLast, first: $groupFirst,where: $groupWhere) {
+              edges {
+                cursor
+                node {
+                  id
+                  name
+                  displayName
+                  quotaCpu
+                  quotaGpu
+                  userVolumeCapacity
+                }
+              }
+              pageInfo {
+                hasNextPage
+                hasPreviousPage
               }
             }
-            pageInfo {
-              hasNextPage
-              hasPreviousPage
-            }
           }
-        }
-        `}
-        fetchPolicy="no-cache"
-      >
-        <toolbar async>
-          <filter
-            component={Filter}
-            fields={[{
-              type: 'text',
-              label: '${name}',
-              key: 'name'
-            }]}
-          />
-          <pagination />
-        </toolbar>
-      </relation>
+          `}
+          fetchPolicy="no-cache"
+        >
+          <toolbar async>
+            <filter
+              component={Filter}
+              fields={[{
+                type: 'text',
+                label: '${name}',
+                key: 'name'
+              }]}
+            />
+            <pagination />
+          </toolbar>
+        </relation>
+      </Layout>
     </Condition>
     </Default>
   </array>
