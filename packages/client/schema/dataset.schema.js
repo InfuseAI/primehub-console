@@ -90,8 +90,8 @@ export default () => (
         packageName="../src/cms-components/customize-string-mount_root"
       />
     </Condition>
-    <boolean keyName="launchGroupOnly" title="${launchGroupOnly}" defaultValue={true} />
     <boolean keyName="global" title="${global}" />
+    <boolean keyName="launchGroupOnly" title="${launchGroupOnly}" defaultValue={true} />
     <string keyName="type" 
       ui="select"
       title="${type}"
