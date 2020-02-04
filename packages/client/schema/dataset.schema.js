@@ -96,6 +96,7 @@ export default () => (
       <boolean keyName="launchGroupOnly" title="${launchGroupOnly}" defaultValue={true} />
     </Condition>
     <string keyName="type" 
+      required
       ui="select"
       title="${type}"
       uiParams={{
