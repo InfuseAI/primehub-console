@@ -1,4 +1,5 @@
 # import PageInfo from "common.graphql"
+# import InstanceType from "instanceType.graphql"
 
 type PhJob {
   id: ID!
@@ -8,7 +9,7 @@ type PhJob {
   groupId: String
   groupName: String
   image: String
-  instanceType: String
+  instanceType: InstanceType
   userId: String
   userName: String
   phase: String

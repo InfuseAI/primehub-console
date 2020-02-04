@@ -8,6 +8,8 @@ import * as moment from 'moment';
 import { escapeToPrimehubLabel } from '../utils/escapism';
 import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
+import { mapping } from './instanceType';
+import * as logger from '../logger';
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 
@@ -152,6 +154,30 @@ const validateQuota = async (context: Context, data: PhJobCreateInput) => {
 /**
  * Query
  */
+
+const NOT_FOUND_INSTANCE_TYPE = {
+  id: 'NOT_FOUND',
+  name: 'NOT_FOUND',
+  tolerations: []
+};
+
+export const typeResolvers = {
+  async instanceType(parent, args, context: Context) {
+    const instanceTypeId = parent.instanceType;
+    try {
+      const instanceType = await context.getInstanceType(instanceTypeId);
+      return mapping(instanceType);
+    } catch (error) {
+      logger.info({
+        component: logger.components.phJob,
+        type: 'RESOURCE_NOT_FOUND',
+        id: parent.id,
+        instanceTypeId
+      });
+      return NOT_FOUND_INSTANCE_TYPE;
+    }
+  }
+};
 
 // tslint:disable-next-line:max-line-length
 const listQuery = async (client: CustomResource<PhJobSpec>, where: any, namespace: string, graphqlHost: string, jobLogCtrl: JobLogCtrl, currentUserId: string, kcAdminClient: KeycloakAdminClient): Promise<PhJob[]> => {

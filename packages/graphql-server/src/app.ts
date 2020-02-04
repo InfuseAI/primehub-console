@@ -139,6 +139,7 @@ const resolvers = {
   Group: group.typeResolvers,
   Workspace: workspace.typeResolvers,
   BuildImage: buildImage.typeResolvers,
+  PhJob: phJob.typeResolvers,
   ...instanceType.typeResolver(),
   ...dataset.typeResolver(),
   ...image.typeResolver(),
