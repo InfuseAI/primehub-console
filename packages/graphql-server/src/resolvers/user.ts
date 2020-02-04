@@ -673,6 +673,31 @@ export const resetPassword = async (root, args, context: Context) => {
  * Type
  */
 
+export const isUserAdmin = async (realm: string, userId: string, kcAdminClient: KcAdminClient) => {
+  if (realm === 'master') {
+    // check if user has admin role
+    const roles = await kcAdminClient.users.listRealmRoleMappings({
+      id: userId
+    });
+    return Boolean(find(roles, role => role.name === 'admin'));
+  } else {
+    // if realm is not master
+    // check if user has client role-mappings: realm-management/realm-admin
+    const clients = await kcAdminClient.clients.find();
+    const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
+
+    if (!realmManagementClient) {
+      return false;
+    }
+
+    const clientRoles = await kcAdminClient.users.listClientRoleMappings({
+      id: userId,
+      clientUniqueId: realmManagementClient.id
+    });
+    return Boolean(find(clientRoles, role => role.name === 'realm-admin'));
+  }
+};
+
 export const typeResolvers = {
   federated: (parent, args, context: Context) => {
     return !isUndefined(parent.federationLink);
@@ -681,29 +706,7 @@ export const typeResolvers = {
     const userId = parent.id;
     // admin is determined by user's role
     const {realm, kcAdminClient} = context;
-
-    if (realm === 'master') {
-      // check if user has admin role
-      const roles = await kcAdminClient.users.listRealmRoleMappings({
-        id: userId
-      });
-      return Boolean(find(roles, role => role.name === 'admin'));
-    } else {
-      // if realm is not master
-      // check if user has client role-mappings: realm-management/realm-admin
-      const clients = await kcAdminClient.clients.find();
-      const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
-
-      if (!realmManagementClient) {
-        return false;
-      }
-
-      const clientRoles = await kcAdminClient.users.listClientRoleMappings({
-        id: userId,
-        clientUniqueId: realmManagementClient.id
-      });
-      return Boolean(find(clientRoles, role => role.name === 'realm-admin'));
-    }
+    return isUserAdmin(realm, userId, kcAdminClient);
   },
 
   volumeCapacity: async (parent, args, context: Context) => {
