@@ -8,8 +8,11 @@ import * as moment from 'moment';
 import { escapeToPrimehubLabel } from '../utils/escapism';
 import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
+import { keycloakMaxCount } from './constant';
+import { isUserAdmin } from './user';
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
+const NOT_AUTH_ERROR = 'NOT_AUTH';
 
 export interface PhJob {
   id: string;
@@ -153,11 +156,38 @@ const validateQuota = async (context: Context, data: PhJobCreateInput) => {
  * Query
  */
 
+const canUserViewJob = async (userId: string, phJob: PhJob, context: Context): Promise<boolean> => {
+  const isAdmin = await isUserAdmin(context.realm, userId, context.kcAdminClient);
+  if (isAdmin) { return true; }
+
+  const members = await context.kcAdminClient.groups.listMembers({
+    id: phJob.groupId,
+    max: keycloakMaxCount
+  });
+  const memberIds = members.map(user => user.id);
+  if (memberIds.indexOf(userId) >= 0) { return true; }
+  return false;
+};
+
+const canUserCreate = async (userId: string, groupId: string, context: Context) => {
+  const members = await context.kcAdminClient.groups.listMembers({
+    id: groupId,
+    max: keycloakMaxCount
+  });
+  const memberIds = members.map(user => user.id);
+  return (memberIds.indexOf(userId) >= 0);
+};
+
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhJobSpec>, where: any, namespace: string, graphqlHost: string, jobLogCtrl: JobLogCtrl, currentUserId: string, kcAdminClient: KeycloakAdminClient): Promise<PhJob[]> => {
+const listQuery = async (client: CustomResource<PhJobSpec>, where: any, context: Context): Promise<PhJob[]> => {
+  const {namespace, graphqlHost, jobLogCtrl, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phJob = await client.get(where.id);
     const transformed = await transform(phJob, namespace, graphqlHost, jobLogCtrl, kcAdminClient);
+    const viewable = await canUserViewJob(currentUserId, transformed, context);
+    if (!viewable) {
+      throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+    }
     return [transformed];
   }
 
@@ -177,31 +207,34 @@ const listQuery = async (client: CustomResource<PhJobSpec>, where: any, namespac
 export const query = async (root, args, context: Context) => {
   const {crdClient} = context;
   // tslint:disable-next-line:max-line-length
-  const phJobs = await listQuery(crdClient.phJobs, args && args.where, context.namespace, context.graphqlHost, context.jobLogCtrl, context.userId, context.kcAdminClient);
+  const phJobs = await listQuery(crdClient.phJobs, args && args.where, context);
   return paginate(phJobs, extractPagination(args));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
   const {crdClient} = context;
   // tslint:disable-next-line:max-line-length
-  const phJobs = await listQuery(crdClient.phJobs, args && args.where, context.namespace, context.graphqlHost, context.jobLogCtrl, context.userId, context.kcAdminClient);
+  const phJobs = await listQuery(crdClient.phJobs, args && args.where, context);
   return toRelay(phJobs, extractPagination(args));
 };
 
 export const queryOne = async (root, args, context: Context) => {
   const id = args.where.id;
-  const {crdClient} = context;
-  try {
-    const phJob = await crdClient.phJobs.get(id);
-    return transform(phJob, context.namespace, context.graphqlHost, context.jobLogCtrl, context.kcAdminClient);
-  } catch (e) {
-    return null;
+  const {crdClient, userId: currentUserId} = context;
+  const phJob = await crdClient.phJobs.get(id);
+  const transformed =
+    await transform(phJob, context.namespace, context.graphqlHost, context.jobLogCtrl, context.kcAdminClient);
+  const viewable = await canUserViewJob(currentUserId, transformed, context);
+  if (!viewable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
   }
+  return transformed;
 };
 
 export const create = async (root, args, context: Context) => {
   const data: PhJobCreateInput = args.data;
   await validateQuota(context, data);
+  await canUserCreate(context.userId, data.groupId, context);
   const phJob = await createJob(context, data);
   return transform(phJob, context.namespace, context.graphqlHost, context.jobLogCtrl, context.kcAdminClient);
 };

@@ -7,6 +7,7 @@ import JobDetail from 'components/job/detail';
 import {errorHandler} from 'components/job/errorHandler';
 import {PhJobFragement} from './jobList';
 import {RERUN_JOB, CANCEL_JOB} from 'containers/jobList';
+import {get} from 'lodash';
 
 type Props = {
   getPhJob: any;
@@ -29,11 +30,15 @@ export const GET_PH_JOB = gql`
 
 const appPrefix = (window as any).APP_PREFIX || '/';
 
+const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
+
 class JobDetailContainer extends React.Component<Props> {
   render() {
     const {getPhJob, history, rerunPhJob, cancelPhJob, rerunPhJobResult, cancelPhJobResult} = this.props;
     if (getPhJob.loading) return null;
-    if (getPhJob.error) return 'Error';
+    if (getPhJob.error) {
+      return getMessage(getPhJob.error)
+    };
     return (
       <JobDetail
         rerunPhJob={rerunPhJob}
