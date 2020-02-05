@@ -35,7 +35,7 @@ export default class LicenseStatus extends React.Component {
   }
 
   render() {
-    const {uiParams} = this.props;
-    return <Tag color={this.getStatusColor(uiParams.data)}>{this.showStatus(uiParams.data)}</Tag>;
+    const {value} = this.props;
+    return <Tag color={this.getStatusColor(value)}>{this.showStatus(value)}</Tag>;
   }
 }
