@@ -91,7 +91,7 @@ export const create = async (root, args, context: Context) => {
 
   let groups = await kcAdminClient.groups.find()
   // max group validation need minus everyone group.
-  if (groups.length - 1 > parseInt(config.maxGroup, 10)) {
+  if (groups.length - 1 > config.maxGroup) {
     throw Boom.badData(`Max group limit: ${config.maxGroup} exceeded`);
   }
 
