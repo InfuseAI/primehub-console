@@ -18,7 +18,14 @@ export const PhJobFragement = gql`
     groupId
     groupName
     image
-    instanceType
+    instanceType {
+      id
+      name
+      displayName
+      cpuLimit
+      memoryLimit
+      gpuLimit
+    }
     userId
     userName
     phase

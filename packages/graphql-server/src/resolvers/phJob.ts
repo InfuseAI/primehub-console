@@ -8,6 +8,8 @@ import * as moment from 'moment';
 import { escapeToPrimehubLabel } from '../utils/escapism';
 import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
+import { mapping } from './instanceType';
+import * as logger from '../logger';
 import { keycloakMaxCount } from './constant';
 import { isUserAdmin } from './user';
 
@@ -155,6 +157,30 @@ const validateQuota = async (context: Context, data: PhJobCreateInput) => {
 /**
  * Query
  */
+
+const NOT_FOUND_INSTANCE_TYPE = {
+  id: 'NOT_FOUND',
+  name: 'NOT_FOUND',
+  tolerations: []
+};
+
+export const typeResolvers = {
+  async instanceType(parent, args, context: Context) {
+    const instanceTypeId = parent.instanceType;
+    try {
+      const instanceType = await context.getInstanceType(instanceTypeId);
+      return mapping(instanceType);
+    } catch (error) {
+      logger.info({
+        component: logger.components.phJob,
+        type: 'RESOURCE_NOT_FOUND',
+        id: parent.id,
+        instanceTypeId
+      });
+      return NOT_FOUND_INSTANCE_TYPE;
+    }
+  }
+};
 
 const canUserViewJob = async (userId: string, phJob: PhJob, context: Context): Promise<boolean> => {
   const isAdmin = await isUserAdmin(context.realm, userId, context.kcAdminClient);
