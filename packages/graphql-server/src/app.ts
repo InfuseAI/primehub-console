@@ -68,6 +68,7 @@ import * as logger from './logger';
 import { Item } from './crdClient/customResource';
 import K8sUploadServerSecret from './k8sResource/k8sUploadServerSecret';
 import { Role } from './resolvers/interface';
+import Token from './oidc/token';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -346,8 +347,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         if (!credentials || !credentials.name || !credentials.pass) {
           throw Boom.forbidden('basic auth not valid');
         }
-
-        username = userId = credentials.name;
+        username = credentials.name;
         role = Role.ADMIN;
 
         // use password grant type if specified, or basic auth provided
@@ -358,6 +358,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           clientSecret: config.keycloakClientSecret,
           grantType: 'password',
         });
+        const token = new Token(kcAdminClient.getAccessToken());
+        userId = token.getContent().sub;
       } else {
         throw Boom.forbidden('request not authorized');
       }

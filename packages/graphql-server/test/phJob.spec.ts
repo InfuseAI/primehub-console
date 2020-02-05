@@ -6,6 +6,7 @@ import CrdClient from '../src/crdClient/crdClientImpl';
 import { cleanupPhJobs } from './sandbox';
 import { pickBy, isUndefined } from 'lodash';
 import { stringifyMemory } from '../src/resolvers/utils';
+import BPromise from 'bluebird';
 
 chai.use(chaiHttp);
 
@@ -20,7 +21,9 @@ const fields = `
   groupId
   groupName
   image
-  instanceType
+  instanceType {
+    id
+  }
   userId
   userName
   phase
@@ -117,7 +120,14 @@ describe('instanceType graphql', function() {
       data
     });
 
-    expect(mutation.createPhJob).to.be.include(data);
+    const expectedResult = {
+      ...data,
+      instanceType: {
+        id: instanceTypeId
+      }
+    };
+    expect(mutation.createPhJob).to.be.deep.include(expectedResult);
+    await BPromise.delay(1000);
 
     // get one
     const queryOne = await this.graphqlRequest(`
@@ -127,7 +137,7 @@ describe('instanceType graphql', function() {
       where: {id: mutation.createPhJob.id}
     });
 
-    expect(queryOne.phJob).to.be.include(data);
+    expect(queryOne.phJob).to.be.deep.include(expectedResult);
     expect(queryOne.phJob.id).to.exist;
 
     this.currentPhJob = queryOne.phJob;
