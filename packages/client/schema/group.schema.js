@@ -79,7 +79,6 @@ export default () => (
         }
       }
     `}
-    fetchPolicy="network-only"
   >
      <toolbar async>
       <filter
@@ -173,10 +172,8 @@ export default () => (
     </Block>
     <Block title="${dataset}">
       <array keyName="datasets"
-        packageName="../src/cms-components/customize-array-table_route"
+        packageName="../src/cms-components/customize-array-datasets_in_groups"
         uiParams={{
-          createKeys: [],
-          datasetsInGroupsActions: true,
           removeActions: true,
           columns: [{
             title: '${displayName}',
