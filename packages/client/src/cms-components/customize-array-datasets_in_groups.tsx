@@ -7,7 +7,7 @@ import {get} from 'lodash';
 import {Props} from './types';
 
 const GROUPS_WITH_DATASETS = gql`
-query ($groupFirst: Int, $groupWhere: GroupWhereInput) {
+query ($groupWhere: GroupWhereInput) {
   group: groupsConnection(where: $groupWhere) {
     edges {
       cursor

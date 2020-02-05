@@ -184,6 +184,13 @@ export const update = async (root, args, context: Context) => {
 
   // validate if a group has sharedVolumeCapacity = null + enabledSharedVolume, it should raise an error.
   validateSharedVolumeAttrs(attrs);
+  // create pvc
+  if (payload.enabledSharedVolume && payload.sharedVolumeCapacity >= 0) {
+    await context.k8sGroupPvc.create({
+      groupName: group.name,
+      volumeSize: payload.sharedVolumeCapacity
+    });
+  }
 
   // update
   try {
