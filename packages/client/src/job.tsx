@@ -109,6 +109,14 @@ const fakeData = {
     createTime: '2019-10-04T14:48:00.000Z',
     startTime: '2019-10-04T14:48:00.000Z',
     finishTime: '2019-10-04T15:48:00.000Z',
+    instanceType: {
+      id: 'everyone-it',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    }
   }, {
     id: 'it2',
     name: 'IT2',

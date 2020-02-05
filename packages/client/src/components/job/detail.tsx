@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {Button, Tabs, Form, Card, Input, Modal} from 'antd';
+import {get} from 'lodash';
 import styled from 'styled-components';
 import moment, { Moment } from 'moment';
 import Log from './log';
@@ -116,7 +117,7 @@ export default class Detail extends React.Component<Props> {
   }
 
   render() {
-    const {job, rerunPhJobResult, cancelPhJobResult, appPrefix, history} = this.props;
+    const {job, rerunPhJobResult, cancelPhJobResult, history} = this.props;
     const startTime = job.startTime ? moment(job.startTime) : '';
     const finishTime = job.finishTime ? moment(job.finishTime) : '';
     const action = getActionByPhase(job.phase);
@@ -174,7 +175,13 @@ export default class Detail extends React.Component<Props> {
                   {job.groupName || '-'}
                 </Form.Item>
                 <Form.Item  style={formItemStyle} label="Instance type:" {...formItemLayout}>
-                  {job.instanceType || '-'}
+                  {get(job, 'instanceType.displayName', '') || get(job, 'instanceType.name', '')}
+                  <span style={{
+                    display: "block",
+                    marginTop: -12
+                  }}>
+                    (CPU: {get(job, 'instanceType.cpuLimit', '-')} / Memory: {get(job, 'instanceType.memoryLimit', '-')}G / GPU: {get(job, 'instanceType.gpuLimit', '-')})
+                  </span>
                 </Form.Item>
                 <Form.Item  style={blockStyle} label="Image:" {...formItemLayout}>
                   {job.image || '-'}
