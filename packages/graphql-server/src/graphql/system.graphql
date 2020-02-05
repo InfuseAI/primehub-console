@@ -11,7 +11,7 @@ type Timezone {
 }
 
 type License {
-  licenseTo: String
+  licensedTo: String
   licenseStatus: String
   startedAt: String
   expiredAt: String

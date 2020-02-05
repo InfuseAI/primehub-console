@@ -43,7 +43,7 @@ const systemFields = `
   }
   defaultUserVolumeCapacity
   license {
-    licenseTo
+    licensedTo
     startedAt
     expiredAt
     maxGroup
@@ -84,7 +84,7 @@ describe('system graphql', function() {
         },
         defaultUserVolumeCapacity: 20,
         license: {
-          licenseTo: null,
+          licensedTo: null,
           startedAt: null,
           expiredAt: null,
           maxGroup: 999
@@ -153,7 +153,7 @@ describe('system graphql', function() {
           password: null
         },
         license: {
-          licenseTo: null,
+          licensedTo: null,
           startedAt: null,
           expiredAt: null,
           enableGroup: false,
@@ -243,7 +243,7 @@ describe('system graphql', function() {
           password: SECRET_VALUE
         },
         license: {
-          licenseTo: null,
+          licensedTo: null,
           startedAt: null,
           expiredAt: null,
           enableGroup: false,

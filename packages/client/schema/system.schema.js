@@ -16,7 +16,7 @@ export default () => (
       <object keyName="license">
         <string keyName="licenseStatus" title="${licenseStatus}" packageName="../src/cms-components/customize-string-license-status"/>
         <dateTime keyName="expiredAt" title="${expirationDate}" format={(text) => moment(text).format('YYYY/MM/DD HH:mm')} packageName="../src/cms-components/customize-string-readonly"/>
-        <string keyName="licenseTo" title="${licenseTo}" packageName="../src/cms-components/customize-string-readonly"/>
+        <string keyName="licensedTo" title="${licensedTo}" packageName="../src/cms-components/customize-string-readonly"/>
       </object>
     </Block>
     <Block title="${systemSettings}">

@@ -65,7 +65,7 @@ export interface Config {
   // license management stuffs
   maxGroup: number;
   licenseStatus: string;
-  licenseTo?: string;
+  licensedTo?: string;
   startedAt?: string;
   expiredAt?: string;
 }
@@ -163,7 +163,7 @@ export const createConfig = (): Config => {
       process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE.toString() === 'true',
     graphqlHost: process.env.GRAPHQL_HOST,
     maxGroup: process.env.MAX_GROUP,
-    licenseTo: process.env.LICENSE_TO,
+    licensedTo: process.env.LICENSED_TO,
     startedAt: process.env.STARTED_AT,
     expiredAt: process.env.EXPIRED_AT,
     licenseStatus: process.env.EXPIRED

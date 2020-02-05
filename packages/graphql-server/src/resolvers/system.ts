@@ -22,7 +22,7 @@ export const query = async (root, args, context: Context) => {
   const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});
   const defaultSystemSettings = createDefaultSystemSettings(context.defaultUserVolumeCapacity);
   const license = {
-    licenseTo: config.licenseTo,
+    licensedTo: config.licensedTo,
     licenseStatus: config.licenseStatus,
     startedAt: config.startedAt,
     expiredAt: config.expiredAt,
