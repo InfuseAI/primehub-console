@@ -86,7 +86,7 @@ spec:
                 this file'
               enum:
               - Pending
-              - Ready
+              - Preparing
               - Running
               - Succeeded
               - Failed
