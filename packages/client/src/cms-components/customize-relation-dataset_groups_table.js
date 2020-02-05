@@ -76,7 +76,8 @@ export default class DatesetGroupTable extends PureComponent {
     const { modalVisible } = this.state;
     let { disabled, value = [], uiParams = {}, refId, relation,
       fetch, fetchRelation, updateQuery, subscribe, intl,
-      schema, Toolbar, relationValue, goTo, rootValue, title
+      schema, Toolbar, relationValue, goTo, rootValue, title,
+      writable, readOnly
     } = this.props;
     const newColumnsRender = renderValue(uiParams.columns, schema[relation.to].items.items);
     const recordValue = getRecordValue(rootValue, refId);
@@ -85,7 +86,6 @@ export default class DatesetGroupTable extends PureComponent {
     if (isHidden) {
       return null;
     }
-    const {readOnly, writable} = getDisplayTableType(recordValue);
     const readOnlyValue = value.filter(item => !item.writable);
     const writableValue = value.filter(item => item.writable);
     return (
@@ -202,31 +202,4 @@ export default class DatesetGroupTable extends PureComponent {
 function getRecordValue(rootValue, refId) {
   const targetRefId = refId.remove();
   return get(rootValue, targetRefId.getPathArr(), {});
-}
-
-function getDisplayTableType(recordValue) {
-  if (recordValue.global && recordValue.type !== 'pv') {
-    return {
-      readOnly: false,
-      writable: false
-    };
-  }
-  if (!recordValue.global && recordValue.type !== 'pv') {
-    return {
-      readOnly: true,
-      writable: false
-    };
-  }
-  if (!recordValue.global && recordValue.type === 'pv') {
-    return {
-      readOnly: true,
-      writable: true
-    };
-  }
-  if (recordValue.global && recordValue.type === 'pv') {
-    return {
-      readOnly: false,
-      writable: true
-    }
-  }
 }
