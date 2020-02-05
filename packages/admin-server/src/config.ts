@@ -48,6 +48,7 @@ export interface Config {
   // license check
   enableLicenseCheck: boolean;
   // maximux group
+  licenseStatus: string;
   maxGroup: number;
 }
 
@@ -74,6 +75,7 @@ const defaultConfigs = {
   enableWorkspace: false,
   enableCustomImage: false,
   enableLicenseCheck: false,
+  licenseStatus: 'invalid',
   maxGroup: 999
 };
 
@@ -121,6 +123,7 @@ export const createConfig = (): Config => {
       process.env.PRIMEHUB_FEATURE_CUSTOM_IMAGE && process.env.PRIMEHUB_FEATURE_CUSTOM_IMAGE.toString() === 'true',
     enableLicenseCheck:
       process.env.PRIMEHUB_FEATURE_LICENSE && process.env.PRIMEHUB_FEATURE_LICENSE.toString() === 'true',
+    licenseStatus: process.env.EXPIRED,
     maxGroup: process.env.MAX_GROUP
   });
 
