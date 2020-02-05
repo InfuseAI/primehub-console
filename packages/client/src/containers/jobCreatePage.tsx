@@ -4,6 +4,7 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {get, unionBy} from 'lodash';
+import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import Title from 'components/job/title';
@@ -17,7 +18,7 @@ export const GET_MY_GROUPS = gql`
       id
       groups {
         ...GroupInfo
-        instanceTypes { id name displayName description spec global gpuLimit }
+        instanceTypes { id name displayName description spec global gpuLimit memoryLimit cpuLimit }
         images { id name displayName description spec global type }
       }
     }
@@ -32,6 +33,23 @@ export const CREATE_JOB = gql`
     }
   }
 `
+
+const compareByAlphabetical = (prev, next) => {
+  if(prev < next) return -1;
+  if(prev > next) return 1;
+  return 0;
+}
+
+const sortItems = (items) => {
+  const copiedItems = items.slice();
+  copiedItems
+    .sort((prev, next) => {
+      const prevName = prev.displayName || prev.name;
+      const nextName = next.displayName || next.name;
+      return compareByAlphabetical(prevName, nextName);
+    });
+  return copiedItems;
+}
 
 type Props = RouteComponentProps & {
   getGroups: any; 
@@ -84,7 +102,7 @@ class JobCreatePage extends React.Component<Props, State> {
       <React.Fragment>
         <Button
           icon="left"
-          onClick={() => history.push(`${appPrefix}job`)}
+          onClick={() => history.goBack()}
           style={{marginRight: 16, verticalAlign: 'top'}}
         >
           Back
@@ -93,9 +111,9 @@ class JobCreatePage extends React.Component<Props, State> {
         <JobCreateForm
           onSelectGroup={this.onChangeGroup}
           selectedGroup={selectedGroup}
-          groups={groups}
-          instanceTypes={instanceTypes}
-          images={images}
+          groups={sortItems(groups)}
+          instanceTypes={sortItems(instanceTypes)}
+          images={sortItems(images)}
           onSubmit={this.onSubmit}
           creatingJob={createPhJobResult.loading || false}
           loading={getGroups.loading}
@@ -113,7 +131,14 @@ export default compose(
   graphql(CREATE_JOB, {
     options: (props: Props) => ({
       onCompleted: () => {
-        props.history.push(`${appPrefix}job`);
+        const groups = get(props.getGroups, 'me.groups', []);
+        const where = JSON.stringify({
+          groupId_in: groups.map(group => group.id)
+        });
+        props.history.push({
+          pathname: `${appPrefix}job`,
+          search: queryString.stringify({where, first: 10})
+        });
       },
       onError: errorHandler
     }),

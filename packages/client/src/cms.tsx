@@ -145,7 +145,7 @@ export default class CMSPage extends React.Component<Props, State> {
     });
   }
 
-  beforeFetch = (key, {query, variables}) => {
+  beforeFetch = (key, {client, query, variables}) => {
     const {match} = this.props;
     const {workspaceId} = match.params as any;
     const whereKey = `${key}Where`;
@@ -157,12 +157,27 @@ export default class CMSPage extends React.Component<Props, State> {
       };
     }
 
+    const newVariables = update(variables, [whereKey], where => ({
+      ...where,
+      workspaceId
+    }));
+
+    // refetch the buildImage list after update
+    if (key === "buildImage" && !query) {
+      try {
+        const query = gql`${schema.schema.buildImage.graphql}`;
+        const data = client.readQuery({
+          query,
+          variables: newVariables
+        });
+        // if cached, clean it
+        if (data) client.clearStore();
+      } catch {}
+    }
+    
     return {
       query,
-      variables: update(variables, [whereKey], where => ({
-        ...where,
-        workspaceId
-      }))
+      variables: newVariables
     };
   }
 

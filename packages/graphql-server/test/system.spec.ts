@@ -152,6 +152,13 @@ describe('system graphql', function() {
           username: null,
           password: null
         },
+        license: {
+          licenseTo: null,
+          startedAt: null,
+          expiredAt: null,
+          enableGroup: false,
+          maxGroup: 999
+        },
         defaultUserVolumeCapacity: delta.defaultUserVolumeCapacity
       }
     });
@@ -234,6 +241,13 @@ describe('system graphql', function() {
           enableAuth: delta.smtp.enableAuth,
           username: delta.smtp.username,
           password: SECRET_VALUE
+        },
+        license: {
+          licenseTo: null,
+          startedAt: null,
+          expiredAt: null,
+          enableGroup: false,
+          maxGroup: 999
         },
         defaultUserVolumeCapacity: delta.defaultUserVolumeCapacity
       }

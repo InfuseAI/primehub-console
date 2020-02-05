@@ -5,7 +5,7 @@ import {ImgurStorage} from '@canner/storage';
 import {FormattedMessage} from 'react-intl';
 import {Tag, Button, Icon, Tooltip} from 'antd';
 
-exports.InvalidChRrror = <React.Fragment>
+exports.InvalidChError = <React.Fragment>
   Invalid characters: &nbsp;
   <Tag color="red">;</Tag>
   <Tag color="red">|</Tag>
@@ -250,6 +250,7 @@ exports.dict = {
     // group
     groups: 'Groups',
     group: 'Groups',
+    "groups.datasets.writable": "Permissions",
     "group.enabledSharedVolume": "Shared Volume",
     "group.sharedVolumeCapacity": "Shared Volume Capacity",
     "group.launchGroupOnly": "Launch Group Only",
@@ -427,7 +428,7 @@ exports.dict = {
     'workspace.description.title': 'Description',
     'workspace.block2.title': 'Members',
     // buildImage
-    'buildImage': 'Build Image',
+    'buildImage': 'Image Builder',
     'buildImage.tabs.info': 'Info',
     'buildImage.tabs.jobs': 'Jobs',
     'buildImage.name': 'Name',
@@ -435,14 +436,14 @@ exports.dict = {
     'buildImage.image': 'Image',
     'buildImage.baseImage': 'Base Image',
     'buildImage.useImagePullSecret': 'Use Image PullSecret',
-    'buildImage.packages': 'Packages',
+    'buildImage.packages': 'Package(s)',
     'buildImage.apt': 'APT',
     'buildImage.pip': 'Pip',
     'buildImage.conda': 'Conda',
     'buildImage.packages.apt.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
     'buildImage.packages.pip.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
     'buildImage.packages.conda.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
-    'buildImageJob': 'Build Image Job',
+    'buildImageJob': 'Image Builder Job',
     'buildImageJob.baseImage': 'Base Image',
     'buildImageJob.targetImage': 'Image',
     'buildImageJob.imageRevision': 'Image Revision',
@@ -487,6 +488,7 @@ exports.dict = {
     readOnlyGroups: 'Readonly Groups',
     writableGroups: 'Writable Groups',
     group: 'Groups',
+    "groups.datasets.writable": "Permissions",
     "group.enabledSharedVolume": "Shared Volume",
     "group.sharedVolumeCapacity": "Shared Volume Capacity",
     "group.launchGroupOnly": "Launch Group Only",
@@ -662,7 +664,7 @@ exports.dict = {
     'workspace.description.title': 'Description',
     'workspace.block2.title': 'Members',
     // buildImage
-    'buildImage': 'Build Image',
+    'buildImage': 'Image Builder',
     'buildImage.tabs.info': 'Info',
     'buildImage.tabs.jobs': 'Jobs',
     'buildImage.name': 'Name',
@@ -670,14 +672,14 @@ exports.dict = {
     'buildImage.image': 'Image',
     'buildImage.baseImage': 'Base Image',
     'buildImage.useImagePullSecret': 'Use Image PullSecret',
-    'buildImage.packages': 'Packages',
+    'buildImage.packages': 'Package(s)',
     'buildImage.apt': 'APT',
     'buildImage.pip': 'Pip',
     'buildImage.conda': 'Conda',
     'buildImage.packages.apt.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
     'buildImage.packages.pip.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
     'buildImage.packages.conda.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
-    'buildImageJob': 'Build Image Job',
+    'buildImageJob': 'Image Builder Job',
     'buildImageJob.baseImage': 'Base Image',
     'buildImageJob.targetImage': 'Image',
     'buildImageJob.imageRevision': 'Image Revision',

@@ -37,18 +37,36 @@ const radioGroupStyle = {
 
 const transformImages = (images, instanceType) => {
   const gpuInstance = Boolean(instanceType && instanceType.gpuLimit);
-  return images.map(image => ({
-    ...image,
-    disabled: !gpuInstance && (image.type || '').toLowerCase() === 'gpu'
-  }))
+  return images.map(image => {
+    return {
+      ...image,
+      __disabled: !gpuInstance && (image.type || '').toLowerCase() === 'gpu'
+    };
+  });
 }
+
+const getImageType = (image) => {
+  const imageType = (image.type || '').toLowerCase();
+  switch (imageType) {
+    case 'gpu':
+      return 'GPU';
+    case 'cpu':
+      return 'CPU';
+    case 'both':
+      return 'Universal'
+    default:
+      return 'Unknown';
+  }
+}
+
+const dashOrNumber = value => value === null ? '-' : value;
 
 const commandPlaceHolder = `echo "Start training"
 python /project/group-a/train.py \\
   --dataset /datasets/dataset-a/train.txt \\
   --output /workingdir/output \\
   --parameter_1 value_1 \\
-  --parameter_1 value_2 \\
+  --parameter_2 value_2
 `;
 
 class CreateForm extends React.Component<Props> {
@@ -65,13 +83,19 @@ class CreateForm extends React.Component<Props> {
   }
 
   autoSelectFirstGroup = () => {
-    const {onSelectGroup, selectedGroup, groups} = this.props;
-    if (!selectedGroup && groups.length) onSelectGroup(get(groups[0], 'id', null));
+    const {onSelectGroup, selectedGroup, groups, form} = this.props;
+    if (!selectedGroup && groups.length) {
+      const id = get(groups[0], 'id', null);
+      onSelectGroup(id);
+      form.setFieldsValue({groupId: id});
+    }
   }
 
   autoSelectFirstInstanceType = () => {
     const {instanceTypes, form} = this.props;
-    if (!form.getFieldValue('instanceType') && instanceTypes.length) {
+    const currentInstanceType = form.getFieldValue('instanceType');
+    const validInstanceType = instanceTypes.some(instanceType => instanceType.id === currentInstanceType);
+    if ((!form.getFieldValue('instanceType') || !validInstanceType) && instanceTypes.length) {
       form.setFieldsValue({instanceType: instanceTypes[0].id});
     }
   }
@@ -82,7 +106,7 @@ class CreateForm extends React.Component<Props> {
     const imageId = form.getFieldValue('image');
     const instanceType = instanceTypes.find(it => it.id === instanceTypeId);
     const transformedImages = transformImages(images, instanceType);
-    const availableImages = transformedImages.filter(image => !image.disabled);
+    const availableImages = transformedImages.filter(image => !image.__disabled);
     if (imageId && availableImages.some(image => image.id === imageId)) return;
     if (availableImages.length) form.setFieldsValue({image: availableImages[0].id});
   }
@@ -147,9 +171,20 @@ class CreateForm extends React.Component<Props> {
                   instanceTypes.length ? (
                     <Radio.Group style={radioGroupStyle} onChange={this.autoSelectFirstImage}>
                       {instanceTypes.map(instanceType => (
-                        <Radio style={radioStyle} value={instanceType.id}>
+                        <Radio style={radioStyle} value={instanceType.id} key={instanceType.id}>
                           <div style={radioContentStyle}>
-                            <h4>{instanceType.displayName || instanceType.name}</h4>
+                            <h4>
+                              {instanceType.displayName || instanceType.name}
+                              <Tooltip
+                                title={`CPU: ${dashOrNumber(instanceType.cpuLimit)} / Memory: ${dashOrNumber(instanceType.memoryLimit)} G / GPU: ${dashOrNumber(instanceType.gpuLimit)}`}
+                              >
+                                <Icon
+                                  type="info-circle"
+                                  theme="filled"
+                                  style={{marginLeft: 8}}
+                                />
+                              </Tooltip>
+                            </h4>
                             {instanceType.description}
                           </div>
                         </Radio>
@@ -170,9 +205,9 @@ class CreateForm extends React.Component<Props> {
                   images.length ? (
                     <Radio.Group style={radioGroupStyle}>
                       {transformImages(images, instanceType).map(image => (
-                        <Radio style={radioStyle} value={image.id} disabled={image.disabled}>
+                        <Radio key={image.id} style={radioStyle} value={image.id} disabled={image.__disabled}>
                           <div style={radioContentStyle}>
-                            <h4>{image.displayName || image.name}</h4>
+                            <h4>{image.displayName || image.name} ({getImageType(image)})</h4>
                             {image.description}
                           </div>
                         </Radio>
@@ -192,7 +227,9 @@ class CreateForm extends React.Component<Props> {
             <Card>
               <Form.Item label="Job name">
                 {form.getFieldDecorator('displayName', {
-                  rules: [{ required: true, message: 'Please input a name!' }],
+                  rules: [
+                    { whitespace: true, required: true, message: 'Please input a name!' },
+                  ],
                 })(
                   <Input />
                 )}
@@ -233,12 +270,4 @@ class CreateForm extends React.Component<Props> {
 }
 
 
-export default Form.create<Props>({
-  mapPropsToFields(props) {
-    return {
-      groupId: Form.createFormField({
-        value: props.selectedGroup,
-      })
-    };
-  },
-})(CreateForm);
+export default Form.create<Props>()(CreateForm);

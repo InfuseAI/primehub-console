@@ -21,13 +21,6 @@ export const query = async (root, args, context: Context) => {
   const kcAdminClient: KcAdminClient = context.kcAdminClient;
   const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});
   const defaultSystemSettings = createDefaultSystemSettings(context.defaultUserVolumeCapacity);
-  if (isEmpty(attributes)) {
-    return {
-      ...defaultSystemSettings,
-      defaultUserVolumeCapacity: parseDiskQuota(defaultSystemSettings.defaultUserVolumeCapacity)
-    };
-  }
-
   const license = {
     licenseTo: config.licenseTo,
     licenseStatus: config.licenseStatus,
@@ -35,6 +28,14 @@ export const query = async (root, args, context: Context) => {
     expiredAt: config.expiredAt,
     maxGroup: config.maxGroup
   };
+
+  if (isEmpty(attributes)) {
+    return {
+      ...defaultSystemSettings,
+      license,
+      defaultUserVolumeCapacity: parseDiskQuota(defaultSystemSettings.defaultUserVolumeCapacity)
+    };
+  }
 
   const flatData = mapValues(attributes, value => {
     return (value && value[0]) || null;
