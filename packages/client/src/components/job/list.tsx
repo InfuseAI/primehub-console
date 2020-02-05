@@ -46,7 +46,7 @@ const renderTimeIfValid = time => {
 const getCreateTimeAndFinishTime = (startTime, finishTime, phase: Phase) => {
   switch (phase) {
     case Phase.Pending:
-    case Phase.Ready:
+    case Phase.Preparing:
       return {
         startTime: '-',
         finishTime: '-'

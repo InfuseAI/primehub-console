@@ -1,6 +1,6 @@
 export enum Phase {
   Pending = 'Pending',
-  Ready = 'Ready',
+  Preparing = 'Preparing',
   Running = 'Running',
   Succedded = 'Succedded',
   Failed = 'Failed',
@@ -11,7 +11,7 @@ export enum Phase {
 export function getActionByPhase(phase: Phase) {
   switch (phase) {
     case Phase.Pending:
-    case Phase.Ready:
+    case Phase.Preparing:
     case Phase.Running:
       return 'Cancel';
     case Phase.Succedded:

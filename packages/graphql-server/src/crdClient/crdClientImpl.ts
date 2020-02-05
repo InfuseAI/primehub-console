@@ -126,7 +126,7 @@ export interface PhJobSpec {
 
 export enum PhJobPhase {
   Pending = 'Pending',
-  Ready = 'Ready',
+  Preparing = 'Preparing',
   Running = 'Running',
   Succeeded = 'Succeeded',
   Failed = 'Failed',
