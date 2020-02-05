@@ -1,7 +1,7 @@
 import { client as kubeClient } from '../crdClient/crdClientImpl';
 import { get, isEmpty, reduce } from 'lodash';
 import { ApolloError } from 'apollo-server';
-import * as Boom from 'boom';
+import Boom from 'boom';
 
 export interface K8sNamespaceResponse {
   id: string;

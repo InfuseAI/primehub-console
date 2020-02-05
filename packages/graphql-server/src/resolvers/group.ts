@@ -21,7 +21,7 @@ import { Attributes, FieldType } from './attr';
 import { keycloakMaxCount, defaultWorkspaceId } from './constant';
 import { ApolloError } from 'apollo-server';
 import * as logger from '../logger';
-import * as Boom from 'boom';
+import Boom from 'boom';
 import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspace';
 import { isKeycloakGroupNameWorkspace } from '../workspace/api';
 import GroupRepresentation from 'keycloak-admin/lib/defs/groupRepresentation';
