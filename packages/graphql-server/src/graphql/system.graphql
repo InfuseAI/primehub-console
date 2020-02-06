@@ -11,12 +11,11 @@ type Timezone {
 }
 
 type License {
-  licenseTo: String
+  licensedTo: String
   licenseStatus: String
   startedAt: String
   expiredAt: String
   maxGroup: Int
-  enableGroup: Boolean
 }
 
 type Smtp {

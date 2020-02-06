@@ -10,6 +10,7 @@ import {Props} from './types';
 const ButtonGroup = Button.Group;
 const confirm = Modal.confirm;
 const GLOBAL_DISABLE = (window as any).disableMode || false;
+const DISABLE_GROUP = (window as any).disableGroup || false;
 @injectIntl
 export default class ArrayBreadcrumb extends Component<Props> {
   static defaultProps = {
@@ -129,7 +130,8 @@ export default class ArrayBreadcrumb extends Component<Props> {
     if (keyName === 'workspace') {
       dataSource = value.filter(ws => !ws.isDefault);
     }
-    const disabled = (keyName === 'image' || keyName === 'instanceType') && GLOBAL_DISABLE;
+    const disabled = ((keyName === 'image' || keyName === 'instanceType') && GLOBAL_DISABLE) ||
+                     (keyName === 'group' && DISABLE_GROUP);
     const {
       selectedRowKeys,
       emailFormVisible
