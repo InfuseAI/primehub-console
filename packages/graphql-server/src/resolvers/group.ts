@@ -21,10 +21,13 @@ import { Attributes, FieldType } from './attr';
 import { keycloakMaxCount, defaultWorkspaceId } from './constant';
 import { ApolloError } from 'apollo-server';
 import * as logger from '../logger';
-import * as Boom from 'boom';
+import Boom from 'boom';
 import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspace';
 import { isKeycloakGroupNameWorkspace } from '../workspace/api';
 import GroupRepresentation from 'keycloak-admin/lib/defs/groupRepresentation';
+import {createConfig} from '../config';
+
+const config = createConfig();
 
 // constants
 const attrSchema = {
@@ -85,6 +88,12 @@ export const create = async (root, args, context: Context) => {
   });
 
   validateSharedVolumeAttrs(attrs);
+
+  let groups = await kcAdminClient.groups.find()
+  // max group validation need minus everyone group.
+  if (groups.length > config.maxGroup) {
+    throw Boom.badData(`Max group limit: ${config.maxGroup} exceeded`);
+  }
 
   let groupId: string;
   try {

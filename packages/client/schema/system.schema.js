@@ -1,5 +1,6 @@
 /** @jsx builder */
 import builder, {Block, Condition} from 'canner-script';
+import Tag from 'antd'
 import moment from 'moment';
 import 'moment-timezone';
 
@@ -11,6 +12,13 @@ const emailValidator = (value, cb) => {
 
 export default () => (
   <object keyName="system" title="${system}" >
+    <Block title="${primehubLicense}" hidden={!window.enableLicenseCheck}>
+      <object keyName="license">
+        <string keyName="licenseStatus" title="${licenseStatus}" packageName="../src/cms-components/customize-string-license-status"/>
+        <dateTime keyName="expiredAt" title="${expirationDate}" format={(text) => moment(text).format('YYYY/MM/DD HH:mm')} packageName="../src/cms-components/customize-string-readonly"/>
+        <string keyName="licensedTo" title="${licensedTo}" packageName="../src/cms-components/customize-string-readonly"/>
+      </object>
+    </Block>
     <Block title="${systemSettings}">
       <object keyName="org">
         <string keyName="name" title="${name}"/>

@@ -37,7 +37,7 @@ Canner CMS
 * GRAPHQL_HOST: graphql public host, ex: `https://test.graphql.com:8080`
 * MAX_GROUP: (int) default: 999, Maximum number of user group
 * EXPIRED: (string) default: invalid
-* LICENSE_TO: (string) License destination
+* LICENSED_TO: (string) License destination
 * STARTED_AT: (string) License started time
 * EXPIRED_AT: (string) License end time
 * PRIMEHUB_GROUP_VOLUME_STORAGE_CLASS: storageClass of group pvc

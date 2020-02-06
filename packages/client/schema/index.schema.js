@@ -25,7 +25,7 @@ const schema = (
     {/* <Idp/> */}
     {/* <UserFederation/> */}
     <Workspaces />
-    <User/>  
+    <User/>
     <Group/>
     <InstanceType/>
     <Image/>
