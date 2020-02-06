@@ -156,7 +156,6 @@ describe('system graphql', function() {
           licensedTo: null,
           startedAt: null,
           expiredAt: null,
-          enableGroup: false,
           maxGroup: 999
         },
         defaultUserVolumeCapacity: delta.defaultUserVolumeCapacity
@@ -246,7 +245,6 @@ describe('system graphql', function() {
           licensedTo: null,
           startedAt: null,
           expiredAt: null,
-          enableGroup: false,
           maxGroup: 999
         },
         defaultUserVolumeCapacity: delta.defaultUserVolumeCapacity
