@@ -85,7 +85,7 @@ export default class RelationTable extends PureComponent {
               <Icon type="link"/>
               <FormattedMessage
                 id="relation.multipleSelect.connect"
-                defaultMessage="connect existing "
+                defaultMessage="edit "
               />
               <span style={{marginLeft: 4}}>
                 {pluralize.plural(schema[relation.to].keyName)}

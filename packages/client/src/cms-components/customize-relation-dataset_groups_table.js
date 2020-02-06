@@ -109,7 +109,7 @@ export default class DatesetGroupTable extends PureComponent {
                     <Icon type="link"/>
                     <FormattedMessage
                       id="relation.multipleSelect.connect"
-                      defaultMessage="connect existing "
+                      defaultMessage="edit "
                     />
                     <span style={{marginLeft: 4}}>
                       {pluralize.plural(schema[relation.to].keyName)}
@@ -159,7 +159,7 @@ export default class DatesetGroupTable extends PureComponent {
                     <Icon type="link"/>
                     <FormattedMessage
                       id="relation.multipleSelect.connect"
-                      defaultMessage="connect existing "
+                      defaultMessage="edit "
                     />
                     <span style={{marginLeft: 4}}>
                       {pluralize.plural(schema[relation.to].keyName)}
