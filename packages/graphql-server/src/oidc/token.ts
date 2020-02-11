@@ -87,7 +87,7 @@ export default class Token {
    * @return {boolean} `true` if this token has the specified role, otherwise `false`.
    */
   public hasApplicationRole(appName: string, roleName: string): boolean {
-    const appRoles = this.content.resource_access[appName];
+    const appRoles = this.content.resource_access && this.content.resource_access[appName];
 
     if (!appRoles) {
       return false;
