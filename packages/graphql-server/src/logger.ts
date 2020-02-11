@@ -23,7 +23,8 @@ export enum components {
   secret = 'Secret',
   workspace = 'Workspace',
   buildImage = 'BuildImage',
-  phJob = 'PhJob'
+  phJob = 'PhJob',
+  internal = 'Internal'
 }
 
 export const log = (levelType: level = level.info, payload?: any) => {

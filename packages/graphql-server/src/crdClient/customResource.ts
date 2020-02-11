@@ -1,6 +1,7 @@
-import { Resource } from 'kubernetes-client';
 import { Watch } from '@kubernetes/client-node';
 import { pick } from 'lodash';
+import * as logger from '../logger';
+import { apiUnavailable } from '../k8sResource/k8sError';
 
 export interface Metadata {
   clusterName?: string;
@@ -44,15 +45,33 @@ export default class CustomResource<SpecType = any, StatusType = any> {
   }
 
   public get = async (name: string, namespace?: string): Promise<Item<SpecType, StatusType>> => {
-    const resource = this.getResource(namespace);
-    const {body} = await resource(name).get();
-    return pick(body, ['metadata', 'spec', 'status']) as Item<SpecType, StatusType>;
+    try {
+      const resource = this.getResource(namespace);
+      const {body} = await resource(name).get();
+      return pick(body, ['metadata', 'spec', 'status']) as Item<SpecType, StatusType>;
+    } catch (error) {
+      logger.error({
+        component: logger.components.internal,
+        type: 'K8S_API_FAILED',
+        error
+      });
+      throw apiUnavailable();
+    }
   }
 
   public list = async (namespace?: string, qs?: Record<string, any>): Promise<Array<Item<SpecType, StatusType>>> => {
-    const resource = this.getResource(namespace);
-    const {body} = await resource.get({qs});
-    return body.items.map(item => pick(item, ['metadata', 'spec', 'status']));
+    try {
+      const resource = this.getResource(namespace);
+      const {body} = await resource.get({qs});
+      return body.items.map(item => pick(item, ['metadata', 'spec', 'status']));
+    } catch (error) {
+      logger.error({
+        component: logger.components.internal,
+        type: 'K8S_API_FAILED',
+        error
+      });
+      throw apiUnavailable();
+    }
   }
 
   // tslint:disable-next-line:max-line-length
