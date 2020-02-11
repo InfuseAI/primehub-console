@@ -35,7 +35,7 @@ const POD_FAILED = 'PodFailed';
 const renderMessage = (job: Record<string, any>) => {
   switch (job.phase) {
     case 'Succeeded':
-      return 'Job Complete';
+      return job.message || 'Job Complete';
     case 'Failed':
       if (job.reason === POD_FAILED)
         return <span>{job.message}. Please see <b>Logs</b> tab for more details</span>;
@@ -45,7 +45,7 @@ const renderMessage = (job: Record<string, any>) => {
         return <span><b>[Runtime Error]</b> {lastLine}</span>;
       return <span><b>[Runtime Error]</b> {lastLine.substr(0, maxMessageLength)}... Find more info in <b>Logs</b> tab</span>
     default:
-      return '-';
+      return job.message || '-';
   }
 };
 
