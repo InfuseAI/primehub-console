@@ -33,6 +33,8 @@ const maxMessageLength = 60;
 const POD_FAILED = 'PodFailed';
 
 const renderMessage = (job: Record<string, any>) => {
+  if (job.cancel || job.phase === 'Cancelled')
+    return 'Cancelled by user';
   switch (job.phase) {
     case 'Succeeded':
       return job.message || 'Job Complete';
