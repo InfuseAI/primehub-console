@@ -10,8 +10,14 @@ const inCluster = (process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES
 // initialize k8s client
 const Client = (kubeClient as any).Client;
 const config = (kubeClient as any).config;
+const clusterConfig = inCluster ? config.getInCluster() : config.fromKubeconfig();
 export const client = new Client({
-  config: inCluster ? config.getInCluster() : config.fromKubeconfig(),
+  config: {
+    ...clusterConfig,
+    // k8s api timeout, related: https://github.com/godaddy/kubernetes-client/issues/367
+    // it got stuck for no reason
+    timeout: 2000
+  },
   version: '1.10'
 });
 
