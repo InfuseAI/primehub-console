@@ -23,7 +23,7 @@ export default () => (
       }, {
         title: '${buildImage.image}',
         dataIndex: 'image',
-        render: renderCopyableText
+        render: (text, record) => record.status === 'Succeeded' ? renderCopyableText(text,record) : '-'
       }]
     }}
     graphql={
@@ -125,7 +125,7 @@ export default () => (
             }, {
               title: '${buildImageJob.targetImage}',
               dataIndex: 'targetImage',
-              render: renderCopyableText
+              render: (text, record) => record.status === 'Succeeded' ? renderCopyableText(text,record) : '-'
             }]
           }}
         >
