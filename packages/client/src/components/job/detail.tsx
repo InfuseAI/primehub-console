@@ -30,18 +30,24 @@ const {confirm} = Modal;
 
 const maxMessageLength = 60;
 
+const POD_FAILED = 'PodFailed';
+
 const renderMessage = (job: Record<string, any>) => {
+  if (job.cancel || job.phase === 'Cancelled')
+    return 'Cancelled by user';
   switch (job.phase) {
     case 'Succeeded':
-      return 'Job Complete';
+      return job.message || 'Job Complete';
     case 'Failed':
+      if (job.reason === POD_FAILED)
+        return <span>{job.message}. Please see <b>Logs</b> tab for more details</span>;
       if (!job.message) return <span><b>[System Error]</b> {job.reason}</span>;
       const lastLine = (job.message || '').replace(/\n$/, '').split('\n').pop();
       if (lastLine.length < maxMessageLength)
         return <span><b>[Runtime Error]</b> {lastLine}</span>;
-      return <span><b>[Runtime Error]</b> {lastLine.substr(0, maxMessageLength)}... Find more info in <b>logs</b> tab</span>
+      return <span><b>[Runtime Error]</b> {lastLine.substr(0, maxMessageLength)}... Find more info in <b>Logs</b> tab</span>
     default:
-      return '-';
+      return job.message || '-';
   }
 };
 

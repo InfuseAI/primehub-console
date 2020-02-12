@@ -122,7 +122,8 @@ const fakeData = {
     name: 'IT2',
     displayName: 'IT2',
     phase: 'Failed',
-    reason: 'Your instance type resource limit is bigger your user or group quota'
+    message: 'Pod Failed',
+    reason: 'PodFailed'
   }, {
     id: 'it3',
     name: 'IT3',

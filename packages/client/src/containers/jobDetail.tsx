@@ -84,9 +84,6 @@ export default compose(
         query: GET_PH_JOB,
         variables: {where: {id: props.match.params.jobId}}
       }],
-      onCompleted: () => {
-        props.history.goBack();
-      },
       onError: errorHandler
     }),
     name: 'cancelPhJob'
