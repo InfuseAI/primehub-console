@@ -12,7 +12,7 @@ import {
   extractPagination,
   parseBoolean
 } from './utils';
-import { pick, first, isNil, omit } from 'lodash';
+import { pick, first, isNil, omit, get } from 'lodash';
 import { crd as instanceTypeResolver } from './instanceType';
 import { crd as datasetResolver } from './dataset';
 import { crd as imageResolver } from './image';
@@ -89,7 +89,7 @@ export const create = async (root, args, context: Context) => {
 
   validateSharedVolumeAttrs(attrs);
 
-  let groups = await kcAdminClient.groups.find()
+  const groups = await kcAdminClient.groups.find();
   // max group validation need minus everyone group.
   if (groups.length > config.maxGroup) {
     throw Boom.badData(`Max group limit: ${config.maxGroup} exceeded`);
@@ -283,6 +283,12 @@ export const destroy = async (root, args, context: Context) => {
 
 const listQuery = async (
   kcAdminClient: KcAdminClient, where: any, currentWorkspace: CurrentWorkspace, context: Context) => {
+  const idWhere = get(where, 'id');
+  if (idWhere) {
+    const group = await kcAdminClient.groups.findOne({id: idWhere});
+    return group ? [injectWorkspace(group, currentWorkspace)] : [];
+  }
+
   const whereWithoutWorkspace = omit(where, 'workspaceId');
   const workspaceApi = context.workspaceApi;
   let groups = (currentWorkspace.checkIsDefault()) ?

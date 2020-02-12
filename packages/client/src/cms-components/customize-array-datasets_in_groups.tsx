@@ -7,8 +7,23 @@ import {get} from 'lodash';
 import {Props} from './types';
 
 const GROUPS_WITH_DATASETS = gql`
-query ($groupWhere: GroupWhereInput) {
+query ($groupWhere: GroupWhereInput, $everyoneGroupWhere: GroupWhereInput) {
   group: groupsConnection(where: $groupWhere) {
+    edges {
+      cursor
+      node {
+        datasets {
+          id
+          displayName
+          type
+          description
+          writable
+        }
+      }
+    }
+  }
+
+  everyoneGroup: groupsConnection(where: $everyoneGroupWhere) {
     edges {
       cursor
       node {
@@ -46,11 +61,21 @@ export default class ArrayBreadcrumb extends Component<Props> {
       variables: {
         groupWhere: {
           id: routes[1]
+        },
+        everyoneGroupWhere: {
+          id: (window as any).everyoneGroupId
         }
       },
       fetchPolicy: 'network-only',
     }).then(result => {
-      const value = get(result.data, [keyName, 'edges', index, 'node', datasetName], []);
+      const group = get(result.data, ['group', 'edges', index, 'node', datasetName], []);
+      const everyoneGroup = get(result.data, ['everyoneGroup', 'edges', '0', 'node', datasetName], []);
+      const value = [...group, ...everyoneGroup];
+      value.sort((a, b) => {
+        if(a.displayName < b.displayName) return -1;
+        if(a.displayName > b.displayName) return 1;
+        return 0;
+      })
       this.setState({
         value,
         fetched: true
