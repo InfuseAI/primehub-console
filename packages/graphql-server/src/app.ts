@@ -34,6 +34,7 @@ import koaMount from 'koa-mount';
 import { OidcTokenVerifier } from './oidc/oidcTokenVerifier';
 import cors from '@koa/cors';
 import { JobLogCtrl, mount as mountJobLogCtrl } from './controllers/jobLogCtrl';
+import { PhJobCacheList } from './crdClient/phJobCacheList';
 
 // cache
 import {
@@ -258,6 +259,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   await imageCache.refetch();
   await instCache.refetch();
 
+  // phJob
+  const phJobCacheList = new PhJobCacheList(config.k8sCrdNamespace);
+
   // create observer
   const observer = new Observer({
     crdClient,
@@ -395,7 +399,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         k8sUploadServerSecret,
         namespace: config.k8sCrdNamespace,
         graphqlHost: config.graphqlHost,
-        jobLogCtrl: logCtrl
+        jobLogCtrl: logCtrl,
+        phJobCacheList,
       };
     },
     formatError: (error: any) => {
