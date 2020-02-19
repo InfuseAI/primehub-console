@@ -186,7 +186,7 @@ describe('instanceType graphql', function() {
 
     // do it in serial, so we don't crush the dev env
     await BPromise.each(
-      range(2000),
+      range(500),
       async i => {
         return BPromise.delay(100)
         .then(() => {

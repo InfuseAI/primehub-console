@@ -217,8 +217,7 @@ const listQuery = async (client: CustomResource<PhJobSpec>, where: any, context:
     return [transformed];
   }
 
-  // const phJobs = await context.phJobCacheList.list();
-  const phJobs = await client.list();
+  const phJobs = await context.phJobCacheList.list();
   let transformedPhJobs = await Promise.all(
     phJobs.map(job => transform(job, namespace, graphqlHost, jobLogCtrl, kcAdminClient)));
 
