@@ -138,7 +138,7 @@ class CreateForm extends React.Component<Props> {
         <Row gutter={16}>
           <Col xs={24} sm={8} lg={8}>
             <Card loading={loading || creatingJob}>
-              <h3>Select your notebook setting</h3>
+              <h3>Environment Settings</h3>
               <Divider />
               {
                 groups.length ? (
@@ -225,6 +225,8 @@ class CreateForm extends React.Component<Props> {
           </Col>
           <Col xs={24} sm={16} lg={16}>
             <Card>
+              <h3>Job Details</h3>
+              <Divider />
               <Form.Item label="Job name">
                 {form.getFieldDecorator('displayName', {
                   rules: [
