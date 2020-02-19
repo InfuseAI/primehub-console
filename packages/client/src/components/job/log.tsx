@@ -94,7 +94,8 @@ export default class Logs extends React.Component<Props, State> {
     return <Input.TextArea
       style={{
         background: 'black',
-        color: '#ddd'
+        color: '#ddd',
+        fontFamily: 'monospace',
       }}
       rows={rows || 40}
       value={log}
