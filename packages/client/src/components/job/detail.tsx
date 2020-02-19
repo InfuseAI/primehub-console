@@ -196,7 +196,8 @@ export default class Detail extends React.Component<Props> {
                   <Input.TextArea
                     style={{
                       background: 'black',
-                      color: '#ddd'
+                      color: '#ddd',
+                      fontFamily: 'monospace',
                     }}
                     rows={5}
                     value={job.command}
