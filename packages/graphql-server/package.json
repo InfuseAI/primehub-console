@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@koa/cors": "^2.2.1",
-    "@kubernetes/client-node": "^0.5.2",
+    "@kubernetes/client-node": "^0.11.1",
     "agentkeepalive": "^3.5.1",
     "apache-md5": "^1.1.2",
     "apollo-server": "^2.6.7",

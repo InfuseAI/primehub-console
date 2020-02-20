@@ -85,10 +85,16 @@ export const cleanupInstanceTypes = async () => {
 };
 
 export const cleanupPhJobs = async () => {
-  const phJobs = await crdClient.phJobs.list();
-  await Promise.all(phJobs.map(async phJob => {
-    await crdClient.phJobs.del(phJob.metadata.name);
-  }));
+  try {
+    const phJobs = await crdClient.phJobs.list();
+    await Promise.all(phJobs.map(async phJob => {
+      await crdClient.phJobs.del(phJob.metadata.name);
+    }));
+  } catch (error) {
+    console.log('fail to cleanup phjobs');
+    console.log(error);
+    return;
+  }
 };
 
 export const cleaupAllCrd = async () => {
