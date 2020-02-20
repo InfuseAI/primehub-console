@@ -7,6 +7,7 @@ import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
 import K8sUploadServerSecret from '../k8sResource/k8sUploadServerSecret';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
 import K8sGroupPvc from '../k8sResource/k8sGroupPvc';
+import { PhJobCacheList } from '../crdClient/phJobCacheList';
 
 export enum Role {
   CLIENT = 'CLIENT',
@@ -37,4 +38,5 @@ export interface Context {
   namespace: string;
   graphqlHost: string;
   jobLogCtrl: JobLogCtrl;
+  phJobCacheList: PhJobCacheList;
 }

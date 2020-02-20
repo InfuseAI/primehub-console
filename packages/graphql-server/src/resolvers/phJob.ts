@@ -217,7 +217,7 @@ const listQuery = async (client: CustomResource<PhJobSpec>, where: any, context:
     return [transformed];
   }
 
-  const phJobs = await client.list();
+  const phJobs = await context.phJobCacheList.list();
   let transformedPhJobs = await Promise.all(
     phJobs.map(job => transform(job, namespace, graphqlHost, jobLogCtrl, kcAdminClient)));
 
@@ -262,6 +262,15 @@ export const create = async (root, args, context: Context) => {
   await validateQuota(context, data);
   await canUserCreate(context.userId, data.groupId, context);
   const phJob = await createJob(context, data);
+
+  logger.info({
+    component: logger.components.phJob,
+    type: 'CREATE',
+    userId: context.userId,
+    username: context.username,
+    id: phJob.metadata.name
+  });
+
   return transform(phJob, context.namespace, context.graphqlHost, context.jobLogCtrl, context.kcAdminClient);
 };
 
@@ -283,6 +292,14 @@ export const rerun = async (root, args, context: Context) => {
     command: phJob.spec.command
   });
 
+  logger.info({
+    component: logger.components.phJob,
+    type: 'RERUN',
+    userId: context.userId,
+    username: context.username,
+    id: rerunPhJob.metadata.name
+  });
+
   return transform(rerunPhJob, context.namespace, context.graphqlHost, context.jobLogCtrl, context.kcAdminClient);
 };
 
@@ -291,5 +308,14 @@ export const cancel = async (root, args, context: Context) => {
   await context.crdClient.phJobs.patch(id, {
     spec: {cancel: true} as any
   });
+
+  logger.info({
+    component: logger.components.phJob,
+    type: 'CANCEL',
+    userId: context.userId,
+    username: context.username,
+    id
+  });
+
   return {id};
 };

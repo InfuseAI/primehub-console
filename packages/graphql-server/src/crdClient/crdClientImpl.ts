@@ -22,7 +22,7 @@ export const client = new Client({
 });
 
 // kubernetes-client/javascript for watch
-let watch: k8s.Watch;
+export let watch: k8s.Watch;
 const kc = new k8s.KubeConfig();
 if (inCluster) {
   kc.loadFromCluster();
@@ -30,6 +30,8 @@ if (inCluster) {
   kc.loadFromFile(`${process.env.HOME}/.kube/config`);
 }
 watch = new k8s.Watch(kc);
+
+export const kubeConfig = kc;
 
 /**
  * Spec interface
@@ -160,6 +162,10 @@ export interface CrdArgs {
   namespace?: string;
 }
 
+// share with phJobCacheList
+// todo: remove godaddy k8s client
+export const phJobCrd = loadCrd('phJob');
+
 export default class CrdClientImpl {
   public instanceTypes: CustomResource<InstanceTypeSpec>;
   public datasets: CustomResource<DatasetSpec>;
@@ -205,7 +211,7 @@ export default class CrdClientImpl {
     this.phJobs = new CustomResource<PhJobSpec, PhJobStatus>(
       client,
       watch,
-      loadCrd('phJob'),
+      phJobCrd,
       this.namespace
     );
     this.announcements = new CustomResource<AnnouncementSpec>(
