@@ -43,6 +43,7 @@ export default () => (
       }`
     }
     fetchPolicy="network-only"
+    hideButtons
   >
     <Tabs component={BuildImageTab}>
       <Default keyName="info" title="${buildImage.tabs.info}">
