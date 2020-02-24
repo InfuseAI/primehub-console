@@ -161,7 +161,8 @@ export default class ArrayBreadcrumb extends Component<Props> {
       columns = [],
       removeActions,
       announcementCustomActions,
-      datasetsInGroupsActions
+      datasetsInGroupsActions,
+      buildImageCustomActions,
     } = uiParams;
 
     const newColumnsRender = renderValue(columns, items.items, {
@@ -204,6 +205,40 @@ export default class ArrayBreadcrumb extends Component<Props> {
         }
       });
     }
+
+    if (buildImageCustomActions) {
+      newColumnsRender.push({
+        title: intl.formatMessage({ id: "array.table.actions" }),
+        dataIndex: "__settings",
+        key: "__settings",
+        render: (text, record) => {
+          return (
+            <ButtonGroup>
+              <Button icon={"search"}
+                data-testid="view-button"
+                onClick={() => goTo({
+                  pathname: `buildImage/${record.id}`,
+                  payload: {
+                    tab: 'jobs'
+                  }
+                })}
+              ></Button>
+              <Button icon={"edit"}
+                data-testid="edit-button"
+                onClick={() => this.edit(record.id)}
+              >
+              </Button>
+              <Button icon="delete"
+                data-testid="delete-button"
+                disabled={disabled === true}
+                onClick={() => this.remove(record.__index)}
+              />
+            </ButtonGroup>
+          );
+        }
+      });
+    }
+
     if (announcementCustomActions) {
 
       newColumnsRender.push({
