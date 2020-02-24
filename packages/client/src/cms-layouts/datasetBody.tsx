@@ -66,7 +66,7 @@ export default class Body extends React.Component {
           onClick={this.back}
           style={{
             marginBottom: 16,
-            display: routerParams.operator === 'update' ? undefined : 'none',
+            display: routerParams.operator === 'update' && routes.length > 1 ? undefined : 'none',
           }}
         >
           <Icon type="arrow-left" />
