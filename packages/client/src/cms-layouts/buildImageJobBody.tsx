@@ -11,6 +11,9 @@ export default class Body extends React.Component {
       goTo({
         pathname: `buildImage/${imageId}`,
         operator: 'update',
+        payload: {
+          tab: 'jobs'
+        }
       });
     }
   }
@@ -67,7 +70,7 @@ export default class Body extends React.Component {
         minHeight: '100vh'
       }}>
         <Button onClick={this.backToBuildImage} style={{marginBottom: 16}}>
-          <Icon type="arrow-left" /> Back to build image
+          <Icon type="arrow-left" /> Back
         </Button>
         <Item />
       </div>
