@@ -53,6 +53,7 @@ export default class CustomResource<SpecType = any, StatusType = any> {
       logger.error({
         component: logger.components.internal,
         type: 'K8S_API_FAILED',
+        resource: this.getResourcePlural(),
         error
       });
       throw apiUnavailable();
@@ -68,6 +69,7 @@ export default class CustomResource<SpecType = any, StatusType = any> {
       logger.error({
         component: logger.components.internal,
         type: 'K8S_API_FAILED',
+        resource: this.getResourcePlural(),
         error
       });
       throw apiUnavailable();
