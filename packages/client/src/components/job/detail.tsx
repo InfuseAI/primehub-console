@@ -6,6 +6,7 @@ import moment, { Moment } from 'moment';
 import Log from './log';
 import {getActionByPhase, Phase} from 'components/job/phase';
 import Title from 'components/job/title';
+import Message from 'components/job/message';
 import {History} from 'history';
 
 const TabPane = Tabs.TabPane;
@@ -37,17 +38,20 @@ const renderMessage = (job: Record<string, any>) => {
     return 'Cancelled by user';
   switch (job.phase) {
     case 'Succeeded':
-      return job.message || 'Job Complete';
+      return <Message text={job.message} /> || 'Job Complete';
     case 'Failed':
       if (job.reason === POD_FAILED)
-        return <span>{job.message}. Please see <b>Logs</b> tab for more details</span>;
+        return <Message
+          text={job.message}
+          extra={<span>Please see <b>Logs</b> tab for more details</span>}
+        />;
       if (!job.message) return <span><b>[System Error]</b> {job.reason}</span>;
       const lastLine = (job.message || '').replace(/\n$/, '').split('\n').pop();
       if (lastLine.length < maxMessageLength)
         return <span><b>[Runtime Error]</b> {lastLine}</span>;
       return <span><b>[Runtime Error]</b> {lastLine.substr(0, maxMessageLength)}... Find more info in <b>Logs</b> tab</span>
     default:
-      return job.message || '-';
+      return <Message text={job.message} /> || '-';
   }
 };
 

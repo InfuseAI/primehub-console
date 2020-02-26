@@ -105,10 +105,14 @@ const fakeData = {
     name: 'IT1',
     displayName: 'IT1',
     phase: 'Running',
-    message: 'Job Complete',
     createTime: '2019-10-04T14:48:00.000Z',
     startTime: '2019-10-04T14:48:00.000Z',
     finishTime: '2019-10-04T15:48:00.000Z',
+    message: `batch1
+    batch2
+    batch3
+    batch4
+    `,
     instanceType: {
       id: 'everyone-it',
       name: 'it',
@@ -122,14 +126,23 @@ const fakeData = {
     name: 'IT2',
     displayName: 'IT2',
     phase: 'Failed',
-    message: 'Pod Failed',
+    message: `
+    batch1
+    batch2
+    batch3
+    batch4`,
     reason: 'PodFailed'
   }, {
     id: 'it3',
     name: 'IT3',
     displayName: 'IT3',
     phase: 'Failed',
-    message: `Traceback (most recent call last):
+    message: `
+    batch1
+    batch2
+    batch3
+    batch4
+    Traceback (most recent call last):
     File "<stdin>", line 1, in <module>
     File "<stdin>", line 3, in divide
   TypeError: unsupported operand type(s) for /: 'str' and 'str'`
