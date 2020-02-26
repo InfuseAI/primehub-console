@@ -24,7 +24,9 @@ export default () => (
         title: '${buildImage.image}',
         dataIndex: 'image',
         render: (text, record) => record.status === 'Succeeded' ? renderCopyableText(text,record) : '-'
-      }]
+      }],
+      removeActions: true,
+      buildImageCustomActions: true,
     }}
     graphql={
       `query($buildImageAfter: String, $buildImageBefore: String, $buildImageLast: Int, $buildImageFirst: Int, $buildImageWhere: BuildImageWhereInput) {
@@ -43,6 +45,7 @@ export default () => (
       }`
     }
     fetchPolicy="network-only"
+    hideButtons
   >
     <Tabs component={BuildImageTab}>
       <Default keyName="info" title="${buildImage.tabs.info}">
