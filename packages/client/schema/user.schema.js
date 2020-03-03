@@ -90,9 +90,6 @@ export default () => (
       }, {
         title: '${isAdmin}',
         dataIndex: 'isAdmin'
-      }, {
-        title: '${totp}',
-        dataIndex: 'totp'
       }],
     }}
     graphql={`
@@ -179,7 +176,6 @@ export default () => (
         * Fields will NOT be hidden if federated is true
         */}
       <Condition match={(data, operator) => operator === 'update'}>
-        <boolean keyName="totp" title="${totp}" />
         <boolean keyName="isAdmin" title="${isAdmin}" />
         <number keyName="volumeCapacity" title="${volumeCapacity}"
           description="${quotaForNewly}"
