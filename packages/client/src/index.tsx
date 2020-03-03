@@ -5,18 +5,15 @@ import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-d
 import {IntlProvider, addLocaleData} from 'react-intl';
 import {LocaleProvider, notification, Button} from 'antd';
 import en from 'react-intl/locale-data/en';
-import zh from 'react-intl/locale-data/zh';
-import zh_TW from 'antd/lib/locale-provider/zh_TW';
 import en_US from 'antd/lib/locale-provider/en_US';
 import 'moment/locale/zh-tw';
-addLocaleData([...en, ...zh])
+addLocaleData([...en])
 import CMSPage from './cms';
 import schema from '../schema/index.schema.js';
 import myLocales from './utils/locales';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 const firstKey = Object.keys(schema.schema)[0];
 const locales = {
-  zh: zh_TW,
   en: en_US
 };
 (window as any).LOCALE = (window as any).LOCALE || 'en';
