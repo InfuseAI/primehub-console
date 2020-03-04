@@ -189,7 +189,7 @@ class ScheduleList extends React.Component<Props> {
       dataIndex: 'jobTemplate.userName'
     }, {
       title: 'Action',
-      key: 'action',
+      dataIndex: 'id',
       render: renderAction
     }]
     return (

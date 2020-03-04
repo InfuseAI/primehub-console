@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import {get} from 'lodash';
-import {RecurrenceType} from 'components/schedule/recurrence';
+import RecurrenceInput, {RecurrenceType, recurrenceValidator} from 'components/schedule/recurrence';
 
 const { Option } = Select;
 
@@ -275,9 +275,14 @@ class CreateForm extends React.Component<Props> {
               </Form.Item>
               {
                 type === 'schedule' && (
-                  <Form.Item label="TODO">
-                    {/* TODO */}
-                    TODO
+                  <Form.Item label="Recurrence Options">
+                    {form.getFieldDecorator('recurrence', {
+                      rules: [
+                        { required: true },
+                        { validator: recurrenceValidator }],
+                    })(
+                      <RecurrenceInput />
+                    )}
                   </Form.Item>
                 )
               }

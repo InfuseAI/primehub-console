@@ -47,7 +47,7 @@ export default class Detail extends React.Component<Props> {
 
   render() {
     const {schedule = {}, runPhScheduleResult, history} = this.props;
-    const jobTemplate = get(schedule, 'jobTemplate', {});
+    const jobTemplate = get(schedule, 'jobTemplate', {}) || {};
     return (
       <>
         <TitleContainer>
