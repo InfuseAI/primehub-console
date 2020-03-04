@@ -116,22 +116,19 @@ const fakeData = {
       type: 'weekly',
       cron: '* */2 * * *',
     },
-    jobTemplate: {
-      command: 'haha',
-      displayName: 'hello',
-      userId: 'userId',
-      userName: 'phadmin',
-      groupId: 'everyone',
-      groupName: 'groupName',
-      image: 'image name',
-      instanceType: {
-        id: 'everyone-it',
-        name: 'it',
-        displayName: 'gpu0',
-        gpuLimit: 0,
-        cpuLimit: 0.5,
-        memoryLimit: 4,
-      }
+    command: 'haha',
+    userId: 'userId',
+    userName: 'phadmin',
+    groupId: 'everyone',
+    groupName: 'groupName',
+    image: 'image name',
+    instanceType: {
+      id: 'everyone-it',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
     },
   }]
 }

@@ -20,23 +20,21 @@ export const PhScheduleFragment = gql`
       type
       cron
     }
-    jobTemplate {
+    displayName
+    command
+    groupId
+    groupName
+    image
+    instanceType {
+      id
+      name
       displayName
-      command
-      groupId
-      groupName
-      image
-      instanceType {
-        id
-        name
-        displayName
-        cpuLimit
-        memoryLimit
-        gpuLimit
-      }
-      userId
-      userName
+      cpuLimit
+      memoryLimit
+      gpuLimit
     }
+    userId
+    userName
     nextRunTime
  }
 `

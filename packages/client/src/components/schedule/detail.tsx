@@ -47,7 +47,6 @@ export default class Detail extends React.Component<Props> {
 
   render() {
     const {schedule = {}, runPhScheduleResult, history} = this.props;
-    const jobTemplate = get(schedule, 'jobTemplate', {}) || {};
     return (
       <>
         <TitleContainer>
@@ -82,22 +81,22 @@ export default class Detail extends React.Component<Props> {
               {schedule.displayName || '-'}
             </Form.Item>
             <Form.Item  style={formItemStyle} label="User:" {...formItemLayout}>
-              {jobTemplate.userName || '-'}
+              {schedule.userName || '-'}
             </Form.Item>
             <Form.Item  style={formItemStyle} label="Group:" {...formItemLayout}>
-              {jobTemplate.groupName || '-'}
+              {schedule.groupName || '-'}
             </Form.Item>
             <Form.Item  style={formItemStyle} label="Instance type:" {...formItemLayout}>
-              {get(jobTemplate, 'instanceType.displayName', '') || get(jobTemplate, 'instanceType.name', '')}
+              {get(schedule, 'instanceType.displayName', '') || get(schedule, 'instanceType.name', '')}
               <span style={{
                 display: "block",
                 marginTop: -12
               }}>
-                (CPU: {get(jobTemplate, 'instanceType.cpuLimit', '-')} / Memory: {get(jobTemplate, 'instanceType.memoryLimit', '-')}G / GPU: {get(jobTemplate, 'instanceType.gpuLimit', '-')})
+                (CPU: {get(schedule, 'instanceType.cpuLimit', '-')} / Memory: {get(schedule, 'instanceType.memoryLimit', '-')}G / GPU: {get(schedule, 'instanceType.gpuLimit', '-')})
               </span>
             </Form.Item>
             <Form.Item  style={blockStyle} label="Image:" {...formItemLayout}>
-              {jobTemplate.image || '-'}
+              {schedule.image || '-'}
             </Form.Item>
             <Form.Item  style={formItemStyle} label="Command:"  {...formItemLayout}>
               <Input.TextArea
@@ -106,7 +105,7 @@ export default class Detail extends React.Component<Props> {
                   color: '#ddd'
                 }}
                 rows={5}
-                value={jobTemplate.command}
+                value={schedule.command}
               />
             </Form.Item>
           </Form>

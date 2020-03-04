@@ -67,7 +67,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
     if (getPhSchedule.error) {
       return getMessage(getPhSchedule.error)
     };
-    const selectedGroup = this.state.selectedGroup || get(getPhSchedule, 'phSchedule.jobTemplate.groupId');
+    const selectedGroup = this.state.selectedGroup || get(getPhSchedule, 'phSchedule.groupId');
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups.filter(group => group.id !== everyoneGroupId);
@@ -106,10 +106,10 @@ class ScheduleDetailContainer extends React.Component<Props> {
           timezone={get(getTimezone, 'system.timezone')}
           initialValue={{
             displayName: get(getPhSchedule, 'phSchedule.displayName'),
-            groupId: get(getPhSchedule, 'phSchedule.jobTemplate.groupId'),
-            image: get(getPhSchedule, 'phSchedule.jobTemplate.image'),
+            groupId: get(getPhSchedule, 'phSchedule.groupId'),
+            image: get(getPhSchedule, 'phSchedule.image'),
             recurrence: get(getPhSchedule, 'phSchedule.recurrence'),
-            instnaceTypeId: get(getPhSchedule, 'phSchedule.jobTemplate.instanceType.id')
+            instnaceTypeId: get(getPhSchedule, 'phSchedule.instanceType.id')
           }}
         />
       </React.Fragment>

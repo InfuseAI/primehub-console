@@ -190,7 +190,8 @@ class ScheduleList extends React.Component<Props> {
       render: renderScheduleName
     }, {
       title: 'Group',
-      dataIndex: 'jobTemplate.groupName'
+      dataIndex: 'groupName',
+      render: name => name ? name : '-'
     }, {
       title: 'Recurrence',
       dataIndex: 'recurrence',
@@ -201,7 +202,8 @@ class ScheduleList extends React.Component<Props> {
       render: renderNextRunTime,
     }, {
       title: 'Created By',
-      dataIndex: 'jobTemplate.userName'
+      dataIndex: 'userName',
+      render: name => name ? name : '-'
     }, {
       title: 'Action',
       dataIndex: 'id',
