@@ -106,6 +106,10 @@ const fakeData = {
     name: 'IT1',
     displayName: 'IT1',
     nextRunTime: '2019-12-26T14:24:22Z',
+    recurrence: {
+      type: 'weekly',
+      cron: '* */2 * * *',
+    },
     jobTemplate: {
       command: 'haha',
       displayName: 'hello',

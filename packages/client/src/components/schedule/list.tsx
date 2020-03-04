@@ -8,6 +8,7 @@ import Filter from 'components/job/filter';
 import {Group} from 'components/job/groupFilter';
 import Pagination from 'components/job/pagination';
 import Title from 'components/job/title';
+import {renderRecurrence} from 'components/schedule/recurrence';
 
 const {confirm} = Modal;
 
@@ -179,6 +180,7 @@ class ScheduleList extends React.Component<Props> {
     }, {
       title: 'Recurrence',
       dataIndex: 'recurrence',
+      render: ({type, cron}) => renderRecurrence(type, cron),
     }, {
       title: 'Next Run',
       dataIndex: 'nextRunTime'

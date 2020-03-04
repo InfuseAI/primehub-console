@@ -2,6 +2,7 @@ import * as React from 'react';
 import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import {get} from 'lodash';
+import {RecurrenceType} from 'components/schedule/recurrence';
 
 const { Option } = Select;
 
@@ -34,14 +35,6 @@ const radioGroupStyle = {
   maxHeight: '30vh',
   overflow: 'auto',
   border: '1px solid #e8e8e8',
-}
-
-enum RecurrenceType {
-  Inactive = 'Inactive',
-  EveryDay = 'Every Day',
-  EveryWeek = 'Every Week',
-  EveryMonth = 'Every Month',
-  Custom = 'Custom',
 }
 
 type FormValue = {

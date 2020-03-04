@@ -109,7 +109,6 @@ class ScheduleListContainer extends React.Component<Props> {
 
   render() {
     const {getPhScheduleConnection, runPhSchedule, runPhScheduleResult,deletePhScheduleResult, deletePhSchedule, groups, pathname} = this.props;
-    console.log(getPhScheduleConnection);
     return (
       <ScheduleList
         schedulesLoading={getPhScheduleConnection.loading}
