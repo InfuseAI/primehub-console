@@ -1,7 +1,9 @@
 import * as React from 'react';
+import {Modal} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
+import {get} from 'lodash';
 import {withRouter} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
@@ -64,6 +66,10 @@ export const RUN_SCHEDULE = gql`
   mutation runPhSchedule($where: PhScheduleWhereUniqueInput!) {
     runPhSchedule(where: $where) {
       ...PhScheduleInfo
+      job {
+        name
+        id
+      }
     }
   }
   ${PhScheduleFragment}
@@ -151,6 +157,23 @@ export default compose(
         query: GET_PH_SCHEDULE_CONNECTION,
         variables: props.getPhScheduleConnection.variables,
       }],
+      onCompleted: data => {
+        const jobId = get(data, 'runPhSchedule.job.id', '');
+        const jobName = get(data, 'runPhSchedule.job.displayName', '');
+        const {history} = props;
+        Modal.success({
+          title: 'Success',
+          content: (
+            <div>
+              {jobName} has been submitted! You can
+              <a href="javascript:void(0)"
+                onClick={() => history.push(`${appPrefix}job/${jobId}`)}
+              > view your job details here.</a>
+            </div>
+          ),
+          onOk() {},
+        });
+      },
       onError: errorHandler
     }),
     name: 'runPhSchedule'
