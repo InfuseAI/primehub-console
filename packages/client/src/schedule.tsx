@@ -10,7 +10,7 @@ import Header from 'components/header';
 import styled from 'styled-components';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import ListContainer from 'containers/list';
-import JobDetailContainer from 'containers/jobDetail';
+import ScheduleDetailContainer from 'containers/scheduleDetail';
 import ScheduleCreatePage from 'containers/scheduleCreatePage';
 import ScheduleListContainer from 'containers/scheduleList';
 
@@ -135,7 +135,7 @@ const connector = new LocalStorageConnector({
 
 const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
-  {connector, schema: {me: {type: 'object'}, phJobs: {type: 'array',items: {type: 'object'}}}});
+  {connector, schema: {me: {type: 'object'}, phSchedules: {type: 'array',items: {type: 'object'}}}});
 const appPrefix = (window as any).APP_PREFIX || '/';
 
 class Schedule extends React.Component {
@@ -154,9 +154,9 @@ class Schedule extends React.Component {
                   <ScheduleCreatePage />
                 </Route>
                 <Route
-                  path={`${appPrefix}schedule/:jobId`}
+                  path={`${appPrefix}schedule/:scheduleId`}
                   exact
-                  component={JobDetailContainer}
+                  component={ScheduleDetailContainer}
                 />
               </Switch>
             </ApolloProvider>
@@ -203,7 +203,7 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       placement: 'bottomRight',
       duration: null,
       btn: (
-        <Button href="javascript:void(0);" type="primary" onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
+        <Button type="primary" onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
           Login Again
         </Button>
       ),
