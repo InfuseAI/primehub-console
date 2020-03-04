@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, notification} from 'antd';
+import {Button} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';

@@ -104,6 +104,7 @@ const fakeData = {
     id: 'it1',
     name: 'IT1',
     displayName: 'IT1',
+    schedule: 'it1',
     phase: 'Running',
     createTime: '2019-10-04T14:48:00.000Z',
     startTime: '2019-10-04T14:48:00.000Z',

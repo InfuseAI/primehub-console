@@ -164,9 +164,7 @@ export default compose(
           content: (
             <div>
               {jobName} has been submitted! You can
-              <a href="javascript:void(0)"
-                onClick={() => history.push(`${appPrefix}job/${jobId}`)}
-              > view your job details here.</a>
+              <a href={`${appPrefix}job/${jobId}`}> view your job details here.</a>
             </div>
           ),
           onOk() {},

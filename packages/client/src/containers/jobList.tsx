@@ -17,6 +17,7 @@ export const PhJobFragment = gql`
     command
     groupId
     groupName
+    schedule
     image
     instanceType {
       id

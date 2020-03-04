@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {Button, Tabs, Form, Card, Input, Modal} from 'antd';
+import {Link} from 'react-router-dom';
 import {get} from 'lodash';
 import styled from 'styled-components';
 import moment, { Moment } from 'moment';
@@ -8,6 +9,8 @@ import {getActionByPhase, Phase} from 'components/job/phase';
 import Title from 'components/job/title';
 import Message from 'components/job/message';
 import {History} from 'history';
+
+const appPrefix = (window as any).APP_PREFIX || '/';
 
 const TabPane = Tabs.TabPane;
 
@@ -168,6 +171,16 @@ export default class Detail extends React.Component<Props> {
                 </Form.Item>
                 <Form.Item  style={formItemStyle} label="Job name" {...formItemLayout}>
                   {job.displayName || '-'}
+                </Form.Item>
+                <Form.Item  style={formItemStyle} label="Schedule" {...formItemLayout}>
+                  {
+                    job.schedule ? (
+                      <a href={`${appPrefix}schedule/${job.schedule}`}>
+                        {job.schedule}
+                      </a>
+                    ) : '-'
+                  }
+                  
                 </Form.Item>
                 <Form.Item  style={formItemStyle} label="User:" {...formItemLayout}>
                   {job.userName || '-'}

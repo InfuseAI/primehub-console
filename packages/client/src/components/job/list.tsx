@@ -34,6 +34,12 @@ const renderJobName = (text, record) => (
   </Tooltip>
 );
 
+const renderSchedule = text => text ? (
+  <a href={`${appPrefix}schedule/${text}`}>
+    {text}
+  </a>
+) : '-'
+
 const renderTimeIfValid = time => {
   if (!time) {
     return '-'
@@ -274,6 +280,10 @@ class JobList extends React.Component<Props> {
       title: 'Job name',
       dataIndex: 'displayName',
       render: renderJobName
+    }, {
+      title: 'Schedule',
+      dataIndex: 'schedule',
+      render: renderSchedule,
     }, {
       title: 'User',
       dataIndex: 'userName'
