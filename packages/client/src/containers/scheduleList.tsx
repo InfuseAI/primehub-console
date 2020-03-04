@@ -16,7 +16,6 @@ export const PhScheduleFragment = gql`
   fragment PhScheduleInfo on PhSchedule {
     id
     displayName
-    name
     recurrence {
       type
       cron
@@ -66,7 +65,7 @@ export const RUN_SCHEDULE = gql`
   mutation runPhSchedule($where: PhScheduleWhereUniqueInput!) {
     runPhSchedule(where: $where) {
       job {
-        name
+        displayName
         id
       }
     }
