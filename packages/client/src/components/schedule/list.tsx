@@ -2,6 +2,7 @@ import * as React from 'react';
 import {Button, Tooltip, Table as AntTable, Row, Col, Icon, Modal} from 'antd';
 import {RouteComponentProps} from 'react-router';
 import {Link, withRouter} from 'react-router-dom';
+import moment from 'moment';
 import {get} from 'lodash';
 import styled from 'styled-components';
 import Filter from 'components/job/filter';
@@ -31,6 +32,19 @@ const renderScheduleName = (text, record) => (
     </Link>
   </Tooltip>
 );
+
+const renderNextRunTime = time => {
+  const tooltipTime = time ? moment(time).format('YYYY-MM-DD HH:mm'): '-';
+  const text = time ? moment(time).fromNow() : '-';
+  return (
+    <Tooltip
+      placement="top"
+      title={`Scheduled for: ${tooltipTime}`}
+    >
+      {text}
+    </Tooltip>
+  );
+};
 
 type JobsConnection = {
   pageInfo: {
@@ -183,7 +197,8 @@ class ScheduleList extends React.Component<Props> {
       render: ({type, cron}) => renderRecurrence(type, cron),
     }, {
       title: 'Next Run',
-      dataIndex: 'nextRunTime'
+      dataIndex: 'nextRunTime',
+      render: renderNextRunTime,
     }, {
       title: 'Created By',
       dataIndex: 'jobTemplate.userName'
