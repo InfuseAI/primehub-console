@@ -65,7 +65,6 @@ export const GET_PH_SCHEDULE_CONNECTION = gql`
 export const RUN_SCHEDULE = gql`
   mutation runPhSchedule($where: PhScheduleWhereUniqueInput!) {
     runPhSchedule(where: $where) {
-      ...PhScheduleInfo
       job {
         name
         id
