@@ -115,8 +115,7 @@ class JobCreatePage extends React.Component<Props, State> {
           instanceTypes={sortItems(instanceTypes)}
           images={sortItems(images)}
           onSubmit={this.onSubmit}
-          creating={createPhJobResult.loading || false}
-          loading={getGroups.loading}
+          loading={getGroups.loading || createPhJobResult.loading}
         />
       </React.Fragment>
     );

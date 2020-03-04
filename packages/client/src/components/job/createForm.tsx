@@ -13,8 +13,8 @@ type Props = FormComponentProps & {
   instanceTypes: Array<Record<string, any>>;
   images: Array<Record<string, any>>;
   onSubmit: Function;
-  creating: boolean;
   loading: boolean;
+  initialValue?: any;
   type?: 'schedule' | 'job';
 };
 
@@ -143,22 +143,31 @@ class CreateForm extends React.Component<Props> {
       instanceTypes,
       images,
       loading,
-      creating,
       form,
-      type
+      type,
+      initialValue = {},
     } = this.props;
     const instanceType = instanceTypes.find(instanceType => instanceType.id === form.getFieldValue('instanceType'));
+    const {
+      groupId,
+      instanceTypeId,
+      image,
+      displayName,
+      command,
+      recurrence = {},
+    } = initialValue;
     return (
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
           <Col xs={24} sm={8} lg={8}>
-            <Card loading={loading || creating}>
+            <Card loading={loading}>
               <h3>Environment Settings</h3>
               <Divider />
               {
                 groups.length ? (
                   <Form.Item label="Group">
                     {form.getFieldDecorator('groupId', {
+                      initialValue: groupId,
                       rules: [{ required: true, message: 'Please select a group!' }],
                     })(
                       <Select placeholder="Please select a group" onChange={id => onSelectGroup(id)}>
@@ -181,6 +190,7 @@ class CreateForm extends React.Component<Props> {
 
               <Form.Item label="InstanceTypes">
                 {form.getFieldDecorator('instanceType', {
+                  initialValue: instanceTypeId,
                   rules: [{ required: true, message: 'Please select a instance type!' }],
                 })(
                   instanceTypes.length ? (
@@ -215,6 +225,7 @@ class CreateForm extends React.Component<Props> {
 
               <Form.Item label="Images">
                 {form.getFieldDecorator('image', {
+                  initialValue: image,
                   rules: [{ required: true, message: 'Please select a image!' }],
                 })(
                   images.length ? (
@@ -244,6 +255,7 @@ class CreateForm extends React.Component<Props> {
               <Divider />
               <Form.Item label="Job name">
                 {form.getFieldDecorator('displayName', {
+                  initialValue: displayName,
                   rules: [
                     { whitespace: true, required: true, message: 'Please input a name!' },
                   ],
@@ -265,6 +277,7 @@ class CreateForm extends React.Component<Props> {
                 </span>
               )} >
                 {form.getFieldDecorator('command', {
+                  initialValue: command,
                   rules: [{ required: true, message: 'Please input commands!' }],
                 })(
                   <Input.TextArea
@@ -277,6 +290,7 @@ class CreateForm extends React.Component<Props> {
                 type === 'schedule' && (
                   <Form.Item label="Recurrence Options">
                     {form.getFieldDecorator('recurrence', {
+                      initialValue: {type: RecurrenceType.Inactive, ...recurrence},
                       rules: [
                         { required: true },
                         { validator: recurrenceValidator }],

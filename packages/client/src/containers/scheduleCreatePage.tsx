@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, notification} from 'antd';
+import {Button} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -40,7 +40,7 @@ const compareByAlphabetical = (prev, next) => {
   return 0;
 }
 
-const sortItems = (items) => {
+export const sortItems = (items) => {
   const copiedItems = items.slice();
   copiedItems
     .sort((prev, next) => {
@@ -115,8 +115,7 @@ class ScheduleCreatePage extends React.Component<Props, State> {
           instanceTypes={sortItems(instanceTypes)}
           images={sortItems(images)}
           onSubmit={this.onSubmit}
-          creating={createPhScheduleResult.loading || false}
-          loading={getGroups.loading}
+          loading={getGroups.loading || createPhScheduleResult.loading}
           type="schedule"
         />
       </React.Fragment>

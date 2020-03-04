@@ -57,13 +57,13 @@ type Props = {
 };
 
 export const recurrenceValidator = (rules, value, callback) => {
-  console.log(value);
   if (!value.cron) return callback();
   try {
     cronParser.parseExpression(value.cron);
   } catch (e) {
     return callback('Invalid cron format');
   }
+  return callback();
 }
 
 export default class RecurrenceInput extends React.Component<Props | any> {
