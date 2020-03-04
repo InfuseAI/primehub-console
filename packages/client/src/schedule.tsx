@@ -107,24 +107,21 @@ const fakeData = {
     displayName: 'IT1',
     nextRunTime: '2019-12-26T14:24:22Z',
     jobTemplate: {
-      spec: {
-        command: 'haha',
-        displayName: 'hello',
-        userId: 'userId',
-        userName: 'phadmin',
-        groupName: 'groupName',
-        image: 'image name',
-        instanceType: 'evergds'
+      command: 'haha',
+      displayName: 'hello',
+      userId: 'userId',
+      userName: 'phadmin',
+      groupName: 'groupName',
+      image: 'image name',
+      instanceType: {
+        id: 'everyone-it',
+        name: 'it',
+        displayName: 'gpu0',
+        gpuLimit: 0,
+        cpuLimit: 0.5,
+        memoryLimit: 4,
       }
     },
-    instanceType: {
-      id: 'everyone-it',
-      name: 'it',
-      displayName: 'gpu0',
-      gpuLimit: 0,
-      cpuLimit: 0.5,
-      memoryLimit: 4,
-    }
   }]
 }
 

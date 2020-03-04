@@ -2,12 +2,10 @@ import * as React from 'react';
 import {Button, Tooltip, Table as AntTable, Row, Col, Icon, Modal} from 'antd';
 import {RouteComponentProps} from 'react-router';
 import {Link, withRouter} from 'react-router-dom';
-import {startCase, get} from 'lodash';
+import {get} from 'lodash';
 import styled from 'styled-components';
 import Filter from 'components/job/filter';
-import moment from 'moment';
 import {Group} from 'components/job/groupFilter';
-import {computeDuration} from 'components/job/detail';
 import Pagination from 'components/job/pagination';
 import Title from 'components/job/title';
 
@@ -32,15 +30,6 @@ const renderScheduleName = (text, record) => (
     </Link>
   </Tooltip>
 );
-
-const renderTimeIfValid = time => {
-  if (!time) {
-    return '-'
-  }
-
-  const momentTime = moment(time);
-  return momentTime.isValid() ? momentTime.format('YYYY-MM-DD HH:mm:ss') : '-';
-}
 
 type JobsConnection = {
   pageInfo: {
@@ -186,7 +175,7 @@ class ScheduleList extends React.Component<Props> {
       render: renderScheduleName
     }, {
       title: 'Group',
-      dataIndex: 'jobTemplate.spec.groupName'
+      dataIndex: 'jobTemplate.groupName'
     }, {
       title: 'Recurrence',
       dataIndex: 'recurrence',
@@ -195,10 +184,9 @@ class ScheduleList extends React.Component<Props> {
       dataIndex: 'nextRunTime'
     }, {
       title: 'Created By',
-      dataIndex: 'jobTemplate.spec.userName'
+      dataIndex: 'jobTemplate.userName'
     }, {
       title: 'Action',
-      dataIndex: 'phase',
       key: 'action',
       render: renderAction
     }]

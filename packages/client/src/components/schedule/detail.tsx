@@ -47,7 +47,7 @@ export default class Detail extends React.Component<Props> {
 
   render() {
     const {schedule = {}, runPhScheduleResult, history} = this.props;
-    const spec = get(schedule, 'jobTemplate.spec', {});
+    const jobTemplate = get(schedule, 'jobTemplate', {});
     return (
       <>
         <TitleContainer>
@@ -82,22 +82,22 @@ export default class Detail extends React.Component<Props> {
               {schedule.displayName || '-'}
             </Form.Item>
             <Form.Item  style={formItemStyle} label="User:" {...formItemLayout}>
-              {spec.userName || '-'}
+              {jobTemplate.userName || '-'}
             </Form.Item>
             <Form.Item  style={formItemStyle} label="Group:" {...formItemLayout}>
-              {spec.groupName || '-'}
+              {jobTemplate.groupName || '-'}
             </Form.Item>
             <Form.Item  style={formItemStyle} label="Instance type:" {...formItemLayout}>
-              {get(spec, 'instanceType.displayName', '') || get(spec, 'instanceType.name', '')}
+              {get(jobTemplate, 'instanceType.displayName', '') || get(jobTemplate, 'instanceType.name', '')}
               <span style={{
                 display: "block",
                 marginTop: -12
               }}>
-                (CPU: {get(spec, 'instanceType.cpuLimit', '-')} / Memory: {get(spec, 'instanceType.memoryLimit', '-')}G / GPU: {get(schedule, 'instanceType.gpuLimit', '-')})
+                (CPU: {get(jobTemplate, 'instanceType.cpuLimit', '-')} / Memory: {get(jobTemplate, 'instanceType.memoryLimit', '-')}G / GPU: {get(jobTemplate, 'instanceType.gpuLimit', '-')})
               </span>
             </Form.Item>
             <Form.Item  style={blockStyle} label="Image:" {...formItemLayout}>
-              {spec.image || '-'}
+              {jobTemplate.image || '-'}
             </Form.Item>
             <Form.Item  style={formItemStyle} label="Command:"  {...formItemLayout}>
               <Input.TextArea
@@ -106,7 +106,7 @@ export default class Detail extends React.Component<Props> {
                   color: '#ddd'
                 }}
                 rows={5}
-                value={spec.command}
+                value={jobTemplate.command}
               />
             </Form.Item>
           </Form>
