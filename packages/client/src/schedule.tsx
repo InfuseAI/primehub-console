@@ -37,6 +37,12 @@ const graphqlClient = new GraphqlClient({
 });
 
 const fakeData = {
+  system: {
+    timezone: {
+      name: "America/Adak",
+      offset: -10
+    }
+  },
   me: {
     groups: [{
       id: 'groupId1',
@@ -136,7 +142,7 @@ const connector = new LocalStorageConnector({
 
 const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
-  {connector, schema: {me: {type: 'object'}, phSchedules: {type: 'array',items: {type: 'object'}}}});
+  {connector, schema: {system: {type: 'object'}, me: {type: 'object'}, phSchedules: {type: 'array',items: {type: 'object'}}}});
 const appPrefix = (window as any).APP_PREFIX || '/';
 
 class Schedule extends React.Component {

@@ -32,6 +32,17 @@ export const CREATE_SCHEDULE = gql`
       id
     }
   }
+`;
+
+export const GET_TIMEZONE = gql`
+  query system {
+    system {
+      timezone {
+        name
+        offset
+      }
+    }
+  }
 `
 
 const compareByAlphabetical = (prev, next) => {
@@ -55,6 +66,7 @@ type Props = RouteComponentProps & {
   getGroups: any; 
   createPhSchedule: any;
   createPhScheduleResult: any;
+  getTimezone: Function;
 }
 type State = {
   selectedGroup: string | null;
@@ -81,7 +93,7 @@ class ScheduleCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {getGroups, createPhScheduleResult, history} = this.props;
+    const {getGroups, getTimezone, createPhScheduleResult, history} = this.props;
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups.filter(group => group.id !== everyoneGroupId);
@@ -116,6 +128,7 @@ class ScheduleCreatePage extends React.Component<Props, State> {
           images={sortItems(images)}
           onSubmit={this.onSubmit}
           loading={getGroups.loading || createPhScheduleResult.loading}
+          timezone={get(getTimezone, 'system.timezone')}
           type="schedule"
         />
       </React.Fragment>
@@ -127,6 +140,9 @@ export default compose(
   withRouter,
   graphql(GET_MY_GROUPS, {
     name: 'getGroups'
+  }),
+  graphql(GET_TIMEZONE, {
+    name: 'getTimezone'
   }),
   graphql(CREATE_SCHEDULE, {
     options: (props: Props) => ({

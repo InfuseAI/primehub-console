@@ -8,8 +8,8 @@ import queryString from 'querystring';
 import ScheduleUpdateForm from 'components/job/createForm';
 import Title from 'components/job/title';
 import {errorHandler} from 'components/job/errorHandler';
-import {RUN_SCHEDULE, PhScheduleFragment} from 'containers/scheduleList';
-import {GET_MY_GROUPS, sortItems} from 'containers/scheduleCreatePage';
+import {PhScheduleFragment} from 'containers/scheduleList';
+import {GET_MY_GROUPS, GET_TIMEZONE, sortItems} from 'containers/scheduleCreatePage';
 import {get, unionBy} from 'lodash';
 
 type Props = {
@@ -17,6 +17,7 @@ type Props = {
   getPhSchedule: any;
   updatePhSchedule: Function;
   updatePhScheduleResult: any;
+  getTime: Function;
 } & RouteComponentProps<{
   scheduleId: string;
 }>;
@@ -62,7 +63,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {getPhSchedule, getGroups, history, updatePhSchedule, updatePhScheduleResult} = this.props;
+    const {getPhSchedule, getTimezone, getGroups, history, updatePhScheduleResult} = this.props;
     if (getPhSchedule.loading) return null;
     if (getPhSchedule.error) {
       return getMessage(getPhSchedule.error)
@@ -102,6 +103,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
           onSubmit={this.onSubmit}
           loading={getGroups.loading || updatePhScheduleResult.loading}
           type="schedule"
+          timezone={get(getTimezone, 'system.timezone')}
           initialValue={{
             displayName: get(getPhSchedule, 'phSchedule.displayName'),
             groupId: get(getPhSchedule, 'phSchedule.jobTemplate.displayName'),
@@ -119,6 +121,9 @@ export default compose(
   withRouter,
   graphql(GET_MY_GROUPS, {
     name: 'getGroups'
+  }),
+  graphql(GET_TIMEZONE, {
+    name: 'getTimezone'
   }),
   graphql(UPDATE_SCHEDULE, {
     options: (props: Props) => ({

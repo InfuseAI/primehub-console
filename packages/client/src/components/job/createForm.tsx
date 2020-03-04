@@ -16,6 +16,10 @@ type Props = FormComponentProps & {
   loading: boolean;
   initialValue?: any;
   type?: 'schedule' | 'job';
+  timezone?: {
+    name: string;
+    offset: number;
+  }
 };
 
 const radioStyle = {
@@ -146,6 +150,7 @@ class CreateForm extends React.Component<Props> {
       form,
       type,
       initialValue = {},
+      timezone,
     } = this.props;
     const instanceType = instanceTypes.find(instanceType => instanceType.id === form.getFieldValue('instanceType'));
     const {
@@ -156,6 +161,10 @@ class CreateForm extends React.Component<Props> {
       command,
       recurrence = {},
     } = initialValue;
+    let recurrenceLabel = `Recurrence Options`;
+    if (timezone) {
+      recurrenceLabel += ` (GMT${timezone.offset}, ${timezone.name})`;
+    }
     return (
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
@@ -288,7 +297,7 @@ class CreateForm extends React.Component<Props> {
               </Form.Item>
               {
                 type === 'schedule' && (
-                  <Form.Item label="Recurrence Options">
+                  <Form.Item label={recurrenceLabel}>
                     {form.getFieldDecorator('recurrence', {
                       initialValue: {type: RecurrenceType.Inactive, ...recurrence},
                       rules: [
