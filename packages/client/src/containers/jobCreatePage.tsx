@@ -10,7 +10,7 @@ import {withRouter} from 'react-router-dom';
 import Title from 'components/job/title';
 import {errorHandler} from 'components/job/errorHandler';
 import JobCreateForm from 'components/job/createForm';
-import {GroupFragment} from 'containers/job';
+import {GroupFragment} from 'containers/list';
 
 export const GET_MY_GROUPS = gql`
   query me {

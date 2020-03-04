@@ -12,7 +12,8 @@ import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import ListContainer from 'containers/list';
 import JobDetailContainer from 'containers/jobDetail';
 import JobCreatePage from 'containers/jobCreatePage';
-import JobListContainer from 'containers/jobList';
+import ScheduleListContainer from 'containers/scheduleList';
+
 const PAGE_PADDING = 64;
 const HEADER_HEIGHT = 64;
 
@@ -100,19 +101,22 @@ const fakeData = {
       }]
     }]
   },
-  phJobs: [{
+  phSchedules: [{
     id: 'it1',
     name: 'IT1',
     displayName: 'IT1',
-    phase: 'Running',
-    createTime: '2019-10-04T14:48:00.000Z',
-    startTime: '2019-10-04T14:48:00.000Z',
-    finishTime: '2019-10-04T15:48:00.000Z',
-    message: `batch1
-    batch2
-    batch3
-    batch4
-    `,
+    nextRunTime: '2019-12-26T14:24:22Z',
+    jobTemplate: {
+      spec: {
+        command: 'haha',
+        displayName: 'hello',
+        userId: 'userId',
+        userName: 'phadmin',
+        groupName: 'groupName',
+        image: 'image name',
+        instanceType: 'evergds'
+      }
+    },
     instanceType: {
       id: 'everyone-it',
       name: 'it',
@@ -121,57 +125,12 @@ const fakeData = {
       cpuLimit: 0.5,
       memoryLimit: 4,
     }
-  }, {
-    id: 'it2',
-    name: 'IT2',
-    displayName: 'IT2',
-    phase: 'Failed',
-    message: `
-    batch1
-    batch2
-    batch3
-    batch4`,
-    reason: 'PodFailed'
-  }, {
-    id: 'it3',
-    name: 'IT3',
-    displayName: 'IT3',
-    phase: 'Failed',
-    message: `
-    batch1
-    batch2
-    batch3
-    batch4
-    Traceback (most recent call last):
-    File "<stdin>", line 1, in <module>
-    File "<stdin>", line 3, in divide
-  TypeError: unsupported operand type(s) for /: 'str' and 'str'`
-  }, {
-    id: 'it4',
-    name: 'IT4',
-    displayName: 'IT4',
-    phase: 'Failed',
-    message: `Traceback (most recent call last):
-    File "<stdin>", line 1, in <module>
-    File "<stdin>", line 3, in divide
-  TypeError: unsupported operand type(s) for /: 'str' and 'str'TypeError: unsupported operand type(s) for /: 'str' and 'str'
-`
-  }, {
-    id: 'it5',
-    name: 'IT5',
-    displayName: 'IT5',
-    phase: 'Cancelled',
-    message: `Traceback (most recent call last):
-    File "<stdin>", line 1, in <module>
-    File "<stdin>", line 3, in divide
-  TypeError: unsupported operand type(s) for /: 'str' and 'str'TypeError: unsupported operand type(s) for /: 'str' and 'str'
-`
   }]
 }
 
 const connector = new LocalStorageConnector({
   defaultData: fakeData,
-  localStorageKey: 'infuse-job'
+  localStorageKey: 'infuse-schedule'
 })
 
 const client = genClient(process.env.NODE_ENV === 'production' ?
@@ -179,7 +138,7 @@ const client = genClient(process.env.NODE_ENV === 'production' ?
   {connector, schema: {me: {type: 'object'}, phJobs: {type: 'array',items: {type: 'object'}}}});
 const appPrefix = (window as any).APP_PREFIX || '/';
 
-class Job extends React.Component {
+class Schedule extends React.Component {
   render() {
     return (
       <Layout>
@@ -188,14 +147,14 @@ class Job extends React.Component {
           <BrowserRouter>
             <ApolloProvider client={client}>
               <Switch>
-                <Route path={`${appPrefix}job`} exact>
-                  <ListContainer Com={JobListContainer} />
+                <Route path={`${appPrefix}schedule`} exact>
+                  <ListContainer Com={ScheduleListContainer} />
                 </Route>
-                <Route path={`${appPrefix}job/create`} exact>
+                <Route path={`${appPrefix}schedule/create`} exact>
                   <JobCreatePage />
                 </Route>
                 <Route
-                  path={`${appPrefix}job/:jobId`}
+                  path={`${appPrefix}schedule/:jobId`}
                   exact
                   component={JobDetailContainer}
                 />
@@ -244,7 +203,7 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       placement: 'bottomRight',
       duration: null,
       btn: (
-        <Button type="primary" onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
+        <Button href="javascript:void(0);" type="primary" onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
           Login Again
         </Button>
       ),
@@ -256,5 +215,5 @@ tokenSyncWorker.run().catch(console.error);
 
 // render
 ReactDOM.render(
-  <Job />
+  <Schedule />
 , document.getElementById('root'));
