@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import ListContainer from 'containers/list';
 import JobDetailContainer from 'containers/jobDetail';
-import JobCreatePage from 'containers/jobCreatePage';
+import ScheduleCreatePage from 'containers/scheduleCreatePage';
 import ScheduleListContainer from 'containers/scheduleList';
 
 const PAGE_PADDING = 64;
@@ -151,7 +151,7 @@ class Schedule extends React.Component {
                   <ListContainer Com={ScheduleListContainer} />
                 </Route>
                 <Route path={`${appPrefix}schedule/create`} exact>
-                  <JobCreatePage />
+                  <ScheduleCreatePage />
                 </Route>
                 <Route
                   path={`${appPrefix}schedule/:jobId`}

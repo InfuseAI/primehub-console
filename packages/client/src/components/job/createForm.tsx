@@ -12,8 +12,9 @@ type Props = FormComponentProps & {
   instanceTypes: Array<Record<string, any>>;
   images: Array<Record<string, any>>;
   onSubmit: Function;
-  creatingJob: boolean;
+  creating: boolean;
   loading: boolean;
+  type?: 'schedule' | 'job';
 };
 
 const radioStyle = {
@@ -34,6 +35,26 @@ const radioGroupStyle = {
   overflow: 'auto',
   border: '1px solid #e8e8e8',
 }
+
+enum RecurrenceType {
+  Inactive = 'Inactive',
+  EveryDay = 'Every Day',
+  EveryWeek = 'Every Week',
+  EveryMonth = 'Every Month',
+  Custom = 'Custom',
+}
+
+type FormValue = {
+  groupId: string;
+  instanceType: string;
+  image: string;
+  displayName: string;
+  command: string;
+  recurrence: {
+    cron: string;
+    type: RecurrenceType;
+  }
+};
 
 const transformImages = (images, instanceType) => {
   const gpuInstance = Boolean(instanceType && instanceType.gpuLimit);
@@ -115,8 +136,9 @@ class CreateForm extends React.Component<Props> {
     const {form, onSubmit} = this.props;
     e.preventDefault();
 
-    form.validateFields(async (err, values) => {
+    form.validateFields(async (err, values: FormValue) => {
       if (err) return;
+
       onSubmit(values);
     });
   }
@@ -128,16 +150,16 @@ class CreateForm extends React.Component<Props> {
       instanceTypes,
       images,
       loading,
-      creatingJob,
-      form
+      creating,
+      form,
+      type
     } = this.props;
-
     const instanceType = instanceTypes.find(instanceType => instanceType.id === form.getFieldValue('instanceType'));
     return (
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
           <Col xs={24} sm={8} lg={8}>
-            <Card loading={loading || creatingJob}>
+            <Card loading={loading || creating}>
               <h3>Environment Settings</h3>
               <Divider />
               {
@@ -258,6 +280,14 @@ class CreateForm extends React.Component<Props> {
                   />
                 )}
               </Form.Item>
+              {
+                type === 'schedule' && (
+                  <Form.Item label="TODO">
+                    {/* TODO */}
+                    TODO
+                  </Form.Item>
+                )
+              }
             </Card>
             <Form.Item style={{textAlign: 'right', marginRight: 8, marginTop: 24}}>
               <Button type="primary" htmlType="submit">
