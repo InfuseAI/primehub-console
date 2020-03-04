@@ -17,7 +17,7 @@ type Props = {
   getPhSchedule: any;
   updatePhSchedule: Function;
   updatePhScheduleResult: any;
-  getTime: Function;
+  getTimezone: Function;
 } & RouteComponentProps<{
   scheduleId: string;
 }>;
@@ -62,12 +62,12 @@ class ScheduleDetailContainer extends React.Component<Props> {
   }
 
   render() {
-    const {selectedGroup} = this.state;
     const {getPhSchedule, getTimezone, getGroups, history, updatePhScheduleResult} = this.props;
     if (getPhSchedule.loading) return null;
     if (getPhSchedule.error) {
       return getMessage(getPhSchedule.error)
     };
+    const selectedGroup = this.state.selectedGroup || get(getPhSchedule, 'phSchedule.jobTemplate.groupId');
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups.filter(group => group.id !== everyoneGroupId);
@@ -106,7 +106,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
           timezone={get(getTimezone, 'system.timezone')}
           initialValue={{
             displayName: get(getPhSchedule, 'phSchedule.displayName'),
-            groupId: get(getPhSchedule, 'phSchedule.jobTemplate.displayName'),
+            groupId: get(getPhSchedule, 'phSchedule.jobTemplate.groupId'),
             image: get(getPhSchedule, 'phSchedule.jobTemplate.image'),
             recurrence: get(getPhSchedule, 'phSchedule.recurrence'),
             instnaceTypeId: get(getPhSchedule, 'phSchedule.jobTemplate.instanceType.id')

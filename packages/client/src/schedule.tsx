@@ -121,6 +121,7 @@ const fakeData = {
       displayName: 'hello',
       userId: 'userId',
       userName: 'phadmin',
+      groupId: 'everyone',
       groupName: 'groupName',
       image: 'image name',
       instanceType: {
