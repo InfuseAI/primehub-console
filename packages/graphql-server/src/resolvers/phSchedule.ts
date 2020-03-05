@@ -1,8 +1,7 @@
 import { Context } from './interface';
 import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory } from './utils';
-import { PhJobPhase, PhJobSpec, PhJobStatus } from '../crdClient/crdClientImpl';
+import { PhScheduleSpec, PhScheduleStatus } from '../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../crdClient/customResource';
-import { JobLogCtrl } from '../controllers/jobLogCtrl';
 import { orderBy, omit, get, isUndefined, isNil } from 'lodash';
 import * as moment from 'moment';
 import { escapeToPrimehubLabel } from '../utils/escapism';
@@ -16,10 +15,13 @@ import { isUserAdmin } from './user';
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 const NOT_AUTH_ERROR = 'NOT_AUTH';
 
-export interface PhJob {
+export interface PhSchedule {
   id: string;
   displayName: string;
-  cancel: boolean;
+  recurrence: {
+    type: string;
+    cron?: string;
+  };
   command: string;
   groupId: string;
   groupName: string;
@@ -27,59 +29,62 @@ export interface PhJob {
   instanceType: string;
   userId: string;
   userName: string;
-  phase: PhJobPhase;
-  reason?: string;
-  message?: string;
   createTime: string;
-  startTime: string;
-  finishTime?: string;
-  logEndpoint: string;
+  updateTime: string;
+  nextRunTime: string;
 }
 
-export interface PhJobCreateInput {
+export interface PhScheduleMutationInput {
   displayName: string;
   groupId: string;
   instanceType: string;
   image: string;
   command: string;
+  recurrence: {
+    type: string;
+    cron?: string;
+  };
 }
 
 // tslint:disable-next-line:max-line-length
-export const transform = async (item: Item<PhJobSpec, PhJobStatus>, namespace: string, graphqlHost: string, jobLogCtrl: JobLogCtrl, kcAdminClient: KeycloakAdminClient): Promise<PhJob> => {
-  const phase = item.spec.cancel ? PhJobPhase.Cancelled : get(item, 'status.phase', PhJobPhase.Pending);
-  const group = item.spec.groupId ? await kcAdminClient.groups.findOne({id: item.spec.groupId}) : null;
+export const transform = async (item: Item<PhScheduleSpec, PhScheduleStatus>, namespace: string, graphqlHost: string, kcAdminClient: KeycloakAdminClient): Promise<PhSchedule> => {
+  const jobTemplate = item.spec.jobTemplate;
+  const group = jobTemplate.spec.groupId ?
+    await kcAdminClient.groups.findOne({id: jobTemplate.spec.groupId}) : null;
   const groupName = get(group, 'attributes.displayName.0') || get(group, 'name');
   return {
     id: item.metadata.name,
-    displayName: item.spec.displayName,
-    cancel: item.spec.cancel,
-    command: item.spec.command,
-    groupId: item.spec.groupId,
+
+    // from jobTemplate
+    displayName: jobTemplate.spec.displayName,
+    command: jobTemplate.spec.command,
+    groupId: jobTemplate.spec.groupId,
     groupName,
-    image: item.spec.image,
-    instanceType: item.spec.instanceType,
-    userId: item.spec.userId,
-    userName: item.spec.userName,
-    phase,
-    reason: get(item, 'status.reason'),
-    message: get(item, 'status.message'),
+    image: jobTemplate.spec.image,
+    instanceType: jobTemplate.spec.instanceType,
+    userId: jobTemplate.spec.userId,
+    userName: jobTemplate.spec.userName,
+
+    // from spec & status
+    recurrence: item.spec.recurrence,
+    nextRunTime: item.status.nextRunTime,
+
+    // times
     createTime: item.metadata.creationTimestamp,
-    startTime: get(item, 'status.startTime'),
-    finishTime: get(item, 'status.finishTime'),
-    logEndpoint: `${graphqlHost}${jobLogCtrl.getPhJobEndpoint(namespace, item.metadata.name)}`
+    updateTime: item.spec.updateTime
   };
 };
 
 // utils
-const createJobName = () => {
+const createScheduleName = () => {
   // generate string like: 201912301200-gxzhaz
-  return `job-${moment.utc().format('YYYYMMDDHHmm')}-${Math.random().toString(36).slice(2, 8)}`;
+  return `schedule-${moment.utc().format('YYYYMMDDHHmm')}-${Math.random().toString(36).slice(2, 8)}`;
 };
 
-export const createJob = async (context: Context, data: PhJobCreateInput) => {
+const createSchedule = async (context: Context, data: PhScheduleMutationInput) => {
   const {crdClient, kcAdminClient, userId, username} = context;
   const group = await kcAdminClient.groups.findOne({id: data.groupId});
-  const name = createJobName();
+  const name = createScheduleName();
   const metadata = {
     name,
     labels: {
@@ -88,23 +93,31 @@ export const createJob = async (context: Context, data: PhJobCreateInput) => {
     }
   };
   const spec = {
-    cancel: false,
-    userId,
-    userName: username,
+    updateTime: moment.utc().toISOString(),
+    recurrence: data.recurrence,
 
-    // merge from user input
-    command: data.command,
-    displayName: data.displayName,
-    groupId: data.groupId,
-    groupName: group.name,
-    image: data.image,
-    instanceType: data.instanceType,
+    jobTemplate: {
+      metadata: {
+        labels: {
+          'phjob.primehub.io/scheduledBy': name
+        }
+      },
+      spec: {
+        userId,
+        userName: username,
+        command: data.command,
+        displayName: data.displayName,
+        groupId: data.groupId,
+        groupName: group.name,
+        image: data.image,
+        instanceType: data.instanceType,
+      }
+    }
   };
-  return crdClient.phJobs.create(metadata, spec);
+  return crdClient.phSchedules.create(metadata, spec);
 };
 
-const validateQuota = async (context: Context, data: PhJobCreateInput) => {
-  const {groupId, instanceType: instanceTypeId} = data;
+const validateQuota = async (context: Context, groupId: string, instanceTypeId: string) => {
   const group = await context.kcAdminClient.groups.findOne({id: groupId});
   const quotaCpu: number = getFromAttr('quota-cpu', group.attributes, null, parseFloat);
   const quotaGpu: number = getFromAttr('quota-gpu', group.attributes, null, parseInt);
@@ -182,12 +195,12 @@ export const typeResolvers = {
   }
 };
 
-const canUserViewJob = async (userId: string, phJob: PhJob, context: Context): Promise<boolean> => {
+const canUserViewSchedule = async (userId: string, phSchedule: PhSchedule, context: Context): Promise<boolean> => {
   const isAdmin = await isUserAdmin(context.realm, userId, context.kcAdminClient);
   if (isAdmin) { return true; }
 
   const members = await context.kcAdminClient.groups.listMembers({
-    id: phJob.groupId,
+    id: phSchedule.groupId,
     max: keycloakMaxCount
   });
   const memberIds = members.map(user => user.id);
@@ -195,7 +208,7 @@ const canUserViewJob = async (userId: string, phJob: PhJob, context: Context): P
   return false;
 };
 
-const canUserCreate = async (userId: string, groupId: string, context: Context) => {
+const canUserMutate = async (userId: string, groupId: string, context: Context) => {
   const members = await context.kcAdminClient.groups.listMembers({
     id: groupId,
     max: keycloakMaxCount
@@ -205,52 +218,52 @@ const canUserCreate = async (userId: string, groupId: string, context: Context) 
 };
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhJobSpec>, where: any, context: Context): Promise<PhJob[]> => {
+const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any, context: Context): Promise<PhSchedule[]> => {
   const {namespace, graphqlHost, jobLogCtrl, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
-    const phJob = await client.get(where.id);
-    const transformed = await transform(phJob, namespace, graphqlHost, jobLogCtrl, kcAdminClient);
-    const viewable = await canUserViewJob(currentUserId, transformed, context);
+    const phSchedule = await client.get(where.id);
+    const transformed = await transform(phSchedule, namespace, graphqlHost, kcAdminClient);
+    const viewable = await canUserViewSchedule(currentUserId, transformed, context);
     if (!viewable) {
       throw new ApolloError('user not auth', NOT_AUTH_ERROR);
     }
     return [transformed];
   }
 
-  const phJobs = await context.phJobCacheList.list();
-  let transformedPhJobs = await Promise.all(
-    phJobs.map(job => transform(job, namespace, graphqlHost, jobLogCtrl, kcAdminClient)));
+  const phSchedules = await client.list();
+  let transformedPhSchedules = await Promise.all(
+    phSchedules.map(schedule => transform(schedule, namespace, graphqlHost, kcAdminClient)));
 
   if (where && where.mine) {
     where.userId_eq = currentUserId;
   }
 
-  // sort by createTime
-  transformedPhJobs = orderBy(transformedPhJobs, 'createTime', 'desc');
-  return filter(transformedPhJobs, omit(where, 'mine'));
+  // sort by updateTime
+  transformedPhSchedules = orderBy(transformedPhSchedules, 'updateTime', 'desc');
+  return filter(transformedPhSchedules, omit(where, 'mine'));
 };
 
 export const query = async (root, args, context: Context) => {
   const {crdClient} = context;
   // tslint:disable-next-line:max-line-length
-  const phJobs = await listQuery(crdClient.phJobs, args && args.where, context);
-  return paginate(phJobs, extractPagination(args));
+  const phSchedules = await listQuery(crdClient.phSchedules, args && args.where, context);
+  return paginate(phSchedules, extractPagination(args));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
   const {crdClient} = context;
   // tslint:disable-next-line:max-line-length
-  const phJobs = await listQuery(crdClient.phJobs, args && args.where, context);
-  return toRelay(phJobs, extractPagination(args));
+  const phSchedules = await listQuery(crdClient.phSchedules, args && args.where, context);
+  return toRelay(phSchedules, extractPagination(args));
 };
 
 export const queryOne = async (root, args, context: Context) => {
   const id = args.where.id;
   const {crdClient, userId: currentUserId} = context;
-  const phJob = await crdClient.phJobs.get(id);
+  const phSchedule = await crdClient.phSchedules.get(id);
   const transformed =
-    await transform(phJob, context.namespace, context.graphqlHost, context.jobLogCtrl, context.kcAdminClient);
-  const viewable = await canUserViewJob(currentUserId, transformed, context);
+    await transform(phSchedule, context.namespace, context.graphqlHost, context.kcAdminClient);
+  const viewable = await canUserViewSchedule(currentUserId, transformed, context);
   if (!viewable) {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
   }
@@ -258,64 +271,65 @@ export const queryOne = async (root, args, context: Context) => {
 };
 
 export const create = async (root, args, context: Context) => {
-  const data: PhJobCreateInput = args.data;
-  await validateQuota(context, data);
-  await canUserCreate(context.userId, data.groupId, context);
-  const phJob = await createJob(context, data);
-
-  logger.info({
-    component: logger.components.phJob,
-    type: 'CREATE',
-    userId: context.userId,
-    username: context.username,
-    id: phJob.metadata.name
-  });
-
-  return transform(phJob, context.namespace, context.graphqlHost, context.jobLogCtrl, context.kcAdminClient);
+  const data: PhScheduleMutationInput = args.data;
+  await validateQuota(context, data.groupId, data.instanceType);
+  await canUserMutate(context.userId, data.groupId, context);
+  const phSchedule = await createSchedule(context, data);
+  return transform(phSchedule, context.namespace, context.graphqlHost, context.kcAdminClient);
 };
 
-export const rerun = async (root, args, context: Context) => {
-  const {id} = args.where;
-  const phJob = await context.crdClient.phJobs.get(id);
+export const update = async (root, args, context: Context) => {
+  const {crdClient, kcAdminClient, userId, username} = context;
+  const data: Partial<PhScheduleMutationInput> = args.data;
+  const phSchedule = await crdClient.phSchedules.get(args.where.id);
+  const groupId = data.groupId || phSchedule.spec.jobTemplate.spec.groupId;
+  const instanceType = data.instanceType || phSchedule.spec.jobTemplate.spec.instanceType;
+  await validateQuota(context, groupId, instanceType);
+  await canUserMutate(userId, groupId, context);
 
-  if (!phJob) {
-    return null;
-  }
+  // construct metadata & spec
+  const group = await kcAdminClient.groups.findOne({id: data.groupId});
+  const metadata = data.groupId ? {
+    labels: {
+      'primehub.io/group': escapeToPrimehubLabel(group.name)
+    }
+  } : undefined;
 
-  // rerun found job
-  const rerunPhJob = await createJob(context, {
-    displayName: phJob.spec.displayName,
-    groupId: phJob.spec.groupId,
-    instanceType: phJob.spec.instanceType,
-    image: phJob.spec.image,
-    // todo: use builder pattern, instead of ser and deser like this
-    command: phJob.spec.command
-  });
+  // todo: fix any type
+  const spec: any = {
+    updateTime: moment.utc().toISOString(),
+    recurrence: data.recurrence,
 
-  logger.info({
-    component: logger.components.phJob,
-    type: 'RERUN',
-    userId: context.userId,
-    username: context.username,
-    id: rerunPhJob.metadata.name
-  });
+    jobTemplate: {
+      spec: {
+        command: data.command,
+        displayName: data.displayName,
 
-  return transform(rerunPhJob, context.namespace, context.graphqlHost, context.jobLogCtrl, context.kcAdminClient);
+        // if group is changed
+        groupId: data.groupId,
+        groupName: data.groupId ? group.name : undefined,
+
+        // image & instanceType
+        image: data.image,
+        instanceType: data.instanceType,
+      }
+    }
+  };
+  const updatedSchedule = await context.crdClient.phSchedules.patch(args.where.id, {metadata, spec});
+  return transform(updatedSchedule, context.namespace, context.graphqlHost, context.kcAdminClient);
 };
 
-export const cancel = async (root, args, context: Context) => {
+export const run = async (root, args, context: Context) => {
   const {id} = args.where;
-  await context.crdClient.phJobs.patch(id, {
-    spec: {cancel: true} as any
-  });
+  const phSchedule = await context.crdClient.phSchedules.get(id);
+  return {
+    id: phSchedule.metadata.name,
+    displayName: phSchedule.spec.jobTemplate.spec.displayName
+  };
+};
 
-  logger.info({
-    component: logger.components.phJob,
-    type: 'CANCEL',
-    userId: context.userId,
-    username: context.username,
-    id
-  });
-
+export const destroy = async (root, args, context: Context) => {
+  const {id} = args.where;
+  await context.crdClient.phSchedules.del(id);
   return {id};
 };

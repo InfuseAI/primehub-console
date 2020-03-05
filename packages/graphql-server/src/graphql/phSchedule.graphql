@@ -1,0 +1,74 @@
+# import PageInfo from "common.graphql"
+# import InstanceType from "instanceType.graphql"
+
+type Recurrence {
+  type: String
+  cron: String
+}
+
+type PhSchedule {
+  id: ID!
+  displayName: String
+  recurrence: recurrence
+  command: String
+  groupId: String
+  groupName: String
+  image: String
+  instanceType: InstanceType
+  userId: String
+  userName: String
+  createTime: String
+  updateTime: String
+  nextRunTime: String
+}
+
+type PhScheduleDeleteResponse {
+  id: ID!
+}
+
+type PhScheduleRunResponse {
+  id: ID!
+  displayName: String
+}
+
+"""An edge in a connection."""
+type PhScheduleEdge {
+  """The item at the end of the edge."""
+  node: PhSchedule!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type PhScheduleConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [PhScheduleEdge]!
+}
+
+input PhScheduleWhereUniqueInput {
+  id: ID!
+}
+
+input PhScheduleWhereInput {
+  id: ID
+  groupId_in: [String]
+  mine: Boolean
+}
+
+"""Mutation input"""
+input RecurrenceInput {
+  type: String
+  cron: String
+}
+
+input PhScheduleCreateInput {
+  displayName: String
+  groupId: String
+  instanceType: String
+  image: String
+  command: String
+  recurrence: RecurrenceInput
+}

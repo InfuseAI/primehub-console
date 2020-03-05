@@ -14,6 +14,7 @@ export interface Metadata {
   selfLink?: string;
   uid?: string;
   annotations?: any;
+  labels?: any;
 }
 
 export interface Item<SpecType, StatusType = any> {
