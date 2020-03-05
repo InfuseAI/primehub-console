@@ -156,13 +156,15 @@ export default compose(
       onCompleted: data => {
         const jobId = get(data, 'runPhSchedule.job.id', '');
         const jobName = get(data, 'runPhSchedule.job.displayName', '');
-        const {history} = props;
         Modal.success({
           title: 'Success',
           content: (
             <div>
               {jobName} has been submitted! You can
-              <a href={`${appPrefix}job/${jobId}`}> view your job details here.</a>
+              <a href={`${appPrefix}job/${jobId}`}>
+                {` `}
+                <u>view your job details here.</u>
+              </a>
             </div>
           ),
           onOk() {},

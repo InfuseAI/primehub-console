@@ -22,17 +22,6 @@ const Table = styled(AntTable as any)`
 
 const appPrefix = (window as any).APP_PREFIX || '/';
 
-const renderScheduleName = (text, record) => (
-  <Tooltip
-    placement="top"
-    title={`Job ID: ${record.id}`}
-  >
-    <Link to={`${appPrefix}schedule/${record.id}`}>
-      {text}
-    </Link>
-  </Tooltip>
-);
-
 const renderNextRunTime = time => {
   const tooltipTime = time ? moment(time).format('YYYY-MM-DD HH:mm'): '-';
   const text = time ? moment(time).fromNow() : '-';
@@ -83,7 +72,7 @@ class ScheduleList extends React.Component<Props> {
     this.setState({currentId: id});
     confirm({
       title: `Delete`,
-      content: `Do you want to delete '${schedule.displayName || schedule.name}'?`,
+      content: `Are you sure you want to delete '${schedule.displayName}'?`,
       iconType: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
@@ -187,7 +176,7 @@ class ScheduleList extends React.Component<Props> {
     const columns = [{
       title: 'Name',
       dataIndex: 'displayName',
-      render: renderScheduleName
+      render: name => name ? name : '-'
     }, {
       title: 'Group',
       dataIndex: 'groupName',
@@ -221,7 +210,7 @@ class ScheduleList extends React.Component<Props> {
         </Col>
         <Col span={18}>
           <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <Title>Job Schedules</Title>
+            <Title>Job Schedule</Title>
             <div>
               <Button onClick={this.scheduleJob}>
                 Schedule Job

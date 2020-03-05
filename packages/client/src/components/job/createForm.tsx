@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
-import {get} from 'lodash';
+import {get, startCase} from 'lodash';
 import RecurrenceInput, {RecurrenceType, recurrenceValidator} from 'components/schedule/recurrence';
 
 const { Option } = Select;
@@ -260,9 +260,9 @@ class CreateForm extends React.Component<Props> {
           </Col>
           <Col xs={24} sm={16} lg={16}>
             <Card>
-              <h3>Job Details</h3>
+              <h3>{startCase(type || 'job')} Details</h3>
               <Divider />
-              <Form.Item label="Job name">
+              <Form.Item label={`${startCase(type || 'job')} name`}>
                 {form.getFieldDecorator('displayName', {
                   initialValue: displayName,
                   rules: [
