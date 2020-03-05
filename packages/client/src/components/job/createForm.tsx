@@ -140,6 +140,12 @@ class CreateForm extends React.Component<Props> {
     });
   }
 
+  stringifyZone(zone, offset): string {
+    const ensure2Digits = num => (num > 9 ? `${num}` : `0${num}`);
+
+    return `${offset}${zone.offset < 0 ? '-' : '+'}${ensure2Digits(Math.floor(Math.abs(zone.offset)))}:${ensure2Digits(Math.abs((zone.offset % 1) * 60))}, ${zone.name}`;
+  }
+
   render() {
     const {
       groups,
@@ -163,7 +169,7 @@ class CreateForm extends React.Component<Props> {
     } = initialValue;
     let recurrenceLabel = `Recurrence Options`;
     if (timezone) {
-      recurrenceLabel += ` (GMT${timezone.offset}, ${timezone.name})`;
+      recurrenceLabel += `(${this.stringifyZone(timezone, 'GMT')})`;
     }
     return (
       <Form onSubmit={this.submit}>
