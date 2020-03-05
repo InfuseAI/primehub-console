@@ -140,7 +140,7 @@ export default class Detail extends React.Component<Props> {
           <div>
             <Button
               icon="left"
-              onClick={() => history.goBack()}
+              onClick={() => history.push(`${appPrefix}job`)}
               style={{marginRight: 16, verticalAlign: 'top'}}
             >
               Back

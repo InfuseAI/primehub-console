@@ -93,7 +93,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
       <React.Fragment>
         <Button
           icon="left"
-          onClick={() => history.goBack()}
+          onClick={() => history.push(`${appPrefix}schedule`)}
           style={{marginRight: 16, verticalAlign: 'top'}}
         >
           Back
