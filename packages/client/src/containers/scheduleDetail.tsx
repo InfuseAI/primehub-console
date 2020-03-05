@@ -108,8 +108,9 @@ class ScheduleDetailContainer extends React.Component<Props> {
             displayName: get(getPhSchedule, 'phSchedule.displayName'),
             groupId: get(getPhSchedule, 'phSchedule.groupId'),
             image: get(getPhSchedule, 'phSchedule.image'),
+            command: get(getPhSchedule, 'phSchedule.command'),
             recurrence: get(getPhSchedule, 'phSchedule.recurrence'),
-            instnaceTypeId: get(getPhSchedule, 'phSchedule.instanceType.id')
+            instanceTypeId: get(getPhSchedule, 'phSchedule.instanceType.id')
           }}
         />
       </React.Fragment>
