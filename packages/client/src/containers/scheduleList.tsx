@@ -68,7 +68,6 @@ export const RUN_SCHEDULE = gql`
       }
     }
   }
-  ${PhScheduleFragment}
 `;
 
 export const DELETE_SCHEDULE = gql`

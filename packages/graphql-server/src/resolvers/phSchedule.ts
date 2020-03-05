@@ -11,9 +11,12 @@ import { mapping } from './instanceType';
 import * as logger from '../logger';
 import { keycloakMaxCount } from './constant';
 import { isUserAdmin } from './user';
+import { createJob } from './phJob';
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 const NOT_AUTH_ERROR = 'NOT_AUTH';
+
+export const SCHEDULE_LABEL = 'phjob.primehub.io/scheduledBy';
 
 export interface PhSchedule {
   id: string;
@@ -67,7 +70,7 @@ export const transform = async (item: Item<PhScheduleSpec, PhScheduleStatus>, na
 
     // from spec & status
     recurrence: item.spec.recurrence,
-    nextRunTime: item.status.nextRunTime,
+    nextRunTime: get(item, 'status.nextRunTime'),
 
     // times
     createTime: item.metadata.creationTimestamp,
@@ -99,7 +102,7 @@ const createSchedule = async (context: Context, data: PhScheduleMutationInput) =
     jobTemplate: {
       metadata: {
         labels: {
-          'phjob.primehub.io/scheduledBy': name
+          [SCHEDULE_LABEL]: name
         }
       },
       spec: {
@@ -219,7 +222,7 @@ const canUserMutate = async (userId: string, groupId: string, context: Context) 
 
 // tslint:disable-next-line:max-line-length
 const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any, context: Context): Promise<PhSchedule[]> => {
-  const {namespace, graphqlHost, jobLogCtrl, userId: currentUserId, kcAdminClient} = context;
+  const {namespace, graphqlHost, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phSchedule = await client.get(where.id);
     const transformed = await transform(phSchedule, namespace, graphqlHost, kcAdminClient);
@@ -322,9 +325,26 @@ export const update = async (root, args, context: Context) => {
 export const run = async (root, args, context: Context) => {
   const {id} = args.where;
   const phSchedule = await context.crdClient.phSchedules.get(id);
+
+  // get job template
+  const jobTemplate = phSchedule.spec.jobTemplate;
+
+  // create job
+  const job = await createJob(context, {
+    command: jobTemplate.spec.command,
+    displayName: jobTemplate.spec.displayName,
+    groupId: jobTemplate.spec.groupId,
+    image: jobTemplate.spec.image,
+    instanceType: jobTemplate.spec.instanceType,
+  }, {
+    [SCHEDULE_LABEL]: id
+  });
+
   return {
-    id: phSchedule.metadata.name,
-    displayName: phSchedule.spec.jobTemplate.spec.displayName
+    job: {
+      id: job.metadata.name,
+      displayName: job.spec.displayName
+    }
   };
 };
 

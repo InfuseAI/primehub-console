@@ -1,5 +1,6 @@
 # import PageInfo from "common.graphql"
 # import InstanceType from "instanceType.graphql"
+# import PhJob from "phJob.graphql"
 
 type Recurrence {
   type: String
@@ -9,7 +10,7 @@ type Recurrence {
 type PhSchedule {
   id: ID!
   displayName: String
-  recurrence: recurrence
+  recurrence: Recurrence
   command: String
   groupId: String
   groupName: String
@@ -27,8 +28,7 @@ type PhScheduleDeleteResponse {
 }
 
 type PhScheduleRunResponse {
-  id: ID!
-  displayName: String
+  job: PhJob
 }
 
 """An edge in a connection."""
@@ -65,6 +65,15 @@ input RecurrenceInput {
 }
 
 input PhScheduleCreateInput {
+  displayName: String
+  groupId: String
+  instanceType: String
+  image: String
+  command: String
+  recurrence: RecurrenceInput
+}
+
+input PhScheduleUpdateInput {
   displayName: String
   groupId: String
   instanceType: String

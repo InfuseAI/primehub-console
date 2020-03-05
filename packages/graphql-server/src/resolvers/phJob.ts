@@ -12,6 +12,7 @@ import { mapping } from './instanceType';
 import * as logger from '../logger';
 import { keycloakMaxCount } from './constant';
 import { isUserAdmin } from './user';
+import { SCHEDULE_LABEL } from './phSchedule';
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 const NOT_AUTH_ERROR = 'NOT_AUTH';
@@ -27,6 +28,7 @@ export interface PhJob {
   instanceType: string;
   userId: string;
   userName: string;
+  schedule: string;
   phase: PhJobPhase;
   reason?: string;
   message?: string;
@@ -60,6 +62,7 @@ export const transform = async (item: Item<PhJobSpec, PhJobStatus>, namespace: s
     instanceType: item.spec.instanceType,
     userId: item.spec.userId,
     userName: item.spec.userName,
+    schedule: item.metadata.labels && item.metadata.labels[SCHEDULE_LABEL],
     phase,
     reason: get(item, 'status.reason'),
     message: get(item, 'status.message'),
@@ -76,7 +79,7 @@ const createJobName = () => {
   return `job-${moment.utc().format('YYYYMMDDHHmm')}-${Math.random().toString(36).slice(2, 8)}`;
 };
 
-export const createJob = async (context: Context, data: PhJobCreateInput) => {
+export const createJob = async (context: Context, data: PhJobCreateInput, labels?: any) => {
   const {crdClient, kcAdminClient, userId, username} = context;
   const group = await kcAdminClient.groups.findOne({id: data.groupId});
   const name = createJobName();
@@ -84,7 +87,8 @@ export const createJob = async (context: Context, data: PhJobCreateInput) => {
     name,
     labels: {
       'primehub.io/group': escapeToPrimehubLabel(group.name),
-      'primehub.io/user': escapeToPrimehubLabel(username)
+      'primehub.io/user': escapeToPrimehubLabel(username),
+      ...labels
     }
   };
   const spec = {
