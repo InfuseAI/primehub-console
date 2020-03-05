@@ -55,6 +55,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
   onSubmit = (payload) => {
     const {updatePhSchedule, getPhSchedule} = this.props;
     const id = get(getPhSchedule, 'phSchedule.id');
+    delete payload.recurrence.__typename;
     updatePhSchedule({
       variables: {
         data: payload,
