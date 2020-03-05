@@ -32,8 +32,8 @@ export const GET_PH_SCHEDULE = gql`
 `;
 
 export const UPDATE_SCHEDULE = gql`
-  mutation updatePhSchedule($data: PhScheduleUpdateInput!) {
-    updatePhSchedule(data: $data) {
+  mutation updatePhSchedule($data: PhScheduleUpdateInput!, $where: PhScheduleWhereUniqueInput!) {
+    updatePhSchedule(data: $data, where: $where) {
       id
     }
   }
@@ -53,10 +53,14 @@ class ScheduleDetailContainer extends React.Component<Props> {
   }
 
   onSubmit = (payload) => {
-    const {updatePhSchedule} = this.props;
+    const {updatePhSchedule, getPhSchedule} = this.props;
+    const id = get(getPhSchedule, 'phSchedule.id');
     updatePhSchedule({
       variables: {
-        data: payload
+        data: payload,
+        where: {
+          id
+        }
       }
     });
   }
