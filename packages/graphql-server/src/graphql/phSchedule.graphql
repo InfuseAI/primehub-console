@@ -21,6 +21,8 @@ type PhSchedule {
   createTime: String
   updateTime: String
   nextRunTime: String
+  invalid: Boolean
+  message: String
 }
 
 type PhScheduleDeleteResponse {

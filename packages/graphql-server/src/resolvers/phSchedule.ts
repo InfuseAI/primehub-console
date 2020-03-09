@@ -35,6 +35,8 @@ export interface PhSchedule {
   createTime: string;
   updateTime: string;
   nextRunTime: string;
+  invalid: boolean;
+  message: string;
 }
 
 export interface PhScheduleMutationInput {
@@ -71,6 +73,8 @@ export const transform = async (item: Item<PhScheduleSpec, PhScheduleStatus>, na
     // from spec & status
     recurrence: item.spec.recurrence,
     nextRunTime: get(item, 'status.nextRunTime'),
+    invalid: get(item, 'status.invalid', false),
+    message: get(item, 'status.message'),
 
     // times
     createTime: item.metadata.creationTimestamp,

@@ -171,7 +171,8 @@ export interface PhJobStatus {
 }
 
 export interface PhScheduleStatus {
-  valid: boolean;
+  invalid: boolean;
+  message: string;
   nextRunTime: string;
 }
 
