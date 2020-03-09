@@ -14,6 +14,7 @@ type Props = FormComponentProps & {
   instanceTypes: Array<Record<string, any>>;
   images: Array<Record<string, any>>;
   onSubmit: Function;
+  onCancel?: Function;
   loading: boolean;
   initialValue?: any;
   type?: 'schedule' | 'job';
@@ -168,9 +169,10 @@ class CreateForm extends React.Component<Props> {
       loading,
       form,
       type,
-      initialValue = {},
+      initialValue,
       timezone,
       selectedGroup,
+      onCancel,
     } = this.props;
     const instanceType = instanceTypes.find(instanceType => instanceType.id === form.getFieldValue('instanceType'));
     const {
@@ -184,7 +186,7 @@ class CreateForm extends React.Component<Props> {
       recurrence = {},
       invalid,
       message,
-    } = initialValue;
+    } = initialValue || {};
     let recurrenceLabel = `Recurrence Options`;
     if (timezone) {
       recurrenceLabel += `(${this.stringifyZone(timezone, 'GMT')})`;
@@ -371,9 +373,26 @@ class CreateForm extends React.Component<Props> {
               }
             </Card>
             <Form.Item style={{textAlign: 'right', marginRight: 8, marginTop: 24}}>
-              <Button type="primary" htmlType="submit">
-                Submit
-              </Button>
+              {
+                initialValue ? (
+                  <>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      style={{marginRight: 8}}
+                    >
+                      Confirm
+                    </Button>
+                    <Button onClick={onCancel}>
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <Button type="primary" htmlType="submit">
+                    Submit
+                  </Button>
+                )
+              }
             </Form.Item>
           </Col>
         </Row>
