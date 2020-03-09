@@ -2,6 +2,9 @@ import { Item } from '../crdClient/customResource';
 import * as logger from '../logger';
 const createEmptySpec = () => ({spec: {}, metadata: {name: 'empty'}});
 
+const MAX_RETRY = 10;
+const MAX_STALE_DURATION = 5 * 60 * 1000;
+
 export class CrdCache<SpecType> {
   private fetching: boolean = false;
   private fetchingPromise: Promise<Array<Item<SpecType>>>;
@@ -10,6 +13,7 @@ export class CrdCache<SpecType> {
   private maxAge: number;
   private cached: Map<string, Item<SpecType>> = new Map();
   private resource: string;
+  private retryCount: number = 0;
 
   constructor({
     resource,
@@ -56,9 +60,10 @@ export class CrdCache<SpecType> {
       resource: this.resource
     });
     this.fetching = true;
-    this.cached = new Map();
     this.fetchingPromise = this.originList();
     return this.fetchingPromise.then(items => {
+      this.retryCount = 0;
+      this.cached = new Map();
       items.forEach(item => {
         this.cached.set(item.metadata.name, item);
       });
@@ -69,6 +74,29 @@ export class CrdCache<SpecType> {
         type: 'FIN_REFETCH',
         resource: this.resource
       });
+    }).catch(error => {
+      logger.info({
+        component: logger.components.crdCache,
+        type: 'ERR_REFETCH',
+        resource: this.resource,
+        error
+      });
+
+      // try too many times and data stay stale for too long
+      if (this.retryCount > MAX_RETRY && Date.now() - this.lastTimeFetch >= MAX_STALE_DURATION) {
+        logger.info({
+          component: logger.components.crdCache,
+          type: 'FAIL_REFETCH_TOO_MANY_TIMES',
+          resource: this.resource,
+          error
+        });
+
+        process.exit(1);
+      }
+
+      this.fetching = false;
+      this.retryCount += 1;
+      setTimeout(() => this.refetch(), this.retryCount * 1000);
     });
   }
 
