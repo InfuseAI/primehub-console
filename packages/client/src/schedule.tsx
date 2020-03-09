@@ -116,6 +116,8 @@ const fakeData = {
       type: 'weekly',
       cron: '* */2 * * *',
     },
+    invalid: true,
+    message: 'Something happened',
     command: 'haha',
     userId: 'userId',
     userName: 'phadmin',

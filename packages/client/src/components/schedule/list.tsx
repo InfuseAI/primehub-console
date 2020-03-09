@@ -22,7 +22,19 @@ const Table = styled(AntTable as any)`
 
 const appPrefix = (window as any).APP_PREFIX || '/';
 
-const renderNextRunTime = time => {
+const renderNextRunTime = (time, record) => {
+  if (record.invalid) {
+    return (
+      <Tooltip
+        placement="top"
+        title={record.message || 'This schedule is invalid'}
+      >
+        <span style={{color: 'red'}}>
+        Invalid
+        </span>
+      </Tooltip>
+    )
+  }
   const tooltipTime = time ? moment(time).format('YYYY-MM-DD HH:mm'): '-';
   const text = time ? moment(time).fromNow() : '-';
   return (
@@ -167,7 +179,7 @@ class ScheduleList extends React.Component<Props> {
     const renderAction = (id: string, record) => {
       return (
         <Button.Group>
-          <Button icon="caret-right" onClick={() => this.runJob(id)} />
+          <Button icon="caret-right" onClick={() => this.runJob(id)} disabled={record.invalid} />
           <Button icon="edit" onClick={() => this.editJob(id)} />
           <Button icon="delete" onClick={() => this.deleteSchedule(id)} />
         </Button.Group>

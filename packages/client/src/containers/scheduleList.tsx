@@ -20,6 +20,8 @@ export const PhScheduleFragment = gql`
       type
       cron
     }
+    invalid
+    message
     displayName
     command
     groupId
