@@ -72,7 +72,7 @@ export default class RecurrenceInput extends React.Component<Props | any> {
       case RecurrenceType.Monthly:
         return onChange({type, cron: '0 4 1 * *'});
       case RecurrenceType.Inactive:
-        return onChange({type, cron: ''});
+        return onChange({type, cron: '* * * * *'});
       case RecurrenceType.Custom:
         return onChange({ cron: '* * * * *', ...value, type});
       default:
