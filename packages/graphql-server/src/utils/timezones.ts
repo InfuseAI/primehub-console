@@ -507,7 +507,7 @@ export const timezones = [
   {
     label: 'UTC',
     name: 'UTC',
-    offset: null,
+    offset: 0,
   },
   {
     label: 'Algiers',
