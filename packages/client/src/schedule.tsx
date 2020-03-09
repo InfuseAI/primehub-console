@@ -121,11 +121,11 @@ const fakeData = {
     command: 'haha',
     userId: 'userId',
     userName: 'phadmin',
-    groupId: 'everyone',
+    groupId: 'everyone1-432',
     groupName: 'groupName',
     image: 'image name',
     instanceType: {
-      id: 'everyone-it',
+      id: 'everyone-it-aha',
       name: 'it',
       displayName: 'gpu0',
       gpuLimit: 0,

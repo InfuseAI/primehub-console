@@ -112,10 +112,12 @@ class ScheduleDetailContainer extends React.Component<Props> {
           initialValue={{
             displayName: get(getPhSchedule, 'phSchedule.displayName'),
             groupId: get(getPhSchedule, 'phSchedule.groupId'),
+            groupName: get(getPhSchedule, 'phSchedule.groupName'),
             image: get(getPhSchedule, 'phSchedule.image'),
             command: get(getPhSchedule, 'phSchedule.command'),
             recurrence: get(getPhSchedule, 'phSchedule.recurrence'),
-            instanceTypeId: get(getPhSchedule, 'phSchedule.instanceType.id')
+            instanceTypeId: get(getPhSchedule, 'phSchedule.instanceType.id'),
+            instanceTypeName: get(getPhSchedule, 'phSchedule.instanceType.name')
           }}
         />
       </React.Fragment>
