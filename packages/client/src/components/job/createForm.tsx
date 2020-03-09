@@ -3,6 +3,7 @@ import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Ic
 import {FormComponentProps} from 'antd/lib/form';
 import {get, startCase} from 'lodash';
 import RecurrenceInput, {RecurrenceType, recurrenceValidator} from 'components/schedule/recurrence';
+import Message from 'components/job/message';
 
 const { Option } = Select;
 
@@ -13,6 +14,7 @@ type Props = FormComponentProps & {
   instanceTypes: Array<Record<string, any>>;
   images: Array<Record<string, any>>;
   onSubmit: Function;
+  onCancel?: Function;
   loading: boolean;
   initialValue?: any;
   type?: 'schedule' | 'job';
@@ -89,9 +91,12 @@ python /project/group-a/train.py \\
 
 class CreateForm extends React.Component<Props> {
   componentDidMount() {
-    this.autoSelectFirstGroup();
-    this.autoSelectFirstInstanceType();
-    this.autoSelectFirstImage();
+    const {initialValue} = this.props;
+    if (!initialValue) {
+      this.autoSelectFirstGroup();
+      this.autoSelectFirstInstanceType();
+      this.autoSelectFirstImage();
+    }
   }
 
   componentDidUpdate() {
@@ -146,6 +151,15 @@ class CreateForm extends React.Component<Props> {
     return `${offset}${zone.offset < 0 ? '-' : '+'}${ensure2Digits(Math.floor(Math.abs(zone.offset)))}:${ensure2Digits(Math.abs((zone.offset % 1) * 60))}, ${zone.name}`;
   }
 
+  renderLabel = (defaultLabel: string, invalid: boolean, message: any) => {
+    let label = <span>{defaultLabel}</span>;
+    if (invalid)
+      label = <span>
+        {defaultLabel} <span style={{color: 'red'}}>({message})</span>
+      </span>
+    return label;
+  }
+
   render() {
     const {
       groups,
@@ -155,34 +169,69 @@ class CreateForm extends React.Component<Props> {
       loading,
       form,
       type,
-      initialValue = {},
+      initialValue,
       timezone,
+      selectedGroup,
+      onCancel,
     } = this.props;
     const instanceType = instanceTypes.find(instanceType => instanceType.id === form.getFieldValue('instanceType'));
     const {
       groupId,
+      groupName,
       instanceTypeId,
+      instanceTypeName,
       image,
       displayName,
       command,
       recurrence = {},
-    } = initialValue;
+      invalid,
+      message,
+    } = initialValue || {};
     let recurrenceLabel = `Recurrence Options`;
     if (timezone) {
       recurrenceLabel += `(${this.stringifyZone(timezone, 'GMT')})`;
     }
+
+    const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
+    const groupLabel = this.renderLabel(
+      'Group',
+      invalidInitialGroup,
+      <span>The group <b>{groupName}</b> was deleted.</span>
+    )
+    
+    const invalidInitialInstanceType = !invalidInitialGroup && 
+      instanceTypeId && 
+      !form.getFieldValue('instanceType') &&
+      !instanceTypes.find(it => it.id === instanceTypeId);
+    const instanceTypeLabel = this.renderLabel(
+      'InstanceTypes',
+      invalidInitialInstanceType,
+      <span>The instance type <b>{instanceTypeName}</b> was deleted.</span>
+    )
+
+    const invalidInitialImage = !invalidInitialGroup &&
+      image &&
+      !form.getFieldValue('image') &&
+      !images.find(it => it.id === image);
+    const imageLabel = this.renderLabel(
+      'Images',
+      invalidInitialImage,
+      <span>The image <b>{image}</b> was deleted.</span>
+    )
+
+    
     return (
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
           <Col xs={24} sm={8} lg={8}>
-            <Card loading={loading}>
+            <Card loading={loading} style={{overflow: 'auto'}}>
               <h3>Environment Settings</h3>
               <Divider />
               {
                 groups.length ? (
-                  <Form.Item label="Group">
+                  <Form.Item label={groupLabel}>
                     {form.getFieldDecorator('groupId', {
-                      initialValue: groupId,
+                      initialValue: invalidInitialGroup ? '' : groupId,
                       rules: [{ required: true, message: 'Please select a group!' }],
                     })(
                       <Select placeholder="Please select a group" onChange={id => onSelectGroup(id)}>
@@ -203,7 +252,7 @@ class CreateForm extends React.Component<Props> {
                 )
               }
 
-              <Form.Item label="InstanceTypes">
+              <Form.Item label={instanceTypeLabel}>
                 {form.getFieldDecorator('instanceType', {
                   initialValue: instanceTypeId,
                   rules: [{ required: true, message: 'Please select a instance type!' }],
@@ -238,7 +287,7 @@ class CreateForm extends React.Component<Props> {
                 )}
               </Form.Item>
 
-              <Form.Item label="Images">
+              <Form.Item label={imageLabel}>
                 {form.getFieldDecorator('image', {
                   initialValue: image,
                   rules: [{ required: true, message: 'Please select a image!' }],
@@ -315,11 +364,35 @@ class CreateForm extends React.Component<Props> {
                   </Form.Item>
                 )
               }
+              {
+                type === 'schedule' && invalid && (
+                  <Form.Item label="Message">
+                    <Message text={message} />
+                  </Form.Item>
+                )
+              }
             </Card>
             <Form.Item style={{textAlign: 'right', marginRight: 8, marginTop: 24}}>
-              <Button type="primary" htmlType="submit">
-                Submit
-              </Button>
+              {
+                initialValue ? (
+                  <>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      style={{marginRight: 8}}
+                    >
+                      Confirm
+                    </Button>
+                    <Button onClick={onCancel}>
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <Button type="primary" htmlType="submit">
+                    Submit
+                  </Button>
+                )
+              }
             </Form.Item>
           </Col>
         </Row>

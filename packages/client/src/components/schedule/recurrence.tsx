@@ -1,7 +1,7 @@
 import {startCase} from 'lodash';
 import React from 'react';
 import {Input, Select} from 'antd';
-import cronParser from 'cron-parser';
+import { isValidCron } from 'cron-validator'
 
 export enum RecurrenceType {
   Inactive = 'inactive',
@@ -57,13 +57,8 @@ type Props = {
 };
 
 export const recurrenceValidator = (rules, value, callback) => {
-  if (!value.cron) return callback();
-  try {
-    cronParser.parseExpression(value.cron);
-  } catch (e) {
-    return callback('Invalid cron format');
-  }
-  return callback();
+  if (!value.cron || isValidCron(value.cron)) return callback();
+  return callback('Invalid cron format');
 }
 
 export default class RecurrenceInput extends React.Component<Props | any> {
@@ -77,7 +72,7 @@ export default class RecurrenceInput extends React.Component<Props | any> {
       case RecurrenceType.Monthly:
         return onChange({type, cron: '0 4 1 * *'});
       case RecurrenceType.Inactive:
-        return onChange({type, cron: ''});
+        return onChange({type, cron: '* * * * *'});
       case RecurrenceType.Custom:
         return onChange({ cron: '* * * * *', ...value, type});
       default:

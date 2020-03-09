@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {RouteComponentProps, withRouter} from 'react-router-dom';
 import {compose} from 'recompose';
-import {Button} from 'antd';
+import {Button, Modal} from 'antd';
 import queryString from 'querystring';
 import ScheduleUpdateForm from 'components/job/createForm';
 import Title from 'components/job/title';
@@ -66,6 +66,23 @@ class ScheduleDetailContainer extends React.Component<Props> {
     });
   }
 
+  cancel = () => {
+    const {history} = this.props;
+    Modal.confirm({
+      title: 'Do you want to discard the changes?',
+      content: 'Your changes will be lost. Are you sure?',
+      okText: 'Discard',
+      cancelText: 'Cancel',
+      onOk: () => history.push(`${appPrefix}schedule`),
+      cancelButtonProps: {
+        style: {
+          float: 'right',
+          marginLeft: 8
+        }
+      }
+    });
+  }
+
   render() {
     const {getPhSchedule, getTimezone, getGroups, history, updatePhScheduleResult} = this.props;
     if (getPhSchedule.loading) return null;
@@ -110,13 +127,11 @@ class ScheduleDetailContainer extends React.Component<Props> {
           type="schedule"
           timezone={get(getTimezone, 'system.timezone')}
           initialValue={{
-            displayName: get(getPhSchedule, 'phSchedule.displayName'),
-            groupId: get(getPhSchedule, 'phSchedule.groupId'),
-            image: get(getPhSchedule, 'phSchedule.image'),
-            command: get(getPhSchedule, 'phSchedule.command'),
-            recurrence: get(getPhSchedule, 'phSchedule.recurrence'),
-            instanceTypeId: get(getPhSchedule, 'phSchedule.instanceType.id')
+            ...get(getPhSchedule, 'phSchedule', {}) || {},
+            instanceTypeId: get(getPhSchedule, 'phSchedule.instanceType.id'),
+            instanceTypeName: get(getPhSchedule, 'phSchedule.instanceType.name'),
           }}
+          onCancel={this.cancel}
         />
       </React.Fragment>
     );
