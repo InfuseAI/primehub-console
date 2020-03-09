@@ -3,6 +3,7 @@ import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Ic
 import {FormComponentProps} from 'antd/lib/form';
 import {get, startCase} from 'lodash';
 import RecurrenceInput, {RecurrenceType, recurrenceValidator} from 'components/schedule/recurrence';
+import Message from 'components/job/message';
 
 const { Option } = Select;
 
@@ -181,6 +182,8 @@ class CreateForm extends React.Component<Props> {
       displayName,
       command,
       recurrence = {},
+      invalid,
+      message,
     } = initialValue;
     let recurrenceLabel = `Recurrence Options`;
     if (timezone) {
@@ -356,6 +359,13 @@ class CreateForm extends React.Component<Props> {
                     })(
                       <RecurrenceInput />
                     )}
+                  </Form.Item>
+                )
+              }
+              {
+                type === 'schedule' && invalid && (
+                  <Form.Item label="Message">
+                    <Message text={message} />
                   </Form.Item>
                 )
               }
