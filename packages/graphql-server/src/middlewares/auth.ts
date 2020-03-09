@@ -31,12 +31,19 @@ export const permissions = shield({
     'instanceType': or(isAdmin, isClient),
     'phJob': or(isAdmin, isJobUser),
     'phJobs': or(isAdmin, isJobUser),
-    'phJobsConnection': or(isAdmin, isJobUser)
+    'phJobsConnection': or(isAdmin, isJobUser),
+    'phSchedule': or(isAdmin, isJobUser),
+    'phSchedules': or(isAdmin, isJobUser),
+    'phSchedulesConnection': or(isAdmin, isJobUser)
   },
   Mutation: {
     '*': isAdmin,
     'createPhJob': or(isAdmin, isJobUser),
     'rerunPhJob': or(isAdmin, isJobUser),
-    'cancelPhJob': or(isAdmin, isJobUser)
+    'cancelPhJob': or(isAdmin, isJobUser),
+    'createPhSchedule': or(isAdmin, isJobUser),
+    'updatePhSchedule': or(isAdmin, isJobUser),
+    'deletePhSchedule': or(isAdmin, isJobUser),
+    'runPhSchedule': or(isAdmin, isJobUser)
   }
 });

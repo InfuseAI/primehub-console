@@ -56,7 +56,7 @@ export const transform = async (item: Item<PhScheduleSpec, PhScheduleStatus>, na
   const jobTemplate = item.spec.jobTemplate;
   const group = jobTemplate.spec.groupId ?
     await kcAdminClient.groups.findOne({id: jobTemplate.spec.groupId}) : null;
-  const groupName = get(group, 'attributes.displayName.0') || get(group, 'name');
+  const groupName = get(group, 'attributes.displayName.0') || get(group, 'name') || jobTemplate.spec.groupName;
   return {
     id: item.metadata.name,
 
@@ -178,12 +178,6 @@ const validateQuota = async (context: Context, groupId: string, instanceTypeId: 
  * Query
  */
 
-const NOT_FOUND_INSTANCE_TYPE = {
-  id: 'NOT_FOUND',
-  name: 'NOT_FOUND',
-  tolerations: []
-};
-
 export const typeResolvers = {
   async instanceType(parent, args, context: Context) {
     const instanceTypeId = parent.instanceType;
@@ -197,7 +191,11 @@ export const typeResolvers = {
         id: parent.id,
         instanceTypeId
       });
-      return NOT_FOUND_INSTANCE_TYPE;
+      return {
+        id: instanceTypeId,
+        name: instanceTypeId,
+        tolerations: []
+      };
     }
   }
 };
