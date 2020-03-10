@@ -9,7 +9,7 @@ import JobList from 'components/job/list';
 import {errorHandler} from 'components/job/errorHandler';
 import {Group} from 'components/job/groupFilter';
 
-export const PhJobFragement = gql`
+export const PhJobFragment = gql`
   fragment PhJobInfo on PhJob {
     id
     displayName
@@ -17,6 +17,7 @@ export const PhJobFragement = gql`
     command
     groupId
     groupName
+    schedule
     image
     instanceType {
       id
@@ -55,7 +56,7 @@ export const GET_PH_JOB_CONNECTION = gql`
       }
     }
   }
-  ${PhJobFragement}
+  ${PhJobFragment}
 `;
 
 export const RERUN_JOB = gql`
@@ -64,7 +65,7 @@ export const RERUN_JOB = gql`
       ...PhJobInfo
     }
   }
-  ${PhJobFragement}
+  ${PhJobFragment}
 `;
 
 export const CANCEL_JOB = gql`

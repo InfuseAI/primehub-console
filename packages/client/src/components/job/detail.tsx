@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {Button, Tabs, Form, Card, Input, Modal} from 'antd';
+import {Link} from 'react-router-dom';
 import {get} from 'lodash';
 import styled from 'styled-components';
 import moment, { Moment } from 'moment';
@@ -8,6 +9,8 @@ import {getActionByPhase, Phase} from 'components/job/phase';
 import Title from 'components/job/title';
 import Message from 'components/job/message';
 import {History} from 'history';
+
+const appPrefix = (window as any).APP_PREFIX || '/';
 
 const TabPane = Tabs.TabPane;
 
@@ -126,6 +129,15 @@ export default class Detail extends React.Component<Props> {
     });
   }
 
+  back = () => {
+    const {history} = this.props;
+    const pathname = get(history, 'location.state.prevPathname');
+    const search = get(history, 'location.state.prevSearch');
+    if (pathname)
+      return history.push(`${pathname}${search}`)
+    history.push(`${appPrefix}job`);
+  }
+
   render() {
     const {job, rerunPhJobResult, cancelPhJobResult, history} = this.props;
     const startTime = job.startTime ? moment(job.startTime) : '';
@@ -137,7 +149,7 @@ export default class Detail extends React.Component<Props> {
           <div>
             <Button
               icon="left"
-              onClick={() => history.goBack()}
+              onClick={this.back}
               style={{marginRight: 16, verticalAlign: 'top'}}
             >
               Back
@@ -168,6 +180,16 @@ export default class Detail extends React.Component<Props> {
                 </Form.Item>
                 <Form.Item  style={formItemStyle} label="Job name" {...formItemLayout}>
                   {job.displayName || '-'}
+                </Form.Item>
+                <Form.Item  style={formItemStyle} label="Schedule" {...formItemLayout}>
+                  {
+                    job.schedule ? (
+                      <a href={`${appPrefix}schedule/${job.schedule}`}>
+                        {job.schedule}
+                      </a>
+                    ) : '-'
+                  }
+                  
                 </Form.Item>
                 <Form.Item  style={formItemStyle} label="User:" {...formItemLayout}>
                   {job.userName || '-'}

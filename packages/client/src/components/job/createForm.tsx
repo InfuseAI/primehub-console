@@ -1,7 +1,9 @@
 import * as React from 'react';
 import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
-import {get} from 'lodash';
+import {get, startCase} from 'lodash';
+import RecurrenceInput, {RecurrenceType, recurrenceValidator} from 'components/schedule/recurrence';
+import Message from 'components/job/message';
 
 const { Option } = Select;
 
@@ -12,8 +14,14 @@ type Props = FormComponentProps & {
   instanceTypes: Array<Record<string, any>>;
   images: Array<Record<string, any>>;
   onSubmit: Function;
-  creatingJob: boolean;
+  onCancel?: Function;
   loading: boolean;
+  initialValue?: any;
+  type?: 'schedule' | 'job';
+  timezone?: {
+    name: string;
+    offset: number;
+  }
 };
 
 const radioStyle = {
@@ -34,6 +42,18 @@ const radioGroupStyle = {
   overflow: 'auto',
   border: '1px solid #e8e8e8',
 }
+
+type FormValue = {
+  groupId: string;
+  instanceType: string;
+  image: string;
+  displayName: string;
+  command: string;
+  recurrence: {
+    cron: string;
+    type: RecurrenceType;
+  }
+};
 
 const transformImages = (images, instanceType) => {
   const gpuInstance = Boolean(instanceType && instanceType.gpuLimit);
@@ -71,9 +91,12 @@ python /project/group-a/train.py \\
 
 class CreateForm extends React.Component<Props> {
   componentDidMount() {
-    this.autoSelectFirstGroup();
-    this.autoSelectFirstInstanceType();
-    this.autoSelectFirstImage();
+    const {initialValue} = this.props;
+    if (!initialValue) {
+      this.autoSelectFirstGroup();
+      this.autoSelectFirstInstanceType();
+      this.autoSelectFirstImage();
+    }
   }
 
   componentDidUpdate() {
@@ -115,10 +138,33 @@ class CreateForm extends React.Component<Props> {
     const {form, onSubmit} = this.props;
     e.preventDefault();
 
-    form.validateFields(async (err, values) => {
+    form.validateFields(async (err, values: FormValue) => {
       if (err) return;
+
       onSubmit(values);
     });
+  }
+
+  cancel = () => {
+    const {form, onCancel} = this.props;
+    if (!onCancel) return;
+    const values = form.getFieldsValue();
+    onCancel(values);
+  }
+
+  stringifyZone(zone, offset): string {
+    const ensure2Digits = num => (num > 9 ? `${num}` : `0${num}`);
+
+    return `${offset}${zone.offset < 0 ? '-' : '+'}${ensure2Digits(Math.floor(Math.abs(zone.offset)))}:${ensure2Digits(Math.abs((zone.offset % 1) * 60))}, ${zone.name}`;
+  }
+
+  renderLabel = (defaultLabel: string, invalid: boolean, message: any) => {
+    let label = <span>{defaultLabel}</span>;
+    if (invalid)
+      label = <span>
+        {defaultLabel} <span style={{color: 'red'}}>({message})</span>
+      </span>
+    return label;
   }
 
   render() {
@@ -128,22 +174,70 @@ class CreateForm extends React.Component<Props> {
       instanceTypes,
       images,
       loading,
-      creatingJob,
-      form
+      form,
+      type,
+      initialValue,
+      timezone,
+      selectedGroup,
     } = this.props;
-
     const instanceType = instanceTypes.find(instanceType => instanceType.id === form.getFieldValue('instanceType'));
+    const {
+      groupId,
+      groupName,
+      instanceTypeId,
+      instanceTypeName,
+      image,
+      displayName,
+      command,
+      recurrence = {},
+      invalid,
+      message,
+    } = initialValue || {};
+    let recurrenceLabel = `Recurrence Options`;
+    if (timezone) {
+      recurrenceLabel += `(${this.stringifyZone(timezone, 'GMT')})`;
+    }
+
+    const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
+    const groupLabel = this.renderLabel(
+      'Group',
+      invalidInitialGroup,
+      <span>The group <b>{groupName}</b> was deleted.</span>
+    )
+    
+    const invalidInitialInstanceType = !invalidInitialGroup && 
+      instanceTypeId && 
+      !form.getFieldValue('instanceType') &&
+      !instanceTypes.find(it => it.id === instanceTypeId);
+    const instanceTypeLabel = this.renderLabel(
+      'InstanceTypes',
+      invalidInitialInstanceType,
+      <span>The instance type <b>{instanceTypeName}</b> was deleted.</span>
+    )
+
+    const invalidInitialImage = !invalidInitialGroup &&
+      image &&
+      !form.getFieldValue('image') &&
+      !images.find(it => it.id === image);
+    const imageLabel = this.renderLabel(
+      'Images',
+      invalidInitialImage,
+      <span>The image <b>{image}</b> was deleted.</span>
+    )
+
+    
     return (
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
           <Col xs={24} sm={8} lg={8}>
-            <Card loading={loading || creatingJob}>
+            <Card loading={loading} style={{overflow: 'auto'}}>
               <h3>Environment Settings</h3>
               <Divider />
               {
                 groups.length ? (
-                  <Form.Item label="Group">
+                  <Form.Item label={groupLabel}>
                     {form.getFieldDecorator('groupId', {
+                      initialValue: invalidInitialGroup ? '' : groupId,
                       rules: [{ required: true, message: 'Please select a group!' }],
                     })(
                       <Select placeholder="Please select a group" onChange={id => onSelectGroup(id)}>
@@ -164,8 +258,9 @@ class CreateForm extends React.Component<Props> {
                 )
               }
 
-              <Form.Item label="InstanceTypes">
+              <Form.Item label={instanceTypeLabel}>
                 {form.getFieldDecorator('instanceType', {
+                  initialValue: instanceTypeId,
                   rules: [{ required: true, message: 'Please select a instance type!' }],
                 })(
                   instanceTypes.length ? (
@@ -198,8 +293,9 @@ class CreateForm extends React.Component<Props> {
                 )}
               </Form.Item>
 
-              <Form.Item label="Images">
+              <Form.Item label={imageLabel}>
                 {form.getFieldDecorator('image', {
+                  initialValue: image,
                   rules: [{ required: true, message: 'Please select a image!' }],
                 })(
                   images.length ? (
@@ -225,10 +321,11 @@ class CreateForm extends React.Component<Props> {
           </Col>
           <Col xs={24} sm={16} lg={16}>
             <Card>
-              <h3>Job Details</h3>
+              <h3>{startCase(type || 'job')} Details</h3>
               <Divider />
-              <Form.Item label="Job name">
+              <Form.Item label={`${startCase(type || 'job')} name`}>
                 {form.getFieldDecorator('displayName', {
+                  initialValue: displayName,
                   rules: [
                     { whitespace: true, required: true, message: 'Please input a name!' },
                   ],
@@ -250,6 +347,7 @@ class CreateForm extends React.Component<Props> {
                 </span>
               )} >
                 {form.getFieldDecorator('command', {
+                  initialValue: command,
                   rules: [{ required: true, message: 'Please input commands!' }],
                 })(
                   <Input.TextArea
@@ -258,11 +356,49 @@ class CreateForm extends React.Component<Props> {
                   />
                 )}
               </Form.Item>
+              {
+                type === 'schedule' && (
+                  <Form.Item label={recurrenceLabel}>
+                    {form.getFieldDecorator('recurrence', {
+                      initialValue: {type: RecurrenceType.Inactive, ...recurrence},
+                      rules: [
+                        { required: true },
+                        { validator: recurrenceValidator }],
+                    })(
+                      <RecurrenceInput />
+                    )}
+                  </Form.Item>
+                )
+              }
+              {
+                type === 'schedule' && invalid && (
+                  <Form.Item label="Message">
+                    <Message text={message} />
+                  </Form.Item>
+                )
+              }
             </Card>
             <Form.Item style={{textAlign: 'right', marginRight: 8, marginTop: 24}}>
-              <Button type="primary" htmlType="submit">
-                Submit
-              </Button>
+              {
+                initialValue ? (
+                  <>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      style={{marginRight: 8}}
+                    >
+                      Confirm
+                    </Button>
+                    <Button onClick={this.cancel}>
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <Button type="primary" htmlType="submit">
+                    Submit
+                  </Button>
+                )
+              }
             </Form.Item>
           </Col>
         </Row>

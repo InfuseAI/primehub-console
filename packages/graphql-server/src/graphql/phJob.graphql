@@ -15,6 +15,7 @@ type PhJob {
   phase: String
   reason: String
   message: String
+  schedule: String
   createTime: String
   startTime: String
   finishTime: String

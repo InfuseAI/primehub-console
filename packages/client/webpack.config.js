@@ -13,7 +13,8 @@ module.exports = {
   entry: {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
-    job: devMode ? './src/job.tsx' : ['./src/public-import.js', './src/job.tsx']
+    job: devMode ? './src/job.tsx' : ['./src/public-import.js', './src/job.tsx'],
+    schedule: devMode ? './src/schedule.tsx' : ['./src/public-import.js', './src/schedule.tsx']
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -29,6 +30,7 @@ module.exports = {
     historyApiFallback: {
       rewrites: [
         { from: /^\/job/, to: '/job.html' },
+        { from: /^\/schedule/, to: '/schedule.html' },
         { from: /^\/landing$/, to: '/landing.html' },
         { from: /./, to: '/index.html' }
       ]
@@ -98,6 +100,11 @@ module.exports = {
       chunks: ['job'],
       template: 'docs/index.html',
       filename: 'job.html'
+    }),
+    new HtmlWebPackPlugin({
+      chunks: ['schedule'],
+      template: 'docs/index.html',
+      filename: 'schedule.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new MiniCssExtractPlugin({

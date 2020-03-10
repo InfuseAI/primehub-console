@@ -28,11 +28,23 @@ const renderJobName = (text, record) => (
     placement="top"
     title={`Job ID: ${record.id}`}
   >
-    <Link to={`${appPrefix}job/${record.id}`}>
+    <Link to={{
+      state: {
+        prevPathname: location.pathname,
+        prevSearch: location.search,
+      },
+      pathname: `${appPrefix}job/${record.id}`
+    }} >
       {text}
     </Link>
   </Tooltip>
 );
+
+const renderSchedule = text => text ? (
+  <a href={`${appPrefix}schedule/${text}`}>
+    {text}
+  </a>
+) : '-'
 
 const renderTimeIfValid = time => {
   if (!time) {
@@ -274,6 +286,10 @@ class JobList extends React.Component<Props> {
       title: 'Job name',
       dataIndex: 'displayName',
       render: renderJobName
+    }, {
+      title: 'Schedule',
+      dataIndex: 'schedule',
+      render: renderSchedule,
     }, {
       title: 'User',
       dataIndex: 'userName'
