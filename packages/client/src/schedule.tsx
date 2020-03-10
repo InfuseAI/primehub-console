@@ -10,9 +10,10 @@ import Header from 'components/header';
 import styled from 'styled-components';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import ListContainer from 'containers/list';
-import JobDetailContainer from 'containers/jobDetail';
-import JobCreatePage from 'containers/jobCreatePage';
-import JobListContainer from 'containers/jobList';
+import ScheduleDetailContainer from 'containers/scheduleDetail';
+import ScheduleCreatePage from 'containers/scheduleCreatePage';
+import ScheduleListContainer from 'containers/scheduleList';
+
 const PAGE_PADDING = 64;
 const HEADER_HEIGHT = 64;
 
@@ -36,6 +37,12 @@ const graphqlClient = new GraphqlClient({
 });
 
 const fakeData = {
+  system: {
+    timezone: {
+      name: "America/Adak",
+      offset: -10
+    }
+  },
   me: {
     groups: [{
       id: 'groupId1',
@@ -100,87 +107,45 @@ const fakeData = {
       }]
     }]
   },
-  phJobs: [{
+  phSchedules: [{
     id: 'it1',
     name: 'IT1',
     displayName: 'IT1',
-    schedule: 'it1',
-    phase: 'Running',
-    createTime: '2019-10-04T14:48:00.000Z',
-    startTime: '2019-10-04T14:48:00.000Z',
-    finishTime: '2019-10-04T15:48:00.000Z',
-    message: `batch1
-    batch2
-    batch3
-    batch4
-    `,
+    nextRunTime: '2019-12-26T14:24:22Z',
+    recurrence: {
+      type: 'weekly',
+      cron: '* */2 * * *',
+    },
+    invalid: true,
+    message: 'Something happened',
+    command: 'haha',
+    userId: 'userId',
+    userName: 'phadmin',
+    groupId: 'everyone1-432',
+    groupName: 'groupName',
+    image: 'image name',
     instanceType: {
-      id: 'everyone-it',
+      id: 'everyone-it-aha',
       name: 'it',
       displayName: 'gpu0',
       gpuLimit: 0,
       cpuLimit: 0.5,
       memoryLimit: 4,
-    }
-  }, {
-    id: 'it2',
-    name: 'IT2',
-    displayName: 'IT2',
-    phase: 'Failed',
-    message: `
-    batch1
-    batch2
-    batch3
-    batch4`,
-    reason: 'PodFailed'
-  }, {
-    id: 'it3',
-    name: 'IT3',
-    displayName: 'IT3',
-    phase: 'Failed',
-    message: `
-    batch1
-    batch2
-    batch3
-    batch4
-    Traceback (most recent call last):
-    File "<stdin>", line 1, in <module>
-    File "<stdin>", line 3, in divide
-  TypeError: unsupported operand type(s) for /: 'str' and 'str'`
-  }, {
-    id: 'it4',
-    name: 'IT4',
-    displayName: 'IT4',
-    phase: 'Failed',
-    message: `Traceback (most recent call last):
-    File "<stdin>", line 1, in <module>
-    File "<stdin>", line 3, in divide
-  TypeError: unsupported operand type(s) for /: 'str' and 'str'TypeError: unsupported operand type(s) for /: 'str' and 'str'
-`
-  }, {
-    id: 'it5',
-    name: 'IT5',
-    displayName: 'IT5',
-    phase: 'Cancelled',
-    message: `Traceback (most recent call last):
-    File "<stdin>", line 1, in <module>
-    File "<stdin>", line 3, in divide
-  TypeError: unsupported operand type(s) for /: 'str' and 'str'TypeError: unsupported operand type(s) for /: 'str' and 'str'
-`
+    },
   }]
 }
 
 const connector = new LocalStorageConnector({
   defaultData: fakeData,
-  localStorageKey: 'infuse-job'
+  localStorageKey: 'infuse-schedule'
 })
 
 const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
-  {connector, schema: {me: {type: 'object'}, phJobs: {type: 'array',items: {type: 'object'}}}});
+  {connector, schema: {system: {type: 'object'}, me: {type: 'object'}, phSchedules: {type: 'array',items: {type: 'object'}}}});
 const appPrefix = (window as any).APP_PREFIX || '/';
 
-class Job extends React.Component {
+class Schedule extends React.Component {
   render() {
     return (
       <Layout>
@@ -189,16 +154,16 @@ class Job extends React.Component {
           <BrowserRouter>
             <ApolloProvider client={client}>
               <Switch>
-                <Route path={`${appPrefix}job`} exact>
-                  <ListContainer Com={JobListContainer} />
+                <Route path={`${appPrefix}schedule`} exact>
+                  <ListContainer Com={ScheduleListContainer} />
                 </Route>
-                <Route path={`${appPrefix}job/create`} exact>
-                  <JobCreatePage />
+                <Route path={`${appPrefix}schedule/create`} exact>
+                  <ScheduleCreatePage />
                 </Route>
                 <Route
-                  path={`${appPrefix}job/:jobId`}
+                  path={`${appPrefix}schedule/:scheduleId`}
                   exact
-                  component={JobDetailContainer}
+                  component={ScheduleDetailContainer}
                 />
               </Switch>
             </ApolloProvider>
@@ -257,5 +222,5 @@ tokenSyncWorker.run().catch(console.error);
 
 // render
 ReactDOM.render(
-  <Job />
+  <Schedule />
 , document.getElementById('root'));

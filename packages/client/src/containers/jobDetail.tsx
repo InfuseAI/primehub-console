@@ -5,7 +5,7 @@ import {RouteComponentProps} from 'react-router-dom';
 import {compose} from 'recompose';
 import JobDetail from 'components/job/detail';
 import {errorHandler} from 'components/job/errorHandler';
-import {PhJobFragement} from './jobList';
+import {PhJobFragment} from './jobList';
 import {RERUN_JOB, CANCEL_JOB} from 'containers/jobList';
 import {get} from 'lodash';
 
@@ -25,7 +25,7 @@ export const GET_PH_JOB = gql`
       ...PhJobInfo
     }
   }
-  ${PhJobFragement}
+  ${PhJobFragment}
 `;
 
 const appPrefix = (window as any).APP_PREFIX || '/';

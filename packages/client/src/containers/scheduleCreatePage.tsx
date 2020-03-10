@@ -9,7 +9,7 @@ import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import Title from 'components/job/title';
 import {errorHandler} from 'components/job/errorHandler';
-import JobCreateForm from 'components/job/createForm';
+import ScheduleCreateForm from 'components/job/createForm';
 import {GroupFragment} from 'containers/list';
 
 export const GET_MY_GROUPS = gql`
@@ -26,10 +26,21 @@ export const GET_MY_GROUPS = gql`
   ${GroupFragment}
 `
 
-export const CREATE_JOB = gql`
-  mutation createPhJob($data: PhJobCreateInput!) {
-    createPhJob(data: $data) {
+export const CREATE_SCHEDULE = gql`
+  mutation createPhSchedule($data: PhScheduleCreateInput!) {
+    createPhSchedule(data: $data) {
       id
+    }
+  }
+`;
+
+export const GET_TIMEZONE = gql`
+  query system {
+    system {
+      timezone {
+        name
+        offset
+      }
     }
   }
 `
@@ -40,7 +51,7 @@ const compareByAlphabetical = (prev, next) => {
   return 0;
 }
 
-const sortItems = (items) => {
+export const sortItems = (items) => {
   const copiedItems = items.slice();
   copiedItems
     .sort((prev, next) => {
@@ -53,15 +64,16 @@ const sortItems = (items) => {
 
 type Props = RouteComponentProps & {
   getGroups: any; 
-  createPhJob: any;
-  createPhJobResult: any;
+  createPhSchedule: any;
+  createPhScheduleResult: any;
+  getTimezone: Function;
 }
 type State = {
   selectedGroup: string | null;
 }
 
 const appPrefix = (window as any).APP_PREFIX || '/';
-class JobCreatePage extends React.Component<Props, State> {
+class ScheduleCreatePage extends React.Component<Props, State> {
   state = {
     selectedGroup: null,
   };
@@ -71,8 +83,8 @@ class JobCreatePage extends React.Component<Props, State> {
   }
 
   onSubmit = (payload) => {
-    const {createPhJob} = this.props;
-    createPhJob({
+    const {createPhSchedule} = this.props;
+    createPhSchedule({
       variables: {
         data: payload
       }
@@ -81,7 +93,7 @@ class JobCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {getGroups, createPhJobResult, history} = this.props;
+    const {getGroups, getTimezone, createPhScheduleResult, history} = this.props;
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups.filter(group => group.id !== everyoneGroupId);
@@ -107,15 +119,17 @@ class JobCreatePage extends React.Component<Props, State> {
         >
           Back
         </Button>
-        <Title>Create Job</Title>
-        <JobCreateForm
+        <Title>Create Schedule</Title>
+        <ScheduleCreateForm
           onSelectGroup={this.onChangeGroup}
           selectedGroup={selectedGroup}
           groups={sortItems(groups)}
           instanceTypes={sortItems(instanceTypes)}
           images={sortItems(images)}
           onSubmit={this.onSubmit}
-          loading={getGroups.loading || createPhJobResult.loading}
+          loading={getGroups.loading || createPhScheduleResult.loading}
+          timezone={get(getTimezone, 'system.timezone')}
+          type="schedule"
         />
       </React.Fragment>
     );
@@ -127,7 +141,10 @@ export default compose(
   graphql(GET_MY_GROUPS, {
     name: 'getGroups'
   }),
-  graphql(CREATE_JOB, {
+  graphql(GET_TIMEZONE, {
+    name: 'getTimezone'
+  }),
+  graphql(CREATE_SCHEDULE, {
     options: (props: Props) => ({
       onCompleted: () => {
         const groups = get(props.getGroups, 'me.groups', []);
@@ -135,12 +152,12 @@ export default compose(
           groupId_in: groups.map(group => group.id)
         });
         props.history.push({
-          pathname: `${appPrefix}job`,
+          pathname: `${appPrefix}schedule`,
           search: queryString.stringify({where, first: 10})
         });
       },
       onError: errorHandler
     }),
-    name: 'createPhJob'
+    name: 'createPhSchedule'
   })
-)(JobCreatePage)
+)(ScheduleCreatePage)

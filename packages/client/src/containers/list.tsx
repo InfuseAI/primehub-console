@@ -4,9 +4,9 @@ import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {get} from 'lodash';
 import queryString from 'querystring';
-import JobListContainer from 'containers/jobList';
 import {withRouter} from 'react-router';
 import {RouteComponentProps} from 'react-router-dom';
+import withPath, { PathComponentProps } from 'components/job/withPath';
 
 export const GroupFragment = gql`
   fragment GroupInfo on Group {
@@ -30,14 +30,17 @@ export const GET_MY_GROUPS = gql`
 
 type Props = {
   getMyGroups: any;
-} & RouteComponentProps;
+  Com: any;
+} & RouteComponentProps
+  & PathComponentProps;
 
 const appPrefix = (window as any).APP_PREFIX || '/';
 
-class JobContainer extends React.Component<Props> {
+class ListContainer extends React.Component<Props> {
   render() {
     const {
       getMyGroups,
+      Com,
     } = this.props;
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     if (getMyGroups.loading) return null;
@@ -47,7 +50,7 @@ class JobContainer extends React.Component<Props> {
       .filter(group => group.id !== everyoneGroupId);
 
     return (
-      <JobListContainer
+      <Com
         groups={groups}
       />
     );
@@ -56,6 +59,7 @@ class JobContainer extends React.Component<Props> {
 
 export default compose(
   withRouter,
+  withPath,
   graphql(GET_MY_GROUPS, {
     name: 'getMyGroups',
     options: (props: Props) => ({
@@ -65,11 +69,13 @@ export default compose(
         const where = JSON.stringify({
           groupId_in: groups.map(group => group.id)
         });
+        if (props.location.search) return;
         props.history.push({
-          pathname: `${appPrefix}job`,
+          pathname: `${appPrefix}${props.pathname}`,
           search: queryString.stringify({where, first: 10})
         });
-      }
-    })
+      },
+      fetchPolicy: 'cache-and-network'
+    }),
   })
-)(JobContainer)
+)(ListContainer)

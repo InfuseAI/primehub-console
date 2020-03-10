@@ -132,6 +132,25 @@ export interface PhJobSpec {
   userName: string;
 }
 
+export interface PhScheduleSpec {
+  updateTime: string;
+
+  recurrence: {
+    type: string;
+    cron?: string;
+  };
+
+  jobTemplate: {
+    metadata: {
+      labels: {
+        'phjob.primehub.io/scheduledBy': string;
+      }
+    }
+
+    spec: Omit<PhJobSpec, 'cancel'>;
+  };
+}
+
 export enum PhJobPhase {
   Pending = 'Pending',
   Preparing = 'Preparing',
@@ -149,6 +168,12 @@ export interface PhJobStatus {
   message?: string;
   startTime: string;
   finishTime?: string;
+}
+
+export interface PhScheduleStatus {
+  invalid: boolean;
+  message: string;
+  nextRunTime: string;
 }
 
 /**
@@ -174,6 +199,7 @@ export default class CrdClientImpl {
   public announcements: CustomResource<AnnouncementSpec>;
   public imageSpecJobs: CustomResource<ImageSpecJobSpec, ImageSpecJobStatus>;
   public phJobs: CustomResource<PhJobSpec, PhJobStatus>;
+  public phSchedules: CustomResource<PhScheduleSpec, PhScheduleStatus>;
   private namespace: string;
 
   constructor(args?: CrdArgs) {
@@ -212,6 +238,12 @@ export default class CrdClientImpl {
       client,
       watch,
       phJobCrd,
+      this.namespace
+    );
+    this.phSchedules = new CustomResource<PhScheduleSpec, PhScheduleStatus>(
+      client,
+      watch,
+      loadCrd('phSchedule'),
       this.namespace
     );
     this.announcements = new CustomResource<AnnouncementSpec>(

@@ -9,6 +9,7 @@
 # import Workspace, WorkspaceEdge, WorkspaceConnection, WorkspaceWhereInput, WorkspaceWhereUniqueInput, WorkspaceCreateInput, WorkspaceUpdateInput from "./workspace.graphql"
 # import BuildImageJob, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql" 
 # import PhJob, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput, PhJobCreateInput, PhJobCancelResponse from "./phJob.graphql"
+# import PhSchedule, PhScheduleConnection, PhScheduleWhereUniqueInput, PhScheduleWhereInput, PhScheduleCreateInput, PhScheduleUpdateInput, PhScheduleDeleteResponse, PhScheduleRunResponse from "./phSchedule.graphql"
 
 scalar JSON
 
@@ -204,6 +205,23 @@ type Query {
     first: Int
     last: Int
   ): PhJobConnection!
+
+  """PhSchedule"""
+  phSchedule(where: PhScheduleWhereUniqueInput!): PhSchedule!
+  phSchedules(
+    where: PhScheduleWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [PhSchedule]!
+  phSchedulesConnection(
+    where: PhScheduleWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): PhScheduleConnection!
 }
 
 type Mutation {
@@ -265,4 +283,10 @@ type Mutation {
   createPhJob(data: PhJobCreateInput!): PhJob!
   rerunPhJob(where: PhJobWhereUniqueInput!): PhJob!
   cancelPhJob(where: PhJobWhereUniqueInput!): PhJobCancelResponse!
+
+  """PhSchedule"""
+  createPhSchedule(data: PhScheduleCreateInput!): PhSchedule!
+  updatePhSchedule(where: PhScheduleWhereUniqueInput!, data: PhScheduleUpdateInput!): PhSchedule!
+  runPhSchedule(where: PhScheduleWhereUniqueInput!): PhScheduleRunResponse!
+  deletePhSchedule(where: PhScheduleWhereUniqueInput!): PhScheduleDeleteResponse!
 }

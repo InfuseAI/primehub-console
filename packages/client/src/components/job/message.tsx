@@ -34,7 +34,7 @@ export default class Message extends React.Component<Props, State> {
   render() {
     const {text, extra} = this.props;
     const {hidden} = this.state;
-    const texts = text.split('\n');
+    const texts = (text || '').split('\n');
     return (
       <div style={{
         marginTop: '10px',
