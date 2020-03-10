@@ -10,7 +10,7 @@ import Title from 'components/job/title';
 import {errorHandler} from 'components/job/errorHandler';
 import {PhScheduleFragment} from 'containers/scheduleList';
 import {GET_MY_GROUPS, GET_TIMEZONE, sortItems} from 'containers/scheduleCreatePage';
-import {get, unionBy} from 'lodash';
+import {get, unionBy, isEqual} from 'lodash';
 
 type Props = {
   getGroups: any; 
@@ -66,8 +66,19 @@ class ScheduleDetailContainer extends React.Component<Props> {
     });
   }
 
-  cancel = () => {
-    const {history} = this.props;
+  cancel = values => {
+    const {history, getPhSchedule} = this.props;
+    const initialValue = {
+      instanceType: get(getPhSchedule, 'phSchedule.instanceType.id'),
+      image: get(getPhSchedule, 'phSchedule.image'),
+      groupId: get(getPhSchedule, 'phSchedule.groupId'),
+      displayName: get(getPhSchedule, 'phSchedule.displayName'),
+      command: get(getPhSchedule, 'phSchedule.command'),
+      recurrence: get(getPhSchedule, 'phSchedule.recurrence'),
+    }
+    if (isEqual(values, initialValue))
+      return history.push(`${appPrefix}schedule`);
+
     Modal.confirm({
       title: 'Do you want to discard the changes?',
       content: 'Your changes will be lost. Are you sure?',
