@@ -69,11 +69,13 @@ export default compose(
         const where = JSON.stringify({
           groupId_in: groups.map(group => group.id)
         });
+        if (props.location.search) return;
         props.history.push({
           pathname: `${appPrefix}${props.pathname}`,
           search: queryString.stringify({where, first: 10})
         });
-      }
-    })
+      },
+      fetchPolicy: 'cache-and-network'
+    }),
   })
 )(ListContainer)

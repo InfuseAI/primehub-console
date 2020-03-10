@@ -28,7 +28,13 @@ const renderJobName = (text, record) => (
     placement="top"
     title={`Job ID: ${record.id}`}
   >
-    <Link to={`${appPrefix}job/${record.id}`}>
+    <Link to={{
+      state: {
+        prevPathname: location.pathname,
+        prevSearch: location.search,
+      },
+      pathname: `${appPrefix}job/${record.id}`
+    }} >
       {text}
     </Link>
   </Tooltip>

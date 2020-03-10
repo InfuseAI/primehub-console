@@ -77,14 +77,14 @@ class ScheduleDetailContainer extends React.Component<Props> {
       recurrence: get(getPhSchedule, 'phSchedule.recurrence'),
     }
     if (isEqual(values, initialValue))
-      return history.push(`${appPrefix}schedule`);
+      return this.back();
 
     Modal.confirm({
       title: 'Do you want to discard the changes?',
       content: 'Your changes will be lost. Are you sure?',
       okText: 'Discard',
       cancelText: 'Cancel',
-      onOk: () => history.push(`${appPrefix}schedule`),
+      onOk: this.back,
       cancelButtonProps: {
         style: {
           float: 'right',
@@ -92,6 +92,15 @@ class ScheduleDetailContainer extends React.Component<Props> {
         }
       }
     });
+  }
+
+  back = () => {
+    const {history} = this.props;
+    const pathname = get(history, 'location.state.prevPathname');
+    const search = get(history, 'location.state.prevSearch');
+    if (pathname)
+      return history.push(`${pathname}${search}`)
+    history.push(`${appPrefix}schedule`)
   }
 
   render() {
@@ -121,7 +130,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
       <React.Fragment>
         <Button
           icon="left"
-          onClick={() => history.push(`${appPrefix}schedule`)}
+          onClick={this.back}
           style={{marginRight: 16, verticalAlign: 'top'}}
         >
           Back
