@@ -145,6 +145,13 @@ class CreateForm extends React.Component<Props> {
     });
   }
 
+  cancel = () => {
+    const {form, onCancel} = this.props;
+    if (!onCancel) return;
+    const values = form.getFieldsValue();
+    onCancel(values);
+  }
+
   stringifyZone(zone, offset): string {
     const ensure2Digits = num => (num > 9 ? `${num}` : `0${num}`);
 
@@ -172,7 +179,6 @@ class CreateForm extends React.Component<Props> {
       initialValue,
       timezone,
       selectedGroup,
-      onCancel,
     } = this.props;
     const instanceType = instanceTypes.find(instanceType => instanceType.id === form.getFieldValue('instanceType'));
     const {
@@ -383,7 +389,7 @@ class CreateForm extends React.Component<Props> {
                     >
                       Confirm
                     </Button>
-                    <Button onClick={onCancel}>
+                    <Button onClick={this.cancel}>
                       Cancel
                     </Button>
                   </>

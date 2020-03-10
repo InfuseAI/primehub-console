@@ -57,7 +57,7 @@ type Props = {
 };
 
 export const recurrenceValidator = (rules, value, callback) => {
-  if (!value.cron || isValidCron(value.cron)) return callback();
+  if (value.type === "inactive" || isValidCron(value.cron)) return callback();
   return callback('Invalid cron format');
 }
 
@@ -72,9 +72,9 @@ export default class RecurrenceInput extends React.Component<Props | any> {
       case RecurrenceType.Monthly:
         return onChange({type, cron: '0 4 1 * *'});
       case RecurrenceType.Inactive:
-        return onChange({type, cron: '* * * * *'});
+        return onChange({type, cron: ''});
       case RecurrenceType.Custom:
-        return onChange({ cron: '* * * * *', ...value, type});
+        return onChange({ ...value, type});
       default:
         return onChange(value);
     }
@@ -87,7 +87,7 @@ export default class RecurrenceInput extends React.Component<Props | any> {
 
   render() {
     const {value = {}} = this.props;
-    const {type = RecurrenceType.Inactive, cron = '* * * * *'} = value;
+    const {type = RecurrenceType.Inactive, cron} = value;
     const disabled = type === RecurrenceType.Daily ||
       type === RecurrenceType.Weekly ||
       type === RecurrenceType.Monthly;
