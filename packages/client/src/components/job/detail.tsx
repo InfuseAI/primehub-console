@@ -129,6 +129,15 @@ export default class Detail extends React.Component<Props> {
     });
   }
 
+  back = () => {
+    const {history} = this.props;
+    const pathname = get(history, 'location.state.prevPathname');
+    const search = get(history, 'location.state.prevSearch');
+    if (pathname)
+      return history.push(`${pathname}${search}`)
+    history.push(`${appPrefix}job`);
+  }
+
   render() {
     const {job, rerunPhJobResult, cancelPhJobResult, history} = this.props;
     const startTime = job.startTime ? moment(job.startTime) : '';
@@ -140,7 +149,7 @@ export default class Detail extends React.Component<Props> {
           <div>
             <Button
               icon="left"
-              onClick={() => history.push(`${appPrefix}job`)}
+              onClick={this.back}
               style={{marginRight: 16, verticalAlign: 'top'}}
             >
               Back

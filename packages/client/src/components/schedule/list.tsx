@@ -108,8 +108,11 @@ class ScheduleList extends React.Component<Props> {
   }
 
   editJob = (id: string) => {
-    const {history} = this.props;
-    history.push(`${appPrefix}schedule/${id}`)
+    const {history, location} = this.props;
+    history.push(`${appPrefix}schedule/${id}`, {
+      prevPathname: location.pathname,
+      prevSearch: location.search,
+    });
   }
 
   scheduleJob = () => {
