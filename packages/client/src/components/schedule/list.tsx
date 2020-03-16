@@ -88,12 +88,6 @@ class ScheduleList extends React.Component<Props> {
       iconType: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
-      okButtonProps: {
-        style: {
-          float: 'left',
-          marginRight: '8px'
-        }
-      },
       onOk() {
         return deletePhSchedule({variables: {where: {id}}});
       },
