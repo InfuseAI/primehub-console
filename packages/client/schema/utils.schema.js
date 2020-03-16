@@ -124,23 +124,23 @@ exports.ImagePackages = ({attributes}) => (
         </Col>
         <Col span={8}>
           <string
-            keyName="pip"
-            title="${buildImage.pip}"
-            uiParams={attributes.pip || {}}
-            packageName="../src/cms-components/customize-string-textarea"
-            validation={{
-              validator: attributes.pip.validator
-            }}
-          />
-        </Col>
-        <Col span={8}>
-          <string
             keyName="conda"
             title="${buildImage.conda}"
             uiParams={attributes.conda || {}}
             packageName="../src/cms-components/customize-string-textarea"
             validation={{
               validator: attributes.conda.validator
+            }}
+          />
+        </Col>
+        <Col span={8}>
+          <string
+            keyName="pip"
+            title="${buildImage.pip}"
+            uiParams={attributes.pip || {}}
+            packageName="../src/cms-components/customize-string-textarea"
+            validation={{
+              validator: attributes.pip.validator
             }}
           />
         </Col>
