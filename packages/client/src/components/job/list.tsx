@@ -88,7 +88,7 @@ const renderTiming = record => {
     <>
       <Tooltip
         placement="top"
-        title={`Create time: ${moment(createTime).format('YYYY-MM-DD HH:mm:ss')}`}
+        title={`Creation time: ${moment(createTime).format('YYYY-MM-DD HH:mm:ss')}`}
       >
         {createTime ? moment(createTime).fromNow() : '-'}
         <br/>
