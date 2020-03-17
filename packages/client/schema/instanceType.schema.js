@@ -37,7 +37,8 @@ export default () => (
         title: '${memoryLimit}',
         dataIndex: 'memoryLimit',
         render: text => `${text || 0} GB`
-      }]
+      }],
+      disableCreate: true
     }}
     graphql={`
       query($instanceTypeAfter: String, $instanceTypeBefore: String, $instanceTypeLast: Int, $instanceTypeFirst: Int,$instanceTypeWhere: InstanceTypeWhereInput) {

@@ -18,25 +18,35 @@ import {createFakeData} from 'canner-helpers';
 import {dict, graphqlClient, imageStorage} from './utils';
 import BuildImageJobBody from '../src/cms-layouts/buildImageJobBody';
 import DatasetBody from '../src/cms-layouts/datasetBody';
+import CommonBody from '../src/cms-layouts/commonBody';
+import UserBody from '../src/cms-layouts/userBody';
 
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
     <System/>
-    {/* <Idp/> */}
-    {/* <UserFederation/> */}
-    <Workspaces />
-    <User/>
-    <Group/>
-    <InstanceType/>
-    <Image/>
-    <BuildImage />
+    <Body component={CommonBody}>
+      {/* <Idp/> */}
+      {/* <UserFederation/> */}
+      <Workspaces />
+    </Body>
+    <Body component={UserBody}>
+      <User/>
+    </Body>
+    <Body component={CommonBody}>
+      <Group/>
+      <InstanceType/>
+      <Image/>
+      <BuildImage />
+    </Body>
     <Body component={BuildImageJobBody}>
       <BuildImageJob />
     </Body>
     <Body component={DatasetBody}>
       <Dataset/>
     </Body>
-    <Secret />
+    <Body component={CommonBody}>
+      <Secret />
+    </Body>
     {/* <Announcement /> */}
   </root>
 )

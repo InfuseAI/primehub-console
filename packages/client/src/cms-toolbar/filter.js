@@ -8,11 +8,9 @@ import {FormattedMessage} from 'react-intl';
 import defaultMessage from './locale';
 
 const FilterRow = styled(Row)`
-  margin-bottom: 30px;
   width: 100%;
   border: 1px #f8f8f8 solid;
   padding: 15px;
-  margin-top: 20px;
   box-shadow: 1px 1px 4px #eee;
 `;
 
@@ -72,6 +70,7 @@ class FilterGroup extends React.Component {
           return <TextFilter defaultValue={(where[val.key] || {}).contains || ''} onChange={cond => this.onChange(cond, val.key)} name={val.key} label={val.label} placeholder={val.placeholder} search={this.submit}/>;
       }
     });
+    if (!filters.length) return null;
     return (
       <FilterRow type="flex" justify="space-between" align="bottom">
         <Col span={20}>
@@ -80,7 +79,7 @@ class FilterGroup extends React.Component {
           </FilterPlugins>
         </Col>
         <ButtonCol span={4}>
-          <Button data-testid="search-button" type="primary" icon="search" size="large" onClick={this.submit}>
+          <Button data-testid="search-button" icon="search" onClick={this.submit}>
             <FormattedMessage
               id="query.filter.search"
               defaultMessage={defaultMessage.en['query.filter.search']}
