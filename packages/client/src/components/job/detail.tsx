@@ -95,12 +95,6 @@ export default class Detail extends React.Component<Props> {
         okText: 'Yes',
         okType: 'danger',
         cancelText: 'No',
-        okButtonProps: {
-          style: {
-            float: 'left',
-            marginRight: '8px'
-          }
-        },
         onOk() {
           return cancelPhJob({variables: {where: {id}}});
         },
@@ -114,12 +108,6 @@ export default class Detail extends React.Component<Props> {
       iconType: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
-      okButtonProps: {
-        style: {
-          float: 'left',
-          marginRight: '8px'
-        }
-      },
       onOk() {
         return rerunPhJob({variables: {where: {id}}});
       },

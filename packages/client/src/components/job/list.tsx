@@ -157,12 +157,6 @@ class JobList extends React.Component<Props> {
       iconType: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
-      okButtonProps: {
-        style: {
-          float: 'left',
-          marginRight: '8px'
-        }
-      },
       onOk() {
         return cancelPhJob({variables: {where: {id}}});
       },
@@ -182,12 +176,6 @@ class JobList extends React.Component<Props> {
       iconType: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
-      okButtonProps: {
-        style: {
-          float: 'left',
-          marginRight: '8px'
-        }
-      },
       onOk() {
         return rerunPhJob({variables: {where: {id}}});
       },
