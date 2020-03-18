@@ -16,7 +16,8 @@ export default () => (
       }, {
         title: '${workspace.displayName.title}',
         dataIndex: 'displayName'
-      }]
+      }],
+      disableCreate: true
     }}
     graphql={`
       query($workspaceWhere: WorkspaceWhereInput) {

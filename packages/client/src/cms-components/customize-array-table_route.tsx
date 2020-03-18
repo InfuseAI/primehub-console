@@ -12,7 +12,9 @@ const confirm = Modal.confirm;
 const GLOBAL_DISABLE = (window as any).disableMode || false;
 const DISABLE_GROUP = (window as any).disableGroup || false;
 @injectIntl
-export default class ArrayBreadcrumb extends Component<Props> {
+export default class ArrayBreadcrumb extends Component<Props & {
+  registerSendEmailCallback: (callback: Function) => void;
+}> {
   static defaultProps = {
     value: [],
     showPagination: true,
@@ -26,6 +28,12 @@ export default class ArrayBreadcrumb extends Component<Props> {
   state = {
     emailFormVisible: false,
     selectedRowKeys: []
+  }
+
+  componentDidMount() {
+    const {registerSendEmailCallback, keyName} = this.props;
+    if (keyName === 'user' && registerSendEmailCallback)
+      registerSendEmailCallback(this.openModal);
   }
 
   onSelectChange = (record, selected) => {
@@ -124,8 +132,9 @@ export default class ArrayBreadcrumb extends Component<Props> {
       deploy,
       refId,
       onChange,
-      routes
+      routes,
     } = this.props;
+
     let dataSource = value;
     if (keyName === 'workspace') {
       dataSource = value.filter(ws => !ws.isDefault);
@@ -163,6 +172,7 @@ export default class ArrayBreadcrumb extends Component<Props> {
       announcementCustomActions,
       datasetsInGroupsActions,
       buildImageCustomActions,
+      disableCreate,
     } = uiParams;
 
     const newColumnsRender = renderValue(columns, items.items, {
@@ -288,25 +298,7 @@ export default class ArrayBreadcrumb extends Component<Props> {
             textAlign: 'right'
           }}
         >
-          {
-            keyName === "user" && (
-              <Button
-                onClick={this.openModal}
-                data-testid="mail-button"
-              >
-                <Icon
-                  type="mail"
-                  theme="outlined"
-                  style={{
-                    position: 'relative',
-                    top: 1
-                  }}
-                />
-                {sendEmailText}
-              </Button>
-            )
-          }
-          {(!createKeys || createKeys.length > 0) && (
+          {((!createKeys || createKeys.length > 0) && !disableCreate) && (
             <Button
               onClick={this.add}
               data-testid="add-button"

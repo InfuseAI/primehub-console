@@ -91,6 +91,7 @@ export default () => (
         title: '${isAdmin}',
         dataIndex: 'isAdmin'
       }],
+      disableCreate: true
     }}
     graphql={`
     query ($userAfter: String, $userBefore: String, $userLast: Int,$userFirst: Int, $userWhere: UserWhereInput, $userOrderBy: UsersOrderBy) {

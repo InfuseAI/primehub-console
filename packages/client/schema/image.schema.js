@@ -36,7 +36,8 @@ export default () => (
       },{
         title: '${description}',
         dataIndex: 'description'
-      }]
+      }],
+      disableCreate: true
     }}
     graphql={
       `query($imageAfter: String, $imageBefore: String, $imageLast: Int, $imageFirst: Int,$imageWhere: ImageWhereInput) {

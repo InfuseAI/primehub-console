@@ -5,6 +5,10 @@ export default () => (
   <array ui="tableRoute"
     keyName="secret"
     title="Secrets"
+    packageName="../src/cms-components/customize-array-table_route"
+    hideBackButton={true}
+    controlDeployAndResetButtons={true}
+    cacheActions={true}
     uiParams={{
       columns: [{
         title: 'Name',
@@ -12,7 +16,8 @@ export default () => (
       }, {
         title: 'Display Name',
         dataIndex: 'displayName'
-      }]
+      }],
+      disableCreate: true
     }}
     graphql={`
       query($secretWhere: SecretWhereInput) {
