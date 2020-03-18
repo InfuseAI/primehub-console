@@ -140,6 +140,7 @@ export default class Detail extends React.Component<Props> {
 
   render() {
     const {job, rerunPhJobResult, cancelPhJobResult, history} = this.props;
+    const createTime = job.createTime ? moment(job.createTime) : '';
     const startTime = job.startTime ? moment(job.startTime) : '';
     const finishTime = job.finishTime ? moment(job.finishTime) : '';
     const action = getActionByPhase(job.phase);
@@ -193,6 +194,9 @@ export default class Detail extends React.Component<Props> {
                 </Form.Item>
                 <Form.Item  style={formItemStyle} label="User:" {...formItemLayout}>
                   {job.userName || '-'}
+                </Form.Item>
+                <Form.Item  style={formItemStyle} label="Creation Time:" {...formItemLayout}>
+                  {createTime ? createTime.format('YYYY-MM-DD HH:mm:ss') : '-'}
                 </Form.Item>
                 <Form.Item  style={formItemStyle} label="Start Time:" {...formItemLayout}>
                   {startTime ? startTime.format('YYYY-MM-DD HH:mm:ss') : '-'}

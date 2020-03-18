@@ -87,8 +87,9 @@ const renderTiming = record => {
   return (
     <>
       <Tooltip
+        overlayStyle={{maxWidth: 300}}
         placement="top"
-        title={`Create time: ${moment(createTime).format('YYYY-MM-DD HH:mm:ss')}`}
+        title={`Creation time: ${moment(createTime).format('YYYY-MM-DD HH:mm:ss')}`}
       >
         {createTime ? moment(createTime).fromNow() : '-'}
         <br/>
