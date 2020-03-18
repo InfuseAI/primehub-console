@@ -27,6 +27,7 @@ export default () => (
       }],
       removeActions: true,
       buildImageCustomActions: true,
+      disableCreate: true
     }}
     graphql={
       `query($buildImageAfter: String, $buildImageBefore: String, $buildImageLast: Int, $buildImageFirst: Int, $buildImageWhere: BuildImageWhereInput) {

@@ -54,7 +54,8 @@ export default () => (
       //   dataIndex: 'users',
       //   render: renderRelationField
       // }
-    ]
+      ],
+      disableCreate: true
     }}
     graphql={`
       query($groupAfter: String, $groupBefore: String, $groupLast: Int, $groupFirst: Int,$groupWhere: GroupWhereInput) {

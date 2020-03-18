@@ -25,7 +25,8 @@ export default () => (
       }, {
         title: '${description}',
         dataIndex: 'description'
-      }]
+      }],
+      disableCreate: true
     }}
     refetch
     hideButtons

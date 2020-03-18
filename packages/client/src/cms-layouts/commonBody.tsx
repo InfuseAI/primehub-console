@@ -1,12 +1,24 @@
 import * as React from 'react';
 import {Breadcrumb, Icon, Button} from 'antd';
 import {Item} from 'canner-helpers';
-import {get} from 'lodash';
+import {get, startCase} from 'lodash';
 import AddButton from './addButtton';
+import {Props} from '../cms-components/types';
 
-export default class Body extends React.Component {
+function getRouteName(key) {
+  switch (key) {
+    case 'buildImage':
+      return 'Image Builder';
+    case 'system':
+      return startCase(key);
+    default:
+      return `${startCase(key)}s`;
+  }
+}
+
+export default class CommonBody extends React.Component<Props> {
   back = () => {
-    const {goTo, routerParams} = this.props;
+    const {goTo, routes, routerParams} = this.props;
     const groupId = get(routerParams, 'payload.backToGroup', '');
     if (groupId) {
       goTo({
@@ -15,7 +27,7 @@ export default class Body extends React.Component {
       });
     } else {
       goTo({
-        pathname: `dataset`,
+        pathname: routes[0],
       })
     }
   }
@@ -32,13 +44,12 @@ export default class Body extends React.Component {
     const {title, description, schema, routes, routerParams} = this.props;
     const key = routes[0];
     const item = schema[key];
-    const groupId = get(routerParams, 'payload.backToGroup', '');
     const breadcrumbs = [{
       path: 'home',
       render: () => <Icon type="home" />
     }, {
-      path: 'dataset',
-      render: () => 'Datasets'
+      path: routes[0],
+      render: () => getRouteName(routes[0])
     }];
     const itemRender = (route) => {
       return route.render();
@@ -79,16 +90,13 @@ export default class Body extends React.Component {
           }}
         >
           <Icon type="arrow-left" />
-          { groupId ? 
-            ` Back to group`:
-            ' Back'
-          }
+          Back
         </Button>
         <AddButton
-          display={routes.length === 1 && routerParams.operator !== 'create' ? 'flex' : 'none'}
           add={this.add}
+          display={routes.length === 1 && routerParams.operator !== 'create' ? 'flex' : 'none'}
         />
-        <Item />
+        <Item hideBackButton/>
       </div>
     </div>;
   }
