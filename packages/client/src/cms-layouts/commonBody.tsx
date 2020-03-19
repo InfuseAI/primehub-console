@@ -1,6 +1,8 @@
 import * as React from 'react';
-import {Breadcrumb, Icon, Button} from 'antd';
+import {Breadcrumb, Icon, Button, Spin} from 'antd';
 import {Item} from 'canner-helpers';
+import {injectIntl} from 'react-intl';
+import styled from 'styled-components';
 import {get, startCase} from 'lodash';
 import AddButton from './addButtton';
 import {Props} from '../cms-components/types';
@@ -16,7 +18,19 @@ function getRouteName(key) {
   }
 }
 
+const ButtonWrapper = styled.div<{visible: boolean}>`
+  text-align: right;
+  display: ${props => props.visible ? undefined: 'none'};
+`;
+
+
+@injectIntl
 export default class CommonBody extends React.Component<Props> {
+  state = {
+    loading: false,
+    loadingTip: ''
+  };
+
   back = () => {
     const {goTo, routes, routerParams} = this.props;
     const groupId = get(routerParams, 'payload.backToGroup', '');
@@ -40,8 +54,43 @@ export default class CommonBody extends React.Component<Props> {
     });
   }
 
+  deploy = () => {
+    const {routes, deploy, intl} = this.props;
+    this.setState({
+      loading: true,
+      loadingTip: intl.formatMessage({id: 'hocs.route.deployingTip'}),
+    });
+    deploy(routes[0])
+      .then(this.success)
+      .catch(this.fail);
+  }
+
+  reset = () => {
+    const {routes, reset, intl} = this.props;
+    this.setState({
+      loading: true,
+      loadingTip: intl.formatMessage({id: 'hocs.route.resetingTip'}),
+    });
+    reset(routes[0])
+      .then(this.success)
+      .catch(this.fail);
+  }
+
+  success = () => {
+    this.setState({
+      loading: false
+    }, () => setTimeout(this.back, 400));
+  }
+
+  fail = () => {
+    this.setState({
+      loading: false
+    });
+  }
+
   render() {
-    const {title, description, schema, routes, routerParams} = this.props;
+    const {title, description, schema, routes, routerParams, intl} = this.props;
+    const {loading, loadingTip} = this.state;
     const key = routes[0];
     const item = schema[key];
     const breadcrumbs = [{
@@ -96,7 +145,17 @@ export default class CommonBody extends React.Component<Props> {
           add={this.add}
           display={routes.length === 1 && routerParams.operator !== 'create' ? 'flex' : 'none'}
         />
-        <Item hideBackButton/>
+        <Spin tip={loadingTip} spinning={loading}>
+          <Item hideBackButton hideButtons/>
+          <ButtonWrapper visible={routes.length > 1 || routerParams.operator === 'create'}>
+            <Button href="#" style={{marginRight: 16}} type="primary" onClick={this.deploy} data-testid="confirm-button">
+              {intl.formatMessage({id: 'hocs.route.confirmText'})}
+            </Button>
+            <Button onClick={this.reset} data-testid="reset-button">
+              {intl.formatMessage({id: 'hocs.route.resetText'})}
+            </Button>
+          </ButtonWrapper>
+        </Spin>
       </div>
     </div>;
   }
