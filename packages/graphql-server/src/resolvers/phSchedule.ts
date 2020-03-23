@@ -338,8 +338,6 @@ export const run = async (root, args, context: Context) => {
     groupId: jobTemplate.spec.groupId,
     image: jobTemplate.spec.image,
     instanceType: jobTemplate.spec.instanceType,
-  }, {
-    [SCHEDULE_LABEL]: id
   });
 
   return {
