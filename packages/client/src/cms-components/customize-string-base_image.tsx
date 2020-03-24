@@ -1,14 +1,14 @@
 // @flow
 
 import React, { PureComponent } from "react";
-import { Select } from "antd";
+import { AutoComplete } from "antd";
 import defaultMessage from "@canner/antd-locales";
 import {injectIntl} from 'react-intl';
 import RefId from 'canner-ref-id';
 import gql from 'graphql-tag';
 import {flatMap} from 'lodash';
 
-const Option = Select.Option;
+const Option = AutoComplete.Option;
 
 // types
 type UIParams = {
@@ -58,7 +58,6 @@ export default class SelectString extends PureComponent<Props> {
     const {client} = this.props;
     const regex = new RegExp(`${appPrefix}cms/([^/]+)/buildImage`);
     const result = location.pathname.match(regex)
-    console.log(location.pathname, result);
     client.query({
       query: IMAGES,
       variables: {
@@ -79,7 +78,6 @@ export default class SelectString extends PureComponent<Props> {
   }
 
   onChange = (val: string) => {
-    this.setState({searchText: ''});
     this.props.onChange(this.props.refId, "update", val);
   };
 
@@ -88,9 +86,34 @@ export default class SelectString extends PureComponent<Props> {
     let { uiParams } = this.props;
     const {images, searchText} = this.state;
     const {style} = uiParams;
+    const dataSource = flatMap(images, image => {
+      const {urlForGpu, url} = image;
+      if (urlForGpu && url !== urlForGpu)
+        return [
+          image,
+          {...image, url: image.urlForGpu}
+        ];
+      return image
+    })
+    .filter(image => image.url.indexOf(searchText) > -1)
+    .map((opt, i) => {
+      const { url } = opt;
+      const index = url.indexOf(searchText);
+      const name = <span>
+        {url.substr(0, index)}
+        <b>{url.substr(index, searchText.length)}</b>
+        {url.substr(index + searchText.length)}
+      </span>
+      return (
+        <Option value={url} key={url}>
+          {name}
+        </Option>
+      );
+    })
     return (
-      <Select
+      <AutoComplete
         style={style || {}}
+        dataSource={dataSource}
         disabled={disabled}
         showSearch
         value={value}
@@ -104,32 +127,7 @@ export default class SelectString extends PureComponent<Props> {
         showArrow={false}
         onChange={this.onChange}
         filterOption={false}
-      >
-        {flatMap(images, image => {
-          const {urlForGpu, url} = image;
-          if (urlForGpu && url !== urlForGpu)
-            return [
-              image,
-              {...image, url: image.urlForGpu}
-            ];
-          return image
-        })
-        .filter(image => image.url.indexOf(searchText) > -1)
-        .map((opt, i) => {
-          const { url } = opt;
-          const index = url.indexOf(searchText);
-          const name = <span>
-            {url.substr(0, index)}
-            <b>{url.substr(index, searchText.length)}</b>
-            {url.substr(index + searchText.length)}
-          </span>
-          return (
-            <Option value={url} key={url}>
-              {name}
-            </Option>
-          );
-        })}
-      </Select>
+      />
     );
   }
 }
