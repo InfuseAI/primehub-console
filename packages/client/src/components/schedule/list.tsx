@@ -11,6 +11,7 @@ import Pagination from 'components/job/pagination';
 import Title from 'components/job/title';
 import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
 import {renderRecurrence} from 'components/schedule/recurrence';
+import {appPrefix} from 'utils/env';
 
 const {confirm} = Modal;
 
@@ -20,8 +21,6 @@ const Table = styled(AntTable as any)`
     margin-right: 16px;
   }
 `;
-
-const appPrefix = (window as any).APP_PREFIX || '/';
 
 const renderNextRunTime = (time, record) => {
   if (record.invalid) {

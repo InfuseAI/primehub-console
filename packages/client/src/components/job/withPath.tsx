@@ -1,6 +1,5 @@
 import React from 'react';
-
-const appPrefix = (window as any).APP_PREFIX || '/';
+import {appPrefix} from 'utils/env';
 
 export default function withPath(Com) {
   return class ComWithPath extends React.Component<any> {

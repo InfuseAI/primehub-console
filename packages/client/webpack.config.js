@@ -29,8 +29,11 @@ module.exports = {
     contentBase: path.join(__dirname, 'dist'),
     historyApiFallback: {
       rewrites: [
+        { from: /^\/app-prefix\/job/, to: '/job.html' },
         { from: /^\/job/, to: '/job.html' },
+        { from: /^\/app-prefix\/schedule/, to: '/schedule.html' },
         { from: /^\/schedule/, to: '/schedule.html' },
+        { from: /^\/app-prefix\/landing/, to: '/landing.html' },
         { from: /^\/landing$/, to: '/landing.html' },
         { from: /./, to: '/index.html' }
       ]

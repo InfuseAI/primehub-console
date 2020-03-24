@@ -11,6 +11,7 @@ import ScheduleList from 'components/schedule/list';
 import {errorHandler} from 'components/job/errorHandler';
 import {Group} from 'components/job/groupFilter';
 import withPath, { PathComponentProps } from 'components/job/withPath';
+import {appPrefix} from 'utils/env';
 
 export const PhScheduleFragment = gql`
   fragment PhScheduleInfo on PhSchedule {
@@ -88,8 +89,6 @@ type Props = {
   runPhScheduleResult: any;
   deletePhScheduleResult: any;
 } & RouteComponentProps & PathComponentProps;
-
-const appPrefix = (window as any).APP_PREFIX || '/';
 
 class ScheduleListContainer extends React.Component<Props> {
   changeFilter = (payload) => {

@@ -8,6 +8,7 @@ import {errorHandler} from 'components/job/errorHandler';
 import {PhJobFragment} from './jobList';
 import {RERUN_JOB, CANCEL_JOB} from 'containers/jobList';
 import {get} from 'lodash';
+import {appPrefix} from 'utils/env';
 
 type Props = {
   getPhJob: any;
@@ -27,8 +28,6 @@ export const GET_PH_JOB = gql`
   }
   ${PhJobFragment}
 `;
-
-const appPrefix = (window as any).APP_PREFIX || '/';
 
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 

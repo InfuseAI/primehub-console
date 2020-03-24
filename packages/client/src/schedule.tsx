@@ -14,6 +14,7 @@ import ListContainer from 'containers/list';
 import ScheduleDetailContainer from 'containers/scheduleDetail';
 import ScheduleCreatePage from 'containers/scheduleCreatePage';
 import ScheduleListContainer from 'containers/scheduleList';
+import {appPrefix} from 'utils/env';
 
 const PAGE_PADDING = 48;
 const HEADER_HEIGHT = 64;
@@ -144,7 +145,6 @@ const connector = new LocalStorageConnector({
 const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
   {connector, schema: {system: {type: 'object'}, me: {type: 'object'}, phSchedules: {type: 'array',items: {type: 'object'}}}});
-const appPrefix = (window as any).APP_PREFIX || '/';
 
 class Schedule extends React.Component {
   render() {

@@ -1,7 +1,6 @@
 import React from 'react';
 import {Layout, Menu} from 'antd';
-
-const appPrefix = (window as any).APP_PREFIX || '/';
+import {appPrefix} from 'utils/env';
 
 type Props = {
   defaultKey: string

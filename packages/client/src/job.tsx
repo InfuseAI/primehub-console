@@ -14,6 +14,7 @@ import ListContainer from 'containers/list';
 import JobDetailContainer from 'containers/jobDetail';
 import JobCreatePage from 'containers/jobCreatePage';
 import JobListContainer from 'containers/jobList';
+import {appPrefix} from 'utils/env';
 const PAGE_PADDING = 48;
 const HEADER_HEIGHT = 64;
 
@@ -179,7 +180,6 @@ const connector = new LocalStorageConnector({
 const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
   {connector, schema: {me: {type: 'object'}, phJobs: {type: 'array',items: {type: 'object'}}}});
-const appPrefix = (window as any).APP_PREFIX || '/';
 
 class Job extends React.Component {
   render() {

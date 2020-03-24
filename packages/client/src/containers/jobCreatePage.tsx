@@ -12,6 +12,7 @@ import {errorHandler} from 'components/job/errorHandler';
 import JobCreateForm from 'components/job/createForm';
 import JobBreadcrumb from 'components/job/breadcrumb';
 import {GroupFragment} from 'containers/list';
+import {appPrefix} from 'utils/env';
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -61,7 +62,6 @@ type State = {
   selectedGroup: string | null;
 }
 
-const appPrefix = (window as any).APP_PREFIX || '/';
 class JobCreatePage extends React.Component<Props, State> {
   state = {
     selectedGroup: null,

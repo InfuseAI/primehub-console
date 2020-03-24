@@ -12,6 +12,7 @@ import {errorHandler} from 'components/job/errorHandler';
 import {PhScheduleFragment} from 'containers/scheduleList';
 import {GET_MY_GROUPS, GET_TIMEZONE, sortItems} from 'containers/scheduleCreatePage';
 import {get, unionBy, isEqual} from 'lodash';
+import {appPrefix} from 'utils/env';
 
 type Props = {
   getGroups: any; 
@@ -39,8 +40,6 @@ export const UPDATE_SCHEDULE = gql`
     }
   }
 `
-
-const appPrefix = (window as any).APP_PREFIX || '/';
 
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 

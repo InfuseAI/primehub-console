@@ -7,6 +7,7 @@ import queryString from 'querystring';
 import {withRouter} from 'react-router';
 import {RouteComponentProps} from 'react-router-dom';
 import withPath, { PathComponentProps } from 'components/job/withPath';
+import {appPrefix} from 'utils/env';
 
 export const GroupFragment = gql`
   fragment GroupInfo on Group {
@@ -33,8 +34,6 @@ type Props = {
   Com: any;
 } & RouteComponentProps
   & PathComponentProps;
-
-const appPrefix = (window as any).APP_PREFIX || '/';
 
 class ListContainer extends React.Component<Props> {
   render() {
