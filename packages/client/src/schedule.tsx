@@ -7,6 +7,7 @@ import {LocalStorageConnector} from 'canner-graphql-interface';
 import {Layout, notification, Button} from 'antd';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import Header from 'components/header';
+import Sidebar from 'components/job/sidebar';
 import styled from 'styled-components';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import ListContainer from 'containers/list';
@@ -14,7 +15,7 @@ import ScheduleDetailContainer from 'containers/scheduleDetail';
 import ScheduleCreatePage from 'containers/scheduleCreatePage';
 import ScheduleListContainer from 'containers/scheduleList';
 
-const PAGE_PADDING = 64;
+const PAGE_PADDING = 48;
 const HEADER_HEIGHT = 64;
 
 const Content = styled(Layout.Content)`
@@ -150,25 +151,28 @@ class Schedule extends React.Component {
     return (
       <Layout>
         <Header />
-        <Content>
-          <BrowserRouter>
-            <ApolloProvider client={client}>
-              <Switch>
-                <Route path={`${appPrefix}schedule`} exact>
-                  <ListContainer Com={ScheduleListContainer} />
-                </Route>
-                <Route path={`${appPrefix}schedule/create`} exact>
-                  <ScheduleCreatePage />
-                </Route>
-                <Route
-                  path={`${appPrefix}schedule/:scheduleId`}
-                  exact
-                  component={ScheduleDetailContainer}
-                />
-              </Switch>
-            </ApolloProvider>
-          </BrowserRouter>
-        </Content>
+        <Layout>
+          <Sidebar defaultKey="schedule" />
+          <Content>
+            <BrowserRouter>
+              <ApolloProvider client={client}>
+                <Switch>
+                  <Route path={`${appPrefix}schedule`} exact>
+                    <ListContainer Com={ScheduleListContainer} />
+                  </Route>
+                  <Route path={`${appPrefix}schedule/create`} exact>
+                    <ScheduleCreatePage />
+                  </Route>
+                  <Route
+                    path={`${appPrefix}schedule/:scheduleId`}
+                    exact
+                    component={ScheduleDetailContainer}
+                  />
+                </Switch>
+              </ApolloProvider>
+            </BrowserRouter>
+          </Content>
+        </Layout>
       </Layout>
     )
   }

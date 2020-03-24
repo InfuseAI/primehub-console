@@ -7,13 +7,14 @@ import {LocalStorageConnector} from 'canner-graphql-interface';
 import {Layout, notification, Button} from 'antd';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import Header from 'components/header';
+import Sidebar from 'components/job/sidebar';
 import styled from 'styled-components';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import ListContainer from 'containers/list';
 import JobDetailContainer from 'containers/jobDetail';
 import JobCreatePage from 'containers/jobCreatePage';
 import JobListContainer from 'containers/jobList';
-const PAGE_PADDING = 64;
+const PAGE_PADDING = 48;
 const HEADER_HEIGHT = 64;
 
 const Content = styled(Layout.Content)`
@@ -185,25 +186,28 @@ class Job extends React.Component {
     return (
       <Layout>
         <Header />
-        <Content>
-          <BrowserRouter>
-            <ApolloProvider client={client}>
-              <Switch>
-                <Route path={`${appPrefix}job`} exact>
-                  <ListContainer Com={JobListContainer} />
-                </Route>
-                <Route path={`${appPrefix}job/create`} exact>
-                  <JobCreatePage />
-                </Route>
-                <Route
-                  path={`${appPrefix}job/:jobId`}
-                  exact
-                  component={JobDetailContainer}
-                />
-              </Switch>
-            </ApolloProvider>
-          </BrowserRouter>
-        </Content>
+        <Layout>
+          <Sidebar defaultKey="job" />
+          <Content>
+            <BrowserRouter>
+              <ApolloProvider client={client}>
+                <Switch>
+                  <Route path={`${appPrefix}job`} exact>
+                    <ListContainer Com={JobListContainer} />
+                  </Route>
+                  <Route path={`${appPrefix}job/create`} exact>
+                    <JobCreatePage />
+                  </Route>
+                  <Route
+                    path={`${appPrefix}job/:jobId`}
+                    exact
+                    component={JobDetailContainer}
+                  />
+                </Switch>
+              </ApolloProvider>
+            </BrowserRouter>
+          </Content>
+        </Layout>
       </Layout>
     )
   }
