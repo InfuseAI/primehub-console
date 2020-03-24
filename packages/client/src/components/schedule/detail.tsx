@@ -3,6 +3,7 @@ import {Button, Form, Card, Input} from 'antd';
 import {get} from 'lodash';
 import styled from 'styled-components';
 import Title from 'components/job/title';
+import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
 import {History} from 'history';
 
 
@@ -46,22 +47,14 @@ export default class Detail extends React.Component<Props> {
   }
 
   render() {
-    const {schedule = {}, runPhScheduleResult, history} = this.props;
+    const {schedule = {}, runPhScheduleResult} = this.props;
     return (
       <>
         <TitleContainer>
-          <div>
-            <Button
-              icon="left"
-              onClick={() => history.goBack()}
-              style={{marginRight: 16, verticalAlign: 'top'}}
-            >
-              Back
-            </Button>
-            <Title>
-              Schedule: {schedule.displayName || schedule.name}
-            </Title>
-          </div>
+          <Title>
+            <ScheduleBreadCrumb scheduleName={schedule.displayName} />
+            Schedule: {schedule.displayName || schedule.name}
+          </Title>
           <Button
             onClick={() => this.runSchedule()}
             loading={runPhScheduleResult.loading}

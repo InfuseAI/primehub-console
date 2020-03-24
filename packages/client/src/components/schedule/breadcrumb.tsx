@@ -4,28 +4,28 @@ import {withRouter, Link} from 'react-router-dom';
 import {RouteComponentProps} from 'react-router';
 
 type Props = RouteComponentProps & {
-  jobName?: string
+  scheduleName?: string
 };
 
 const appPrefix = (window as any).APP_PREFIX || '/';
 
-function getBreadcrumbName(url: string, jobName: string) {
+function getBreadcrumbName(url: string, scheduleName: string) {
   switch (url) {
-    case `${appPrefix}job`:
-      return 'Job Submission'
-    case `${appPrefix}job/create`:
-      return 'Create Job';
+    case `${appPrefix}schedule`:
+      return 'Job Scheduler'
+    case `${appPrefix}schedule/create`:
+      return 'Create Schedule';
   }
 
-  return `Job: ${jobName}`
+  return `Schedule: ${scheduleName}`
 
 }
 
 
-class JobBreadcrumb extends React.Component<Props> {
+class JobScheduleBreadcrumb extends React.Component<Props> {
 
   render() {
-    const { location, jobName } = this.props;
+    const { location, scheduleName } = this.props;
     const pathSnippets = location.pathname.split('/').filter(i => i && i !== appPrefix.replace('/',''));
     const extraBreadcrumbItems = pathSnippets.map((_, index) => {
       const url = `${appPrefix}${pathSnippets.slice(0, index + 1).join('/')}`;
@@ -33,8 +33,8 @@ class JobBreadcrumb extends React.Component<Props> {
         <Breadcrumb.Item key={url}>
           {
             pathSnippets.length === index + 1 ?
-            getBreadcrumbName(url, jobName) :
-            <Link to={url}>{getBreadcrumbName(url, jobName)}</Link>
+            getBreadcrumbName(url, scheduleName) :
+            <Link to={url}>{getBreadcrumbName(url, scheduleName)}</Link>
           }
         </Breadcrumb.Item>
       );
@@ -54,4 +54,4 @@ class JobBreadcrumb extends React.Component<Props> {
   }
 }
 
-export default withRouter(JobBreadcrumb);
+export default withRouter(JobScheduleBreadcrumb);
