@@ -210,7 +210,7 @@ class ScheduleList extends React.Component<Props> {
     }]
     return (
       <Row type="flex" gutter={16}>
-        <Col span={6}>
+        <Col span={4}>
           <Filter
             groups={groups}
             selectedGroups={get(schedulesVariables, 'where.groupId_in', [])}
