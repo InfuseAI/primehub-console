@@ -66,7 +66,6 @@ export default class SelectString extends PureComponent<Props> {
         }
       }
     }).then(result => {
-      console.log(result);
       this.setState({
         images: result.data.images
       });
@@ -120,13 +119,14 @@ export default class SelectString extends PureComponent<Props> {
         onSearch={this.handleSearch}
         placeholder={
           intl.formatMessage({
-            id: "string.select.placeholder",
-            defaultMessage: defaultMessage.en["string.select.placeholder"]
+            id: "buildImage.baseImage.placeholder",
+            defaultMessage: defaultMessage.en["buildImage.baseImage.placeholder"]
           })
         }
         showArrow={false}
         onChange={this.onChange}
         filterOption={false}
+        optionLabelProp="value"
       />
     );
   }
