@@ -10,6 +10,7 @@ import {Group} from 'components/job/groupFilter';
 import {computeDuration} from 'components/job/detail';
 import Pagination from 'components/job/pagination';
 import Title from 'components/job/title';
+import JobBreadcrumb from 'components/job/breadcrumb';
 import { Phase, getActionByPhase } from './phase';
 
 const {confirm} = Modal;
@@ -306,9 +307,12 @@ class JobList extends React.Component<Props> {
           />
         </Col>
         <Col span={18}>
-          <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <Title>Jobs</Title>
-            <div>
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end'}}>
+            <Title>
+              <JobBreadcrumb />
+              Jobs
+            </Title>
+            <div style={{marginBottom: 16}}>
               <Button onClick={this.createPhJob}>
                 Create Job
               </Button>

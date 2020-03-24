@@ -10,6 +10,7 @@ import {withRouter} from 'react-router-dom';
 import Title from 'components/job/title';
 import {errorHandler} from 'components/job/errorHandler';
 import JobCreateForm from 'components/job/createForm';
+import JobBreadcrumb from 'components/job/breadcrumb';
 import {GroupFragment} from 'containers/list';
 
 export const GET_MY_GROUPS = gql`
@@ -100,14 +101,10 @@ class JobCreatePage extends React.Component<Props, State> {
     );
     return (
       <React.Fragment>
-        <Button
-          icon="left"
-          onClick={() => history.goBack()}
-          style={{marginRight: 16, verticalAlign: 'top'}}
-        >
-          Back
-        </Button>
-        <Title>Create Job</Title>
+        <Title>
+          <JobBreadcrumb />
+          Create Job
+        </Title>
         <JobCreateForm
           onSelectGroup={this.onChangeGroup}
           selectedGroup={selectedGroup}

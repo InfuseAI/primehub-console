@@ -8,6 +8,7 @@ import Log from './log';
 import {getActionByPhase, Phase} from 'components/job/phase';
 import Title from 'components/job/title';
 import Message from 'components/job/message';
+import JobBreadcrumb from 'components/job/breadcrumb';
 import {History} from 'history';
 
 const appPrefix = (window as any).APP_PREFIX || '/';
@@ -117,14 +118,6 @@ export default class Detail extends React.Component<Props> {
     });
   }
 
-  back = () => {
-    const {history} = this.props;
-    const pathname = get(history, 'location.state.prevPathname');
-    const search = get(history, 'location.state.prevSearch');
-    if (pathname)
-      return history.push(`${pathname}${search}`)
-    history.push(`${appPrefix}job`);
-  }
 
   render() {
     const {job, rerunPhJobResult, cancelPhJobResult, history} = this.props;
@@ -135,18 +128,10 @@ export default class Detail extends React.Component<Props> {
     return (
       <>
         <TitleContainer>
-          <div>
-            <Button
-              icon="left"
-              onClick={this.back}
-              style={{marginRight: 16, verticalAlign: 'top'}}
-            >
-              Back
-            </Button>
-            <Title>
-              Job: {job.displayName || job.name}
-            </Title>
-          </div>
+          <Title>
+            <JobBreadcrumb jobName={job.displayName || job.name} />
+            Job: {job.displayName || job.name}
+          </Title>
           <Button
             onClick={() => this.handleClick(action)}
             loading={rerunPhJobResult.loading || cancelPhJobResult.loading}
