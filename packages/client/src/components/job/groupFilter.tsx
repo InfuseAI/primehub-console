@@ -68,7 +68,7 @@ export default class GroupFilter extends React.Component<Props, State> {
         >
           <Row type="flex">
             {groups.map(group => (
-              <Col key={group.id} span={12}>
+              <Col key={group.id} span={24}>
                 <Checkbox value={group.id}>{group.displayName || group.name}</Checkbox>
               </Col>
             ))}

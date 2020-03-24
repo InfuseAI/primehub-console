@@ -209,7 +209,7 @@ class ScheduleList extends React.Component<Props> {
       render: renderAction
     }]
     return (
-      <Row type="flex" gutter={24}>
+      <Row type="flex" gutter={16}>
         <Col span={6}>
           <Filter
             groups={groups}
