@@ -10,8 +10,7 @@ import Title from 'components/job/title';
 import Message from 'components/job/message';
 import JobBreadcrumb from 'components/job/breadcrumb';
 import {History} from 'history';
-
-const appPrefix = (window as any).APP_PREFIX || '/';
+import {appPrefix} from 'utils/env';
 
 const TabPane = Tabs.TabPane;
 

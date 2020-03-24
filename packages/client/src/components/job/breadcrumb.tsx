@@ -2,12 +2,12 @@ import React from 'react';
 import {Breadcrumb, Icon} from 'antd';
 import {withRouter, Link} from 'react-router-dom';
 import {RouteComponentProps} from 'react-router';
+import {appPrefix} from 'utils/env';
 
 type Props = RouteComponentProps & {
   jobName?: string
 };
 
-const appPrefix = (window as any).APP_PREFIX || '/';
 
 function getBreadcrumbName(url: string, jobName: string) {
   switch (url) {
@@ -26,7 +26,7 @@ class JobBreadcrumb extends React.Component<Props> {
 
   render() {
     const { location, jobName } = this.props;
-    const pathSnippets = location.pathname.split('/').filter(i => i && i !== appPrefix.replace('/',''));
+    const pathSnippets = location.pathname.split('/').filter(i => i && i !== appPrefix.replace(/\//g, ''));
     const extraBreadcrumbItems = pathSnippets.map((_, index) => {
       const url = `${appPrefix}${pathSnippets.slice(0, index + 1).join('/')}`;
       return (
@@ -41,7 +41,7 @@ class JobBreadcrumb extends React.Component<Props> {
     });
     const breadcrumbItems = [
       <Breadcrumb.Item key="home">
-        <Link to={appPrefix}>
+        <Link to={`${appPrefix}`}>
           <Icon type="home" />
         </Link>
       </Breadcrumb.Item>,

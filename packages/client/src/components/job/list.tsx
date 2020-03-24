@@ -12,6 +12,7 @@ import Pagination from 'components/job/pagination';
 import Title from 'components/job/title';
 import JobBreadcrumb from 'components/job/breadcrumb';
 import { Phase, getActionByPhase } from './phase';
+import {appPrefix} from 'utils/env';
 
 const {confirm} = Modal;
 
@@ -21,8 +22,6 @@ const Table = styled(AntTable as any)`
     margin-right: 16px;
   }
 `;
-
-const appPrefix = (window as any).APP_PREFIX || '/';
 
 const renderJobName = (text, record) => (
   <Tooltip

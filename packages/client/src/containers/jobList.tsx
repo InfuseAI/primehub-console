@@ -8,6 +8,7 @@ import {RouteComponentProps} from 'react-router';
 import JobList from 'components/job/list';
 import {errorHandler} from 'components/job/errorHandler';
 import {Group} from 'components/job/groupFilter';
+import {appPrefix} from 'utils/env';
 
 export const PhJobFragment = gql`
   fragment PhJobInfo on PhJob {
@@ -84,8 +85,6 @@ type Props = {
   rerunPhJobResult: any;
   cancelPhJobResult: any;
 } & RouteComponentProps;
-
-const appPrefix = (window as any).APP_PREFIX || '/';
 
 class JobListContainer extends React.Component<Props> {
   changeFilter = (payload) => {

@@ -12,6 +12,7 @@ import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
 import {errorHandler} from 'components/job/errorHandler';
 import ScheduleCreateForm from 'components/job/createForm';
 import {GroupFragment} from 'containers/list';
+import {appPrefix} from 'utils/env';
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -73,7 +74,6 @@ type State = {
   selectedGroup: string | null;
 }
 
-const appPrefix = (window as any).APP_PREFIX || '/';
 class ScheduleCreatePage extends React.Component<Props, State> {
   state = {
     selectedGroup: null,
