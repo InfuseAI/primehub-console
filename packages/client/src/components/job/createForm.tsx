@@ -147,7 +147,7 @@ class CreateForm extends React.Component<Props, State> {
     e.preventDefault();
 
     const recurrence = form.getFieldValue('recurrence');
-    if (recurrence.type !== 'inactive' && !recurrence.cron) {
+    if (recurrence && recurrence.type !== 'inactive' && !recurrence.cron) {
       return this.setState({
         recurrenceError: 'Please input cron expression!'
       });
