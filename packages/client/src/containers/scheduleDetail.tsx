@@ -6,6 +6,7 @@ import {compose} from 'recompose';
 import {Button, Modal} from 'antd';
 import queryString from 'querystring';
 import ScheduleUpdateForm from 'components/job/createForm';
+import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
 import Title from 'components/job/title';
 import {errorHandler} from 'components/job/errorHandler';
 import {PhScheduleFragment} from 'containers/scheduleList';
@@ -128,14 +129,10 @@ class ScheduleDetailContainer extends React.Component<Props> {
     );
     return (
       <React.Fragment>
-        <Button
-          icon="left"
-          onClick={this.back}
-          style={{marginRight: 16, verticalAlign: 'top'}}
-        >
-          Back
-        </Button>
-        <Title>Schedule: {get(getPhSchedule, 'phSchedule.displayName')}</Title>
+        <Title>
+          <ScheduleBreadCrumb scheduleName={get(getPhSchedule, 'phSchedule.displayName')} />
+          Schedule: {get(getPhSchedule, 'phSchedule.displayName')}
+        </Title>
         <ScheduleUpdateForm
           onSelectGroup={this.onChangeGroup}
           selectedGroup={selectedGroup}

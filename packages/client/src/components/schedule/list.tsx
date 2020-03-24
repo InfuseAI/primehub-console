@@ -9,6 +9,7 @@ import Filter from 'components/job/filter';
 import {Group} from 'components/job/groupFilter';
 import Pagination from 'components/job/pagination';
 import Title from 'components/job/title';
+import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
 import {renderRecurrence} from 'components/schedule/recurrence';
 
 const {confirm} = Modal;
@@ -218,9 +219,12 @@ class ScheduleList extends React.Component<Props> {
           />
         </Col>
         <Col span={18}>
-          <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <Title>Job Schedule</Title>
-            <div>
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end'}}>
+            <Title>
+              <ScheduleBreadCrumb />
+              Job Schedule
+            </Title>
+            <div style={{marginBottom: 16}}>
               <Button onClick={this.scheduleJob}>
                 Schedule Job
               </Button>

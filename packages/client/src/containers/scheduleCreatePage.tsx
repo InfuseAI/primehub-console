@@ -8,6 +8,7 @@ import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import Title from 'components/job/title';
+import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
 import {errorHandler} from 'components/job/errorHandler';
 import ScheduleCreateForm from 'components/job/createForm';
 import {GroupFragment} from 'containers/list';
@@ -112,14 +113,10 @@ class ScheduleCreatePage extends React.Component<Props, State> {
     );
     return (
       <React.Fragment>
-        <Button
-          icon="left"
-          onClick={() => history.goBack()}
-          style={{marginRight: 16, verticalAlign: 'top'}}
-        >
-          Back
-        </Button>
-        <Title>Create Schedule</Title>
+        <Title>
+          <ScheduleBreadCrumb />
+          Create Schedule
+        </Title>
         <ScheduleCreateForm
           onSelectGroup={this.onChangeGroup}
           selectedGroup={selectedGroup}
