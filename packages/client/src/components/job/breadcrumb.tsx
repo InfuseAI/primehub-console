@@ -41,9 +41,9 @@ class JobBreadcrumb extends React.Component<Props> {
     });
     const breadcrumbItems = [
       <Breadcrumb.Item key="home">
-        <Link to={`${appPrefix}`}>
+        <a href={`${appPrefix}`}>
           <Icon type="home" />
-        </Link>
+        </a>
       </Breadcrumb.Item>,
     ].concat(extraBreadcrumbItems);
     return (
