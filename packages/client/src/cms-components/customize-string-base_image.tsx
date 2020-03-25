@@ -6,7 +6,7 @@ import defaultMessage from "@canner/antd-locales";
 import {injectIntl} from 'react-intl';
 import RefId from 'canner-ref-id';
 import gql from 'graphql-tag';
-import {flatMap} from 'lodash';
+import {flatMap, uniq} from 'lodash';
 
 const Option = AutoComplete.Option;
 
@@ -85,18 +85,17 @@ export default class SelectString extends PureComponent<Props> {
     let { uiParams } = this.props;
     const {images, searchText} = this.state;
     const {style} = uiParams;
-    const dataSource = flatMap(images, image => {
+    const dataSource = uniq(flatMap(images, image => {
       const {urlForGpu, url} = image;
       if (urlForGpu && url !== urlForGpu)
         return [
-          image,
-          {...image, url: image.urlForGpu}
+          url,
+          urlForGpu
         ];
-      return image
-    })
-    .filter(image => image.url.indexOf(searchText) > -1)
-    .map((opt, i) => {
-      const { url } = opt;
+      return url
+    }))
+    .filter(url => url.indexOf(searchText) > -1)
+    .map((url, i) => {
       const index = url.indexOf(searchText);
       const name = <span>
         {url.substr(0, index)}
