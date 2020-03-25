@@ -74,7 +74,13 @@ export default () => (
             required
           />
         </Condition>
-        <string required keyName="baseImage" title="${buildImage.baseImage}"/>
+        <string
+          required
+          keyName="baseImage"
+          title="${buildImage.baseImage}"
+          uiParams={{style: {width: 300}}}
+          packageName="../src/cms-components/customize-string-base_image"
+        />
         <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${buildImage.useImagePullSecret}" />
         <ImagePackages
           apt={{
