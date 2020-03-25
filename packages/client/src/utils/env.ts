@@ -1,6 +1,6 @@
 function getAppPrefix() {
   const appPrefix = (window as any).APP_PREFIX;
-  if (!appPrefix) return '/';
+  if (!appPrefix || appPrefix === '/') return '/';
   return `/${appPrefix.replace(/\//g, '')}/`;
 }
 
