@@ -11,6 +11,8 @@ import Message from 'components/job/message';
 import JobBreadcrumb from 'components/job/breadcrumb';
 import {History} from 'history';
 import {appPrefix} from 'utils/env';
+import PageTitle from 'components/pageTitle';
+import PageBody from 'components/pageBody';
 
 const TabPane = Tabs.TabPane;
 
@@ -126,19 +128,19 @@ export default class Detail extends React.Component<Props> {
     const action = getActionByPhase(job.phase);
     return (
       <>
-        <TitleContainer>
-          <Title>
-            <JobBreadcrumb jobName={job.displayName || job.name} />
-            Job: {job.displayName || job.name}
-          </Title>
-          <Button
-            onClick={() => this.handleClick(action)}
-            loading={rerunPhJobResult.loading || cancelPhJobResult.loading}
-          >
-            {action}
-          </Button>
-        </TitleContainer>
-        <Card>
+        <PageTitle
+          breadcrumb={<JobBreadcrumb jobName={job.displayName || job.name} />}
+          title={`Job: ${job.displayName || job.name}`}
+        />
+        <PageBody>
+          <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+            <Button
+              onClick={() => this.handleClick(action)}
+              loading={rerunPhJobResult.loading || cancelPhJobResult.loading}
+            >
+              {action}
+            </Button>
+          </div>
           <Tabs>
             <TabPane key="information" tab="Information">
               <Form>
@@ -211,7 +213,7 @@ export default class Detail extends React.Component<Props> {
               <Log endpoint={job.logEndpoint}/>
             </TabPane>
           </Tabs>
-        </Card>
+        </PageBody>
       </>
     )
   }

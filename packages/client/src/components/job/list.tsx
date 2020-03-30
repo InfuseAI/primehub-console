@@ -13,6 +13,8 @@ import Title from 'components/job/title';
 import JobBreadcrumb from 'components/job/breadcrumb';
 import { Phase, getActionByPhase } from './phase';
 import {appPrefix} from 'utils/env';
+import PageTitle from 'components/pageTitle';
+import PageBody from 'components/pageBody';
 
 const {confirm} = Modal;
 
@@ -296,21 +298,13 @@ class JobList extends React.Component<Props> {
       render: renderAction
     }]
     return (
-      <Row type="flex" gutter={16}>
-        <Col span={4}>
-          <Filter
-            groups={groups}
-            selectedGroups={get(jobsVariables, 'where.groupId_in', [])}
-            submittedByMe={get(jobsVariables, 'where.mine', false)}
-            onChange={this.changeFilter}
-          />
-        </Col>
-        <Col span={18}>
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end'}}>
-            <Title>
-              <JobBreadcrumb />
-              Jobs
-            </Title>
+      <>
+        <PageTitle
+          breadcrumb={<JobBreadcrumb />}
+          title={"Jobs"}
+        />
+        <PageBody>
+          <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
             <div style={{marginBottom: 16}}>
               <Button onClick={this.createPhJob}>
                 Create Job
@@ -320,6 +314,12 @@ class JobList extends React.Component<Props> {
               </Button>
             </div>
           </div>
+          <Filter
+            groups={groups}
+            selectedGroups={get(jobsVariables, 'where.groupId_in', [])}
+            submittedByMe={get(jobsVariables, 'where.mine', false)}
+            onChange={this.changeFilter}
+          />
           <Table
             dataSource={jobsConnection.edges.map(edge => edge.node)}
             columns={columns}
@@ -332,8 +332,8 @@ class JobList extends React.Component<Props> {
             nextPage={this.nextPage}
             previousPage={this.previousPage}
           />
-        </Col>
-      </Row>
+        </PageBody>
+      </>
     )
   }
 }

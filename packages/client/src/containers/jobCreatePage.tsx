@@ -13,6 +13,7 @@ import JobCreateForm from 'components/job/createForm';
 import JobBreadcrumb from 'components/job/breadcrumb';
 import {GroupFragment} from 'containers/list';
 import {appPrefix} from 'utils/env';
+import PageTitle from 'components/pageTitle';
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -101,19 +102,23 @@ class JobCreatePage extends React.Component<Props, State> {
     );
     return (
       <React.Fragment>
-        <Title>
-          <JobBreadcrumb />
-          Create Job
-        </Title>
-        <JobCreateForm
-          onSelectGroup={this.onChangeGroup}
-          selectedGroup={selectedGroup}
-          groups={sortItems(groups)}
-          instanceTypes={sortItems(instanceTypes)}
-          images={sortItems(images)}
-          onSubmit={this.onSubmit}
-          loading={getGroups.loading || createPhJobResult.loading}
+        <PageTitle
+          breadcrumb={<JobBreadcrumb />}
+          title={"Create Job"}
         />
+        <div style={{
+          margin: '16px',
+        }}>
+          <JobCreateForm
+            onSelectGroup={this.onChangeGroup}
+            selectedGroup={selectedGroup}
+            groups={sortItems(groups)}
+            instanceTypes={sortItems(instanceTypes)}
+            images={sortItems(images)}
+            onSubmit={this.onSubmit}
+            loading={getGroups.loading || createPhJobResult.loading}
+          />
+        </div>
       </React.Fragment>
     );
   }

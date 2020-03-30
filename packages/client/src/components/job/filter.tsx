@@ -1,7 +1,9 @@
 import * as React from 'react';
-import {Checkbox} from 'antd';
+import {Checkbox, Col, Divider} from 'antd';
 import styled from 'styled-components';
 import GroupFilter, {Group} from 'components/job/groupFilter';
+import {FilterRow, FilterPlugins, ButtonCol} from '../../cms-toolbar/filter';
+import {Label} from '../../cms-toolbar/share';
 
 type Props = {
   groups: Group[];
@@ -40,25 +42,32 @@ export default class Filter extends React.Component<Props> {
   render() {
     const {groups, selectedGroups, submittedByMe} = this.props;
     return (
-      <React.Fragment>
-        <Title>
-          Filter by Group
-        </Title>
-        <GroupFilter
-          groups={groups}
-          selectedGroups={selectedGroups}
-          onChange={this.handleSelectedGroupsChange}
-        />
-        <Title>
-          Filter by Submitted
-        </Title>
-        <Checkbox
-          checked={submittedByMe}
-          onChange={this.handleSubmittedByMeChange}
-        >
-          Submitted By Me
-        </Checkbox>
-      </React.Fragment>
+      <FilterRow type="flex" justify="space-between" align="bottom" style={{marginBottom: 32, marginTop: 32}}>
+        <Col style={{flex: 1}}>
+          <FilterPlugins style={{marginRight: 0}}>
+            <Label>Group</Label>
+            <GroupFilter
+              groups={groups}
+              selectedGroups={selectedGroups}
+              onChange={this.handleSelectedGroupsChange}
+            />
+          </FilterPlugins>
+        </Col>
+        <div style={{borderLeft: '1px solid #d9d9d9', margin: '0px 8px 2px', height: 28}} />
+        <ButtonCol>
+          <Checkbox
+            style={{
+              border: '1px solid #d9d9d9',
+              borderRadius: 4,
+              padding: '4px 8px'
+            }}
+            checked={submittedByMe}
+            onChange={this.handleSubmittedByMeChange}
+          >
+            Submitted By Me
+          </Checkbox>
+        </ButtonCol>
+      </FilterRow>
     )
   }
 }

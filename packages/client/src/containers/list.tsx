@@ -63,15 +63,11 @@ export default compose(
     name: 'getMyGroups',
     options: (props: Props) => ({
       onCompleted: data => {
-        // default select all groups and first=10
-        const groups = get(data, 'me.groups', []);
-        const where = JSON.stringify({
-          groupId_in: groups.map(group => group.id)
-        });
+        // default  first=10
         if (props.location.search) return;
         props.history.push({
           pathname: `${appPrefix}${props.pathname}`,
-          search: queryString.stringify({where, first: 10})
+          search: queryString.stringify({first: 10})
         });
       },
       fetchPolicy: 'cache-and-network'
