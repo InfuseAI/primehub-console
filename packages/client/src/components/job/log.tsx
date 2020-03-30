@@ -1,14 +1,15 @@
 import * as React from 'react';
-import {Input} from 'antd';
+import {Input, Button} from 'antd';
 import {get} from 'lodash';
 
 type Props = {
   endpoint: string;
-  rows?: number
+  rows?: number;
 }
 
 type State = {
   log: string;
+  autoScroll: boolean;
 }
 
 export default class Logs extends React.Component<Props, State> {
@@ -19,18 +20,21 @@ export default class Logs extends React.Component<Props, State> {
     super(props);
     this.retryCount = 0;
     this.state = {
-      log: ''
+      log: '',
+      autoScroll: true,
     };
     this.myRef = React.createRef();
   }
 
   componentDidMount() {
     this.fetchLog();
+    this.listenOnScrollToTOP();
   }
 
   componentDidUpdate(_prevProps, prevState) {
+    const restartAutoScroll = !prevState.autoScroll && this.state.autoScroll;
     // scroll log box to bottom
-    if (this.state.log !== prevState.log && this.myRef) {
+    if (this.myRef && ((this.state.log !== prevState.log && this.state.autoScroll) || restartAutoScroll)) {
       //https://github.com/ant-design/ant-design/issues/10527
       // @ts-ignore
       this.myRef.current.textAreaRef.scrollTop = this.myRef.current.textAreaRef.scrollHeight;
@@ -67,9 +71,11 @@ export default class Logs extends React.Component<Props, State> {
         if (result.done)
           return 'done';
         const chunk = new TextDecoder().decode(result.value.buffer);
+        
         that.setState((prevState: any) => ({
           log: prevState.log + chunk
-        }));
+        }))
+
         return readChunk();
       }
 
@@ -88,19 +94,48 @@ export default class Logs extends React.Component<Props, State> {
     });
   }
 
+  listenOnScrollToTOP = () => {
+    // @ts-ignore
+    this.myRef.current.textAreaRef.onscroll = () => {
+      const {
+        clientHeight,
+        scrollTop,
+        scrollHeight
+      } = this.myRef.current.textAreaRef;
+      if (scrollHeight > clientHeight + scrollTop) {
+        this.setState({autoScroll: false})
+      }
+
+    }
+  }
+
+  enableAutoScroll = () => {
+    this.setState({
+      autoScroll: true
+    });
+  }
+
   render() {
     const {rows = 40} = this.props;
     const {log} = this.state;
-    return <Input.TextArea
-      style={{
-        background: 'black',
-        color: '#ddd',
-        fontFamily: 'monospace',
-      }}
-      rows={rows || 40}
-      value={log}
-      // @ts-ignore
-      ref={this.myRef}
-    />;
+    return <>
+      <Button
+        onClick={this.enableAutoScroll}
+        style={{float: 'right', marginBottom: 4}}
+      >
+        Scroll to Bottom
+      </Button>
+      <Input.TextArea
+        style={{
+          background: 'black',
+          color: '#ddd',
+          fontFamily: 'monospace',
+        }}
+        rows={rows || 40}
+        value={log}
+        // @ts-ignore
+        ref={this.myRef}
+      />
+    </>;
   }
 }
