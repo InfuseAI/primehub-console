@@ -244,7 +244,7 @@ const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any, con
   }
 
   if (isEmpty(where.groupId_in)) {
-    where.groupId_in = getGroupIdsByUser(context, currentUserId);
+    where.groupId_in = await getGroupIdsByUser(context, currentUserId);
   }
 
   // sort by updateTime

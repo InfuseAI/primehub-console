@@ -230,7 +230,7 @@ const listQuery = async (client: CustomResource<PhJobSpec>, where: any, context:
   }
 
   if (isEmpty(where.groupId_in)) {
-    where.groupId_in = getGroupIdsByUser(context, currentUserId);
+    where.groupId_in = await getGroupIdsByUser(context, currentUserId);
   }
 
   // sort by createTime
