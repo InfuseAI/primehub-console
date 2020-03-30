@@ -207,6 +207,7 @@ class ScheduleList extends React.Component<Props> {
     }, {
       title: 'Action',
       dataIndex: 'id',
+      width: 150,
       render: renderAction
     }]
     return (

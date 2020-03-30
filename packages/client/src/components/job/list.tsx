@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Tooltip, Table as AntTable, Row, Col, Icon, Modal} from 'antd';
+import {Button, Tooltip, Table as AntTable, Row, Col, Icon, Modal} from 'antd';
 import {RouteComponentProps} from 'react-router';
 import {Link, withRouter} from 'react-router-dom';
 import {startCase, get} from 'lodash';
@@ -263,9 +263,9 @@ class JobList extends React.Component<Props> {
       }
       const loading = cancelPhJobResult.loading && rerunPhJobResult.loading && id === currentId;
       return (
-        <InfuseButton onClick={onClick} loading={loading}>
+        <Button onClick={onClick} loading={loading}>
           {action}
-        </InfuseButton>
+        </Button>
       )
     }
     const columns = [{
@@ -295,7 +295,8 @@ class JobList extends React.Component<Props> {
       title: 'Action',
       dataIndex: 'phase',
       key: 'action',
-      render: renderAction
+      render: renderAction,
+      width: 150
     }]
     return (
       <>
