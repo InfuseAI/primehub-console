@@ -13,6 +13,7 @@ import {errorHandler} from 'components/job/errorHandler';
 import ScheduleCreateForm from 'components/job/createForm';
 import {GroupFragment} from 'containers/list';
 import {appPrefix} from 'utils/env';
+import PageTitle from 'components/pageTitle';
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -113,21 +114,23 @@ class ScheduleCreatePage extends React.Component<Props, State> {
     );
     return (
       <React.Fragment>
-        <Title>
-          <ScheduleBreadCrumb />
-          Create Schedule
-        </Title>
-        <ScheduleCreateForm
-          onSelectGroup={this.onChangeGroup}
-          selectedGroup={selectedGroup}
-          groups={sortItems(groups)}
-          instanceTypes={sortItems(instanceTypes)}
-          images={sortItems(images)}
-          onSubmit={this.onSubmit}
-          loading={getGroups.loading || createPhScheduleResult.loading}
-          timezone={get(getTimezone, 'system.timezone')}
-          type="schedule"
+        <PageTitle
+          title="Create Schedule"
+          breadcrumb={<ScheduleBreadCrumb />}
         />
+        <div style={{margin: 16}}>
+          <ScheduleCreateForm
+            onSelectGroup={this.onChangeGroup}
+            selectedGroup={selectedGroup}
+            groups={sortItems(groups)}
+            instanceTypes={sortItems(instanceTypes)}
+            images={sortItems(images)}
+            onSubmit={this.onSubmit}
+            loading={getGroups.loading || createPhScheduleResult.loading}
+            timezone={get(getTimezone, 'system.timezone')}
+            type="schedule"
+          />
+        </div>
       </React.Fragment>
     );
   }

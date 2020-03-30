@@ -13,6 +13,7 @@ import {PhScheduleFragment} from 'containers/scheduleList';
 import {GET_MY_GROUPS, GET_TIMEZONE, sortItems} from 'containers/scheduleCreatePage';
 import {get, unionBy, isEqual} from 'lodash';
 import {appPrefix} from 'utils/env';
+import PageTitle from 'components/pageTitle';
 
 type Props = {
   getGroups: any; 
@@ -128,27 +129,29 @@ class ScheduleDetailContainer extends React.Component<Props> {
     );
     return (
       <React.Fragment>
-        <Title>
-          <ScheduleBreadCrumb scheduleName={get(getPhSchedule, 'phSchedule.displayName')} />
-          Schedule: {get(getPhSchedule, 'phSchedule.displayName')}
-        </Title>
-        <ScheduleUpdateForm
-          onSelectGroup={this.onChangeGroup}
-          selectedGroup={selectedGroup}
-          groups={sortItems(groups)}
-          instanceTypes={sortItems(instanceTypes)}
-          images={sortItems(images)}
-          onSubmit={this.onSubmit}
-          loading={getGroups.loading || updatePhScheduleResult.loading}
-          type="schedule"
-          timezone={get(getTimezone, 'system.timezone')}
-          initialValue={{
-            ...get(getPhSchedule, 'phSchedule', {}) || {},
-            instanceTypeId: get(getPhSchedule, 'phSchedule.instanceType.id'),
-            instanceTypeName: get(getPhSchedule, 'phSchedule.instanceType.name'),
-          }}
-          onCancel={this.cancel}
+        <PageTitle
+          breadcrumb={<ScheduleBreadCrumb scheduleName={get(getPhSchedule, 'phSchedule.displayName')} />}
+          title={`Schedule: ${get(getPhSchedule, 'phSchedule.displayName')}`}
         />
+        <div style={{margin: 16}}>
+          <ScheduleUpdateForm
+            onSelectGroup={this.onChangeGroup}
+            selectedGroup={selectedGroup}
+            groups={sortItems(groups)}
+            instanceTypes={sortItems(instanceTypes)}
+            images={sortItems(images)}
+            onSubmit={this.onSubmit}
+            loading={getGroups.loading || updatePhScheduleResult.loading}
+            type="schedule"
+            timezone={get(getTimezone, 'system.timezone')}
+            initialValue={{
+              ...get(getPhSchedule, 'phSchedule', {}) || {},
+              instanceTypeId: get(getPhSchedule, 'phSchedule.instanceType.id'),
+              instanceTypeName: get(getPhSchedule, 'phSchedule.instanceType.name'),
+            }}
+            onCancel={this.cancel}
+          />
+        </div>
       </React.Fragment>
     );
   }

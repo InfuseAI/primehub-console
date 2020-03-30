@@ -5,6 +5,8 @@ import styled from 'styled-components';
 import Title from 'components/job/title';
 import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
 import {History} from 'history';
+import PageTitle from 'components/pageTitle';
+import PageBody from 'components/pageBody';
 
 
 const TitleContainer = styled.div`
@@ -50,19 +52,19 @@ export default class Detail extends React.Component<Props> {
     const {schedule = {}, runPhScheduleResult} = this.props;
     return (
       <>
-        <TitleContainer>
-          <Title>
-            <ScheduleBreadCrumb scheduleName={schedule.displayName} />
-            Schedule: {schedule.displayName || schedule.name}
-          </Title>
-          <Button
-            onClick={() => this.runSchedule()}
-            loading={runPhScheduleResult.loading}
-          >
-            Run
-          </Button>
-        </TitleContainer>
-        <Card>
+        <PageTitle
+          breadcrumb={<ScheduleBreadCrumb scheduleName={schedule.displayName} />}
+          title={`Schedule: ${schedule.displayName || schedule.name}`}
+        />
+        <PageBody>
+          <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+            <Button
+              onClick={() => this.runSchedule()}
+              loading={runPhScheduleResult.loading}
+            >
+              Run
+            </Button>
+          </div>
           <Form>
             <Form.Item style={formItemStyle} label="Status:" {...formItemLayout}>
               {schedule.phase}
@@ -102,7 +104,7 @@ export default class Detail extends React.Component<Props> {
               />
             </Form.Item>
           </Form>
-        </Card>
+        </PageBody>
       </>
     )
   }

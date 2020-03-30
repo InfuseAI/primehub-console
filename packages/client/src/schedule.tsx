@@ -16,11 +16,10 @@ import ScheduleCreatePage from 'containers/scheduleCreatePage';
 import ScheduleListContainer from 'containers/scheduleList';
 import {appPrefix} from 'utils/env';
 
-const PAGE_PADDING = 48;
 const HEADER_HEIGHT = 64;
 
 const Content = styled(Layout.Content)`
-  margin: ${HEADER_HEIGHT + 24}px ${PAGE_PADDING}px;
+  margin-top: ${HEADER_HEIGHT}px;
   padding: 24;
   min-height: calc(100vh - 64px);
 `;

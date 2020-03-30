@@ -15,7 +15,6 @@ import JobDetailContainer from 'containers/jobDetail';
 import JobCreatePage from 'containers/jobCreatePage';
 import JobListContainer from 'containers/jobList';
 import {appPrefix} from 'utils/env';
-const PAGE_PADDING = 48;
 const HEADER_HEIGHT = 64;
 
 const Content = styled(Layout.Content)`
