@@ -405,7 +405,7 @@ class CreateForm extends React.Component<Props, State> {
                     <Button
                       type="primary"
                       htmlType="submit"
-                      style={{marginRight: 8}}
+                      style={{marginRight: 16}}
                     >
                       Confirm
                     </Button>

@@ -38,7 +38,7 @@ export default class GroupFilter extends React.Component<Props, State> {
       >
         {groups.map(group => (
           <Select.Option key={group.id} value={group.id}>
-            {group.displayName}
+            {group.displayName || group.name}
           </Select.Option>
         ))}
       </Select>

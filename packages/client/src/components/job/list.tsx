@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, Tooltip, Table as AntTable, Row, Col, Icon, Modal} from 'antd';
+import {Tooltip, Table as AntTable, Row, Col, Icon, Modal} from 'antd';
 import {RouteComponentProps} from 'react-router';
 import {Link, withRouter} from 'react-router-dom';
 import {startCase, get} from 'lodash';
@@ -9,12 +9,12 @@ import moment from 'moment';
 import {Group} from 'components/job/groupFilter';
 import {computeDuration} from 'components/job/detail';
 import Pagination from 'components/job/pagination';
-import Title from 'components/job/title';
 import JobBreadcrumb from 'components/job/breadcrumb';
 import { Phase, getActionByPhase } from './phase';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
+import InfuseButton from 'components/infuseButton';
 
 const {confirm} = Modal;
 
@@ -250,7 +250,7 @@ class JobList extends React.Component<Props> {
   }
 
   render() {
-    const {groups, jobsConnection, jobsVariables, cancelPhJobResult, rerunPhJobResult} = this.props;
+    const {groups, jobsConnection, jobsLoading, jobsVariables, cancelPhJobResult, rerunPhJobResult} = this.props;
     const {currentId} = this.state;
     const renderAction = (phase: Phase, record) => {
       const action = getActionByPhase(phase);
@@ -263,9 +263,9 @@ class JobList extends React.Component<Props> {
       }
       const loading = cancelPhJobResult.loading && rerunPhJobResult.loading && id === currentId;
       return (
-        <Button onClick={onClick} loading={loading}>
+        <InfuseButton onClick={onClick} loading={loading}>
           {action}
-        </Button>
+        </InfuseButton>
       )
     }
     const columns = [{
@@ -306,12 +306,17 @@ class JobList extends React.Component<Props> {
         <PageBody>
           <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
             <div style={{marginBottom: 16}}>
-              <Button onClick={this.createPhJob}>
+              <InfuseButton
+                icon="plus"
+                onClick={this.createPhJob}
+                style={{marginRight: 16, width: 120}}
+                type="primary"
+              >
                 Create Job
-              </Button>
-              <Button onClick={this.refresh} style={{marginLeft: 16}}>
+              </InfuseButton>
+              <InfuseButton onClick={this.refresh}>
                 Refresh
-              </Button>
+              </InfuseButton>
             </div>
           </div>
           <Filter
@@ -321,6 +326,7 @@ class JobList extends React.Component<Props> {
             onChange={this.changeFilter}
           />
           <Table
+            loading={jobsLoading}
             dataSource={jobsConnection.edges.map(edge => edge.node)}
             columns={columns}
             rowKey="id"

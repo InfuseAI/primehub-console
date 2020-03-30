@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, Tabs, Form, Card, Input, Modal} from 'antd';
+import {Tabs, Form, Card, Input, Modal} from 'antd';
 import {Link} from 'react-router-dom';
 import {get} from 'lodash';
 import styled from 'styled-components';
@@ -13,6 +13,7 @@ import {History} from 'history';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
+import InfuseButton from 'components/infuseButton';
 
 const TabPane = Tabs.TabPane;
 
@@ -134,12 +135,12 @@ export default class Detail extends React.Component<Props> {
         />
         <PageBody>
           <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-            <Button
+            <InfuseButton
               onClick={() => this.handleClick(action)}
               loading={rerunPhJobResult.loading || cancelPhJobResult.loading}
             >
               {action}
-            </Button>
+            </InfuseButton>
           </div>
           <Tabs>
             <TabPane key="information" tab="Information">

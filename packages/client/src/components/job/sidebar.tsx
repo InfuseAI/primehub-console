@@ -22,7 +22,7 @@ class Sidebar extends React.Component<Props> {
           </Menu.Item>
           <Menu.Item key="schedule">
             <Link to={`${appPrefix}schedule`}>
-              Schedules
+              Schedule
             </Link>
           </Menu.Item>
         </Menu>

@@ -8,12 +8,12 @@ import styled from 'styled-components';
 import Filter from 'components/job/filter';
 import {Group} from 'components/job/groupFilter';
 import Pagination from 'components/job/pagination';
-import Title from 'components/job/title';
 import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
 import {renderRecurrence} from 'components/schedule/recurrence';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
+import InfuseButton from 'components/infuseButton';
 
 const {confirm} = Modal;
 
@@ -174,7 +174,7 @@ class ScheduleList extends React.Component<Props> {
   }
 
   render() {
-    const {groups, schedulesConnection, schedulesVariables, deletePhScheduleResult, runPhScheduleResult} = this.props;
+    const {groups, schedulesConnection, schedulesLoading, schedulesVariables, deletePhScheduleResult, runPhScheduleResult} = this.props;
     const renderAction = (id: string, record) => {
       return (
         <Button.Group>
@@ -218,12 +218,12 @@ class ScheduleList extends React.Component<Props> {
         <PageBody>
           <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
             <div style={{marginBottom: 16}}>
-              <Button onClick={this.scheduleJob}>
+              <InfuseButton icon="plus" onClick={this.scheduleJob} style={{width: 140}} type="primary">
                 Schedule Job
-              </Button>
-              <Button onClick={this.refresh} style={{marginLeft: 16}}>
+              </InfuseButton>
+              <InfuseButton onClick={this.refresh} style={{marginLeft: 16}}>
                 Refresh
-              </Button>
+              </InfuseButton>
             </div>
           </div>
           <Filter
@@ -236,6 +236,7 @@ class ScheduleList extends React.Component<Props> {
             dataSource={schedulesConnection.edges.map(edge => edge.node)}
             columns={columns}
             rowKey="id"
+            loading={schedulesLoading}
             pagination={false}
           />
           <Pagination
