@@ -1,9 +1,9 @@
 import { Context } from './interface';
-import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory } from './utils';
+import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser } from './utils';
 import { PhJobPhase, PhJobSpec, PhJobStatus } from '../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../crdClient/customResource';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
-import { orderBy, omit, get, isUndefined, isNil } from 'lodash';
+import { orderBy, omit, get, isUndefined, isNil, isEmpty } from 'lodash';
 import * as moment from 'moment';
 import { escapeToPrimehubLabel } from '../utils/escapism';
 import { ApolloError } from 'apollo-server';
@@ -227,6 +227,10 @@ const listQuery = async (client: CustomResource<PhJobSpec>, where: any, context:
 
   if (where && where.mine) {
     where.userId_eq = currentUserId;
+  }
+
+  if (isEmpty(where.groupId_in)) {
+    where.groupId_in = getGroupIdsByUser(context, currentUserId);
   }
 
   // sort by createTime

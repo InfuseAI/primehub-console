@@ -1,8 +1,8 @@
 import { Context } from './interface';
-import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory } from './utils';
+import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser } from './utils';
 import { PhScheduleSpec, PhScheduleStatus } from '../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../crdClient/customResource';
-import { orderBy, omit, get, isUndefined, isNil } from 'lodash';
+import { orderBy, omit, get, isUndefined, isNil, isEmpty } from 'lodash';
 import * as moment from 'moment';
 import { escapeToPrimehubLabel } from '../utils/escapism';
 import { ApolloError } from 'apollo-server';
@@ -241,6 +241,10 @@ const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any, con
 
   if (where && where.mine) {
     where.userId_eq = currentUserId;
+  }
+
+  if (isEmpty(where.groupId_in)) {
+    where.groupId_in = getGroupIdsByUser(context, currentUserId);
   }
 
   // sort by updateTime
