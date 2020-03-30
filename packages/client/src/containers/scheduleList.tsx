@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {get} from 'lodash';
-import {withRouter} from 'react-router-dom';
+import {withRouter, Link} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import ScheduleList from 'components/schedule/list';
@@ -156,12 +156,15 @@ export default compose(
       onCompleted: data => {
         const jobId = get(data, 'runPhSchedule.job.id', '');
         const jobName = get(data, 'runPhSchedule.job.displayName', '');
-        Modal.success({
+        const modal = Modal.success({
           title: 'Success',
           content: (
             <div>
               {jobName} has been submitted! You can
-              <a href={`${appPrefix}job/${jobId}`}>
+              <a onClick={() => {
+                props.history.push(`${appPrefix}job/${jobId}`)
+                modal.destroy();
+              }}>
                 {` `}
                 <u>view your job details here.</u>
               </a>

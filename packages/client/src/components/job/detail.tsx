@@ -159,9 +159,9 @@ export default class Detail extends React.Component<Props> {
                 <Form.Item  style={formItemStyle} label="Schedule" {...formItemLayout}>
                   {
                     job.schedule ? (
-                      <a href={`${appPrefix}schedule/${job.schedule}`}>
+                      <Link to={`${appPrefix}schedule/${job.schedule}`}>
                         {job.schedule}
-                      </a>
+                      </Link>
                     ) : '-'
                   }
                   

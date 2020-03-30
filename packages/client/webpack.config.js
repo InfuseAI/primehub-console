@@ -14,7 +14,6 @@ module.exports = {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
     job: devMode ? './src/job.tsx' : ['./src/public-import.js', './src/job.tsx'],
-    schedule: devMode ? './src/schedule.tsx' : ['./src/public-import.js', './src/schedule.tsx']
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -31,8 +30,8 @@ module.exports = {
       rewrites: [
         { from: /^\/app-prefix\/job/, to: '/job.html' },
         { from: /^\/job/, to: '/job.html' },
-        { from: /^\/app-prefix\/schedule/, to: '/schedule.html' },
-        { from: /^\/schedule/, to: '/schedule.html' },
+        { from: /^\/app-prefix\/schedule/, to: '/job.html' },
+        { from: /^\/schedule/, to: '/job.html' },
         { from: /^\/app-prefix\/landing/, to: '/landing.html' },
         { from: /^\/landing$/, to: '/landing.html' },
         { from: /./, to: '/index.html' }
@@ -103,11 +102,6 @@ module.exports = {
       chunks: ['job'],
       template: 'docs/index.html',
       filename: 'job.html'
-    }),
-    new HtmlWebPackPlugin({
-      chunks: ['schedule'],
-      template: 'docs/index.html',
-      filename: 'schedule.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new MiniCssExtractPlugin({

@@ -14,6 +14,9 @@ import ListContainer from 'containers/list';
 import JobDetailContainer from 'containers/jobDetail';
 import JobCreatePage from 'containers/jobCreatePage';
 import JobListContainer from 'containers/jobList';
+import ScheduleDetailContainer from 'containers/scheduleDetail';
+import ScheduleCreatePage from 'containers/scheduleCreatePage';
+import ScheduleListContainer from 'containers/scheduleList';
 import {appPrefix} from 'utils/env';
 const HEADER_HEIGHT = 64;
 
@@ -168,6 +171,32 @@ const fakeData = {
     File "<stdin>", line 3, in divide
   TypeError: unsupported operand type(s) for /: 'str' and 'str'TypeError: unsupported operand type(s) for /: 'str' and 'str'
 `
+  }],
+  phSchedules: [{
+    id: 'it1',
+    name: 'IT1',
+    displayName: 'IT1',
+    nextRunTime: '2019-12-26T14:24:22Z',
+    recurrence: {
+      type: 'weekly',
+      cron: '* */2 * * *',
+    },
+    invalid: true,
+    message: 'Something happened',
+    command: 'haha',
+    userId: 'userId',
+    userName: 'phadmin',
+    groupId: 'everyone1-432',
+    groupName: 'groupName',
+    image: 'image name',
+    instanceType: {
+      id: 'everyone-it-aha',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    },
   }]
 }
 
@@ -178,36 +207,47 @@ const connector = new LocalStorageConnector({
 
 const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
-  {connector, schema: {me: {type: 'object'}, phJobs: {type: 'array',items: {type: 'object'}}}});
+  {connector, schema: {me: {type: 'object'}, phJobs: {type: 'array',items: {type: 'object'}}, phSchedules: {type: 'array',items: {type: 'object'}}}});
 
 class Job extends React.Component {
   render() {
     return (
-      <Layout>
-        <Header />
+      <BrowserRouter>
         <Layout>
-          <Sidebar defaultKey="job" />
-          <Content>
-            <BrowserRouter>
-              <ApolloProvider client={client}>
-                <Switch>
-                  <Route path={`${appPrefix}job`} exact>
-                    <ListContainer Com={JobListContainer} />
-                  </Route>
-                  <Route path={`${appPrefix}job/create`} exact>
-                    <JobCreatePage />
-                  </Route>
-                  <Route
-                    path={`${appPrefix}job/:jobId`}
-                    exact
-                    component={JobDetailContainer}
-                  />
-                </Switch>
-              </ApolloProvider>
-            </BrowserRouter>
-          </Content>
+          <Header />
+          <Layout>
+            <Sidebar />
+            <Content>
+                <ApolloProvider client={client}>
+                  <Switch>
+                    <Route path={`${appPrefix}job`} exact>
+                      <ListContainer Com={JobListContainer} />
+                    </Route>
+                    <Route path={`${appPrefix}job/create`} exact>
+                      <JobCreatePage />
+                    </Route>
+                    <Route
+                      path={`${appPrefix}job/:jobId`}
+                      exact
+                      component={JobDetailContainer}
+                    />
+                    <Route path={`${appPrefix}schedule`} exact>
+                      <ListContainer Com={ScheduleListContainer} />
+                    </Route>
+                    <Route path={`${appPrefix}schedule/create`} exact>
+                      <ScheduleCreatePage />
+                    </Route>
+                    <Route
+                      path={`${appPrefix}schedule/:scheduleId`}
+                      exact
+                      component={ScheduleDetailContainer}
+                    />
+                  </Switch>
+                </ApolloProvider>
+            </Content>
+          </Layout>
         </Layout>
-      </Layout>
+      </BrowserRouter>
     )
   }
 }

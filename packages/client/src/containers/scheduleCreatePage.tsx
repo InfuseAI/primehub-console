@@ -7,7 +7,6 @@ import {get, unionBy} from 'lodash';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
-import Title from 'components/job/title';
 import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
 import {errorHandler} from 'components/job/errorHandler';
 import ScheduleCreateForm from 'components/job/createForm';
@@ -147,13 +146,9 @@ export default compose(
   graphql(CREATE_SCHEDULE, {
     options: (props: Props) => ({
       onCompleted: () => {
-        const groups = get(props.getGroups, 'me.groups', []);
-        const where = JSON.stringify({
-          groupId_in: groups.map(group => group.id)
-        });
         props.history.push({
           pathname: `${appPrefix}schedule`,
-          search: queryString.stringify({where, first: 10})
+          search: queryString.stringify({first: 10})
         });
       },
       onError: errorHandler

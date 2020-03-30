@@ -43,9 +43,9 @@ const renderJobName = (text, record) => (
 );
 
 const renderSchedule = text => text ? (
-  <a href={`${appPrefix}schedule/${text}`}>
+  <Link to={`${appPrefix}schedule/${text}`}>
     {text}
-  </a>
+  </Link>
 ) : '-'
 
 const renderTimeIfValid = time => {

@@ -168,13 +168,9 @@ export default compose(
   graphql(UPDATE_SCHEDULE, {
     options: (props: Props) => ({
       onCompleted: () => {
-        const groups = get(props.getGroups, 'me.groups', []);
-        const where = JSON.stringify({
-          groupId_in: groups.map(group => group.id)
-        });
         props.history.push({
           pathname: `${appPrefix}schedule`,
-          search: queryString.stringify({where, first: 10})
+          search: queryString.stringify({first: 10})
         });
       },
       onError: errorHandler
