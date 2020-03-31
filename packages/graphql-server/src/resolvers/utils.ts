@@ -13,6 +13,7 @@ import {
 } from 'lodash';
 import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
 import { EOL } from 'os';
+import { Context } from './interface';
 
 export interface Pagination {
   last?: number;
@@ -219,4 +220,11 @@ export const stringifyPackageField = (pkgs: string[]): string => {
 
 export const parsePackageField = (pkgs: string): string[] => {
   return pkgs.split(EOL).filter(v => v);
+};
+
+export const getGroupIdsByUser = async (context: Context, userId: string) => {
+  const groups = await context.kcAdminClient.users.listGroups({
+    id: userId,
+  });
+  return groups.map(group => group.id);
 };

@@ -57,7 +57,8 @@ type Props = {
 };
 
 export const recurrenceValidator = (rules, value, callback) => {
-  if (value.type === "inactive" || isValidCron(value.cron)) return callback();
+  // we skip validate empty cron here for better ui
+  if (value.type === "inactive" || !value.cron || isValidCron(value.cron)) return callback();
   return callback('Invalid cron format');
 }
 

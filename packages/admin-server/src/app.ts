@@ -190,14 +190,14 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
 
   // job schedule
   rootRouter.get('/schedule', oidcCtrl.loggedIn, async ctx => {
-    await ctx.render('schedule', {
+    await ctx.render('job', {
       title: 'PrimeHub Job Schedule',
       staticPath
     });
   });
 
   rootRouter.get('/schedule/:scheduleId', oidcCtrl.loggedIn, async ctx => {
-    await ctx.render('schedule', {
+    await ctx.render('job', {
       title: 'PrimeHub Job Schedule',
       staticPath
     });

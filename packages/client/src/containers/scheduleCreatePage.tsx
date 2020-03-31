@@ -7,10 +7,12 @@ import {get, unionBy} from 'lodash';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
-import Title from 'components/job/title';
+import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
 import {errorHandler} from 'components/job/errorHandler';
 import ScheduleCreateForm from 'components/job/createForm';
 import {GroupFragment} from 'containers/list';
+import {appPrefix} from 'utils/env';
+import PageTitle from 'components/pageTitle';
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -72,7 +74,6 @@ type State = {
   selectedGroup: string | null;
 }
 
-const appPrefix = (window as any).APP_PREFIX || '/';
 class ScheduleCreatePage extends React.Component<Props, State> {
   state = {
     selectedGroup: null,
@@ -112,25 +113,23 @@ class ScheduleCreatePage extends React.Component<Props, State> {
     );
     return (
       <React.Fragment>
-        <Button
-          icon="left"
-          onClick={() => history.goBack()}
-          style={{marginRight: 16, verticalAlign: 'top'}}
-        >
-          Back
-        </Button>
-        <Title>Create Schedule</Title>
-        <ScheduleCreateForm
-          onSelectGroup={this.onChangeGroup}
-          selectedGroup={selectedGroup}
-          groups={sortItems(groups)}
-          instanceTypes={sortItems(instanceTypes)}
-          images={sortItems(images)}
-          onSubmit={this.onSubmit}
-          loading={getGroups.loading || createPhScheduleResult.loading}
-          timezone={get(getTimezone, 'system.timezone')}
-          type="schedule"
+        <PageTitle
+          title="Create Schedule"
+          breadcrumb={<ScheduleBreadCrumb />}
         />
+        <div style={{margin: 16}}>
+          <ScheduleCreateForm
+            onSelectGroup={this.onChangeGroup}
+            selectedGroup={selectedGroup}
+            groups={sortItems(groups)}
+            instanceTypes={sortItems(instanceTypes)}
+            images={sortItems(images)}
+            onSubmit={this.onSubmit}
+            loading={getGroups.loading || createPhScheduleResult.loading}
+            timezone={get(getTimezone, 'system.timezone')}
+            type="schedule"
+          />
+        </div>
       </React.Fragment>
     );
   }
@@ -147,13 +146,9 @@ export default compose(
   graphql(CREATE_SCHEDULE, {
     options: (props: Props) => ({
       onCompleted: () => {
-        const groups = get(props.getGroups, 'me.groups', []);
-        const where = JSON.stringify({
-          groupId_in: groups.map(group => group.id)
-        });
         props.history.push({
           pathname: `${appPrefix}schedule`,
-          search: queryString.stringify({where, first: 10})
+          search: queryString.stringify({first: 10})
         });
       },
       onError: errorHandler

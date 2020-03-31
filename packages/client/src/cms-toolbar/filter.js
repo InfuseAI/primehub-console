@@ -7,20 +7,20 @@ import isEmpty from 'lodash/isEmpty';
 import {FormattedMessage} from 'react-intl';
 import defaultMessage from './locale';
 
-const FilterRow = styled(Row)`
+export const FilterRow = styled(Row)`
   width: 100%;
   border: 1px #f8f8f8 solid;
   padding: 15px;
   box-shadow: 1px 1px 4px #eee;
 `;
 
-const FilterPlugins = styled.div`
+export const FilterPlugins = styled.div`
   flex: 1;
   margin-right: 15px;
   min-width: 100px;
 `;
 
-const ButtonCol = styled(Col)`
+export const ButtonCol = styled(Col)`
   text-align: right;
   padding-top: 16px;
 `;

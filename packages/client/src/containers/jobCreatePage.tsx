@@ -10,7 +10,10 @@ import {withRouter} from 'react-router-dom';
 import Title from 'components/job/title';
 import {errorHandler} from 'components/job/errorHandler';
 import JobCreateForm from 'components/job/createForm';
+import JobBreadcrumb from 'components/job/breadcrumb';
 import {GroupFragment} from 'containers/list';
+import {appPrefix} from 'utils/env';
+import PageTitle from 'components/pageTitle';
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -60,7 +63,6 @@ type State = {
   selectedGroup: string | null;
 }
 
-const appPrefix = (window as any).APP_PREFIX || '/';
 class JobCreatePage extends React.Component<Props, State> {
   state = {
     selectedGroup: null,
@@ -100,23 +102,23 @@ class JobCreatePage extends React.Component<Props, State> {
     );
     return (
       <React.Fragment>
-        <Button
-          icon="left"
-          onClick={() => history.goBack()}
-          style={{marginRight: 16, verticalAlign: 'top'}}
-        >
-          Back
-        </Button>
-        <Title>Create Job</Title>
-        <JobCreateForm
-          onSelectGroup={this.onChangeGroup}
-          selectedGroup={selectedGroup}
-          groups={sortItems(groups)}
-          instanceTypes={sortItems(instanceTypes)}
-          images={sortItems(images)}
-          onSubmit={this.onSubmit}
-          loading={getGroups.loading || createPhJobResult.loading}
+        <PageTitle
+          breadcrumb={<JobBreadcrumb />}
+          title={"Create Job"}
         />
+        <div style={{
+          margin: '16px',
+        }}>
+          <JobCreateForm
+            onSelectGroup={this.onChangeGroup}
+            selectedGroup={selectedGroup}
+            groups={sortItems(groups)}
+            instanceTypes={sortItems(instanceTypes)}
+            images={sortItems(images)}
+            onSubmit={this.onSubmit}
+            loading={getGroups.loading || createPhJobResult.loading}
+          />
+        </div>
       </React.Fragment>
     );
   }
@@ -130,13 +132,9 @@ export default compose(
   graphql(CREATE_JOB, {
     options: (props: Props) => ({
       onCompleted: () => {
-        const groups = get(props.getGroups, 'me.groups', []);
-        const where = JSON.stringify({
-          groupId_in: groups.map(group => group.id)
-        });
         props.history.push({
           pathname: `${appPrefix}job`,
-          search: queryString.stringify({where, first: 10})
+          search: queryString.stringify({first: 10})
         });
       },
       onError: errorHandler

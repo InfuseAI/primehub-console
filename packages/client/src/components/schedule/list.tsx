@@ -8,8 +8,12 @@ import styled from 'styled-components';
 import Filter from 'components/job/filter';
 import {Group} from 'components/job/groupFilter';
 import Pagination from 'components/job/pagination';
-import Title from 'components/job/title';
+import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
 import {renderRecurrence} from 'components/schedule/recurrence';
+import {appPrefix} from 'utils/env';
+import PageTitle from 'components/pageTitle';
+import PageBody from 'components/pageBody';
+import InfuseButton from 'components/infuseButton';
 
 const {confirm} = Modal;
 
@@ -19,8 +23,6 @@ const Table = styled(AntTable as any)`
     margin-right: 16px;
   }
 `;
-
-const appPrefix = (window as any).APP_PREFIX || '/';
 
 const renderNextRunTime = (time, record) => {
   if (record.invalid) {
@@ -172,7 +174,7 @@ class ScheduleList extends React.Component<Props> {
   }
 
   render() {
-    const {groups, schedulesConnection, schedulesVariables, deletePhScheduleResult, runPhScheduleResult} = this.props;
+    const {groups, schedulesConnection, schedulesLoading, schedulesVariables, deletePhScheduleResult, runPhScheduleResult} = this.props;
     const renderAction = (id: string, record) => {
       return (
         <Button.Group>
@@ -205,34 +207,37 @@ class ScheduleList extends React.Component<Props> {
     }, {
       title: 'Action',
       dataIndex: 'id',
+      width: 150,
       render: renderAction
     }]
     return (
-      <Row type="flex" gutter={24}>
-        <Col span={6}>
+      <>
+        <PageTitle
+          breadcrumb={<ScheduleBreadCrumb />}
+          title={"Job Schedule"}
+        />
+        <PageBody>
+          <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
+            <div style={{marginBottom: 16}}>
+              <InfuseButton icon="plus" onClick={this.scheduleJob} style={{width: 140}} type="primary">
+                Schedule Job
+              </InfuseButton>
+              <InfuseButton onClick={this.refresh} style={{marginLeft: 16}}>
+                Refresh
+              </InfuseButton>
+            </div>
+          </div>
           <Filter
             groups={groups}
             selectedGroups={get(schedulesVariables, 'where.groupId_in', [])}
             submittedByMe={get(schedulesVariables, 'where.mine', false)}
             onChange={this.changeFilter}
           />
-        </Col>
-        <Col span={18}>
-          <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <Title>Job Schedule</Title>
-            <div>
-              <Button onClick={this.scheduleJob}>
-                Schedule Job
-              </Button>
-              <Button onClick={this.refresh} style={{marginLeft: 16}}>
-                Refresh
-              </Button>
-            </div>
-          </div>
           <Table
             dataSource={schedulesConnection.edges.map(edge => edge.node)}
             columns={columns}
             rowKey="id"
+            loading={schedulesLoading}
             pagination={false}
           />
           <Pagination
@@ -241,8 +246,8 @@ class ScheduleList extends React.Component<Props> {
             nextPage={this.nextPage}
             previousPage={this.previousPage}
           />
-        </Col>
-      </Row>
+        </PageBody>
+      </>
     )
   }
 }

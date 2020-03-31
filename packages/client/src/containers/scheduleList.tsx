@@ -4,13 +4,14 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {get} from 'lodash';
-import {withRouter} from 'react-router-dom';
+import {withRouter, Link} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import ScheduleList from 'components/schedule/list';
 import {errorHandler} from 'components/job/errorHandler';
 import {Group} from 'components/job/groupFilter';
 import withPath, { PathComponentProps } from 'components/job/withPath';
+import {appPrefix} from 'utils/env';
 
 export const PhScheduleFragment = gql`
   fragment PhScheduleInfo on PhSchedule {
@@ -89,8 +90,6 @@ type Props = {
   deletePhScheduleResult: any;
 } & RouteComponentProps & PathComponentProps;
 
-const appPrefix = (window as any).APP_PREFIX || '/';
-
 class ScheduleListContainer extends React.Component<Props> {
   changeFilter = (payload) => {
     const {pathname} = this.props;
@@ -157,12 +156,15 @@ export default compose(
       onCompleted: data => {
         const jobId = get(data, 'runPhSchedule.job.id', '');
         const jobName = get(data, 'runPhSchedule.job.displayName', '');
-        Modal.success({
+        const modal = Modal.success({
           title: 'Success',
           content: (
             <div>
               {jobName} has been submitted! You can
-              <a href={`${appPrefix}job/${jobId}`}>
+              <a onClick={() => {
+                props.history.push(`${appPrefix}job/${jobId}`)
+                modal.destroy();
+              }}>
                 {` `}
                 <u>view your job details here.</u>
               </a>

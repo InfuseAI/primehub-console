@@ -3,7 +3,10 @@ import {Button, Form, Card, Input} from 'antd';
 import {get} from 'lodash';
 import styled from 'styled-components';
 import Title from 'components/job/title';
+import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
 import {History} from 'history';
+import PageTitle from 'components/pageTitle';
+import PageBody from 'components/pageBody';
 
 
 const TitleContainer = styled.div`
@@ -46,30 +49,22 @@ export default class Detail extends React.Component<Props> {
   }
 
   render() {
-    const {schedule = {}, runPhScheduleResult, history} = this.props;
+    const {schedule = {}, runPhScheduleResult} = this.props;
     return (
       <>
-        <TitleContainer>
-          <div>
+        <PageTitle
+          breadcrumb={<ScheduleBreadCrumb scheduleName={schedule.displayName} />}
+          title={`Schedule: ${schedule.displayName || schedule.name}`}
+        />
+        <PageBody>
+          <div style={{display: 'flex', justifyContent: 'flex-end'}}>
             <Button
-              icon="left"
-              onClick={() => history.goBack()}
-              style={{marginRight: 16, verticalAlign: 'top'}}
+              onClick={() => this.runSchedule()}
+              loading={runPhScheduleResult.loading}
             >
-              Back
+              Run
             </Button>
-            <Title>
-              Schedule: {schedule.displayName || schedule.name}
-            </Title>
           </div>
-          <Button
-            onClick={() => this.runSchedule()}
-            loading={runPhScheduleResult.loading}
-          >
-            Run
-          </Button>
-        </TitleContainer>
-        <Card>
           <Form>
             <Form.Item style={formItemStyle} label="Status:" {...formItemLayout}>
               {schedule.phase}
@@ -109,7 +104,7 @@ export default class Detail extends React.Component<Props> {
               />
             </Form.Item>
           </Form>
-        </Card>
+        </PageBody>
       </>
     )
   }
