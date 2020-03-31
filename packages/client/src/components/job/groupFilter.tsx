@@ -16,6 +16,23 @@ type Props = {
 type State = {
 }
 
+const compareByAlphabetical = (prev, next) => {
+  if(prev < next) return -1;
+  if(prev > next) return 1;
+  return 0;
+}
+
+const sortItems = (items) => {
+  const copiedItems = items.slice();
+  copiedItems
+    .sort((prev, next) => {
+      const prevName = prev.displayName || prev.name;
+      const nextName = next.displayName || next.name;
+      return compareByAlphabetical(prevName, nextName);
+    });
+  return copiedItems;
+}
+
 export default class GroupFilter extends React.Component<Props, State> {
 
 
@@ -36,7 +53,7 @@ export default class GroupFilter extends React.Component<Props, State> {
         style={{width: '100%'}}
         mode="multiple"
       >
-        {groups.map(group => (
+        {sortItems(groups).map(group => (
           <Select.Option key={group.id} value={group.id}>
             {group.displayName || group.name}
           </Select.Option>
