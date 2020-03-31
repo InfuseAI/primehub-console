@@ -9,8 +9,12 @@ import moment from 'moment';
 import {Group} from 'components/job/groupFilter';
 import {computeDuration} from 'components/job/detail';
 import Pagination from 'components/job/pagination';
-import Title from 'components/job/title';
+import JobBreadcrumb from 'components/job/breadcrumb';
 import { Phase, getActionByPhase } from './phase';
+import {appPrefix} from 'utils/env';
+import PageTitle from 'components/pageTitle';
+import PageBody from 'components/pageBody';
+import InfuseButton from 'components/infuseButton';
 
 const {confirm} = Modal;
 
@@ -20,8 +24,6 @@ const Table = styled(AntTable as any)`
     margin-right: 16px;
   }
 `;
-
-const appPrefix = (window as any).APP_PREFIX || '/';
 
 const renderJobName = (text, record) => (
   <Tooltip
@@ -41,9 +43,9 @@ const renderJobName = (text, record) => (
 );
 
 const renderSchedule = text => text ? (
-  <a href={`${appPrefix}schedule/${text}`}>
+  <Link to={`${appPrefix}schedule/${text}`}>
     {text}
-  </a>
+  </Link>
 ) : '-'
 
 const renderTimeIfValid = time => {
@@ -248,7 +250,7 @@ class JobList extends React.Component<Props> {
   }
 
   render() {
-    const {groups, jobsConnection, jobsVariables, cancelPhJobResult, rerunPhJobResult} = this.props;
+    const {groups, jobsConnection, jobsLoading, jobsVariables, cancelPhJobResult, rerunPhJobResult} = this.props;
     const {currentId} = this.state;
     const renderAction = (phase: Phase, record) => {
       const action = getActionByPhase(phase);
@@ -293,31 +295,39 @@ class JobList extends React.Component<Props> {
       title: 'Action',
       dataIndex: 'phase',
       key: 'action',
-      render: renderAction
+      render: renderAction,
+      width: 150
     }]
     return (
-      <Row type="flex" gutter={24}>
-        <Col span={6}>
+      <>
+        <PageTitle
+          breadcrumb={<JobBreadcrumb />}
+          title={"Jobs"}
+        />
+        <PageBody>
+          <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
+            <div style={{marginBottom: 16}}>
+              <InfuseButton
+                icon="plus"
+                onClick={this.createPhJob}
+                style={{marginRight: 16, width: 120}}
+                type="primary"
+              >
+                Create Job
+              </InfuseButton>
+              <InfuseButton onClick={this.refresh}>
+                Refresh
+              </InfuseButton>
+            </div>
+          </div>
           <Filter
             groups={groups}
             selectedGroups={get(jobsVariables, 'where.groupId_in', [])}
             submittedByMe={get(jobsVariables, 'where.mine', false)}
             onChange={this.changeFilter}
           />
-        </Col>
-        <Col span={18}>
-          <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <Title>Jobs</Title>
-            <div>
-              <Button onClick={this.createPhJob}>
-                Create Job
-              </Button>
-              <Button onClick={this.refresh} style={{marginLeft: 16}}>
-                Refresh
-              </Button>
-            </div>
-          </div>
           <Table
+            loading={jobsLoading}
             dataSource={jobsConnection.edges.map(edge => edge.node)}
             columns={columns}
             rowKey="id"
@@ -329,8 +339,8 @@ class JobList extends React.Component<Props> {
             nextPage={this.nextPage}
             previousPage={this.previousPage}
           />
-        </Col>
-      </Row>
+        </PageBody>
+      </>
     )
   }
 }

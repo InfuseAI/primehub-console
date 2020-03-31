@@ -24,6 +24,10 @@ type Props = FormComponentProps & {
   }
 };
 
+type State = {
+  recurrenceError: string;
+}
+
 const radioStyle = {
   display: 'block',
   padding: '4px 8px',
@@ -89,7 +93,11 @@ python /project/group-a/train.py \\
   --parameter_2 value_2
 `;
 
-class CreateForm extends React.Component<Props> {
+class CreateForm extends React.Component<Props, State> {
+  state = {
+    recurrenceError: ''
+  };
+
   componentDidMount() {
     const {initialValue} = this.props;
     if (!initialValue) {
@@ -138,6 +146,13 @@ class CreateForm extends React.Component<Props> {
     const {form, onSubmit} = this.props;
     e.preventDefault();
 
+    const recurrence = form.getFieldValue('recurrence');
+    if (recurrence && recurrence.type !== 'inactive' && !recurrence.cron) {
+      return this.setState({
+        recurrenceError: 'Please input cron expression!'
+      });
+    }
+
     form.validateFields(async (err, values: FormValue) => {
       if (err) return;
 
@@ -180,6 +195,9 @@ class CreateForm extends React.Component<Props> {
       timezone,
       selectedGroup,
     } = this.props;
+    const {
+      recurrenceError
+    } = this.state;
     const instanceType = instanceTypes.find(instanceType => instanceType.id === form.getFieldValue('instanceType'));
     const {
       groupId,
@@ -225,7 +243,6 @@ class CreateForm extends React.Component<Props> {
       <span>The image <b>{image}</b> was deleted.</span>
     )
 
-    
     return (
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
@@ -358,14 +375,17 @@ class CreateForm extends React.Component<Props> {
               </Form.Item>
               {
                 type === 'schedule' && (
-                  <Form.Item label={recurrenceLabel}>
+                  <Form.Item
+                    label={recurrenceLabel}
+                    validateStatus={recurrenceError ? "error" : undefined}
+                    help={recurrenceError ? recurrenceError : undefined}
+                  >
                     {form.getFieldDecorator('recurrence', {
                       initialValue: {type: RecurrenceType.Inactive, ...recurrence},
                       rules: [
-                        { required: true },
                         { validator: recurrenceValidator }],
                     })(
-                      <RecurrenceInput />
+                      <RecurrenceInput onChange={() => this.setState({recurrenceError: ''})} />
                     )}
                   </Form.Item>
                 )
@@ -385,7 +405,7 @@ class CreateForm extends React.Component<Props> {
                     <Button
                       type="primary"
                       htmlType="submit"
-                      style={{marginRight: 8}}
+                      style={{marginRight: 16}}
                     >
                       Confirm
                     </Button>

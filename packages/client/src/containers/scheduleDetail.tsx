@@ -6,11 +6,14 @@ import {compose} from 'recompose';
 import {Button, Modal} from 'antd';
 import queryString from 'querystring';
 import ScheduleUpdateForm from 'components/job/createForm';
+import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
 import Title from 'components/job/title';
 import {errorHandler} from 'components/job/errorHandler';
 import {PhScheduleFragment} from 'containers/scheduleList';
 import {GET_MY_GROUPS, GET_TIMEZONE, sortItems} from 'containers/scheduleCreatePage';
 import {get, unionBy, isEqual} from 'lodash';
+import {appPrefix} from 'utils/env';
+import PageTitle from 'components/pageTitle';
 
 type Props = {
   getGroups: any; 
@@ -38,8 +41,6 @@ export const UPDATE_SCHEDULE = gql`
     }
   }
 `
-
-const appPrefix = (window as any).APP_PREFIX || '/';
 
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 
@@ -128,31 +129,29 @@ class ScheduleDetailContainer extends React.Component<Props> {
     );
     return (
       <React.Fragment>
-        <Button
-          icon="left"
-          onClick={this.back}
-          style={{marginRight: 16, verticalAlign: 'top'}}
-        >
-          Back
-        </Button>
-        <Title>Schedule: {get(getPhSchedule, 'phSchedule.displayName')}</Title>
-        <ScheduleUpdateForm
-          onSelectGroup={this.onChangeGroup}
-          selectedGroup={selectedGroup}
-          groups={sortItems(groups)}
-          instanceTypes={sortItems(instanceTypes)}
-          images={sortItems(images)}
-          onSubmit={this.onSubmit}
-          loading={getGroups.loading || updatePhScheduleResult.loading}
-          type="schedule"
-          timezone={get(getTimezone, 'system.timezone')}
-          initialValue={{
-            ...get(getPhSchedule, 'phSchedule', {}) || {},
-            instanceTypeId: get(getPhSchedule, 'phSchedule.instanceType.id'),
-            instanceTypeName: get(getPhSchedule, 'phSchedule.instanceType.name'),
-          }}
-          onCancel={this.cancel}
+        <PageTitle
+          breadcrumb={<ScheduleBreadCrumb scheduleName={get(getPhSchedule, 'phSchedule.displayName')} />}
+          title={`Schedule: ${get(getPhSchedule, 'phSchedule.displayName')}`}
         />
+        <div style={{margin: 16}}>
+          <ScheduleUpdateForm
+            onSelectGroup={this.onChangeGroup}
+            selectedGroup={selectedGroup}
+            groups={sortItems(groups)}
+            instanceTypes={sortItems(instanceTypes)}
+            images={sortItems(images)}
+            onSubmit={this.onSubmit}
+            loading={getGroups.loading || updatePhScheduleResult.loading}
+            type="schedule"
+            timezone={get(getTimezone, 'system.timezone')}
+            initialValue={{
+              ...get(getPhSchedule, 'phSchedule', {}) || {},
+              instanceTypeId: get(getPhSchedule, 'phSchedule.instanceType.id'),
+              instanceTypeName: get(getPhSchedule, 'phSchedule.instanceType.name'),
+            }}
+            onCancel={this.cancel}
+          />
+        </div>
       </React.Fragment>
     );
   }
@@ -169,13 +168,9 @@ export default compose(
   graphql(UPDATE_SCHEDULE, {
     options: (props: Props) => ({
       onCompleted: () => {
-        const groups = get(props.getGroups, 'me.groups', []);
-        const where = JSON.stringify({
-          groupId_in: groups.map(group => group.id)
-        });
         props.history.push({
           pathname: `${appPrefix}schedule`,
-          search: queryString.stringify({where, first: 10})
+          search: queryString.stringify({first: 10})
         });
       },
       onError: errorHandler

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, Tabs, Form, Card, Input, Modal} from 'antd';
+import {Tabs, Form, Card, Input, Modal} from 'antd';
 import {Link} from 'react-router-dom';
 import {get} from 'lodash';
 import styled from 'styled-components';
@@ -8,9 +8,12 @@ import Log from './log';
 import {getActionByPhase, Phase} from 'components/job/phase';
 import Title from 'components/job/title';
 import Message from 'components/job/message';
+import JobBreadcrumb from 'components/job/breadcrumb';
 import {History} from 'history';
-
-const appPrefix = (window as any).APP_PREFIX || '/';
+import {appPrefix} from 'utils/env';
+import PageTitle from 'components/pageTitle';
+import PageBody from 'components/pageBody';
+import InfuseButton from 'components/infuseButton';
 
 const TabPane = Tabs.TabPane;
 
@@ -117,14 +120,6 @@ export default class Detail extends React.Component<Props> {
     });
   }
 
-  back = () => {
-    const {history} = this.props;
-    const pathname = get(history, 'location.state.prevPathname');
-    const search = get(history, 'location.state.prevSearch');
-    if (pathname)
-      return history.push(`${pathname}${search}`)
-    history.push(`${appPrefix}job`);
-  }
 
   render() {
     const {job, rerunPhJobResult, cancelPhJobResult, history} = this.props;
@@ -134,27 +129,19 @@ export default class Detail extends React.Component<Props> {
     const action = getActionByPhase(job.phase);
     return (
       <>
-        <TitleContainer>
-          <div>
-            <Button
-              icon="left"
-              onClick={this.back}
-              style={{marginRight: 16, verticalAlign: 'top'}}
+        <PageTitle
+          breadcrumb={<JobBreadcrumb jobName={job.displayName || job.name} />}
+          title={`Job: ${job.displayName || job.name}`}
+        />
+        <PageBody>
+          <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+            <InfuseButton
+              onClick={() => this.handleClick(action)}
+              loading={rerunPhJobResult.loading || cancelPhJobResult.loading}
             >
-              Back
-            </Button>
-            <Title>
-              Job: {job.displayName || job.name}
-            </Title>
+              {action}
+            </InfuseButton>
           </div>
-          <Button
-            onClick={() => this.handleClick(action)}
-            loading={rerunPhJobResult.loading || cancelPhJobResult.loading}
-          >
-            {action}
-          </Button>
-        </TitleContainer>
-        <Card>
           <Tabs>
             <TabPane key="information" tab="Information">
               <Form>
@@ -173,9 +160,9 @@ export default class Detail extends React.Component<Props> {
                 <Form.Item  style={formItemStyle} label="Schedule" {...formItemLayout}>
                   {
                     job.schedule ? (
-                      <a href={`${appPrefix}schedule/${job.schedule}`}>
+                      <Link to={`${appPrefix}schedule/${job.schedule}`}>
                         {job.schedule}
-                      </a>
+                      </Link>
                     ) : '-'
                   }
                   
@@ -227,7 +214,7 @@ export default class Detail extends React.Component<Props> {
               <Log endpoint={job.logEndpoint}/>
             </TabPane>
           </Tabs>
-        </Card>
+        </PageBody>
       </>
     )
   }
