@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import ModelDeploymentListContainer from 'containers/modelDeploymentList';
 import JobDetailContainer from 'containers/jobDetail';
-import JobCreatePage from 'containers/jobCreatePage';
+import DeploymentCreatePage from 'containers/deploymentCreatePage';
 import {appPrefix} from 'utils/env';
 const HEADER_HEIGHT = 64;
 
@@ -240,7 +240,7 @@ class Job extends React.Component {
                     <ModelDeploymentListContainer />
                   </Route>
                   <Route path={`${appPrefix}model-deployment/create`} exact>
-                    <JobCreatePage />
+                    <DeploymentCreatePage />
                   </Route>
                   <Route
                     path={`${appPrefix}model-deployment/:deploymentId`}

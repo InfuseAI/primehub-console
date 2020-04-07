@@ -92,12 +92,12 @@ class DeploymentCard extends React.Component<Props> {
         />
         <Field
           label="Metadata"
-          value={(
+          value={deployment.metadata ? (
             <Tooltip
               overlayStyle={{width: '100%'}}
               title={(
                 <>
-                  {Object.keys(deployment.metadata || {}).map(key => (
+                  {Object.keys(deployment.metadata).map(key => (
                     <Field
                       style={{marginBottom: 0}}
                       key={key}
@@ -112,7 +112,7 @@ class DeploymentCard extends React.Component<Props> {
                 View
               </a>
             </Tooltip>
-          )}
+          ): '-'}
         />
         <Field
           label="Last Updated"

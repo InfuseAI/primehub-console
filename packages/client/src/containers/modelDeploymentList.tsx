@@ -131,7 +131,7 @@ class DeploymentListContainer extends React.Component<Props, State> {
           <Row gutter={36}>
             {phDeploymentsConnection.edges.map(edge => {
               return (
-                <Col span={6} key={edge.cursor}>
+                <Col span={6} key={edge.cursor} style={{marginBottom: 36}}>
                   <DeploymentCard
                     deployment={edge.node}
                     copyClipBoard={this.copyClipBoard}

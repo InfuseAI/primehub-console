@@ -35,7 +35,7 @@ module.exports = {
         { from: /^\/schedule/, to: '/job.html' },
         { from: /^\/app-prefix\/landing/, to: '/landing.html' },
         { from: /^\/landing$/, to: '/landing.html' },
-        { from: /^\/model-deployment$/, to: '/model-deployment.html' },
+        { from: /^\/model-deployment/, to: '/model-deployment.html' },
         { from: /^\/app-prefix\/model-deployment/, to: './model-deployment.html' },
         { from: /./, to: '/index.html' }
       ]
