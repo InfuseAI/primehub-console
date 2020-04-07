@@ -14,6 +14,7 @@ module.exports = {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
     job: devMode ? './src/job.tsx' : ['./src/public-import.js', './src/job.tsx'],
+    'model-deployment': devMode ? './src/modelDeployment.tsx' : ['./src/public-import.js', './src/modelDeployment.tsx'],
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -34,6 +35,8 @@ module.exports = {
         { from: /^\/schedule/, to: '/job.html' },
         { from: /^\/app-prefix\/landing/, to: '/landing.html' },
         { from: /^\/landing$/, to: '/landing.html' },
+        { from: /^\/model-deployment$/, to: '/model-deployment.html' },
+        { from: /^\/app-prefix\/model-deployment/, to: './model-deployment.html' },
         { from: /./, to: '/index.html' }
       ]
     },
@@ -102,6 +105,11 @@ module.exports = {
       chunks: ['job'],
       template: 'docs/index.html',
       filename: 'job.html'
+    }),
+    new HtmlWebPackPlugin({
+      chunks: ['model-deployment'],
+      template: 'docs/index.html',
+      filename: 'model-deployment.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new MiniCssExtractPlugin({
