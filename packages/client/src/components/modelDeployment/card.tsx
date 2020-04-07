@@ -10,15 +10,30 @@ type Props = RouteComponentProps & {
   copyClipBoard: (text: string) => void;
 }
 
-function Field({
+export function Field({
   label,
   value,
+  type = 'horizontal',
   style = {}
 }: {
   label: React.ReactNode,
   value: React.ReactNode,
-  style?: object
+  style?: object,
+  type?: 'vertical' | 'horizontal'
 }) {
+  if (type === 'vertical') return (
+    <div style={{marginBottom: 8, ...style}}>
+      <div style={{
+        color: '#aaa',
+        marginBottom: 8
+      }}>
+        {label}
+      </div>
+      <div style={{color: '#333'}}>
+        {value}
+      </div>
+    </div>
+  )
   return (
     <Row gutter={12} style={{marginBottom: 8, ...style}}>
       <Col span={8} style={{

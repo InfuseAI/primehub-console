@@ -10,7 +10,7 @@ import Header from 'components/header';
 import styled from 'styled-components';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import ModelDeploymentListContainer from 'containers/modelDeploymentList';
-import JobDetailContainer from 'containers/jobDetail';
+import DeploymentDetailContainer from 'containers/deploymentDetail';
 import DeploymentCreatePage from 'containers/deploymentCreatePage';
 import {appPrefix} from 'utils/env';
 const HEADER_HEIGHT = 64;
@@ -245,7 +245,7 @@ class Job extends React.Component {
                   <Route
                     path={`${appPrefix}model-deployment/:deploymentId`}
                     exact
-                    component={JobDetailContainer}
+                    component={DeploymentDetailContainer}
                   />
                 </Switch>
               </ApolloProvider>

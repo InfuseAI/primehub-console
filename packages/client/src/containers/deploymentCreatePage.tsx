@@ -148,14 +148,14 @@ export default compose(
         notification.success({
           duration: 10,
           placement: 'bottomRight',
-          title: 'Success!',
-          message: (
+          message: 'Success!',
+          description: (
             <>
               Your model has begun deploying.
               Click <a onClick={() => history.push(`${appPrefix}model-deployment/${data.createPhDeployment.id}`)}>here</a> to view.
             </>
           )
-        })
+        });
       },
       onError: errorHandler
     }),
