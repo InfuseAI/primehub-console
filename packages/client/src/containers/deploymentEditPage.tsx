@@ -70,6 +70,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
     const {updatePhDeployment} = this.props;
     updatePhDeployment({
       variables: {
+        where: {id: payload.id},
         data: pick(payload, ['instanceType', 'modelImage', 'imagePullSecret', 'replicas', 'metadata', 'description'])
       }
     });
@@ -183,6 +184,7 @@ export default compose(
     options: (props: Props) => ({
       onCompleted: (data: any) => {
         const {history} = props;
+        history.push(`${appPrefix}model-deployment`);
         notification.success({
           duration: 10,
           placement: 'bottomRight',
