@@ -107,6 +107,7 @@ export default () => (
     </Condition>
 
     <string keyName="displayName" title="${displayName}" />
+    <boolean keyName="enabledDeployment" title="${groups.enabledDeployment}" uiParams={{yesText: ' ', noText: ' '}} />
     <ShareVolumn />
     <Block title="User Quota">
       <Row type="flex">
