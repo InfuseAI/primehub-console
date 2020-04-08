@@ -14,20 +14,7 @@ import PageTitle from 'components/modelDeployment/pageTitle';
 import InfuseButton from 'components/infuseButton';
 import {PhDeploymentFragment} from 'components/modelDeployment/common';
 import {GET_PH_DEPLOYMENT, getMessage} from './deploymentDetail';
-
-export const GET_MY_GROUPS = gql`
-  query me {
-    me(groupsWhere: {enableDeployment: true}) {
-      id
-      groups {
-        ...GroupInfo
-        instanceTypes { id name displayName description spec global gpuLimit memoryLimit cpuLimit }
-        images { id name displayName description spec global type }
-      }
-    }
-  }
-  ${GroupFragment}
-`
+import {GET_MY_GROUPS} from './deploymentCreatePage';
 
 export const UPDATE_DEPLOYMENT = gql`
   mutation updatePhDeployment($where: PhDeploymentWhereUniqueInput!, $data: PhDeploymentUpdateInput!) {

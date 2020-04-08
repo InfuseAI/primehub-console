@@ -16,7 +16,7 @@ import InfuseButton from 'components/infuseButton';
 
 export const GET_MY_GROUPS = gql`
   query me {
-    me(groupsWhere: {enableDeployment: true}) {
+    me(groupsWhere: {enabledDeployment: true}) {
       id
       groups {
         ...GroupInfo
