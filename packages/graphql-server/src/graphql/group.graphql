@@ -26,6 +26,8 @@ type Group {
   sharedVolumeCapacity: Int
   homeSymlink: Boolean
   launchGroupOnly: Boolean
+  # enabledDeployment
+  enabledDeployment: Boolean
 }
 
 """An edge in a connection."""
@@ -85,6 +87,8 @@ input GroupCreateInput {
   workspaceId: String
   # dataset placeholder
   datasets: DatasetPlaceHolder
+  # enabledDeployment
+  enabledDeployment: Boolean
 }
 
 input GroupUpdateInput {
@@ -106,6 +110,8 @@ input GroupUpdateInput {
   launchGroupOnly: Boolean
   # dataset placeholder
   datasets: DatasetPlaceHolder
+  # enabledDeployment
+  enabledDeployment: Boolean
 }
 
 """Relation input"""

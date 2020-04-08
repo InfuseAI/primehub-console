@@ -203,6 +203,21 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     });
   });
 
+  // model deployment
+  rootRouter.get('/model-deployment', oidcCtrl.loggedIn, async ctx => {
+    await ctx.render('model-deployment', {
+      title: 'PrimeHub Model Deployment',
+      staticPath
+    });
+  });
+
+  rootRouter.get('/model-deployment/*', oidcCtrl.loggedIn, async ctx => {
+    await ctx.render('model-deployment', {
+      title: 'PrimeHub Model Deployment',
+      staticPath
+    });
+  });
+
   // cms
   rootRouter.get('/cms', oidcCtrl.ensureAdmin, async ctx => {
     await ctx.render('cms', {title: 'PrimeHub', staticPath});

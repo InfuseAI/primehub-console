@@ -24,6 +24,7 @@ export enum components {
   workspace = 'Workspace',
   buildImage = 'BuildImage',
   phJob = 'PhJob',
+  phDeployment = 'PhDeployment',
   internal = 'Internal'
 }
 

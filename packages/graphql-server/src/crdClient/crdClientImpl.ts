@@ -176,6 +176,45 @@ export interface PhScheduleStatus {
   nextRunTime: string;
 }
 
+// PhDeployment
+export enum PhDeploymentPhase {
+  Deploying = 'deploying',
+  Deployed = 'deployed',
+  Stopped = 'stopped',
+  Failed = 'failed',
+}
+
+export interface PhDeploymentSpec {
+  displayName: string;
+  userId: string;
+  userName: string;
+  groupId: string;
+  groupName: string;
+  stop: boolean;
+  description: string;
+  updateTime: string;
+  predictors: Array<{
+    name: string;
+    replicas: number;
+    modelImage: string;
+    instanceType: string;
+    imagePullSecret: string;
+    metadata: Record<string, any>;
+  }>;
+}
+
+export interface PhDeploymentStatus {
+  phase: PhDeploymentPhase;
+  message: string;
+  replicas: number;
+  availableReplicas: number;
+  endpoint: string;
+  history: Array<{
+    time: string;
+    spec: PhDeploymentSpec;
+  }>;
+}
+
 /**
  * CRD
  */
@@ -200,6 +239,7 @@ export default class CrdClientImpl {
   public imageSpecJobs: CustomResource<ImageSpecJobSpec, ImageSpecJobStatus>;
   public phJobs: CustomResource<PhJobSpec, PhJobStatus>;
   public phSchedules: CustomResource<PhScheduleSpec, PhScheduleStatus>;
+  public phDeployments: CustomResource<PhDeploymentSpec, PhDeploymentStatus>;
   private namespace: string;
 
   constructor(args?: CrdArgs) {
@@ -244,6 +284,12 @@ export default class CrdClientImpl {
       client,
       watch,
       loadCrd('phSchedule'),
+      this.namespace
+    );
+    this.phDeployments = new CustomResource<PhDeploymentSpec, PhDeploymentStatus>(
+      client,
+      watch,
+      loadCrd('phDeployment'),
       this.namespace
     );
     this.announcements = new CustomResource<AnnouncementSpec>(
