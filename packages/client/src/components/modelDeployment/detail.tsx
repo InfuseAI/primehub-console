@@ -133,8 +133,8 @@ export default class Detail extends React.Component<Props> {
   }
 }
 
-function Metadata({metadata = {}}: {metadata: object}) {
-  const metadataList = Object.keys(metadata).map(key => ({
+function Metadata({metadata}: {metadata: object}) {
+  const metadataList = Object.keys(metadata || {}).map(key => ({
     key,
     value: metadata[key]
   }));

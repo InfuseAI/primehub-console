@@ -9,6 +9,7 @@ const InputGroup = Input.Group;
 type Props = {
   onChange?: (value: object) => void;
   disabled?: boolean;
+  value?: object;
 }
 
 type State = {

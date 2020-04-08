@@ -12,6 +12,7 @@ import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import ModelDeploymentListContainer from 'containers/modelDeploymentList';
 import DeploymentDetailContainer from 'containers/deploymentDetail';
 import DeploymentCreatePage from 'containers/deploymentCreatePage';
+import DeploymentEditPage from 'containers/deploymentEditPage';
 import {appPrefix} from 'utils/env';
 const HEADER_HEIGHT = 64;
 
@@ -111,7 +112,7 @@ const fakeData = {
     batch3
     batch4
     `,
-    groupId: 'groupId',
+    groupId: 'everyone',
     groupName: 'groupName',
     endpoint: '/',
     modelImage: 'imageurl',
@@ -140,7 +141,7 @@ const fakeData = {
     batch3
     batch4
     `,
-    groupId: 'groupId',
+    groupId: 'everyone',
     groupName: 'groupName',
     endpoint: '/',
     modelImage: 'imageurl',
@@ -168,7 +169,7 @@ const fakeData = {
     batch3
     batch4
     `,
-    groupId: 'groupId',
+    groupId: 'everyone',
     groupName: 'groupName',
     endpoint: '/',
     modelImage: 'imageurl',
@@ -197,7 +198,7 @@ const fakeData = {
     batch3
     batch4
     `,
-    groupId: 'groupId',
+    groupId: 'everyone',
     groupName: 'groupName',
     endpoint: '/',
     modelImage: 'imageurl',
@@ -247,6 +248,12 @@ class Job extends React.Component {
                     exact
                     component={DeploymentDetailContainer}
                   />
+                  <Route
+                    path={`${appPrefix}model-deployment/edit/:deploymentId`}
+                    exact
+                  >
+                     <DeploymentEditPage />
+                  </Route>
                 </Switch>
               </ApolloProvider>
             </Content>

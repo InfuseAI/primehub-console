@@ -34,6 +34,7 @@ export interface DeploymentInfo {
   endpoint: string;
   modelImage: string;
   replicas: number;
+  imagePullSecret: string;
   instanceType: {
     id: string;
     name: string;
@@ -59,6 +60,7 @@ fragment PhDeploymentInfo on PhDeployment {
   endpoint
   modelImage
   replicas
+  imagePullSecret
   instanceType {
     id
     name

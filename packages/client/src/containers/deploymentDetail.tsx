@@ -48,7 +48,7 @@ export const DELETE_DEPLOYMENT = gql`
   ${PhDeploymentFragment}
 `;
 
-const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
+export const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 
 class JobDetailContainer extends React.Component<Props> {
   render() {

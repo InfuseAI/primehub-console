@@ -3,19 +3,20 @@ import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Ic
 import {FormComponentProps} from 'antd/lib/form';
 import {get, snakeCase, debounce} from 'lodash';
 import DynamicFields from 'components/share/dynamicFields';
+import InfuseButton from 'components/infuseButton';
 
 const { Option } = Select;
 
 type Props = FormComponentProps & {
   groups: Array<Record<string, any>>;
-  onSelectGroup: Function;
+  onSelectGroup?: Function;
   selectedGroup: string;
   instanceTypes: Array<Record<string, any>>;
-  images: Array<Record<string, any>>;
   onSubmit: Function;
   onCancel?: Function;
   loading: boolean;
   initialValue?: any;
+  type?: 'edit' | 'create';
 };
 
 type State = {
@@ -52,16 +53,6 @@ type FormValue = {
   replicas: number;
 };
 
-const transformImages = (images, instanceType) => {
-  const gpuInstance = Boolean(instanceType && instanceType.gpuLimit);
-  return images.map(image => {
-    return {
-      ...image,
-      __disabled: !gpuInstance && (image.type || '').toLowerCase() === 'gpu'
-    };
-  });
-}
-
 const dashOrNumber = value => value === null ? '-' : value;
 
 const autoGenId = (name: string) => {
@@ -92,7 +83,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
     const {onSelectGroup, selectedGroup, groups, form} = this.props;
     if (!selectedGroup && groups.length) {
       const id = get(groups[0], 'id', null);
-      onSelectGroup(id);
+      onSelectGroup && onSelectGroup(id);
       form.setFieldsValue({groupId: id});
     }
   }
@@ -147,22 +138,25 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       groups,
       onSelectGroup,
       instanceTypes,
-      images,
       loading,
       form,
       initialValue,
       selectedGroup,
+      type
     } = this.props;
-    const instanceType = instanceTypes.find(instanceType => instanceType.id === form.getFieldValue('instanceType'));
     const {
       groupId,
       groupName,
       instanceTypeId,
       instanceTypeName,
-      image,
-      name
+      name,
+      replicas,
+      id,
+      modelImage,
+      imagePullSecret,
+      description,
+      metadata,
     } = initialValue || {};
-
     const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
     const groupLabel = this.renderLabel(
       'Group',
@@ -180,16 +174,6 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       <span>The instance type <b>{instanceTypeName}</b> was deleted.</span>
     )
 
-    const invalidInitialImage = !invalidInitialGroup &&
-      image &&
-      !form.getFieldValue('image') &&
-      !images.find(it => it.id === image);
-    const imageLabel = this.renderLabel(
-      'Images',
-      invalidInitialImage,
-      <span>The image <b>{image}</b> was deleted.</span>
-    )
-
     return (
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
@@ -204,7 +188,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                       initialValue: invalidInitialGroup ? '' : groupId,
                       rules: [{ required: true, message: 'Please select a group!' }],
                     })(
-                      <Select placeholder="Please select a group" onChange={id => onSelectGroup(id)}>
+                      <Select disabled={type === 'edit'} placeholder="Please select a group" onChange={id => onSelectGroup(id)}>
                         {groups.map(group => (
                           <Option key={group.id} value={group.id}>
                             {group.displayName || group.name}
@@ -259,7 +243,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
 
               <Form.Item label="Replicas">
                 {form.getFieldDecorator('replicas', {
-                  initialValue: 0,
+                  initialValue: replicas,
                   rules: [{ required: true, message: 'Please input replicas!' }],
                 })(
                   <InputNumber />
@@ -280,11 +264,13 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                     { pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*/, message: `alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`}
                   ],
                 })(
-                  <Input onChange={this.handleNameChange} />
+                  <Input disabled={type === 'edit'} onChange={this.handleNameChange} />
                 )}
               </Form.Item>
               <Form.Item label={`Deployment ID`}>
-                {form.getFieldDecorator('id')(
+                {form.getFieldDecorator('id', {
+                  initialValue: id
+                })(
                   <Input disabled />
                 )}
               </Form.Item>
@@ -295,6 +281,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                       rules: [
                         { whitespace: true, required: true, message: 'Please input a model image url!' },
                       ],
+                      initialValue: modelImage
                     })(
                       <Input />
                     )}
@@ -303,8 +290,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                 <Col span={12}>
                   <Form.Item label={`Image Pull Secret`}>
                     {form.getFieldDecorator('imagePullSecret', {
-                      rules: [
-                      ],
+                      initialValue: imagePullSecret,
                     })(
                       <Input />
                     )}
@@ -313,6 +299,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
               </Row>
               <Form.Item label="description" >
                 {form.getFieldDecorator('description', {
+                  initialValue: description
                 })(
                   <Input.TextArea
                     rows={4}
@@ -323,6 +310,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
               <Divider />
               <Form.Item >
                 {form.getFieldDecorator('metadata', {
+                  initialValue: metadata
                 })(
                   <DynamicFields />
                 )}
@@ -330,23 +318,23 @@ class DeploymentCreateForm extends React.Component<Props, State> {
             </Card>
             <Form.Item style={{textAlign: 'right', marginRight: 8, marginTop: 24}}>
               {
-                initialValue ? (
+                type === 'edit' ? (
                   <>
-                    <Button
+                    <InfuseButton
                       type="primary"
                       htmlType="submit"
-                      style={{marginRight: 16}}
+                      style={{marginRight: 16, width: 'auto'}}
                     >
-                      Confirm
-                    </Button>
-                    <Button onClick={this.cancel}>
+                      Confirm and Deployment
+                    </InfuseButton>
+                    <InfuseButton onClick={this.cancel}>
                       Cancel
-                    </Button>
+                    </InfuseButton>
                   </>
                 ) : (
-                  <Button type="primary" htmlType="submit">
+                  <InfuseButton type="primary" htmlType="submit">
                     Deploy
-                  </Button>
+                  </InfuseButton>
                 )
               }
             </Form.Item>
