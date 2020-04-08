@@ -14,6 +14,15 @@ import DeploymentDetailContainer from 'containers/deploymentDetail';
 import DeploymentCreatePage from 'containers/deploymentCreatePage';
 import DeploymentEditPage from 'containers/deploymentEditPage';
 import {appPrefix} from 'utils/env';
+import {dict} from '../schema/utils';
+import en from 'react-intl/locale-data/en';
+import 'moment/locale/zh-tw';
+import {IntlProvider, addLocaleData} from 'react-intl';
+addLocaleData([...en])
+import myLocales from './utils/locales';
+const locale = (window as any).LOCALE || 'en';
+
+
 const HEADER_HEIGHT = 64;
 
 const Content = styled(Layout.Content)`
@@ -35,6 +44,12 @@ const graphqlClient = new GraphqlClient({
 });
 
 const fakeData = {
+  secrets: [{
+    id: 'secret1',
+    name: 'secret name',
+    type: 'secret',
+    ifDockerConfigJson: true,
+  }],
   me: {
     groups: [{
       id: 'groupId1',
@@ -223,43 +238,46 @@ const connector = new LocalStorageConnector({
   localStorageKey: 'infuse-deployment'
 })
 
+const objectListType = {type: 'array',items: {type: 'object'}};
 const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
-  {connector, schema: {me: {type: 'object'}, phDeployments: {type: 'array',items: {type: 'object'}}}});
+  {connector, schema: {secrets: objectListType, me: {type: 'object'}, phDeployments: objectListType}});
 
 class Job extends React.Component {
   render() {
     return (
-      <BrowserRouter>
-        <Layout>
-          <Header />
+      <IntlProvider locale={locale} messages={{...dict[locale], ...myLocales[locale]}}>
+        <BrowserRouter>
           <Layout>
-            <Content>
-              <ApolloProvider client={client}>
-                <Switch>
-                  <Route path={`${appPrefix}model-deployment`} exact>
-                    <ModelDeploymentListContainer />
-                  </Route>
-                  <Route path={`${appPrefix}model-deployment/create`} exact>
-                    <DeploymentCreatePage />
-                  </Route>
-                  <Route
-                    path={`${appPrefix}model-deployment/:deploymentId`}
-                    exact
-                    component={DeploymentDetailContainer}
-                  />
-                  <Route
-                    path={`${appPrefix}model-deployment/edit/:deploymentId`}
-                    exact
-                  >
-                     <DeploymentEditPage />
-                  </Route>
-                </Switch>
-              </ApolloProvider>
-            </Content>
+            <Header />
+            <Layout>
+              <Content>
+                <ApolloProvider client={client}>
+                  <Switch>
+                    <Route path={`${appPrefix}model-deployment`} exact>
+                      <ModelDeploymentListContainer />
+                    </Route>
+                    <Route path={`${appPrefix}model-deployment/create`} exact>
+                      <DeploymentCreatePage />
+                    </Route>
+                    <Route
+                      path={`${appPrefix}model-deployment/:deploymentId`}
+                      exact
+                      component={DeploymentDetailContainer}
+                    />
+                    <Route
+                      path={`${appPrefix}model-deployment/edit/:deploymentId`}
+                      exact
+                    >
+                      <DeploymentEditPage />
+                    </Route>
+                  </Switch>
+                </ApolloProvider>
+              </Content>
+            </Layout>
           </Layout>
-        </Layout>
-      </BrowserRouter>
+        </BrowserRouter>
+      </IntlProvider>
     )
   }
 }

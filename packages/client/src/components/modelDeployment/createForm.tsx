@@ -4,6 +4,7 @@ import {FormComponentProps} from 'antd/lib/form';
 import {get, snakeCase, debounce} from 'lodash';
 import DynamicFields from 'components/share/dynamicFields';
 import InfuseButton from 'components/infuseButton';
+import ImagePullSecret from 'components/share/ImagePullSecret';
 
 const { Option } = Select;
 
@@ -243,7 +244,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
 
               <Form.Item label="Replicas">
                 {form.getFieldDecorator('replicas', {
-                  initialValue: replicas,
+                  initialValue: replicas || 0,
                   rules: [{ required: true, message: 'Please input replicas!' }],
                 })(
                   <InputNumber />
@@ -292,7 +293,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                     {form.getFieldDecorator('imagePullSecret', {
                       initialValue: imagePullSecret,
                     })(
-                      <Input />
+                      <ImagePullSecret />
                     )}
                   </Form.Item>
                 </Col>
