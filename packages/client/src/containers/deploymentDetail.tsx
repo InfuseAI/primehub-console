@@ -14,8 +14,10 @@ type Props = {
   getPhDeployment: any;
   stopPhDeployment: Function;
   deletePhDeployment: Function;
+  deployPhDeployment: Function;
   stopPhDeploymentResult: any;
   deletePhDeploymentResult: any;
+  deployPhDeploymentResult: any;
 } & RouteComponentProps<{
   deploymentId: string;
 }>;
@@ -48,11 +50,20 @@ export const DELETE_DEPLOYMENT = gql`
   ${PhDeploymentFragment}
 `;
 
+export const DEPLOY_DEPLOYMENT = gql`
+  mutation deployPhDeployment($where: PhDeploymentWhereUniqueInput!) {
+    deployPhDeployment(where: $where) {
+      ...PhDeploymentInfo
+    }
+  }
+  ${PhDeploymentFragment}
+`;
+
 export const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 
 class JobDetailContainer extends React.Component<Props> {
   render() {
-    const {getPhDeployment, history, stopPhDeployment, deletePhDeployment, stopPhDeploymentResult, deletePhDeploymentResult} = this.props;
+    const {getPhDeployment, history, stopPhDeployment, deletePhDeployment, stopPhDeploymentResult, deletePhDeploymentResult, deployPhDeployment, deployPhDeploymentResult} = this.props;
     if (getPhDeployment.loading) return null;
     if (getPhDeployment.error) {
       return getMessage(getPhDeployment.error)
@@ -62,8 +73,10 @@ class JobDetailContainer extends React.Component<Props> {
         history={history}
         stopPhDeployment={stopPhDeployment}
         deletePhDeployment={deletePhDeployment}
+        deployPhDeployment={deployPhDeployment}
         stopPhDeploymentResult={stopPhDeploymentResult}
         deletePhDeploymentResult={deletePhDeploymentResult}
+        deployPhDeploymentResult={deployPhDeploymentResult}
         phDeployment={getPhDeployment.phDeployment || {id: 'test'}}
       />
     );
@@ -112,5 +125,22 @@ export default compose(
       onError: errorHandler
     }),
     name: 'deletePhDeployment'
+  }),
+  graphql(DEPLOY_DEPLOYMENT, {
+    options: (props: Props) => ({
+      refetchQueries: [{
+        query: GET_PH_DEPLOYMENT,
+        variables: {where: {id: props.match.params.deploymentId}}
+      }],
+      onCompleted: () => {
+        notification.success({
+          duration: 10,
+          placement: 'bottomRight',
+          message: 'The model deployment has been deployed.'
+        })
+      },
+      onError: errorHandler
+    }),
+    name: 'deployPhDeployment'
   })
 )(JobDetailContainer)

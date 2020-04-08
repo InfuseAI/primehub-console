@@ -7,7 +7,7 @@ import moment, { Moment } from 'moment';
 import Log from './log';
 import {getActionByPhase, Phase} from 'components/job/phase';
 import Title from 'components/job/title';
-import Message from 'components/job/message';
+import Message from 'components/share/message';
 import JobBreadcrumb from 'components/job/breadcrumb';
 import {History} from 'history';
 import {appPrefix} from 'utils/env';

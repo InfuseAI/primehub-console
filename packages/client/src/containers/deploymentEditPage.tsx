@@ -1,10 +1,9 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
-import {Icon, notification} from 'antd';
+import {Icon, notification, Modal} from 'antd';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
-import {get, unionBy} from 'lodash';
-import queryString from 'querystring';
+import {get, unionBy, isEqual, pick} from 'lodash';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'components/job/errorHandler';
@@ -71,7 +70,38 @@ class DeploymentCreatePage extends React.Component<Props, State> {
     const {updatePhDeployment} = this.props;
     updatePhDeployment({
       variables: {
-        data: payload
+        data: pick(payload, ['instanceType', 'modelImage', 'imagePullSecret', 'replicas', 'metadata', 'description'])
+      }
+    });
+  }
+
+  onCancel = values => {
+    const {history, getPhDeployment} = this.props;
+    const initialValue = {
+      id: get(getPhDeployment, 'phDeployment.id'),
+      instanceType: get(getPhDeployment, 'phDeployment.instanceType.id'),
+      modelImage: get(getPhDeployment, 'phDeployment.modelImage'),
+      imagePullSecret: get(getPhDeployment, 'phDeployment.imagePullSecret'),
+      replicas: get(getPhDeployment, 'phDeployment.replicas'),
+      groupId: get(getPhDeployment, 'phDeployment.groupId'),
+      name: get(getPhDeployment, 'phDeployment.name'),
+      metadata: get(getPhDeployment, 'phDeployment.metadata'),
+      description: get(getPhDeployment, 'phDeployment.description'),
+    }
+    if (isEqual(values, initialValue))
+      return history.push(`${appPrefix}model-deployment`);
+
+    Modal.confirm({
+      title: 'Do you want to discard the changes?',
+      content: 'Your changes will be lost. Are you sure?',
+      okText: 'Discard',
+      cancelText: 'Cancel',
+      onOk: () => history.push(`${appPrefix}model-deployment`),
+      cancelButtonProps: {
+        style: {
+          float: 'right',
+          marginLeft: 8
+        }
       }
     });
   }
@@ -125,6 +155,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
           groups={sortItems(groups)}
           instanceTypes={sortItems(instanceTypes)}
           onSubmit={this.onSubmit}
+          onCancel={this.onCancel}
           loading={getGroups.loading || updatePhDeploymentResult.loading}
         />
       </React.Fragment>

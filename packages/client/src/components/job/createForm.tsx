@@ -3,7 +3,7 @@ import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Ic
 import {FormComponentProps} from 'antd/lib/form';
 import {get, startCase} from 'lodash';
 import RecurrenceInput, {RecurrenceType, recurrenceValidator} from 'components/schedule/recurrence';
-import Message from 'components/job/message';
+import Message from 'components/share/message';
 
 const { Option } = Select;
 

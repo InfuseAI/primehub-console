@@ -6,6 +6,7 @@ import InfuseButton from 'components/infuseButton';
 import { appPrefix } from 'utils/env';
 import {Link} from 'react-router-dom';
 import {Field} from 'components/modelDeployment/card';
+import Message from 'components/share/message';
 import moment from 'moment';
 
 const {confirm} = Modal;
@@ -13,8 +14,10 @@ const {confirm} = Modal;
 type Props = {
   stopPhDeployment: Function;
   deletePhDeployment: Function;
+  deployPhDeployment: Function;
   stopPhDeploymentResult: any;
   deletePhDeploymentResult: any;
+  deployPhDeploymentResult: any;
   phDeployment: DeploymentInfo;
   history: any;
 }
@@ -49,9 +52,23 @@ export default class Detail extends React.Component<Props> {
       },
     });
   }
+
+  handleDeploy = () => {
+    const {phDeployment, deployPhDeployment} = this.props;
+    confirm({
+      title: `Deploy`,
+      content: `Do you want to deploy '${phDeployment.name}'?`,
+      iconType: 'info-circle',
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk() {
+        return deployPhDeployment({variables: {where: {id: phDeployment.id}}});
+      },
+    });
+  }
   
   render() {
-    const {phDeployment, stopPhDeploymentResult, deletePhDeploymentResult, history} = this.props;
+    const {phDeployment, stopPhDeploymentResult, deletePhDeploymentResult, deployPhDeploymentResult, history} = this.props;
     return (
       <>
         <PageTitle
@@ -68,17 +85,29 @@ export default class Detail extends React.Component<Props> {
             <InfuseButton onClick={this.handleDelete} style={{marginRight: 16}}>
               Delete
             </InfuseButton>
-            <InfuseButton onClick={this.handleStop} style={{marginRight: 16}}>
-              Stop
-            </InfuseButton>
-            <InfuseButton>
-              <Link to={`${appPrefix}model-deployment/edit/${phDeployment.id}`}>
-                Update
-              </Link>
-            </InfuseButton>
+            {
+              (phDeployment.status === Status.Failed || phDeployment.status === Status.Deployed) ? (
+                <InfuseButton onClick={this.handleStop} style={{marginRight: 16}}>
+                  Stop
+                </InfuseButton>
+              ) : (
+                <InfuseButton onClick={this.handleDeploy} style={{marginRight: 16}}>
+                  Deploy
+                </InfuseButton>
+              )
+            }
+            {
+              phDeployment.status !== Status.Deploying && (
+                <InfuseButton>
+                  <Link to={`${appPrefix}model-deployment/edit/${phDeployment.id}`}>
+                    Update
+                  </Link>
+                </InfuseButton>
+              )
+            }
           </div>}
         />
-        <Card loading={stopPhDeploymentResult.loading || deletePhDeploymentResult.loading}>
+        <Card loading={stopPhDeploymentResult.loading || deletePhDeploymentResult.loading || deployPhDeploymentResult.loading}>
           <Tabs>
             <Tabs.TabPane tab="Information" />
           </Tabs>
@@ -92,12 +121,12 @@ export default class Detail extends React.Component<Props> {
             <Divider />
             <Row>
               <Col span={12}>
-                <Field label="Endpoint" value={phDeployment.endpoint} />
-                <Field label="Model Image" value={phDeployment.modelImage} />
+                <Field label="Endpoint" value={phDeployment.status === Status.Deployed ? phDeployment.endpoint : '-'} />
+                <Field label="Model Image" value={phDeployment.status !== Status.Stopped ? phDeployment.modelImage : '-'} />
                 <Field label="Replicas" value={phDeployment.replicas} />
                 <Field label="Deployment Name" value={phDeployment.name} />
                 <Field label="Group" value={phDeployment.groupName} />
-                <Field label="Instance Type" value={renderInstanceType(phDeployment.instanceType || {})} />
+                <Field label="Instance Type" value={phDeployment.status !== Status.Stopped ? renderInstanceType(phDeployment.instanceType || {}) : '-'} />
                 <Field label="Creation Time" value={renderTime(phDeployment.creationTime)} />
                 <Field label="Last Updated" value={renderTime(phDeployment.lastUpdatedTime)} />
               </Col>
@@ -164,7 +193,7 @@ function getMessage(deployment: DeploymentInfo) {
     case Status.Deployed:
       return 'Deployment completed';
     case Status.Failed:
-      return 'Depends on error type';
+      return <Message text={deployment.message} />;
     case Status.Deploying:
     case Status.Stopped:
     default:
