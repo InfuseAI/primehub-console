@@ -326,7 +326,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                       htmlType="submit"
                       style={{marginRight: 16, width: 'auto'}}
                     >
-                      Confirm and Deployment
+                      Confirm and Deploy
                     </InfuseButton>
                     <InfuseButton onClick={this.cancel}>
                       Cancel
