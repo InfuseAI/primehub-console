@@ -1,10 +1,10 @@
 import gql from 'graphql-tag';
 
 export enum Status {
-  Deploying = 'Deploying',
-  Deployed = 'Deployed',
-  Stopped = 'Stopped',
-  Failed = 'Failed',
+  deploying = 'deploying',
+  deployed = 'deployed',
+  stopped = 'stopped',
+  failed = 'failed',
 }
 
 export interface DeploymentConnection {

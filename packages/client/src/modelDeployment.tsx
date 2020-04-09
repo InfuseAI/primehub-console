@@ -122,7 +122,7 @@ const fakeData = {
     name: 'd0',
     description: 'd0',
     schedule: 'd0',
-    status: 'Failed',
+    status: 'failed',
     creationTIme: '2019-10-04T14:48:00.000Z',
     lastUpdatedTime: '2019-10-04T14:48:00.000Z',
     message: `batch1
@@ -132,7 +132,7 @@ const fakeData = {
     `,
     groupId: 'everyone',
     groupName: 'groupName',
-    endpoint: '/',
+    endpoint: 'https://endpoint/modedeployment/example/test/1',
     modelImage: 'imageurl',
     replicas: 4,
     instanceType: {
@@ -151,7 +151,7 @@ const fakeData = {
     name: 'd1',
     description: 'd1',
     schedule: 'd1',
-    status: 'Deployed',
+    status: 'deployed',
     creationTIme: '2019-10-04T14:48:00.000Z',
     lastUpdatedTime: '2019-10-04T14:48:00.000Z',
     message: `batch1
@@ -161,7 +161,7 @@ const fakeData = {
     `,
     groupId: 'everyone',
     groupName: 'groupName',
-    endpoint: '/',
+    endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
     replicas: 4,
     instanceType: {
@@ -179,7 +179,7 @@ const fakeData = {
     id: 'id2',
     name: 'd2',
     description: 'd2',
-    status: 'Deploying',
+    status: 'deploying',
     creationTIme: '2019-10-04T14:48:00.000Z',
     lastUpdatedTime: '2019-10-04T14:48:00.000Z',
     message: `batch1
@@ -189,7 +189,7 @@ const fakeData = {
     `,
     groupId: 'everyone',
     groupName: 'groupName',
-    endpoint: '/',
+    endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
     replicas: 4,
     instanceType: {
@@ -208,7 +208,7 @@ const fakeData = {
     id: 'id3',
     name: 'd3',
     description: 'd3',
-    status: 'Stopped',
+    status: 'stopped',
     creationTIme: '2019-10-04T14:48:00.000Z',
     lastUpdatedTime: '2019-10-04T14:48:00.000Z',
     message: `batch1
@@ -218,7 +218,7 @@ const fakeData = {
     `,
     groupId: 'everyone',
     groupName: 'groupName',
-    endpoint: '/',
+    endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
     replicas: 4,
     instanceType: {
