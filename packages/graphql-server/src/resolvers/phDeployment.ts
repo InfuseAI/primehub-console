@@ -75,7 +75,7 @@ export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>
     groupName,
 
     // status
-    status: capitalize(status) as any,
+    status,
     message: get(item, 'status.message'),
     endpoint: get(item, 'status.endpoint'),
 
@@ -247,7 +247,7 @@ const listQuery = async (client: CustomResource<PhDeploymentSpec>, where: any, c
   // }
 
   // sort by updateTime
-  transformedPhDeployments = orderBy(transformedPhDeployments, 'updateTime', 'desc');
+  transformedPhDeployments = orderBy(transformedPhDeployments, 'lastUpdatedTime', 'desc');
   return filter(transformedPhDeployments, omit(where, 'mine'));
 };
 

@@ -14,16 +14,12 @@
 
 scalar JSON
 
-input MeGroupWhere {
-  enabledDeployment: Boolean
-}
-
 type Query {
   """System"""
   system: System!
 
   """User"""
-  me(groupsWhere: MeGroupWhere): User
+  me: User
   user(where: UserWhereUniqueInput!): User
   users(
     where: UserWhereInput
