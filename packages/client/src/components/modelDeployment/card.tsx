@@ -50,13 +50,13 @@ export function Field({
 
 function getCardColor(deployment: DeploymentInfo) {
   switch (deployment.status) {
-    case Status.Deployed:
+    case Status.deployed:
       return '#33ea33';
-    case Status.Deploying:
+    case Status.deploying:
       return 'orange'
-    case Status.Failed:
+    case Status.failed:
       return 'red';
-    case Status.Stopped:
+    case Status.stopped:
     default:
       return '#aaa';
   }
@@ -82,7 +82,7 @@ class DeploymentCard extends React.Component<Props> {
         />
         <Field
           label="Endpoint"
-          value={(
+          value={deployment.status === Status.deployed ? (
             <Tooltip title={(
               <span>
                 Click to copy:
@@ -92,18 +92,22 @@ class DeploymentCard extends React.Component<Props> {
             )}>
               <a
                 style={{
+                  textDecoration: 'underline',
                   overflow: 'hidden',
-                  textDecoration: 'underline'
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  msTextOverflow: 'ellipsis',
+                  display: 'block'
                 }}
                 onClick={e => {
                   e.stopPropagation();
                   copyClipBoard(deployment.endpoint || '')
                 }}
               >
-                {deployment.endpoint || ''}
+                {deployment.endpoint}
               </a>
             </Tooltip>
-          )}
+          ) : '-'}
         />
         <Field
           label="Metadata"

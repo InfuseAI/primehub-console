@@ -86,7 +86,7 @@ export default class Detail extends React.Component<Props> {
               Delete
             </InfuseButton>
             {
-              (phDeployment.status === Status.Failed || phDeployment.status === Status.Deployed) ? (
+              (phDeployment.status === Status.deploying || phDeployment.status === Status.deployed) ? (
                 <InfuseButton onClick={this.handleStop} style={{marginRight: 16}}>
                   Stop
                 </InfuseButton>
@@ -97,7 +97,7 @@ export default class Detail extends React.Component<Props> {
               )
             }
             {
-              phDeployment.status !== Status.Deploying && (
+              phDeployment.status !== Status.deploying && (
                 <InfuseButton>
                   <Link to={`${appPrefix}model-deployment/edit/${phDeployment.id}`}>
                     Update
@@ -121,12 +121,12 @@ export default class Detail extends React.Component<Props> {
             <Divider />
             <Row>
               <Col span={12}>
-                <Field label="Endpoint" value={phDeployment.status === Status.Deployed ? phDeployment.endpoint : '-'} />
-                <Field label="Model Image" value={phDeployment.status !== Status.Stopped ? phDeployment.modelImage : '-'} />
+                <Field label="Endpoint" value={phDeployment.status === Status.deployed ? phDeployment.endpoint : '-'} />
+                <Field label="Model Image" value={phDeployment.status !== Status.stopped ? phDeployment.modelImage : '-'} />
                 <Field label="Replicas" value={phDeployment.replicas} />
                 <Field label="Deployment Name" value={phDeployment.name} />
                 <Field label="Group" value={phDeployment.groupName} />
-                <Field label="Instance Type" value={phDeployment.status !== Status.Stopped ? renderInstanceType(phDeployment.instanceType || {}) : '-'} />
+                <Field label="Instance Type" value={phDeployment.status !== Status.stopped ? renderInstanceType(phDeployment.instanceType || {}) : '-'} />
                 <Field label="Creation Time" value={renderTime(phDeployment.creationTime)} />
                 <Field label="Last Updated" value={renderTime(phDeployment.lastUpdatedTime)} />
               </Col>
@@ -190,12 +190,12 @@ function Metadata({metadata}: {metadata: object}) {
 
 function getMessage(deployment: DeploymentInfo) {
   switch (deployment.status) {
-    case Status.Deployed:
+    case Status.deployed:
       return 'Deployment completed';
-    case Status.Failed:
+    case Status.failed:
       return <Message text={deployment.message} />;
-    case Status.Deploying:
-    case Status.Stopped:
+    case Status.deploying:
+    case Status.stopped:
     default:
       return '-'
   }
