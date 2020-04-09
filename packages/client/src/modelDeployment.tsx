@@ -54,6 +54,7 @@ const fakeData = {
     groups: [{
       id: 'groupId1',
       name: 'Group',
+      enabledDeployment: true,
       displayName: 'c-Group 1',
       instanceTypes: [{
         id: 'g-it1',
@@ -68,6 +69,7 @@ const fakeData = {
     }, {
       id: 'groupId2',
       name: 'Group',
+      enabledDeployment: true,
       displayName: 'Group 2',
       instanceTypes: [{
         id: 'ggit1',
@@ -82,6 +84,7 @@ const fakeData = {
     }, {
       id: 'everyone',
       name: 'Group',
+      enabledDeployment: true,
       displayName: 'Group DisplayName',
       instanceTypes: [{
         id: 'everyone-it',
