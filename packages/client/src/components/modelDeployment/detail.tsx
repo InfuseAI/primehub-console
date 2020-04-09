@@ -86,7 +86,7 @@ export default class Detail extends React.Component<Props> {
               Delete
             </InfuseButton>
             {
-              (phDeployment.status === Status.failed || phDeployment.status === Status.deployed) ? (
+              (phDeployment.status === Status.deploying || phDeployment.status === Status.deployed) ? (
                 <InfuseButton onClick={this.handleStop} style={{marginRight: 16}}>
                   Stop
                 </InfuseButton>
