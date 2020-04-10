@@ -50,13 +50,13 @@ export function Field({
 
 function getCardColor(deployment: DeploymentInfo) {
   switch (deployment.status) {
-    case Status.deployed:
+    case Status.Deployed:
       return '#33ea33';
-    case Status.deploying:
+    case Status.Deploying:
       return 'orange'
-    case Status.failed:
+    case Status.Failed:
       return 'red';
-    case Status.stopped:
+    case Status.Stopped:
     default:
       return '#aaa';
   }
@@ -82,7 +82,7 @@ class DeploymentCard extends React.Component<Props> {
         />
         <Field
           label="Endpoint"
-          value={deployment.status === Status.deployed ? (
+          value={deployment.status === Status.Deployed ? (
             <Tooltip title={(
               <span>
                 Click to copy:
