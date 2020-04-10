@@ -1,5 +1,6 @@
 import React from 'react';
 import {Row, Col, Card, Tooltip} from 'antd';
+import {isEmpty} from 'lodash';
 import {RouteComponentProps, withRouter} from 'react-router-dom';
 import {DeploymentInfo, Status} from 'components/modelDeployment/common';
 import moment from 'moment';
@@ -73,9 +74,20 @@ class DeploymentCard extends React.Component<Props> {
         hoverable
         onClick={() => history.push(`${appPrefix}model-deployment/${deployment.id}`)}
       >
-        <h2>
-          {deployment.name}
-        </h2>
+        <Tooltip
+          overlayStyle={{width: '100%'}}
+          title={deployment.name}
+        >
+          <h2 style={{
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            msTextOverflow: 'ellipsis',
+            display: 'block'
+          }}>
+            {deployment.name}
+          </h2>
+        </Tooltip>
         <Field
           label="Group"
           value={deployment.groupName || ''}
@@ -111,7 +123,7 @@ class DeploymentCard extends React.Component<Props> {
         />
         <Field
           label="Metadata"
-          value={deployment.metadata ? (
+          value={!isEmpty(deployment.metadata) ? (
             <Tooltip
               overlayStyle={{width: '100%'}}
               title={(
