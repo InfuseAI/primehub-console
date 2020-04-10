@@ -244,10 +244,10 @@ class DeploymentCreateForm extends React.Component<Props, State> {
 
               <Form.Item label="Replicas">
                 {form.getFieldDecorator('replicas', {
-                  initialValue: replicas || 0,
+                  initialValue: replicas || 1,
                   rules: [{ required: true, message: 'Please input replicas!' }],
                 })(
-                  <InputNumber />
+                  <InputNumber min={1} precision={0} />
                 )}
               </Form.Item>
               
