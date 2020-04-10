@@ -89,7 +89,13 @@ export default class Detail extends React.Component<Props> {
                 <Icon type="arrow-left" />
                 Back
               </InfuseButton>
-              Deployment: {phDeployment.name}
+              <div style={{
+                maxWidth: 540,
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                msTextOverflow: 'ellipsis',
+              }}>Deployment: {phDeployment.name}</div>
             </div>
           )}
           extra={<div>
@@ -130,7 +136,7 @@ export default class Detail extends React.Component<Props> {
               </Col>
             </Row>
             <Divider />
-            <Row>
+            <Row gutter={36}>
               <Col span={12}>
                 <Field label="Endpoint" value={phDeployment.status === Status.Deployed ? phDeployment.endpoint : '-'} />
                 <Field label="Model Image" value={phDeployment.status !== Status.Stopped ? phDeployment.modelImage : '-'} />

@@ -128,7 +128,7 @@ class DeploymentListContainer extends React.Component<Props, State> {
           )}
         />
         <Spin spinning={loading}>
-          <Row gutter={36}>
+          <Row gutter={36} type="flex">
             {phDeploymentsConnection.edges.map(edge => {
               return (
                 <Col span={6} key={edge.cursor} style={{marginBottom: 36}}>

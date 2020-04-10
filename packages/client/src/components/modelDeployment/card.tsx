@@ -42,7 +42,7 @@ export function Field({
       }}>
         {label}
       </Col>
-      <Col span={16}>
+      <Col span={16} style={{wordBreak: 'break-all'}}>
         {value}
       </Col>
     </Row>
@@ -69,6 +69,7 @@ class DeploymentCard extends React.Component<Props> {
     return (
       <Card
         style={{
+          height: '100%',
           borderLeft: `8px solid ${getCardColor(deployment)}`
         }}
         hoverable
@@ -90,7 +91,7 @@ class DeploymentCard extends React.Component<Props> {
         </Tooltip>
         <Field
           label="Group"
-          value={deployment.groupName || ''}
+          value={deployment.groupName || 'fdjskalfdjskafjdlsafjdksafl;djkslagdjksfadjsalkf;adsfkdjlsa'}
         />
         <Field
           label="Endpoint"
