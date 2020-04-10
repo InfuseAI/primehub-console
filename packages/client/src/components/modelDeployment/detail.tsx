@@ -1,5 +1,5 @@
 import React from 'react';
-import {Icon, Modal, Card, Divider, Row, Col, Tabs, Input, Table} from 'antd';
+import {Icon, Modal, Card, Divider, Row, Col, Tabs, Input, Table, Button, message} from 'antd';
 import { DeploymentInfo, Status } from './common';
 import PageTitle from './pageTitle';
 import InfuseButton from 'components/infuseButton';
@@ -23,6 +23,17 @@ type Props = {
 }
 
 export default class Detail extends React.Component<Props> {
+  textArea: React.RefObject<any> = React.createRef();
+
+  copyClipBoard = () => {
+    if (this.textArea && this.textArea.current) {
+      this.textArea.current.textAreaRef.select();
+      document.execCommand('copy');
+      message.success('copied');
+      this.textArea.current.textAreaRef.blur();
+    }
+  }
+
   handleDelete = () => {
     const {phDeployment, deletePhDeployment} = this.props;
     confirm({
@@ -141,19 +152,36 @@ export default class Detail extends React.Component<Props> {
               </div>
             )} />
             <Field style={{marginTop: 32}} type="vertical" label="Run an Example" value={(
-              <Input.TextArea
-                style={{
-                  background: 'black',
-                  color: '#ddd',
-                  fontFamily: 'monospace',
-                }}
-                rows={5}
-                value={`curl -X POST \\
-  -d '{"data":{"names":["a","b"],"tensor":{"shape":[2,2],"values":[0,0,1,1]}}}' \\
-  -H "Content-Type: application/json" \\
-  ${phDeployment.endpoint || '<endpoint>'}
-                `}
-              />
+              <>
+                <Button icon="copy" onClick={() => this.copyClipBoard()}
+                  style={{
+                    float: 'right',
+                    top: 32,
+                    marginTop: -32,
+                    zIndex: 10,
+                    position: 'relative',
+                    color: '#ccc',
+                    borderColor: '#ccc'
+                  }}
+                  type="ghost"
+                >
+                  Copy
+                </Button>
+                <Input.TextArea
+                  ref={this.textArea}
+                  style={{
+                    background: 'black',
+                    color: '#ddd',
+                    fontFamily: 'monospace',
+                  }}
+                  rows={5}
+                  value={`curl -X POST \\
+    -d '{"data":{"names":["a","b"],"tensor":{"shape":[2,2],"values":[0,0,1,1]}}}' \\
+    -H "Content-Type: application/json" \\
+    ${phDeployment.endpoint || '<endpoint>'}
+                  `}
+                />
+              </>
             )} />
           </div>
         </Card>
