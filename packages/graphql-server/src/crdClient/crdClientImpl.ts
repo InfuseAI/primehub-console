@@ -178,10 +178,10 @@ export interface PhScheduleStatus {
 
 // PhDeployment
 export enum PhDeploymentPhase {
-  Deploying = 'deploying',
-  Deployed = 'deployed',
-  Stopped = 'stopped',
-  Failed = 'failed',
+  Deploying = 'Deploying',
+  Deployed = 'Deployed',
+  Stopped = 'Stopped',
+  Failed = 'Failed',
 }
 
 export interface PhDeploymentSpec {
