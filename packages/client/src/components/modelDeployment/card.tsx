@@ -75,20 +75,15 @@ class DeploymentCard extends React.Component<Props> {
         hoverable
         onClick={() => history.push(`${appPrefix}model-deployment/${deployment.id}`)}
       >
-        <Tooltip
-          overlayStyle={{width: '100%'}}
-          title={deployment.name}
-        >
-          <h2 style={{
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis',
-            msTextOverflow: 'ellipsis',
-            display: 'block'
-          }}>
-            {deployment.name}
-          </h2>
-        </Tooltip>
+        <h2 style={{
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+          textOverflow: 'ellipsis',
+          msTextOverflow: 'ellipsis',
+          display: 'block'
+        }}>
+          {deployment.name}
+        </h2>
         <Field
           label="Group"
           value={deployment.groupName || 'fdjskalfdjskafjdlsafjdksafl;djkslagdjksfadjsalkf;adsfkdjlsa'}
