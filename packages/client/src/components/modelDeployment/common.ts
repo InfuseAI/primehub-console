@@ -33,6 +33,7 @@ export interface DeploymentInfo {
   lastUpdatedTime: string;
   endpoint: string;
   modelImage: string;
+  availableReplicas: Array<string>,
   replicas: number;
   imagePullSecret: string;
   instanceType: {
@@ -59,6 +60,7 @@ fragment PhDeploymentInfo on PhDeployment {
   lastUpdatedTime
   endpoint
   modelImage
+  availableReplicas
   replicas
   imagePullSecret
   instanceType {
