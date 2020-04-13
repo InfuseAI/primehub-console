@@ -10,6 +10,7 @@ type Props = {
   onChange?: (value: object) => void;
   disabled?: boolean;
   value?: object;
+  empty?: React.ReactNode;
 }
 
 type State = {
@@ -77,18 +78,16 @@ export default class DynamicFields extends React.Component<Props, State> {
 
   render() {
     const {fields, errorIndex, errorMessage} = this.state;
-    const {disabled} = this.props;
+    const {disabled, empty = <Empty
+      style={{ width: 'calc(50% + 16px)'}}
+      height={200}
+      description="Empty."
+    />} = this.props;
 
     return (
       <React.Fragment>
         {
-          fields.length === 0 ? (
-            <Empty
-              style={{ width: 'calc(50% + 16px)'}}
-              height={200}
-              description="Empty."
-            />
-          ) :fields.map((field, i) => (
+          fields.length === 0 ? empty :fields.map((field, i) => (
             <React.Fragment key={i}>
               <div style={{display: 'flex', alignItems: 'center', marginBottom: 8}}>
                 <div style={{marginRight: 16}}>{i + 1}.</div>

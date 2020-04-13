@@ -11,41 +11,70 @@ type Props = RouteComponentProps & {
   copyClipBoard: (text: string) => void;
 }
 
+const textOverflowStyle: React.CSSProperties = {
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+  msTextOverflow: 'ellipsis',
+  display: 'block',
+}
+
 export function Field({
   label,
   value,
-  type = 'horizontal',
-  style = {}
+  type = 'flex',
+  style = {},
+  labelStyle = {},
+  valueStyle = {}
 }: {
   label: React.ReactNode,
   value: React.ReactNode,
-  style?: object,
-  type?: 'vertical' | 'horizontal'
+  style?: React.CSSProperties,
+  labelStyle?: React.CSSProperties,
+  valueStyle?: React.CSSProperties,
+  type?: 'vertical' | 'horizontal' | 'flex'
 }) {
   if (type === 'vertical') return (
     <div style={{marginBottom: 8, ...style}}>
       <div style={{
         color: '#aaa',
-        marginBottom: 8
+        marginBottom: 8,
+        ...labelStyle
       }}>
         {label}
       </div>
-      <div style={{color: '#333'}}>
+      <div style={{color: '#333', ...valueStyle}}>
         {value}
       </div>
     </div>
   )
-  return (
+  if (type === 'flex') return (
     <Row gutter={12} style={{marginBottom: 8, ...style}}>
       <Col span={8} style={{
         color: '#aaa',
+        ...labelStyle
       }}>
         {label}
       </Col>
-      <Col span={16} style={{wordBreak: 'break-all'}}>
+      <Col span={16} style={{wordBreak: 'break-all', ...valueStyle}}>
         {value}
       </Col>
     </Row>
+  )
+
+  if (type === 'horizontal') return (
+    <div style={{marginBottom: 8,  display: 'flex', ...style}}>
+      <span style={{
+        color: '#aaa',
+        width: 120,
+        ...labelStyle
+      }}>
+        {label}
+      </span>
+      <span style={{wordBreak: 'break-all', ...valueStyle}}>
+        {value}
+      </span>
+    </div>
   )
 }
 
@@ -86,7 +115,11 @@ class DeploymentCard extends React.Component<Props> {
         </h2>
         <Field
           label="Group"
-          value={deployment.groupName || 'fdjskalfdjskafjdlsafjdksafl;djkslagdjksfadjsalkf;adsfkdjlsa'}
+          value={(
+            <div style={textOverflowStyle}>
+              {deployment.groupName || '-'}
+            </div>
+          )}
         />
         <Field
           label="Endpoint"
@@ -101,11 +134,7 @@ class DeploymentCard extends React.Component<Props> {
               <a
                 style={{
                   textDecoration: 'underline',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis',
-                  msTextOverflow: 'ellipsis',
-                  display: 'block'
+                  ...textOverflowStyle
                 }}
                 onClick={e => {
                   e.stopPropagation();
@@ -121,12 +150,15 @@ class DeploymentCard extends React.Component<Props> {
           label="Metadata"
           value={!isEmpty(deployment.metadata) ? (
             <Tooltip
-              overlayStyle={{width: '100%'}}
+              overlayStyle={{maxWidth: 500}}
               title={(
                 <>
                   {Object.keys(deployment.metadata).map(key => (
                     <Field
+                      type="horizontal"
                       style={{marginBottom: 0}}
+                      labelStyle={{...textOverflowStyle}}
+                      valueStyle={{...textOverflowStyle}}
                       key={key}
                       label={key}
                       value={deployment.metadata[key]}
