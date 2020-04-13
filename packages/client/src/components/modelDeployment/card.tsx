@@ -86,7 +86,17 @@ class DeploymentCard extends React.Component<Props> {
         </h2>
         <Field
           label="Group"
-          value={deployment.groupName || 'fdjskalfdjskafjdlsafjdksafl;djkslagdjksfadjsalkf;adsfkdjlsa'}
+          value={(
+            <div style={{
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
+              msTextOverflow: 'ellipsis',
+              display: 'block'
+            }}>
+              {deployment.groupName || '-'}
+            </div>
+          )}
         />
         <Field
           label="Endpoint"
