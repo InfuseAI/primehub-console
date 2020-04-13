@@ -146,17 +146,17 @@ export default class Detail extends React.Component<Props> {
                 <Field label="Instance Type" value={phDeployment.status !== Status.Stopped ? renderInstanceType(phDeployment.instanceType || {}) : '-'} />
                 <Field label="Creation Time" value={renderTime(phDeployment.creationTime)} />
                 <Field label="Last Updated" value={renderTime(phDeployment.lastUpdatedTime)} />
+                <Field label="Description" value={(
+                  <div style={{whiteSpace: 'pre-line'}}>
+                    {phDeployment.description || '-'}
+                  </div>
+                )} />
               </Col>
               <Col span={12}>
                 <Field type="vertical" label="Metadata" value={<Metadata metadata={phDeployment.metadata} />} />
                 
               </Col>
             </Row>
-            <Field style={{marginTop: 32}} type="vertical" label="Description" value={(
-              <div style={{whiteSpace: 'pre-line'}}>
-                {phDeployment.description}
-              </div>
-            )} />
             <Field style={{marginTop: 32}} type="vertical" label="Run an Example" value={(
               <>
                 <Button icon="copy" onClick={() => this.copyClipBoard()}
