@@ -103,24 +103,22 @@ export default class Detail extends React.Component<Props> {
               Delete
             </InfuseButton>
             {
-              (phDeployment.status === Status.Deploying || phDeployment.status === Status.Deployed) ? (
+              phDeployment.status === Status.Stopped ? (
+                <InfuseButton onClick={this.handleDeploy} style={{marginRight: 16}}>
+                  Start
+                </InfuseButton>
+              ):(
                 <InfuseButton onClick={this.handleStop} style={{marginRight: 16}}>
                   Stop
-                </InfuseButton>
-              ) : (
-                <InfuseButton onClick={this.handleDeploy} style={{marginRight: 16}}>
-                  Deploy
                 </InfuseButton>
               )
             }
             {
-              phDeployment.status !== Status.Deploying && (
-                <InfuseButton>
-                  <Link to={`${appPrefix}model-deployment/edit/${phDeployment.id}`}>
-                    Update
-                  </Link>
-                </InfuseButton>
-              )
+              <InfuseButton>
+                <Link to={`${appPrefix}model-deployment/edit/${phDeployment.id}`}>
+                  Update
+                </Link>
+              </InfuseButton>
             }
           </div>}
         />
