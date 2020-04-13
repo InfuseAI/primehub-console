@@ -136,7 +136,7 @@ class DeploymentCard extends React.Component<Props> {
                 <>
                   {Object.keys(deployment.metadata).map(key => (
                     <Field
-                      style={{marginBottom: 0}}
+                      style={{marginBottom: 0, alignItems: 'center', display: 'flex'}}
                       key={key}
                       label={key}
                       value={deployment.metadata[key]}
