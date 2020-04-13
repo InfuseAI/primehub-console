@@ -298,7 +298,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   </Form.Item>
                 </Col>
               </Row>
-              <Form.Item label="description" >
+              <Form.Item label="Description" >
                 {form.getFieldDecorator('description', {
                   initialValue: description
                 })(
