@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 import {get} from 'lodash';
 import styled from 'styled-components';
 import moment, { Moment } from 'moment';
-import Log from './log';
+import Log from '../share/log';
 import {getActionByPhase, Phase} from 'components/job/phase';
 import Title from 'components/job/title';
 import Message from 'components/share/message';

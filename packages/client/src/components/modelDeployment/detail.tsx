@@ -6,6 +6,7 @@ import InfuseButton from 'components/infuseButton';
 import { appPrefix } from 'utils/env';
 import {Link} from 'react-router-dom';
 import {Field} from 'components/modelDeployment/card';
+import ModelDeploymentLogs from 'components/modelDeployment/logs';
 import Message from 'components/share/message';
 import moment from 'moment';
 
@@ -77,6 +78,79 @@ export default class Detail extends React.Component<Props> {
       },
     });
   }
+
+  renderInformation = () => {
+    const {phDeployment} = this.props;
+    return (
+      <div style={{padding: '16px 36px'}}>
+        <Row>
+          <Col span={12}>
+            <Field label="Status" value={<strong>{phDeployment.status}</strong>} />
+            <Field label="Message" value={getMessage(phDeployment)} />
+          </Col>
+        </Row>
+        <Divider />
+        <Row gutter={36}>
+          <Col span={12}>
+            <Field label="Endpoint" value={phDeployment.status === Status.Deployed ? phDeployment.endpoint : '-'} />
+            <Field label="Model Image" value={phDeployment.status !== Status.Stopped ? phDeployment.modelImage : '-'} />
+            <Field label="Replicas" value={`${(phDeployment.availableReplicas || []).length}/${phDeployment.replicas}`} />
+            <Field label="Deployment Name" value={phDeployment.name} />
+            <Field label="Group" value={phDeployment.groupName} />
+            <Field label="Instance Type" value={phDeployment.status !== Status.Stopped ? renderInstanceType(phDeployment.instanceType || {}) : '-'} />
+            <Field label="Creation Time" value={renderTime(phDeployment.creationTime)} />
+            <Field label="Last Updated" value={renderTime(phDeployment.lastUpdatedTime)} />
+            <Field label="Description" value={(
+              <div style={{whiteSpace: 'pre-line'}}>
+                {phDeployment.description || '-'}
+              </div>
+            )} />
+          </Col>
+          <Col span={12}>
+            <Field type="vertical" label="Metadata" value={<Metadata metadata={phDeployment.metadata} />} />
+            
+          </Col>
+        </Row>
+        <Field style={{marginTop: 32}} type="vertical" label="Run an Example" value={(
+          <>
+            <Button icon="copy" onClick={() => this.copyClipBoard()}
+              style={{
+                float: 'right',
+                top: 32,
+                marginTop: -32,
+                zIndex: 10,
+                position: 'relative',
+                color: '#ccc',
+                borderColor: '#ccc'
+              }}
+              type="ghost"
+            >
+              Copy
+            </Button>
+            <Input.TextArea
+              ref={this.textArea}
+              style={{
+                background: 'black',
+                color: '#ddd',
+                fontFamily: 'monospace',
+              }}
+              rows={5}
+              value={`curl -X POST \\
+-d '{"data":{"names":["a","b"],"tensor":{"shape":[2,2],"values":[0,0,1,1]}}}' \\
+-H "Content-Type: application/json" \\
+${phDeployment.endpoint || '<endpoint>'}
+              `}
+            />
+          </>
+        )} />
+      </div>
+    )
+  }
+
+  renderLogs = () => {
+    const {phDeployment} = this.props;
+    return <ModelDeploymentLogs availableReplicas={phDeployment.availableReplicas}/>;
+  }
   
   render() {
     const {phDeployment, stopPhDeploymentResult, deletePhDeploymentResult, deployPhDeploymentResult, history} = this.props;
@@ -123,71 +197,14 @@ export default class Detail extends React.Component<Props> {
           </div>}
         />
         <Card loading={stopPhDeploymentResult.loading || deletePhDeploymentResult.loading || deployPhDeploymentResult.loading}>
-          <Tabs>
-            <Tabs.TabPane tab="Information" />
+          <Tabs defaultActiveKey="information">
+            <Tabs.TabPane key="information" tab="Information">
+              {this.renderInformation()}
+            </Tabs.TabPane>
+            <Tabs.TabPane key="logs" tab="Logs">
+              {this.renderLogs()}
+            </Tabs.TabPane>
           </Tabs>
-          <div style={{padding: '16px 36px'}}>
-            <Row>
-              <Col span={12}>
-                <Field label="Status" value={<strong>{phDeployment.status}</strong>} />
-                <Field label="Message" value={getMessage(phDeployment)} />
-              </Col>
-            </Row>
-            <Divider />
-            <Row gutter={36}>
-              <Col span={12}>
-                <Field label="Endpoint" value={phDeployment.status === Status.Deployed ? phDeployment.endpoint : '-'} />
-                <Field label="Model Image" value={phDeployment.status !== Status.Stopped ? phDeployment.modelImage : '-'} />
-                <Field label="Replicas" value={`${(phDeployment.availableReplicas || []).length}/${phDeployment.replicas}`} />
-                <Field label="Deployment Name" value={phDeployment.name} />
-                <Field label="Group" value={phDeployment.groupName} />
-                <Field label="Instance Type" value={phDeployment.status !== Status.Stopped ? renderInstanceType(phDeployment.instanceType || {}) : '-'} />
-                <Field label="Creation Time" value={renderTime(phDeployment.creationTime)} />
-                <Field label="Last Updated" value={renderTime(phDeployment.lastUpdatedTime)} />
-                <Field label="Description" value={(
-                  <div style={{whiteSpace: 'pre-line'}}>
-                    {phDeployment.description || '-'}
-                  </div>
-                )} />
-              </Col>
-              <Col span={12}>
-                <Field type="vertical" label="Metadata" value={<Metadata metadata={phDeployment.metadata} />} />
-                
-              </Col>
-            </Row>
-            <Field style={{marginTop: 32}} type="vertical" label="Run an Example" value={(
-              <>
-                <Button icon="copy" onClick={() => this.copyClipBoard()}
-                  style={{
-                    float: 'right',
-                    top: 32,
-                    marginTop: -32,
-                    zIndex: 10,
-                    position: 'relative',
-                    color: '#ccc',
-                    borderColor: '#ccc'
-                  }}
-                  type="ghost"
-                >
-                  Copy
-                </Button>
-                <Input.TextArea
-                  ref={this.textArea}
-                  style={{
-                    background: 'black',
-                    color: '#ddd',
-                    fontFamily: 'monospace',
-                  }}
-                  rows={5}
-                  value={`curl -X POST \\
-    -d '{"data":{"names":["a","b"],"tensor":{"shape":[2,2],"values":[0,0,1,1]}}}' \\
-    -H "Content-Type: application/json" \\
-    ${phDeployment.endpoint || '<endpoint>'}
-                  `}
-                />
-              </>
-            )} />
-          </div>
         </Card>
       </>
     )
