@@ -219,18 +219,19 @@ function Metadata({metadata}: {metadata: object}) {
   const columns = [{
     title: 'Name',
     dataIndex: 'key',
-    width: '50%'
+    width: '30%'
   }, {
     title: 'Value',
     dataIndex: 'value',
-    width: '50%'
+    width: '70%',
+    render: value => <div style={{wordBreak: 'break-all'}}>{value}</div>
   }];
   return (
     <Table
       style={{border: '1px solid #eee'}}
       columns={columns}
       dataSource={metadataList}
-      scroll={{y: 180}}
+      scroll={{y: 207}}
       size="middle"
       pagination={false}
     />
