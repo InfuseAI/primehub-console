@@ -134,7 +134,8 @@ const fakeData = {
     groupName: 'groupName',
     endpoint: 'https://endpoint/modedeployment/example/test/1',
     modelImage: 'imageurl',
-    availableReplicas: ['model-deployment', 'job', 'landing'],
+    pods: ['model-deployment', 'job', 'landing'],
+    availableReplicas: 3,
     replicas: 4,
     instanceType: {
       id: 'everyone-it',
@@ -164,7 +165,8 @@ const fakeData = {
     groupName: 'groupName',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
-    availableReplicas: ['model-deployment', 'job', 'landing'],
+    pods: ['model-deployment', 'job', 'landing'],
+    availableReplicas: 3,
     replicas: 4,
     instanceType: {
       id: 'everyone-it',
@@ -193,7 +195,8 @@ const fakeData = {
     groupName: 'groupName',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
-    availableReplicas: ['model-deployment', 'job', 'landing'],
+    pods: ['model-deployment', 'job', 'landing'],
+    availableReplicas: 3,
     replicas: 4,
     instanceType: {
       id: 'everyone-it',
@@ -223,7 +226,8 @@ const fakeData = {
     groupName: 'groupName',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
-    availableReplicas: ['model-deployment', 'job', 'landing'],
+    pods: ['model-deployment', 'job', 'landing'],
+    availableReplicas: 3,
     replicas: 4,
     instanceType: {
       id: 'everyone-it',

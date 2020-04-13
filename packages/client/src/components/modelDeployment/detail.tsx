@@ -94,7 +94,7 @@ export default class Detail extends React.Component<Props> {
           <Col span={12}>
             <Field label="Endpoint" value={phDeployment.status === Status.Deployed ? phDeployment.endpoint : '-'} />
             <Field label="Model Image" value={phDeployment.status !== Status.Stopped ? phDeployment.modelImage : '-'} />
-            <Field label="Replicas" value={`${(phDeployment.availableReplicas || []).length}/${phDeployment.replicas}`} />
+            <Field label="Replicas" value={`${(phDeployment.availableReplicas || 0)}/${phDeployment.replicas}`} />
             <Field label="Deployment Name" value={phDeployment.name} />
             <Field label="Group" value={phDeployment.groupName} />
             <Field label="Instance Type" value={phDeployment.status !== Status.Stopped ? renderInstanceType(phDeployment.instanceType || {}) : '-'} />
@@ -149,7 +149,7 @@ ${phDeployment.endpoint || '<endpoint>'}
 
   renderLogs = () => {
     const {phDeployment} = this.props;
-    return <ModelDeploymentLogs availableReplicas={phDeployment.availableReplicas}/>;
+    return <ModelDeploymentLogs pods={phDeployment.pods}/>;
   }
   
   render() {
