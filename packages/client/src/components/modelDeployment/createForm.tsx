@@ -58,7 +58,7 @@ const dashOrNumber = value => value === null ? '-' : value;
 
 const autoGenId = (name: string) => {
   const normalizedNAme = name.replace(/[ _:\/\\]/g, '-');
-  const randomString = Math.random().toString(36).substring(5);
+  const randomString = Math.random().toString(36).substring(7).substring(0, 5);
   return `${normalizedNAme}-${randomString}`;
 }
 
@@ -313,7 +313,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                 {form.getFieldDecorator('metadata', {
                   initialValue: metadata
                 })(
-                  <DynamicFields />
+                  <DynamicFields empty={null}/>
                 )}
               </Form.Item>
             </Card>
