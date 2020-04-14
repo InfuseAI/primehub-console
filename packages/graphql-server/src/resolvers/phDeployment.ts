@@ -2,7 +2,9 @@ import { Context } from './interface';
 import {
   toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser, mergeVariables
 } from './utils';
-import { PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase } from '../crdClient/crdClientImpl';
+import {
+  PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, client as kubeClient
+} from '../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../crdClient/customResource';
 import { orderBy, omit, get, isUndefined, isNil, isEmpty, isNull, capitalize } from 'lodash';
 import * as moment from 'moment';
@@ -31,6 +33,7 @@ export interface PhDeployment {
   endpoint: string;
   modelImage: string;
   replicas: number;
+  availableReplicas: number;
   imagePullSecret: string;
   instanceType: string;
   creationTime: string;
@@ -78,6 +81,7 @@ export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>
     status,
     message: get(item, 'status.message'),
     endpoint: get(item, 'status.endpoint'),
+    availableReplicas: get(item, 'status.availableReplicas'),
 
     // predictator
     modelImage: predictator.modelImage,
@@ -105,7 +109,7 @@ const createDeployment = async (context: Context, data: PhDeploymentMutationInpu
     userName: username,
     groupId: group.id,
     groupName: group.name,
-    stop: true,
+    stop: false,
     description: data.description,
     predictors: [{
       name: 'predictor1',
@@ -173,6 +177,13 @@ const validateQuota = async (context: Context, groupId: string, instanceTypeId: 
  * Query
  */
 
+const labelStringify = (labels: Record<string, string>) => {
+  return Object.keys(labels).map(labelKey => {
+    const labelValue = labels[labelKey];
+    return `${labelKey}=${labelValue}`;
+  }).join(',');
+};
+
 export const typeResolvers = {
   async instanceType(parent, args, context: Context) {
     const instanceTypeId = parent.instanceType;
@@ -196,7 +207,24 @@ export const typeResolvers = {
         tolerations: []
       };
     }
-  }
+  },
+  async pods(parent, args, context: Context) {
+    const labelSelector = labelStringify({
+      'app': 'primehub-deployment',
+      'primehub.io/phdeployment': parent.id,
+    });
+    const {body: {items}} = await kubeClient.api.v1.namespaces(context.crdNamespace).pods.get({
+      qs: {labelSelector}
+    });
+    return (items || []).map(item => {
+      const podName = get(item, 'metadata.name');
+      return {
+        name: podName,
+        logEndpoint:
+          `${context.graphqlHost}${context.jobLogCtrl.getPhDeploymentEndpoint(context.crdNamespace, podName)}`,
+      };
+    });
+  },
 };
 
 const canUserView = async (userId: string, phDeployment: PhDeployment, context: Context): Promise<boolean> => {

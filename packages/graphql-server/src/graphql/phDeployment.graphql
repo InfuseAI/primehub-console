@@ -1,6 +1,11 @@
 # import PageInfo from "common.graphql"
 # import InstanceType from "instanceType.graphql"
 
+type Pod {
+  name: String
+  logEndpoint: String
+}
+
 type PhDeployment {
   id: ID!
   status: String
@@ -16,10 +21,12 @@ type PhDeployment {
   endpoint: String
   modelImage: String
   replicas: Int
+  availableReplicas: Int
   imagePullSecret: String
   instanceType: InstanceType
   creationTime: String
   lastUpdatedTime: String
+  pods: [Pod]
 }
 
 """An edge in a connection."""
