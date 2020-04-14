@@ -219,7 +219,8 @@ function Metadata({metadata}: {metadata: object}) {
   const columns = [{
     title: 'Name',
     dataIndex: 'key',
-    width: '30%'
+    width: '30%',
+    render: value => <div style={{wordBreak: 'break-all'}}>{value}</div>
   }, {
     title: 'Value',
     dataIndex: 'value',

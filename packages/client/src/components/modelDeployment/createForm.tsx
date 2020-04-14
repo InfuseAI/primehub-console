@@ -57,7 +57,7 @@ type FormValue = {
 const dashOrNumber = value => value === null ? '-' : value;
 
 const autoGenId = (name: string) => {
-  const normalizedNAme = name.replace(/[ _:\/\\]/g, '-');
+  const normalizedNAme = name.replace(/[\W_]/g, '-');
   const randomString = Math.random().toString(36).substring(7).substring(0, 5);
   return `${normalizedNAme}-${randomString}`;
 }
