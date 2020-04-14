@@ -30,7 +30,7 @@ export default class ModelDeploymentLogs extends React.Component<Props, State> {
     return (
       <>
         <span>Filters: </span>
-        <Select style={{width: 250}} placeholder="Select replica" value={logEndpoint} onChange={logEndpoint => this.setState({logEndpoint})} >
+        <Select style={{width: 250}} disabled={!pods.length} placeholder="Select replica" value={logEndpoint || '-'} onChange={logEndpoint => this.setState({logEndpoint})} >
           {pods.map(pod => (
             <Select.Option key={pod.name} value={pod.logEndpoint}>{pod.name}</Select.Option>
           ))}

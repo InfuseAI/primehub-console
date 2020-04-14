@@ -55,6 +55,7 @@ export default class Logs extends React.Component<Props, State> {
     const token = window.localStorage.getItem('canner.accessToken');
     const {endpoint} = this.props;
     const that = this;
+    if (!endpoint) return;
     return fetch(endpoint, {
       method: 'GET',
       headers: {
