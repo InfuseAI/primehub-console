@@ -134,7 +134,11 @@ const fakeData = {
     groupName: 'groupName',
     endpoint: 'https://endpoint/modedeployment/example/test/1',
     modelImage: 'imageurl',
-    pods: ['model-deployment', 'job', 'landing'],
+    pods: [
+      {name: 'model-deployment',logEndpoint: '/model-deployment'},
+      {name: 'job', logEndpoint: '/job'},
+      {name: 'landing', logEndpoint: '/landing'}
+    ],
     availableReplicas: 3,
     replicas: 4,
     instanceType: {
@@ -165,7 +169,11 @@ const fakeData = {
     groupName: 'groupName',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
-    pods: ['model-deployment', 'job', 'landing'],
+    pods: [
+      {name: 'model-deployment',logEndpoint: '/model-deployment'},
+      {name: 'job', logEndpoint: '/job'},
+      {name: 'landing', logEndpoint: '/landing'}
+    ],
     availableReplicas: 3,
     replicas: 4,
     instanceType: {
@@ -195,7 +203,11 @@ const fakeData = {
     groupName: 'groupName',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
-    pods: ['model-deployment', 'job', 'landing'],
+    pods: [
+      {name: 'model-deployment',logEndpoint: '/model-deployment'},
+      {name: 'job', logEndpoint: '/job'},
+      {name: 'landing', logEndpoint: '/landing'}
+    ],
     availableReplicas: 3,
     replicas: 4,
     instanceType: {
@@ -226,7 +238,11 @@ const fakeData = {
     groupName: 'groupName',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
-    pods: ['model-deployment', 'job', 'landing'],
+    pods: [
+      {name: 'model-deployment',logEndpoint: '/model-deployment'},
+      {name: 'job', logEndpoint: '/job'},
+      {name: 'landing', logEndpoint: '/landing'}
+    ],
     availableReplicas: 3,
     replicas: 4,
     instanceType: {
