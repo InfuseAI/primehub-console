@@ -66,12 +66,14 @@ export function Field({
     <div style={{marginBottom: 8,  display: 'flex', ...style}}>
       <span style={{
         color: '#aaa',
-        width: 120,
+        width: 80,
+        minWidth: 80,
+        marginRight: 16,
         ...labelStyle
       }}>
         {label}
       </span>
-      <span style={{wordBreak: 'break-all', ...valueStyle}}>
+      <span style={{wordBreak: 'break-all', width: '100%', ...valueStyle}}>
         {value}
       </span>
     </div>
@@ -150,7 +152,7 @@ class DeploymentCard extends React.Component<Props> {
           label="Metadata"
           value={!isEmpty(deployment.metadata) ? (
             <Tooltip
-              overlayStyle={{maxWidth: 500}}
+              overlayStyle={{maxWidth: 300}}
               title={(
                 <>
                   {Object.keys(deployment.metadata).map(key => (
