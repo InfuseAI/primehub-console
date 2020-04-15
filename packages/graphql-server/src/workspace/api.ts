@@ -12,8 +12,10 @@ export interface Workspace {
   keycloakGroupId: string;
 }
 
+const PRIMEHUB_PREFIX = '__primehub-';
+
 export const isKeycloakGroupNameWorkspace = (name: string) => {
-  return name && name.startsWith('primehub-');
+  return name && name.startsWith(PRIMEHUB_PREFIX);
 };
 
 export default class WorkspaceApi {
@@ -79,7 +81,7 @@ export default class WorkspaceApi {
     const namespaceName = `primehub-${name}`;
     // create keycloak group
     const group = await this.kcAdminClient.groups.create({
-      name: `primehub-${name}`,
+      name: `${PRIMEHUB_PREFIX}${name}`,
       attributes: {
         isWorkspace: ['true'],
         namespace: [namespaceName]
