@@ -83,7 +83,7 @@ export default class Detail extends React.Component<Props> {
     const {phDeployment} = this.props;
     return (
       <div style={{padding: '16px 36px'}}>
-        <Row>
+        <Row gutter={36}>
           <Col span={12}>
             <Field label="Status" value={<strong>{phDeployment.status}</strong>} />
             <Field label="Message" value={getMessage(phDeployment)} />
