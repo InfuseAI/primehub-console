@@ -4,6 +4,7 @@ export enum Status {
   Deploying = 'Deploying',
   Deployed = 'Deployed',
   Stopped = 'Stopped',
+  Stopping = 'Stopping',
   Failed = 'Failed',
 }
 

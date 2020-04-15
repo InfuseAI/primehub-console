@@ -177,7 +177,7 @@ export default class Detail extends React.Component<Props> {
               Delete
             </InfuseButton>
             {
-              phDeployment.status === Status.Stopped ? (
+              (phDeployment.status === Status.Stopped || phDeployment.status === Status.Stopping) ? (
                 <InfuseButton onClick={this.handleDeploy} style={{marginRight: 16}}>
                   Start
                 </InfuseButton>
@@ -245,6 +245,7 @@ function getMessage(deployment: DeploymentInfo) {
       return 'Deployment completed';
     case Status.Failed:
       return <Message text={deployment.message} />;
+    case Status.Stopping:
     case Status.Deploying:
     case Status.Stopped:
     default:
