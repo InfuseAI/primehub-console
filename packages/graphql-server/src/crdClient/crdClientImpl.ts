@@ -181,6 +181,7 @@ export enum PhDeploymentPhase {
   Deploying = 'Deploying',
   Deployed = 'Deployed',
   Stopped = 'Stopped',
+  Stopping = 'Stopping',
   Failed = 'Failed',
 }
 

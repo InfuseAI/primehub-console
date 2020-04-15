@@ -52,6 +52,21 @@ export interface PhDeploymentMutationInput {
   instanceType: string;
 }
 
+const getFallbackPhase = (stopped: boolean, phase: PhDeploymentPhase) => {
+  const finalized = [PhDeploymentPhase.Deployed, PhDeploymentPhase.Failed].indexOf(phase) >= 0;
+  // if user click start, but operator hasn't change phase to `Deploying` or it hasn't transit to finalized phases
+  if (!stopped && !finalized) {
+    return PhDeploymentPhase.Deploying;
+  }
+
+  // if user click stop, but operator hasn't change phase to `Stopping` or transit to `Stopped`
+  if (stopped && phase !== PhDeploymentPhase.Stopped) {
+    return PhDeploymentPhase.Stopping;
+  }
+
+  return phase || PhDeploymentPhase.Stopped;
+};
+
 // tslint:disable-next-line:max-line-length
 export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>, kcAdminClient: KeycloakAdminClient): Promise<PhDeployment> => {
   const group = item.spec.groupId ?
@@ -59,14 +74,7 @@ export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>
   const groupName = get(group, 'attributes.displayName.0') || get(group, 'name') || item.spec.groupName;
   const predictator = item.spec.predictors[0];
   const phase = get(item, 'status.phase');
-  let status;
-  if (item.spec.stop) {
-    status = PhDeploymentPhase.Stopped;
-  } else if (!item.spec.stop && phase === PhDeploymentPhase.Stopped) {
-    status = PhDeploymentPhase.Deploying;
-  } else {
-    status = phase || PhDeploymentPhase.Stopped;
-  }
+  const status = getFallbackPhase(item.spec.stop, phase);
   return {
     id: item.metadata.name,
     name: item.spec.displayName,
