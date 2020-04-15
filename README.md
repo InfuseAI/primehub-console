@@ -61,6 +61,7 @@ Canner CMS
 * PRIMEHUB_FEATURE_DATASET_UPLOAD: enable upload feature or not
 * PRIMEHUB_FEATURE_ENABLE_WORKSPACE: enable workspace or not
 * PRIMEHUB_FEATURE_CUSTOM_IMAGE: enable custom image or not
+* PRIMEHUB_FEATURE_MODEL_DEPLOYMENT: enable model deployment
 
 ### watcher
 * KC_API_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. Ex: 'http://127.0.0.1:8080/auth'. For API usage.

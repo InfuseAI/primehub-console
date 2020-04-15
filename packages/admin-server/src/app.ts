@@ -78,6 +78,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.state.enableWorkspace = config.enableWorkspace;
     ctx.state.enableCustomImage = config.enableCustomImage;
     ctx.state.enableLicenseCheck = config.enableLicenseCheck;
+    ctx.state.enableModelDeployment = config.enableModelDeployment;
     ctx.state.disableGroup = config.enableLicenseCheck ? config.licenseStatus !== 'unexpired' : false;
     ctx.state.everyoneGroupId = config.keycloakEveryoneGroupId;
 
