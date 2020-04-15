@@ -136,9 +136,9 @@ export default class Detail extends React.Component<Props> {
               }}
               rows={5}
               value={`curl -X POST \\
--d '{"data":{"names":["a","b"],"tensor":{"shape":[2,2],"values":[0,0,1,1]}}}' \\
--H "Content-Type: application/json" \\
-${phDeployment.endpoint || '<endpoint>'}
+    -d '{"data":{"names":["a","b"],"tensor":{"shape":[2,2],"values":[0,0,1,1]}}}' \\
+    -H "Content-Type: application/json" \\
+    ${phDeployment.endpoint || '<endpoint>'}
               `}
             />
           </>
