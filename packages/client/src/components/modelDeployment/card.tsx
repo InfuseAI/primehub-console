@@ -84,6 +84,7 @@ function getCardColor(deployment: DeploymentInfo) {
   switch (deployment.status) {
     case Status.Deployed:
       return '#33ea33';
+    case Status.Stopping:
     case Status.Deploying:
       return 'orange'
     case Status.Failed:

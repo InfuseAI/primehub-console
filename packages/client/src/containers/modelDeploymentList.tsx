@@ -143,7 +143,7 @@ class DeploymentListContainer extends React.Component<Props, State> {
         </Spin>
         <Input
           ref={this.textArea}
-          style={{display: 'none'}}
+          style={{position: 'absolute', left: '-1000px', top: '-1000px'}}
         />
         <Pagination
           hasNextPage={phDeploymentsConnection.pageInfo.hasNextPage}

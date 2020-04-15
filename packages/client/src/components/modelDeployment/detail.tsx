@@ -83,7 +83,7 @@ export default class Detail extends React.Component<Props> {
     const {phDeployment} = this.props;
     return (
       <div style={{padding: '16px 36px'}}>
-        <Row>
+        <Row gutter={36}>
           <Col span={12}>
             <Field label="Status" value={<strong>{phDeployment.status}</strong>} />
             <Field label="Message" value={getMessage(phDeployment)} />
@@ -136,9 +136,9 @@ export default class Detail extends React.Component<Props> {
               }}
               rows={5}
               value={`curl -X POST \\
--d '{"data":{"names":["a","b"],"tensor":{"shape":[2,2],"values":[0,0,1,1]}}}' \\
--H "Content-Type: application/json" \\
-${phDeployment.endpoint || '<endpoint>'}
+    -d '{"data":{"names":["a","b"],"tensor":{"shape":[2,2],"values":[0,0,1,1]}}}' \\
+    -H "Content-Type: application/json" \\
+    ${phDeployment.endpoint || '<endpoint>'}
               `}
             />
           </>
@@ -177,7 +177,7 @@ ${phDeployment.endpoint || '<endpoint>'}
               Delete
             </InfuseButton>
             {
-              phDeployment.status === Status.Stopped ? (
+              (phDeployment.status === Status.Stopped || phDeployment.status === Status.Stopping) ? (
                 <InfuseButton onClick={this.handleDeploy} style={{marginRight: 16}}>
                   Start
                 </InfuseButton>
@@ -245,6 +245,7 @@ function getMessage(deployment: DeploymentInfo) {
       return 'Deployment completed';
     case Status.Failed:
       return <Message text={deployment.message} />;
+    case Status.Stopping:
     case Status.Deploying:
     case Status.Stopped:
     default:

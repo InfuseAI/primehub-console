@@ -223,6 +223,41 @@ const fakeData = {
       'new': 'fdsafdsafdsafdsafdsafdsafdsagdsags'
     }
   }, {
+    id: 'id2-stopping',
+    name: 'd2',
+    description: 'd2',
+    status: 'Stopping',
+    creationTIme: '2019-10-04T14:48:00.000Z',
+    lastUpdatedTime: '2019-10-04T14:48:00.000Z',
+    message: `batch1
+    batch2
+    batch3
+    batch4
+    `,
+    groupId: 'everyone',
+    groupName: 'groupName',
+    endpoint: 'https://endpoint/mode-deployment/example/test/1',
+    modelImage: 'imageurl',
+    pods: [
+      {name: 'model-deployment',logEndpoint: '/model-deployment'},
+      {name: 'job', logEndpoint: '/job'},
+      {name: 'landing', logEndpoint: '/landing'}
+    ],
+    availableReplicas: 3,
+    replicas: 4,
+    instanceType: {
+      id: 'everyone-it',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    },
+    metadata: {
+      'hello': 123,
+      'new': 'fdsafdsafdsafdsafdsafdsafdsagdsags'
+    }
+  }, {
     id: 'id3',
     name: 'd3',
     description: 'd3',
