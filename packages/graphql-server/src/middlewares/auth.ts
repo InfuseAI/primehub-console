@@ -34,7 +34,10 @@ export const permissions = shield({
     'phJobsConnection': or(isAdmin, isJobUser),
     'phSchedule': or(isAdmin, isJobUser),
     'phSchedules': or(isAdmin, isJobUser),
-    'phSchedulesConnection': or(isAdmin, isJobUser)
+    'phSchedulesConnection': or(isAdmin, isJobUser),
+    'phDeployment': or(isAdmin, isJobUser),
+    'phDeployments': or(isAdmin, isJobUser),
+    'phDeploymentsConnection': or(isAdmin, isJobUser)
   },
   Mutation: {
     '*': isAdmin,
@@ -44,6 +47,11 @@ export const permissions = shield({
     'createPhSchedule': or(isAdmin, isJobUser),
     'updatePhSchedule': or(isAdmin, isJobUser),
     'deletePhSchedule': or(isAdmin, isJobUser),
-    'runPhSchedule': or(isAdmin, isJobUser)
+    'runPhSchedule': or(isAdmin, isJobUser),
+    'createPhDeployment': or(isAdmin, isJobUser),
+    'updatePhDeployment': or(isAdmin, isJobUser),
+    'deletePhDeployment': or(isAdmin, isJobUser),
+    'stopPhDeployment': or(isAdmin, isJobUser),
+    'deployPhDeployment': or(isAdmin, isJobUser),
   }
 });

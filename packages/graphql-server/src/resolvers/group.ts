@@ -43,7 +43,8 @@ const attrSchema = {
   enabledSharedVolume: {type: FieldType.boolean, rename: 'enabled-shared-volume'},
   sharedVolumeCapacity: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota, rename: 'shared-volume-capacity'},
   homeSymlink: {type: FieldType.boolean, rename: 'home-symlink'},
-  launchGroupOnly: {type: FieldType.boolean, rename: 'launch-group-only'}
+  launchGroupOnly: {type: FieldType.boolean, rename: 'launch-group-only'},
+  enabledDeployment: {type: FieldType.boolean, rename: 'enabled-deployment'}
 };
 
 const groupAttrs = Object.keys(attrSchema);
@@ -372,6 +373,9 @@ export const typeResolvers = {
 
   launchGroupOnly: async (parent, args, context: Context) =>
     getFromAttr('launch-group-only', parent.attributes, null, parseBoolean),
+
+  enabledDeployment: async (parent, args, context: Context) =>
+    getFromAttr('enabled-deployment', parent.attributes, null, parseBoolean),
 
   displayName: async (parent, args, context: Context) =>
     getFromAttr('displayName', parent.attributes, null),

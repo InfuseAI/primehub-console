@@ -1,0 +1,79 @@
+# import PageInfo from "common.graphql"
+# import InstanceType from "instanceType.graphql"
+
+type Pod {
+  name: String
+  logEndpoint: String
+}
+
+type PhDeployment {
+  id: ID!
+  status: String
+  message: String
+  name: String
+  description: String
+  metadata: JSON
+  stop: Boolean
+  userId: String
+  userName: String
+  groupId: String
+  groupName: String
+  endpoint: String
+  modelImage: String
+  replicas: Int
+  availableReplicas: Int
+  imagePullSecret: String
+  instanceType: InstanceType
+  creationTime: String
+  lastUpdatedTime: String
+  pods: [Pod]
+}
+
+"""An edge in a connection."""
+type PhDeploymentEdge {
+  """The item at the end of the edge."""
+  node: PhDeployment!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type PhDeploymentConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [PhDeploymentEdge]!
+}
+
+input PhDeploymentWhereUniqueInput {
+  id: ID!
+}
+
+input PhDeploymentWhereInput {
+  id: ID
+  groupId_in: [String]
+  mine: Boolean
+}
+
+"""Mutation input"""
+input PhDeploymentCreateInput {
+  id: ID!
+  name: String
+  replicas: Int
+  modelImage: String
+  imagePullSecret: String
+  description: String
+  metadata: JSON
+  groupId: String
+  instanceType: String
+}
+
+input PhDeploymentUpdateInput {
+  replicas: Int
+  modelImage: String
+  imagePullSecret: String
+  description: String
+  metadata: JSON
+  instanceType: String
+}

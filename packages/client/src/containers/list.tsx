@@ -14,6 +14,7 @@ export const GroupFragment = gql`
     id
     displayName
     name
+    enabledDeployment
   }
 `;
 

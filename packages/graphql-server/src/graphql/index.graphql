@@ -10,6 +10,7 @@
 # import BuildImageJob, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql" 
 # import PhJob, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput, PhJobCreateInput, PhJobCancelResponse from "./phJob.graphql"
 # import PhSchedule, PhScheduleConnection, PhScheduleWhereUniqueInput, PhScheduleWhereInput, PhScheduleCreateInput, PhScheduleUpdateInput, PhScheduleDeleteResponse, PhScheduleRunResponse from "./phSchedule.graphql"
+# import PhDeployment, PhDeploymentConnection, PhDeploymentWhereUniqueInput, PhDeploymentWhereInput, PhDeploymentCreateInput, PhDeploymentUpdateInput from "./phDeployment.graphql"
 
 scalar JSON
 
@@ -222,6 +223,23 @@ type Query {
     first: Int
     last: Int
   ): PhScheduleConnection!
+
+  """PhDeployment"""
+  phDeployment(where: PhDeploymentWhereUniqueInput!): PhDeployment!
+  phDeployments(
+    where: PhDeploymentWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [PhDeployment]!
+  phDeploymentsConnection(
+    where: PhDeploymentWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): PhDeploymentConnection!
 }
 
 type Mutation {
@@ -289,4 +307,11 @@ type Mutation {
   updatePhSchedule(where: PhScheduleWhereUniqueInput!, data: PhScheduleUpdateInput!): PhSchedule!
   runPhSchedule(where: PhScheduleWhereUniqueInput!): PhScheduleRunResponse!
   deletePhSchedule(where: PhScheduleWhereUniqueInput!): PhScheduleDeleteResponse!
+
+  """PhDeployment"""
+  createPhDeployment(data: PhDeploymentCreateInput!): PhDeployment!
+  updatePhDeployment(where: PhDeploymentWhereUniqueInput!, data: PhDeploymentUpdateInput!): PhDeployment!
+  stopPhDeployment(where: PhDeploymentWhereUniqueInput!): PhDeployment!
+  deployPhDeployment(where: PhDeploymentWhereUniqueInput!): PhDeployment!
+  deletePhDeployment(where: PhDeploymentWhereUniqueInput!): PhDeployment!
 }

@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Input } from 'antd';
-import Log from 'components/job/log';
+import Log from 'components/share/log';
 
 type Props = {
   uiParams: {
