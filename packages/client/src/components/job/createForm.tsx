@@ -356,7 +356,7 @@ class CreateForm extends React.Component<Props, State> {
                   <Tooltip title={(
                     <React.Fragment>
                       <h4 style={{color: 'white'}}>Information</h4>
-                      <div>{`Commands allow multiline. The working directory is located at '/workingdir'. The group volume is mounted at '/project/<group>' and datasets are mounted at '/datasets/<dataset>'.`}</div>
+                      <div>{`Commands allow multiline. The working directory is located at '/home/jovyan'. The group volume is mounted at '/home/jovyan/<group>' and datasets are mounted at '/home/jovyan/datasets/<dataset>'.`}</div>
                     </React.Fragment>
                   )}>
                     <Icon type="question-circle-o" />
