@@ -31,7 +31,17 @@ export default class Logs extends React.Component<Props, State> {
     this.listenOnScrollToTOP();
   }
 
-  componentDidUpdate(_prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.endpoint !== this.props.endpoint) {
+      this.setState({
+        log: '',
+        autoScroll: true
+      }, () => {
+        this.fetchLog();
+        this.listenOnScrollToTOP();
+      });
+    }
+
     const restartAutoScroll = !prevState.autoScroll && this.state.autoScroll;
     // scroll log box to bottom
     if (this.myRef && ((this.state.log !== prevState.log && this.state.autoScroll) || restartAutoScroll)) {
@@ -45,6 +55,7 @@ export default class Logs extends React.Component<Props, State> {
     const token = window.localStorage.getItem('canner.accessToken');
     const {endpoint} = this.props;
     const that = this;
+    if (!endpoint) return;
     return fetch(endpoint, {
       method: 'GET',
       headers: {

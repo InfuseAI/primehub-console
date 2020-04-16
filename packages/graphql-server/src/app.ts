@@ -24,6 +24,7 @@ import * as buildImage from './resolvers/buildImage';
 import * as buildImageJob from './resolvers/buildImageJob';
 import * as phJob from './resolvers/phJob';
 import * as phSchedule from './resolvers/phSchedule';
+import * as phDeployment from './resolvers/phDeployment';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset, regenerateUploadSecret} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
@@ -104,6 +105,9 @@ const resolvers = {
     phSchedule: phSchedule.queryOne,
     phSchedules: phSchedule.query,
     phSchedulesConnection: phSchedule.connectionQuery,
+    phDeployment: phDeployment.queryOne,
+    phDeployments: phDeployment.query,
+    phDeploymentsConnection: phDeployment.connectionQuery,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),
@@ -137,6 +141,11 @@ const resolvers = {
     updatePhSchedule: phSchedule.update,
     deletePhSchedule: phSchedule.destroy,
     runPhSchedule: phSchedule.run,
+    createPhDeployment: phDeployment.create,
+    updatePhDeployment: phDeployment.update,
+    deletePhDeployment: phDeployment.destroy,
+    deployPhDeployment: phDeployment.deploy,
+    stopPhDeployment: phDeployment.stop,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation(),
@@ -151,6 +160,7 @@ const resolvers = {
   BuildImage: buildImage.typeResolvers,
   PhJob: phJob.typeResolvers,
   PhSchedule: phSchedule.typeResolvers,
+  PhDeployment: phDeployment.typeResolvers,
   ...instanceType.typeResolver(),
   ...dataset.typeResolver(),
   ...image.typeResolver(),

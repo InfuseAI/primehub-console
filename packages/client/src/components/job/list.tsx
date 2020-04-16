@@ -8,7 +8,7 @@ import Filter from 'components/job/filter';
 import moment from 'moment';
 import {Group} from 'components/job/groupFilter';
 import {computeDuration} from 'components/job/detail';
-import Pagination from 'components/job/pagination';
+import Pagination from 'components/share/pagination';
 import JobBreadcrumb from 'components/job/breadcrumb';
 import { Phase, getActionByPhase } from './phase';
 import {appPrefix} from 'utils/env';

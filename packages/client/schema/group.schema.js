@@ -1,8 +1,9 @@
 /** @jsx builder */
-import builder, {Condition, Block, Row, Col, Default} from 'canner-script';
+import builder, {Condition, Block, Row, Col, Default, Layout} from 'canner-script';
 import {Tag} from 'antd';
 import Filter from '../src/cms-toolbar/filter';
 import {renderRelationField, parseToStepDot5} from './utils';
+import EnableModelDeployment from '../src/cms-layouts/enableModelDeployment';
 export default () => (
   <array keyName="group" title="${group}"
     controlDeployAndResetButtons={true}
@@ -107,6 +108,9 @@ export default () => (
     </Condition>
 
     <string keyName="displayName" title="${displayName}" />
+    <Layout component={EnableModelDeployment}>
+      <boolean keyName="enabledDeployment" title="${groups.enabledDeployment}" uiParams={{yesText: ' ', noText: ' '}} />
+    </Layout>
     <ShareVolumn />
     <Block title="User Quota">
       <Row type="flex">

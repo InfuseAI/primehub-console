@@ -78,6 +78,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.state.enableWorkspace = config.enableWorkspace;
     ctx.state.enableCustomImage = config.enableCustomImage;
     ctx.state.enableLicenseCheck = config.enableLicenseCheck;
+    ctx.state.enableModelDeployment = config.enableModelDeployment;
     ctx.state.disableGroup = config.enableLicenseCheck ? config.licenseStatus !== 'unexpired' : false;
     ctx.state.everyoneGroupId = config.keycloakEveryoneGroupId;
 
@@ -199,6 +200,21 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   rootRouter.get('/schedule/:scheduleId', oidcCtrl.loggedIn, async ctx => {
     await ctx.render('job', {
       title: 'PrimeHub Job Schedule',
+      staticPath
+    });
+  });
+
+  // model deployment
+  rootRouter.get('/model-deployment', oidcCtrl.loggedIn, async ctx => {
+    await ctx.render('model-deployment', {
+      title: 'PrimeHub Model Deployment',
+      staticPath
+    });
+  });
+
+  rootRouter.get('/model-deployment/*', oidcCtrl.loggedIn, async ctx => {
+    await ctx.render('model-deployment', {
+      title: 'PrimeHub Model Deployment',
       staticPath
     });
   });

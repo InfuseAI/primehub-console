@@ -1,68 +1,53 @@
-import React, { SyntheticEvent } from 'react';
-import {Checkbox, Select, Spin} from 'antd';
-import {Query} from 'react-apollo';
+import React from 'react';
+import {Checkbox, Select, Spin, Input} from 'antd';
 import gql from 'graphql-tag';
+import {Query} from 'react-apollo';
 import {FormattedMessage} from 'react-intl';
 
-type RefId = any;
 type Props = {
-  refId: RefId;
-  onChange: (refId: RefId, actionType: string, value: string) => void;
+  onChange: (value: string) => void;
   value: string;
   title: React.ReactNode;
   disabled: boolean
 }
 type State = {
-  checked: boolean
 }
 
-export default class UseImagePullSecret extends React.Component<Props, State> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      checked: Boolean(props.value)
-    };
-  }
-
+export default class ImagePullSecret extends React.Component<Props, State> {
   handleCheck = (e: any) => {
-    const {refId, onChange} = this.props;
+    const {onChange} = this.props;
     const checked = e.target.checked;
-    // we don't case about the async setState here
-    this.setState({checked});
     if (!checked) {
-      onChange(refId, 'update', null);
+      return onChange(null);
     }
+    onChange('');
   }
 
   handleSelect = (value: string) => {
-    const {onChange, refId} = this.props;
-    onChange(refId, 'update', value);
+    const {onChange} = this.props;
+    onChange(value);
   }
 
   render() {
     const {value, title, disabled} = this.props;
-    const {checked} = this.state;
+    const checked = typeof value === 'string';
     return (
-      <>
-        <Checkbox disabled={disabled} onChange={this.handleCheck} checked={checked}>
+      <div style={{display: 'flex', alignItems:'center'}}>
+        <Checkbox style={{marginRight: 8}} disabled={disabled} onChange={this.handleCheck} checked={checked}>
           {title}
         </Checkbox>
         {
-          checked && (
-            <div style={{marginTop: 16, maxWidth: 400}}>
+          checked ? (
+            <div style={{flex: 1}}>
               <Selector disabled={disabled} onChange={this.handleSelect} value={value} />
             </div>
+          ): (
+            <Input disabled style={{flex: 1}} />
           )
         }
-      </>
+      </div>
     );
   }
-}
-
-function getWorkspaceId() {
-  const prefix = window.APP_PREFIX + 'cms/';
-  const path = window.location.pathname.substr(prefix.length);
-  return path.split('/')[0];
 }
 
 type SelectorProps = {
@@ -71,25 +56,21 @@ type SelectorProps = {
   onChange: (value: string) => void
 }
 
-export class Selector extends React.Component<SelectorProps> {
-  constructor(props) {
-    super(props);
-    const workspaceId = getWorkspaceId();
-    this.GET_SECRET = gql`
-    {
-      secrets(where: {ifDockerConfigJson: true, workspaceId: "${workspaceId}"}) {
-        id
-        name
-        type
-      }
-    }
-    `
+const GET_SECRET = gql`
+{
+  secrets(where: {ifDockerConfigJson: true}) {
+    id
+    name
+    type
   }
+}
+`;
 
+export class Selector extends React.Component<SelectorProps> {
   render() {
     const {value, onChange, disabled} = this.props;
     return (
-      <Query query={this.GET_SECRET}>
+      <Query query={GET_SECRET}>
         {({data, loading}) => (
           <Select
             disabled={disabled}

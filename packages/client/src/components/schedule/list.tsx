@@ -7,7 +7,7 @@ import {get} from 'lodash';
 import styled from 'styled-components';
 import Filter from 'components/job/filter';
 import {Group} from 'components/job/groupFilter';
-import Pagination from 'components/job/pagination';
+import Pagination from 'components/share/pagination';
 import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
 import {renderRecurrence} from 'components/schedule/recurrence';
 import {appPrefix} from 'utils/env';
