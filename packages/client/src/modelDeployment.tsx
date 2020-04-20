@@ -151,7 +151,32 @@ const fakeData = {
     },
     metadata: {
       'hello': 123
-    }
+    },
+    history: [{
+      time: new Date().toISOString(),
+      deployment: {
+        id: 'd0',
+        user: {
+          name: 'Leo'
+        },
+        name: 'd0',
+        description: 'fdksoapfkeowpfadsangisoagdsagsgeiwagegiowagegeianogigeanogeiaogneiasogensioagenifdksoapfkeowpfadsangisoagdsagsgeiwagegiowagegeianogigeanogeiaogneiasogensioageni',
+        groupName: 'groupName',
+        modelImage: 'imageurl',
+        replicas: 4,
+        instanceType: {
+          id: 'everyone-it',
+          name: 'it',
+          displayName: 'gpu0',
+          gpuLimit: 0,
+          cpuLimit: 0.5,
+          memoryLimit: 4,
+        },
+        metadata: {
+          'hello': 123
+        },
+      }
+    }]
   }, {
     id: 'd1',
     name: 'd1',
