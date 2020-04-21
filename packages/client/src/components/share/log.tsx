@@ -9,29 +9,29 @@ type Props = {
 }
 
 type State = {
-  log: string;
+  log: Array<string>;
+  topmost: boolean;
   autoScroll: boolean;
   tailLines?: number;
   downloading: boolean;
 }
 
-const APPEND_LENGTH = 100;
-const INITIAL_LENGTH = 200;
+const INITIAL_LENGTH = 2000;
 
 export default class Logs extends React.Component<Props, State> {
   retryCount: number;
   myRef: React.Ref<HTMLTextAreaElement>;
   controller: AbortController;
-  waitForChangeScrollTop: boolean;
 
   constructor(props) {
     super(props);
     this.retryCount = 0;
     this.state = {
-      log: '',
+      log: [],
       autoScroll: true,
       tailLines: INITIAL_LENGTH,
       downloading: false,
+      topmost: false,
     };
     this.myRef = React.createRef();
   }
@@ -44,7 +44,7 @@ export default class Logs extends React.Component<Props, State> {
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.endpoint !== this.props.endpoint) {
       this.setState({
-        log: '',
+        log: [],
         autoScroll: true,
         tailLines: INITIAL_LENGTH
       }, () => {
@@ -53,23 +53,9 @@ export default class Logs extends React.Component<Props, State> {
       });
     }
 
-    if (this.myRef.current && prevState.tailLines !== this.state.tailLines) {
-      this.waitForChangeScrollTop = true;
-      this.fetchLog();
-      this.listenOnScrollToTOP();
-    }
-
-    if (this.state.log !== prevState.log && this.waitForChangeScrollTop) {
-      const lines = this.state.log.split('\n').length;
-      if (lines >= APPEND_LENGTH) {
-        this.myRef.current.textAreaRef.scrollTop = APPEND_LENGTH * 21;
-        this.waitForChangeScrollTop = false;
-      }
-    }
-
     const restartAutoScroll = !prevState.autoScroll && this.state.autoScroll;
     // scroll log box to bottom
-    if (this.myRef && ((this.state.log !== prevState.log && this.state.autoScroll) || restartAutoScroll)) {
+    if (this.myRef && ((this.state.log[this.state.log.length - 1] !== prevState.log[prevState.log.length - 1] && this.state.autoScroll) || restartAutoScroll)) {
       //https://github.com/ant-design/ant-design/issues/10527
       // @ts-ignore
       this.myRef.current.textAreaRef.scrollTop = this.myRef.current.textAreaRef.scrollHeight;
@@ -98,10 +84,10 @@ export default class Logs extends React.Component<Props, State> {
         return res.json().then(content => {
           const reason = get(content, 'message', 'of internal error');
           that.setState(() => ({
-            log: `Error: cannot get log due to ${reason}`
+            log: [`Error: cannot get log due to ${reason}`]
           }));
         });
-      that.setState({log: ''});
+      that.setState({log: []});
       
       const reader = res.body.getReader();
       
@@ -112,10 +98,10 @@ export default class Logs extends React.Component<Props, State> {
       function appendChunks(result) {
         if (result.done)
           return 'done';
-        const chunk = new TextDecoder().decode(result.value.buffer);
+        const chunk = new TextDecoder().decode(result.value.buffer).split('\n').filter(text => text);
         
         that.setState((prevState: any) => ({
-          log: prevState.log + chunk,
+          log: [...prevState.log.slice(chunk.length), ...chunk],
         }))
 
         return readChunk();
@@ -150,18 +136,12 @@ export default class Logs extends React.Component<Props, State> {
       if (scrollHeight > clientHeight + scrollTop) {
         this.setState({autoScroll: false})
       }
-      // if scroll to topmost, then we should fetch more.
-      if (scrollTop === 0) {
-        this.updateTailLines()
-      }
+
+      this.setState({
+        topmost: scrollTop === 0
+      });
     }
   }
-
-  updateTailLines = throttle(() => {
-    this.setState(prevState => ({
-      tailLines: prevState.log.split('\n').length + APPEND_LENGTH,
-    }))
-  }, 3000);
 
   enableAutoScroll = () => {
     this.setState({
@@ -190,7 +170,7 @@ export default class Logs extends React.Component<Props, State> {
 
   render() {
     const {rows = 40} = this.props;
-    const {log, downloading} = this.state;
+    const {log, downloading, topmost} = this.state;
     return <>
       <div style={{float: 'right', marginBottom: 4, display: 'flex'}}>
         <Button
@@ -206,14 +186,31 @@ export default class Logs extends React.Component<Props, State> {
           Scroll to Bottom
         </Button>
       </div>
+      <div
+        style={{
+          padding: 16,
+          position: 'relative',
+          top: 56,
+          marginTop: -52,
+          zIndex: 1,
+          background: '#eee',
+          letterSpacing: '0.4px',
+          opacity: topmost ? 1 : 0,
+          color: '#333',
+          transition: 'opacity 0.1s',
+        }}
+      >
+        Please download to check out more than 2000 lines.
+      </div>
       <Input.TextArea
         style={{
           background: 'black',
           color: '#ddd',
           fontFamily: 'monospace',
+          border: 0
         }}
         rows={rows || 40}
-        value={log}
+        value={log.join('\n')}
         // @ts-ignore
         ref={this.myRef}
       />
