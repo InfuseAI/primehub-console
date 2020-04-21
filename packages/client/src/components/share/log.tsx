@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Input, Button} from 'antd';
-import {get} from 'lodash';
+import {get, throttle} from 'lodash';
 
 type Props = {
   endpoint: string;
@@ -10,11 +10,17 @@ type Props = {
 type State = {
   log: string;
   autoScroll: boolean;
+  tailLines?: number;
 }
+
+const APPEND_LENGTH = 100;
+const INITIAL_LENGTH = 200;
 
 export default class Logs extends React.Component<Props, State> {
   retryCount: number;
   myRef: React.Ref<HTMLTextAreaElement>;
+  controller: AbortController;
+  waitForChangeScrollTop: boolean;
 
   constructor(props) {
     super(props);
@@ -22,6 +28,7 @@ export default class Logs extends React.Component<Props, State> {
     this.state = {
       log: '',
       autoScroll: true,
+      tailLines: INITIAL_LENGTH,
     };
     this.myRef = React.createRef();
   }
@@ -35,11 +42,26 @@ export default class Logs extends React.Component<Props, State> {
     if (prevProps.endpoint !== this.props.endpoint) {
       this.setState({
         log: '',
-        autoScroll: true
+        autoScroll: true,
+        tailLines: INITIAL_LENGTH
       }, () => {
         this.fetchLog();
         this.listenOnScrollToTOP();
       });
+    }
+
+    if (this.myRef.current && prevState.tailLines !== this.state.tailLines) {
+      this.waitForChangeScrollTop = true;
+      this.fetchLog();
+      this.listenOnScrollToTOP();
+    }
+
+    if (this.state.log !== prevState.log && this.waitForChangeScrollTop) {
+      const lines = this.state.log.split('\n').length;
+      if (lines >= APPEND_LENGTH) {
+        this.myRef.current.textAreaRef.scrollTop = APPEND_LENGTH * 21;
+        this.waitForChangeScrollTop = false;
+      }
     }
 
     const restartAutoScroll = !prevState.autoScroll && this.state.autoScroll;
@@ -54,9 +76,15 @@ export default class Logs extends React.Component<Props, State> {
   fetchLog = () => {
     const token = window.localStorage.getItem('canner.accessToken');
     const {endpoint} = this.props;
+    const {tailLines} = this.state;
     const that = this;
+    if (this.controller) this.controller.abort();
+    const controller = new AbortController();
+    this.controller = controller
+    const signal = controller.signal;
     if (!endpoint) return;
-    return fetch(endpoint, {
+    return fetch(`${endpoint}?tailLines=${tailLines}`, {
+      signal,
       method: 'GET',
       headers: {
         'Authorization': 'Bearer ' + token
@@ -70,8 +98,8 @@ export default class Logs extends React.Component<Props, State> {
             log: `Error: cannot get log due to ${reason}`
           }));
         });
-      
       that.setState({log: ''});
+      
       const reader = res.body.getReader();
       
       function readChunk() {
@@ -84,7 +112,7 @@ export default class Logs extends React.Component<Props, State> {
         const chunk = new TextDecoder().decode(result.value.buffer);
         
         that.setState((prevState: any) => ({
-          log: prevState.log + chunk
+          log: prevState.log + chunk,
         }))
 
         return readChunk();
@@ -93,6 +121,9 @@ export default class Logs extends React.Component<Props, State> {
       return readChunk();
     })
     .catch(err => {
+      if (err.message === 'The user aborted a request.') {
+        return;
+      }
       console.log(err);
       setTimeout(() => {
         if (this.retryCount <= 5) {
@@ -116,9 +147,18 @@ export default class Logs extends React.Component<Props, State> {
       if (scrollHeight > clientHeight + scrollTop) {
         this.setState({autoScroll: false})
       }
-
+      // if scroll to topmost, then we should fetch more.
+      if (scrollTop === 0) {
+        this.updateTailLines()
+      }
     }
   }
+
+  updateTailLines = throttle(() => {
+    this.setState(prevState => ({
+      tailLines: prevState.log.split('\n').length + APPEND_LENGTH,
+    }))
+  }, 3000);
 
   enableAutoScroll = () => {
     this.setState({
