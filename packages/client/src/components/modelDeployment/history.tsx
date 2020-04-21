@@ -99,9 +99,9 @@ export default class History extends React.Component<Props, State> {
     }, {
       title: 'User',
       key: 'user',
-      dataIndex: 'deployment.user',
+      dataIndex: 'deployment.userName',
       width: '20%',
-      render: user => <span>{user.name}</span>
+      render: userName => <span>{userName}</span>
     }, {
       title: 'Timestamp',
       key: 'time',
@@ -132,7 +132,7 @@ export default class History extends React.Component<Props, State> {
             deployment &&  (
               <Row gutter={36}>
                 <Col span={12}>
-                  <Field label="User" value={deployment.user ? deployment.user.name : '-'} />
+                  <Field label="User" value={deployment.userName ? deployment.userName : '-'} />
                   <Field label="Stop" value={deployment.stop || 'false'} />
                   <Field label="Model Image" value={deployment.modelImage || '-'} />
                   <Field label="Replicas" value={deployment.replicas} />

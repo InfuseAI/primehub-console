@@ -90,9 +90,7 @@ fragment PhDeploymentInfo on PhDeployment {
   history {
     deployment {
       id
-      user {
-        name
-      }
+      userName
       stop
       modelImage
       replicas
@@ -106,8 +104,6 @@ fragment PhDeploymentInfo on PhDeployment {
         cpuLimit
         memoryLimit
         gpuLimit
-        description
-        metadata
       }
     }
     time
