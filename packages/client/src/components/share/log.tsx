@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {Input, Button} from 'antd';
 import {get, throttle} from 'lodash';
+import downloadjs from 'downloadjs';
 
 type Props = {
   endpoint: string;
@@ -11,6 +12,7 @@ type State = {
   log: string;
   autoScroll: boolean;
   tailLines?: number;
+  downloading: boolean;
 }
 
 const APPEND_LENGTH = 100;
@@ -29,6 +31,7 @@ export default class Logs extends React.Component<Props, State> {
       log: '',
       autoScroll: true,
       tailLines: INITIAL_LENGTH,
+      downloading: false,
     };
     this.myRef = React.createRef();
   }
@@ -166,16 +169,43 @@ export default class Logs extends React.Component<Props, State> {
     });
   }
 
+  download = () => {
+    const {endpoint} = this.props;
+    const {tailLines} = this.state;
+    const token = window.localStorage.getItem('canner.accessToken');
+    this.setState({downloading: true});
+    fetch(`${endpoint}?follow=true&&tailLines=${tailLines}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      },
+    }).then(res => res.blob())
+    .then(blob => {
+      return downloadjs(blob, 'deployment.log', 'text/plain');
+    })
+    .finally(() => {
+      this.setState({downloading: false});
+    })
+  }
+
   render() {
     const {rows = 40} = this.props;
-    const {log} = this.state;
+    const {log, downloading} = this.state;
     return <>
-      <Button
-        onClick={this.enableAutoScroll}
-        style={{float: 'right', marginBottom: 4}}
-      >
-        Scroll to Bottom
-      </Button>
+      <div style={{float: 'right', marginBottom: 4, display: 'flex'}}>
+        <Button
+          onClick={this.download}
+          style={{marginRight: 8}}
+          loading={downloading}
+        >
+          Download
+        </Button>
+        <Button
+          onClick={this.enableAutoScroll}
+        >
+          Scroll to Bottom
+        </Button>
+      </div>
       <Input.TextArea
         style={{
           background: 'black',
