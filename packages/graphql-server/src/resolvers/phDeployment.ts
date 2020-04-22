@@ -68,17 +68,17 @@ const getFallbackPhase = (stopped: boolean, phase: PhDeploymentPhase) => {
   return phase || PhDeploymentPhase.Stopped;
 };
 
-const transformSpec = (id: string, groupName: string, spec: any) => {
+const transformSpec = (id: string, time: string, groupName: string, spec: any) => {
   const predictator = get(spec, 'predictors.0');
   return {
-    id,
+    id: `${id}-${time}`,
     name: spec.displayName,
     description: spec.description,
     userId: spec.userId,
     userName: spec.userName,
     groupName,
     groupId: spec.groupId,
-    stop: spec.stop,
+    stop: isUndefined(spec.stop) ? false : spec.stop,
     lastUpdatedTime: spec.updateTime,
 
     // predictator
@@ -101,7 +101,7 @@ export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>
   const history = get(item, 'status.history', []).map(historyItem => {
     return {
       time: historyItem.time,
-      deployment: transformSpec(item.metadata.name, groupName, historyItem.spec),
+      deployment: transformSpec(item.metadata.name, historyItem.time, groupName, historyItem.spec),
     };
   });
   return {
