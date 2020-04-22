@@ -83,6 +83,7 @@
     "react-dotdotdot": "^1.2.3",
     "react-router-dom": "^4.2.2",
     "react-timezone": "^2.1.0",
+    "react-window": "^1.8.5",
     "rimraf": "^2.5.4",
     "style-loader": "^0.21.0",
     "styled-components": "^3.2.6",
@@ -118,6 +119,7 @@
   "license": "Apache-2.0",
   "private": true,
   "dependencies": {
-    "canner": "2.0.62"
+    "canner": "2.0.62",
+    "downloadjs": "^1.4.7"
   }
 }
