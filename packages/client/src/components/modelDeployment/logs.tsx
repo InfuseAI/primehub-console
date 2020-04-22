@@ -35,7 +35,7 @@ export default class ModelDeploymentLogs extends React.Component<Props, State> {
             <Select.Option key={pod.name} value={pod.logEndpoint}>{pod.name}</Select.Option>
           ))}
         </Select> 
-        <Logs endpoint={logEndpoint} />
+        <Logs style={{marginTop: 16}} endpoint={logEndpoint} />
       </>
     );
   }

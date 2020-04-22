@@ -6,6 +6,7 @@ import downloadjs from 'downloadjs';
 type Props = {
   endpoint: string;
   rows?: number;
+  style?: object;
 }
 
 type State = {
@@ -98,11 +99,21 @@ export default class Logs extends React.Component<Props, State> {
       function appendChunks(result) {
         if (result.done)
           return 'done';
-        const chunk = new TextDecoder().decode(result.value.buffer).split('\n').filter(text => text);
+        const chunk = new TextDecoder().decode(result.value.buffer).split('\n');
+        if (!chunk[chunk.length - 1]) chunk.pop();
         
-        that.setState((prevState: any) => ({
-          log: [...prevState.log.slice(chunk.length), ...chunk],
-        }))
+        that.setState((prevState: any) => {
+          const log = prevState.log.length > 2000 ?
+          prevState.log.slice(chunk.length) : 
+          prevState.log;
+          return {
+            log: [...log, ...chunk],
+          }
+        }, () => {
+          if (!that.state.autoScroll && that.state.log.length >= 2000) {
+            that.myRef.current.textAreaRef.scrollTop -= chunk.length * 21;
+          }
+        });
 
         return readChunk();
       }
@@ -169,7 +180,7 @@ export default class Logs extends React.Component<Props, State> {
   }
 
   render() {
-    const {rows = 40} = this.props;
+    const {rows = 40, style = {}} = this.props;
     const {log, downloading, topmost} = this.state;
     return <>
       <div style={{float: 'right', marginBottom: 4, display: 'flex'}}>
@@ -186,34 +197,36 @@ export default class Logs extends React.Component<Props, State> {
           Scroll to Bottom
         </Button>
       </div>
-      <div
-        style={{
-          padding: 16,
-          position: 'relative',
-          top: 56,
-          marginTop: -52,
-          zIndex: 1,
-          background: '#eee',
-          letterSpacing: '0.4px',
-          opacity: topmost ? 1 : 0,
-          color: '#333',
-          transition: 'opacity 0.1s',
-        }}
-      >
-        Please download to check out more than 2000 lines.
+      <div style={{position: 'relative', marginTop: 48, ...style}}>
+        <div
+          style={{
+            padding: 16,
+            position: 'absolute',
+            width: '100%',
+            top: 0,
+            zIndex: 1,
+            background: '#eee',
+            letterSpacing: '0.4px',
+            opacity: topmost && log.length >= 2000 ? 1 : 0,
+            color: '#333',
+            transition: 'opacity 0.1s',
+          }}
+        >
+          Please download to check out more than 2000 lines.
+        </div>
+        <Input.TextArea
+          style={{
+            background: 'black',
+            color: '#ddd',
+            fontFamily: 'monospace',
+            border: 0
+          }}
+          rows={rows || 40}
+          value={log.join('\n')}
+          // @ts-ignore
+          ref={this.myRef}
+        />
       </div>
-      <Input.TextArea
-        style={{
-          background: 'black',
-          color: '#ddd',
-          fontFamily: 'monospace',
-          border: 0
-        }}
-        rows={rows || 40}
-        value={log.join('\n')}
-        // @ts-ignore
-        ref={this.myRef}
-      />
     </>;
   }
 }
