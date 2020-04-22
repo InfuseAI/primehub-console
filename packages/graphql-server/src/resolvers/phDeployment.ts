@@ -38,6 +38,7 @@ export interface PhDeployment {
   instanceType: string;
   creationTime: string;
   lastUpdatedTime: string;
+  history: Array<{time: string, deployment: any}>;
 }
 
 export interface PhDeploymentMutationInput {
@@ -67,6 +68,28 @@ const getFallbackPhase = (stopped: boolean, phase: PhDeploymentPhase) => {
   return phase || PhDeploymentPhase.Stopped;
 };
 
+const transformSpec = (id: string, time: string, groupName: string, spec: any) => {
+  const predictator = get(spec, 'predictors.0');
+  return {
+    id: `${id}-${time}`,
+    name: spec.displayName,
+    description: spec.description,
+    userId: spec.userId,
+    userName: spec.userName,
+    groupName,
+    groupId: spec.groupId,
+    stop: isUndefined(spec.stop) ? false : spec.stop,
+    lastUpdatedTime: spec.updateTime,
+
+    // predictator
+    modelImage: predictator.modelImage,
+    replicas: predictator.replicas,
+    imagePullSecret: predictator.imagePullSecret,
+    instanceType: predictator.instanceType,
+    metadata: predictator.metadata,
+  };
+};
+
 // tslint:disable-next-line:max-line-length
 export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>, kcAdminClient: KeycloakAdminClient): Promise<PhDeployment> => {
   const group = item.spec.groupId ?
@@ -75,6 +98,12 @@ export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>
   const predictator = item.spec.predictors[0];
   const phase = get(item, 'status.phase');
   const status = getFallbackPhase(item.spec.stop, phase);
+  const history = get(item, 'status.history', []).map(historyItem => {
+    return {
+      time: historyItem.time,
+      deployment: transformSpec(item.metadata.name, historyItem.time, groupName, historyItem.spec),
+    };
+  });
   return {
     id: item.metadata.name,
     name: item.spec.displayName,
@@ -100,7 +129,10 @@ export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>
 
     // times
     creationTime: item.metadata.creationTimestamp,
-    lastUpdatedTime: item.spec.updateTime
+    lastUpdatedTime: item.spec.updateTime,
+
+    // history
+    history,
   };
 };
 
@@ -211,7 +243,7 @@ export const typeResolvers = {
       });
       return {
         id: instanceTypeId,
-        name: instanceTypeId,
+        name: 'REMOVED',
         tolerations: []
       };
     }
@@ -323,7 +355,7 @@ export const create = async (root, args, context: Context) => {
 };
 
 export const update = async (root, args, context: Context) => {
-  const {crdClient, userId} = context;
+  const {crdClient, userId, username} = context;
   const data: Partial<PhDeploymentMutationInput> = args.data;
   const phDeployment = await crdClient.phDeployments.get(args.where.id);
   // group is immutable
@@ -340,6 +372,8 @@ export const update = async (root, args, context: Context) => {
 
   const spec: any = {
     updateTime: moment.utc().toISOString(),
+    userId,
+    userName: username,
     displayName: data.name,
     description: data.description,
     predictors: [{
@@ -356,25 +390,35 @@ export const update = async (root, args, context: Context) => {
 };
 
 export const deploy = async (root, args, context: Context) => {
-  const {crdClient, userId} = context;
+  const {crdClient, userId, username} = context;
   const {id} = args.where;
   const phDeployment = await crdClient.phDeployments.get(id);
   const groupId = phDeployment.spec.groupId;
   await canUserMutate(userId, groupId, context);
 
-  const spec = { updateTime: moment.utc().toISOString(), stop: false } as any;
+  const spec = {
+    updateTime: moment.utc().toISOString(),
+    userId,
+    userName: username,
+    stop: false
+  } as any;
   const updated = await context.crdClient.phDeployments.patch(args.where.id, {spec});
   return transform(updated, context.kcAdminClient);
 };
 
 export const stop = async (root, args, context: Context) => {
-  const {crdClient, userId} = context;
+  const {crdClient, userId, username} = context;
   const {id} = args.where;
   const phDeployment = await crdClient.phDeployments.get(id);
   const groupId = phDeployment.spec.groupId;
   await canUserMutate(userId, groupId, context);
 
-  const spec = { updateTime: moment.utc().toISOString(), stop: true } as any;
+  const spec = {
+    updateTime: moment.utc().toISOString(),
+    userId,
+    userName: username,
+    stop: true
+  } as any;
   const updated = await context.crdClient.phDeployments.patch(args.where.id, {spec});
   return transform(updated, context.kcAdminClient);
 };
