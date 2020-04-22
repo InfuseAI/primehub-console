@@ -6,6 +6,11 @@ type Pod {
   logEndpoint: String
 }
 
+type HistoryItem {
+  time: String
+  deployment: PhDeployment
+}
+
 type PhDeployment {
   id: ID!
   status: String
@@ -27,6 +32,7 @@ type PhDeployment {
   creationTime: String
   lastUpdatedTime: String
   pods: [Pod]
+  history: [HistoryItem]
 }
 
 """An edge in a connection."""

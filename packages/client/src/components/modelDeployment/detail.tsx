@@ -7,6 +7,8 @@ import { appPrefix } from 'utils/env';
 import {Link} from 'react-router-dom';
 import {Field} from 'components/modelDeployment/card';
 import ModelDeploymentLogs from 'components/modelDeployment/logs';
+import ModelDeploymentHistory from 'components/modelDeployment/history';
+import Metadata from 'components/modelDeployment/metadata';
 import Message from 'components/share/message';
 import moment from 'moment';
 
@@ -151,6 +153,11 @@ export default class Detail extends React.Component<Props> {
     const {phDeployment} = this.props;
     return <ModelDeploymentLogs pods={phDeployment.pods}/>;
   }
+
+  renderHistory = () => {
+    const {phDeployment} = this.props;
+    return <ModelDeploymentHistory history={phDeployment.history} />;
+  }
   
   render() {
     const {phDeployment, stopPhDeploymentResult, deletePhDeploymentResult, deployPhDeploymentResult, history} = this.props;
@@ -204,39 +211,14 @@ export default class Detail extends React.Component<Props> {
             <Tabs.TabPane key="logs" tab="Logs">
               {this.renderLogs()}
             </Tabs.TabPane>
+            <Tabs.TabPane key="history" tab="History">
+              {this.renderHistory()}
+            </Tabs.TabPane>
           </Tabs>
         </Card>
       </>
     )
   }
-}
-
-function Metadata({metadata}: {metadata: object}) {
-  const metadataList = Object.keys(metadata || {}).map(key => ({
-    key,
-    value: metadata[key]
-  }));
-  const columns = [{
-    title: 'Name',
-    dataIndex: 'key',
-    width: '30%',
-    render: value => <div style={{wordBreak: 'break-all'}}>{value}</div>
-  }, {
-    title: 'Value',
-    dataIndex: 'value',
-    width: '70%',
-    render: value => <div style={{wordBreak: 'break-all'}}>{value}</div>
-  }];
-  return (
-    <Table
-      style={{border: '1px solid #eee'}}
-      columns={columns}
-      dataSource={metadataList}
-      scroll={{y: 207}}
-      size="middle"
-      pagination={false}
-    />
-  )
 }
 
 function getMessage(deployment: DeploymentInfo) {
@@ -254,7 +236,7 @@ function getMessage(deployment: DeploymentInfo) {
 }
 const dashOrNumber = value => value === null ? '-' : value;
 
-function renderInstanceType(instanceType) {
+export function renderInstanceType(instanceType) {
   return (
     <div>
       {instanceType.displayName || instanceType.name}
@@ -264,6 +246,6 @@ function renderInstanceType(instanceType) {
   )
 }
 
-function renderTime(time: string) {
+export function renderTime(time: string) {
   return time ? moment(time).format('YYYY-MM-DD HH:mm:ss') : '-';
 }

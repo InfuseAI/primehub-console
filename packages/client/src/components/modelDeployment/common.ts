@@ -21,9 +21,15 @@ export interface DeploymentConnection {
   }>
 }
 
+export interface HistoryItem {
+  deployment: DeploymentInfo;
+  time: string;
+}
+
 export interface DeploymentInfo {
   id: string;
-  status: Status
+  user: {name: string};
+  status: Status;
   message: string;
   name: string;
   description: string;
@@ -48,7 +54,8 @@ export interface DeploymentInfo {
     cpuLimit: number;
     memoryLimit: number;
     gpuLimit: number;
-  }
+  };
+  history: Array<HistoryItem>;
 }
 
 export const PhDeploymentFragment = gql`
@@ -79,6 +86,27 @@ fragment PhDeploymentInfo on PhDeployment {
     cpuLimit
     memoryLimit
     gpuLimit
+  }
+  history {
+    deployment {
+      id
+      userName
+      stop
+      modelImage
+      replicas
+      groupName
+      description
+      metadata
+      instanceType {
+        id
+        name
+        displayName
+        cpuLimit
+        memoryLimit
+        gpuLimit
+      }
+    }
+    time
   }
 }
 `
