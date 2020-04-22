@@ -223,7 +223,7 @@ const canUserMutate = async (userId: string, groupId: string, context: Context) 
 };
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any, context: Context): Promise<PhSchedule[]> => {
+const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any = {}, context: Context): Promise<PhSchedule[]> => {
   const {namespace, graphqlHost, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phSchedule = await client.get(where.id);

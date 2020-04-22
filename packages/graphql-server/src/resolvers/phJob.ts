@@ -209,7 +209,7 @@ const canUserCreate = async (userId: string, groupId: string, context: Context) 
 };
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhJobSpec>, where: any, context: Context): Promise<PhJob[]> => {
+const listQuery = async (client: CustomResource<PhJobSpec>, where: any = {}, context: Context): Promise<PhJob[]> => {
   const {namespace, graphqlHost, jobLogCtrl, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phJob = await client.get(where.id);
