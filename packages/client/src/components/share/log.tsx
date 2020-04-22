@@ -165,7 +165,7 @@ export default class Logs extends React.Component<Props, State> {
     const {tailLines} = this.state;
     const token = window.localStorage.getItem('canner.accessToken');
     this.setState({downloading: true});
-    fetch(`${endpoint}?follow=true&&tailLines=${tailLines}`, {
+    fetch(`${endpoint}?follow=false&&tailLines=${tailLines}`, {
       method: 'GET',
       headers: {
         'Authorization': 'Bearer ' + token
