@@ -2,6 +2,7 @@ import Router from 'koa-router';
 import CrdClientImpl, { client as kubeClient } from '../crdClient/crdClientImpl';
 import { ParameterizedContext } from 'koa';
 import { Stream } from 'stream';
+import { get } from 'lodash';
 
 const MODEL = 'model';
 
@@ -27,25 +28,28 @@ export class JobLogCtrl {
   }
 
   public streamLogs = async (ctx: ParameterizedContext) => {
+    const {follow, tailLines} = ctx.query;
     const namespace = ctx.params.namespace || this.namespace;
     const jobId = ctx.params.jobId;
     const job = await this.crdClient.imageSpecJobs.get(jobId);
     const podName = job.status.podName;
-    ctx.body = this.getStream(namespace, podName);
+    ctx.body = this.getStream(namespace, podName, {follow, tailLines});
   }
 
   public streamPhJobLogs = async (ctx: ParameterizedContext) => {
+    const {follow, tailLines} = ctx.query;
     const namespace = ctx.params.namespace || this.namespace;
     const jobId = ctx.params.jobId;
     const phjob = await this.crdClient.phJobs.get(jobId);
     const podName = phjob.status.podName;
-    ctx.body = this.getStream(namespace, podName);
+    ctx.body = this.getStream(namespace, podName, {follow, tailLines});
   }
 
   public streamPhDeploymentLogs = async (ctx: ParameterizedContext) => {
+    const {follow, tailLines} = ctx.query;
     const namespace = ctx.params.namespace || this.namespace;
     const podName = ctx.params.podName;
-    ctx.body = this.getStream(namespace, podName, MODEL);
+    ctx.body = this.getStream(namespace, podName, {container: MODEL, follow, tailLines});
   }
 
   public getRoute = () => {
@@ -72,9 +76,15 @@ export class JobLogCtrl {
     return `${this.appPrefix || ''}/logs/namespaces/${namespace}/phdeployments/${podName}`;
   }
 
-  private getStream = (namespace: string, podName: string, container?: string): Stream => {
+  private getStream = (
+    namespace: string,
+    podName: string,
+    options?: {follow?: number, tailLines?: number, container?: string}): Stream => {
+    const container = get(options, 'container');
+    const follow = get(options, 'follow', true);
+    const tailLines = get(options, 'tailLines');
     return this.kubeClient.api.v1.namespaces(namespace)
-      .pods(podName).log.getStream({ qs: { follow: true, container } });
+      .pods(podName).log.getStream({ qs: { container, follow, tailLines } });
   }
 }
 
