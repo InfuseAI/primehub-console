@@ -99,10 +99,8 @@ class CreateForm extends React.Component<Props, State> {
   };
 
   componentDidMount() {
-    const {initialValue, onSelectGroup} = this.props;
-    if (initialValue) {
-      onSelectGroup(initialValue.groupId);
-    } else {
+    const {initialValue} = this.props;
+    if (!initialValue) {
       this.autoSelectFirstGroup();
       this.autoSelectFirstInstanceType();
       this.autoSelectFirstImage();
@@ -218,17 +216,17 @@ class CreateForm extends React.Component<Props, State> {
       recurrenceLabel += `(${this.stringifyZone(timezone, 'GMT')})`;
     }
 
-    const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
+    const invalidInitialGroup = groupId && !form.getFieldValue('groupId') && !groups.find(group => group.id === groupId);
     const groupLabel = this.renderLabel(
       'Group',
       invalidInitialGroup,
       <span>The group <b>{groupName}</b> was deleted.</span>
     )
-    
+
     const invalidInitialInstanceType = !invalidInitialGroup && 
-      instanceTypeId && 
-      !form.getFieldValue('instanceType') &&
+      instanceTypeId && !form.getFieldValue('instanceType') &&
       !instanceTypes.find(it => it.id === instanceTypeId);
+
     const instanceTypeLabel = this.renderLabel(
       'InstanceTypes',
       invalidInitialInstanceType,
@@ -236,8 +234,7 @@ class CreateForm extends React.Component<Props, State> {
     )
 
     const invalidInitialImage = !invalidInitialGroup &&
-      image &&
-      !form.getFieldValue('image') &&
+      image && !form.getFieldValue('image') &&
       !images.find(it => it.id === image);
     const imageLabel = this.renderLabel(
       'Images',

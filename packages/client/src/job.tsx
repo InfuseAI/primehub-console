@@ -132,6 +132,16 @@ const fakeData = {
   }, {
     id: 'it2',
     name: 'IT2',
+    groupId: 'no ',
+    groupName: 'groupName2',
+    instanceType: {
+      id: 'no-instanceType',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    },
     displayName: 'IT2',
     phase: 'Failed',
     message: `
@@ -193,7 +203,7 @@ const fakeData = {
     groupName: 'groupName1',
     image: 'image name',
     instanceType: {
-      id: 'everyone-it-aha',
+      id: 'g-it1',
       name: 'it',
       displayName: 'gpu0',
       gpuLimit: 0,

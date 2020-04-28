@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button} from 'antd';
+import {Card, Skeleton, Row, Col} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -57,16 +57,19 @@ type Props = RouteComponentProps & {
   getGroups: any; 
   createPhJob: any;
   createPhJobResult: any;
-  defaultValue?: string;
+  defaultValue?: object;
 }
 type State = {
   selectedGroup: string | null;
 }
 
 class JobCreatePage extends React.Component<Props, State> {
-  state = {
-    selectedGroup: null,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedGroup: get(props, 'defaultValue.groupId') || null
+    }
+  }
 
   onChangeGroup = (id: string) => {
     this.setState({selectedGroup: id});
@@ -109,16 +112,37 @@ class JobCreatePage extends React.Component<Props, State> {
         <div style={{
           margin: '16px',
         }}>
-          <JobCreateForm
-            initialValue={defaultValue ? JSON.parse(defaultValue) : undefined}
-            onSelectGroup={this.onChangeGroup}
-            selectedGroup={selectedGroup}
-            groups={sortItems(groups)}
-            instanceTypes={sortItems(instanceTypes)}
-            images={sortItems(images)}
-            onSubmit={this.onSubmit}
-            loading={getGroups.loading || createPhJobResult.loading}
-          />
+
+          {getGroups.loading ? (
+            <Row gutter={16}>
+              <Col xs={24} sm={8} lg={8}>
+                <Card>
+                  <Skeleton active />
+                  <Skeleton active />
+                  <Skeleton active />
+                </Card>
+              </Col>
+              <Col xs={24} sm={16} lg={16}>
+                <Card>
+                  <Skeleton active />
+                  <Skeleton active />
+                  <Skeleton active />
+                </Card>
+              </Col>
+            </Row>
+          ) : (
+            <JobCreateForm
+              initialValue={defaultValue}
+              onSelectGroup={this.onChangeGroup}
+              selectedGroup={selectedGroup}
+              groups={sortItems(groups)}
+              instanceTypes={sortItems(instanceTypes)}
+              images={sortItems(images)}
+              onSubmit={this.onSubmit}
+              loading={createPhJobResult.loading}
+            />
+          )}
+          
         </div>
       </React.Fragment>
     );
@@ -144,6 +168,6 @@ export default compose(
   }),
   Com => props => {
     const {defaultValue}: {defaultValue?: string} = queryString.parse(props.location.search.replace(/^\?/, ''));
-    return <Com {...props} defaultValue={defaultValue}  />
+    return <Com {...props} defaultValue={defaultValue ? JSON.parse(defaultValue) : undefined}  />
   }
 )(JobCreatePage)
