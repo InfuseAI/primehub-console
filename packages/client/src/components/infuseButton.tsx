@@ -7,7 +7,7 @@ export default function InfuseButton(props: ButtonProps) {
   return (
     <Button
       style={{
-        width: 99,
+        minWidth: 99,
         alignItems: 'center',
         ...style
       }}

@@ -18,7 +18,7 @@ export default class AddButton extends React.Component<Props> {
         style={{
           marginLeft: 'auto',
           marginRight: 16,
-          width: 99,
+          minWidth: 99,
           alignItems: 'center',
           display,
           ...style
