@@ -175,15 +175,7 @@ export default class ArrayBreadcrumb extends Component<Props & {
       disableCreate,
     } = uiParams;
 
-    const newColumnsRender = renderValue(columns, items.items, {
-      refId,
-      deploy,
-      reset,
-      onChange,
-      goTo,
-      uiParams,
-      intl
-    });
+    const newColumnsRender = renderValue(columns, items.items, this.props);
     if (keyName === 'dataset' && (window as any).enableUploadServer) {
       newColumnsRender.push({
         title: intl.formatMessage({ id: 'uploadServerLink' }),

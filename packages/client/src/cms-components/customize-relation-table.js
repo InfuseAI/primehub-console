@@ -67,7 +67,8 @@ export default class RelationTable extends PureComponent {
       fetch, fetchRelation, updateQuery, subscribe, intl,
       schema, Toolbar, relationValue, goTo, rootValue, title, isRelationFetching
     } = this.props;
-    const newColumnsRender = renderValue(uiParams.columns, schema[relation.to].items.items);
+    const columnsRender = renderValue(uiParams.columns, schema[relation.to].items.items, this.props);
+    const pickerColumnsRender = renderValue(uiParams.pickerColumns || uiParams.columns, schema[relation.to].items.items, this.props);
     const recordValue = getRecordValue(rootValue, refId);
     // hack
     const isHidden = uiParams.isHidden ? uiParams.isHidden(recordValue) : false;
@@ -95,7 +96,7 @@ export default class RelationTable extends PureComponent {
         }
         <Table
           dataSource={value}
-          columns={newColumnsRender}
+          columns={columnsRender}
           style={{marginBottom: 16}}
         />
         {
@@ -105,7 +106,7 @@ export default class RelationTable extends PureComponent {
             onCancel={this.handleCancel}
             // $FlowFixMe
             pickedIds={value.map(v => v.id)}
-            columns={newColumnsRender}
+            columns={pickerColumnsRender}
             refId={refId}
             relation={relation}
             relationValue={relationValue}

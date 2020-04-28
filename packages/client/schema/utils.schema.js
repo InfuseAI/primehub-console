@@ -1,33 +1,7 @@
 /** @jsx builder */
-
 import builder, {Block, Row, Col} from 'canner-script';
 import Filter from '../src/cms-toolbar/filter';
-
-export const groupColumns = [{
-  title: '${name}',
-  dataIndex: 'name'
-}, {
-  title: '${displayName}',
-  dataIndex: 'displayName'
-}, , {
-  title: '${cpuQuota}',
-  dataIndex: 'quotaCpu',
-  render: text => {
-    return text === null ? '∞' : text;
-  }
-}, {
-  title: '${gpuQuota}',
-  dataIndex: 'quotaGpu',
-  render: text => {
-    return text === null ? '∞' : text;
-  }
-}, {
-  title: '${userVolumeCapacity}',
-  dataIndex: 'userVolumeCapacity',
-  render: text => {
-    return text === null ? '-' : text;
-  }
-}];
+import {groupColumns, groupPickerColumns} from './utils';
 
 exports.GroupRelation = () => (
   <relation keyName="groups" title="${groups}"
@@ -38,7 +12,8 @@ exports.GroupRelation = () => (
       fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu', 'userVolumeCapacity']
     }}
     uiParams={{
-      columns: groupColumns 
+      columns: groupColumns,
+      pickerColumns: groupPickerColumns
     }}
     graphql={`
     query($groupAfter: String, $groupBefore: String, $groupLast: Int, $groupFirst: Int,$groupWhere: GroupWhereInput) {

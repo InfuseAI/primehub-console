@@ -34,16 +34,10 @@ export default class CommonBody extends React.Component<Props> {
   back = () => {
     const {goTo, routes, routerParams} = this.props;
     const groupId = get(routerParams, 'payload.backToGroup', '');
-    if (groupId) {
-      goTo({
-        pathname: `group/${groupId}`,
-        operator: 'update',
-      });
-    } else {
-      goTo({
-        pathname: routes[0],
-      })
-    }
+    let backTo = get(routerParams, 'payload.backTo', '');
+    if (groupId) backTo = `group/${groupId}`
+    if (backTo) return goTo({ pathname: backTo });
+    goTo({ pathname: routes[0] })
   }
 
   add = () => {

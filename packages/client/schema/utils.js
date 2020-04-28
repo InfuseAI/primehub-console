@@ -5,6 +5,49 @@ import {ImgurStorage} from '@canner/storage';
 import {FormattedMessage} from 'react-intl';
 import {Tag, Button, Icon, Tooltip} from 'antd';
 
+export const groupColumns = [{
+  title: '${name}',
+  dataIndex: 'name',
+  render: (text, record, cannerProps) => {
+    const onClick = () => {
+      const currentPath = cannerProps.routes.join('/');
+      cannerProps.goTo({
+        pathname: `/group/${record.id}`,
+        payload: {
+          backTo: currentPath
+        }
+      })
+    }
+    return <a onClick={onClick}>{text}</a>;
+  }
+}, {
+  title: '${displayName}',
+  dataIndex: 'displayName'
+}, , {
+  title: '${cpuQuota}',
+  dataIndex: 'quotaCpu',
+  render: text => {
+    return text === null ? '∞' : text;
+  }
+}, {
+  title: '${gpuQuota}',
+  dataIndex: 'quotaGpu',
+  render: text => {
+    return text === null ? '∞' : text;
+  }
+}, {
+  title: '${userVolumeCapacity}',
+  dataIndex: 'userVolumeCapacity',
+  render: text => {
+    return text === null ? '-' : text;
+  }
+}];
+
+export const groupPickerColumns =  [{
+  title: '${name}',
+  dataIndex: 'name',
+}].concat(groupColumns.slice(1));
+
 exports.InvalidChError = <React.Fragment>
   Invalid characters: &nbsp;
   <Tag color="red">;</Tag>

@@ -4,7 +4,7 @@ import Filter from '../src/cms-toolbar/filter';
 import DatasetWrapper from '../src/cms-layouts/datasetWrapper';
 import EnableUploadServer from '../src/cms-layouts/enableUploadServer';
 import DatasetGroupWrapper from '../src/cms-layouts/datasetGroupsWrapper';
-import {groupColumns} from './utils.schema';
+import {groupColumns, groupPickerColumns} from './utils';
 
 export default () => (
   <array keyName="dataset" title="${dataset}"
@@ -184,7 +184,8 @@ export default () => (
             fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu', 'userVolumeCapacity', 'writable']
           }}
           uiParams={{
-            columns: groupColumns
+            columns: groupColumns,
+            pickerColumns: groupPickerColumns,
           }}
           graphql={`
           query($groupAfter: String, $groupBefore: String, $groupLast: Int, $groupFirst: Int,$groupWhere: GroupWhereInput) {
