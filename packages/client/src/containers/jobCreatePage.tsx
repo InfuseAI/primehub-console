@@ -7,7 +7,6 @@ import {get, unionBy} from 'lodash';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
-import Title from 'components/job/title';
 import {errorHandler} from 'components/job/errorHandler';
 import JobCreateForm from 'components/job/createForm';
 import JobBreadcrumb from 'components/job/breadcrumb';
@@ -58,6 +57,7 @@ type Props = RouteComponentProps & {
   getGroups: any; 
   createPhJob: any;
   createPhJobResult: any;
+  defaultValue?: string;
 }
 type State = {
   selectedGroup: string | null;
@@ -83,7 +83,7 @@ class JobCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {getGroups, createPhJobResult, history} = this.props;
+    const {getGroups, createPhJobResult, defaultValue} = this.props;
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups.filter(group => group.id !== everyoneGroupId);
@@ -110,6 +110,7 @@ class JobCreatePage extends React.Component<Props, State> {
           margin: '16px',
         }}>
           <JobCreateForm
+            initialValue={defaultValue ? JSON.parse(defaultValue) : undefined}
             onSelectGroup={this.onChangeGroup}
             selectedGroup={selectedGroup}
             groups={sortItems(groups)}
@@ -140,5 +141,9 @@ export default compose(
       onError: errorHandler
     }),
     name: 'createPhJob'
-  })
+  }),
+  Com => props => {
+    const {defaultValue}: {defaultValue?: string} = queryString.parse(props.location.search.replace(/^\?/, ''));
+    return <Com {...props} defaultValue={defaultValue}  />
+  }
 )(JobCreatePage)

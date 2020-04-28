@@ -99,8 +99,10 @@ class CreateForm extends React.Component<Props, State> {
   };
 
   componentDidMount() {
-    const {initialValue} = this.props;
-    if (!initialValue) {
+    const {initialValue, onSelectGroup} = this.props;
+    if (initialValue) {
+      onSelectGroup(initialValue.groupId);
+    } else {
       this.autoSelectFirstGroup();
       this.autoSelectFirstInstanceType();
       this.autoSelectFirstImage();
@@ -242,7 +244,6 @@ class CreateForm extends React.Component<Props, State> {
       invalidInitialImage,
       <span>The image <b>{image}</b> was deleted.</span>
     )
-
     return (
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
