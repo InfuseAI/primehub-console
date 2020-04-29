@@ -244,12 +244,11 @@ function getMessage(deployment: DeploymentInfo) {
     case Status.Deployed:
       return 'Deployment completed';
     case Status.Failed:
-      return <Message text={deployment.message} />;
     case Status.Stopping:
     case Status.Deploying:
     case Status.Stopped:
     default:
-      return '-'
+      return deployment.message ? <Message text={deployment.message} /> : '-';
   }
 }
 const dashOrNumber = value => value === null ? '-' : value;
