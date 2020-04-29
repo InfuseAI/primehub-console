@@ -60,7 +60,7 @@ export function Field({
       }}>
         {label}
       </Col>
-      <Col span={valueCol} style={{wordBreak: 'break-all', ...valueStyle}}>
+      <Col span={valueCol} style={{wordBreak: 'break-word', ...valueStyle}}>
         {value}
       </Col>
     </Row>
@@ -77,7 +77,7 @@ export function Field({
       }}>
         {label}
       </span>
-      <span style={{wordBreak: 'break-all', width: '100%', ...valueStyle}}>
+      <span style={{wordBreak: 'break-word', width: '100%', ...valueStyle}}>
         {value}
       </span>
     </div>
