@@ -210,7 +210,7 @@ export const typeResolvers = {
         instanceTypeId
       });
       return {
-        id: instanceTypeId,
+        id: `${instanceTypeId}-not-found`,
         name: instanceTypeId,
         tolerations: []
       };
