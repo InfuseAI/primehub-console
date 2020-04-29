@@ -128,7 +128,7 @@ export default class CommonBody extends React.Component<Props> {
           onClick={this.back}
           style={{
             marginBottom: 16,
-            width: 99,
+            minWidth: 99,
             display: routerParams.operator === 'create' || routes.length > 1 ? undefined : 'none',
           }}
         >
