@@ -3,6 +3,7 @@ import * as React from 'react';
 type Props = {
   text: string;
   extra?: any;
+  style?: object;
 }
 
 type State = {
@@ -32,13 +33,14 @@ export default class Message extends React.Component<Props, State> {
   }
 
   render() {
-    const {text, extra} = this.props;
+    const {text, extra, style = {}} = this.props;
     const {hidden} = this.state;
     const texts = (text || '').split('\n');
     return (
       <div style={{
         marginTop: '10px',
         lineHeight: '22px',
+        ...style
       }}>
         {renderTexts(texts.slice(0, this.showMaxLine))}
         {

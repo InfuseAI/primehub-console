@@ -21,6 +21,8 @@ const textOverflowStyle: React.CSSProperties = {
 
 export function Field({
   label,
+  labelCol = 8,
+  valueCol = 16,
   value,
   type = 'flex',
   style = {},
@@ -28,6 +30,8 @@ export function Field({
   valueStyle = {}
 }: {
   label: React.ReactNode,
+  labelCol?: number,
+  valueCol?: number,
   value: React.ReactNode,
   style?: React.CSSProperties,
   labelStyle?: React.CSSProperties,
@@ -50,13 +54,13 @@ export function Field({
   )
   if (type === 'flex') return (
     <Row gutter={12} style={{marginBottom: 8, ...style}}>
-      <Col span={8} style={{
+      <Col span={labelCol} style={{
         color: '#aaa',
         ...labelStyle
       }}>
         {label}
       </Col>
-      <Col span={16} style={{wordBreak: 'break-all', ...valueStyle}}>
+      <Col span={valueCol} style={{wordBreak: 'break-word', ...valueStyle}}>
         {value}
       </Col>
     </Row>
@@ -73,7 +77,7 @@ export function Field({
       }}>
         {label}
       </span>
-      <span style={{wordBreak: 'break-all', width: '100%', ...valueStyle}}>
+      <span style={{wordBreak: 'break-word', width: '100%', ...valueStyle}}>
         {value}
       </span>
     </div>
