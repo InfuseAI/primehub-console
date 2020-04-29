@@ -249,23 +249,42 @@ class JobList extends React.Component<Props> {
     jobsRefetch(newVariables);
   }
 
+  cloneJob = (record) => {
+    const {history} = this.props;
+    const data = {
+      displayName: record.displayName,
+      groupId: record.groupId,
+      groupName: record.groupName,
+      instanceTypeId: get(record, 'instanceType.id'),
+      instanceTypeName: get(record, 'instanceType.displayName') || get(record, 'instanceType.name'),
+      image: record.image,
+      command: record.command,
+    }
+    history.push(`${appPrefix}job/create?defaultValue=${JSON.stringify(data)}`)
+  }
+
   render() {
     const {groups, jobsConnection, jobsLoading, jobsVariables, cancelPhJobResult, rerunPhJobResult} = this.props;
     const {currentId} = this.state;
     const renderAction = (phase: Phase, record) => {
       const action = getActionByPhase(phase);
       const id = record.id;
-      let onClick = () => {}
-      if (action.toLowerCase() === 'cancel') {
-        onClick = () => this.handleCancel(id);
-      } else {
-        onClick = () => this.handleRerun(id);
-      }
       const loading = cancelPhJobResult.loading && rerunPhJobResult.loading && id === currentId;
       return (
-        <Button onClick={onClick} loading={loading}>
-          {action}
-        </Button>
+        <Button.Group>
+          {
+            action.toLowerCase() === 'cancel' ? (
+              <Button onClick={() => this.handleCancel(id)} loading={loading}>
+                {action}
+              </Button>
+            ) : [
+              <Button onClick={() => this.handleRerun(id)} loading={loading}>
+                {action}
+              </Button>,
+              <Button onClick={() => this.cloneJob(record)}>Clone</Button>
+            ]
+          }
+        </Button.Group>
       )
     }
     const columns = [{
@@ -296,7 +315,7 @@ class JobList extends React.Component<Props> {
       dataIndex: 'phase',
       key: 'action',
       render: renderAction,
-      width: 150
+      width: 200
     }]
     return (
       <>

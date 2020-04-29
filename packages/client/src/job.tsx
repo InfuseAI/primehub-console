@@ -110,6 +110,8 @@ const fakeData = {
     displayName: 'IT1',
     schedule: 'it1',
     phase: 'Running',
+    groupId: 'groupId1',
+    groupName: 'groupName1',
     createTime: '2019-10-04T14:48:00.000Z',
     startTime: '2019-10-04T14:48:00.000Z',
     finishTime: '2019-10-04T15:48:00.000Z',
@@ -118,6 +120,7 @@ const fakeData = {
     batch3
     batch4
     `,
+    command: `fdsf`,
     instanceType: {
       id: 'everyone-it',
       name: 'it',
@@ -129,6 +132,16 @@ const fakeData = {
   }, {
     id: 'it2',
     name: 'IT2',
+    groupId: 'no ',
+    groupName: 'groupName2',
+    instanceType: {
+      id: 'no-instanceType',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    },
     displayName: 'IT2',
     phase: 'Failed',
     message: `
@@ -186,11 +199,11 @@ const fakeData = {
     command: 'haha',
     userId: 'userId',
     userName: 'phadmin',
-    groupId: 'everyone1-432',
-    groupName: 'groupName',
+    groupId: 'groupId1',
+    groupName: 'groupName1',
     image: 'image name',
     instanceType: {
-      id: 'everyone-it-aha',
+      id: 'g-it1',
       name: 'it',
       displayName: 'gpu0',
       gpuLimit: 0,
