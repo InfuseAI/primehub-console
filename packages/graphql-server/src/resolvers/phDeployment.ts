@@ -376,6 +376,7 @@ export const update = async (root, args, context: Context) => {
     userName: username,
     displayName: data.name,
     description: data.description,
+    stop: false,
     predictors: [{
       name: 'predictor1',
       replicas: isUndefined(data.replicas) ? predictor.replicas : data.replicas ,
