@@ -79,7 +79,8 @@ export default class DatesetGroupTable extends PureComponent {
       schema, Toolbar, relationValue, goTo, rootValue, title,
       writable, readOnly
     } = this.props;
-    const newColumnsRender = renderValue(uiParams.columns, schema[relation.to].items.items);
+    const columnsRender = renderValue(uiParams.columns, schema[relation.to].items.items, this.props);
+    const pickerColumnsRender = renderValue(uiParams.pickerColumns || uiParams.columns, schema[relation.to].items.items, this.props);
     const recordValue = getRecordValue(rootValue, refId);
     // hack
     const isHidden = uiParams.isHidden ? uiParams.isHidden(recordValue) : false;
@@ -119,7 +120,7 @@ export default class DatesetGroupTable extends PureComponent {
               }
               <Table
                 dataSource={readOnlyValue}
-                columns={newColumnsRender}
+                columns={columnsRender}
                 size="small"
                 style={{marginBottom: 16}}
               />
@@ -130,7 +131,7 @@ export default class DatesetGroupTable extends PureComponent {
                   onCancel={this.handleCancel}
                   // $FlowFixMe
                   pickedIds={readOnlyValue.map(v => v.id)}
-                  columns={newColumnsRender}
+                  columns={pickerColumnsRender}
                   refId={refId}
                   relation={relation}
                   relationValue={relationValue}
@@ -169,7 +170,7 @@ export default class DatesetGroupTable extends PureComponent {
               }
               <Table
                 dataSource={writableValue}
-                columns={newColumnsRender}
+                columns={columnsRender}
                 style={{marginBottom: 16}}
                 size="small"
               />
@@ -180,7 +181,7 @@ export default class DatesetGroupTable extends PureComponent {
                   onCancel={this.handleCancel}
                   // $FlowFixMe
                   pickedIds={writableValue.map(v => v.id)}
-                  columns={newColumnsRender}
+                  columns={pickerColumnsRender}
                   refId={refId}
                   relation={relation}
                   relationValue={relationValue}

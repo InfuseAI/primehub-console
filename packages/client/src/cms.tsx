@@ -16,9 +16,9 @@ import get from 'lodash.get';
 import update from 'lodash/update';
 const {Sider, Content} = Layout;
 const confirm = Modal.confirm;
-declare var process: {
-  env: {
-    NODE_ENV: string
+declare global {
+  interface Window {
+    workspaceId?: string;
   }
 }
 
@@ -98,6 +98,8 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    const {match} = this.props;
+    window.workspaceId = (match.params as any).workspaceId || null;
     if (!ENABLE_WORKSPACE) return;
     this.fetchWorkspaceList()
       .then(wss => {
