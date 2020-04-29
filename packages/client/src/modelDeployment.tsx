@@ -264,7 +264,7 @@ const fakeData = {
     status: 'Stopped',
     creationTIme: '2019-10-04T14:48:00.000Z',
     lastUpdatedTime: '2019-10-04T14:48:00.000Z',
-    message: `batch1
+    message: `batch1 ffsdafn fdksoanfkosafdns kofdsnaiofdnsnfsodnfidosanfdisoafidsfndsio
     batch2
     batch3
     batch4

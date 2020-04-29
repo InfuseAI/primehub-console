@@ -84,9 +84,9 @@ export default class Detail extends React.Component<Props> {
     return (
       <div style={{padding: '16px 36px'}}>
         <Row gutter={36}>
-          <Col span={12}>
-            <Field label="Status" value={<strong>{phDeployment.status}</strong>} />
-            <Field label="Message" value={getMessage(phDeployment)} />
+          <Col span={24}>
+            <Field labelCol={4} valueCol={20} label="Status" value={<strong>{phDeployment.status}</strong>} />
+            <Field labelCol={4} valueCol={20} label="Message" value={getMessage(phDeployment)} />
           </Col>
         </Row>
         <Divider />
@@ -248,7 +248,7 @@ function getMessage(deployment: DeploymentInfo) {
     case Status.Deploying:
     case Status.Stopped:
     default:
-      return deployment.message ? <Message text={deployment.message} /> : '-';
+      return deployment.message ? <Message style={{marginTop: 0}} text={deployment.message} /> : '-';
   }
 }
 const dashOrNumber = value => value === null ? '-' : value;
