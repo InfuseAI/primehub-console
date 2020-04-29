@@ -220,12 +220,12 @@ function Metadata({metadata}: {metadata: object}) {
     title: 'Name',
     dataIndex: 'key',
     width: '30%',
-    render: value => <div style={{wordBreak: 'break-all'}}>{value}</div>
+    render: value => <div style={{wordBreak: 'break-word'}}>{value}</div>
   }, {
     title: 'Value',
     dataIndex: 'value',
     width: '70%',
-    render: value => <div style={{wordBreak: 'break-all'}}>{value}</div>
+    render: value => <div style={{wordBreak: 'break-word'}}>{value}</div>
   }];
   return (
     <Table
