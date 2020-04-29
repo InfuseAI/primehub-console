@@ -162,12 +162,6 @@ const validateQuota = async (context: Context, data: PhJobCreateInput) => {
  * Query
  */
 
-const NOT_FOUND_INSTANCE_TYPE = {
-  id: 'NOT_FOUND',
-  name: 'NOT_FOUND',
-  tolerations: []
-};
-
 export const typeResolvers = {
   async instanceType(parent, args, context: Context) {
     const instanceTypeId = parent.instanceType;
@@ -181,7 +175,11 @@ export const typeResolvers = {
         id: parent.id,
         instanceTypeId
       });
-      return NOT_FOUND_INSTANCE_TYPE;
+      return {
+        id: `${instanceTypeId}-not-found`,
+        name: instanceTypeId,
+        tolerations: []
+      };
     }
   }
 };

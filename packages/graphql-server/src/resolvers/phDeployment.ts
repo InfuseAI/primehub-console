@@ -242,8 +242,8 @@ export const typeResolvers = {
         instanceTypeId
       });
       return {
-        id: instanceTypeId,
-        name: 'REMOVED',
+        id: `${instanceTypeId}-not-found`,
+        name: instanceTypeId,
         tolerations: []
       };
     }

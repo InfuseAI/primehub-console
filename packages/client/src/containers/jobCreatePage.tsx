@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button} from 'antd';
+import {Card, Skeleton, Row, Col} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -7,7 +7,6 @@ import {get, unionBy} from 'lodash';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
-import Title from 'components/job/title';
 import {errorHandler} from 'components/job/errorHandler';
 import JobCreateForm from 'components/job/createForm';
 import JobBreadcrumb from 'components/job/breadcrumb';
@@ -58,15 +57,19 @@ type Props = RouteComponentProps & {
   getGroups: any; 
   createPhJob: any;
   createPhJobResult: any;
+  defaultValue?: object;
 }
 type State = {
   selectedGroup: string | null;
 }
 
 class JobCreatePage extends React.Component<Props, State> {
-  state = {
-    selectedGroup: null,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedGroup: get(props, 'defaultValue.groupId') || null
+    }
+  }
 
   onChangeGroup = (id: string) => {
     this.setState({selectedGroup: id});
@@ -83,7 +86,7 @@ class JobCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {getGroups, createPhJobResult, history} = this.props;
+    const {getGroups, createPhJobResult, defaultValue} = this.props;
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups.filter(group => group.id !== everyoneGroupId);
@@ -109,15 +112,37 @@ class JobCreatePage extends React.Component<Props, State> {
         <div style={{
           margin: '16px',
         }}>
-          <JobCreateForm
-            onSelectGroup={this.onChangeGroup}
-            selectedGroup={selectedGroup}
-            groups={sortItems(groups)}
-            instanceTypes={sortItems(instanceTypes)}
-            images={sortItems(images)}
-            onSubmit={this.onSubmit}
-            loading={getGroups.loading || createPhJobResult.loading}
-          />
+
+          {getGroups.loading ? (
+            <Row gutter={16}>
+              <Col xs={24} sm={8} lg={8}>
+                <Card>
+                  <Skeleton active />
+                  <Skeleton active />
+                  <Skeleton active />
+                </Card>
+              </Col>
+              <Col xs={24} sm={16} lg={16}>
+                <Card>
+                  <Skeleton active />
+                  <Skeleton active />
+                  <Skeleton active />
+                </Card>
+              </Col>
+            </Row>
+          ) : (
+            <JobCreateForm
+              initialValue={defaultValue}
+              onSelectGroup={this.onChangeGroup}
+              selectedGroup={selectedGroup}
+              groups={sortItems(groups)}
+              instanceTypes={sortItems(instanceTypes)}
+              images={sortItems(images)}
+              onSubmit={this.onSubmit}
+              loading={createPhJobResult.loading}
+            />
+          )}
+          
         </div>
       </React.Fragment>
     );
@@ -140,5 +165,9 @@ export default compose(
       onError: errorHandler
     }),
     name: 'createPhJob'
-  })
+  }),
+  Com => props => {
+    const {defaultValue}: {defaultValue?: string} = queryString.parse(props.location.search.replace(/^\?/, ''));
+    return <Com {...props} defaultValue={defaultValue ? JSON.parse(defaultValue) : undefined}  />
+  }
 )(JobCreatePage)
