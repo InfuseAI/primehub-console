@@ -102,7 +102,7 @@ class ScheduleListContainer extends React.Component<Props> {
     if (history.location.search === `?${search}`) {
       getPhScheduleConnection.refetch(payload);
     } else {
-      history.push({
+      history.replace({
         pathname: `${appPrefix}${pathname}`,
         search
       });

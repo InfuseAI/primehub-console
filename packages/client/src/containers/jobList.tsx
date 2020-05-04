@@ -97,7 +97,7 @@ class JobListContainer extends React.Component<Props> {
     if (history.location.search === `?${search}`) {
       getPhJobConnection.refetch(payload);
     } else {
-      history.push({
+      history.replace({
         pathname: `${appPrefix}job`,
         search
       });

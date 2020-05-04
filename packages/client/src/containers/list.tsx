@@ -66,7 +66,7 @@ export default compose(
       onCompleted: data => {
         // default  first=10
         if (props.location.search) return;
-        props.history.push({
+        props.history.replace({
           pathname: `${appPrefix}${props.pathname}`,
           search: queryString.stringify({first: 10})
         });
