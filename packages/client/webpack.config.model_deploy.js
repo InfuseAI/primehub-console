@@ -11,15 +11,14 @@ const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
   entry: {
-    index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
+    index: devMode ? './src/index.model_deploy.tsx' : ['./src/public-import.js', './src/index.model_deploy.tsx'],
     landing: './src/landing.tsx',
-    job: devMode ? './src/job.tsx' : ['./src/public-import.js', './src/job.tsx'],
     'model-deployment': devMode ? './src/modelDeployment.tsx' : ['./src/public-import.js', './src/modelDeployment.tsx'],
   },
   output: {
     path: path.join(__dirname, 'dist'),
     filename: '[name].js',
-    publicPath: devMode ? 'https://localhost:8090/' : ''
+    publicPath: devMode ? 'http://localhost:8090/' : ''
   },
   mode: devMode ? 'development' : 'production',
   externals,
@@ -29,10 +28,6 @@ module.exports = {
     contentBase: path.join(__dirname, 'dist'),
     historyApiFallback: {
       rewrites: [
-        { from: /^\/app-prefix\/job/, to: '/job.html' },
-        { from: /^\/job/, to: '/job.html' },
-        { from: /^\/app-prefix\/schedule/, to: '/job.html' },
-        { from: /^\/schedule/, to: '/job.html' },
         { from: /^\/app-prefix\/landing/, to: '/landing.html' },
         { from: /^\/landing$/, to: '/landing.html' },
         { from: /^\/model-deployment/, to: '/model-deployment.html' },
@@ -40,7 +35,7 @@ module.exports = {
         { from: /./, to: '/index.html' }
       ]
     },
-    https: true
+    https: false
   },
   module: {
     rules: [
@@ -100,11 +95,6 @@ module.exports = {
       chunks: ['landing'],
       template: 'docs/index.html',
       filename: 'landing.html'
-    }),
-    new HtmlWebPackPlugin({
-      chunks: ['job'],
-      template: 'docs/index.html',
-      filename: 'job.html'
     }),
     new HtmlWebPackPlugin({
       chunks: ['model-deployment'],
