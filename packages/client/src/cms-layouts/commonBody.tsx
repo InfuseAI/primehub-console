@@ -1,11 +1,13 @@
 import * as React from 'react';
-import {Breadcrumb, Icon, Button, Spin} from 'antd';
+import {Breadcrumb, Icon, Button, Spin, Alert} from 'antd';
 import {Item} from 'canner-helpers';
 import {injectIntl} from 'react-intl';
 import styled from 'styled-components';
 import {get, startCase} from 'lodash';
 import AddButton from './addButtton';
 import {Props} from '../cms-components/types';
+
+const DISABLE_BUILD_IMAGE = !(window as any).customImageSetup || true;
 
 function getRouteName(key) {
   switch (key) {
@@ -97,6 +99,18 @@ export default class CommonBody extends React.Component<Props> {
     const itemRender = (route) => {
       return route.render();
     }
+
+    let customImageAlert = undefined;
+    if (key === 'buildImage' && DISABLE_BUILD_IMAGE === true) {
+      let desc = <span>{intl.formatMessage({id: 'buildImage.msg.pleaseCheckSetup'})} <a href={intl.formatMessage({id: 'buildImage.msg.regsitrySetupLink'})} target="_blank">More Info</a></span>;
+      customImageAlert = <Alert
+          message="Warning"
+          description={desc}
+          type="warning"
+          showIcon
+        />;
+    }
+
     return <div>
       <div style={{
         background: '#fff',
@@ -119,6 +133,7 @@ export default class CommonBody extends React.Component<Props> {
           )
         }
       </div>
+      {customImageAlert}
       <div style={{
         margin: '16px',
         padding: '16px',
@@ -137,6 +152,7 @@ export default class CommonBody extends React.Component<Props> {
         </Button>
         <AddButton
           add={this.add}
+          keyName={key}
           display={routes.length === 1 && routerParams.operator !== 'create' ? 'flex' : 'none'}
         />
         <Spin tip={loadingTip} spinning={loading}>

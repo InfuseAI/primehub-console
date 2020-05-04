@@ -260,6 +260,7 @@ exports.parseToStepDot5 = function(value) {
 }
 
 const instanceTypeLink = "https://infuseai.zendesk.com/hc/en-us/articles/360027959911-Instance-Type-Management";
+const imageBuilderLink = "https://docs.primehub.io/docs/tasks/dockerhub-registry#set-up-dockerhub-registry";
 
 exports.dict = {
   en: {
@@ -482,6 +483,8 @@ exports.dict = {
     'buildImage.baseImage.placeholder': 'Input image url',
     'buildImage.useImagePullSecret': 'Use Image PullSecret',
     'buildImage.packages': 'Package(s)',
+    'buildImage.msg.pleaseCheckSetup': 'Missing image registry setting, please setup your image registry to use the image builder.',
+    'buildImage.msg.regsitrySetupLink': imageBuilderLink,
     'buildImage.apt': 'APT',
     'buildImage.pip': 'Pip',
     'buildImage.conda': 'Conda',
