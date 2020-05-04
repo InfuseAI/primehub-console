@@ -64,7 +64,7 @@ export const getMessage = error => get(error, 'graphQLErrors.0.extensions.code')
 class JobDetailContainer extends React.Component<Props> {
   render() {
     const {getPhDeployment, history, stopPhDeployment, deletePhDeployment, stopPhDeploymentResult, deletePhDeploymentResult, deployPhDeployment, deployPhDeploymentResult} = this.props;
-    if (getPhDeployment.loading) return null;
+    if (!getPhDeployment.phDeployment) return null;
     if (getPhDeployment.error) {
       return getMessage(getPhDeployment.error)
     };
@@ -91,7 +91,8 @@ export default compose(
           id: props.match.params.deploymentId
         }
       },
-      fetchPolicy: 'cache-and-network'
+      fetchPolicy: 'cache-and-network',
+      pollInterval: 2000,
     }),
     name: 'getPhDeployment'
   }),
