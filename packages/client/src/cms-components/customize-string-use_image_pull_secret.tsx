@@ -30,7 +30,7 @@ export default class UseImagePullSecret extends React.Component<Props, State> {
     // we don't case about the async setState here
     this.setState({checked});
     if (!checked) {
-      onChange(refId, 'update', null);
+      onChange(refId, 'update', "");
     }
   }
 
