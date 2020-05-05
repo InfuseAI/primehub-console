@@ -7,7 +7,7 @@ import {get, startCase} from 'lodash';
 import AddButton from './addButtton';
 import {Props} from '../cms-components/types';
 
-const DISABLE_BUILD_IMAGE = !(window as any).customImageSetup || true;
+const DISABLE_BUILD_IMAGE = !(window as any).customImageSetup;
 
 function getRouteName(key) {
   switch (key) {

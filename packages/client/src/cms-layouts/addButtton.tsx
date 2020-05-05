@@ -3,7 +3,7 @@ import {Icon, Button} from 'antd';
 
 const GLOBAL_DISABLE = (window as any).disableMode || false;
 const DISABLE_GROUP = (window as any).disableGroup || false;
-const DISABLE_BUILD_IMAGE = !(window as any).customImageSetup || true;
+const DISABLE_BUILD_IMAGE = !(window as any).customImageSetup;
 
 
 type Props = {
