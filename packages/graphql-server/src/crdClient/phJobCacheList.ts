@@ -64,7 +64,7 @@ export class PhJobCacheList {
         type: 'PHJOB_WATCH_RETRY_STOP',
         message: `Retry phjob watch over ${RETRY_LIMIT} times. stop trying.`
       });
-      return;
+      process.exit(1);
     }
 
     logger.error({
