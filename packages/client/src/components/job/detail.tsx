@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Tabs, Form, Card, Input, Modal} from 'antd';
+import {Tabs, Input, Modal, Divider} from 'antd';
 import {Link} from 'react-router-dom';
 import {get} from 'lodash';
 import styled from 'styled-components';
@@ -14,24 +14,9 @@ import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
+import Field from 'components/share/field';
 
 const TabPane = Tabs.TabPane;
-
-const TitleContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 4 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 20 },
-  },
-};
 
 const {confirm} = Modal;
 
@@ -80,10 +65,6 @@ type Props = {
 
 const blockStyle = {
   marginBottom: 36
-}
-
-const formItemStyle = {
-  marginBottom: 0
 }
 
 export default class Detail extends React.Component<Props> {
@@ -144,71 +125,46 @@ export default class Detail extends React.Component<Props> {
           </div>
           <Tabs>
             <TabPane key="information" tab="Information">
-              <Form>
-                <Form.Item style={formItemStyle} label="Status:" {...formItemLayout}>
-                  {job.phase}
-                </Form.Item>
-                <Form.Item style={blockStyle} label="Message:" {...formItemLayout}>
-                  {renderMessage(job)}
-                </Form.Item>
-                <Form.Item  style={formItemStyle} label="Job ID:" {...formItemLayout}>
-                  {job.id}
-                </Form.Item>
-                <Form.Item  style={formItemStyle} label="Job name" {...formItemLayout}>
-                  {job.displayName || '-'}
-                </Form.Item>
-                <Form.Item  style={formItemStyle} label="Schedule" {...formItemLayout}>
-                  {
-                    job.schedule ? (
-                      <Link to={`${appPrefix}schedule/${job.schedule}`}>
-                        {job.schedule}
-                      </Link>
-                    ) : '-'
-                  }
-                  
-                </Form.Item>
-                <Form.Item  style={formItemStyle} label="User:" {...formItemLayout}>
-                  {job.userName || '-'}
-                </Form.Item>
-                <Form.Item  style={formItemStyle} label="Creation Time:" {...formItemLayout}>
-                  {createTime ? createTime.format('YYYY-MM-DD HH:mm:ss') : '-'}
-                </Form.Item>
-                <Form.Item  style={formItemStyle} label="Start Time:" {...formItemLayout}>
-                  {startTime ? startTime.format('YYYY-MM-DD HH:mm:ss') : '-'}
-                </Form.Item>
-                <Form.Item  style={formItemStyle} label="Finished Time:" {...formItemLayout}>
-                  {renderFinishTime(job)}
-                </Form.Item>
-                <Form.Item  style={blockStyle} label="Duration" {...formItemLayout}>
-                  {computeDuration(startTime, finishTime)}
-                </Form.Item>
-                <Form.Item  style={formItemStyle} label="Group:" {...formItemLayout}>
-                  {job.groupName || '-'}
-                </Form.Item>
-                <Form.Item  style={formItemStyle} label="Instance type:" {...formItemLayout}>
+            <div style={{padding: '16px 36px'}}>
+              <Field labelCol={4} valueCol={20} label="Status" value={<strong>{job.phase}</strong>} />
+              <Field labelCol={4} valueCol={20} label="Message" value={renderMessage(job)} />
+              <Divider />
+              <Field labelCol={4} valueCol={20} label="Job ID" value={job.id} />
+              <Field labelCol={4} valueCol={20} label="Job name" value={job.displayName || '-'} />
+              <Field labelCol={4} valueCol={20} label="Schedule" value={
+                job.schedule ? (
+                  <Link to={`${appPrefix}schedule/${job.schedule}`}>
+                    {job.schedule}
+                  </Link>
+                ) : '-'
+              }/>
+              <Field labelCol={4} valueCol={20} label="User" value={job.userName || '-'} />
+              <Field labelCol={4} valueCol={20} label="Creation Time:" value={createTime ? createTime.format('YYYY-MM-DD HH:mm:ss') : '-'} />
+              <Field labelCol={4} valueCol={20} label="Start Time:" value={startTime ? startTime.format('YYYY-MM-DD HH:mm:ss') : '-'} />
+              <Field labelCol={4} valueCol={20} label="Finished Time:" value={renderFinishTime(job)} />
+              <Field labelCol={4} valueCol={20} label="Duration" style={blockStyle} value={computeDuration(startTime, finishTime)} />
+              <Field labelCol={4} valueCol={20} label="Group:" value={job.groupName || '-'} />
+              <Field labelCol={4} valueCol={20} label="Instance type:" value={(
+                <div>
                   {get(job, 'instanceType.displayName', '') || get(job, 'instanceType.name', '')}
-                  <span style={{
-                    display: "block",
-                    marginTop: -12
-                  }}>
-                    (CPU: {get(job, 'instanceType.cpuLimit', '-')} / Memory: {get(job, 'instanceType.memoryLimit', '-')}G / GPU: {get(job, 'instanceType.gpuLimit', '-')})
-                  </span>
-                </Form.Item>
-                <Form.Item  style={blockStyle} label="Image:" {...formItemLayout}>
-                  {job.image || '-'}
-                </Form.Item>
-                <Form.Item  style={formItemStyle} label="Command:"  {...formItemLayout}>
-                  <Input.TextArea
-                    style={{
-                      background: 'black',
-                      color: '#ddd',
-                      fontFamily: 'monospace',
-                    }}
-                    rows={5}
-                    value={job.command}
-                  />
-                </Form.Item>
-              </Form>
+                  <br />
+                  (CPU: {get(job, 'instanceType.cpuLimit', '-')} / Memory: {get(job, 'instanceType.memoryLimit', '-')}G / GPU: {get(job, 'instanceType.gpuLimit', '-')})
+                </div>)}
+              />
+              <Field labelCol={4} valueCol={20} style={blockStyle} label="Image:" value={job.image || '-'} />
+              <Field style={{marginTop: 32}} type="vertical" label="Command:"  value={(
+                <Input.TextArea
+                  style={{
+                    background: 'black',
+                    color: '#ddd',
+                    fontFamily: 'monospace',
+                  }}
+                  rows={5}
+                  value={job.command}
+                />
+              )} />
+            </div>
+
             </TabPane>
             <TabPane key="logs" tab="Logs" disabled={job.phase === Phase.Pending || !job.logEndpoint}>
               <Log endpoint={job.logEndpoint}/>
