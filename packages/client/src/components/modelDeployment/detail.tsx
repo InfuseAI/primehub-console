@@ -1,7 +1,8 @@
 import React from 'react';
-import {Icon, Modal, Card, Divider, Row, Col, Tabs, Input, Table, Button, message} from 'antd';
+import { Modal, Card, Divider, Row, Col, Tabs, Input, Button, message} from 'antd';
 import { DeploymentInfo, Status } from './common';
-import PageTitle from './pageTitle';
+import PageTitle from 'components/pageTitle';
+import DeploymentBreadcrumb from 'components/modelDeployment/breadcrumb';
 import InfuseButton from 'components/infuseButton';
 import { appPrefix } from 'utils/env';
 import {Link} from 'react-router-dom';
@@ -164,22 +165,11 @@ export default class Detail extends React.Component<Props> {
     return (
       <>
         <PageTitle
-          title={(
-            <div style={{ display: 'flex', alignItems: 'center'}}>
-              <InfuseButton style={{marginRight: 16}} onClick={() => history.push(`${appPrefix}model-deployment`)}>
-                <Icon type="arrow-left" />
-                Back
-              </InfuseButton>
-              <div style={{
-                maxWidth: 540,
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-                textOverflow: 'ellipsis',
-                msTextOverflow: 'ellipsis',
-              }}>Deployment: {phDeployment.name}</div>
-            </div>
-          )}
-          extra={<div>
+          title={`Deployment: ${phDeployment.name}`}
+          breadcrumb={<DeploymentBreadcrumb deploymentName={phDeployment.name} />}
+        />
+        <Card style={{margin: 16}} loading={stopPhDeploymentResult.loading || deletePhDeploymentResult.loading || deployPhDeploymentResult.loading}>
+          <div style={{marginBottom: 16, textAlign: 'right'}}>
             <InfuseButton onClick={this.handleDelete} style={{marginRight: 16}}>
               Delete
             </InfuseButton>
@@ -201,9 +191,7 @@ export default class Detail extends React.Component<Props> {
                 </Link>
               </InfuseButton>
             }
-          </div>}
-        />
-        <Card loading={stopPhDeploymentResult.loading || deletePhDeploymentResult.loading || deployPhDeploymentResult.loading}>
+          </div>
           <Tabs defaultActiveKey="information">
             <Tabs.TabPane key="information" tab="Information">
               {this.renderInformation()}
