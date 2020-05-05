@@ -483,7 +483,7 @@ exports.dict = {
     'buildImage.baseImage.placeholder': 'Input image url',
     'buildImage.useImagePullSecret': 'Use Image PullSecret',
     'buildImage.packages': 'Package(s)',
-    'buildImage.msg.pleaseCheckSetup': 'Missing image registry setting, please setup your image registry to use the image builder.',
+    'buildImage.msg.pleaseCheckSetup': 'Image registry not found. Please set up your image registry using Image Builder.',
     'buildImage.msg.regsitrySetupLink': imageBuilderLink,
     'buildImage.apt': 'APT',
     'buildImage.pip': 'Pip',
