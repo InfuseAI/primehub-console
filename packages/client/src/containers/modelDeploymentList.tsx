@@ -116,9 +116,9 @@ class DeploymentListContainer extends React.Component<Props, State> {
         <PageTitle
           breadcrumb={<DeploymentBreadcrumb />}
           title={"Model Deployments"}
+          style={{paddingLeft: 64}}
         />
-        
-        <div style={{margin: 16}}>
+        <div style={{margin: '16px 64px'}}>
           <div style={{textAlign: 'right', margin: '16px 0px 36px'}}>
             <InfuseButton
               icon="plus"
