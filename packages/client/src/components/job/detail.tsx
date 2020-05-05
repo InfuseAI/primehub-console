@@ -139,20 +139,20 @@ export default class Detail extends React.Component<Props> {
                 ) : '-'
               }/>
               <Field labelCol={4} valueCol={20} label="User" value={job.userName || '-'} />
-              <Field labelCol={4} valueCol={20} label="Creation Time:" value={createTime ? createTime.format('YYYY-MM-DD HH:mm:ss') : '-'} />
-              <Field labelCol={4} valueCol={20} label="Start Time:" value={startTime ? startTime.format('YYYY-MM-DD HH:mm:ss') : '-'} />
-              <Field labelCol={4} valueCol={20} label="Finished Time:" value={renderFinishTime(job)} />
+              <Field labelCol={4} valueCol={20} label="Creation Time" value={createTime ? createTime.format('YYYY-MM-DD HH:mm:ss') : '-'} />
+              <Field labelCol={4} valueCol={20} label="Start Time" value={startTime ? startTime.format('YYYY-MM-DD HH:mm:ss') : '-'} />
+              <Field labelCol={4} valueCol={20} label="Finished Time" value={renderFinishTime(job)} />
               <Field labelCol={4} valueCol={20} label="Duration" style={blockStyle} value={computeDuration(startTime, finishTime)} />
-              <Field labelCol={4} valueCol={20} label="Group:" value={job.groupName || '-'} />
-              <Field labelCol={4} valueCol={20} label="Instance type:" value={(
+              <Field labelCol={4} valueCol={20} label="Group" value={job.groupName || '-'} />
+              <Field labelCol={4} valueCol={20} label="Instance type" value={(
                 <div>
                   {get(job, 'instanceType.displayName', '') || get(job, 'instanceType.name', '')}
                   <br />
                   (CPU: {get(job, 'instanceType.cpuLimit', '-')} / Memory: {get(job, 'instanceType.memoryLimit', '-')}G / GPU: {get(job, 'instanceType.gpuLimit', '-')})
                 </div>)}
               />
-              <Field labelCol={4} valueCol={20} style={blockStyle} label="Image:" value={job.image || '-'} />
-              <Field style={{marginTop: 32}} type="vertical" label="Command:"  value={(
+              <Field labelCol={4} valueCol={20} style={blockStyle} label="Image" value={job.image || '-'} />
+              <Field style={{marginTop: 32}} type="vertical" label="Command" value={(
                 <Input.TextArea
                   style={{
                     background: 'black',
