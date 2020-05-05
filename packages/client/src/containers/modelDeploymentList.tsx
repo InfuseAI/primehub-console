@@ -8,7 +8,8 @@ import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {appPrefix} from 'utils/env';
 import Pagination from 'components/share/pagination';
-import PageTitle from 'components/modelDeployment/pageTitle';
+import PageTitle from 'components/pageTitle';
+import DeploymentBreadcrumb from 'components/modelDeployment/breadcrumb';
 import DeploymentCard from 'components/modelDeployment/card';
 import { PhDeploymentFragment, DeploymentConnection } from 'components/modelDeployment/common';
 import InfuseButton from 'components/infuseButton';
@@ -94,7 +95,7 @@ class DeploymentListContainer extends React.Component<Props, State> {
   }
 
   render() {
-    const { getPhDeploymentConnection } = this.props;
+    const { getPhDeploymentConnection, history } = this.props;
     const {
       error,
       loading,
@@ -113,44 +114,47 @@ class DeploymentListContainer extends React.Component<Props, State> {
     return (
       <>
         <PageTitle
-          title="Model Deployments"
-          extra={(
-            <div>
-              <InfuseButton
-                style={{marginRight: 16, width: 'auto'}}
-              >
-                <Link to={`${appPrefix}model-deployment/create`}>
-                  Create Deployment
-                </Link>
-              </InfuseButton>
-              <InfuseButton onClick={() => refetch()}>Refresh</InfuseButton>
-            </div>
-          )}
+          breadcrumb={<DeploymentBreadcrumb />}
+          title={"Model Deployments"}
         />
-        <Spin spinning={loading}>
-          <Row gutter={36} type="flex">
-            {phDeploymentsConnection.edges.map(edge => {
-              return (
-                <Col span={6} key={edge.cursor} style={{marginBottom: 36}}>
-                  <DeploymentCard
-                    deployment={edge.node}
-                    copyClipBoard={this.copyClipBoard}
-                  />
-                </Col>
-              );
-            })}
-          </Row>
-        </Spin>
-        <Input
-          ref={this.textArea}
-          style={{position: 'absolute', left: '-1000px', top: '-1000px'}}
-        />
-        <Pagination
-          hasNextPage={phDeploymentsConnection.pageInfo.hasNextPage}
-          hasPreviousPage={phDeploymentsConnection.pageInfo.hasPreviousPage}
-          nextPage={this.nextPage}
-          previousPage={this.previousPage}
-        />
+        
+        <div style={{margin: 16}}>
+          <div style={{textAlign: 'right', margin: '16px 0px 36px'}}>
+            <InfuseButton
+              icon="plus"
+              type="primary"
+              onClick={() => history.push(`${appPrefix}model-deployment/create`)}
+              style={{marginRight: 16, width: 'auto'}}
+            >
+              Create Deployment
+            </InfuseButton>
+            <InfuseButton onClick={() => refetch()}>Refresh</InfuseButton>
+          </div>
+          <Spin spinning={loading}>
+            <Row gutter={36} type="flex">
+              {phDeploymentsConnection.edges.map(edge => {
+                return (
+                  <Col span={6} key={edge.cursor} style={{marginBottom: 36}}>
+                    <DeploymentCard
+                      deployment={edge.node}
+                      copyClipBoard={this.copyClipBoard}
+                    />
+                  </Col>
+                );
+              })}
+            </Row>
+          </Spin>
+          <Input
+            ref={this.textArea}
+            style={{position: 'absolute', left: '-1000px', top: '-1000px'}}
+          />
+          <Pagination
+            hasNextPage={phDeploymentsConnection.pageInfo.hasNextPage}
+            hasPreviousPage={phDeploymentsConnection.pageInfo.hasPreviousPage}
+            nextPage={this.nextPage}
+            previousPage={this.previousPage}
+          />
+        </div>
       </>
     );
   }

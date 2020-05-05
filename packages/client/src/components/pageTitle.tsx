@@ -3,6 +3,7 @@ import React from 'react';
 type Props = {
   breadcrumb: React.ReactNode;
   title: React.ReactNode;
+  extra?: React.ReactNode;
 };
 
 export default class PageTitle extends React.Component<Props> {
@@ -10,6 +11,7 @@ export default class PageTitle extends React.Component<Props> {
     const {
       breadcrumb,
       title,
+      extra,
     } = this.props;
     return (
       <div style={{

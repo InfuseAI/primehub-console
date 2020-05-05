@@ -1,6 +1,6 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
-import {Icon, notification} from 'antd';
+import {notification} from 'antd';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {get, unionBy} from 'lodash';
@@ -9,10 +9,10 @@ import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'components/job/errorHandler';
 import DeploymentCreateForm from 'components/modelDeployment/createForm';
+import DeploymentBreadcrumb from 'components/modelDeployment/breadcrumb';
 import {GroupFragment} from 'containers/list';
 import {appPrefix} from 'utils/env';
-import PageTitle from 'components/modelDeployment/pageTitle';
-import InfuseButton from 'components/infuseButton';
+import PageTitle from 'components/pageTitle';
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -102,31 +102,20 @@ class DeploymentCreatePage extends React.Component<Props, State> {
     return (
       <React.Fragment>
         <PageTitle
-          title={(
-            <div style={{display: 'flex', alignItems: 'center'}}>
-              <InfuseButton
-                style={{marginRight: 32}}
-                onClick={() => history.push(`${appPrefix}model-deployment`)}
-              >
-                <Icon type="arrow-left" />
-                Back
-              </InfuseButton>
-              Create Deployment
-            </div>
-          )}
-          extra={(
-            <></>
-          )}
+          breadcrumb={<DeploymentBreadcrumb />}
+          title={"Create Deployment"}
         />
-        <DeploymentCreateForm
-          onSelectGroup={this.onChangeGroup}
-          selectedGroup={selectedGroup}
-          groups={sortItems(groups)}
-          instanceTypes={sortItems(instanceTypes)}
-          images={sortItems(images)}
-          onSubmit={this.onSubmit}
-          loading={getGroups.loading || createPhDeploymentResult.loading}
-        />
+        <div style={{margin: 16}}>
+          <DeploymentCreateForm
+            onSelectGroup={this.onChangeGroup}
+            selectedGroup={selectedGroup}
+            groups={sortItems(groups)}
+            instanceTypes={sortItems(instanceTypes)}
+            images={sortItems(images)}
+            onSubmit={this.onSubmit}
+            loading={getGroups.loading || createPhDeploymentResult.loading}
+          />
+        </div>
       </React.Fragment>
     );
   }
