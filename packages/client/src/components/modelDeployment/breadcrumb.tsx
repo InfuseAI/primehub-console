@@ -14,9 +14,15 @@ function getBreadcrumbName(url: string, deploymentName: string) {
     case `${appPrefix}model-deployment`:
       return 'Model Deployments'
     case `${appPrefix}model-deployment/create`:
-      return 'Create Model Deployment';
+      return 'Create Deployment';
   }
+  // edit
+  if (url === `${appPrefix}model-deployment/edit`)
+    return null;
+  if (url.indexOf(`${appPrefix}model-deployment/edit`) > -1)
+    return 'Update Deployment';
 
+  // detail
   return `Model Deployment: ${deploymentName}`
 
 }
@@ -29,12 +35,13 @@ class DeploymentBreadcrumb extends React.Component<Props> {
     const pathSnippets = location.pathname.split('/').filter(i => i && i !== appPrefix.replace(/\//g, ''));
     const extraBreadcrumbItems = pathSnippets.map((_, index) => {
       const url = `${appPrefix}${pathSnippets.slice(0, index + 1).join('/')}`;
+      const breadcrumbName = getBreadcrumbName(url, deploymentName);
       return (
         <Breadcrumb.Item key={url}>
           {
             pathSnippets.length === index + 1 ?
-            getBreadcrumbName(url, deploymentName) :
-            <Link to={url}>{getBreadcrumbName(url, deploymentName)}</Link>
+            breadcrumbName :
+            breadcrumbName && <Link to={url}>{breadcrumbName}</Link>
           }
         </Breadcrumb.Item>
       );

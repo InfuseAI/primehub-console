@@ -8,10 +8,9 @@ import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'components/job/errorHandler';
 import DeploymentCreateForm from 'components/modelDeployment/createForm';
-import {GroupFragment} from 'containers/list';
 import {appPrefix} from 'utils/env';
-import PageTitle from 'components/modelDeployment/pageTitle';
-import InfuseButton from 'components/infuseButton';
+import PageTitle from 'components/pageTitle';
+import DeploymentBreadcrumb from 'components/modelDeployment/breadcrumb';
 import {PhDeploymentFragment} from 'components/modelDeployment/common';
 import {GET_PH_DEPLOYMENT, getMessage} from './deploymentDetail';
 import {GET_MY_GROUPS} from './deploymentCreatePage';
@@ -116,36 +115,25 @@ class DeploymentCreatePage extends React.Component<Props, State> {
     return (
       <React.Fragment>
         <PageTitle
-          title={(
-            <div style={{display: 'flex', alignItems: 'center'}}>
-              <InfuseButton
-                style={{marginRight: 32}}
-                onClick={() => history.push(`${appPrefix}model-deployment`)}
-              >
-                <Icon type="arrow-left" />
-                Back
-              </InfuseButton>
-              Update Deployment
-            </div>
-          )}
-          extra={(
-            <></>
-          )}
+          title={`Update Deployment`}
+          breadcrumb={<DeploymentBreadcrumb deploymentName={get(getPhDeployment, 'phDeployment.name')} />}
         />
-        <DeploymentCreateForm
-          type="edit"
-          initialValue={{
-            ...(getPhDeployment.phDeployment || {}),
-            instanceTypeId: get(getPhDeployment, 'phDeployment.instanceType.id', ''),
-            instanceTypeName: get(getPhDeployment, 'phDeployment.instanceType.name', '')
-          }}
-          selectedGroup={selectedGroup}
-          groups={sortItems(groups)}
-          instanceTypes={sortItems(instanceTypes)}
-          onSubmit={this.onSubmit}
-          onCancel={this.onCancel}
-          loading={getGroups.loading || updatePhDeploymentResult.loading}
-        />
+        <div style={{margin: 16}}>
+          <DeploymentCreateForm
+            type="edit"
+            initialValue={{
+              ...(getPhDeployment.phDeployment || {}),
+              instanceTypeId: get(getPhDeployment, 'phDeployment.instanceType.id', ''),
+              instanceTypeName: get(getPhDeployment, 'phDeployment.instanceType.name', '')
+            }}
+            selectedGroup={selectedGroup}
+            groups={sortItems(groups)}
+            instanceTypes={sortItems(instanceTypes)}
+            onSubmit={this.onSubmit}
+            onCancel={this.onCancel}
+            loading={getGroups.loading || updatePhDeploymentResult.loading}
+          />
+        </div>
       </React.Fragment>
     );
   }
