@@ -260,6 +260,7 @@ exports.parseToStepDot5 = function(value) {
 }
 
 const instanceTypeLink = "https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-feature";
+const imageBuilderLink = "https://docs.primehub.io/docs/tasks/dockerhub-registry#set-up-dockerhub-registry";
 
 exports.dict = {
   en: {
@@ -482,6 +483,8 @@ exports.dict = {
     'buildImage.baseImage.placeholder': 'Input image url',
     'buildImage.useImagePullSecret': 'Use Image PullSecret',
     'buildImage.packages': 'Package(s)',
+    'buildImage.msg.pleaseCheckSetup': 'Image registry not found. Please set up your image registry using Image Builder.',
+    'buildImage.msg.regsitrySetupLink': imageBuilderLink,
     'buildImage.apt': 'APT',
     'buildImage.pip': 'Pip',
     'buildImage.conda': 'Conda',
