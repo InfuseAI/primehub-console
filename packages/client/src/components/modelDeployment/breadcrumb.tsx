@@ -23,7 +23,7 @@ function getBreadcrumbName(url: string, deploymentName: string) {
     return 'Update Deployment';
 
   // detail
-  return `Model Deployment: ${deploymentName}`
+  return `Deployment: ${deploymentName}`
 
 }
 
