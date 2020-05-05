@@ -259,7 +259,7 @@ exports.parseToStepDot5 = function(value) {
   }
 }
 
-const instanceTypeLink = "https://infuseai.zendesk.com/hc/en-us/articles/360027959911-Instance-Type-Management";
+const instanceTypeLink = "https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-feature";
 
 exports.dict = {
   en: {
