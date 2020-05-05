@@ -43,8 +43,12 @@ export interface Config {
 
   // workspace feature
   enableWorkspace: boolean;
-  // custom image
+  // image builder
+  // TODO: need rename variable to image builder for consistently
   enableCustomImage: boolean;
+  // image builder should have registry setup, use env.PRIMEHUB_CUSTOM_IMAGE_REGISTRY_ENDPOINT to determine it.
+  customImageSetup: boolean;
+
   // license check
   enableLicenseCheck: boolean;
   // model deployment feature
@@ -76,6 +80,7 @@ const defaultConfigs = {
   enableDatasetUpload: false,
   enableWorkspace: false,
   enableCustomImage: false,
+  customImageSetup: false,
   enableLicenseCheck: false,
   enableModelDeployment: false,
   licenseStatus: 'invalid',
@@ -124,6 +129,7 @@ export const createConfig = (): Config => {
       process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE.toString() === 'true',
     enableCustomImage:
       process.env.PRIMEHUB_FEATURE_CUSTOM_IMAGE && process.env.PRIMEHUB_FEATURE_CUSTOM_IMAGE.toString() === 'true',
+    customImageSetup: process.env.PRIMEHUB_CUSTOM_IMAGE_REGISTRY_ENDPOINT ? true : false,
     enableLicenseCheck:
       process.env.PRIMEHUB_FEATURE_LICENSE && process.env.PRIMEHUB_FEATURE_LICENSE.toString() === 'true',
     enableModelDeployment:
