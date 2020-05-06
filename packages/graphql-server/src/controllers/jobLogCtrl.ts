@@ -3,6 +3,7 @@ import CrdClientImpl, { client as kubeClient } from '../crdClient/crdClientImpl'
 import { ParameterizedContext } from 'koa';
 import { Stream } from 'stream';
 import { get } from 'lodash';
+import * as logger from '../logger';
 
 const MODEL = 'model';
 
@@ -33,7 +34,18 @@ export class JobLogCtrl {
     const jobId = ctx.params.jobId;
     const job = await this.crdClient.imageSpecJobs.get(jobId);
     const podName = job.status.podName;
-    ctx.body = this.getStream(namespace, podName, {follow, tailLines});
+    const stream = this.getStream(namespace, podName, {follow, tailLines});
+
+    stream.on('error', err => {
+      logger.error({
+        component: logger.components.internal,
+        type: 'K8S_STREAM_LOG',
+        message: err.message
+      });
+
+      ctx.res.end();
+    });
+    ctx.body = stream;
   }
 
   public streamPhJobLogs = async (ctx: ParameterizedContext) => {
@@ -42,14 +54,34 @@ export class JobLogCtrl {
     const jobId = ctx.params.jobId;
     const phjob = await this.crdClient.phJobs.get(jobId);
     const podName = phjob.status.podName;
-    ctx.body = this.getStream(namespace, podName, {follow, tailLines});
+    const stream = this.getStream(namespace, podName, {follow, tailLines});
+    stream.on('error', err => {
+      logger.error({
+        component: logger.components.internal,
+        type: 'K8S_STREAM_LOG',
+        message: err.message
+      });
+
+      ctx.res.end();
+    });
+    ctx.body = stream;
   }
 
   public streamPhDeploymentLogs = async (ctx: ParameterizedContext) => {
     const {follow, tailLines} = ctx.query;
     const namespace = ctx.params.namespace || this.namespace;
     const podName = ctx.params.podName;
-    ctx.body = this.getStream(namespace, podName, {container: MODEL, follow, tailLines});
+    const stream = this.getStream(namespace, podName, {container: MODEL, follow, tailLines});
+    stream.on('error', err => {
+      logger.error({
+        component: logger.components.internal,
+        type: 'K8S_STREAM_LOG',
+        message: err.message
+      });
+
+      ctx.res.end();
+    });
+    ctx.body = stream;
   }
 
   public getRoute = () => {

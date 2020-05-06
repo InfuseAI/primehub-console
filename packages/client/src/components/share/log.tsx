@@ -1,7 +1,9 @@
 import * as React from 'react';
-import {Input, Button} from 'antd';
-import {get, throttle} from 'lodash';
+import {FixedSizeList as List} from 'react-window';
+import {Button} from 'antd';
+import {get} from 'lodash';
 import downloadjs from 'downloadjs';
+import styled from 'styled-components';
 
 type Props = {
   endpoint: string;
@@ -17,11 +19,26 @@ type State = {
   downloading: boolean;
 }
 
+const Hint = styled.div`
+  padding: 4px 12px;
+  width: 100%;
+  top: 0;
+  z-index: 1;
+  background: #eee;
+  letter-spacing: 0.4px;
+  opacity: ${(props: any) => props.opacity ? 0 : 1};
+  color: #333;
+  transition: opacity 0.1s;
+` as any;
+
 const INITIAL_LENGTH = 2000;
+
+const LINE_HEIGHT = 21;
 
 export default class Logs extends React.Component<Props, State> {
   retryCount: number;
-  myRef: React.Ref<HTMLTextAreaElement>;
+  listRef: React.RefObject<any>;
+  outerRef: React.RefObject<any>;
   controller: AbortController;
 
   constructor(props) {
@@ -34,12 +51,13 @@ export default class Logs extends React.Component<Props, State> {
       downloading: false,
       topmost: false,
     };
-    this.myRef = React.createRef();
+    this.listRef = React.createRef();
+    this.outerRef = React.createRef();
   }
 
   componentDidMount() {
     this.fetchLog();
-    this.listenOnScrollToTOP();
+    this.scrollToBottom();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -50,17 +68,38 @@ export default class Logs extends React.Component<Props, State> {
         tailLines: INITIAL_LENGTH
       }, () => {
         this.fetchLog();
-        this.listenOnScrollToTOP();
       });
     }
 
     const restartAutoScroll = !prevState.autoScroll && this.state.autoScroll;
     // scroll log box to bottom
-    if (this.myRef && ((this.state.log[this.state.log.length - 1] !== prevState.log[prevState.log.length - 1] && this.state.autoScroll) || restartAutoScroll)) {
+    if (((this.state.log[this.state.log.length - 1] !== prevState.log[prevState.log.length - 1] && this.state.autoScroll) || restartAutoScroll)) {
       //https://github.com/ant-design/ant-design/issues/10527
       // @ts-ignore
-      this.myRef.current.textAreaRef.scrollTop = this.myRef.current.textAreaRef.scrollHeight;
+      this.scrollToBottom();
     }
+  }
+
+  scrollToBottom = () => {
+    if (!this.listRef.current) return;
+    this.listRef.current.scrollToItem(this.outerRef.current.scrollHeight - this.outerRef.current.clientHeight)
+  }
+
+  showNewLog = (chunk: string) => {
+    const newLog = chunk.split(/[\n\r]+/);
+    if (!newLog[newLog.length - 1]) newLog.pop();
+    this.setState((prevState: any) => {
+      const log = prevState.log.length >= 2000 ?
+      prevState.log.slice(newLog.length) : 
+      prevState.log;
+      return {
+        log: [...log, ...newLog],
+      }
+    }, () => {
+      if (!this.state.autoScroll && this.state.log.length >= 2000) {
+        this.listRef.current.scrollTo(this.outerRef.current.scrollTop - newLog.length * LINE_HEIGHT);
+      }
+    });
   }
 
   fetchLog = () => {
@@ -99,26 +138,18 @@ export default class Logs extends React.Component<Props, State> {
       function appendChunks(result) {
         if (result.done)
           return 'done';
-        const chunk = new TextDecoder().decode(result.value.buffer).split('\n');
-        if (!chunk[chunk.length - 1]) chunk.pop();
-        
-        that.setState((prevState: any) => {
-          const log = prevState.log.length > 2000 ?
-          prevState.log.slice(chunk.length) : 
-          prevState.log;
-          return {
-            log: [...log, ...chunk],
-          }
-        }, () => {
-          if (!that.state.autoScroll && that.state.log.length >= 2000) {
-            that.myRef.current.textAreaRef.scrollTop -= chunk.length * 21;
-          }
-        });
+        const chunk = new TextDecoder().decode(result.value.buffer);
+        that.showNewLog(chunk);
 
         return readChunk();
       }
 
       return readChunk();
+    })
+    .then(() => {
+      setTimeout(() => {
+        this.fetchLog();
+      }, 10000);
     })
     .catch(err => {
       if (err.message === 'The user aborted a request.') {
@@ -136,22 +167,19 @@ export default class Logs extends React.Component<Props, State> {
     });
   }
 
-  listenOnScrollToTOP = () => {
-    // @ts-ignore
-    this.myRef.current.textAreaRef.onscroll = () => {
-      const {
-        clientHeight,
-        scrollTop,
-        scrollHeight
-      } = this.myRef.current.textAreaRef;
-      if (scrollHeight > clientHeight + scrollTop) {
-        this.setState({autoScroll: false})
-      }
-
-      this.setState({
-        topmost: scrollTop === 0
-      });
+  onScroll = ({
+    scrollDirection,
+    scrollOffset,
+    scrollUpdateWasRequested
+  }) => {
+    if (!this.outerRef.current) return;
+    if (scrollUpdateWasRequested) {
+      return;
     }
+    this.setState({
+      topmost: scrollDirection === 'backward' && scrollOffset === 0,
+      autoScroll: scrollDirection === 'forward' && this.outerRef.current.scrollHeight - this.outerRef.current.clientHeight === scrollOffset
+    });
   }
 
   enableAutoScroll = () => {
@@ -162,10 +190,9 @@ export default class Logs extends React.Component<Props, State> {
 
   download = () => {
     const {endpoint} = this.props;
-    const {tailLines} = this.state;
     const token = window.localStorage.getItem('canner.accessToken');
     this.setState({downloading: true});
-    fetch(`${endpoint}?follow=false&&tailLines=${tailLines}`, {
+    fetch(`${endpoint}?follow=false`, {
       method: 'GET',
       headers: {
         'Authorization': 'Bearer ' + token
@@ -181,7 +208,7 @@ export default class Logs extends React.Component<Props, State> {
 
   render() {
     const {rows = 40, style = {}} = this.props;
-    const {log, downloading, topmost} = this.state;
+    const {log, downloading} = this.state;
     return <>
       <div style={{float: 'right', marginBottom: 4, display: 'flex'}}>
         <Button
@@ -198,35 +225,37 @@ export default class Logs extends React.Component<Props, State> {
         </Button>
       </div>
       <div style={{position: 'relative', marginTop: 48, ...style}}>
-        <div
-          style={{
-            padding: 16,
-            position: 'absolute',
-            width: '100%',
-            top: 0,
-            zIndex: 1,
-            background: '#eee',
-            letterSpacing: '0.4px',
-            opacity: topmost && log.length >= 2000 ? 1 : 0,
-            color: '#333',
-            transition: 'opacity 0.1s',
-          }}
-        >
+        <Hint>
           Please download to check out more than 2000 lines.
-        </div>
-        <Input.TextArea
+        </Hint>
+        <List
           style={{
             background: 'black',
             color: '#ddd',
             fontFamily: 'monospace',
-            border: 0
+            border: 0,
           }}
-          rows={rows || 40}
-          value={log.join('\n')}
-          // @ts-ignore
-          ref={this.myRef}
-        />
+          onScroll={this.onScroll}
+          ref={this.listRef}
+          outerRef={this.outerRef}
+          height={rows * LINE_HEIGHT}
+          itemCount={log.length}
+          itemSize={LINE_HEIGHT}
+        >
+          {({index, style}) => <div key={index} style={{
+            ...style,
+            padding: '0px 12px',
+            overflow: 'visible',
+          }}>{handleLong(log[index])}</div>}
+        </List>
       </div>
     </>;
   }
+}
+
+function handleLong(log: string) {
+  if (log.length > 200) {
+    return log.slice(0, 30) + ` ...Download to see more... ` + log.slice(-30);
+  }
+  return log;
 }
