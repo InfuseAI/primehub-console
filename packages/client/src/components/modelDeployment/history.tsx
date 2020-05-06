@@ -1,7 +1,7 @@
 import React from 'react';
 import {Table, Modal, Row, Col, Tooltip} from 'antd';
 import {renderTime, renderInstanceType} from 'components/modelDeployment/detail';
-import {Field} from 'components/modelDeployment/card';
+import Field from 'components/share/field';
 import {HistoryItem} from 'components/modelDeployment/common';
 import Metadata from 'components/modelDeployment/metadata';
 import moment from 'moment';
