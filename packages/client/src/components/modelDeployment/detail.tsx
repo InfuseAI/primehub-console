@@ -6,7 +6,7 @@ import DeploymentBreadcrumb from 'components/modelDeployment/breadcrumb';
 import InfuseButton from 'components/infuseButton';
 import { appPrefix } from 'utils/env';
 import {Link} from 'react-router-dom';
-import {Field} from 'components/modelDeployment/card';
+import Field from 'components/share/field';
 import ModelDeploymentLogs from 'components/modelDeployment/logs';
 import ModelDeploymentHistory from 'components/modelDeployment/history';
 import Metadata from 'components/modelDeployment/metadata';
