@@ -334,7 +334,7 @@ class Job extends React.Component {
           <Layout>
             <Header />
             <Layout>
-              <Content>
+              <Content style={{padding: 0}}>
                 <ApolloProvider client={client}>
                   <Switch>
                     <Route path={`${appPrefix}model-deployment`} exact>
