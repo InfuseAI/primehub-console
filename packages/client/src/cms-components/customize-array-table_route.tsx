@@ -47,9 +47,9 @@ export default class ArrayBreadcrumb extends Component<Props & {
 
   handleTableChange = (pagination, filters, sorter) => {
     const {changeOrderBy} = this.props;
-    changeOrderBy({
-      [sorter.field]: get(sorter, 'order[0]') === 'ascend' ? 'asc' : 'desc'
-    });
+    changeOrderBy(sorter.field ? {
+      [sorter.field]: get(sorter, 'order') === 'ascend' ? 'asc' : 'desc'
+    }: {});
   }
 
   onSelectChange = (record, selected) => {

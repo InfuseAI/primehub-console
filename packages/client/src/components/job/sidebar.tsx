@@ -16,12 +16,12 @@ class Sidebar extends React.Component<Props> {
           selectedKeys={[key]}
         >
           <Menu.Item key="job">
-            <Link to={`${appPrefix}job?first=10`}>
+            <Link to={`${appPrefix}job?page=1`}>
               Jobs
             </Link>
           </Menu.Item>
           <Menu.Item key="schedule">
-            <Link to={`${appPrefix}schedule?first=10`}>
+            <Link to={`${appPrefix}schedule?page=1`}>
               Schedule
             </Link>
           </Menu.Item>

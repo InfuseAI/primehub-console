@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, Tooltip, Table as AntTable, Row, Col, Icon, Modal} from 'antd';
+import {Button, Tooltip, Table as AntTable, Icon, Modal} from 'antd';
 import {RouteComponentProps} from 'react-router';
 import {Link, withRouter} from 'react-router-dom';
 import {startCase, get} from 'lodash';
@@ -8,7 +8,6 @@ import Filter from 'components/job/filter';
 import moment from 'moment';
 import {Group} from 'components/job/groupFilter';
 import {computeDuration} from 'components/job/detail';
-import Pagination from 'components/share/pagination';
 import JobBreadcrumb from 'components/job/breadcrumb';
 import { Phase, getActionByPhase } from './phase';
 import {appPrefix} from 'utils/env';
@@ -22,6 +21,11 @@ const Table = styled(AntTable as any)`
   background: white;
   .ant-pagination.ant-table-pagination {
     margin-right: 16px;
+  }
+
+  /* hide header sort arrow */
+  th svg {
+    display: none;
   }
 `;
 
@@ -80,7 +84,7 @@ const getCreateTimeAndFinishTime = (startTime, finishTime, phase: Phase) => {
   }
 }
 
-const renderTiming = record => {
+const renderTiming = (createTime, record) => {
   const createTime = record.createTime;
   const startTime = record.startTime;
   const finishTime = record.finishTime;
@@ -195,37 +199,8 @@ class JobList extends React.Component<Props> {
   refresh = () => {
     const {jobsVariables, jobsRefetch} = this.props;
     const newVariables = {
-      where: jobsVariables.where,
-      before: undefined,
-      first: 10,
-      last: undefined,
-      after: undefined,
-    };
-    jobsRefetch(newVariables);
-  }
-
-  nextPage = () => {
-    const {jobsVariables, jobsRefetch, jobsConnection} = this.props;
-    const after = jobsConnection.pageInfo.endCursor;
-    const newVariables = {
-      where: jobsVariables.where,
-      after,
-      first: 10,
-      last: undefined,
-      before: undefined
-    };
-    jobsRefetch(newVariables);
-  }
-
-  previousPage = () => {
-    const {jobsVariables, jobsRefetch, jobsConnection} = this.props;
-    const before = jobsConnection.pageInfo.startCursor;
-    const newVariables = {
-      where: jobsVariables.where,
-      before,
-      last: 10,
-      first: undefined,
-      after: undefined,
+      ...jobsVariables,
+      page: 1,
     };
     jobsRefetch(newVariables);
   }
@@ -247,6 +222,19 @@ class JobList extends React.Component<Props> {
       }
     };
     jobsRefetch(newVariables);
+  }
+
+  handleTableChange = (pagination, _filters, sorter) => {
+    const {jobsVariables, jobsRefetch} = this.props;
+    const orderBy: any = {}
+    if (sorter.field) {
+      orderBy[sorter.field] = get(sorter, 'order') === 'ascend' ? 'asc' : 'desc'
+    }
+    jobsRefetch({
+      ...jobsVariables,
+      page: pagination.current,
+      orderBy
+    });
   }
 
   cloneJob = (record) => {
@@ -291,24 +279,31 @@ class JobList extends React.Component<Props> {
       title: 'Status',
       dataIndex: 'phase',
       key: 'phase',
+      sorter: true,
       render: text => startCase(text)
     }, {
       title: 'Job name',
       dataIndex: 'displayName',
+      sorter: true,
       render: renderJobName
     }, {
       title: 'Schedule',
       dataIndex: 'schedule',
+      sorter: true,
       render: renderSchedule,
     }, {
       title: 'User',
+      sorter: true,
       dataIndex: 'userName'
     }, {
       title: 'Group',
+      sorter: true,
       dataIndex: 'groupName'
     }, {
       title: 'Timing',
+      sorter: true,
       key: 'timing',
+      dataIndex: 'createTime',
       render: renderTiming
     }, {
       title: 'Action',
@@ -350,13 +345,11 @@ class JobList extends React.Component<Props> {
             dataSource={jobsConnection.edges.map(edge => edge.node)}
             columns={columns}
             rowKey="id"
-            pagination={false}
-          />
-          <Pagination
-            hasNextPage={jobsConnection.pageInfo.hasNextPage}
-            hasPreviousPage={jobsConnection.pageInfo.hasPreviousPage}
-            nextPage={this.nextPage}
-            previousPage={this.previousPage}
+            pagination={{
+              current: get(jobsConnection, 'pageInfo.currentPage', 0),
+              total: get(jobsConnection, 'pageInfo.totalPage', 0) * 10,
+            }}
+            onChange={this.handleTableChange}
           />
         </PageBody>
       </>
