@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {get} from 'lodash';
+import {get, mapValues} from 'lodash';
 import { Table, Button, Modal, Icon, notification } from "antd";
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from "react-intl";
@@ -23,6 +23,9 @@ const StyledTable = styled(Table)`
 export default class ArrayBreadcrumb extends Component<Props & {
   registerSendEmailCallback: (callback: Function) => void;
   changeOrderBy: (orderBy: Record<string, string>) => void;
+  query: any;
+  toolbar: Object;
+  updateQuery: Function;
 }> {
   static defaultProps = {
     value: [],
@@ -46,10 +49,22 @@ export default class ArrayBreadcrumb extends Component<Props & {
   }
 
   handleTableChange = (pagination, filters, sorter) => {
-    const {changeOrderBy} = this.props;
-    changeOrderBy(sorter.field ? {
-      [sorter.field]: get(sorter, 'order') === 'ascend' ? 'asc' : 'desc'
-    }: {});
+    const {updateQuery, keyName, query, toolbar} = this.props;
+    const defaultArgs: any = {};
+    if (get(toolbar, 'pagination.number', false)) {
+      defaultArgs.page = 1
+    } else {
+      defaultArgs.first = 10;
+    }
+    const queries = query.getQueries([keyName]).args || defaultArgs;
+    const variables = query.getVariables();
+    const args = mapValues(queries, v => variables[v.substr(1)]);
+    updateQuery([keyName], {
+      ...args,
+      orderBy:sorter.field ? {
+        [sorter.field]: get(sorter, 'order') === 'ascend' ? 'asc' : 'desc'
+      } : {}
+    });
   }
 
   onSelectChange = (record, selected) => {
