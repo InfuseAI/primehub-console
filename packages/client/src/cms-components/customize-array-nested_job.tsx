@@ -10,9 +10,6 @@ import styled from 'styled-components';
 
 const ButtonGroup = Button.Group;
 const StyledTable = styled(Table)`
-  th svg {
-    display: none;
-  }
 `
 @injectIntl
 export default class ArrayNestedJob extends Component<Props & {

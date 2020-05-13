@@ -14,9 +14,6 @@ const confirm = Modal.confirm;
 const GLOBAL_DISABLE = (window as any).disableMode || false;
 const DISABLE_GROUP = (window as any).disableGroup || false;
 const StyledTable = styled(Table)`
-  th svg {
-    display: none;
-  }
 `
 
 @injectIntl
@@ -49,7 +46,7 @@ export default class ArrayBreadcrumb extends Component<Props & {
   }
 
   handleTableChange = (pagination, filters, sorter) => {
-    const {updateQuery, keyName, query, toolbar} = this.props;
+    const {updateQuery, keyName, query, toolbar, fetch} = this.props;
     const defaultArgs: any = {};
     if (!get(toolbar, 'async')) return;
     if (get(toolbar, 'pagination.number', false)) {
@@ -65,7 +62,7 @@ export default class ArrayBreadcrumb extends Component<Props & {
       orderBy:sorter.field ? {
         [sorter.field]: get(sorter, 'order') === 'ascend' ? 'asc' : 'desc'
       } : {}
-    });
+    }).then(() => fetch(keyName));
   }
 
   onSelectChange = (record, selected) => {

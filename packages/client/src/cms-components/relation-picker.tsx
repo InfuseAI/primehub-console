@@ -49,9 +49,6 @@ type State = {
 };
 
 const StyledTable = styled(Table)`
-  th svg {
-    display: none;
-  }
 `
 
 export default class Picker extends React.PureComponent<Props, State> {

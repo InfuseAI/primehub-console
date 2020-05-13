@@ -132,7 +132,7 @@ export default compose(
         variables: {
           where: JSON.parse(params.where as string || '{}'),
           orderBy: JSON.parse(params.orderBy as string || '{}'),
-          page: params.page || 1,
+          page: Number(params.page || 1),
         },
         fetchPolicy: 'cache-and-network'
       }
