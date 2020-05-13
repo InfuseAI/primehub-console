@@ -12,13 +12,16 @@ export default () => (
     uiParams={{
       columns: [{
         title: '${name}',
-        dataIndex: 'name'
+        dataIndex: 'name',
+        sorter: true
       }, {
         title: '${displayName}',
-        dataIndex: 'displayName'
+        dataIndex: 'displayName',
+        sorter: true
       }, {
         title: "${group.sharedVolumeCapacity}",
         dataIndex: 'sharedVolumeCapacity',
+        sorter: true,
         render: (value) => {
           if (value) {
             return `${value}G`
@@ -28,24 +31,28 @@ export default () => (
       }, {
         title: '${cpuQuotaListTitle}',
         dataIndex: 'quotaCpu',
+        sorter: true,
         render: text => {
           return text === null ? '∞' : text;
         }
       }, {
         title: '${gpuQuotaListTitle}',
         dataIndex: 'quotaGpu',
+        sorter: true,
         render: text => {
           return text === null ? '∞' : text;
         }
       }, {
         title: '${projectCpuQuota}',
         dataIndex: 'projectQuotaCpu',
+        sorter: true,
         render: text => {
           return text === null ? '∞' : text;
         }
       }, {
         title: '${projectGpuQuota}',
         dataIndex: 'projectQuotaGpu',
+        sorter: true,
         render: text => {
           return text === null ? '∞' : text;
         }
@@ -59,8 +66,8 @@ export default () => (
       disableCreate: true
     }}
     graphql={`
-      query($groupPage: Int, $groupWhere: GroupWhereInput) {
-        group: groupsConnection(page: $groupPage, where: $groupWhere) {
+      query($groupPage: Int, $groupOrderBy: GroupOrderByInput, $groupWhere: GroupWhereInput) {
+        group: groupsConnection(page: $groupPage, orderBy: $groupOrderBy, where: $groupWhere) {
           edges {
             cursor
             node {

@@ -15,16 +15,20 @@ export default () => (
     uiParams={{
       columns: [{
         title: '${name}',
-        dataIndex: 'name'
+        dataIndex: 'name',
+        sorter: true,
       }, {
         title: '${displayName}',
-        dataIndex: 'displayName'
+        dataIndex: 'displayName',
+        sorter: true,
       }, {
         title: '${type}',
-        dataIndex: 'type'
+        dataIndex: 'type',
+        sorter: true,
       }, {
         title: '${description}',
-        dataIndex: 'description'
+        dataIndex: 'description',
+        sorter: true,
       }],
       disableCreate: true
     }}
@@ -32,8 +36,8 @@ export default () => (
     hideButtons
     graphql={
       `
-      query($datasetPage: Int, $datasetWhere: DatasetWhereInput) {
-        dataset: datasetsConnection(page: $datasetPage, where: $datasetWhere) {
+      query($datasetPage: Int, $datasetOrderBy: DatasetOrderByInput, $datasetWhere: DatasetWhereInput) {
+        dataset: datasetsConnection(page: $datasetPage, orderBy: $datasetOrderBy, where: $datasetWhere) {
           edges {
             cursor
             node {
@@ -188,8 +192,8 @@ export default () => (
             pickerColumns: groupPickerColumns,
           }}
           graphql={`
-          query($groupPage: Int, $groupWhere: GroupWhereInput) {
-            group: groupsConnection(page: $groupPage, where: $groupWhere) {
+          query($groupPage: Int, $groupOrderBy: GroupOrderByInput, $groupWhere: GroupWhereInput) {
+            group: groupsConnection(page: $groupPage, orderBy: $groupOrderBy, $where: $groupWhere) {
               edges {
                 cursor
                 node {

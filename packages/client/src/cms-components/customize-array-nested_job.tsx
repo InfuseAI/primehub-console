@@ -10,11 +10,12 @@ import RefId from 'canner-ref-id';
 import {get} from 'lodash';
 
 const ButtonGroup = Button.Group;
-const confirm = Modal.confirm;
-const GLOBAL_DISABLE = (window as any).disableMode || false;
 
 @injectIntl
-export default class ArrayNestedJob extends Component<Props> {
+export default class ArrayNestedJob extends Component<Props & {
+  updateQuery: (path: Array<string>, args: Object) => void;
+  query: any;
+}> {
   static defaultProps = {
     value: [],
     showPagination: true,
@@ -57,6 +58,19 @@ export default class ArrayNestedJob extends Component<Props> {
     // });
     
   }
+
+  // handleTableChange = (pagination, filters, sorter) => {
+  //   const {updateQuery, keyName, query} = this.props;
+  //   console.log(keyName);
+  //   const queries = query.getQueries([keyName]).args || {};
+  //   const variables = query.getVariables();
+  //   const args = mapValues(queries, v => variables[v.substr(1)]);
+
+  //   updateQuery([keyName], {
+  //     ...args,
+  //     [sorter.field]: get(sorter, 'order[0]') === 'ascend' ? 'asc' : 'desc'
+  //   });
+  // }
 
   render() {
     const {
@@ -119,6 +133,7 @@ export default class ArrayNestedJob extends Component<Props> {
           dataSource={value.map((datum, i) => {
             return {...datum, __index: i, key: datum.key || i};
           })}
+          // onChange={this.handleTableChange}
           columns={newColumnsRender}
           style={{marginBottom: 32}}
           rowKey="id"

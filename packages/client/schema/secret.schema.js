@@ -12,16 +12,18 @@ export default () => (
     uiParams={{
       columns: [{
         title: 'Name',
-        dataIndex: 'name'
+        dataIndex: 'name',
+        sorter: true,
       }, {
         title: 'Display Name',
-        dataIndex: 'displayName'
+        dataIndex: 'displayName',
+        sorter: true,
       }],
       disableCreate: true
     }}
     graphql={`
-      query($secretWhere: SecretWhereInput) {
-      secret: secretsConnection(where: $secretWhere) {
+      query($secretWhere: SecretWhereInput, $secretOrderBy: SecretOrderByInput) {
+      secret: secretsConnection(where: $secretWhere, orderBy: $secretOrderBy) {
         edges {
           cursor
           node {

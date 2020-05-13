@@ -18,31 +18,37 @@ export default () => (
     uiParams={{
       columns: [{
         title: '${name}',
-        dataIndex: 'name'
+        dataIndex: 'name',
+        sorter: true
       }, {
         title: '${displayName}',
-        dataIndex: 'displayName'
+        dataIndex: 'displayName',
+        sorter: true
       }, {
         title: '${description}',
-        dataIndex: 'description'
+        dataIndex: 'description',
+        sorter: true
       }, {
         title: '${cpuLimit}',
         dataIndex: 'cpuLimit',
+        sorter: true,
         render: v => v || 0
       }, {
         title: '${gpuLimit}',
         dataIndex: 'gpuLimit',
-        render: v => v || 0
+        render: v => v || 0,
+        sorter: true,
       }, {
         title: '${memoryLimit}',
         dataIndex: 'memoryLimit',
-        render: text => `${text || 0} GB`
+        render: text => `${text || 0} GB`,
+        sorter: true,
       }],
       disableCreate: true
     }}
     graphql={`
-      query($instanceTypePage: Int, $instanceTypeWhere: InstanceTypeWhereInput) {
-        instanceType: instanceTypesConnection(page: $instanceTypePage, where: $instanceTypeWhere) {
+      query($instanceTypePage: Int, $instanceTypeOrderBy: InstanceTypeOrderByInput, $instanceTypeWhere: InstanceTypeWhereInput) {
+        instanceType: instanceTypesConnection(page: $instanceTypePage, orderBy: $instanceTypeOrderBy, where: $instanceTypeWhere) {
           edges {
             cursor
             node {

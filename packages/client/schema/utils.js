@@ -43,6 +43,12 @@ export const groupColumns = [{
   }
 }];
 
+// export const groupPickerColumns =  [{
+//   title: '${name}',
+//   dataIndex: 'name',
+//   sorter: true,
+// }].concat(groupColumns.slice(1).map(item => ({...item, sorter: true})));
+
 export const groupPickerColumns =  [{
   title: '${name}',
   dataIndex: 'name',

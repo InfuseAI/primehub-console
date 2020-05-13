@@ -15,13 +15,16 @@ export default () => (
     uiParams={{
       columns: [{
         title: '${name}',
-        dataIndex: 'name'
+        dataIndex: 'name',
+        sorter: true,
       }, {
         title: '${displayName}',
-        dataIndex: 'displayName'
+        dataIndex: 'displayName',
+        sorter: true,
       }, {
         title: '${type}',
         dataIndex: 'type',
+        sorter: true,
         render: (value) => {
           if (!value) {
               return '-';
@@ -35,13 +38,14 @@ export default () => (
         }
       },{
         title: '${description}',
-        dataIndex: 'description'
+        dataIndex: 'description',
+        sorter: true,
       }],
       disableCreate: true
     }}
     graphql={
-      `query($imagePage: Int, $imageWhere: ImageWhereInput) {
-        image: imagesConnection(page: $imagePage, where: $imageWhere) {
+      `query($imagePage: Int, $imageOrderBy: ImageOrderByInput, $imageWhere: ImageWhereInput) {
+        image: imagesConnection(page: $imagePage, orderBy: $imageOrderBy, where: $imageWhere) {
           edges {
             cursor
             node {

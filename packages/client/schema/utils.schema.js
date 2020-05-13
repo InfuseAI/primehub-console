@@ -16,8 +16,8 @@ exports.GroupRelation = () => (
       pickerColumns: groupPickerColumns
     }}
     graphql={`
-    query($groupPage: Int, $groupWhere: GroupWhereInput) {
-      group: groupsConnection(page: $groupPage, where: $groupWhere) {
+    query($groupPage: Int, $groupWhere: GroupWhereInput, $groupOrderBy: GroupOrderByInput) {
+      group: groupsConnection(page: $groupPage, where: $groupWhere, orderBy: $groupOrderBy) {
         edges {
           cursor
           node {

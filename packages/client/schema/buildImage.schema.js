@@ -16,13 +16,16 @@ export default () => (
     uiParams={{
       columns: [{
         title: '${buildImage.name}',
-        dataIndex: 'name'
+        dataIndex: 'name',
+        sorter: true,
       }, {
         title: '${buildImage.status}',
         dataIndex: 'status',
+        sorter: true,
       }, {
         title: '${buildImage.image}',
         dataIndex: 'image',
+        sorter: true,
         render: (text, record) => record.status === 'Succeeded' ? renderCopyableText(text,record) : '-'
       }],
       removeActions: true,
@@ -30,8 +33,8 @@ export default () => (
       disableCreate: true
     }}
     graphql={
-      `query($buildImagePage: Int, $buildImageWhere: BuildImageWhereInput) {
-        buildImage: buildImagesConnection(page: $buildImagePage, where: $buildImageWhere) {
+      `query($buildImagePage: Int, $buildImageOrderBy: BuildImageOrderByInput, $buildImageWhere: BuildImageWhereInput) {
+        buildImage: buildImagesConnection(page: $buildImagePage, orderBy: $buildImageOrderBy, where: $buildImageWhere) {
           edges {
             cursor
             node {
@@ -123,17 +126,21 @@ export default () => (
             columns: [{
               title: '${buildImageJob.updateTime}',
               dataIndex: 'updateTime',
+              // sorter: true,
               render: text => {
                 return text ? moment(text).format('YYYY/MM/DD HH:mm') : '-'
               }
             }, {
               title: '${buildImageJob.imageRevision}',
+              // sorter: true,
               dataIndex: 'imageRevision'
             }, {
               title: '${buildImageJob.status}',
+              // sorter: true,
               dataIndex: 'status'
             }, {
               title: '${buildImageJob.targetImage}',
+              // sorter: true,
               dataIndex: 'targetImage',
               render: (text, record) => record.status === 'Succeeded' ? renderCopyableText(text,record) : '-'
             }]
