@@ -193,7 +193,7 @@ export default () => (
           }}
           graphql={`
           query($groupPage: Int, $groupOrderBy: GroupOrderByInput, $groupWhere: GroupWhereInput) {
-            group: groupsConnection(page: $groupPage, orderBy: $groupOrderBy, $where: $groupWhere) {
+            group: groupsConnection(page: $groupPage, orderBy: $groupOrderBy, where: $groupWhere) {
               edges {
                 cursor
                 node {
