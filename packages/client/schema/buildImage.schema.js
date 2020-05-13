@@ -30,8 +30,8 @@ export default () => (
       disableCreate: true
     }}
     graphql={
-      `query($buildImageAfter: String, $buildImageBefore: String, $buildImageLast: Int, $buildImageFirst: Int, $buildImageWhere: BuildImageWhereInput) {
-        buildImage: buildImagesConnection(after: $buildImageAfter, before: $buildImageBefore, last: $buildImageLast, first: $buildImageFirst,where: $buildImageWhere) {
+      `query($buildImagePage: Int, $buildImageWhere: BuildImageWhereInput) {
+        buildImage: buildImagesConnection(page: $buildImagePage, where: $buildImageWhere) {
           edges {
             cursor
             node {
@@ -39,8 +39,8 @@ export default () => (
             }
           }
           pageInfo {
-            hasNextPage
-            hasPreviousPage
+            totalPage
+            currentPage
           }
         }
       }`
@@ -59,7 +59,7 @@ export default () => (
               key: 'name'
             }]}
           />
-          <pagination />
+          <pagination number />
         </toolbar>
         <string keyName="status" title="${buildImage.status}" hidden/>
         <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
@@ -140,7 +140,7 @@ export default () => (
           }}
         >
           <toolbar async>
-            <pagination />
+            <pagination number/>
           </toolbar>
           <string keyName="id" hidden/>
           <string keyName="imageRevision" title="${buildImageJob.imageRevision" />

@@ -59,8 +59,8 @@ export default () => (
       disableCreate: true
     }}
     graphql={`
-      query($groupAfter: String, $groupBefore: String, $groupLast: Int, $groupFirst: Int,$groupWhere: GroupWhereInput) {
-        group: groupsConnection(after: $groupAfter, before: $groupBefore, last: $groupLast, first: $groupFirst,where: $groupWhere) {
+      query($groupPage: Int, $groupWhere: GroupWhereInput) {
+        group: groupsConnection(page: $groupPage, where: $groupWhere) {
           edges {
             cursor
             node {
@@ -75,8 +75,8 @@ export default () => (
             }
           }
           pageInfo {
-            hasNextPage
-            hasPreviousPage
+            currentPage
+            totalPage
           }
         }
       }
@@ -92,7 +92,7 @@ export default () => (
           key: 'name'
         }]}
       />
-      <pagination />
+      <pagination number/>
     </toolbar>
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
       <string keyName="name" title="${name}"
@@ -242,7 +242,7 @@ export default () => (
               key: 'username'
             }]}
           />
-          <pagination />
+          <pagination number/>
         </toolbar>
       </relation>
     </Block>

@@ -94,8 +94,8 @@ export default () => (
       disableCreate: true
     }}
     graphql={`
-    query ($userAfter: String, $userBefore: String, $userLast: Int,$userFirst: Int, $userWhere: UserWhereInput, $userOrderBy: UsersOrderBy) {
-      user: usersConnection(after: $userAfter, before: $userBefore, last: $userLast, first: $userFirst,where: $userWhere, userOrderBy: $userOrderBy) {
+    query ($userPage: Int, $userWhere: UserWhereInput, $userOrderBy: UsersOrderBy) {
+      user: usersConnection(page: $userPage, where: $userWhere, userOrderBy: $userOrderBy) {
         edges {
           cursor
           node {
@@ -110,10 +110,8 @@ export default () => (
           }
         }
         pageInfo {
-          hasNextPage
-          hasPreviousPage
-          startCursor
-          endCursor
+          currentPage
+          totalPage
         }
       }
     }
@@ -132,7 +130,7 @@ export default () => (
           key: 'email'
         }]}
       />
-      <pagination />
+      <pagination number />
     </toolbar>
     <Layout component={Tab} disabledKeysInCreate={['__1', '__2']}>
     {/* <Layout component={CustomizeBlock} disabledKeysInCreate={['__1', '__2']}> */}

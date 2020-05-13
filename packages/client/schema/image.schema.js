@@ -40,8 +40,8 @@ export default () => (
       disableCreate: true
     }}
     graphql={
-      `query($imageAfter: String, $imageBefore: String, $imageLast: Int, $imageFirst: Int,$imageWhere: ImageWhereInput) {
-        image: imagesConnection(after: $imageAfter, before: $imageBefore, last: $imageLast, first: $imageFirst,where: $imageWhere) {
+      `query($imagePage: Int, $imageWhere: ImageWhereInput) {
+        image: imagesConnection(page: $imagePage, where: $imageWhere) {
           edges {
             cursor
             node {
@@ -49,8 +49,8 @@ export default () => (
             }
           }
           pageInfo {
-            hasNextPage
-            hasPreviousPage
+            currentPage
+            totalPage
           }
         }
       }`
@@ -69,7 +69,7 @@ export default () => (
           key: 'displayName'
         }]}
       />
-      <pagination />
+      <pagination number />
     </toolbar>
     <Layout component={DisableModeLayout}>
       <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">

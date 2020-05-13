@@ -32,8 +32,8 @@ export default () => (
     hideButtons
     graphql={
       `
-      query($datasetAfter: String, $datasetBefore: String, $datasetLast: Int, $datasetFirst: Int, $datasetWhere: DatasetWhereInput) {
-        dataset: datasetsConnection(after: $datasetAfter, before: $datasetBefore, last: $datasetLast, first: $datasetFirst,where: $datasetWhere) {
+      query($datasetPage: Int, $datasetWhere: DatasetWhereInput) {
+        dataset: datasetsConnection(page: $datasetPage, where: $datasetWhere) {
           edges {
             cursor
             node {
@@ -46,8 +46,8 @@ export default () => (
             }
           }
           pageInfo {
-            hasNextPage
-            hasPreviousPage
+            currentPage
+            totalPage
           }
         }
       }
@@ -67,7 +67,7 @@ export default () => (
           key: 'displayName'
         }]}
       />
-      <pagination />
+      <pagination number/>
     </toolbar>
     <Default component={DatasetWrapper}>
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
@@ -188,8 +188,8 @@ export default () => (
             pickerColumns: groupPickerColumns,
           }}
           graphql={`
-          query($groupAfter: String, $groupBefore: String, $groupLast: Int, $groupFirst: Int,$groupWhere: GroupWhereInput) {
-            group: groupsConnection(after: $groupAfter, before: $groupBefore, last: $groupLast, first: $groupFirst,where: $groupWhere) {
+          query($groupPage: Int, $groupWhere: GroupWhereInput) {
+            group: groupsConnection(page: $groupPage, where: $groupWhere) {
               edges {
                 cursor
                 node {
@@ -202,8 +202,8 @@ export default () => (
                 }
               }
               pageInfo {
-                hasNextPage
-                hasPreviousPage
+                currentPage
+                totalPage
               }
             }
           }
@@ -219,7 +219,7 @@ export default () => (
                 key: 'name'
               }]}
             />
-            <pagination />
+            <pagination number/>
           </toolbar>
         </relation>
       </Layout>

@@ -41,8 +41,8 @@ export default () => (
       disableCreate: true
     }}
     graphql={`
-      query($instanceTypeAfter: String, $instanceTypeBefore: String, $instanceTypeLast: Int, $instanceTypeFirst: Int,$instanceTypeWhere: InstanceTypeWhereInput) {
-        instanceType: instanceTypesConnection(after: $instanceTypeAfter, before: $instanceTypeBefore, last: $instanceTypeLast, first: $instanceTypeFirst,where: $instanceTypeWhere) {
+      query($instanceTypePage: Int, $instanceTypeWhere: InstanceTypeWhereInput) {
+        instanceType: instanceTypesConnection(page: $instanceTypePage, where: $instanceTypeWhere) {
           edges {
             cursor
             node {
@@ -56,8 +56,8 @@ export default () => (
             }
           }
           pageInfo {
-            hasNextPage
-            hasPreviousPage
+            currentPage
+            totalPage
           }
         }
       }
@@ -76,7 +76,7 @@ export default () => (
           key: 'displayName'
         }]}
       />
-      <pagination />
+      <pagination number/>
     </toolbar>
     <Tabs>
       <Default title="Basic Info" keyName="basicInfo">
