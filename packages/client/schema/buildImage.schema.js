@@ -126,29 +126,29 @@ export default () => (
             columns: [{
               title: '${buildImageJob.updateTime}',
               dataIndex: 'updateTime',
-              // sorter: true,
+              sorter: (a, b) => {
+                const value = new Date(b.updateTime).getTime() - new Date(a.updateTime).getTime();
+                return value
+              },
               render: text => {
                 return text ? moment(text).format('YYYY/MM/DD HH:mm') : '-'
               }
             }, {
               title: '${buildImageJob.imageRevision}',
-              // sorter: true,
+              sorter: (a, b) => (a.imageRevision || '').localeCompare(b.imageRevision || ''),
               dataIndex: 'imageRevision'
             }, {
               title: '${buildImageJob.status}',
-              // sorter: true,
+              sorter: (a, b) => (a.imageRevision || '').localeCompare(b.imageRevision || ''),
               dataIndex: 'status'
             }, {
               title: '${buildImageJob.targetImage}',
-              // sorter: true,
+              sorter: (a, b) => (a.imageRevision || '').localeCompare(b.imageRevision || ''),
               dataIndex: 'targetImage',
               render: (text, record) => record.status === 'Succeeded' ? renderCopyableText(text,record) : '-'
             }]
           }}
         >
-          <toolbar async>
-            <pagination number/>
-          </toolbar>
           <string keyName="id" hidden/>
           <string keyName="imageRevision" title="${buildImageJob.imageRevision" />
           <string keyName="status" title="${buildImageJob.status" />

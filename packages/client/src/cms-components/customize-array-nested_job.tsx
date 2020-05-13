@@ -1,16 +1,19 @@
 import React, { Component } from "react";
-import { Table, Button, Modal, Icon, notification } from "antd";
+import { Table, Button } from "antd";
 import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl } from "react-intl";
-import defaultMessage, {renderValue} from "@canner/antd-locales";
-import EmailForm from '../cms-toolbar/sendEmailModal';
-import {renderUploadServerLink} from '../../schema/utils';
+import { injectIntl } from "react-intl";
+import {renderValue} from "@canner/antd-locales";
 import {Props} from './types';
 import RefId from 'canner-ref-id';
 import {get} from 'lodash';
+import styled from 'styled-components';
 
 const ButtonGroup = Button.Group;
-
+const StyledTable = styled(Table)`
+  th svg {
+    display: none;
+  }
+`
 @injectIntl
 export default class ArrayNestedJob extends Component<Props & {
   updateQuery: (path: Array<string>, args: Object) => void;
@@ -46,31 +49,7 @@ export default class ArrayNestedJob extends Component<Props & {
 
   remove = (index) => {
     const {onChange, deploy, refId, value, intl} = this.props;
-    // const jobId = new RefId('buildImageJob');
-    // confirm({
-    //   title: intl.formatMessage({ id: "array.table.delete.confirm" }),
-    //   okType: 'danger',
-    //   onOk() {
-    //     onChange(jobId.child(index), 'delete').then(() => {
-    //       deploy(jobId.getPathArr()[0], value[index].id);
-    //     });
-    //   }
-    // });
-    
   }
-
-  // handleTableChange = (pagination, filters, sorter) => {
-  //   const {updateQuery, keyName, query} = this.props;
-  //   console.log(keyName);
-  //   const queries = query.getQueries([keyName]).args || {};
-  //   const variables = query.getVariables();
-  //   const args = mapValues(queries, v => variables[v.substr(1)]);
-
-  //   updateQuery([keyName], {
-  //     ...args,
-  //     [sorter.field]: get(sorter, 'order[0]') === 'ascend' ? 'asc' : 'desc'
-  //   });
-  // }
 
   render() {
     const {
@@ -89,10 +68,7 @@ export default class ArrayNestedJob extends Component<Props & {
 
   
     let {
-      createKeys,
       columns = [],
-      removeActions,
-      announcementCustomActions
     } = uiParams;
 
     const newColumnsRender = renderValue(columns, items.items, {
@@ -128,12 +104,11 @@ export default class ArrayNestedJob extends Component<Props & {
 
     return (
       <div>
-        <Table
+        <StyledTable
           pagination={showPagination}
           dataSource={value.map((datum, i) => {
             return {...datum, __index: i, key: datum.key || i};
           })}
-          // onChange={this.handleTableChange}
           columns={newColumnsRender}
           style={{marginBottom: 32}}
           rowKey="id"
