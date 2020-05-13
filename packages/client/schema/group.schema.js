@@ -17,11 +17,9 @@ export default () => (
       }, {
         title: '${displayName}',
         dataIndex: 'displayName',
-        sorter: true
       }, {
         title: "${group.sharedVolumeCapacity}",
         dataIndex: 'sharedVolumeCapacity',
-        sorter: true,
         render: (value) => {
           if (value) {
             return `${value}G`
@@ -31,28 +29,24 @@ export default () => (
       }, {
         title: '${cpuQuotaListTitle}',
         dataIndex: 'quotaCpu',
-        sorter: true,
         render: text => {
           return text === null ? '∞' : text;
         }
       }, {
         title: '${gpuQuotaListTitle}',
         dataIndex: 'quotaGpu',
-        sorter: true,
         render: text => {
           return text === null ? '∞' : text;
         }
       }, {
         title: '${projectCpuQuota}',
         dataIndex: 'projectQuotaCpu',
-        sorter: true,
         render: text => {
           return text === null ? '∞' : text;
         }
       }, {
         title: '${projectGpuQuota}',
         dataIndex: 'projectQuotaGpu',
-        sorter: true,
         render: text => {
           return text === null ? '∞' : text;
         }
