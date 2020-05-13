@@ -19,7 +19,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'dist'),
     filename: '[name].js',
-    publicPath: devMode ? 'https://localhost:8090/' : ''
+    publicPath: devMode ? 'http://localhost:8090/' : ''
   },
   mode: devMode ? 'development' : 'production',
   externals,
@@ -39,8 +39,7 @@ module.exports = {
         { from: /^\/app-prefix\/model-deployment/, to: './model-deployment.html' },
         { from: /./, to: '/index.html' }
       ]
-    },
-    https: true
+    }
   },
   module: {
     rules: [
