@@ -27,6 +27,15 @@ type Dataset {
   workspaceId: String
 }
 
+"""order"""
+input DatasetOrderByInput {
+  name: String
+  displayName: String
+  type: String
+  description: String
+  uploadServerLink: String
+}
+
 type DatasetUploadSecret {
   username: String
   password: String

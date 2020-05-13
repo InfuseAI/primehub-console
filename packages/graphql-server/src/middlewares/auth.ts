@@ -53,5 +53,5 @@ export const permissions = shield({
     'deletePhDeployment': or(isAdmin, isJobUser),
     'stopPhDeployment': or(isAdmin, isJobUser),
     'deployPhDeployment': or(isAdmin, isJobUser),
-  }
+  },
 });
