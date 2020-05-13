@@ -51,6 +51,7 @@ export default class ArrayBreadcrumb extends Component<Props & {
   handleTableChange = (pagination, filters, sorter) => {
     const {updateQuery, keyName, query, toolbar} = this.props;
     const defaultArgs: any = {};
+    if (!get(toolbar, 'async')) return;
     if (get(toolbar, 'pagination.number', false)) {
       defaultArgs.page = 1
     } else {

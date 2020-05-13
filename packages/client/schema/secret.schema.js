@@ -13,17 +13,17 @@ export default () => (
       columns: [{
         title: 'Name',
         dataIndex: 'name',
-        sorter: true,
+        sorter: (a, b) => (a.name || '').localeCompare(b.name || ''),
       }, {
         title: 'Display Name',
         dataIndex: 'displayName',
-        sorter: true,
+        sorter: (a, b) => (a.displayName || '').localeCompare(b.displayName || ''),
       }],
       disableCreate: true
     }}
     graphql={`
-      query($secretWhere: SecretWhereInput, $secretOrderBy: SecretOrderByInput) {
-      secret: secretsConnection(where: $secretWhere, orderBy: $secretOrderBy) {
+      query($secretWhere: SecretWhereInput) {
+      secret: secretsConnection(where: $secretWhere) {
         edges {
           cursor
           node {

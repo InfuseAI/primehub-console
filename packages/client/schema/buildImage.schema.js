@@ -139,11 +139,11 @@ export default () => (
               dataIndex: 'imageRevision'
             }, {
               title: '${buildImageJob.status}',
-              sorter: (a, b) => (a.imageRevision || '').localeCompare(b.imageRevision || ''),
+              sorter: (a, b) => (a.status || '').localeCompare(b.status || ''),
               dataIndex: 'status'
             }, {
               title: '${buildImageJob.targetImage}',
-              sorter: (a, b) => (a.imageRevision || '').localeCompare(b.imageRevision || ''),
+              sorter: (a, b) => (a.targetImage || '').localeCompare(b.targetImage || ''),
               dataIndex: 'targetImage',
               render: (text, record) => record.status === 'Succeeded' ? renderCopyableText(text,record) : '-'
             }]
