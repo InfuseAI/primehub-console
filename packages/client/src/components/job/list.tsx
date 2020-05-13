@@ -22,11 +22,6 @@ const Table = styled(AntTable as any)`
   .ant-pagination.ant-table-pagination {
     margin-right: 16px;
   }
-
-  /* hide header sort arrow */
-  th svg {
-    display: none;
-  }
 `;
 
 const renderJobName = (text, record) => (
