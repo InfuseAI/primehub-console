@@ -114,42 +114,44 @@ export default () => (
     <Condition match={() => !window.modelDeploymentOnly} defaultMode="hidden">
       <ShareVolumn />
     </Condition>
-    <Block title="User Quota">
-      <Row type="flex">
-        <Col sm={8} xs={24}>
-          <number keyName="quotaCpu"
-            uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
-            defaultValue={0.5}
-            title="${cpuQuota}"
-            packageName="../src/cms-components/customize-number-checkbox"
-            nullable
-          />
-        </Col>
-        <Col sm={8} xs={24}>
-          <number keyName="quotaGpu" title="${gpuQuota}"  uiParams={{min: 0, step: 1, precision: 0}}
-            defaultValue={() => 0}
-            packageName="../src/cms-components/customize-number-checkbox"
-            nullable
-          />
-        </Col>
-        <Col sm={8} xs={24}>
-          <number keyName="quotaMemory" title="${quotaMemory}"  uiParams={{min: 0, step: 1, precision: 1, unit: ' GB'}}
-            defaultValue={() => null}
-            packageName="../src/cms-components/customize-number-checkbox"
-            nullable
-          />
-        </Col>
-        <Col sm={8} xs={24}>
-          <number keyName="userVolumeCapacity" title="${userVolumeCapacity}"
-            uiParams={{min: 1, step: 1, precision: 0, unit: ' GB', disableText: 'use default value'}}
-            defaultValue={() => null}
-            description="${quotaForNewly}"
-            packageName="../src/cms-components/customize-number-checkbox"
-            nullable
-          />
-        </Col>
-      </Row>
-    </Block>
+    <Condition match={() => !window.modelDeploymentOnly} defaultMode="hidden">
+      <Block title="User Quota">
+        <Row type="flex">
+          <Col sm={8} xs={24}>
+            <number keyName="quotaCpu"
+              uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
+              defaultValue={0.5}
+              title="${cpuQuota}"
+              packageName="../src/cms-components/customize-number-checkbox"
+              nullable
+            />
+          </Col>
+          <Col sm={8} xs={24}>
+            <number keyName="quotaGpu" title="${gpuQuota}"  uiParams={{min: 0, step: 1, precision: 0}}
+              defaultValue={() => 0}
+              packageName="../src/cms-components/customize-number-checkbox"
+              nullable
+            />
+          </Col>
+          <Col sm={8} xs={24}>
+            <number keyName="quotaMemory" title="${quotaMemory}"  uiParams={{min: 0, step: 1, precision: 1, unit: ' GB'}}
+              defaultValue={() => null}
+              packageName="../src/cms-components/customize-number-checkbox"
+              nullable
+            />
+          </Col>
+          <Col sm={8} xs={24}>
+            <number keyName="userVolumeCapacity" title="${userVolumeCapacity}"
+              uiParams={{min: 1, step: 1, precision: 0, unit: ' GB', disableText: 'use default value'}}
+              defaultValue={() => null}
+              description="${quotaForNewly}"
+              packageName="../src/cms-components/customize-number-checkbox"
+              nullable
+            />
+          </Col>
+        </Row>
+      </Block>
+    </Condition>
     <Block title="${groupQuota}">
       <Row type="flex">
         <Col sm={8} xs={24}>
