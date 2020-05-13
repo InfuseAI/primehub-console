@@ -8,7 +8,7 @@ import en from 'react-intl/locale-data/en';
 import en_US from 'antd/lib/locale-provider/en_US';
 import 'moment/locale/zh-tw';
 addLocaleData([...en])
-import CMSPage from './cms.model_deploy';
+import CMSPage from './cms';
 import schema from '../schema/index.model_deploy.schema.js';
 import myLocales from './utils/locales';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
@@ -74,7 +74,7 @@ ReactDOM.render(
         <React.Fragment>
           <Switch>
             {/* <Route path="/login" component={Login} /> */}
-            <Route path={`${(window as any).APP_PREFIX}cms/:workspaceId/:activeKey`} component={CMSPage}/>
+            <Route path={`${(window as any).APP_PREFIX}cms/:workspaceId/:activeKey`} component={(props) => <CMSPage {...props} schema={schema} />}/>
             <Redirect to={`${(window as any).APP_PREFIX}cms/default/${firstKey}`}/>
           </Switch>
         </React.Fragment>
