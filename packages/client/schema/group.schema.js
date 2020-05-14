@@ -111,43 +111,47 @@ export default () => (
     <Layout component={EnableModelDeployment}>
       <boolean keyName="enabledDeployment" title="${groups.enabledDeployment}" uiParams={{yesText: ' ', noText: ' '}} />
     </Layout>
-    <ShareVolumn />
-    <Block title="User Quota">
-      <Row type="flex">
-        <Col sm={8} xs={24}>
-          <number keyName="quotaCpu"
-            uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
-            defaultValue={0.5}
-            title="${cpuQuota}"
-            packageName="../src/cms-components/customize-number-checkbox"
-            nullable
-          />
-        </Col>
-        <Col sm={8} xs={24}>
-          <number keyName="quotaGpu" title="${gpuQuota}"  uiParams={{min: 0, step: 1, precision: 0}}
-            defaultValue={() => 0}
-            packageName="../src/cms-components/customize-number-checkbox"
-            nullable
-          />
-        </Col>
-        <Col sm={8} xs={24}>
-          <number keyName="quotaMemory" title="${quotaMemory}"  uiParams={{min: 0, step: 1, precision: 1, unit: ' GB'}}
-            defaultValue={() => null}
-            packageName="../src/cms-components/customize-number-checkbox"
-            nullable
-          />
-        </Col>
-        <Col sm={8} xs={24}>
-          <number keyName="userVolumeCapacity" title="${userVolumeCapacity}"
-            uiParams={{min: 1, step: 1, precision: 0, unit: ' GB', disableText: 'use default value'}}
-            defaultValue={() => null}
-            description="${quotaForNewly}"
-            packageName="../src/cms-components/customize-number-checkbox"
-            nullable
-          />
-        </Col>
-      </Row>
-    </Block>
+    <Condition match={() => !window.modelDeploymentOnly} defaultMode="hidden">
+      <ShareVolumn />
+    </Condition>
+    <Condition match={() => !window.modelDeploymentOnly} defaultMode="hidden">
+      <Block title="User Quota">
+        <Row type="flex">
+          <Col sm={8} xs={24}>
+            <number keyName="quotaCpu"
+              uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
+              defaultValue={0.5}
+              title="${cpuQuota}"
+              packageName="../src/cms-components/customize-number-checkbox"
+              nullable
+            />
+          </Col>
+          <Col sm={8} xs={24}>
+            <number keyName="quotaGpu" title="${gpuQuota}"  uiParams={{min: 0, step: 1, precision: 0}}
+              defaultValue={() => 0}
+              packageName="../src/cms-components/customize-number-checkbox"
+              nullable
+            />
+          </Col>
+          <Col sm={8} xs={24}>
+            <number keyName="quotaMemory" title="${quotaMemory}"  uiParams={{min: 0, step: 1, precision: 1, unit: ' GB'}}
+              defaultValue={() => null}
+              packageName="../src/cms-components/customize-number-checkbox"
+              nullable
+            />
+          </Col>
+          <Col sm={8} xs={24}>
+            <number keyName="userVolumeCapacity" title="${userVolumeCapacity}"
+              uiParams={{min: 1, step: 1, precision: 0, unit: ' GB', disableText: 'use default value'}}
+              defaultValue={() => null}
+              description="${quotaForNewly}"
+              packageName="../src/cms-components/customize-number-checkbox"
+              nullable
+            />
+          </Col>
+        </Row>
+      </Block>
+    </Condition>
     <Block title="${groupQuota}">
       <Row type="flex">
         <Col sm={8} xs={24}>
@@ -175,49 +179,51 @@ export default () => (
         </Col>
       </Row>
     </Block>
-    <Block title="${dataset}">
-      <array keyName="datasets"
-        packageName="../src/cms-components/customize-array-datasets_in_groups"
-        uiParams={{
-          removeActions: true,
-          columns: [{
-            title: '${displayName}',
-            dataIndex: 'displayName'
-          }, {
-            title: '${type}',
-            dataIndex: 'type'
-          }, {
-            title: '${description}',
-            dataIndex: 'description'
-          }, {
-            title: '${groups.datasets.writable}',
-            dataIndex: 'writable',
-            render: writable => writable ? 'Write' : 'Read Only'
-          }]
-        }}
-      >
-        <string keyName="id" />
-        <string keyName="displayName" title="${displayName}" />
-        <string keyName="type"
-          ui="select"
-          title="${type}"
+    <Condition match={() => !window.modelDeploymentOnly} defaultMode="hidden">
+      <Block title="${dataset}">
+        <array keyName="datasets"
+          packageName="../src/cms-components/customize-array-datasets_in_groups"
           uiParams={{
-            options: [{
-              text: 'git',
-              value: 'git'
+            removeActions: true,
+            columns: [{
+              title: '${displayName}',
+              dataIndex: 'displayName'
             }, {
-              text: 'env',
-              value: 'env'
+              title: '${type}',
+              dataIndex: 'type'
             }, {
-              text: 'pv',
-              value: 'pv'
+              title: '${description}',
+              dataIndex: 'description'
+            }, {
+              title: '${groups.datasets.writable}',
+              dataIndex: 'writable',
+              render: writable => writable ? 'Write' : 'Read Only'
             }]
           }}
-        />
-        <string keyName="description" title="${description}" />
-        <boolean keyName="writable" title="${groups.datasets.writable}" />
-      </array>
-    </Block>
+        >
+          <string keyName="id" />
+          <string keyName="displayName" title="${displayName}" />
+          <string keyName="type"
+            ui="select"
+            title="${type}"
+            uiParams={{
+              options: [{
+                text: 'git',
+                value: 'git'
+              }, {
+                text: 'env',
+                value: 'env'
+              }, {
+                text: 'pv',
+                value: 'pv'
+              }]
+            }}
+          />
+          <string keyName="description" title="${description}" />
+          <boolean keyName="writable" title="${groups.datasets.writable}" />
+        </array>
+      </Block>
+    </Condition>
     <Block title="${users}">
       <relation keyName="users"
         packageName='../src/cms-components/customize-relation-table'

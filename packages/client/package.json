@@ -22,7 +22,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "start": "npm run antd:dev && NODE_ENV=development webpack-dev-server",
+    "start:model_deploy": "npm run antd:dev && NODE_ENV=development webpack-dev-server --config webpack.config.model_deploy.js",
     "build": "npm run antd && NODE_ENV=production webpack",
+    "build:model_deploy": "npm run antd && NODE_ENV=production webpack --config webpack.config.model_deploy.js",
     "antd": "webpack --config webpack.config.antd.js",
     "antd:dev": "NODE_ENV=development webpack --config webpack.config.antd.js",
     "validate": "npm ls"

@@ -10,7 +10,6 @@ import Error from 'components/error';
 import styled, {injectGlobal} from 'styled-components';
 import color from 'styledShare/color';
 import {RouteComponentProps} from 'react-router';
-import schema from '../schema/index.schema.js';
 import myLocales from './utils/locales';
 import get from 'lodash.get';
 import update from 'lodash/update';
@@ -74,6 +73,7 @@ export interface State {
 
 @injectIntl
 export default class CMSPage extends React.Component<Props, State> {
+  schema = null;
 
   state = {
     prepare: false,
@@ -87,7 +87,7 @@ export default class CMSPage extends React.Component<Props, State> {
 
   constructor(props) {
     super(props);
-    this.process(schema);
+    this.schema = this.process(props.schema);
   }
 
   process = (schema) => {
@@ -95,6 +95,7 @@ export default class CMSPage extends React.Component<Props, State> {
       delete schema.schema.buildImage;
       delete schema.schema.buildImageJob;
     }
+    return schema;
   }
 
   componentDidMount() {
@@ -126,7 +127,7 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   fetchWorkspaceList = async () => {
-    const client = genClient(schema);
+    const client = genClient(this.schema);
     const result = await client.query({
       query: gql`query {
         workspaces {
@@ -167,7 +168,7 @@ export default class CMSPage extends React.Component<Props, State> {
     // refetch the buildImage list after update
     if (key === "buildImage" && !query) {
       try {
-        const query = gql`${schema.schema.buildImage.graphql}`;
+        const query = gql`${this.schema.schema.buildImage.graphql}`;
         const data = client.readQuery({
           query,
           variables: newVariables
@@ -404,7 +405,7 @@ export default class CMSPage extends React.Component<Props, State> {
         )}
         {ENABLE_WORKSPACE && workspaceMenu}
         {
-          Object.keys(schema.schema)
+          Object.keys(this.schema.schema)
             .filter(key => key !== 'buildImageJob')
             .filter(key => {
               if (!ENABLE_WORKSPACE && key !== 'workspace') return true;
@@ -417,7 +418,7 @@ export default class CMSPage extends React.Component<Props, State> {
               return key !== 'workspace';
             }).map(key => (
               <Menu.Item key={key}>
-                {schema.schema[key].title}
+                {this.schema.schema[key].title}
               </Menu.Item>
             ))
         }
@@ -478,7 +479,7 @@ export default class CMSPage extends React.Component<Props, State> {
               // use workspaceId as the key. So, if the workspaceId changed,
               // the Canner component will re-mount to fetch correct data
               key={workspaceId}
-              schema={schema}
+              schema={this.schema}
               goTo={router.goTo}
               routes={routes}
               ref={canner => this.cannerRef = canner}

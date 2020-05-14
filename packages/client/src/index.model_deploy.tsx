@@ -9,7 +9,7 @@ import en_US from 'antd/lib/locale-provider/en_US';
 import 'moment/locale/zh-tw';
 addLocaleData([...en])
 import CMSPage from './cms';
-import schema from '../schema/index.schema.js';
+import schema from '../schema/index.model_deploy.schema.js';
 import myLocales from './utils/locales';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 const firstKey = Object.keys(schema.schema)[0];
@@ -19,6 +19,7 @@ const locales = {
 (window as any).LOCALE = (window as any).LOCALE || 'en';
 (window as any).APP_PREFIX = (window as any).APP_PREFIX || '/';
 const locale = (window as any).LOCALE;
+(window as any).modelDeploymentOnly = true;
 /**
  * Background worker
  */
