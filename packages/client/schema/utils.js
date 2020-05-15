@@ -354,6 +354,10 @@ exports.dict = {
     'dataset.enableUploadServerModalTitle': 'Enable upload server successfully, please memorize the secret below.',
     'dataset.regenerateSecretErrorModalTitle': `Sorry.`,
     'dataset.regenerateSecretErrorModalContent': `Something went wrong, we cloudn't regenerate secret.`,
+    nfsServer: 'NFS Server',
+    nfsPath: 'NFS Path',
+    hostPath: 'Host Path',
+    
     // userfederation
     userFederations: 'User Federations',
     basicInformation: 'Basic Information',
@@ -593,6 +597,9 @@ exports.dict = {
     'dataset.enableUploadServerModalTitle': 'Enable upload server successfully, please memorize the secret below.',
     'dataset.regenerateSecretErrorModalTitle': `Sorry.`,
     'dataset.regenerateSecretErrorModalContent': `Something went wrong, we cloudn't regenerate secret.`,
+    nfsServer: 'NFS Server',
+    nfsPath: 'NFS Path',
+    hostPath: 'Host Path',
 
     // userfederation
     userFederations: 'User Federations',

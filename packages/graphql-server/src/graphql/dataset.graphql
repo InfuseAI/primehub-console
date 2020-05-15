@@ -10,6 +10,9 @@ type Dataset {
   global: Boolean
   type: String
   url: String
+  nfsServer: String
+  nfsPath: String
+  hostPath: String
   variables: JSON
   writable: Boolean
   spec: JSON
@@ -125,6 +128,9 @@ input DatasetCreateInput {
   global: Boolean
   type: String
   url: String
+  nfsServer: String
+  nfsPath: String
+  hostPath: String
   variables: JSON
   groups: DatasetGroupCreateManyInput
   secret: SecretCreateOneInput
@@ -147,6 +153,9 @@ input DatasetUpdateInput {
   global: Boolean
   type: String
   url: String
+  nfsServer: String
+  nfsPath: String
+  hostPath: String
   variables: JSON
   groups: DatasetGroupUpdateManyInput
   secret: SecretUpdateOneInput

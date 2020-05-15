@@ -21,7 +21,16 @@ export default () => (
         dataIndex: 'displayName'
       }, {
         title: '${type}',
-        dataIndex: 'type'
+        dataIndex: 'type',
+        render: (value) => {
+          if (value == 'pv') {
+            return 'persistent volume';
+          } else if (value == 'hostPath') {
+            return 'host path';
+          } else {
+            return value;
+          }
+        }
       }, {
         title: '${description}',
         dataIndex: 'description'
@@ -102,14 +111,20 @@ export default () => (
       title="${type}"
       uiParams={{
         options: [{
+          text: 'persistent volume',
+          value: 'pv'
+        }, {
+          text: 'nfs',
+          value: 'nfs'
+        }, {
+          text: 'host path',
+          value: 'hostPath'
+        },{
           text: 'git',
           value: 'git'
         }, {
           text: 'env',
           value: 'env'
-        }, {
-          text: 'pv',
-          value: 'pv'
         }]
       }}
     />
@@ -151,6 +166,40 @@ export default () => (
         packageName="../src/cms-components/customize-object-dynamic-field"
       />
     </Condition>
+    <Condition match={data => data.type === 'nfs'}>
+      <string keyName="nfsServer" title="${nfsServer}" 
+        validation={{
+          validator: (value, cb) => {
+            if (!value.match(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/)) {
+              return cb(`please provide a domain or an ip.`);
+            }
+          }
+        }}
+        required
+      />
+      <string keyName="nfsPath" title="${nfsPath}" 
+        validation={{
+          validator: (value, cb) => {
+            if (!value.match(/^\/|\/\/|(\/[\w-]+)+$/)) {
+              return cb(`please provide a correct path string.`);
+            }
+          }
+        }}
+        required
+      />
+    </Condition>
+    <Condition match={data => data.type === 'hostPath'}>
+      <string keyName="hostPath" title="${hostPath}" 
+        validation={{
+          validator: (value, cb) => {
+            if (!value.match(/^\/|\/\/|(\/[\w-]+)+$/)) {
+              return cb(`please provide a correct path string.`);
+            }
+          }
+        }}
+        required
+      />
+    </Condition>
     <Condition match={data => data.type === 'pv'}>
       <Layout component={EnableUploadServer}>
         <Condition match={(data, operator) => operator === 'update'} defaultMode="hidden">
@@ -174,7 +223,7 @@ export default () => (
         />
       </Condition>
     </Condition>
-    <Condition match={data => !(data.global && data.type !== 'pv')}>
+    <Condition match={data => !(data.global && !['pv', 'nfs', 'hostPath'].includes(data.type))}>
       <Layout component={DatasetGroupWrapper}>
         <relation keyName="groups"
           packageName='../src/cms-components/customize-relation-dataset_groups_table'

@@ -3,25 +3,26 @@ import {get} from 'lodash';
 import {Item} from 'canner-helpers';
 
 function getDisplayTableType(recordValue) {
-  if (recordValue.global && recordValue.type !== 'pv') {
+  let dataset_type_list = ['pv', 'nfs', 'hostPath'];
+  if (recordValue.global && !dataset_type_list.includes(recordValue.type)) {
     return {
       readOnly: false,
       writable: false
     };
   }
-  if (!recordValue.global && recordValue.type !== 'pv') {
+  if (!recordValue.global && !dataset_type_list.includes(recordValue.type)) {
     return {
       readOnly: true,
       writable: false
     };
   }
-  if (!recordValue.global && recordValue.type === 'pv') {
+  if (!recordValue.global && dataset_type_list.includes(recordValue.type)) {
     return {
       readOnly: true,
       writable: true
     };
   }
-  if (recordValue.global && recordValue.type === 'pv') {
+  if (recordValue.global && dataset_type_list.includes(recordValue.type)) {
     return {
       readOnly: false,
       writable: true

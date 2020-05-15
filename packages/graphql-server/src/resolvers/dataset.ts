@@ -67,6 +67,9 @@ export const mapping = (item: Item<DatasetSpec>) => {
     volumeName: item.spec.volumeName,
     spec: item.spec,
     writable: (item as any).roleName && (item as any).roleName.indexOf(':rw:') >= 0,
+    nfsServer: get(item, 'spec.nfs.server'),
+    nfsPath: get(item, 'spec.nfs.path'),
+    hostPath: get(item, 'spec.hostPath.path'),
     secret: get(item, 'spec.gitsync.secret'),
     // default to empty string
     mountRoot: get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/mountRoot`], ''),
@@ -92,6 +95,12 @@ export const createMapping = (data: any) => {
   const gitSyncProp = gitSyncSecretId
     ? {gitsync: {secret: gitSyncSecretId}}
     : {};
+  const nfsProp = (data.nfsServer && data.nfsPath)
+    ? {nfs: {server: data.nfsServer, path: data.nfsPath}}
+    : {};
+  const hostPathProp = data.hostPath
+    ? {hostPath: {path: data.hostPath}}
+    : {};
   const annotations: any = (data.type === 'git')
     ? {'primehub-gitsync': 'true'}
     : {};
@@ -116,7 +125,9 @@ export const createMapping = (data: any) => {
       variables: data.variables,
       // volumeName = dataset name
       volumeName: data.name,
-      ...gitSyncProp
+      ...gitSyncProp,
+      ...nfsProp,
+      ...hostPathProp
     }
   };
 };
@@ -130,6 +141,21 @@ export const updateMapping = (data: any) => {
   } else if (secretDisconnect) {
     gitSyncProp = {gitsync: null};
   }
+
+  let nfsSyncProp: any = {};
+  if (data.nfsServer) {
+    nfsSyncProp = {nfs: {server: data.nfsServer}}
+  }
+  if (data.nfsPath) {
+    nfsSyncProp = {nfs: {path: data.nfsPath}}
+  }
+  if (data.nfsServer && data.nfsPath) {
+    nfsSyncProp = {nfs: {server: data.nfsServer, path: data.nfsPath}}
+  }
+
+  const hostPathSyncProp = data.hostPath
+    ? {hostPath: {path: data.hostPath}}
+    : {};
 
   // gitsync annotation
   let annotations: any = {};
@@ -162,7 +188,9 @@ export const updateMapping = (data: any) => {
       url: data.url,
       variables: data.variables,
       enableUploadServer: isNil(data.enableUploadServer) ? 'false' : data.enableUploadServer.toString(),
-      ...gitSyncProp
+      ...gitSyncProp,
+      ...nfsSyncProp,
+      ...hostPathSyncProp
     }
   };
 };
