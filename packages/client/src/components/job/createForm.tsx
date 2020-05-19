@@ -21,7 +21,8 @@ type Props = FormComponentProps & {
   timezone?: {
     name: string;
     offset: number;
-  }
+  },
+  submitText?: string;
 };
 
 type State = {
@@ -193,7 +194,8 @@ class CreateForm extends React.Component<Props, State> {
       type,
       initialValue,
       timezone,
-      selectedGroup,
+      onCancel,
+      submitText,
     } = this.props;
     const {
       recurrenceError
@@ -398,24 +400,17 @@ class CreateForm extends React.Component<Props, State> {
             </Card>
             <Form.Item style={{textAlign: 'right', marginRight: 8, marginTop: 24}}>
               {
-                initialValue ? (
-                  <>
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      style={{marginRight: 16}}
-                    >
-                      Confirm
-                    </Button>
-                    <Button onClick={this.cancel}>
-                      Cancel
-                    </Button>
-                  </>
-                ) : (
-                  <Button type="primary" htmlType="submit">
-                    Submit
-                  </Button>
-                )
+                <Button
+                  type="primary" htmlType="submit"
+                  style={{marginRight: onCancel ? 16 : 0}}
+                >
+                  {submitText || 'Submit'}
+                </Button>
+              }
+              {
+                onCancel && <Button onClick={this.cancel}>
+                  Cancel
+                </Button>
               }
             </Form.Item>
           </Col>

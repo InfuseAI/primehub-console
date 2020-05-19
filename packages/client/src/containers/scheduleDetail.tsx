@@ -149,6 +149,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
               instanceTypeId: get(getPhSchedule, 'phSchedule.instanceType.id'),
               instanceTypeName: get(getPhSchedule, 'phSchedule.instanceType.name'),
             }}
+            submitText="Confirm"
             onCancel={this.cancel}
           />
         </div>
