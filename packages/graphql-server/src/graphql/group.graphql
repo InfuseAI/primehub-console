@@ -30,6 +30,17 @@ type Group {
   enabledDeployment: Boolean
 }
 
+"""order"""
+input GroupOrderByInput {
+  name: String
+  displayName: String
+  userVolumeCapacity: String
+  enabledSharedVolume: String
+  quotaCpu: String
+  quotaGpu: String
+  projectQuotaGpu: String
+}
+
 """An edge in a connection."""
 type GroupEdge {
   """The item at the end of the edge."""

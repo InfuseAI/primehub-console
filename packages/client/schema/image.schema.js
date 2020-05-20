@@ -15,13 +15,16 @@ export default () => (
     uiParams={{
       columns: [{
         title: '${name}',
-        dataIndex: 'name'
+        dataIndex: 'name',
+        sorter: true,
       }, {
         title: '${displayName}',
-        dataIndex: 'displayName'
+        dataIndex: 'displayName',
+        sorter: true,
       }, {
         title: '${type}',
         dataIndex: 'type',
+        sorter: true,
         render: (value) => {
           if (!value) {
               return '-';
@@ -35,13 +38,14 @@ export default () => (
         }
       },{
         title: '${description}',
-        dataIndex: 'description'
+        dataIndex: 'description',
+        sorter: true,
       }],
       disableCreate: true
     }}
     graphql={
-      `query($imageAfter: String, $imageBefore: String, $imageLast: Int, $imageFirst: Int,$imageWhere: ImageWhereInput) {
-        image: imagesConnection(after: $imageAfter, before: $imageBefore, last: $imageLast, first: $imageFirst,where: $imageWhere) {
+      `query($imagePage: Int, $imageOrderBy: ImageOrderByInput, $imageWhere: ImageWhereInput) {
+        image: imagesConnection(page: $imagePage, orderBy: $imageOrderBy, where: $imageWhere) {
           edges {
             cursor
             node {
@@ -49,8 +53,8 @@ export default () => (
             }
           }
           pageInfo {
-            hasNextPage
-            hasPreviousPage
+            currentPage
+            totalPage
           }
         }
       }`
@@ -69,7 +73,7 @@ export default () => (
           key: 'displayName'
         }]}
       />
-      <pagination />
+      <pagination number />
     </toolbar>
     <Layout component={DisableModeLayout}>
       <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">

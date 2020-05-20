@@ -1,7 +1,6 @@
 /** @jsx builder */
 import builder, {Default, Tabs, Layout, configure, Block, Condition} from 'canner-script';
 import {Tag} from 'antd';
-import RelationTable from '../src/cms-components/customize-relation-table';
 import {SendEmailTitle, ResetPasswordTitle} from './utils';
 import Tab from '../src/cms-layouts/tab';
 import CustomizeBlock from '../src/cms-layouts/block';

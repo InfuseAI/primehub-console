@@ -57,29 +57,29 @@ const transform = (item: Item<ImageSpecSpec, ImageSpecStatus>): BuildImage => {
  */
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (imageSpecClient: CustomResource<ImageSpecSpec, ImageSpecStatus>, where: any): Promise<BuildImage[]> => {
+const listQuery = async (imageSpecClient: CustomResource<ImageSpecSpec, ImageSpecStatus>, where: any, order: any): Promise<BuildImage[]> => {
   if (where && where.id) {
     const imageSpec = await imageSpecClient.get(where.id);
     return [transform(imageSpec)];
   }
 
   const imageSpecs = await imageSpecClient.list();
-  let transformedImageSpecs = imageSpecs.map(transform);
+  const transformedImageSpecs = imageSpecs.map(transform);
 
   // sort by updateTime in desc
-  transformedImageSpecs = orderBy(transformedImageSpecs, 'updateTime', 'desc');
-  return filter(transformedImageSpecs, where);
+  order = isEmpty(order) ? {updateTime: 'desc'} : order;
+  return filter(transformedImageSpecs, where, order);
 };
 
 export const query = async (root, args, context: Context) => {
   const {crdClient} = context;
-  const imageSpecs = await listQuery(crdClient.imageSpecs, args && args.where);
+  const imageSpecs = await listQuery(crdClient.imageSpecs, args && args.where, args && args.orderBy);
   return paginate(imageSpecs, extractPagination(args));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
   const {crdClient} = context;
-  const imageSpecs = await listQuery(crdClient.imageSpecs, args && args.where);
+  const imageSpecs = await listQuery(crdClient.imageSpecs, args && args.where, args && args.orderBy);
   return toRelay(imageSpecs, extractPagination(args));
 };
 

@@ -1,15 +1,15 @@
 # import System, SystemUpdateInput from "./system.graphql"
 # import User, UsersOrderBy, UserMultiEmailResponse, UserConnection, UserWhereInput, UserWhereUniqueInput, UserCreateInput, UserUpdateInput, UserActionResponse from "./user.graphql"
-# import Group, GroupConnection, GroupWhereInput, GroupWhereUniqueInput, GroupCreateInput, GroupUpdateInput from "./group.graphql"
-# import InstanceType, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput, InstanceTypeCreateInput, InstanceTypeUpdateInput from "./instanceType.graphql"
-# import Image, ImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput from "./image.graphql"
+# import Group, GroupOrderByInput, GroupConnection, GroupWhereInput, GroupWhereUniqueInput, GroupCreateInput, GroupUpdateInput from "./group.graphql"
+# import InstanceType, InstanceTypeOrderByInput, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput, InstanceTypeCreateInput, InstanceTypeUpdateInput from "./instanceType.graphql"
+# import Image, ImageOrderByInput, ImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput from "./image.graphql"
 # import Announcement, AnnouncementConnection, AnnouncementWhereInput, AnnouncementWhereUniqueInput, AnnouncementCreateInput, AnnouncementUpdateInput from "./announcement.graphql"
-# import Dataset, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
-# import Secret, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
+# import Dataset, DatasetOrderByInput, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
+# import Secret, SecretOrderByInput, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
 # import Workspace, WorkspaceEdge, WorkspaceConnection, WorkspaceWhereInput, WorkspaceWhereUniqueInput, WorkspaceCreateInput, WorkspaceUpdateInput from "./workspace.graphql"
-# import BuildImageJob, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql" 
-# import PhJob, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput, PhJobCreateInput, PhJobCancelResponse from "./phJob.graphql"
-# import PhSchedule, PhScheduleConnection, PhScheduleWhereUniqueInput, PhScheduleWhereInput, PhScheduleCreateInput, PhScheduleUpdateInput, PhScheduleDeleteResponse, PhScheduleRunResponse from "./phSchedule.graphql"
+# import BuildImageJob, BuildImageOrderByInput, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql" 
+# import PhJob, PhJobOrderByInput, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput, PhJobCreateInput, PhJobCancelResponse from "./phJob.graphql"
+# import PhSchedule, PhScheduleOrderByInput, PhScheduleConnection, PhScheduleWhereUniqueInput, PhScheduleWhereInput, PhScheduleCreateInput, PhScheduleUpdateInput, PhScheduleDeleteResponse, PhScheduleRunResponse from "./phSchedule.graphql"
 # import PhDeployment, PhDeploymentConnection, PhDeploymentWhereUniqueInput, PhDeploymentWhereInput, PhDeploymentCreateInput, PhDeploymentUpdateInput from "./phDeployment.graphql"
 
 scalar JSON
@@ -42,6 +42,8 @@ type Query {
   group(where: GroupWhereUniqueInput!): Group
   groups(
     where: GroupWhereInput
+    page: Int
+    orderBy: GroupOrderByInput
     before: String
     after: String
     first: Int
@@ -49,6 +51,8 @@ type Query {
   ): [Group]!
   groupsConnection(
     where: GroupWhereInput
+    page: Int
+    orderBy: GroupOrderByInput
     before: String
     after: String
     first: Int
@@ -59,6 +63,8 @@ type Query {
   instanceType(where: InstanceTypeWhereUniqueInput!): InstanceType
   instanceTypes(
     where: InstanceTypeWhereInput
+    page: Int
+    orderBy: InstanceTypeOrderByInput
     before: String
     after: String
     first: Int
@@ -66,6 +72,8 @@ type Query {
   ): [InstanceType]!
   instanceTypesConnection(
     where: InstanceTypeWhereInput
+    page: Int
+    orderBy: InstanceTypeOrderByInput
     before: String
     after: String
     first: Int
@@ -76,6 +84,8 @@ type Query {
   image(where: ImageWhereUniqueInput!): Image
   images(
     where: ImageWhereInput
+    page: Int
+    orderBy: ImageOrderByInput
     before: String
     after: String
     first: Int
@@ -83,6 +93,8 @@ type Query {
   ): [Image]!
   imagesConnection(
     where: ImageWhereInput
+    page: Int
+    orderBy: ImageOrderByInput
     before: String
     after: String
     first: Int
@@ -110,6 +122,8 @@ type Query {
   dataset(where: DatasetWhereUniqueInput!): Dataset
   datasets(
     where: DatasetWhereInput
+    page: Int
+    orderBy: DatasetOrderByInput
     before: String
     after: String
     first: Int
@@ -117,6 +131,8 @@ type Query {
   ): [Dataset]!
   datasetsConnection(
     where: DatasetWhereInput
+    page: Int
+    orderBy: DatasetOrderByInput
     before: String
     after: String
     first: Int
@@ -127,6 +143,8 @@ type Query {
   secret(where: SecretWhereUniqueInput!): Secret!
   secrets(
     where: SecretWhereInput
+    page: Int
+    orderBy: SecretOrderByInput
     before: String
     after: String
     first: Int
@@ -134,6 +152,8 @@ type Query {
   ): [Secret]!
   secretsConnection(
     where: SecretWhereInput
+    page: Int
+    orderBy: SecretOrderByInput
     before: String
     after: String
     first: Int
@@ -160,6 +180,8 @@ type Query {
   buildImage(where: BuildImageWhereUniqueInput!): BuildImage!
   buildImages(
     where: BuildImageWhereInput
+    page: Int
+    orderBy: BuildImageOrderByInput
     before: String
     after: String
     first: Int
@@ -167,6 +189,8 @@ type Query {
   ): [BuildImage]!
   buildImagesConnection(
     where: BuildImageWhereInput
+    page: Int
+    orderBy: BuildImageOrderByInput
     before: String
     after: String
     first: Int
@@ -177,6 +201,7 @@ type Query {
   buildImageJob(where: BuildImageJobWhereUniqueInput!): BuildImageJob!
   buildImageJobs(
     where: BuildImageJobWhereInput
+    page: Int
     before: String
     after: String
     first: Int
@@ -184,6 +209,7 @@ type Query {
   ): [BuildImageJob]!
   buildImageJobsConnection(
     where: BuildImageJobWhereInput
+    page: Int
     before: String
     after: String
     first: Int
@@ -194,6 +220,8 @@ type Query {
   phJob(where: PhJobWhereUniqueInput!): PhJob!
   phJobs(
     where: PhJobWhereInput
+    page: Int
+    orderBy: PhJobOrderByInput
     before: String
     after: String
     first: Int
@@ -201,6 +229,8 @@ type Query {
   ): [PhJob]!
   phJobsConnection(
     where: PhJobWhereInput
+    page: Int
+    orderBy: PhJobOrderByInput
     before: String
     after: String
     first: Int
@@ -211,6 +241,8 @@ type Query {
   phSchedule(where: PhScheduleWhereUniqueInput!): PhSchedule!
   phSchedules(
     where: PhScheduleWhereInput
+    page: Int
+    orderBy: PhScheduleOrderByInput
     before: String
     after: String
     first: Int
@@ -218,6 +250,8 @@ type Query {
   ): [PhSchedule]!
   phSchedulesConnection(
     where: PhScheduleWhereInput
+    page: Int
+    orderBy: PhScheduleOrderByInput
     before: String
     after: String
     first: Int

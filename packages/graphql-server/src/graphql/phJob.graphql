@@ -22,6 +22,16 @@ type PhJob {
   logEndpoint: String
 }
 
+"""order"""
+input PhJobOrderByInput {
+  displayName: String
+  schedule: String
+  createTime: String
+  userName: String
+  groupName: String
+  phase: String
+}
+
 type PhJobCancelResponse {
   id: ID!
 }

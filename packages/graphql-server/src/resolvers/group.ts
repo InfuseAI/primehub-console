@@ -283,7 +283,7 @@ export const destroy = async (root, args, context: Context) => {
  */
 
 const listQuery = async (
-  kcAdminClient: KcAdminClient, where: any, currentWorkspace: CurrentWorkspace, context: Context) => {
+  kcAdminClient: KcAdminClient, where: any, order: any, currentWorkspace: CurrentWorkspace, context: Context) => {
   const idWhere = get(where, 'id');
   if (idWhere) {
     const group = await kcAdminClient.groups.findOne({id: idWhere});
@@ -302,13 +302,14 @@ const listQuery = async (
   groups = groups.filter(group => group.id !== everyoneGroupId);
   // filter workspace groups
   groups = groups.filter(group => !isKeycloakGroupNameWorkspace(group.name));
-  groups = filter(groups, whereWithoutWorkspace);
+  groups = filter(groups, whereWithoutWorkspace, order);
   return groups.map(group => injectWorkspace(group, currentWorkspace));
 };
 
 export const query = async (root, args, context: Context) => {
   const currentWorkspace = createInResolver(root, args, context);
-  const groups = await listQuery(context.kcAdminClient, args && args.where, currentWorkspace, context);
+  const groups =
+    await listQuery(context.kcAdminClient, args && args.where, args && args.orderBy, currentWorkspace, context);
   const paginatedGroups = paginate(groups, extractPagination(args));
   const fetchedGroups = await Promise.all(
     paginatedGroups.map(group => context.kcAdminClient.groups.findOne({id: group.id})));
@@ -317,7 +318,8 @@ export const query = async (root, args, context: Context) => {
 
 export const connectionQuery = async (root, args, context: Context) => {
   const currentWorkspace = createInResolver(root, args, context);
-  const groups = await listQuery(context.kcAdminClient, args && args.where, currentWorkspace, context);
+  const groups =
+    await listQuery(context.kcAdminClient, args && args.where, args && args.orderBy, currentWorkspace, context);
   const relayResponse = toRelay(groups, extractPagination(args));
   relayResponse.edges = await Promise.all(relayResponse.edges.map(
     async edge => {

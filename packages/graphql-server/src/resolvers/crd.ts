@@ -219,11 +219,11 @@ export class Crd<SpecType> {
    */
 
   private listQuery =
-    async (customResource: CustomResource<SpecType>, where: any, currentWorkspace: CurrentWorkspace) => {
+    async (customResource: CustomResource<SpecType>, where: any, order: any, currentWorkspace: CurrentWorkspace) => {
     const namespace = currentWorkspace.getK8sNamespace();
     const rows = await customResource.list(namespace);
     let mappedRows = rows.map(row => this.internalPropMapping(row, currentWorkspace));
-    mappedRows = filter(mappedRows, where);
+    mappedRows = filter(mappedRows, where, order);
     return mappedRows;
   }
 
@@ -236,7 +236,7 @@ export class Crd<SpecType> {
     const currentWorkspace = createInResolver(root, args, context);
     const whereWithoutWorkspaceId = omit(args.where, 'workspaceId');
     const where = this.parseWhere(whereWithoutWorkspaceId);
-    let rows = await this.listQuery(customResource, where, currentWorkspace);
+    let rows = await this.listQuery(customResource, where, args && args.orderBy, currentWorkspace);
     rows = rows.map(row => ({
       ...row,
       currentWorkspace
@@ -249,7 +249,7 @@ export class Crd<SpecType> {
     const currentWorkspace = createInResolver(root, args, context);
     const whereWithoutWorkspaceId = omit(args.where, 'workspaceId');
     const where = this.parseWhere(whereWithoutWorkspaceId);
-    let rows = await this.listQuery(customResource, where, currentWorkspace);
+    let rows = await this.listQuery(customResource, where, args && args.orderBy, currentWorkspace);
     rows = rows.map(row => ({
       ...row,
       currentWorkspace

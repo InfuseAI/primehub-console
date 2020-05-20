@@ -223,7 +223,7 @@ const canUserMutate = async (userId: string, groupId: string, context: Context) 
 };
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any = {}, context: Context): Promise<PhSchedule[]> => {
+const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any = {}, order: any, context: Context): Promise<PhSchedule[]> => {
   const {namespace, graphqlHost, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phSchedule = await client.get(where.id);
@@ -236,7 +236,7 @@ const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any = {}
   }
 
   const phSchedules = await client.list();
-  let transformedPhSchedules = await Promise.all(
+  const transformedPhSchedules = await Promise.all(
     phSchedules.map(schedule => transform(schedule, namespace, graphqlHost, kcAdminClient)));
 
   if (where && where.mine) {
@@ -248,21 +248,21 @@ const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any = {}
   }
 
   // sort by updateTime
-  transformedPhSchedules = orderBy(transformedPhSchedules, 'updateTime', 'desc');
-  return filter(transformedPhSchedules, omit(where, 'mine'));
+  order = isEmpty(order) ? {updateTime: 'desc'} : order;
+  return filter(transformedPhSchedules, omit(where, 'mine'), order);
 };
 
 export const query = async (root, args, context: Context) => {
   const {crdClient} = context;
   // tslint:disable-next-line:max-line-length
-  const phSchedules = await listQuery(crdClient.phSchedules, args && args.where, context);
+  const phSchedules = await listQuery(crdClient.phSchedules, args && args.where, args && args.orderBy, context);
   return paginate(phSchedules, extractPagination(args));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
   const {crdClient} = context;
   // tslint:disable-next-line:max-line-length
-  const phSchedules = await listQuery(crdClient.phSchedules, args && args.where, context);
+  const phSchedules = await listQuery(crdClient.phSchedules, args && args.where, args && args.orderBy, context);
   return toRelay(phSchedules, extractPagination(args));
 };
 

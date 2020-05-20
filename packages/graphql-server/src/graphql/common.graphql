@@ -14,6 +14,10 @@ input CannerImageInput {
 
 """Information about pagination in a connection."""
 type PageInfo {
+  """Number pagination"""
+  currentPage: Int
+  totalPage: Int
+
   """When paginating forwards, are there more items?"""
   hasNextPage: Boolean!
 

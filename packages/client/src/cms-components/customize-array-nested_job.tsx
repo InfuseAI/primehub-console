@@ -1,20 +1,21 @@
 import React, { Component } from "react";
-import { Table, Button, Modal, Icon, notification } from "antd";
+import { Table, Button } from "antd";
 import PropTypes from 'prop-types';
-import { FormattedMessage, injectIntl } from "react-intl";
-import defaultMessage, {renderValue} from "@canner/antd-locales";
-import EmailForm from '../cms-toolbar/sendEmailModal';
-import {renderUploadServerLink} from '../../schema/utils';
+import { injectIntl } from "react-intl";
+import {renderValue} from "@canner/antd-locales";
 import {Props} from './types';
 import RefId from 'canner-ref-id';
 import {get} from 'lodash';
+import styled from 'styled-components';
 
 const ButtonGroup = Button.Group;
-const confirm = Modal.confirm;
-const GLOBAL_DISABLE = (window as any).disableMode || false;
-
+const StyledTable = styled(Table)`
+`
 @injectIntl
-export default class ArrayNestedJob extends Component<Props> {
+export default class ArrayNestedJob extends Component<Props & {
+  updateQuery: (path: Array<string>, args: Object) => void;
+  query: any;
+}> {
   static defaultProps = {
     value: [],
     showPagination: true,
@@ -45,17 +46,6 @@ export default class ArrayNestedJob extends Component<Props> {
 
   remove = (index) => {
     const {onChange, deploy, refId, value, intl} = this.props;
-    // const jobId = new RefId('buildImageJob');
-    // confirm({
-    //   title: intl.formatMessage({ id: "array.table.delete.confirm" }),
-    //   okType: 'danger',
-    //   onOk() {
-    //     onChange(jobId.child(index), 'delete').then(() => {
-    //       deploy(jobId.getPathArr()[0], value[index].id);
-    //     });
-    //   }
-    // });
-    
   }
 
   render() {
@@ -75,10 +65,7 @@ export default class ArrayNestedJob extends Component<Props> {
 
   
     let {
-      createKeys,
       columns = [],
-      removeActions,
-      announcementCustomActions
     } = uiParams;
 
     const newColumnsRender = renderValue(columns, items.items, {
@@ -114,7 +101,7 @@ export default class ArrayNestedJob extends Component<Props> {
 
     return (
       <div>
-        <Table
+        <StyledTable
           pagination={showPagination}
           dataSource={value.map((datum, i) => {
             return {...datum, __index: i, key: datum.key || i};

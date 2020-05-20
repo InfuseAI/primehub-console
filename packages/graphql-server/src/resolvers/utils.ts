@@ -5,7 +5,7 @@ import {
   isEmpty,
   isNull,
   pick,
-  find,
+  orderBy,
   reduce,
   isArray,
   mapValues,
@@ -15,7 +15,10 @@ import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
 import { EOL } from 'os';
 import { Context } from './interface';
 
+const ITEMS_PER_PAGE = 10;
+
 export interface Pagination {
+  page?: number;
   last?: number;
   first?: number;
   before?: string;
@@ -23,12 +26,44 @@ export interface Pagination {
 }
 
 export const paginate = (rows: any[], pagination?: Pagination) => {
+  if (!isUndefined(pagination) && !isUndefined(pagination.page)) {
+    return numberedPaginate(rows, pagination).rows;
+  } else {
+    return cursorPaginate(rows, pagination);
+  }
+};
+
+export const numberedPaginate = (rows: any[], pagination?: Pagination) => {
+  const page = (!isUndefined(pagination) && !isUndefined(pagination.page)) ? pagination.page : 1;
+
+  if (isEmpty(rows)) {
+    return {
+      totalPage: 1,
+      currentPage: 1,
+      rows,
+    };
+  }
+
+  // numbered pagination
+  const size = rows.length;
+  const totalPage = Math.ceil(size / ITEMS_PER_PAGE);
+  const offset = (page - 1) * ITEMS_PER_PAGE;
+
+  return {
+    totalPage,
+    currentPage: page,
+    rows: rows.slice(offset, offset + ITEMS_PER_PAGE),
+  };
+};
+
+export const cursorPaginate = (rows: any[], pagination?: Pagination) => {
   if (isEmpty(pagination)) {
     return rows;
   }
 
   const transforms = [];
   const { last, first, before, after } = pagination;
+
   if (!isUndefined(before)) {
     transforms.push(takeWhile<any>(row => row.id !== before));
   }
@@ -49,6 +84,28 @@ export const paginate = (rows: any[], pagination?: Pagination) => {
 };
 
 export const toRelay = (rows: any[], pagination?: Pagination) => {
+  if (!isUndefined(pagination) && !isUndefined(pagination.page)) {
+    return toRelayWithNumbered(rows, pagination);
+  } else {
+    return toRelayWithCursor(rows, pagination);
+  }
+};
+
+export const toRelayWithNumbered = (rows: any[], pagination?: Pagination) => {
+  const pageInfo = numberedPaginate(rows, pagination);
+  return {
+    edges: pageInfo.rows.map(row => ({
+      cursor: row.id,
+      node: row,
+    })),
+    pageInfo: {
+      totalPage: pageInfo.totalPage,
+      currentPage: pageInfo.currentPage,
+    },
+  };
+};
+
+export const toRelayWithCursor = (rows: any[], pagination?: Pagination) => {
   if (isEmpty(pagination)) {
     return {
       edges: rows.map(row => ({
@@ -64,7 +121,7 @@ export const toRelay = (rows: any[], pagination?: Pagination) => {
     };
   }
 
-  const paginatedRows = paginate(rows, pagination);
+  const paginatedRows = cursorPaginate(rows, pagination);
 
   return {
     edges: paginatedRows.map(row => ({
@@ -84,41 +141,56 @@ export const toRelay = (rows: any[], pagination?: Pagination) => {
   };
 };
 
-export const filter = (rows: any[], where?: any) => {
-  if (isEmpty(where)) {
-    return rows;
+export const filter = (rows: any[], where?: any, order?: any) => {
+  if (!isEmpty(where)) {
+    Object.keys(where).forEach(field => {
+      if (field === 'id') {
+        rows = rows.filter(row => row.id === where.id);
+      } else if (field.indexOf('contains') >= 0) {
+        const fieldName = field.replace('_contains', '');
+        const value = where[field];
+        rows = rows.filter(row => row[fieldName] && row[fieldName].includes && row[fieldName].includes(value));
+      } else if (field.indexOf('_in') >= 0) {
+        const fieldName = field.replace('_in', '');
+        const list: string[] = where[field] || [];
+        rows = rows.filter(row => row[fieldName] && list.indexOf(row[fieldName]) >= 0);
+      } else if (field.indexOf('gt') >= 0) {
+        const fieldName = field.replace('_gt', '');
+        const value = where[field];
+        rows = rows.filter(row => row[fieldName] && row[fieldName] > value);
+      } else if (field.indexOf('lt') >= 0) {
+        const fieldName = field.replace('_lt', '');
+        const value = where[field];
+        rows = rows.filter(row => row[fieldName] && row[fieldName] < value);
+      } else if (field.indexOf('_eq') >= 0) {
+        const fieldName = field.replace('_eq', '');
+        const value = where[field];
+        rows = rows.filter(row => row[fieldName] && row[fieldName] === value);
+      }
+    });
   }
 
-  Object.keys(where).forEach(field => {
-    if (field === 'id') {
-      rows = rows.filter(row => row.id === where.id);
-    } else if (field.indexOf('contains') >= 0) {
-      const fieldName = field.replace('_contains', '');
-      const value = where[field];
-      rows = rows.filter(row => row[fieldName] && row[fieldName].includes && row[fieldName].includes(value));
-    } else if (field.indexOf('_in') >= 0) {
-      const fieldName = field.replace('_in', '');
-      const list: string[] = where[field] || [];
-      rows = rows.filter(row => row[fieldName] && list.indexOf(row[fieldName]) >= 0);
-    } else if (field.indexOf('gt') >= 0) {
-      const fieldName = field.replace('_gt', '');
-      const value = where[field];
-      rows = rows.filter(row => row[fieldName] && row[fieldName] > value);
-    } else if (field.indexOf('lt') >= 0) {
-      const fieldName = field.replace('_lt', '');
-      const value = where[field];
-      rows = rows.filter(row => row[fieldName] && row[fieldName] < value);
-    } else if (field.indexOf('_eq') >= 0) {
-      const fieldName = field.replace('_eq', '');
-      const value = where[field];
-      rows = rows.filter(row => row[fieldName] && row[fieldName] === value);
+  // sorting
+  if (!isEmpty(order)) {
+    const sortField: string = Object.keys(order)[0];
+
+    let orderValue: 'asc' | 'desc';
+    if (order[sortField] === 'asc') {
+      orderValue = 'asc';
+    } else if (order[sortField] === 'desc') {
+      orderValue = 'desc';
+    } else {
+      throw new Error(`order value (${order[sortField]}) not valid. Should be 'asc' or 'desc'`);
     }
-  });
+
+    rows = orderBy(rows, [sortField], [orderValue]);
+  }
+
   return rows;
 };
 
 export const extractPagination = (args: any): Pagination => {
-  return pick(args, ['last', 'first', 'before', 'after']);
+  return pick(args, ['last', 'first', 'before', 'after', 'page']);
 };
 
 export const getFromAttr = (key: string, attributes: Record<string, any>, defaultValue: any, type: any = v => v) => {
