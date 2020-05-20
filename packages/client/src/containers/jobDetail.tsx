@@ -60,7 +60,8 @@ export default compose(
           id: props.match.params.jobId
         }
       },
-      fetchPolicy: 'cache-and-network'
+      fetchPolicy: 'cache-and-network',
+      pollInterval: 2000
     }),
     name: 'getPhJob'
   }),
