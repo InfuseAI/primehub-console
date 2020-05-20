@@ -105,6 +105,7 @@ export default () => (
     <Condition match={(data, operator) => !data.global} defaultMode="hidden">
       <boolean keyName="launchGroupOnly" title="${launchGroupOnly}" defaultValue={true} />
     </Condition>
+    <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
     <string keyName="type" 
       required
       ui="select"
@@ -128,6 +129,7 @@ export default () => (
         }]
       }}
     />
+    </Condition>
     <Condition match={data => data.type === 'git'}>
       <string keyName="url" ui="link" title="${datasetUrl}"/>
       <relation
@@ -210,7 +212,7 @@ export default () => (
           />
         </Condition>
       </Layout>
-      
+
       <string keyName="uploadServerLink" hidden />
       <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
         <Condition match={(data, operator) => operator === 'update'} defaultMode="hidden">
