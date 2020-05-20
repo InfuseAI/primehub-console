@@ -9,13 +9,12 @@ const webpack = require('webpack');
 const devMode = process.env.NODE_ENV !== 'production';
 const CompressionPlugin = require('compression-webpack-plugin');
 
-resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/index.model_deploy.schema.js');
+resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/index.ce.schema.js');
 
 module.exports = {
   entry: {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
-    'model-deployment': devMode ? './src/modelDeployment.tsx' : ['./src/public-import.js', './src/modelDeployment.tsx'],
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -32,12 +31,9 @@ module.exports = {
       rewrites: [
         { from: /^\/app-prefix\/landing/, to: '/landing.html' },
         { from: /^\/landing$/, to: '/landing.html' },
-        { from: /^\/model-deployment/, to: '/model-deployment.html' },
-        { from: /^\/app-prefix\/model-deployment/, to: './model-deployment.html' },
         { from: /./, to: '/index.html' }
       ]
-    },
-    https: false
+    }
   },
   module: {
     rules: [
@@ -98,14 +94,9 @@ module.exports = {
       template: 'docs/index.html',
       filename: 'landing.html'
     }),
-    new HtmlWebPackPlugin({
-      chunks: ['model-deployment'],
-      template: 'docs/index.html',
-      filename: 'model-deployment.html'
-    }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({
-      modelDeploymentOnly: true
+      modelDeploymentOnly: false
     }),
     new MiniCssExtractPlugin({
       filename: devMode ? '[name].css' : '[name].[hash].css',
