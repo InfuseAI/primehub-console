@@ -1,5 +1,5 @@
 import { Context } from './interface';
-import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser } from './utils';
+import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser, validateLicense } from './utils';
 import { PhScheduleSpec, PhScheduleStatus } from '../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../crdClient/customResource';
 import { orderBy, omit, get, isUndefined, isNil, isEmpty } from 'lodash';
@@ -281,6 +281,7 @@ export const queryOne = async (root, args, context: Context) => {
 
 export const create = async (root, args, context: Context) => {
   const data: PhScheduleMutationInput = args.data;
+  validateLicense();
   await validateQuota(context, data.groupId, data.instanceType);
   await canUserMutate(context.userId, data.groupId, context);
   const phSchedule = await createSchedule(context, data);

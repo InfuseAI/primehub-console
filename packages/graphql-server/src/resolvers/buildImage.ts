@@ -1,5 +1,5 @@
 import { Context } from './interface';
-import { toRelay, filter, paginate, extractPagination, parsePackageField, stringifyPackageField } from './utils';
+import { toRelay, filter, paginate, extractPagination, parsePackageField, stringifyPackageField, validateLicense } from './utils';
 import * as logger from '../logger';
 import { get, isEmpty, isUndefined, isNil, isNull, sortBy, orderBy } from 'lodash';
 import CustomResource, { Item } from '../crdClient/customResource';
@@ -99,6 +99,7 @@ export const queryOne = async (root, args, context: Context) => {
  */
 
 export const create = async (root, args, context: Context) => {
+  validateLicense();
   const data = args.data;
   const {crdClient} = context;
   const imageSpecClient = crdClient.imageSpecs;
