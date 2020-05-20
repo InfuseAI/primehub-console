@@ -12,10 +12,11 @@ export default () => (
     uiParams={{
       columns: [{
         title: '${name}',
-        dataIndex: 'name'
+        dataIndex: 'name',
+        sorter: true
       }, {
         title: '${displayName}',
-        dataIndex: 'displayName'
+        dataIndex: 'displayName',
       }, {
         title: "${group.sharedVolumeCapacity}",
         dataIndex: 'sharedVolumeCapacity',
@@ -59,8 +60,8 @@ export default () => (
       disableCreate: true
     }}
     graphql={`
-      query($groupAfter: String, $groupBefore: String, $groupLast: Int, $groupFirst: Int,$groupWhere: GroupWhereInput) {
-        group: groupsConnection(after: $groupAfter, before: $groupBefore, last: $groupLast, first: $groupFirst,where: $groupWhere) {
+      query($groupPage: Int, $groupOrderBy: GroupOrderByInput, $groupWhere: GroupWhereInput) {
+        group: groupsConnection(page: $groupPage, orderBy: $groupOrderBy, where: $groupWhere) {
           edges {
             cursor
             node {
@@ -75,8 +76,8 @@ export default () => (
             }
           }
           pageInfo {
-            hasNextPage
-            hasPreviousPage
+            currentPage
+            totalPage
           }
         }
       }
@@ -92,7 +93,7 @@ export default () => (
           key: 'name'
         }]}
       />
-      <pagination />
+      <pagination number/>
     </toolbar>
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
       <string keyName="name" title="${name}"
@@ -248,7 +249,7 @@ export default () => (
               key: 'username'
             }]}
           />
-          <pagination />
+          <pagination number/>
         </toolbar>
       </relation>
     </Block>

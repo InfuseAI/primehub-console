@@ -16,13 +16,16 @@ export default () => (
     uiParams={{
       columns: [{
         title: '${buildImage.name}',
-        dataIndex: 'name'
+        dataIndex: 'name',
+        sorter: true,
       }, {
         title: '${buildImage.status}',
         dataIndex: 'status',
+        sorter: true,
       }, {
         title: '${buildImage.image}',
         dataIndex: 'image',
+        sorter: true,
         render: (text, record) => record.status === 'Succeeded' ? renderCopyableText(text,record) : '-'
       }],
       removeActions: true,
@@ -30,8 +33,8 @@ export default () => (
       disableCreate: true
     }}
     graphql={
-      `query($buildImageAfter: String, $buildImageBefore: String, $buildImageLast: Int, $buildImageFirst: Int, $buildImageWhere: BuildImageWhereInput) {
-        buildImage: buildImagesConnection(after: $buildImageAfter, before: $buildImageBefore, last: $buildImageLast, first: $buildImageFirst,where: $buildImageWhere) {
+      `query($buildImagePage: Int, $buildImageOrderBy: BuildImageOrderByInput, $buildImageWhere: BuildImageWhereInput) {
+        buildImage: buildImagesConnection(page: $buildImagePage, orderBy: $buildImageOrderBy, where: $buildImageWhere) {
           edges {
             cursor
             node {
@@ -39,8 +42,8 @@ export default () => (
             }
           }
           pageInfo {
-            hasNextPage
-            hasPreviousPage
+            totalPage
+            currentPage
           }
         }
       }`
@@ -59,7 +62,7 @@ export default () => (
               key: 'name'
             }]}
           />
-          <pagination />
+          <pagination number />
         </toolbar>
         <string keyName="status" title="${buildImage.status}" hidden/>
         <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
@@ -123,25 +126,29 @@ export default () => (
             columns: [{
               title: '${buildImageJob.updateTime}',
               dataIndex: 'updateTime',
+              sorter: (a, b) => {
+                const value = new Date(b.updateTime).getTime() - new Date(a.updateTime).getTime();
+                return value
+              },
               render: text => {
                 return text ? moment(text).format('YYYY/MM/DD HH:mm') : '-'
               }
             }, {
               title: '${buildImageJob.imageRevision}',
+              sorter: (a, b) => (a.imageRevision || '').localeCompare(b.imageRevision || ''),
               dataIndex: 'imageRevision'
             }, {
               title: '${buildImageJob.status}',
+              sorter: (a, b) => (a.status || '').localeCompare(b.status || ''),
               dataIndex: 'status'
             }, {
               title: '${buildImageJob.targetImage}',
+              sorter: (a, b) => (a.targetImage || '').localeCompare(b.targetImage || ''),
               dataIndex: 'targetImage',
               render: (text, record) => record.status === 'Succeeded' ? renderCopyableText(text,record) : '-'
             }]
           }}
         >
-          <toolbar async>
-            <pagination />
-          </toolbar>
           <string keyName="id" hidden/>
           <string keyName="imageRevision" title="${buildImageJob.imageRevision" />
           <string keyName="status" title="${buildImageJob.status" />

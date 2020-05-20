@@ -15,6 +15,14 @@ type Image {
   groups: [Group]
 }
 
+"""order"""
+input ImageOrderByInput {
+  name: String
+  displayName: String
+  description: String
+  type: String
+}
+
 """An edge in a connection."""
 type ImageEdge {
   """The item at the end of the edge."""

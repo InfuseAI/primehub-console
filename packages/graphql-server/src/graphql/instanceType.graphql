@@ -18,6 +18,16 @@ type InstanceType {
   nodeSelector: JSON
 }
 
+"""order"""
+input InstanceTypeOrderByInput {
+  name: String
+  displayName: String
+  description: String
+  cpuLimit: String
+  memoryLimit: String
+  gpuLimit: String
+}
+
 type Toleration {
   operator: String!
   key: String

@@ -91,7 +91,9 @@ export const cleanupPhJobs = async () => {
       await crdClient.phJobs.del(phJob.metadata.name);
     }));
   } catch (error) {
+    // tslint:disable-next-line:no-console
     console.log('fail to cleanup phjobs');
+    // tslint:disable-next-line:no-console
     console.log(error);
     return;
   }

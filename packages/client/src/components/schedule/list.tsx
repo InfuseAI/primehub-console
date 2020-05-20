@@ -51,10 +51,8 @@ const renderNextRunTime = (time, record) => {
 
 type JobsConnection = {
   pageInfo: {
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-    startCursor: string;
-    endCursor: string;
+    totalPage: number;
+    currentPage: number;
   },
   edges: Array<{
     cursor: string;
@@ -119,37 +117,8 @@ class ScheduleList extends React.Component<Props> {
   refresh = () => {
     const {schedulesVariables, schedulesRefetch} = this.props;
     const newVariables = {
-      where: schedulesVariables.where,
-      before: undefined,
-      first: 10,
-      last: undefined,
-      after: undefined,
-    };
-    schedulesRefetch(newVariables);
-  }
-
-  nextPage = () => {
-    const {schedulesVariables, schedulesRefetch, schedulesConnection} = this.props;
-    const after = schedulesConnection.pageInfo.endCursor;
-    const newVariables = {
-      where: schedulesVariables.where,
-      after,
-      first: 10,
-      last: undefined,
-      before: undefined
-    };
-    schedulesRefetch(newVariables);
-  }
-
-  previousPage = () => {
-    const {schedulesVariables, schedulesRefetch, schedulesConnection} = this.props;
-    const before = schedulesConnection.pageInfo.startCursor;
-    const newVariables = {
-      where: schedulesVariables.where,
-      before,
-      last: 10,
-      first: undefined,
-      after: undefined,
+      ...schedulesVariables,
+      page: 1,
     };
     schedulesRefetch(newVariables);
   }
@@ -173,6 +142,19 @@ class ScheduleList extends React.Component<Props> {
     schedulesRefetch(newVariables);
   }
 
+
+  handleTableChange = (pagination, _filters, sorter) => {
+    const {schedulesVariables, schedulesRefetch} = this.props;
+    schedulesRefetch({
+      ...schedulesVariables,
+      page: pagination.current,
+      orderBy: sorter.field ? {
+        [sorter.field]: get(sorter, 'order') === 'ascend' ? 'asc' : 'desc'
+      }: {}
+    });
+  }
+
+
   render() {
     const {groups, schedulesConnection, schedulesLoading, schedulesVariables, deletePhScheduleResult, runPhScheduleResult} = this.props;
     const renderAction = (id: string, record) => {
@@ -187,10 +169,12 @@ class ScheduleList extends React.Component<Props> {
     const columns = [{
       title: 'Name',
       dataIndex: 'displayName',
+      sorter: true,
       render: name => name ? name : '-'
     }, {
       title: 'Group',
       dataIndex: 'groupName',
+      sorter: true,
       render: name => name ? name : '-'
     }, {
       title: 'Recurrence',
@@ -199,10 +183,12 @@ class ScheduleList extends React.Component<Props> {
     }, {
       title: 'Next Run',
       dataIndex: 'nextRunTime',
+      sorter: true,
       render: renderNextRunTime,
     }, {
       title: 'Created By',
       dataIndex: 'userName',
+      sorter: true,
       render: name => name ? name : '-'
     }, {
       title: 'Action',
@@ -238,13 +224,11 @@ class ScheduleList extends React.Component<Props> {
             columns={columns}
             rowKey="id"
             loading={schedulesLoading}
-            pagination={false}
-          />
-          <Pagination
-            hasNextPage={schedulesConnection.pageInfo.hasNextPage}
-            hasPreviousPage={schedulesConnection.pageInfo.hasPreviousPage}
-            nextPage={this.nextPage}
-            previousPage={this.previousPage}
+            pagination={{
+              current: get(schedulesConnection, 'pageInfo.currentPage', 0),
+              total: get(schedulesConnection, 'pageInfo.totalPage', 0) * 10,
+            }}
+            onChange={this.handleTableChange}
           />
         </PageBody>
       </>

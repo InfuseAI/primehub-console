@@ -41,13 +41,11 @@ export const PhJobFragment = gql`
 `
 
 export const GET_PH_JOB_CONNECTION = gql`
-  query phJobsConnection($where: PhJobWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
-    phJobsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
+  query phJobsConnection($where: PhJobWhereInput, $page: Int, $orderBy: PhJobOrderByInput) {
+    phJobsConnection(where: $where, page: $page, orderBy: $orderBy) {
       pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
+        totalPage
+        currentPage
       }
       edges {
         cursor
@@ -87,10 +85,12 @@ type Props = {
 } & RouteComponentProps;
 
 class JobListContainer extends React.Component<Props> {
-  changeFilter = (payload) => {
+  jobsRefetch = (payload) => {
     const payloadWithStringWhere = {...payload};
     if (payloadWithStringWhere.where)
       payloadWithStringWhere.where = JSON.stringify(payload.where);
+    if (payloadWithStringWhere.orderBy)
+      payloadWithStringWhere.orderBy = JSON.stringify(payload.orderBy || {});
 
     const {history, getPhJobConnection} = this.props;
     const search = queryString.stringify(payloadWithStringWhere);
@@ -112,7 +112,7 @@ class JobListContainer extends React.Component<Props> {
         jobsError={getPhJobConnection.error}
         jobsConnection={getPhJobConnection.phJobsConnection || {pageInfo: {}, edges: []}}
         jobsVariables={getPhJobConnection.variables}
-        jobsRefetch={this.changeFilter}
+        jobsRefetch={this.jobsRefetch}
         rerunPhJob={rerunPhJob}
         rerunPhJobResult={rerunPhJobResult}
         cancelPhJobResult={cancelPhJobResult}
@@ -131,10 +131,8 @@ export default compose(
       return {
         variables: {
           where: JSON.parse(params.where as string || '{}'),
-          after: params.after || undefined,
-          before: params.before || undefined,
-          first: params.first ? parseInt(params.first as string, 10) : undefined,
-          last: params.last ? parseInt(params.last as string, 10) : undefined
+          orderBy: JSON.parse(params.orderBy as string || '{}'),
+          page: Number(params.page || 1),
         },
         fetchPolicy: 'cache-and-network'
       }

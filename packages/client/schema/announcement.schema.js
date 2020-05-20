@@ -41,7 +41,7 @@ export default () => (
       <filter component={TabsFilter} defaultFilter={{
         expiryDate_gt: moment().toISOString()
       }}/>
-      <pagination />
+      <pagination number/>
     </toolbar>
     <string
       keyName="title"

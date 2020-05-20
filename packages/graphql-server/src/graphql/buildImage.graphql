@@ -73,6 +73,13 @@ type BuildImage {
   workspaceId: String
 }
 
+"""order"""
+input BuildImageOrderByInput {
+  name: String
+  status: String
+  image: String
+}
+
 """An edge in a connection."""
 type BuildImageEdge {
   """The item at the end of the edge."""

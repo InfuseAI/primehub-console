@@ -64,11 +64,11 @@ export default compose(
     name: 'getMyGroups',
     options: (props: Props) => ({
       onCompleted: data => {
-        // default  first=10
+        // default  page=1
         if (props.location.search) return;
         props.history.replace({
           pathname: `${appPrefix}${props.pathname}`,
-          search: queryString.stringify({first: 10})
+          search: queryString.stringify({page: 1})
         });
       },
       fetchPolicy: 'cache-and-network'

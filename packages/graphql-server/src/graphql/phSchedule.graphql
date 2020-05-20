@@ -25,6 +25,15 @@ type PhSchedule {
   message: String
 }
 
+"""order"""
+input PhScheduleOrderByInput {
+  displayName: String
+  groupName: String
+  userName: String
+  nextRunTime: String
+  createTime: String
+}
+
 type PhScheduleDeleteResponse {
   id: ID!
 }
