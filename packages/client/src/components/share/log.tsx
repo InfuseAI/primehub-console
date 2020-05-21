@@ -4,6 +4,7 @@ import {Button} from 'antd';
 import {get} from 'lodash';
 import downloadjs from 'downloadjs';
 import styled from 'styled-components';
+import moment from 'moment';
 
 type Props = {
   endpoint: string;
@@ -199,7 +200,8 @@ export default class Logs extends React.Component<Props, State> {
       },
     }).then(res => res.blob())
     .then(blob => {
-      return downloadjs(blob, 'deployment.log', 'text/plain');
+      return downloadjs(
+        blob, `${moment(new Date().toISOString()).format('YYYY-MM-DD-HH-mm-ss')}.log`, 'text/plain');
     })
     .finally(() => {
       this.setState({downloading: false});
