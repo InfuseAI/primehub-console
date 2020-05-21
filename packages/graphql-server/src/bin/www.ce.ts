@@ -1,4 +1,4 @@
-import {createApp} from '../app';
+import {createApp} from '../app.ce';
 import * as logger from '../logger';
 const port = process.env.NODE_PORT || 3001;
 
@@ -15,7 +15,7 @@ createApp().then(({app, server, config}) => {
     }
     // tslint:disable-next-line:no-console
     console.log(`
-      🚀 Server ready on port ${port}
+      🚀 CE Server ready on port ${port}
       graphql at http://localhost:${port}${server.graphqlPath}
     `);
   });
