@@ -67,6 +67,7 @@ export const mapping = (item: Item<DatasetSpec>) => {
     volumeName: item.spec.volumeName,
     spec: item.spec,
     writable: (item as any).roleName && (item as any).roleName.indexOf(':rw:') >= 0,
+    pvProvisioning: get(item, 'spec.pv.provisioning', 'auto'),
     nfsServer: get(item, 'spec.nfs.server'),
     nfsPath: get(item, 'spec.nfs.path'),
     hostPath: get(item, 'spec.hostPath.path'),
@@ -94,6 +95,9 @@ export const createMapping = (data: any) => {
   const gitSyncSecretId = get(data, 'secret.connect.id');
   const gitSyncProp = gitSyncSecretId
     ? {gitsync: {secret: gitSyncSecretId}}
+    : {};
+  const pvProp = data.pvProvisioning
+    ? {pv: {provisioning: data.pvProvisioning}}
     : {};
   const nfsProp = (data.nfsServer && data.nfsPath)
     ? {nfs: {server: data.nfsServer, path: data.nfsPath}}
@@ -126,6 +130,7 @@ export const createMapping = (data: any) => {
       // volumeName = dataset name
       volumeName: data.name,
       ...gitSyncProp,
+      ...pvProp,
       ...nfsProp,
       ...hostPathProp
     }
@@ -211,10 +216,12 @@ export const onCreate = async (
       throw new Error(`invalid dataset volumeSize: ${data.volumeSize}`);
     }
     // create pvc
-    await context.k8sDatasetPvc.create({
-      volumeName: resource.spec.volumeName,
-      volumeSize: data.volumeSize
-    });
+    if (!(resource.spec.pv && resource.spec.pv.provisioning === 'manual')) {
+      await context.k8sDatasetPvc.create({
+        volumeName: resource.spec.volumeName,
+        volumeSize: data.volumeSize
+      });
+    }
   }
 
   if (data && data.global) {
@@ -384,7 +391,9 @@ export const onDelete = async ({
   name, context, resource, getPrefix
 }: {name: string, context: Context, resource: any, getPrefix: (customizePrefix?: string) => string}) => {
   // delete dataset pvc
-  await context.k8sDatasetPvc.delete(resource.spec.volumeName);
+  if (!(resource.spec.pv && resource.spec.pv.provisioning === 'manual')) {
+    await context.k8sDatasetPvc.delete(resource.spec.volumeName);
+  }
   await context.k8sUploadServerSecret.delete(name);
 
   // delete writable as well
