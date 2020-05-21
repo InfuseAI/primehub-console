@@ -34,7 +34,7 @@ const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'N
 class JobDetailContainer extends React.Component<Props> {
   render() {
     const {getPhJob, history, rerunPhJob, cancelPhJob, rerunPhJobResult, cancelPhJobResult} = this.props;
-    if (getPhJob.loading) return null;
+    if (!getPhJob.phJob) return null;
     if (getPhJob.error) {
       return getMessage(getPhJob.error)
     };
@@ -60,7 +60,8 @@ export default compose(
           id: props.match.params.jobId
         }
       },
-      fetchPolicy: 'cache-and-network'
+      fetchPolicy: 'cache-and-network',
+      pollInterval: 2000
     }),
     name: 'getPhJob'
   }),
