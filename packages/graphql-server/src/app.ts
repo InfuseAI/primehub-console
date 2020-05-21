@@ -10,7 +10,7 @@ import serve from 'koa-static';
 import Router from 'koa-router';
 import morgan from 'koa-morgan';
 import * as GraphQLJSON from 'graphql-type-json';
-import { makeExecutableSchema } from 'graphql-tools';
+import { makeExecutableSchema, mergeSchemas } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
 import WorkspaceApi from './workspace/api';
 
@@ -60,7 +60,10 @@ import Boom from 'boom';
 
 // graphql middlewares
 import readOnlyMiddleware from './middlewares/readonly';
+// Basic Auth middleware
 import { permissions as authMiddleware } from './middlewares/auth';
+// Auth middleware for EE version
+import { permissions as eeAuthMiddleware } from './middlewares/auth.ee';
 import TokenSyncer from './oidc/syncer';
 import K8sSecret from './k8sResource/k8sSecret';
 import K8sDatasetPvc from './k8sResource/k8sDatasetPvc';
@@ -75,9 +78,11 @@ import Token from './oidc/token';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
+// The EE GraphQL schema
+const typeDefsEE = gql(importSchema(path.resolve(__dirname, './graphql/ee.graphql')));
 
 // A map of functions which return data for the schema.
-const resolvers = {
+const ceResolvers = {
   Query: {
     system: system.query,
     me: user.me,
@@ -93,21 +98,6 @@ const resolvers = {
     workspace: workspace.queryOne,
     workspaces: workspace.query,
     workspacesConnection: workspace.connectionQuery,
-    buildImage: buildImage.queryOne,
-    buildImages: buildImage.query,
-    buildImagesConnection: buildImage.connectionQuery,
-    buildImageJob: buildImageJob.queryOne,
-    buildImageJobs: buildImageJob.query,
-    buildImageJobsConnection: buildImageJob.connectionQuery,
-    phJob: phJob.queryOne,
-    phJobs: phJob.query,
-    phJobsConnection: phJob.connectionQuery,
-    phSchedule: phSchedule.queryOne,
-    phSchedules: phSchedule.query,
-    phSchedulesConnection: phSchedule.connectionQuery,
-    phDeployment: phDeployment.queryOne,
-    phDeployments: phDeployment.query,
-    phDeploymentsConnection: phDeployment.connectionQuery,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),
@@ -131,6 +121,45 @@ const resolvers = {
     updateWorkspace: workspace.update,
     deleteWorkspace: workspace.destroy,
     regenerateUploadServerSecret: regenerateUploadSecret,
+    ...instanceType.resolveInMutation(),
+    ...dataset.resolveInMutation(),
+    ...image.resolveInMutation(),
+    ...ann.resolveInMutation()
+  },
+  System: {
+    smtp: system.querySmtp
+  },
+  User: user.typeResolvers,
+  Group: group.typeResolvers,
+  Workspace: workspace.typeResolvers,
+  ...instanceType.typeResolver(),
+  ...dataset.typeResolver(),
+  ...image.typeResolver(),
+  ...ann.typeResolver(),
+
+  // scalars
+  JSON: GraphQLJSON
+};
+
+const eeResolvers = {
+  Query: {
+    buildImage: buildImage.queryOne,
+    buildImages: buildImage.query,
+    buildImagesConnection: buildImage.connectionQuery,
+    buildImageJob: buildImageJob.queryOne,
+    buildImageJobs: buildImageJob.query,
+    buildImageJobsConnection: buildImageJob.connectionQuery,
+    phJob: phJob.queryOne,
+    phJobs: phJob.query,
+    phJobsConnection: phJob.connectionQuery,
+    phSchedule: phSchedule.queryOne,
+    phSchedules: phSchedule.query,
+    phSchedulesConnection: phSchedule.connectionQuery,
+    phDeployment: phDeployment.queryOne,
+    phDeployments: phDeployment.query,
+    phDeploymentsConnection: phDeployment.connectionQuery,
+  },
+  Mutation: {
     createBuildImage: buildImage.create,
     updateBuildImage: buildImage.update,
     deleteBuildImage: buildImage.destroy,
@@ -146,26 +175,11 @@ const resolvers = {
     deletePhDeployment: phDeployment.destroy,
     deployPhDeployment: phDeployment.deploy,
     stopPhDeployment: phDeployment.stop,
-    ...instanceType.resolveInMutation(),
-    ...dataset.resolveInMutation(),
-    ...image.resolveInMutation(),
-    ...ann.resolveInMutation()
   },
-  System: {
-    smtp: system.querySmtp
-  },
-  User: user.typeResolvers,
-  Group: group.typeResolvers,
-  Workspace: workspace.typeResolvers,
   BuildImage: buildImage.typeResolvers,
   PhJob: phJob.typeResolvers,
   PhSchedule: phSchedule.typeResolvers,
   PhDeployment: phDeployment.typeResolvers,
-  ...instanceType.typeResolver(),
-  ...dataset.typeResolver(),
-  ...image.typeResolver(),
-  ...ann.typeResolver(),
-
   // scalars
   JSON: GraphQLJSON
 };
@@ -293,12 +307,27 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
   observer.observe();
 
-  // apollo server
-  const schema: any = makeExecutableSchema({
+  // Schema for CE version
+  const ceSchema = makeExecutableSchema({
     typeDefs: typeDefs as any,
-    resolvers
+    resolvers: ceResolvers as any,
   });
-  const schemaWithMiddleware = applyMiddleware(schema, readOnlyMiddleware, authMiddleware);
+
+  // Schema for EE version
+  const eeSchema = makeExecutableSchema({
+    typeDefs: typeDefsEE as any,
+    resolvers: eeResolvers as any,
+  });
+
+  // Merge CE/EE schema
+  const schema: any = mergeSchemas({
+    schemas: [
+      ceSchema,
+      eeSchema,
+    ],
+  });
+
+  const schemaWithMiddleware = applyMiddleware(schema, readOnlyMiddleware, authMiddleware, eeAuthMiddleware);
   const server = new ApolloServer({
     playground: config.graphqlPlayground,
     // if playground is enabled, so should introspection
