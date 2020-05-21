@@ -10,6 +10,7 @@ type Dataset {
   global: Boolean
   type: String
   url: String
+  pvProvisioning: String
   nfsServer: String
   nfsPath: String
   hostPath: String
@@ -137,6 +138,7 @@ input DatasetCreateInput {
   global: Boolean
   type: String
   url: String
+  pvProvisioning: String
   nfsServer: String
   nfsPath: String
   hostPath: String
