@@ -184,7 +184,6 @@ export const updateMapping = (data: any) => {
     spec: {
       displayName: data.displayName,
       description: data.description,
-      type: data.type,
       url: data.url,
       variables: data.variables,
       enableUploadServer: isNil(data.enableUploadServer) ? 'false' : data.enableUploadServer.toString(),

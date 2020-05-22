@@ -43,13 +43,11 @@ export const PhScheduleFragment = gql`
 `
 
 export const GET_PH_SCHEDULE_CONNECTION = gql`
-  query phSchedulesConnection($where: PhScheduleWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
-    phSchedulesConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
+  query phSchedulesConnection($where: PhScheduleWhereInput, $page: Int, $orderBy: PhScheduleOrderByInput) {
+    phSchedulesConnection(where: $where, page: $page, orderBy: $orderBy) {
       pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
+        totalPage
+        currentPage
       }
       edges {
         cursor
@@ -91,11 +89,13 @@ type Props = {
 } & RouteComponentProps & PathComponentProps;
 
 class ScheduleListContainer extends React.Component<Props> {
-  changeFilter = (payload) => {
+  scheduleRefetch = (payload) => {
     const {pathname} = this.props;
     const payloadWithStringWhere = {...payload};
     if (payloadWithStringWhere.where)
       payloadWithStringWhere.where = JSON.stringify(payload.where);
+    if (payloadWithStringWhere.orderBy)
+      payloadWithStringWhere.orderBy = JSON.stringify(payload.orderBy || {});
 
     const {history, getPhScheduleConnection} = this.props;
     const search = queryString.stringify(payloadWithStringWhere);
@@ -117,7 +117,7 @@ class ScheduleListContainer extends React.Component<Props> {
         schedulesError={getPhScheduleConnection.error}
         schedulesConnection={getPhScheduleConnection.phSchedulesConnection || {pageInfo: {}, edges: []}}
         schedulesVariables={getPhScheduleConnection.variables}
-        schedulesRefetch={this.changeFilter}
+        schedulesRefetch={this.scheduleRefetch}
         runPhSchedule={runPhSchedule}
         runPhScheduleResult={runPhScheduleResult}
         deletePhScheduleResult={deletePhScheduleResult}
@@ -137,10 +137,8 @@ export default compose(
       return {
         variables: {
           where: JSON.parse(params.where as string || '{}'),
-          after: params.after || undefined,
-          before: params.before || undefined,
-          first: params.first ? parseInt(params.first as string, 10) : undefined,
-          last: params.last ? parseInt(params.last as string, 10) : undefined
+          orderBy: JSON.parse(params.orderBy as string || '{}'),
+          page: Number(params.page || 1)
         },
         fetchPolicy: 'cache-and-network'
       }

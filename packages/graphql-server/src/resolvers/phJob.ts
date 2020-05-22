@@ -207,7 +207,7 @@ const canUserCreate = async (userId: string, groupId: string, context: Context) 
 };
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhJobSpec>, where: any = {}, context: Context): Promise<PhJob[]> => {
+const listQuery = async (client: CustomResource<PhJobSpec>, where: any = {}, order: any, context: Context): Promise<PhJob[]> => {
   const {namespace, graphqlHost, jobLogCtrl, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phJob = await client.get(where.id);
@@ -220,7 +220,7 @@ const listQuery = async (client: CustomResource<PhJobSpec>, where: any = {}, con
   }
 
   const phJobs = await context.phJobCacheList.list();
-  let transformedPhJobs = await Promise.all(
+  const transformedPhJobs = await Promise.all(
     phJobs.map(job => transform(job, namespace, graphqlHost, jobLogCtrl, kcAdminClient)));
 
   if (where && where.mine) {
@@ -232,21 +232,21 @@ const listQuery = async (client: CustomResource<PhJobSpec>, where: any = {}, con
   }
 
   // sort by createTime
-  transformedPhJobs = orderBy(transformedPhJobs, 'createTime', 'desc');
-  return filter(transformedPhJobs, omit(where, 'mine'));
+  order = isEmpty(order) ? {createTime: 'desc'} : order;
+  return filter(transformedPhJobs, omit(where, 'mine'), order);
 };
 
 export const query = async (root, args, context: Context) => {
   const {crdClient} = context;
   // tslint:disable-next-line:max-line-length
-  const phJobs = await listQuery(crdClient.phJobs, args && args.where, context);
+  const phJobs = await listQuery(crdClient.phJobs, args && args.where, args && args.orderBy, context);
   return paginate(phJobs, extractPagination(args));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
   const {crdClient} = context;
   // tslint:disable-next-line:max-line-length
-  const phJobs = await listQuery(crdClient.phJobs, args && args.where, context);
+  const phJobs = await listQuery(crdClient.phJobs, args && args.where, args && args.orderBy, context);
   return toRelay(phJobs, extractPagination(args));
 };
 

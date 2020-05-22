@@ -1,6 +1,6 @@
-# import BuildImageJob, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql" 
-# import PhJob, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput, PhJobCreateInput, PhJobCancelResponse from "./phJob.graphql"
-# import PhSchedule, PhScheduleConnection, PhScheduleWhereUniqueInput, PhScheduleWhereInput, PhScheduleCreateInput, PhScheduleUpdateInput, PhScheduleDeleteResponse, PhScheduleRunResponse from "./phSchedule.graphql"
+# import BuildImageJob, BuildImageOrderByInput, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql" 
+# import PhJob, PhJobOrderByInput, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput, PhJobCreateInput, PhJobCancelResponse from "./phJob.graphql"
+# import PhSchedule, PhScheduleOrderByInput, PhScheduleConnection, PhScheduleWhereUniqueInput, PhScheduleWhereInput, PhScheduleCreateInput, PhScheduleUpdateInput, PhScheduleDeleteResponse, PhScheduleRunResponse from "./phSchedule.graphql"
 # import PhDeployment, PhDeploymentConnection, PhDeploymentWhereUniqueInput, PhDeploymentWhereInput, PhDeploymentCreateInput, PhDeploymentUpdateInput from "./phDeployment.graphql"
 
 scalar JSON
@@ -10,6 +10,8 @@ type Query {
   buildImage(where: BuildImageWhereUniqueInput!): BuildImage!
   buildImages(
     where: BuildImageWhereInput
+    page: Int
+    orderBy: BuildImageOrderByInput
     before: String
     after: String
     first: Int
@@ -17,6 +19,8 @@ type Query {
   ): [BuildImage]!
   buildImagesConnection(
     where: BuildImageWhereInput
+    page: Int
+    orderBy: BuildImageOrderByInput
     before: String
     after: String
     first: Int
@@ -27,6 +31,7 @@ type Query {
   buildImageJob(where: BuildImageJobWhereUniqueInput!): BuildImageJob!
   buildImageJobs(
     where: BuildImageJobWhereInput
+    page: Int
     before: String
     after: String
     first: Int
@@ -34,6 +39,7 @@ type Query {
   ): [BuildImageJob]!
   buildImageJobsConnection(
     where: BuildImageJobWhereInput
+    page: Int
     before: String
     after: String
     first: Int
@@ -44,6 +50,8 @@ type Query {
   phJob(where: PhJobWhereUniqueInput!): PhJob!
   phJobs(
     where: PhJobWhereInput
+    page: Int
+    orderBy: PhJobOrderByInput
     before: String
     after: String
     first: Int
@@ -51,6 +59,8 @@ type Query {
   ): [PhJob]!
   phJobsConnection(
     where: PhJobWhereInput
+    page: Int
+    orderBy: PhJobOrderByInput
     before: String
     after: String
     first: Int
@@ -61,6 +71,8 @@ type Query {
   phSchedule(where: PhScheduleWhereUniqueInput!): PhSchedule!
   phSchedules(
     where: PhScheduleWhereInput
+    page: Int
+    orderBy: PhScheduleOrderByInput
     before: String
     after: String
     first: Int
@@ -68,6 +80,8 @@ type Query {
   ): [PhSchedule]!
   phSchedulesConnection(
     where: PhScheduleWhereInput
+    page: Int
+    orderBy: PhScheduleOrderByInput
     before: String
     after: String
     first: Int

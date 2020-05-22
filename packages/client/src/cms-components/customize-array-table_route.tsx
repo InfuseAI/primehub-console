@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import {get, mapValues} from 'lodash';
 import { Table, Button, Modal, Icon, notification } from "antd";
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from "react-intl";
@@ -6,16 +7,23 @@ import defaultMessage, {renderValue} from "@canner/antd-locales";
 import EmailForm from '../cms-toolbar/sendEmailModal';
 import {renderUploadServerLink} from '../../schema/utils';
 import {Props} from './types';
+import styled from 'styled-components';
 
 const ButtonGroup = Button.Group;
 const confirm = Modal.confirm;
 const GLOBAL_DISABLE = (window as any).disableMode || false;
 const DISABLE_GROUP = (window as any).disableGroup || false;
+const StyledTable = styled(Table)`
+`
 const DISABLE_BUILD_IMAGE = !(window as any).customImageSetup || true;
 
 @injectIntl
 export default class ArrayBreadcrumb extends Component<Props & {
   registerSendEmailCallback: (callback: Function) => void;
+  changeOrderBy: (orderBy: Record<string, string>) => void;
+  query: any;
+  toolbar: Object;
+  updateQuery: Function;
 }> {
   static defaultProps = {
     value: [],
@@ -36,6 +44,26 @@ export default class ArrayBreadcrumb extends Component<Props & {
     const {registerSendEmailCallback, keyName} = this.props;
     if (keyName === 'user' && registerSendEmailCallback)
       registerSendEmailCallback(this.openModal);
+  }
+
+  handleTableChange = (pagination, filters, sorter) => {
+    const {updateQuery, keyName, query, toolbar, fetch} = this.props;
+    const defaultArgs: any = {};
+    if (!get(toolbar, 'async')) return;
+    if (get(toolbar, 'pagination.number', false)) {
+      defaultArgs.page = 1
+    } else {
+      defaultArgs.first = 10;
+    }
+    const queries = query.getQueries([keyName]).args || defaultArgs;
+    const variables = query.getVariables();
+    const args = mapValues(queries, v => variables[v.substr(1)]);
+    updateQuery([keyName], {
+      ...args,
+      orderBy:sorter.field ? {
+        [sorter.field]: get(sorter, 'order') === 'ascend' ? 'asc' : 'desc'
+      } : {}
+    }).then(() => fetch(keyName));
   }
 
   onSelectChange = (record, selected) => {
@@ -184,7 +212,8 @@ export default class ArrayBreadcrumb extends Component<Props & {
         title: intl.formatMessage({ id: 'uploadServerLink' }),
         dataIndex: 'uploadServerLink',
         key: 'uploadServerLink',
-        render: renderUploadServerLink
+        render: renderUploadServerLink,
+        sorter: true,
       });
     }
     if (!removeActions) {
@@ -311,11 +340,12 @@ export default class ArrayBreadcrumb extends Component<Props & {
             </Button>
           )}
         </ButtonGroup>
-        <Table
+        <StyledTable
           pagination={showPagination}
           dataSource={dataSource.map((datum, i) => {
             return {...datum, __index: i, key: datum.key || i};
           })}
+          onChange={this.handleTableChange}
           columns={newColumnsRender}
           style={{marginBottom: 32}}
           rowKey="id"

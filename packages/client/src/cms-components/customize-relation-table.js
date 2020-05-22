@@ -3,7 +3,7 @@ import { Tag, Tooltip, Icon, Table, Button } from "antd";
 import template from 'lodash/template';
 import difference from "lodash/difference";
 import get from 'lodash/get';
-import Picker from '@canner/antd-share-relation';
+import Picker from './relation-picker';
 import {injectIntl} from 'react-intl';
 import {FormattedMessage} from "react-intl";
 import {renderValue} from '@canner/antd-locales';
@@ -42,18 +42,17 @@ export default class RelationTable extends PureComponent {
   }
 
   handleCancel = () => {
-    const {updateRelationQuery, relationArgs, relation} = this.props;
+    const {updateRelationQuery, relationArgs, relation, toolbar} = this.props;
     this.setState({
       modalVisible: false
     });
-    updateRelationQuery([relation.to], {
-      where: {},
-      after: undefined,
-      before: undefined,
-      first: 10,
-      last: undefined,
-      orderBy: undefined,
-    })
+    const defaultQuery = {where: {}};
+    if (get(toolbar, 'async') && get(toolbar, 'pagination.number')) {
+      defaultQuery.page = 1;
+    } else {
+      defaultQuery.first = 10;
+    }
+    updateRelationQuery([relation.to], defaultQuery)
   }
 
   handleClose = (index) => {
@@ -64,8 +63,9 @@ export default class RelationTable extends PureComponent {
   render() {
     const { modalVisible } = this.state;
     let { disabled, value = [], uiParams = {}, refId, relation,
-      fetch, fetchRelation, updateQuery, subscribe, intl,
-      schema, Toolbar, relationValue, goTo, rootValue, title, isRelationFetching
+      fetch, fetchRelation, updateQuery, subscribe, intl, toolbar,
+      schema, Toolbar, relationValue, goTo, rootValue, title, isRelationFetching,
+      relationArgs, updateRelationQuery,
     } = this.props;
     const columnsRender = renderValue(uiParams.columns, schema[relation.to].items.items, this.props);
     const pickerColumnsRender = renderValue(uiParams.pickerColumns || uiParams.columns, schema[relation.to].items.items, this.props);
@@ -115,6 +115,9 @@ export default class RelationTable extends PureComponent {
             updateQuery={updateQuery}
             fetchRelation={fetchRelation}
             Toolbar={Toolbar}
+            relationArgs={relationArgs}
+            toolbar={toolbar}
+            updateRelationQuery={updateRelationQuery}
           />
         }
       </div>

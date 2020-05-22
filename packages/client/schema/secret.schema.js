@@ -12,10 +12,12 @@ export default () => (
     uiParams={{
       columns: [{
         title: 'Name',
-        dataIndex: 'name'
+        dataIndex: 'name',
+        sorter: (a, b) => (a.name || '').localeCompare(b.name || ''),
       }, {
         title: 'Display Name',
-        dataIndex: 'displayName'
+        dataIndex: 'displayName',
+        sorter: (a, b) => (a.displayName || '').localeCompare(b.displayName || ''),
       }],
       disableCreate: true
     }}

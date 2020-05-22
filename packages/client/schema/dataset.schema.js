@@ -15,13 +15,16 @@ export default () => (
     uiParams={{
       columns: [{
         title: '${name}',
-        dataIndex: 'name'
+        dataIndex: 'name',
+        sorter: true,
       }, {
         title: '${displayName}',
-        dataIndex: 'displayName'
+        dataIndex: 'displayName',
+        sorter: true,
       }, {
         title: '${type}',
         dataIndex: 'type',
+        sorter: true,
         render: (value) => {
           if (value == 'pv') {
             return 'persistent volume';
@@ -33,7 +36,8 @@ export default () => (
         }
       }, {
         title: '${description}',
-        dataIndex: 'description'
+        dataIndex: 'description',
+        sorter: true,
       }],
       disableCreate: true
     }}
@@ -41,8 +45,8 @@ export default () => (
     hideButtons
     graphql={
       `
-      query($datasetAfter: String, $datasetBefore: String, $datasetLast: Int, $datasetFirst: Int, $datasetWhere: DatasetWhereInput) {
-        dataset: datasetsConnection(after: $datasetAfter, before: $datasetBefore, last: $datasetLast, first: $datasetFirst,where: $datasetWhere) {
+      query($datasetPage: Int, $datasetOrderBy: DatasetOrderByInput, $datasetWhere: DatasetWhereInput) {
+        dataset: datasetsConnection(page: $datasetPage, orderBy: $datasetOrderBy, where: $datasetWhere) {
           edges {
             cursor
             node {
@@ -55,8 +59,8 @@ export default () => (
             }
           }
           pageInfo {
-            hasNextPage
-            hasPreviousPage
+            currentPage
+            totalPage
           }
         }
       }
@@ -76,7 +80,7 @@ export default () => (
           key: 'displayName'
         }]}
       />
-      <pagination />
+      <pagination number/>
     </toolbar>
     <Default component={DatasetWrapper}>
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
@@ -105,6 +109,7 @@ export default () => (
     <Condition match={(data, operator) => !data.global} defaultMode="hidden">
       <boolean keyName="launchGroupOnly" title="${launchGroupOnly}" defaultValue={true} />
     </Condition>
+    <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
     <string keyName="type" 
       required
       ui="select"
@@ -128,6 +133,7 @@ export default () => (
         }]
       }}
     />
+    </Condition>
     <Condition match={data => data.type === 'git'}>
       <string keyName="url" ui="link" title="${datasetUrl}"/>
       <relation
@@ -210,7 +216,7 @@ export default () => (
           />
         </Condition>
       </Layout>
-      
+
       <string keyName="uploadServerLink" hidden />
       <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
         <Condition match={(data, operator) => operator === 'update'} defaultMode="hidden">
@@ -237,8 +243,8 @@ export default () => (
             pickerColumns: groupPickerColumns,
           }}
           graphql={`
-          query($groupAfter: String, $groupBefore: String, $groupLast: Int, $groupFirst: Int,$groupWhere: GroupWhereInput) {
-            group: groupsConnection(after: $groupAfter, before: $groupBefore, last: $groupLast, first: $groupFirst,where: $groupWhere) {
+          query($groupPage: Int, $groupOrderBy: GroupOrderByInput, $groupWhere: GroupWhereInput) {
+            group: groupsConnection(page: $groupPage, orderBy: $groupOrderBy, where: $groupWhere) {
               edges {
                 cursor
                 node {
@@ -251,8 +257,8 @@ export default () => (
                 }
               }
               pageInfo {
-                hasNextPage
-                hasPreviousPage
+                currentPage
+                totalPage
               }
             }
           }
@@ -268,7 +274,7 @@ export default () => (
                 key: 'name'
               }]}
             />
-            <pagination />
+            <pagination number/>
           </toolbar>
         </relation>
       </Layout>

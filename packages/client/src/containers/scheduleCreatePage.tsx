@@ -148,7 +148,7 @@ export default compose(
       onCompleted: () => {
         props.history.push({
           pathname: `${appPrefix}schedule`,
-          search: queryString.stringify({first: 10})
+          search: queryString.stringify({page: 1})
         });
       },
       onError: errorHandler

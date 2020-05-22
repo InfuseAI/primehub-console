@@ -85,7 +85,7 @@ export default class History extends React.Component<Props, State> {
       // ellipsis: true,
       render: deployment => (
         deployment.stop ? (
-          <strong>(Stop deployment)</strong>
+          <div>Deployment Stopped</div>
         ): (
           <Tooltip placement="topLeft" style={{...textOverflowStyle}} title={deployment.description}>
             <div className="cell">
@@ -133,7 +133,7 @@ export default class History extends React.Component<Props, State> {
               <Row gutter={36}>
                 <Col span={12}>
                   <Field label="User" value={deployment.userName ? deployment.userName : '-'} />
-                  <Field label="Stop" value={deployment.stop ? 'true' : 'false'} />
+                  <Field label="Deployment Stopped" value={deployment.stop ? 'True' : 'False'} />
                   <Field label="Model Image" value={deployment.modelImage || '-'} />
                   <Field label="Replicas" value={deployment.replicas} />
                   <Field label="Group" value={deployment.groupName} />

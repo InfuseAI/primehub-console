@@ -24,19 +24,19 @@ const transformSecret = (secret: any) => {
  * Query
  */
 
-const listQuery = async (k8sSecret: K8sSecret, where: any, currentWorkspace: CurrentWorkspace) => {
+const listQuery = async (k8sSecret: K8sSecret, where: any, order: any, currentWorkspace: CurrentWorkspace) => {
   // filter ifDockerConfigJson
   const ifDockerConfigJson = get(where, 'ifDockerConfigJson', false);
   const secrets = ifDockerConfigJson ?
     await k8sSecret.find(SECRET_DOCKER_CONFIG_JSON_TYPE, currentWorkspace.getK8sNamespace()) :
     await k8sSecret.find(null, currentWorkspace.getK8sNamespace());
-  return filter(secrets, where);
+  return filter(secrets, where, order);
 };
 
 export const query = async (root, args, context: Context) => {
   const {k8sSecret} = context;
   const currentWorkspace = createInResolver(root, args, context);
-  let secrets = await listQuery(k8sSecret, args && args.where, currentWorkspace);
+  let secrets = await listQuery(k8sSecret, args && args.where, args && args.orderBy, currentWorkspace);
   secrets = secrets.map(transformSecret);
   return paginate(secrets, extractPagination(args));
 };
@@ -44,7 +44,7 @@ export const query = async (root, args, context: Context) => {
 export const connectionQuery = async (root, args, context: Context) => {
   const {k8sSecret} = context;
   const currentWorkspace = createInResolver(root, args, context);
-  let secrets = await listQuery(k8sSecret, args && args.where, currentWorkspace);
+  let secrets = await listQuery(k8sSecret, args && args.where, args && args.orderBy, currentWorkspace);
   secrets = secrets.map(transformSecret);
   return toRelay(secrets, extractPagination(args));
 };

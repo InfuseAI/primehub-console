@@ -16,8 +16,8 @@ exports.GroupRelation = () => (
       pickerColumns: groupPickerColumns
     }}
     graphql={`
-    query($groupAfter: String, $groupBefore: String, $groupLast: Int, $groupFirst: Int,$groupWhere: GroupWhereInput) {
-      group: groupsConnection(after: $groupAfter, before: $groupBefore, last: $groupLast, first: $groupFirst,where: $groupWhere) {
+    query($groupPage: Int, $groupWhere: GroupWhereInput, $groupOrderBy: GroupOrderByInput) {
+      group: groupsConnection(page: $groupPage, where: $groupWhere, orderBy: $groupOrderBy) {
         edges {
           cursor
           node {
@@ -30,8 +30,8 @@ exports.GroupRelation = () => (
           }
         }
         pageInfo {
-          hasNextPage
-          hasPreviousPage
+          currentPage
+          totalPage
         }
       }
     }
@@ -46,7 +46,7 @@ exports.GroupRelation = () => (
           key: 'name'
         }]}
       />
-      <pagination />
+      <pagination number />
     </toolbar>
   </relation>
 );
