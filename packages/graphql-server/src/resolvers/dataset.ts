@@ -212,11 +212,11 @@ export const onCreate = async (
   const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
   // dataset pvc
   if (data.type === 'pv') {
-    if (isNil(data.volumeSize) || data.volumeSize <= 0) {
-      throw new Error(`invalid dataset volumeSize: ${data.volumeSize}`);
-    }
     // create pvc
     if (!(resource.spec.pv && resource.spec.pv.provisioning === 'manual')) {
+      if (isNil(data.volumeSize) || data.volumeSize <= 0) {
+        throw new Error(`invalid dataset volumeSize: ${data.volumeSize}`);
+      }
       await context.k8sDatasetPvc.create({
         volumeName: resource.spec.volumeName,
         volumeSize: data.volumeSize
@@ -301,11 +301,12 @@ export const onUpdate = async (
   if (data && data.groups) {
     const datasetId = resource.metadata.name;
     const datasetType = resource.spec.type;
+    const dataset_writable_type_list = ['pv', 'nfs', 'hostPath'];
     // add to group
     await mutateRelation({
       resource: data.groups,
       connect: async (where: {id: string, writable: boolean}) => {
-        if (datasetType !== 'pv') {
+        if (!dataset_writable_type_list.includes(datasetType)) {
           return context.kcAdminClient.groups.addRealmRoleMappings({
             id: where.id,
             roles: [{
@@ -314,7 +315,7 @@ export const onUpdate = async (
             }]
           });
         }
-        // pv dataset
+        // dataset_writable_type
         const writableRole = await getWritableRole({
           kcAdminClient: context.kcAdminClient,
           datasetId,
@@ -367,7 +368,7 @@ export const onUpdate = async (
           }]
         });
 
-        if (datasetType === 'pv') {
+        if (!dataset_writable_type_list.includes(datasetType)) {
           // remove writable as well
           const writableRole = await getWritableRole({
             kcAdminClient: context.kcAdminClient,
