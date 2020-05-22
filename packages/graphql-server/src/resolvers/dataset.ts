@@ -11,6 +11,7 @@ import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspac
 import { keycloakMaxCount } from './constant';
 import { ResourceRole, ResourceNamePrefix } from './resourceRole';
 import {createConfig} from '../config';
+import { ApolloError } from 'apollo-server';
 
 export const ATTRIBUTE_PREFIX = 'dataset.primehub.io';
 
@@ -210,18 +211,15 @@ export const onCreate = async (
     currentWorkspace: CurrentWorkspace
   }) => {
   const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
-  // dataset pvc
-  if (data.type === 'pv') {
-    // create pvc
-    if (!(resource.spec.pv && resource.spec.pv.provisioning === 'manual')) {
-      if (isNil(data.volumeSize) || data.volumeSize <= 0) {
-        throw new Error(`invalid dataset volumeSize: ${data.volumeSize}`);
-      }
-      await context.k8sDatasetPvc.create({
-        volumeName: resource.spec.volumeName,
-        volumeSize: data.volumeSize
-      });
+  // dataset pv, create pvc
+  if (data.type === 'pv' && (!resource.spec.pv || resource.spec.pv.provisioning === 'auto')) {
+    if (isNil(data.volumeSize) || data.volumeSize <= 0) {
+      throw new Error(`invalid dataset volumeSize: ${data.volumeSize}`);
     }
+    await context.k8sDatasetPvc.create({
+      volumeName: resource.spec.volumeName,
+      volumeSize: data.volumeSize
+    });
   }
 
   if (data && data.global) {
@@ -392,7 +390,7 @@ export const onDelete = async ({
   name, context, resource, getPrefix
 }: {name: string, context: Context, resource: any, getPrefix: (customizePrefix?: string) => string}) => {
   // delete dataset pvc
-  if (!(resource.spec.pv && resource.spec.pv.provisioning === 'manual')) {
+  if (resource.spec.type === 'pv' && (!resource.spec.pv || resource.spec.pv.provisioning === 'auto')) {
     await context.k8sDatasetPvc.delete(resource.spec.volumeName);
   }
   await context.k8sUploadServerSecret.delete(name);
@@ -594,6 +592,25 @@ export const regenerateUploadSecret = async (root, args, context: Context) => {
   };
 };
 
+export const preCreateCheck = async (
+  {data, context}:
+  {
+    data: any,
+    context: Context,
+  }) => {
+  if (data.type === 'pv' && data.pvProvisioning === 'auto') {
+    // find pvc
+    try {
+      const found = await context.k8sDatasetPvc.findOne(data.name);
+      if (found !== null) {
+        throw new ApolloError(`PVC already exist`, 'PVC_CONFLICT');
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+};
+
 export const crd = new Crd<DatasetSpec>({
   customResourceMethod: 'datasets',
   propMapping: mapping,
@@ -605,5 +622,6 @@ export const crd = new Crd<DatasetSpec>({
   onUpdate,
   onDelete,
   resolveType,
-  customUpdate
+  customUpdate,
+  preCreateCheck: preCreateCheck
 });

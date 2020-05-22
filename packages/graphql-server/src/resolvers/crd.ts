@@ -44,6 +44,7 @@ export class Crd<SpecType> {
   private customParseWhere?: (where: any) => any;
   private generateName?: () => string;
   private rolePrefix?: string;
+  private preCreateCheck?: (data: any) => Promise<any>;
 
   constructor({
     customResourceMethod,
@@ -58,7 +59,8 @@ export class Crd<SpecType> {
     onDelete,
     customUpdate,
     customParseWhere,
-    generateName
+    generateName,
+    preCreateCheck
   }: {
     customResourceMethod: string,
     propMapping: (item: Item<SpecType>) => Record<string, any>,
@@ -84,6 +86,7 @@ export class Crd<SpecType> {
     }) => Promise<any>,
     customParseWhere?: (where: any) => any,
     generateName?: () => string,
+    preCreateCheck?: (data: any) => Promise<any>,
   }) {
     this.customResourceMethod = customResourceMethod;
     this.propMapping = propMapping;
@@ -99,6 +102,7 @@ export class Crd<SpecType> {
     this.rolePrefix = config.rolePrefix;
     this.customParseWhere = customParseWhere;
     this.generateName = generateName;
+    this.preCreateCheck = preCreateCheck;
   }
 
   public setCache(cache: CrdCache<SpecType>) {
@@ -308,6 +312,16 @@ export class Crd<SpecType> {
     const {kcAdminClient, crdClient} = context;
     const customResource = crdClient[this.customResourceMethod];
     const currentWorkspace = createInResolver(root, args, context);
+
+    if (this.preCreateCheck) {
+      try {
+        await this.preCreateCheck({
+          data: args.data, context});
+      } catch (err) {
+        throw err;
+      }
+    }
+
     // create role on keycloak
     const roleName = `${this.getPrefix(currentWorkspace)}${name}`;
     try {
