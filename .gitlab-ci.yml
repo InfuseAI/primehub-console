@@ -101,8 +101,12 @@ build:
     - docker push "${REGISTRY}/${REPOSITORY}/admin-server:${CI_COMMIT_SHA:0:7}"
     - docker build -t "${REGISTRY}/${REPOSITORY}/admin-server-model-deploy:${CI_COMMIT_SHA:0:7}" -f packages/admin-server/overlay/model_deployment/Dockerfile .
     - docker push "${REGISTRY}/${REPOSITORY}/admin-server-model-deploy:${CI_COMMIT_SHA:0:7}"
+    - docker build -t "${REGISTRY}/${REPOSITORY}/admin-server-ce:${CI_COMMIT_SHA:0:7}" -f packages/admin-server/overlay/ce/Dockerfile .
+    - docker push "${REGISTRY}/${REPOSITORY}/admin-server-ce:${CI_COMMIT_SHA:0:7}"
     - docker build -t "${REGISTRY}/${REPOSITORY}/graphql-server:${CI_COMMIT_SHA:0:7}" -f packages/graphql-server/Dockerfile .
     - docker push "${REGISTRY}/${REPOSITORY}/graphql-server:${CI_COMMIT_SHA:0:7}"
+    - docker build -t "${REGISTRY}/${REPOSITORY}/graphql-server-ce:${CI_COMMIT_SHA:0:7}" -f packages/graphql-server/ce/Dockerfile .
+    - docker push "${REGISTRY}/${REPOSITORY}/graphql-server-ce:${CI_COMMIT_SHA:0:7}"
     - docker build -t "${REGISTRY}/${REPOSITORY}/watcher:${CI_COMMIT_SHA:0:7}" -f packages/watcher/Dockerfile .
     - docker push "${REGISTRY}/${REPOSITORY}/watcher:${CI_COMMIT_SHA:0:7}"
   only:
@@ -117,8 +121,12 @@ release:tag:
     - docker push "${REGISTRY}/${REPOSITORY}/admin-server:${CI_COMMIT_TAG}"
     - docker build -t "${REGISTRY}/${REPOSITORY}/admin-server-model-deploy:${CI_COMMIT_TAG}" -f packages/admin-server/overlay/model_deployment/Dockerfile .
     - docker push "${REGISTRY}/${REPOSITORY}/admin-server-model-deploy:${CI_COMMIT_TAG}"
+    - docker build -t "${REGISTRY}/${REPOSITORY}/admin-server-ce:${CI_COMMIT_TAG}" -f packages/admin-server/overlay/ce/Dockerfile .
+    - docker push "${REGISTRY}/${REPOSITORY}/admin-server-ce:${CI_COMMIT_TAG}"
     - docker build -t "${REGISTRY}/${REPOSITORY}/graphql-server:${CI_COMMIT_TAG}" -f packages/graphql-server/Dockerfile .
     - docker push "${REGISTRY}/${REPOSITORY}/graphql-server:${CI_COMMIT_TAG}"
+    - docker build -t "${REGISTRY}/${REPOSITORY}/graphql-server-ce:${CI_COMMIT_TAG}" -f packages/graphql-server/ce/Dockerfile .
+    - docker push "${REGISTRY}/${REPOSITORY}/graphql-server-ce:${CI_COMMIT_TAG}"
     - docker build -t "${REGISTRY}/${REPOSITORY}/watcher:${CI_COMMIT_TAG}" -f packages/watcher/Dockerfile .
     - docker push "${REGISTRY}/${REPOSITORY}/watcher:${CI_COMMIT_TAG}"
   only:

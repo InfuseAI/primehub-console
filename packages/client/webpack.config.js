@@ -9,6 +9,8 @@ const webpack = require('webpack');
 const devMode = process.env.NODE_ENV !== 'production';
 const CompressionPlugin = require('compression-webpack-plugin');
 
+resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/index.schema.js');
+
 module.exports = {
   entry: {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
@@ -111,6 +113,9 @@ module.exports = {
       filename: 'model-deployment.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new webpack.DefinePlugin({
+      modelDeploymentOnly: false
+    }),
     new MiniCssExtractPlugin({
       filename: devMode ? '[name].css' : '[name].[hash].css',
       chunkFilename: devMode ? '[id].css' : '[id].[hash].css',

@@ -112,10 +112,10 @@ export default () => (
     <Layout component={EnableModelDeployment}>
       <boolean keyName="enabledDeployment" title="${groups.enabledDeployment}" uiParams={{yesText: ' ', noText: ' '}} />
     </Layout>
-    <Condition match={() => !window.modelDeploymentOnly} defaultMode="hidden">
+    <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
       <ShareVolumn />
     </Condition>
-    <Condition match={() => !window.modelDeploymentOnly} defaultMode="hidden">
+    <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
       <Block title="User Quota">
         <Row type="flex">
           <Col sm={8} xs={24}>
@@ -180,7 +180,7 @@ export default () => (
         </Col>
       </Row>
     </Block>
-    <Condition match={() => !window.modelDeploymentOnly} defaultMode="hidden">
+    <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
       <Block title="${dataset}">
         <array keyName="datasets"
           packageName="../src/cms-components/customize-array-datasets_in_groups"

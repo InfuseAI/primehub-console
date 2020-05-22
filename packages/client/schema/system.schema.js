@@ -24,7 +24,7 @@ export default () => (
         <string keyName="name" title="${name}"/>
         <image keyName="logo" title="${logo}"/>
       </object>
-      <Condition match={() => !window.modelDeploymentOnly} defaultMode="hidden">
+      <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
         <number keyName="defaultUserVolumeCapacity" title="${defaultUserVolumeCapacity}"
            uiParams={{unit: ' GB', step: 1, min: 1, precision: 0, defaultValue: 1}}
            validation={{min: 1}}

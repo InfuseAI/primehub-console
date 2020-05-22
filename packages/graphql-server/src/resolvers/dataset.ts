@@ -144,13 +144,13 @@ export const updateMapping = (data: any) => {
 
   let nfsSyncProp: any = {};
   if (data.nfsServer) {
-    nfsSyncProp = {nfs: {server: data.nfsServer}}
+    nfsSyncProp = {nfs: {server: data.nfsServer}};
   }
   if (data.nfsPath) {
-    nfsSyncProp = {nfs: {path: data.nfsPath}}
+    nfsSyncProp = {nfs: {path: data.nfsPath}};
   }
   if (data.nfsServer && data.nfsPath) {
-    nfsSyncProp = {nfs: {server: data.nfsServer, path: data.nfsPath}}
+    nfsSyncProp = {nfs: {server: data.nfsServer, path: data.nfsPath}};
   }
 
   const hostPathSyncProp = data.hostPath
