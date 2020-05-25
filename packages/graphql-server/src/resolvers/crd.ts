@@ -197,7 +197,7 @@ export class Crd<SpecType> {
     if (this.preCreateCheck) {
       try {
         await this.preCreateCheck({
-          resource: {metadata, spec}, context});
+          resource: {metadata, spec}});
       } catch (err) {
         throw err;
       }
@@ -327,7 +327,7 @@ export class Crd<SpecType> {
     if (this.preCreateCheck) {
       try {
         await this.preCreateCheck({
-          resource: {metadata, spec}, context});
+          resource: {metadata, spec}});
       } catch (err) {
         throw err;
       }

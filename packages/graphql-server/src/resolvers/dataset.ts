@@ -12,10 +12,15 @@ import { keycloakMaxCount } from './constant';
 import { ResourceRole, ResourceNamePrefix } from './resourceRole';
 import {createConfig} from '../config';
 import { ApolloError } from 'apollo-server';
+import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
 
 export const ATTRIBUTE_PREFIX = 'dataset.primehub.io';
 
 const config = createConfig();
+const datasetPvcQuery = new K8sDatasetPvc({
+  namespace: config.k8sCrdNamespace,
+  primehubGroupSc: config.primehubGroupSc
+});
 
 // utils
 const addToAnnotation = (data: any, field: string, annotation: any) => {
@@ -593,15 +598,14 @@ export const regenerateUploadSecret = async (root, args, context: Context) => {
 };
 
 export const preCreateCheck = async (
-  {resource, context}:
+  {resource}:
   {
-    resource: any,
-    context: Context,
+    resource: any
   }) => {
   if (resource.spec.type === 'pv' && (!resource.spec.pv || resource.spec.pv.provisioning === 'auto')) {
     // find pvc
     try {
-      const found = await context.k8sDatasetPvc.findOne(resource.spec.volumeName);
+      const found = await datasetPvcQuery.findOne(resource.spec.volumeName);
       if (found !== null) {
         throw new ApolloError(`PVC already exist`, 'PVC_CONFLICT');
       }
