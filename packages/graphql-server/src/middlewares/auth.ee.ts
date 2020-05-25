@@ -22,7 +22,6 @@ const isClient = rule({ cache: 'contextual' })(
 
 export const permissions = shield({
   Query: {
-    '*': isAdmin,
     'phJob': or(isAdmin, isJobUser),
     'phJobs': or(isAdmin, isJobUser),
     'phJobsConnection': or(isAdmin, isJobUser),
@@ -34,7 +33,6 @@ export const permissions = shield({
     'phDeploymentsConnection': or(isAdmin, isJobUser)
   },
   Mutation: {
-    '*': isAdmin,
     'createPhJob': or(isAdmin, isJobUser),
     'rerunPhJob': or(isAdmin, isJobUser),
     'cancelPhJob': or(isAdmin, isJobUser),
