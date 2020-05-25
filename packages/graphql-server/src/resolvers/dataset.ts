@@ -366,7 +366,7 @@ export const onUpdate = async (
           }]
         });
 
-        if (!dataset_writable_type_list.includes(datasetType)) {
+        if (dataset_writable_type_list.includes(datasetType)) {
           // remove writable as well
           const writableRole = await getWritableRole({
             kcAdminClient: context.kcAdminClient,
