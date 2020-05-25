@@ -65,6 +65,7 @@ import { Item } from './crdClient/customResource';
 import K8sUploadServerSecret from './k8sResource/k8sUploadServerSecret';
 import { Role } from './resolvers/interface';
 import Token from './oidc/token';
+import ApiTokenCache from './oidc/apiTokenCache';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -207,6 +208,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
   await tokenSyncer.start();
 
+  // api token cache
+  const apiTokenCache = new ApiTokenCache({
+    oidcClient
+  });
   // ann
   const annCtrl = new AnnCtrl({
     createKcAdminClient,
@@ -272,7 +277,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       // the request could come from jupyterHub or cms
       // jupyterHub would use sharedGraphqlSecretKey and cms will use accessToken from refresh_token grant flow
       if (authorization.indexOf('Bearer') >= 0) {
-        const apiToken = authorization.replace('Bearer ', '');
+        let apiToken = authorization.replace('Bearer ', '');
 
         // if config.sharedGraphqlSecretKey is set and apiToken equals to it
         if (!isEmpty(config.sharedGraphqlSecretKey) && config.sharedGraphqlSecretKey === apiToken) {
@@ -288,7 +293,24 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         } else {
           // Either config.sharedGraphqlSecretKey not set, or not a sharedGraphqlSecretKey request
           // we verify the token with oidc public key
-          const tokenPayload = await oidcTokenVerifier.verify(apiToken);
+          let tokenPayload;
+          let checkOfflineToken = false;
+
+          try {
+            tokenPayload = await oidcTokenVerifier.verify(apiToken);
+            if (tokenPayload.typ === "Offline") {
+              checkOfflineToken = true;
+            }
+          } catch (err) {
+            // in keycloak8, the offline token JWT is always verified failed.
+            checkOfflineToken = true;
+          }
+
+          if (checkOfflineToken) {
+            // API Token is a offline token. Refresh it to get the real access token
+            apiToken = await apiTokenCache.getAccessToken(apiToken);
+            tokenPayload = await oidcTokenVerifier.verify(apiToken);
+          }
           userId = tokenPayload.sub;
           username = tokenPayload.preferred_username;
 
