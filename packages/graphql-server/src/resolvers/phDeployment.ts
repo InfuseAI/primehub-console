@@ -258,8 +258,10 @@ export const typeResolvers = {
     });
     return (items || []).map(item => {
       const podName = get(item, 'metadata.name');
+      const phase = get(item, 'status.phase');
       return {
         name: podName,
+        phase,
         logEndpoint:
           `${context.graphqlHost}${context.jobLogCtrl.getPhDeploymentEndpoint(context.crdNamespace, podName)}`,
       };
