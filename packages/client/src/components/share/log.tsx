@@ -9,6 +9,7 @@ type Props = {
   endpoint: string;
   rows?: number;
   style?: object;
+  shouldRetryAfterFetched?: Function;
 }
 
 type State = {
@@ -104,7 +105,7 @@ export default class Logs extends React.Component<Props, State> {
 
   fetchLog = () => {
     const token = window.localStorage.getItem('canner.accessToken');
-    const {endpoint} = this.props;
+    const {endpoint, shouldRetryAfterFetched = () => {}} = this.props;
     const {tailLines} = this.state;
     const that = this;
     if (this.controller) this.controller.abort();
@@ -146,10 +147,13 @@ export default class Logs extends React.Component<Props, State> {
 
       return readChunk();
     })
-    .then(() => {
-      setTimeout(() => {
-        this.fetchLog();
-      }, 10000);
+    .then(async () => {
+      const retryAfterFetched = await shouldRetryAfterFetched();
+      if (retryAfterFetched) {
+        setTimeout(() => {
+          this.fetchLog();
+        }, 10000);
+      }
     })
     .catch(err => {
       if (err.message === 'The user aborted a request.') {

@@ -1,5 +1,13 @@
 import gql from 'graphql-tag';
 
+export enum Phase {
+  Pending = 'Pending',
+  Running = 'Running',
+  Succeeded = 'Succeeded',
+  Failed = 'Failed',
+  Unknown = 'Unknown',
+}
+
 export enum Status {
   Deploying = 'Deploying',
   Deployed = 'Deployed',
@@ -43,6 +51,7 @@ export interface DeploymentInfo {
   pods: Array<{
     name: string;
     logEndpoint: string;
+    phase: Phase;
   }>,
   availableReplicas: number,
   replicas: number;

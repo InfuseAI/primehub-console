@@ -71,6 +71,7 @@ class JobDetailContainer extends React.Component<Props> {
     return (
       <DeploymentDetail
         history={history}
+        refetchPhDeployment={getPhDeployment.refetch}
         stopPhDeployment={stopPhDeployment}
         deletePhDeployment={deletePhDeployment}
         deployPhDeployment={deployPhDeployment}
