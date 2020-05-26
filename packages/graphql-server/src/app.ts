@@ -62,8 +62,6 @@ import Boom from 'boom';
 import readOnlyMiddleware from './middlewares/readonly';
 // Basic Auth middleware
 import { permissions as authMiddleware } from './middlewares/auth';
-// Auth middleware for EE version
-import { permissions as eeAuthMiddleware } from './middlewares/auth.ee';
 import TokenSyncer from './oidc/syncer';
 import K8sSecret from './k8sResource/k8sSecret';
 import K8sDatasetPvc from './k8sResource/k8sDatasetPvc';
@@ -327,7 +325,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     ],
   });
 
-  const schemaWithMiddleware = applyMiddleware(schema, readOnlyMiddleware, authMiddleware, eeAuthMiddleware);
+  const schemaWithMiddleware = applyMiddleware(schema, readOnlyMiddleware, authMiddleware);
   const server = new ApolloServer({
     playground: config.graphqlPlayground,
     // if playground is enabled, so should introspection
