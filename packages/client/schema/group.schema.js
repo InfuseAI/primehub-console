@@ -100,7 +100,7 @@ export default () => (
         validation={{
           validator: (value, cb) => {
             if (!value.match(/^[A-Za-z0-9][-\w]*[A-Za-z0-9]+$/)) {
-              return cb(`alphanumeric characters, '-' or '_' , and must start and end with an alphanumeric character.`);
+              return cb("Group name must begin and end with an alphanumeric character.");
             }
           }
         }}
