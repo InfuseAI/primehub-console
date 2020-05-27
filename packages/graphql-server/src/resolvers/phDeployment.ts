@@ -1,6 +1,6 @@
 import { Context } from './interface';
 import {
-  toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser, mergeVariables
+  toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser, mergeVariables, validateLicense
 } from './utils';
 import {
   PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, client as kubeClient
@@ -348,6 +348,7 @@ export const queryOne = async (root, args, context: Context) => {
 
 export const create = async (root, args, context: Context) => {
   const data: PhDeploymentMutationInput = args.data;
+  validateLicense();
   await validateQuota(context, data.groupId, data.instanceType);
   await canUserMutate(context.userId, data.groupId, context);
   const phDeployment = await createDeployment(context, data);

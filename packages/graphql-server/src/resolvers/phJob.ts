@@ -1,5 +1,5 @@
 import { Context } from './interface';
-import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser } from './utils';
+import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser, validateLicense } from './utils';
 import { PhJobPhase, PhJobSpec, PhJobStatus } from '../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../crdClient/customResource';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
@@ -265,6 +265,7 @@ export const queryOne = async (root, args, context: Context) => {
 
 export const create = async (root, args, context: Context) => {
   const data: PhJobCreateInput = args.data;
+  validateLicense();
   await validateQuota(context, data);
   await canUserCreate(context.userId, data.groupId, context);
   const phJob = await createJob(context, data);
