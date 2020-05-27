@@ -114,8 +114,9 @@ test:
 release:tag:
   stage: release
   script:
-    - echo "${DOCKER_DRIVER}"
-    - docker login -u $DOCKER_USER -p $DOCKER_PASS
+    - echo "${DOCKER_USER}"
+    - docker version
+    - docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
     - docker build -t "infuseai/canner-admin-server:${CI_COMMIT_TAG}" -f packages/admin-server/Dockerfile .
     - docker push "infuseai/canner-admin-server:${CI_COMMIT_TAG}"
     - docker build -t "infuseai/canner-admin-server-model-deploy:${CI_COMMIT_TAG}" -f packages/admin-server/overlay/model_deployment/Dockerfile .
