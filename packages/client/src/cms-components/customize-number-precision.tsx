@@ -30,7 +30,7 @@ export default class Input extends PureComponent<Props> {
         max={uiParams && uiParams.max}
         step={uiParams && uiParams.step}
         precision={uiParams && uiParams.precision}
-        formatter={value => `${value}${uiParams && uiParams.unit ? uiParams.unit : ''}`}
+        formatter={uiParams && uiParams.formatter ? uiParams && uiParams.formatter : value => `${value}${uiParams && uiParams.unit ? uiParams.unit : ''}`}
         parser={uiParams && uiParams.parser ? uiParams && uiParams.parser : value => value.replace(/[^0-9\.]/g, '')}
         value={value}
         onChange={this.onChange}

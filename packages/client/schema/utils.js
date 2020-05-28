@@ -358,6 +358,7 @@ exports.dict = {
     nfsServer: 'NFS Server',
     nfsPath: 'NFS Path',
     hostPath: 'Host Path',
+    pvProvisioning: 'Provisioning',
     
     // userfederation
     userFederations: 'User Federations',

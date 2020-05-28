@@ -114,6 +114,7 @@ export default () => (
       required
       ui="select"
       title="${type}"
+      packageName="../src/cms-components/customize-string-select"
       uiParams={{
         options: [{
           text: 'persistent volume',
@@ -130,7 +131,8 @@ export default () => (
         }, {
           text: 'env',
           value: 'env'
-        }]
+        }],
+        style: {width: 200},
       }}
     />
     </Condition>
@@ -207,6 +209,24 @@ export default () => (
       />
     </Condition>
     <Condition match={data => data.type === 'pv'}>
+      <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
+        <string keyName="pvProvisioning" 
+          required
+          ui="select"
+          title="${pvProvisioning}"
+          defaultValue={'auto'}
+          uiParams={{
+            options: [{
+              text: 'auto',
+              value: 'auto'
+            }, {
+              text: 'manual',
+              value: 'manual'
+            }]
+          }}
+        />
+      </Condition>
+
       <Layout component={EnableUploadServer}>
         <Condition match={(data, operator) => operator === 'update'} defaultMode="hidden">
           <boolean
@@ -222,11 +242,15 @@ export default () => (
         <Condition match={(data, operator) => operator === 'update'} defaultMode="hidden">
           <string keyName="volumeName" title="${volumeName}"/>
         </Condition>
-        <number keyName="volumeSize" title="${volumeSize}"
-          uiParams={{unit: ' GB', step: 1, min: 1, precision: 0}}
-          defaultValue={1}
-          packageName="../src/cms-components/customize-number-precision"
-        />
+        <Condition match={(data, operator) => (operator !== 'create' || data.pvProvisioning !== 'manual')}>
+          <number keyName="volumeSize" title="${volumeSize}"
+            uiParams={{unit: ' GB', step: 1, min: 1, precision: 0, 
+              formatter: function(value) {return (value == -1 ? `-` : `${value} GB`)}
+            }}
+            defaultValue={1}
+            packageName="../src/cms-components/customize-number-precision"
+          />
+        </Condition>
       </Condition>
     </Condition>
     <Condition match={data => !(data.global && !['pv', 'nfs', 'hostPath'].includes(data.type))}>
