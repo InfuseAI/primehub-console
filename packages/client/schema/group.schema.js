@@ -225,6 +225,44 @@ export default () => (
         </array>
       </Block>
     </Condition>
+    <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
+      <Block title="${images}">
+        <relation keyName="images"
+          packageName='../src/cms-components/customize-relation-table'
+          relation={{
+            to: 'image',
+            type: 'toMany'
+          }}
+          uiParams={{
+            textCol: 'displayName',
+            columns: [
+              {
+                title: '${displayName}',
+                dataIndex: 'displayName'
+              }, {
+                title: '${type}',
+                dataIndex: 'type'
+              }, {
+                title: '${description}',
+                dataIndex: 'description'
+              }
+            ]
+          }}
+        >
+          <toolbar async>
+            <filter
+              component={Filter}
+              fields={[{
+                type: 'text',
+                label: '${username}',
+                key: 'username'
+              }]}
+            />
+            <pagination number/>
+          </toolbar>
+        </relation>
+      </Block>
+    </Condition>
     <Block title="${users}">
       <relation keyName="users"
         packageName='../src/cms-components/customize-relation-table'
