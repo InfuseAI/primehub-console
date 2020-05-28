@@ -85,7 +85,8 @@ type Service = {
   name: string,
   uri: string,
   adminOnly: boolean,
-  image: string
+  image: string,
+  target: string
 };
 type CardProps = {
   service: Service,
@@ -117,7 +118,7 @@ const Section = (props: SectionProps) => {
 const ServiceCard = (props: CardProps) => {
   const {service, imageHeight} = props;
   return (<>
-    <a href={service.uri}>
+    <a href={service.uri} target={ service.target ? service.target : '_self' }>
       <Card
         hoverable
       >
