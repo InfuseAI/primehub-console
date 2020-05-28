@@ -109,9 +109,13 @@ export default () => (
     </Condition>
 
     <string keyName="displayName" title="${displayName}" />
-    <Layout component={EnableModelDeployment}>
-      <boolean keyName="enabledDeployment" title="${groups.enabledDeployment}" uiParams={{yesText: ' ', noText: ' '}} />
-    </Layout>
+    <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
+     {/* Hidden enable EnableModelDeployment
+       * because in "deploy" mode it is always enabled. */}
+      <Layout component={EnableModelDeployment}>
+        <boolean keyName="enabledDeployment" title="${groups.enabledDeployment}" uiParams={{yesText: ' ', noText: ' '}} />
+      </Layout>
+    </Condition>
     <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
       <ShareVolumn />
     </Condition>

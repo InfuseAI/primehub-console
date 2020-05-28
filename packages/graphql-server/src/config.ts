@@ -68,6 +68,8 @@ export interface Config {
   licensedTo?: string;
   startedAt?: string;
   expiredAt?: string;
+
+  primehubMode?: string;
 }
 
 const defaultConfigs = {
@@ -97,7 +99,7 @@ const defaultConfigs = {
   enableWorkspace: false,
   licenseStatus: 'invalid',
   maxGroup: 999,
-  graphqlHost: 'http://localhost:3001'
+  graphqlHost: 'http://localhost:3001',
 };
 
 const prodConfigs = {
@@ -166,7 +168,8 @@ export const createConfig = (): Config => {
     licensedTo: process.env.LICENSED_TO,
     startedAt: process.env.STARTED_AT,
     expiredAt: process.env.EXPIRED_AT,
-    licenseStatus: process.env.EXPIRED
+    licenseStatus: process.env.EXPIRED,
+    primehubMode: process.env.PRIMEHUB_MODE
   });
 
   const env = process.env.NODE_ENV || 'development';
