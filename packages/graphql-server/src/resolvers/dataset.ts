@@ -11,10 +11,16 @@ import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspac
 import { keycloakMaxCount } from './constant';
 import { ResourceRole, ResourceNamePrefix } from './resourceRole';
 import {createConfig} from '../config';
+import { ApolloError } from 'apollo-server';
+import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
 
 export const ATTRIBUTE_PREFIX = 'dataset.primehub.io';
 
 const config = createConfig();
+const datasetPvcQuery = new K8sDatasetPvc({
+  namespace: config.k8sCrdNamespace,
+  primehubGroupSc: config.primehubGroupSc
+});
 
 // utils
 const addToAnnotation = (data: any, field: string, annotation: any) => {
@@ -67,6 +73,7 @@ export const mapping = (item: Item<DatasetSpec>) => {
     volumeName: item.spec.volumeName,
     spec: item.spec,
     writable: (item as any).roleName && (item as any).roleName.indexOf(':rw:') >= 0,
+    pvProvisioning: get(item, 'spec.pv.provisioning', 'auto'),
     nfsServer: get(item, 'spec.nfs.server'),
     nfsPath: get(item, 'spec.nfs.path'),
     hostPath: get(item, 'spec.hostPath.path'),
@@ -94,6 +101,9 @@ export const createMapping = (data: any) => {
   const gitSyncSecretId = get(data, 'secret.connect.id');
   const gitSyncProp = gitSyncSecretId
     ? {gitsync: {secret: gitSyncSecretId}}
+    : {};
+  const pvProp = (data.type == 'pv' && data.pvProvisioning)
+    ? {pv: {provisioning: data.pvProvisioning}}
     : {};
   const nfsProp = (data.nfsServer && data.nfsPath)
     ? {nfs: {server: data.nfsServer, path: data.nfsPath}}
@@ -126,6 +136,7 @@ export const createMapping = (data: any) => {
       // volumeName = dataset name
       volumeName: data.name,
       ...gitSyncProp,
+      ...pvProp,
       ...nfsProp,
       ...hostPathProp
     }
@@ -205,12 +216,11 @@ export const onCreate = async (
     currentWorkspace: CurrentWorkspace
   }) => {
   const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
-  // dataset pvc
-  if (data.type === 'pv') {
+  // dataset pv, create pvc
+  if (resource.spec.type === 'pv' && (!resource.spec.pv || resource.spec.pv.provisioning === 'auto')) {
     if (isNil(data.volumeSize) || data.volumeSize <= 0) {
       throw new Error(`invalid dataset volumeSize: ${data.volumeSize}`);
     }
-    // create pvc
     await context.k8sDatasetPvc.create({
       volumeName: resource.spec.volumeName,
       volumeSize: data.volumeSize
@@ -294,11 +304,12 @@ export const onUpdate = async (
   if (data && data.groups) {
     const datasetId = resource.metadata.name;
     const datasetType = resource.spec.type;
+    const dataset_writable_type_list = ['pv', 'nfs', 'hostPath'];
     // add to group
     await mutateRelation({
       resource: data.groups,
       connect: async (where: {id: string, writable: boolean}) => {
-        if (datasetType !== 'pv') {
+        if (!dataset_writable_type_list.includes(datasetType)) {
           return context.kcAdminClient.groups.addRealmRoleMappings({
             id: where.id,
             roles: [{
@@ -307,7 +318,7 @@ export const onUpdate = async (
             }]
           });
         }
-        // pv dataset
+        // dataset_writable_type
         const writableRole = await getWritableRole({
           kcAdminClient: context.kcAdminClient,
           datasetId,
@@ -360,7 +371,7 @@ export const onUpdate = async (
           }]
         });
 
-        if (datasetType === 'pv') {
+        if (dataset_writable_type_list.includes(datasetType)) {
           // remove writable as well
           const writableRole = await getWritableRole({
             kcAdminClient: context.kcAdminClient,
@@ -384,7 +395,9 @@ export const onDelete = async ({
   name, context, resource, getPrefix
 }: {name: string, context: Context, resource: any, getPrefix: (customizePrefix?: string) => string}) => {
   // delete dataset pvc
-  await context.k8sDatasetPvc.delete(resource.spec.volumeName);
+  if (resource.spec.type === 'pv' && (!resource.spec.pv || resource.spec.pv.provisioning === 'auto')) {
+    await context.k8sDatasetPvc.delete(resource.spec.volumeName);
+  }
   await context.k8sUploadServerSecret.delete(name);
 
   // delete writable as well
@@ -529,6 +542,9 @@ export const resolveType = {
     }
 
     const datasetPvc = await k8sDatasetPvc.findOne(parent.volumeName);
+    if (!datasetPvc) {
+      return -1;
+    }
     return get(datasetPvc, 'volumeSize');
   },
   async groups(parent, args, context: Context) {
@@ -584,6 +600,24 @@ export const regenerateUploadSecret = async (root, args, context: Context) => {
   };
 };
 
+export const preCreateCheck = async (
+  {resource}:
+  {
+    resource: any
+  }) => {
+  if (resource.spec.type === 'pv' && (!resource.spec.pv || resource.spec.pv.provisioning === 'auto')) {
+    // find pvc
+    try {
+      const found = await datasetPvcQuery.findOne(resource.spec.volumeName);
+      if (found !== null) {
+        throw new ApolloError(`PVC already exist`, 'PVC_CONFLICT');
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+};
+
 export const crd = new Crd<DatasetSpec>({
   customResourceMethod: 'datasets',
   propMapping: mapping,
@@ -595,5 +629,6 @@ export const crd = new Crd<DatasetSpec>({
   onUpdate,
   onDelete,
   resolveType,
-  customUpdate
+  customUpdate,
+  preCreateCheck: preCreateCheck
 });
