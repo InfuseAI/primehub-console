@@ -1,0 +1,15 @@
+doctype html
+html
+  head
+    title #{title}
+    include ./utils/head.pug
+    script.
+      window.APP_PREFIX = "#{staticPath}";
+      window.graphqlEndpoint = '#{graphqlEndpoint}';
+  body
+    script(src=`${staticPath}js/react.production.min.js`)
+    script(src=`${staticPath}js/react-dom.production.min.js`)
+    script(src=`${staticPath}js/antd.min.v3.10.10.js`)
+    script(src=`${staticPath}js/styled-components.min.js`)
+    div(id='root')
+      script(src= `${staticPath}api-token.js`)
