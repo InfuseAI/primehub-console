@@ -72,6 +72,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   // setup
   app.use(async (ctx: Context, next) => {
     ctx.state.locale = config.locale;
+    ctx.state.cmsHost = config.cmsHost;
     ctx.state.graphqlEndpoint = config.graphqlEndpoint;
     ctx.state.requestApiTokenEndpoint = config.appPrefix ? `${config.appPrefix}/oidc/request-api-token` : '/oidc/request-api-token',
     ctx.state.disableMode = config.readOnlyOnInstanceTypeAndImage;

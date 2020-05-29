@@ -15,6 +15,7 @@ module.exports = {
   entry: {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
+    'api-token': './src/apiToken.tsx',
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -31,6 +32,8 @@ module.exports = {
       rewrites: [
         { from: /^\/app-prefix\/landing/, to: '/landing.html' },
         { from: /^\/landing$/, to: '/landing.html' },
+        { from: /^\/api-token$/, to: '/api-token.html' },
+        { from: /^\/app-prefix\/api-token$/, to: './api-token.html' },
         { from: /./, to: '/index.html' }
       ]
     }
@@ -93,6 +96,11 @@ module.exports = {
       chunks: ['landing'],
       template: 'docs/index.html',
       filename: 'landing.html'
+    }),
+    new HtmlWebPackPlugin({
+      chunks: ['api-token'],
+      template: 'docs/index.html',
+      filename: 'api-token.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({

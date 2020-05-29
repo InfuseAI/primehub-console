@@ -24,7 +24,7 @@ export default class ApiTokenPage extends React.Component<Props, State> {
 
     this.graphqlEndpoint = ((window as any).graphqlEndpoint ?
       (window as any).graphqlEndpoint :
-      "http://localhost/api/graphql");
+      "/api/graphql");
 
     this.apiToken = (window as any).apiToken;
 
@@ -71,7 +71,7 @@ export default class ApiTokenPage extends React.Component<Props, State> {
 
 curl -X POST \\
     -H 'Content-Type: application/json' \\
-    -H 'authorization: Bearer \${API_TOKEN}' \\
+    -H "authorization: Bearer \${API_TOKEN}" \\
     -d '{"query":"{me{id,username}}"}' \\
     ${this.graphqlEndpoint}`
 
