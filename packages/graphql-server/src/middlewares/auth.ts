@@ -54,4 +54,6 @@ export const permissions = shield({
     'stopPhDeployment': or(isAdmin, isJobUser),
     'deployPhDeployment': or(isAdmin, isJobUser),
   },
+}, {
+  allowExternalErrors: true
 });
