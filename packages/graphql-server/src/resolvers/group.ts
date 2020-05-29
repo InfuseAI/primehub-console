@@ -90,6 +90,13 @@ export const create = async (root, args, context: Context) => {
 
   validateSharedVolumeAttrs(attrs);
 
+  if (config.primehubMode === 'deploy') {
+    // enable model deployment in 'deploy' mode automatically
+    attrs.mergeWithData({
+      enabledDeployment: true
+    });
+  }
+  
   const groups = await kcAdminClient.groups.find();
   // max group validation need minus everyone group.
   if (groups.length > config.maxGroup) {
