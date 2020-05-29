@@ -16,6 +16,8 @@ import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
 
 export const ATTRIBUTE_PREFIX = 'dataset.primehub.io';
 
+const upload_server_list = ['pv', 'nfs', 'hostPath'];
+
 const config = createConfig();
 const datasetPvcQuery = new K8sDatasetPvc({
   namespace: config.k8sCrdNamespace,
@@ -87,7 +89,7 @@ export const mapping = (item: Item<DatasetSpec>) => {
       parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/launchGroupOnly`], 'false')),
     enableUploadServer,
     uploadServerLink:
-      (item.spec.type === 'pv' && enableUploadServer) ?
+      (upload_server_list.includes(item.spec.type) && enableUploadServer) ?
         `${config.datasetEndpoint || ''}/${config.k8sCrdNamespace || 'default'}/${item.metadata.name}/browse`
         : null,
     uploadServerSecret:
@@ -433,7 +435,7 @@ const customUpdate = async ({
   // if type is pv
   let datasetUploadSecretUsername;
   let datasetUploadSecretPassword;
-  if (row.spec.type === 'pv' && !isNil(spec.enableUploadServer)) {
+  if (upload_server_list.includes(row.spec.type) && !isNil(spec.enableUploadServer)) {
     const orginalEnabledUploadServer = get(row, 'spec.enableUploadServer', 'false').toString() === 'true';
     const updatedEnabledUploadServer = spec.enableUploadServer.toString() === 'true';
     // original enableUploadServer is false and update with enableUploadServer true
