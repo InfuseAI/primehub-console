@@ -216,12 +216,14 @@ export default class Logs extends React.Component<Props, State> {
         <Button
           onClick={this.download}
           style={{marginRight: 8}}
+          disabled={ log.length <= 0 }
           loading={downloading}
         >
           Download
         </Button>
         <Button
           onClick={this.enableAutoScroll}
+          disabled={ log.length <= 0 }
         >
           Scroll to Bottom
         </Button>
