@@ -6,6 +6,7 @@ jobs:
       - image: docker:18-dind
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           command: |
             docker version
