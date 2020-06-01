@@ -28,6 +28,6 @@ workflows:
   version: 2
   jobs:
     - release:
-      filters:
-        tags:
-          only: /.*/
+        filters:
+          tags:
+            only: /.*/
