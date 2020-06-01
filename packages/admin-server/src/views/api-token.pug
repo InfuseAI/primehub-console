@@ -5,7 +5,7 @@ html
     include ./utils/head.pug
     script.
       window.APP_PREFIX = "#{staticPath}";
-      window.graphqlEndpoint = '#{cmsHost}#{graphqlEndpoint}';
+      window.absGraphqlEndpoint = '#{cmsHost}#{graphqlEndpoint}';
       window.requestApiTokenEndpoint = '#{requestApiTokenEndpoint}';
       window.apiToken = '#{apiToken}';
   body

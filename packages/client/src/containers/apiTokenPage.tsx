@@ -22,15 +22,9 @@ export default class ApiTokenPage extends React.Component<Props, State> {
   constructor(props) {
     super(props)
 
-    this.graphqlEndpoint = ((window as any).graphqlEndpoint ?
-      (window as any).graphqlEndpoint :
-      "/api/graphql");
-
+    this.graphqlEndpoint = (window as any).absGraphqlEndpoint;
     this.apiToken = (window as any).apiToken;
-
-    this.requestApiTokenEndpoint = ((window as any).requestApiTokenEndpoint ?
-      (window as any).requestApiTokenEndpoint :
-      "http://localhost/oidc/request-api-token");
+    this.requestApiTokenEndpoint = (window as any).requestApiTokenEndpoint;
   }
 
   handleRequestApiToken = () => {

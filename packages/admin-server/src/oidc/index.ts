@@ -11,6 +11,8 @@ import { createHash } from 'crypto';
 import UUID from 'uuid';
 
 const CALLBACK_PATH = '/oidc/callback';
+const REQUEST_API_TOKEN_PATH = '/oidc/request-api-token';
+const REQUEST_API_TOKEN_CALLBACK_PATH = '/oidc/request-api-token-callback';
 const NONCE_COOKIE = 'oidc.nonce';
 
 const ERRORS = {
@@ -312,7 +314,7 @@ export class OidcCtrl {
 
   public requestApiToken = async (ctx: any) => {
     const nonce = this.saveNonceSecret(ctx);
-    const redirectUri = `${this.cmsHost}${this.appPrefix}/oidc/request-api-token-callback`
+    const redirectUri = `${this.cmsHost}${this.appPrefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`
 
     const apiTokenUrl = this.oidcClient.authorizationUrl({
       redirect_uri: redirectUri,
@@ -324,7 +326,7 @@ export class OidcCtrl {
 
   public requestApiTokenCallback = async (ctx: any) => {
     const query = ctx.query;
-    const redirectUri = `${this.cmsHost}${this.appPrefix}/oidc/request-api-token-callback`
+    const redirectUri = `${this.cmsHost}${this.appPrefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`
     const nonce = this.createNonceFromSecret(ctx);
     const tokenSet = await this.oidcClient.authorizationCallback(redirectUri, query, {nonce});
 
@@ -383,6 +385,6 @@ export const mount = (rootRouter: Router, oidcCtrl: OidcCtrl) => {
   rootRouter.get(CALLBACK_PATH, oidcCtrl.callback);
   rootRouter.post('/oidc/refresh-token-set', oidcCtrl.refreshTokenSet);
   rootRouter.get('/oidc/logout', oidcCtrl.logout);
-  rootRouter.get('/oidc/request-api-token', oidcCtrl.requestApiToken);
-  rootRouter.get('/oidc/request-api-token-callback', oidcCtrl.requestApiTokenCallback);
+  rootRouter.get(REQUEST_API_TOKEN_PATH, oidcCtrl.requestApiToken);
+  rootRouter.get(REQUEST_API_TOKEN_CALLBACK_PATH, oidcCtrl.requestApiTokenCallback);
 };
