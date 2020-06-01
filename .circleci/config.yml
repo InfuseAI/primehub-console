@@ -8,21 +8,21 @@ jobs:
         steps:
           - checkout
           - run:
-            command: |
-              docker version
-              docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
-              docker build -t "infuseai/canner-admin-server:${CIRCLE_TAG}" -f packages/admin-server/Dockerfile .
-              docker push "infuseai/canner-admin-server:${CIRCLE_TAG}"
-              docker build -t "infuseai/canner-admin-server-model-deploy:${CIRCLE_TAG}" -f packages/admin-server/overlay/model_deployment/Dockerfile .
-              docker push "infuseai/canner-admin-server-model-deploy:${CIRCLE_TAG}"
-              docker build -t "infuseai/canner-admin-server-ce:${CIRCLE_TAG}" -f packages/admin-server/overlay/ce/Dockerfile .
-              docker push "infuseai/canner-admin-server-ce:${CIRCLE_TAG}"
-              docker build -t "infuseai/canner-graphql-server:${CIRCLE_TAG}" -f packages/graphql-server/Dockerfile .
-              docker push "infuseai/canner-graphql-server:${CIRCLE_TAG}"
-              docker build -t "infuseai/canner-graphql-server-ce:${CIRCLE_TAG}" -f packages/graphql-server/ce/Dockerfile .
-              docker push "infuseai/canner-graphql-server-ce:${CIRCLE_TAG}"
-              docker build -t "infuseai/canner-watcher:${CIRCLE_TAG}" -f packages/watcher/Dockerfile .
-              docker push "infuseai/canner-watcher:${CIRCLE_TAG}"
+              command: |
+                docker version
+                docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+                docker build -t "infuseai/canner-admin-server:${CIRCLE_TAG}" -f packages/admin-server/Dockerfile .
+                docker push "infuseai/canner-admin-server:${CIRCLE_TAG}"
+                docker build -t "infuseai/canner-admin-server-model-deploy:${CIRCLE_TAG}" -f packages/admin-server/overlay/model_deployment/Dockerfile .
+                docker push "infuseai/canner-admin-server-model-deploy:${CIRCLE_TAG}"
+                docker build -t "infuseai/canner-admin-server-ce:${CIRCLE_TAG}" -f packages/admin-server/overlay/ce/Dockerfile .
+                docker push "infuseai/canner-admin-server-ce:${CIRCLE_TAG}"
+                docker build -t "infuseai/canner-graphql-server:${CIRCLE_TAG}" -f packages/graphql-server/Dockerfile .
+                docker push "infuseai/canner-graphql-server:${CIRCLE_TAG}"
+                docker build -t "infuseai/canner-graphql-server-ce:${CIRCLE_TAG}" -f packages/graphql-server/ce/Dockerfile .
+                docker push "infuseai/canner-graphql-server-ce:${CIRCLE_TAG}"
+                docker build -t "infuseai/canner-watcher:${CIRCLE_TAG}" -f packages/watcher/Dockerfile .
+                docker push "infuseai/canner-watcher:${CIRCLE_TAG}"
 
 workflows:
   version: 2
