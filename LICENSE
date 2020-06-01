@@ -1,0 +1,42 @@
+The source code in this repository is licensed under the Apache License
+Version 2.0, an Apache compatible license.
+
+Source code in a given file is also licensed under the Apache License
+Version 2.0, unless otherwise noted at the beginning of the file, or if
+a LICENSE file present in the directory subtree declares a separate
+license except the EE parts.
+
+The EE parts include following files:
+
+- ./packages/graphql-server/src/graphql/ee.graphql
+- ./packages/graphql-server/src/graphql/phDeployment.graphql
+- ./packages/graphql-server/src/graphql/phJob.graphql
+- ./packages/graphql-server/src/graphql/phSchedule.graphql
+- ./packages/graphql-server/src/graphql/buildImage.graphql
+- ./packages/graphql-server/src/graphql/workspace.graphql
+- ./packages/graphql-server/src/resolvers/buildImage.ts
+- ./packages/graphql-server/src/resolvers/buildImageJob.ts
+- ./packages/graphql-server/src/resolvers/phDeployment.ts
+- ./packages/graphql-server/src/resolvers/phJob.ts
+- ./packages/graphql-server/src/resolvers/workspace.ts
+- ./packages/graphql-server/src/resolvers/phSchedule.ts
+- ./packages/graphql-server/src/crdClient/phJobCacheList.ts
+- ./packages/graphql-server/workspace/*.*
+- ./packages/client/src/modelDeployment.tsx
+- ./packages/client/src/job.tsx
+- ./packages/client/src/components/job
+- ./packages/client/src/components/schedule
+- ./packages/client/src/components/modelDeployment
+- ./packages/client/src/deployment*.tsx
+- ./packages/client/src/job*.tsx
+- ./packages/client/src/modelDeployment*.tsx
+- ./packages/client/src/schedule*.tsx
+
+Within the EE parts, source code in a given file, unless otherwise
+noted at the beginning of the file, or if a LICENSE file present in the
+directory subtree declares a separate license, belongs to InfuseAI.
+All Rights Reserved.
+
+The build produces two sets of images. The binaries that do not contain
+`-ee` in the artifact name are licensed under the Apache License Version
+2.0.
