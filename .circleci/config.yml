@@ -26,8 +26,9 @@ jobs:
 
 workflows:
   version: 2
-  jobs:
-    - release:
-        filters:
-          tags:
-            only: /.*/
+  build_and_test:
+    jobs:
+      - release:
+          filters:
+            tags:
+              only: /.*/
