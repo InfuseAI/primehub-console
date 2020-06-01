@@ -5,9 +5,23 @@ html
     include ./utils/head.pug
     script.
       window.APP_PREFIX = "#{staticPath}";
+      window.graphqlEndpoint = '#{graphqlEndpoint}';
+      window.username = "#{username}";
+      window.thumbnail = "#{thumbnail}";
+      window.isUserAdmin = #{isUserAdmin};
+      window.links = !{links};
+      window.accessTokenExp = #{accessTokenExp};
+      window.refreshTokenExp = #{refreshTokenExp};
+      window.newAccessToken = "#{newAccessToken}";
+      window.EVERYONE_GROUP_ID = "#{everyoneGroupId}"
       window.absGraphqlEndpoint = '#{cmsHost}#{graphqlEndpoint}';
       window.requestApiTokenEndpoint = '#{requestApiTokenEndpoint}';
       window.apiToken = '#{apiToken}';
+
+      if (window.newAccessToken) {
+        console.log('using new access token');
+        window.localStorage.setItem('canner.accessToken', newAccessToken);
+      }
   body
     script(src=`${staticPath}js/react.production.min.js`)
     script(src=`${staticPath}js/react-dom.production.min.js`)
@@ -17,5 +31,6 @@ html
     script(src=`${staticPath}js/styled-components.min.js`)
     script(src=`${staticPath}js/moment-timezone.min.js`)
     script(src=`${staticPath}js/polyfill.js`)
+    script(src=`${staticPath}js/firebase-app.js`)
     div(id='root')
       script(src= `${staticPath}api-token.js`)
