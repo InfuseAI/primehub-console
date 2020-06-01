@@ -31,6 +31,6 @@ workflows:
       - release:
           filters:
             tags:
-              only: /^ch.*/
+              only: /.*/
             branches:
               ignore: /.*/
