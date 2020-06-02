@@ -227,40 +227,27 @@ export default () => (
     </Condition>
     <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
       <Block title="${images}">
-        <relation keyName="images"
-          packageName='../src/cms-components/customize-relation-table'
-          relation={{
-            to: 'image',
-            type: 'toMany'
-          }}
+        <array keyName="images"
+          packageName="../src/cms-components/customize-array-images_in_groups"
           uiParams={{
-            textCol: 'displayName',
-            columns: [
-              {
-                title: '${displayName}',
-                dataIndex: 'displayName'
-              }, {
-                title: '${type}',
-                dataIndex: 'type'
-              }, {
-                title: '${description}',
-                dataIndex: 'description'
-              }
-            ]
+            removeActions: true,
+            columns: [{
+              title: '${displayName}',
+              dataIndex: 'displayName'
+            }, {
+              title: '${type}',
+              dataIndex: 'type'
+            }, {
+              title: '${description}',
+              dataIndex: 'description'
+            }]
           }}
         >
-          <toolbar async>
-            <filter
-              component={Filter}
-              fields={[{
-                type: 'text',
-                label: '${username}',
-                key: 'username'
-              }]}
-            />
-            <pagination number/>
-          </toolbar>
-        </relation>
+          <string keyName="id" />
+          <string keyName="displayName" title="${displayName}" />
+          <string keyName="type" title="${type} "/>
+          <string keyName="description" title="${description}" />
+        </array>
       </Block>
     </Condition>
     <Block title="${users}">
