@@ -14,6 +14,7 @@ import { mapping } from './instanceType';
 import * as logger from '../logger';
 import { keycloakMaxCount } from './constant';
 import { isUserAdmin } from './user';
+import md5 = require('apache-md5');
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 const NOT_AUTH_ERROR = 'NOT_AUTH';
@@ -39,6 +40,8 @@ export interface PhDeployment {
   creationTime: string;
   lastUpdatedTime: string;
   history: Array<{time: string, deployment: any}>;
+  endpointAccessType: string;
+  endpointClients: Array<{name: string}>;
 }
 
 export interface PhDeploymentMutationInput {
@@ -51,6 +54,7 @@ export interface PhDeploymentMutationInput {
   metadata: Record<string, any>;
   groupId: string;
   instanceType: string;
+  endpointAccessType: string;
 }
 
 const getFallbackPhase = (stopped: boolean, phase: PhDeploymentPhase) => {
@@ -104,6 +108,13 @@ export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>
       deployment: transformSpec(item.metadata.name, historyItem.time, groupName, historyItem.spec),
     };
   });
+  const endpointAccessType = get(item, 'spec.endpoint.accessType', 'public');
+  const endpointClients = get(item, 'spec.endpoint.clients', []).map(clientItem => {
+    return {
+      name: clientItem.name,
+    };
+  });
+
   return {
     id: item.metadata.name,
     name: item.spec.displayName,
@@ -133,6 +144,9 @@ export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>
 
     // history
     history,
+
+    endpointAccessType,
+    endpointClients,
   };
 };
 
@@ -158,7 +172,11 @@ const createDeployment = async (context: Context, data: PhDeploymentMutationInpu
       instanceType: data.instanceType,
       imagePullSecret: data.imagePullSecret,
       metadata: data.metadata,
-    }]
+    }],
+    endpoint: {
+      accessType: data.endpointAccessType || 'public',
+      clients: []
+    },
   };
   return crdClient.phDeployments.create(metadata, spec);
 };
@@ -373,6 +391,9 @@ export const update = async (root, args, context: Context) => {
   const newMetadata = data.metadata || {};
   const mergedMetadata = mergeVariables(originalMetadata, newMetadata);
 
+  const endpointAccessType = get(phDeployment, 'spec.endpoint.accessType', 'public');
+  const endpointClients = get(phDeployment, 'spec.endpoint.clients', []);
+
   const spec: any = {
     updateTime: moment.utc().toISOString(),
     userId,
@@ -387,7 +408,11 @@ export const update = async (root, args, context: Context) => {
       instanceType: data.instanceType || predictor.instanceType,
       imagePullSecret: isNull(data.imagePullSecret) ? null : data.imagePullSecret || predictor.imagePullSecret,
       metadata: mergedMetadata,
-    }]
+    }],
+    endpoint: {
+      accessType: data.endpointAccessType || endpointAccessType,
+      clients: endpointClients
+    },
   };
   const updated = await context.crdClient.phDeployments.patch(args.where.id, {spec});
   return transform(updated, context.kcAdminClient);
@@ -431,4 +456,91 @@ export const destroy = async (root, args, context: Context) => {
   const {id} = args.where;
   await context.crdClient.phDeployments.del(id);
   return {id};
+};
+
+export interface PhDeploymentClient {
+  id: string;
+  deploymentId: string;
+  name: string;
+}
+
+export interface PhDeploymentClientMutationInput {
+  deploymentId: string;
+  name: string;
+  token: string;
+}
+
+const htpasswd = (username: string, password: string) => {
+  return `${username}:${md5(password)}`;
+};
+
+export const createClient = async (root, args, context: Context) => {
+  const data: PhDeploymentClientMutationInput = args.data;
+  const {crdClient, userId, username} = context;
+  const phDeployment = await crdClient.phDeployments.get(data.deploymentId);
+
+  await canUserMutate(context.userId, phDeployment.spec.groupId, context);
+
+  const predictor = phDeployment.spec.predictors[0];
+
+  const accessType = get(phDeployment, 'spec.endpoint.accessType', 'public');
+  let clients = get(phDeployment, 'spec.endpoint.clients', []);
+
+  // remove the same name client
+  clients = clients.filter(client => client.name !== data.name);
+  const newClient = {
+    name: data.name,
+    token: htpasswd(data.name, data.token)
+  };
+  clients.push(newClient);
+
+  const spec: any = {
+    updateTime: phDeployment.spec.updateTime,
+    userId,
+    userName: phDeployment.spec.userName,
+    displayName: phDeployment.spec.displayName,
+    description: phDeployment.spec.description,
+    stop: false,
+    predictors: [predictor],
+    endpoint: {
+      accessType,
+      clients,
+    }
+  };
+  const updated = await context.crdClient.phDeployments.patch(data.deploymentId, {spec});
+
+  return transform(updated, context.kcAdminClient);
+};
+
+export const destroyClient = async (root, args, context: Context) => {
+  const {deploymentId, name} = args.where;
+  const {crdClient, userId, username} = context;
+  const phDeployment = await crdClient.phDeployments.get(deploymentId);
+
+  await canUserMutate(context.userId, phDeployment.spec.groupId, context);
+
+  const predictor = phDeployment.spec.predictors[0];
+
+  const accessType = get(phDeployment, 'spec.endpoint.accessType', 'public');
+  let clients = get(phDeployment, 'spec.endpoint.clients', []);
+
+  // remove the same name client
+  clients = clients.filter(client => client.name !== name);
+
+  const spec: any = {
+    updateTime: phDeployment.spec.updateTime,
+    userId,
+    userName: phDeployment.spec.userName,
+    displayName: phDeployment.spec.displayName,
+    description: phDeployment.spec.description,
+    stop: false,
+    predictors: [predictor],
+    endpoint: {
+      accessType,
+      clients,
+    }
+  };
+  const updated = await context.crdClient.phDeployments.patch(deploymentId, {spec});
+
+  return transform(updated, context.kcAdminClient);
 };

@@ -202,6 +202,7 @@ export interface PhDeploymentSpec {
     imagePullSecret: string;
     metadata: Record<string, any>;
   }>;
+  endpoint: PhDeploymentEndPoint;
 }
 
 export interface PhDeploymentStatus {
@@ -216,6 +217,13 @@ export interface PhDeploymentStatus {
   }>;
 }
 
+export interface PhDeploymentEndPoint {
+  accessType: string;
+  clients: Array<{
+    name: string;
+    token: string;
+  }>;
+}
 /**
  * CRD
  */

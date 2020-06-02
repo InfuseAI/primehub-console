@@ -174,6 +174,8 @@ const eeResolvers = {
     deletePhDeployment: phDeployment.destroy,
     deployPhDeployment: phDeployment.deploy,
     stopPhDeployment: phDeployment.stop,
+    createPhDeploymentClient: phDeployment.createClient,
+    deletePhDeploymentClient: phDeployment.destroyClient,
   },
   BuildImage: buildImage.typeResolvers,
   PhJob: phJob.typeResolvers,
