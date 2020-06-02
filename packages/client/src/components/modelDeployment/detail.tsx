@@ -19,6 +19,7 @@ type Props = {
   stopPhDeployment: Function;
   deletePhDeployment: Function;
   deployPhDeployment: Function;
+  refetchPhDeployment: Function;
   stopPhDeploymentResult: any;
   deletePhDeploymentResult: any;
   deployPhDeploymentResult: any;
@@ -151,8 +152,11 @@ export default class Detail extends React.Component<Props> {
   }
 
   renderLogs = () => {
-    const {phDeployment} = this.props;
-    return <ModelDeploymentLogs pods={phDeployment.pods}/>;
+    const {phDeployment, refetchPhDeployment} = this.props;
+    return <ModelDeploymentLogs
+      refetchPhDeployment={() => refetchPhDeployment({where: {id: phDeployment.id}})}
+      pods={phDeployment.pods}
+    />;
   }
 
   renderHistory = () => {

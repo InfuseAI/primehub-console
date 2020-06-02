@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 import {get} from 'lodash';
 import styled from 'styled-components';
 import moment, { Moment } from 'moment';
-import Log from '../share/log';
+import Log from './log';
 import {getActionByPhase, Phase} from 'components/job/phase';
 import Title from 'components/job/title';
 import Message from 'components/share/message';
@@ -55,6 +55,7 @@ const renderFinishTime = (job: Record<string, any>) => {
 
 type Props = {
   job: any;
+  refetchPhJob: Function;
   rerunPhJob: Function;
   cancelPhJob: Function;
   cancelPhJobResult: any;
@@ -103,7 +104,7 @@ export default class Detail extends React.Component<Props> {
 
 
   render() {
-    const {job, rerunPhJobResult, cancelPhJobResult, history} = this.props;
+    const {job, rerunPhJobResult, cancelPhJobResult, refetchPhJob} = this.props;
     const createTime = job.createTime ? moment(job.createTime) : '';
     const startTime = job.startTime ? moment(job.startTime) : '';
     const finishTime = job.finishTime ? moment(job.finishTime) : '';
@@ -166,8 +167,15 @@ export default class Detail extends React.Component<Props> {
             </div>
 
             </TabPane>
-            <TabPane key="logs" tab="Logs" disabled={job.phase === Phase.Pending || !job.logEndpoint}>
-              <Log endpoint={job.logEndpoint}/>
+            <TabPane
+              key="logs"
+              tab="Logs"
+              disabled={job.phase === Phase.Pending || !job.logEndpoint}
+            >
+              <Log
+                endpoint={job.logEndpoint}
+                refetchJob={() => refetchPhJob({where: {id: job.id}})}
+              />
             </TabPane>
           </Tabs>
         </PageBody>
