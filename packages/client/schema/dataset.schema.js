@@ -214,6 +214,7 @@ export default () => (
           required
           ui="select"
           title="${pvProvisioning}"
+          packageName="../src/cms-components/customize-string-select"
           defaultValue={'auto'}
           uiParams={{
             options: [{
@@ -222,22 +223,11 @@ export default () => (
             }, {
               text: 'manual',
               value: 'manual'
-            }]
+            }],
+            style: {width: 200},
           }}
         />
       </Condition>
-
-      <Layout component={EnableUploadServer}>
-        <Condition match={(data, operator) => operator === 'update'} defaultMode="hidden">
-          <boolean
-            keyName="enableUploadServer"
-            title="${dataset.enableUploadServer}"
-            packageName="../src/cms-components/customize-boolean-enable_upload_server"
-          />
-        </Condition>
-      </Layout>
-
-      <string keyName="uploadServerLink" hidden />
       <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
         <Condition match={(data, operator) => operator === 'update'} defaultMode="hidden">
           <string keyName="volumeName" title="${volumeName}"/>
@@ -252,6 +242,19 @@ export default () => (
           />
         </Condition>
       </Condition>
+    </Condition>
+    <Condition match={data => ['pv', 'nfs', 'hostPath'].includes(data.type)}>
+      <Layout component={EnableUploadServer}>
+        <Condition match={(data, operator) => operator === 'update'} defaultMode="hidden">
+          <boolean
+            keyName="enableUploadServer"
+            title="${dataset.enableUploadServer}"
+            packageName="../src/cms-components/customize-boolean-enable_upload_server"
+          />
+        </Condition>
+      </Layout>
+
+      <string keyName="uploadServerLink" hidden />
     </Condition>
     <Condition match={data => !(data.global && !['pv', 'nfs', 'hostPath'].includes(data.type))}>
       <Layout component={DatasetGroupWrapper}>
