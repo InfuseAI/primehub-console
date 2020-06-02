@@ -11,16 +11,23 @@ type Props = {
   disabled: boolean
 }
 type State = {
+  checked: boolean
 }
 
 export default class ImagePullSecret extends React.Component<Props, State> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      checked: Boolean(props.value)
+    };
+  }
   handleCheck = (e: any) => {
     const {onChange} = this.props;
     const checked = e.target.checked;
+    this.setState({checked});
     if (!checked) {
-      return onChange(null);
+      onChange('');
     }
-    onChange('');
   }
 
   handleSelect = (value: string) => {
@@ -30,7 +37,7 @@ export default class ImagePullSecret extends React.Component<Props, State> {
 
   render() {
     const {value, title, disabled} = this.props;
-    const checked = typeof value === 'string';
+    const {checked} = this.state;
     return (
       <div style={{display: 'flex', alignItems:'center'}}>
         <Checkbox style={{marginRight: 8}} disabled={disabled} onChange={this.handleCheck} checked={checked}>
