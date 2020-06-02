@@ -89,6 +89,7 @@ export default class CommonBody extends React.Component<Props> {
     const {loading, loadingTip} = this.state;
     const key = routes[0];
     const item = schema[key];
+    const groupId = get(routerParams, 'payload.backToGroup', '');
     const breadcrumbs = [{
       path: 'home',
       render: () => <Icon type="home" />
@@ -148,7 +149,10 @@ export default class CommonBody extends React.Component<Props> {
           }}
         >
           <Icon type="arrow-left" />
-          Back
+          { groupId ? 
+            ` Back to group`:
+            ' Back'
+          }
         </Button>
         <AddButton
           add={this.add}

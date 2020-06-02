@@ -21,7 +21,7 @@ const config = createConfig();
 const LICENSE_ERROR = 'LICENSE_ERROR';
 
 export const validateLicense = () => {
-    status = config.licenseStatus.toLowerCase();
+    let status = config.licenseStatus.toLowerCase();
     switch (status) {
       case 'unexpired':
         return;

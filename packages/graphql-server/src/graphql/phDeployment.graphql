@@ -3,12 +3,17 @@
 
 type Pod {
   name: String
+  phase: String
   logEndpoint: String
 }
 
 type HistoryItem {
   time: String
   deployment: PhDeployment
+}
+
+type PhDeploymentClient {
+  name: String
 }
 
 type PhDeployment {
@@ -33,6 +38,8 @@ type PhDeployment {
   lastUpdatedTime: String
   pods: [Pod]
   history: [HistoryItem]
+  endpointAccessType: String
+  endpointClients: [PhDeploymentClient]
 }
 
 """An edge in a connection."""
@@ -62,6 +69,11 @@ input PhDeploymentWhereInput {
   mine: Boolean
 }
 
+input PhDeploymentClientWhereUniqueInput {
+  deploymentId: String!
+  name: String!
+}
+
 """Mutation input"""
 input PhDeploymentCreateInput {
   id: ID!
@@ -82,4 +94,10 @@ input PhDeploymentUpdateInput {
   description: String
   metadata: JSON
   instanceType: String
+}
+
+input PhDeploymentClientCreateInput {
+  deploymentId: String
+  name: String
+  token: String
 }
