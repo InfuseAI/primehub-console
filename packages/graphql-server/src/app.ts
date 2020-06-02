@@ -400,19 +400,22 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           if (roles.indexOf('realm-admin') >= 0) {
             role = Role.ADMIN;
             kcAdminClient.setAccessToken(apiToken);
-          } else if (isJobClient || useCache) {
-            // if request comes from /jobs or other pages not cms
-            // performance would be important.
-            // We'll use cache here
-            role = Role.JOB_USER;
-            getInstanceType = instCache.get;
-            getImage = imageCache.get;
+          } else {
+            role = Role.USER;
 
             // also, we need admin token to access keycloak api
             // this part rely on authMiddleware to control the permission
             // todo: maybe we can use other api to access personal account data?
             const accessToken = await tokenSyncer.getAccessToken();
             kcAdminClient.setAccessToken(accessToken);
+          }
+
+          // if request comes from /jobs or other pages not cms
+          // performance would be important.
+          // We'll use cache here
+          if (isJobClient || useCache) {
+            getInstanceType = instCache.get;
+            getImage = imageCache.get;
           }
         }
       } else if (config.keycloakGrantType === 'password'
