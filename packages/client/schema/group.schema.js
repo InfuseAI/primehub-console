@@ -253,7 +253,7 @@ export default () => (
               key: 'username'
             }]}
           />
-          <pagination number/>
+          <pagination/>
         </toolbar>
       </relation>
     </Block>
