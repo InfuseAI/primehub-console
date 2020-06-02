@@ -40,6 +40,7 @@ class JobDetailContainer extends React.Component<Props> {
     };
     return (
       <JobDetail
+        refetchPhJob={getPhJob.refetch}
         rerunPhJob={rerunPhJob}
         cancelPhJob={cancelPhJob}
         rerunPhJobResult={rerunPhJobResult}
