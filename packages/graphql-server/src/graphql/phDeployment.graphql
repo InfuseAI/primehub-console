@@ -16,6 +16,11 @@ type PhDeploymentClient {
   name: String
 }
 
+type PhDeploymentClientCreateResponse {
+  name: String
+  plainTextToken: String
+}
+
 type PhDeployment {
   id: ID!
   status: String
@@ -99,5 +104,4 @@ input PhDeploymentUpdateInput {
 input PhDeploymentClientCreateInput {
   deploymentId: String
   name: String
-  token: String
 }

@@ -467,8 +467,11 @@ export interface PhDeploymentClient {
 export interface PhDeploymentClientMutationInput {
   deploymentId: string;
   name: string;
-  token: string;
 }
+
+const genRandomString = () => {
+  return Math.random().toString(36).slice(2);
+};
 
 const htpasswd = (username: string, password: string) => {
   return `${username}:${md5(password)}`;
@@ -488,9 +491,10 @@ export const createClient = async (root, args, context: Context) => {
 
   // remove the same name client
   clients = clients.filter(client => client.name !== data.name);
+  const plainTextToken = genRandomString();
   const newClient = {
     name: data.name,
-    token: htpasswd(data.name, data.token)
+    token: htpasswd(data.name, plainTextToken)
   };
   clients.push(newClient);
 
@@ -507,9 +511,12 @@ export const createClient = async (root, args, context: Context) => {
       clients,
     }
   };
-  const updated = await context.crdClient.phDeployments.patch(data.deploymentId, {spec});
+  await context.crdClient.phDeployments.patch(data.deploymentId, {spec});
 
-  return transform(updated, context.kcAdminClient);
+  return {
+    name: data.name,
+    plainTextToken
+  };
 };
 
 export const destroyClient = async (root, args, context: Context) => {

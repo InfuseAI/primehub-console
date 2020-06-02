@@ -1,7 +1,7 @@
 # import BuildImageJob, BuildImageOrderByInput, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql" 
 # import PhJob, PhJobOrderByInput, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput, PhJobCreateInput, PhJobCancelResponse from "./phJob.graphql"
 # import PhSchedule, PhScheduleOrderByInput, PhScheduleConnection, PhScheduleWhereUniqueInput, PhScheduleWhereInput, PhScheduleCreateInput, PhScheduleUpdateInput, PhScheduleDeleteResponse, PhScheduleRunResponse from "./phSchedule.graphql"
-# import PhDeployment, PhDeploymentConnection, PhDeploymentWhereUniqueInput, PhDeploymentWhereInput, PhDeploymentCreateInput, PhDeploymentUpdateInput, PhDeploymentClientCreateInput, PhDeploymentClientWhereUniqueInput from "./phDeployment.graphql"
+# import PhDeployment, PhDeploymentConnection, PhDeploymentWhereUniqueInput, PhDeploymentWhereInput, PhDeploymentCreateInput, PhDeploymentUpdateInput, PhDeploymentClientCreateInput, PhDeploymentClientCreateResponse, PhDeploymentClientWhereUniqueInput from "./phDeployment.graphql"
 
 scalar JSON
 
@@ -131,6 +131,6 @@ type Mutation {
   deletePhDeployment(where: PhDeploymentWhereUniqueInput!): PhDeployment!
 
   """PhDeploymentClient"""
-  createPhDeploymentClient(data: PhDeploymentClientCreateInput!): PhDeployment!
+  createPhDeploymentClient(data: PhDeploymentClientCreateInput!): PhDeploymentClientCreateResponse!
   deletePhDeploymentClient(where: PhDeploymentClientWhereUniqueInput!): PhDeployment
 }
