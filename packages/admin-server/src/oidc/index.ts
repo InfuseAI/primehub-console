@@ -11,6 +11,8 @@ import { createHash } from 'crypto';
 import UUID from 'uuid';
 
 const CALLBACK_PATH = '/oidc/callback';
+const REQUEST_API_TOKEN_PATH = '/oidc/request-api-token';
+const REQUEST_API_TOKEN_CALLBACK_PATH = '/oidc/request-api-token-callback';
 const NONCE_COOKIE = 'oidc.nonce';
 
 const ERRORS = {
@@ -310,6 +312,38 @@ export class OidcCtrl {
     };
   }
 
+  public requestApiToken = async (ctx: any) => {
+    const nonce = this.saveNonceSecret(ctx);
+    const redirectUri = `${this.cmsHost}${this.appPrefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`
+
+    const apiTokenUrl = this.oidcClient.authorizationUrl({
+      redirect_uri: redirectUri,
+      scope: "openid offline_access",
+      nonce
+    });
+    return ctx.redirect(apiTokenUrl);
+  }
+
+  public requestApiTokenCallback = async (ctx: any) => {
+    const query = ctx.query;
+    const redirectUri = `${this.cmsHost}${this.appPrefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`
+    const nonce = this.createNonceFromSecret(ctx);
+    const tokenSet = await this.oidcClient.authorizationCallback(redirectUri, query, {nonce});
+
+    // redirect to frontend
+    const secureRequest = ctx.request.secure;
+    ctx.cookies.set('apiToken', tokenSet.refresh_token, {expires: new Date(Date.now() + 60000), signed: true, secure: secureRequest});
+
+    const backUrl = query.backUrl || this.defaultReturnPath;
+
+    logger.info({
+      component: logger.components.user,
+      type: 'REQUEST_API_TOKEN'
+    });
+
+    return ctx.redirect(`${this.cmsHost}${this.appPrefix}/api-token?result=1`)
+  }
+
   private buildBackUrl = (currentUrl?: string) => {
     if (!currentUrl) {
       return null;
@@ -351,4 +385,6 @@ export const mount = (rootRouter: Router, oidcCtrl: OidcCtrl) => {
   rootRouter.get(CALLBACK_PATH, oidcCtrl.callback);
   rootRouter.post('/oidc/refresh-token-set', oidcCtrl.refreshTokenSet);
   rootRouter.get('/oidc/logout', oidcCtrl.logout);
+  rootRouter.get(REQUEST_API_TOKEN_PATH, oidcCtrl.requestApiToken);
+  rootRouter.get(REQUEST_API_TOKEN_CALLBACK_PATH, oidcCtrl.requestApiTokenCallback);
 };

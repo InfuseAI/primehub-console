@@ -39,6 +39,7 @@ export default class HeaderContainer extends React.Component<Props, {}> {
     const links = (window as any).links || {
       userProfileLink: '',
       changePasswordLink: '',
+      apiTokenLink: '/api-token',
       logoutLink: '',
     }
     switch (item.key) {
@@ -48,6 +49,10 @@ export default class HeaderContainer extends React.Component<Props, {}> {
       }
       case 'changePassword': {
         (window as any).location.href = links.changePasswordLink;
+        break;
+      }
+      case 'apiToken': {
+        (window as any).location.href = links.apiTokenLink;
         break;
       }
       case 'logout': {
@@ -78,6 +83,9 @@ export default class HeaderContainer extends React.Component<Props, {}> {
             </Menu.Item>
             <Menu.Item key="changePassword">
               Change Password
+            </Menu.Item>
+            <Menu.Item key="apiToken">
+              API Token
             </Menu.Item>
             <Menu.Item key="logout" style={{borderTop: '1px solid #f1f1f1'}}>
               Logout

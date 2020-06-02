@@ -16,6 +16,7 @@ module.exports = {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
     'model-deployment': devMode ? './src/modelDeployment.tsx' : ['./src/public-import.js', './src/modelDeployment.tsx'],
+    'api-token': './src/apiToken.tsx',
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -34,6 +35,8 @@ module.exports = {
         { from: /^\/landing$/, to: '/landing.html' },
         { from: /^\/model-deployment/, to: '/model-deployment.html' },
         { from: /^\/app-prefix\/model-deployment/, to: './model-deployment.html' },
+        { from: /^\/api-token$/, to: '/api-token.html' },
+        { from: /^\/app-prefix\/api-token$/, to: './api-token.html' },
         { from: /./, to: '/index.html' }
       ]
     },
@@ -102,6 +105,11 @@ module.exports = {
       chunks: ['model-deployment'],
       template: 'docs/index.html',
       filename: 'model-deployment.html'
+    }),
+    new HtmlWebPackPlugin({
+      chunks: ['api-token'],
+      template: 'docs/index.html',
+      filename: 'api-token.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({

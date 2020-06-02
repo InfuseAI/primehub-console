@@ -72,7 +72,9 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   // setup
   app.use(async (ctx: Context, next) => {
     ctx.state.locale = config.locale;
+    ctx.state.cmsHost = config.cmsHost;
     ctx.state.graphqlEndpoint = config.graphqlEndpoint;
+    ctx.state.requestApiTokenEndpoint = config.appPrefix ? `${config.appPrefix}/oidc/request-api-token` : '/oidc/request-api-token',
     ctx.state.disableMode = config.readOnlyOnInstanceTypeAndImage;
     ctx.state.enableDatasetUpload = config.enableDatasetUpload;
     ctx.state.enableWorkspace = config.enableWorkspace;
@@ -90,6 +92,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
       userProfileLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account?referrer=${config.keycloakClientId}&referrer_uri=${referrer}`,
       // tslint:disable-next-line:max-line-length
       changePasswordLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account/password?referrer=${config.keycloakClientId}&referrer_uri=${referrer}`,
+      apiTokenLink: config.appPrefix ? `${config.appPrefix}/api-token` : '/api-token',
       logoutLink: config.appPrefix ? `${config.appPrefix}/oidc/logout` : '/oidc/logout',
     });
     return next();
@@ -174,6 +177,16 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
       });
     });
   }
+
+  // api token
+  rootRouter.get('/api-token', oidcCtrl.loggedIn, async ctx => {
+    ctx.state.apiToken = ctx.cookies.get('apiToken', {signed: true});
+
+    await ctx.render('api-token', {
+      title: 'API Token',
+      staticPath
+    });
+  });
 
   // job
   rootRouter.get('/job', oidcCtrl.loggedIn, async ctx => {
