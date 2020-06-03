@@ -76,6 +76,10 @@ input DatasetPlaceHolder {
   set: [String]
 }
 
+input ImagePlaceHolder {
+  set: [String]
+}
+
 """Mutation input"""
 input GroupCreateInput {
   name: String!
@@ -98,6 +102,8 @@ input GroupCreateInput {
   workspaceId: String
   # dataset placeholder
   datasets: DatasetPlaceHolder
+  # image placeholer
+  images: ImagePlaceHolder
   # enabledDeployment
   enabledDeployment: Boolean
 }
@@ -121,6 +127,8 @@ input GroupUpdateInput {
   launchGroupOnly: Boolean
   # dataset placeholder
   datasets: DatasetPlaceHolder
+  # image placeholder
+  images: ImagePlaceHolder
   # enabledDeployment
   enabledDeployment: Boolean
 }

@@ -16,6 +16,8 @@ import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
 
 export const ATTRIBUTE_PREFIX = 'dataset.primehub.io';
 
+const uploadServerList = ['pv', 'nfs', 'hostPath'];
+
 const config = createConfig();
 const datasetPvcQuery = new K8sDatasetPvc({
   namespace: config.k8sCrdNamespace,
@@ -87,7 +89,7 @@ export const mapping = (item: Item<DatasetSpec>) => {
       parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/launchGroupOnly`], 'false')),
     enableUploadServer,
     uploadServerLink:
-      (item.spec.type === 'pv' && enableUploadServer) ?
+      (uploadServerList.includes(item.spec.type) && enableUploadServer) ?
         `${config.datasetEndpoint || ''}/${config.k8sCrdNamespace || 'default'}/${item.metadata.name}/browse`
         : null,
     uploadServerSecret:
@@ -304,12 +306,12 @@ export const onUpdate = async (
   if (data && data.groups) {
     const datasetId = resource.metadata.name;
     const datasetType = resource.spec.type;
-    const dataset_writable_type_list = ['pv', 'nfs', 'hostPath'];
+    const datasetWritableTypeList = ['pv', 'nfs', 'hostPath'];
     // add to group
     await mutateRelation({
       resource: data.groups,
       connect: async (where: {id: string, writable: boolean}) => {
-        if (!dataset_writable_type_list.includes(datasetType)) {
+        if (!datasetWritableTypeList.includes(datasetType)) {
           return context.kcAdminClient.groups.addRealmRoleMappings({
             id: where.id,
             roles: [{
@@ -371,7 +373,7 @@ export const onUpdate = async (
           }]
         });
 
-        if (dataset_writable_type_list.includes(datasetType)) {
+        if (datasetWritableTypeList.includes(datasetType)) {
           // remove writable as well
           const writableRole = await getWritableRole({
             kcAdminClient: context.kcAdminClient,
@@ -433,7 +435,7 @@ const customUpdate = async ({
   // if type is pv
   let datasetUploadSecretUsername;
   let datasetUploadSecretPassword;
-  if (row.spec.type === 'pv' && !isNil(spec.enableUploadServer)) {
+  if (uploadServerList.includes(row.spec.type) && !isNil(spec.enableUploadServer)) {
     const orginalEnabledUploadServer = get(row, 'spec.enableUploadServer', 'false').toString() === 'true';
     const updatedEnabledUploadServer = spec.enableUploadServer.toString() === 'true';
     // original enableUploadServer is false and update with enableUploadServer true
@@ -630,5 +632,5 @@ export const crd = new Crd<DatasetSpec>({
   onDelete,
   resolveType,
   customUpdate,
-  preCreateCheck: preCreateCheck
+  preCreateCheck
 });

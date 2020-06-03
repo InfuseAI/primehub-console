@@ -13,6 +13,7 @@ export default class Logs extends React.Component<Props> {
     const {rows} = uiParams;
     return <Log
       endpoint={value}
+      style={{clear: "both"}}
       rows={rows}
     />;
   }

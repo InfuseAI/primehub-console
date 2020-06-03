@@ -229,6 +229,31 @@ export default () => (
         </array>
       </Block>
     </Condition>
+    <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
+      <Block title="${images}">
+        <array keyName="images"
+          packageName="../src/cms-components/customize-array-images_in_groups"
+          uiParams={{
+            removeActions: true,
+            columns: [{
+              title: '${displayName}',
+              dataIndex: 'displayName'
+            }, {
+              title: '${type}',
+              dataIndex: 'type'
+            }, {
+              title: '${description}',
+              dataIndex: 'description'
+            }]
+          }}
+        >
+          <string keyName="id" />
+          <string keyName="displayName" title="${displayName}" />
+          <string keyName="type" title="${type} "/>
+          <string keyName="description" title="${description}" />
+        </array>
+      </Block>
+    </Condition>
     <Block title="${users}">
       <relation keyName="users"
         packageName='../src/cms-components/customize-relation-table'
@@ -253,7 +278,7 @@ export default () => (
               key: 'username'
             }]}
           />
-          <pagination number/>
+          <pagination/>
         </toolbar>
       </relation>
     </Block>
