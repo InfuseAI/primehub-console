@@ -473,10 +473,6 @@ const genRandomString = () => {
   return Math.random().toString(36).slice(2);
 };
 
-const htpasswd = (username: string, password: string) => {
-  return `${username}:${md5(password)}`;
-};
-
 export const createClient = async (root, args, context: Context) => {
   const data: PhDeploymentClientMutationInput = args.data;
   const {crdClient, userId, username} = context;
@@ -494,7 +490,7 @@ export const createClient = async (root, args, context: Context) => {
   const plainTextToken = genRandomString();
   const newClient = {
     name: data.name,
-    token: htpasswd(data.name, plainTextToken)
+    token: md5(plainTextToken)
   };
   clients.push(newClient);
 
@@ -504,7 +500,7 @@ export const createClient = async (root, args, context: Context) => {
     userName: phDeployment.spec.userName,
     displayName: phDeployment.spec.displayName,
     description: phDeployment.spec.description,
-    stop: false,
+    stop: phDeployment.spec.stop || false,
     predictors: [predictor],
     endpoint: {
       accessType,
@@ -540,7 +536,7 @@ export const destroyClient = async (root, args, context: Context) => {
     userName: phDeployment.spec.userName,
     displayName: phDeployment.spec.displayName,
     description: phDeployment.spec.description,
-    stop: false,
+    stop: phDeployment.spec.stop || false,
     predictors: [predictor],
     endpoint: {
       accessType,

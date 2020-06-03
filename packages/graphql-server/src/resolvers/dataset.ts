@@ -104,7 +104,7 @@ export const createMapping = (data: any) => {
   const gitSyncProp = gitSyncSecretId
     ? {gitsync: {secret: gitSyncSecretId}}
     : {};
-  const pvProp = (data.type == 'pv' && data.pvProvisioning)
+  const pvProp = (data.type === 'pv' && data.pvProvisioning)
     ? {pv: {provisioning: data.pvProvisioning}}
     : {};
   const nfsProp = (data.nfsServer && data.nfsPath)

@@ -90,6 +90,7 @@ input PhDeploymentCreateInput {
   metadata: JSON
   groupId: String
   instanceType: String
+  endpointAccessType: String
 }
 
 input PhDeploymentUpdateInput {
@@ -99,6 +100,7 @@ input PhDeploymentUpdateInput {
   description: String
   metadata: JSON
   instanceType: String
+  endpointAccessType: String
 }
 
 input PhDeploymentClientCreateInput {
