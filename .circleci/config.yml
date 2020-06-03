@@ -96,6 +96,13 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - latest:
+          requires:
+            - graphql-lint
+          filters:
+            branches:
+              only:
+                - master
       - release:
           requires:
             - graphql-lint
