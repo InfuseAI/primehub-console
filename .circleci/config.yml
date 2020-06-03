@@ -45,6 +45,7 @@ commands:
       tag:
         type: string
     steps:
+      - docker/check
       # Build and push Primehub-console Watcher image
       - docker/build:
           step-name: 'Docker build: primehub-console-watcher'
@@ -61,6 +62,7 @@ commands:
       tag:
         type: string
     steps:
+      - docker/check
       # Build and push Primehub-console GraphQL EE image
       - docker/build:
           step-name: 'Docker build: primehub-console-graphql'
