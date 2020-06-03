@@ -1,5 +1,6 @@
 import { Context } from '../../resolvers/interface';
-import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser, validateLicense } from '../../resolvers/utils';
+import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser } from '../../resolvers/utils';
+import { validateLicense } from './utils'
 import { PhJobPhase, PhJobSpec, PhJobStatus } from '../../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../../crdClient/customResource';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
