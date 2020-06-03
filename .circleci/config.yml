@@ -76,9 +76,20 @@ jobs:
       - setup_remote_docker
       - build_all:
           tag: $CIRCLE_TAG
+  graphql-lint:
+    docker:
+      - image: circleci/node:lts
+    steps:
+      - run: |
+        cd packages/graphql-server
+        npm install
+        npm run build:test
 
 workflows:
   version: 2
+  tests:
+    jobs:
+      - graphql-lint
   build_and_push:
     jobs:
       - latest:
