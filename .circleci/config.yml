@@ -94,8 +94,8 @@ workflows:
     jobs:
       - graphql-lint
       - release:
-          requires:
-            - graphql-lint
           filters:
             tags:
               only: /.*/
+            branches:
+              ignore: /.*/
