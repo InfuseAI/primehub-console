@@ -11,7 +11,7 @@ import { PhJobCacheList } from '../crdClient/phJobCacheList';
 
 export enum Role {
   CLIENT = 'CLIENT',
-  JOB_USER = 'JOB_USER',
+  USER = 'USER',
   ADMIN = 'ADMIN',
   NOT_AUTH = 'NOT_AUTH'
 }
