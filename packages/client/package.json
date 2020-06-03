@@ -99,7 +99,7 @@
     "webpack-dev-server": "^3.1.0"
   },
   "pre-commit": [],
-  "repository": "https://github.com/Canner/infuseai-canner.git",
+  "repository": "https://github.com/infuseai/primehub-console.git",
   "peerDependencies": {
     "react": "^0.14.0 || ^15.0.0 || 16.x",
     "react-dom": "^0.14.0 || ^15.0.0 || 16.x"
@@ -118,6 +118,9 @@
     "item-hover-bg": "rgba(222, 229, 241, 0.37)",
     "font-size-base": "14px",
     "icon-url": "'/font/iconfont'"
+  },
+  "jest": {
+    "testURL": "http://localhost/"
   },
   "license": "Apache-2.0",
   "private": true,

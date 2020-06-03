@@ -15,7 +15,7 @@ module.exports = {
   entry: {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
-    'model-deployment': devMode ? './src/modelDeployment.tsx' : ['./src/public-import.js', './src/modelDeployment.tsx'],
+    'model-deployment': devMode ? './src/ee/modelDeployment.tsx' : ['./src/public-import.js', './src/ee/modelDeployment.tsx'],
     'api-token': './src/apiToken.tsx',
   },
   output: {
