@@ -17,6 +17,7 @@ import {dict, graphqlClient, imageStorage} from './utils';
 import DatasetBody from '../src/cms-layouts/datasetBody';
 import CommonBody from '../src/cms-layouts/commonBody';
 import UserBody from '../src/cms-layouts/userBody';
+import {isArray} from 'lodash';
 
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
@@ -47,8 +48,15 @@ if (process.env.NODE_ENV === 'production') {
   schema.graphqlClient = graphqlClient;
 } else {
   const fakeData = createFakeData(schema.schema, 12);
+  // ensure workspaceId:default in fakeData
   fakeData.workspace[0].id = 'default';
   fakeData.workspace[0].displayName = 'Default';
+  Object.keys(fakeData).forEach(key => {
+    if (key === 'workspace') return;
+    if (isArray(fakeData[key])) {
+      fakeData[key] = fakeData[key].map(row => ({...row, workspaceId: 'default'}));
+    }
+  })
   schema.connector = new LocalStorageConnector({
     defaultData: fakeData,
     localStorageKey: 'infuse'
