@@ -8,7 +8,9 @@ commands:
       tag:
         type: string
     steps:
-      - docker/check
+      - docker/check:
+          docker-username: $DOCKER_USER
+          docker-password: $DOCKER_PASS
       # Build and push Primehub-console EE image
       - docker/build:
           image: 'infuseai/primehub-console'
