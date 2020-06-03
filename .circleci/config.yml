@@ -93,7 +93,12 @@ workflows:
   build_and_push:
     jobs:
       - graphql-lint
+          filters:
+            tags:
+              only: /.*/
       - release:
+          requires:
+            - graphql
           filters:
             tags:
               only: /.*/
