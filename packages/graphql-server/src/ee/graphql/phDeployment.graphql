@@ -1,5 +1,5 @@
-# import PageInfo from "common.graphql"
-# import InstanceType from "instanceType.graphql"
+# import PageInfo from "../../graphql/common.graphql"
+# import InstanceType from "../../graphql/instanceType.graphql"
 
 type Pod {
   name: String
@@ -82,4 +82,10 @@ input PhDeploymentUpdateInput {
   description: String
   metadata: JSON
   instanceType: String
+}
+
+input PhDeploymentClientCreateInput {
+  deploymentId: String
+  name: String
+  token: String
 }

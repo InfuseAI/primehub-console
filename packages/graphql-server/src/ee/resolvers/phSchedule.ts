@@ -1,16 +1,16 @@
-import { Context } from './interface';
-import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser, validateLicense } from './utils';
-import { PhScheduleSpec, PhScheduleStatus } from '../crdClient/crdClientImpl';
-import CustomResource, { Item } from '../crdClient/customResource';
+import { Context } from '../../resolvers/interface';
+import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser, validateLicense } from '../../resolvers/utils';
+import { PhScheduleSpec, PhScheduleStatus } from '../../crdClient/crdClientImpl';
+import CustomResource, { Item } from '../../crdClient/customResource';
 import { orderBy, omit, get, isUndefined, isNil, isEmpty } from 'lodash';
 import * as moment from 'moment';
-import { escapeToPrimehubLabel } from '../utils/escapism';
+import { escapeToPrimehubLabel } from '../../utils/escapism';
 import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
-import { mapping } from './instanceType';
-import * as logger from '../logger';
-import { keycloakMaxCount } from './constant';
-import { isUserAdmin } from './user';
+import { mapping } from '../../resolvers/instanceType';
+import * as logger from '../../logger';
+import { keycloakMaxCount } from '../../resolvers/constant';
+import { isUserAdmin } from '../../resolvers/user';
 import { createJob } from './phJob';
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';

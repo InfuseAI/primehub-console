@@ -1,8 +1,8 @@
 import * as k8s from '@kubernetes/client-node';
 import { ERROR } from '@kubernetes/client-node/dist/informer';
-import { watch, kubeConfig, phJobCrd, PhJobSpec, PhJobStatus } from './crdClientImpl';
-import { Item } from './customResource';
-import * as logger from '../logger';
+import { watch, kubeConfig, phJobCrd, PhJobSpec, PhJobStatus } from '../../crdClient/crdClientImpl';
+import { Item } from '../../crdClient/customResource';
+import * as logger from '../../logger';
 import BPromise from 'bluebird';
 const k8sClient = kubeConfig.makeApiClient(k8s.CustomObjectsApi);
 

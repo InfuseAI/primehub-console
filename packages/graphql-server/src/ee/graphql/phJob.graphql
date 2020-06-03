@@ -1,5 +1,5 @@
-# import PageInfo from "common.graphql"
-# import InstanceType from "instanceType.graphql"
+# import PageInfo from "../../graphql/common.graphql"
+# import InstanceType from "../../graphql/instanceType.graphql"
 
 type PhJob {
   id: ID!

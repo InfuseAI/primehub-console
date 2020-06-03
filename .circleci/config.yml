@@ -17,10 +17,10 @@ jobs:
             docker push "infuseai/canner-admin-server-model-deploy:${CIRCLE_TAG}"
             docker build -t "infuseai/canner-admin-server-ce:${CIRCLE_TAG}" -f packages/admin-server/overlay/ce/Dockerfile .
             docker push "infuseai/canner-admin-server-ce:${CIRCLE_TAG}"
-            docker build -t "infuseai/canner-graphql-server:${CIRCLE_TAG}" -f packages/graphql-server/Dockerfile .
+            docker build -t "infuseai/canner-admin-server-ce:${CIRCLE_TAG}" -f packages/admin-server/overlay/ce/Dockerfile .
+            docker push "infuseai/canner-admin-server-ce:${CIRCLE_TAG}"
+            docker build -t "infuseai/canner-graphql-server:${CIRCLE_TAG}" -f packages/graphql-server/docker/ee/Dockerfile .
             docker push "infuseai/canner-graphql-server:${CIRCLE_TAG}"
-            docker build -t "infuseai/canner-graphql-server-ce:${CIRCLE_TAG}" -f packages/graphql-server/ce/Dockerfile .
-            docker push "infuseai/canner-graphql-server-ce:${CIRCLE_TAG}"
             docker build -t "infuseai/canner-watcher:${CIRCLE_TAG}" -f packages/watcher/Dockerfile .
             docker push "infuseai/canner-watcher:${CIRCLE_TAG}"
 

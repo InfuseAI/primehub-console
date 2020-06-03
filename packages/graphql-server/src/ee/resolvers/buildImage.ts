@@ -1,9 +1,9 @@
-import { Context } from './interface';
-import { toRelay, filter, paginate, extractPagination, parsePackageField, stringifyPackageField, validateLicense } from './utils';
-import * as logger from '../logger';
+import { Context } from '../../resolvers/interface';
+import { toRelay, filter, paginate, extractPagination, parsePackageField, stringifyPackageField, validateLicense } from '../../resolvers/utils';
+import * as logger from '../../logger';
 import { get, isEmpty, isUndefined, isNil, isNull, sortBy, orderBy } from 'lodash';
-import CustomResource, { Item } from '../crdClient/customResource';
-import { ImageSpecSpec, ImageSpecStatus } from '../crdClient/crdClientImpl';
+import CustomResource, { Item } from '../../crdClient/customResource';
+import { ImageSpecSpec, ImageSpecStatus } from '../../crdClient/crdClientImpl';
 import moment = require('moment');
 import { transform as transformJob } from './buildImageJob';
 import { IMAGE_SPEC_JOB_NAME_LABEL } from './constant';

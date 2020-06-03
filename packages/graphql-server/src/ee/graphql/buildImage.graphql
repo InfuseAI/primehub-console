@@ -1,4 +1,4 @@
-# import PageInfo from "common.graphql"
+# import PageInfo from "../../graphql/common.graphql"
 
 type Packages {
   apt: String

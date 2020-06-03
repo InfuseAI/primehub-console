@@ -9,7 +9,7 @@ COPY packages/graphql-server packages/graphql-server
 
 RUN cd packages/graphql-server \
   && yarn install --ignore-engines --production=false \
-  && npm run build:ce:prod \
+  && npm run build:prod \
   && yarn install --ignore-engines --production=true \
   && rm -rf server/src
 
@@ -19,4 +19,4 @@ WORKDIR /usr/src/app
 COPY --from=build /usr/src/app /usr/src/app
 ENV NODE_ENV production
 EXPOSE 3000
-CMD [ "node", "packages/graphql-server/lib/bin/www.ce.js" ]
+CMD [ "node", "packages/graphql-server/lib/ee/bin/www.js" ]

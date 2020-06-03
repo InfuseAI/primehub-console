@@ -1,19 +1,20 @@
-import { Context } from './interface';
+import { Context } from '../../resolvers/interface';
 import {
   toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser, mergeVariables, validateLicense
-} from './utils';
+} from '../../resolvers/utils';
 import {
   PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, client as kubeClient
-} from '../crdClient/crdClientImpl';
-import CustomResource, { Item } from '../crdClient/customResource';
+} from '../../crdClient/crdClientImpl';
+import CustomResource, { Item } from '../../crdClient/customResource';
 import { orderBy, omit, get, isUndefined, isNil, isEmpty, isNull, capitalize } from 'lodash';
 import * as moment from 'moment';
 import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
-import { mapping } from './instanceType';
-import * as logger from '../logger';
-import { keycloakMaxCount } from './constant';
-import { isUserAdmin } from './user';
+import { mapping } from '../../resolvers/instanceType';
+import * as logger from '../../logger';
+import { keycloakMaxCount } from '../../resolvers/constant';
+import { isUserAdmin } from '../../resolvers/user';
+import md5 = require('apache-md5');
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 const NOT_AUTH_ERROR = 'NOT_AUTH';

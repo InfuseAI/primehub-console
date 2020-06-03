@@ -1,8 +1,8 @@
-import { Context } from './interface';
-import { toRelay, filter, paginate, extractPagination, stringifyPackageField } from './utils';
+import { Context } from '../../resolvers/interface';
+import { toRelay, filter, paginate, extractPagination, stringifyPackageField } from '../../resolvers/utils';
 import { get } from 'lodash';
-import CustomResource, { Item } from '../crdClient/customResource';
-import { ImageSpecJobSpec, ImageSpecJobStatus } from '../crdClient/crdClientImpl';
+import CustomResource, { Item } from '../../crdClient/customResource';
+import { ImageSpecJobSpec, ImageSpecJobStatus } from '../../crdClient/crdClientImpl';
 import { IMAGE_SPEC_JOB_HASH_ANNOTATION, IMAGE_SPEC_JOB_NAME_LABEL } from './constant';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
 

@@ -5,9 +5,9 @@ import { Item } from '../crdClient/customResource';
 import WorkspaceApi from '../workspace/api';
 import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
 import K8sUploadServerSecret from '../k8sResource/k8sUploadServerSecret';
-import { JobLogCtrl } from '../controllers/jobLogCtrl';
+import { JobLogCtrl } from '../ee/controllers/jobLogCtrl';
 import K8sGroupPvc from '../k8sResource/k8sGroupPvc';
-import { PhJobCacheList } from '../crdClient/phJobCacheList';
+import { PhJobCacheList } from '../ee/crdClient/phJobCacheList';
 
 export enum Role {
   CLIENT = 'CLIENT',

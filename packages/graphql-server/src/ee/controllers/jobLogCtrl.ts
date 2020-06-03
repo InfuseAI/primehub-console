@@ -1,9 +1,9 @@
 import Router from 'koa-router';
-import CrdClientImpl, { client as kubeClient } from '../crdClient/crdClientImpl';
+import CrdClientImpl, { client as kubeClient } from '../../crdClient/crdClientImpl';
 import { ParameterizedContext } from 'koa';
 import { Stream } from 'stream';
 import { get } from 'lodash';
-import * as logger from '../logger';
+import * as logger from '../../logger';
 
 const MODEL = 'model';
 

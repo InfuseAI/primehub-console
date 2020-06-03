@@ -9,7 +9,7 @@ COPY packages/graphql-server packages/graphql-server
 
 RUN cd packages/graphql-server \
   && yarn install --ignore-engines --production=false \
-  && npm run build:prod \
+  && npm run build:ce:prod \
   && yarn install --ignore-engines --production=true \
   && rm -rf server/src
 
