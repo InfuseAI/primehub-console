@@ -1,0 +1,13 @@
+The source code in this repository is licensed under the Apache License
+Version 2.0, an Apache compatible license.
+
+Source code in a given file is also licensed under the Apache License
+Version 2.0, unless otherwise noted at the beginning of the file, or if
+a LICENSE file present in the directory subtree declares a separate
+license except the EE parts.
+
+Within all “ee” folders, source code in a given file, unless otherwise
+noted at the beginning of the file, or if a LICENSE file present in the
+directory subtree declares a separate license, belongs to InfuseAI.
+All Rights Reserved.
+

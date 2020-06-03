@@ -15,7 +15,7 @@ createApp().then(({app, server, config}) => {
     }
     // tslint:disable-next-line:no-console
     console.log(`
-      🚀 Server ready on port ${port}
+      🚀 CE Server ready on port ${port}
       graphql at http://localhost:${port}${server.graphqlPath}
     `);
   });

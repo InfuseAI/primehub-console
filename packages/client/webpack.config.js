@@ -9,14 +9,14 @@ const webpack = require('webpack');
 const devMode = process.env.NODE_ENV !== 'production';
 const CompressionPlugin = require('compression-webpack-plugin');
 
-resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/index.schema.js');
+resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/ee/index.schema.js');
 
 module.exports = {
   entry: {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
-    job: devMode ? './src/job.tsx' : ['./src/public-import.js', './src/job.tsx'],
-    'model-deployment': devMode ? './src/modelDeployment.tsx' : ['./src/public-import.js', './src/modelDeployment.tsx'],
+    job: devMode ? './src/ee/job.tsx' : ['./src/public-import.js', './src/ee/job.tsx'],
+    'model-deployment': devMode ? './src/ee/modelDeployment.tsx' : ['./src/public-import.js', './src/ee/modelDeployment.tsx'],
     'api-token': './src/apiToken.tsx',
   },
   output: {

@@ -6,7 +6,7 @@ import {get} from 'lodash';
 import queryString from 'querystring';
 import {withRouter} from 'react-router';
 import {RouteComponentProps} from 'react-router-dom';
-import withPath, { PathComponentProps } from 'components/job/withPath';
+import withPath, { PathComponentProps } from 'ee/components/job/withPath';
 import {appPrefix} from 'utils/env';
 
 export const GroupFragment = gql`

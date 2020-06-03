@@ -1,0 +1,132 @@
+# import PageInfo from "../../graphql/common.graphql"
+
+type Packages {
+  apt: String
+  pip: String
+  conda: String
+}
+
+input PackagesInput {
+  apt: String
+  pip: String
+  conda: String
+}
+
+# BuildImageJob
+
+type BuildImageJob {
+  id: ID!
+  name: String!
+  status: String
+  baseImage: String
+  targetImage: String
+  imageRevision: String
+  useImagePullSecret: String
+  packages: Packages
+  logEndpoint: String
+  updateTime: String
+  # workspace
+  workspaceId: String
+}
+
+"""An edge in a connection."""
+type BuildImageJobEdge {
+  """The item at the end of the edge."""
+  node: BuildImageJob!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type BuildImageJobConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [BuildImageJobEdge]!
+}
+
+input BuildImageJobWhereUniqueInput {
+  id: ID!
+  # workspace
+  workspaceId: String
+}
+
+input BuildImageJobWhereInput {
+  id: ID!
+  # workspace
+  workspaceId: String
+}
+
+# BuildImage
+
+type BuildImage {
+  id: ID!
+  name: String!
+  status: String
+  image: String
+  baseImage: String
+  useImagePullSecret: String
+  packages: Packages
+  buildImageJobs: [BuildImageJob]
+  # workspace
+  workspaceId: String
+}
+
+"""order"""
+input BuildImageOrderByInput {
+  name: String
+  status: String
+  image: String
+}
+
+"""An edge in a connection."""
+type BuildImageEdge {
+  """The item at the end of the edge."""
+  node: BuildImage!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type BuildImageConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [BuildImageEdge]!
+}
+
+input BuildImageWhereUniqueInput {
+  id: ID!
+  # workspace
+  workspaceId: String
+}
+
+input BuildImageWhereInput {
+  id: ID
+  name_contains: String
+  # workspace
+  workspaceId: String
+}
+
+"""Mutation input"""
+input BuildImageCreateInput {
+  name: String!
+  status: String
+  image: String
+  baseImage: String
+  useImagePullSecret: String
+  packages: PackagesInput
+  # workspace
+  workspaceId: String
+}
+
+input BuildImageUpdateInput {
+  name: String
+  status: String
+  image: String
+  baseImage: String
+  useImagePullSecret: String
+  packages: PackagesInput
+}
