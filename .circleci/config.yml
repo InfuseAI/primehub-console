@@ -82,10 +82,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Running tslint & tsc dryrun tests for graphql
           command: |
             cd packages/graphql-server
             npm install
-            npm run build:test
+            npm run test:build
 
 workflows:
   version: 2
