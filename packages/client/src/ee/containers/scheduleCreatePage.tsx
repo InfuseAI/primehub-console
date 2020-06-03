@@ -1,15 +1,15 @@
 import * as React from 'react';
+import {Button} from 'antd';
 import gql from 'graphql-tag';
-import {notification} from 'antd';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {get, unionBy} from 'lodash';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
-import {errorHandler} from 'components/job/errorHandler';
-import DeploymentCreateForm from 'components/modelDeployment/createForm';
-import DeploymentBreadcrumb from 'components/modelDeployment/breadcrumb';
+import ScheduleBreadCrumb from 'ee/components/schedule/breadcrumb';
+import {errorHandler} from 'ee/components/job/errorHandler';
+import ScheduleCreateForm from 'ee/components/job/createForm';
 import {GroupFragment} from 'containers/list';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
@@ -28,13 +28,24 @@ export const GET_MY_GROUPS = gql`
   ${GroupFragment}
 `
 
-export const CREATE_DEPLOYMENT = gql`
-  mutation createPhDeployment($data: PhDeploymentCreateInput!) {
-    createPhDeployment(data: $data) {
+export const CREATE_SCHEDULE = gql`
+  mutation createPhSchedule($data: PhScheduleCreateInput!) {
+    createPhSchedule(data: $data) {
       id
     }
   }
 `;
+
+export const GET_TIMEZONE = gql`
+  query system {
+    system {
+      timezone {
+        name
+        offset
+      }
+    }
+  }
+`
 
 const compareByAlphabetical = (prev, next) => {
   if(prev < next) return -1;
@@ -55,14 +66,15 @@ export const sortItems = (items) => {
 
 type Props = RouteComponentProps & {
   getGroups: any; 
-  createPhDeployment: any;
-  createPhDeploymentResult: any;
+  createPhSchedule: any;
+  createPhScheduleResult: any;
+  getTimezone: Function;
 }
 type State = {
   selectedGroup: string | null;
 }
 
-class DeploymentCreatePage extends React.Component<Props, State> {
+class ScheduleCreatePage extends React.Component<Props, State> {
   state = {
     selectedGroup: null,
   };
@@ -72,8 +84,8 @@ class DeploymentCreatePage extends React.Component<Props, State> {
   }
 
   onSubmit = (payload) => {
-    const {createPhDeployment} = this.props;
-    createPhDeployment({
+    const {createPhSchedule} = this.props;
+    createPhSchedule({
       variables: {
         data: payload
       }
@@ -82,9 +94,9 @@ class DeploymentCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {getGroups, createPhDeploymentResult, history} = this.props;
+    const {getGroups, getTimezone, createPhScheduleResult, history} = this.props;
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
-    const allGroups = get(getGroups, 'me.groups', []).filter(group => group.enabledDeployment || group.id === everyoneGroupId);
+    const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups.filter(group => group.id !== everyoneGroupId);
     const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
     const group = groups
@@ -102,19 +114,20 @@ class DeploymentCreatePage extends React.Component<Props, State> {
     return (
       <React.Fragment>
         <PageTitle
-          breadcrumb={<DeploymentBreadcrumb />}
-          title={"Create Deployment"}
-          style={{paddingLeft: 64}}
+          title="Create Schedule"
+          breadcrumb={<ScheduleBreadCrumb />}
         />
-        <div style={{margin: '16px 64px'}}>
-          <DeploymentCreateForm
+        <div style={{margin: 16}}>
+          <ScheduleCreateForm
             onSelectGroup={this.onChangeGroup}
             selectedGroup={selectedGroup}
             groups={sortItems(groups)}
             instanceTypes={sortItems(instanceTypes)}
             images={sortItems(images)}
             onSubmit={this.onSubmit}
-            loading={getGroups.loading || createPhDeploymentResult.loading}
+            loading={getGroups.loading || createPhScheduleResult.loading}
+            timezone={get(getTimezone, 'system.timezone')}
+            type="schedule"
           />
         </div>
       </React.Fragment>
@@ -127,28 +140,19 @@ export default compose(
   graphql(GET_MY_GROUPS, {
     name: 'getGroups'
   }),
-  graphql(CREATE_DEPLOYMENT, {
+  graphql(GET_TIMEZONE, {
+    name: 'getTimezone'
+  }),
+  graphql(CREATE_SCHEDULE, {
     options: (props: Props) => ({
-      onCompleted: (data: any) => {
-        const {history} = props;
-        history.push({
-          pathname: `${appPrefix}model-deployment`,
-          search: queryString.stringify({first: 8})
-        });
-        notification.success({
-          duration: 10,
-          placement: 'bottomRight',
-          message: 'Success!',
-          description: (
-            <>
-              Your model has begun deploying.
-              Click <a onClick={() => history.push(`${appPrefix}model-deployment/${data.createPhDeployment.id}`)}>here</a> to view.
-            </>
-          )
+      onCompleted: () => {
+        props.history.push({
+          pathname: `${appPrefix}schedule`,
+          search: queryString.stringify({page: 1})
         });
       },
       onError: errorHandler
     }),
-    name: 'createPhDeployment'
+    name: 'createPhSchedule'
   })
-)(DeploymentCreatePage)
+)(ScheduleCreatePage)

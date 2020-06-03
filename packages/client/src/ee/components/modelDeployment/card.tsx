@@ -2,7 +2,7 @@ import React from 'react';
 import {Card, Tooltip} from 'antd';
 import {isEmpty} from 'lodash';
 import {RouteComponentProps, withRouter} from 'react-router-dom';
-import {DeploymentInfo, Status} from 'components/modelDeployment/common';
+import {DeploymentInfo, Status} from 'ee/components/modelDeployment/common';
 import moment from 'moment';
 import { appPrefix } from 'utils/env';
 import Field from 'components/share/field';

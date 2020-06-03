@@ -2,11 +2,11 @@ import * as React from 'react';
 import {Button, Form, Card, Input} from 'antd';
 import {get} from 'lodash';
 import styled from 'styled-components';
-import Title from 'components/job/title';
-import ScheduleBreadCrumb from 'components/schedule/breadcrumb';
+import Title from '../job/title';
+import ScheduleBreadCrumb from './breadcrumb';
 import {History} from 'history';
-import PageTitle from 'components/pageTitle';
-import PageBody from 'components/pageBody';
+import PageTitle from '../../../components/pageTitle';
+import PageBody from '../../../components/pageBody';
 
 
 const TitleContainer = styled.div`

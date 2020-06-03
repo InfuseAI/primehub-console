@@ -1,9 +1,9 @@
 import React from 'react';
 import {Table, Modal, Row, Col, Tooltip} from 'antd';
-import {renderTime, renderInstanceType} from 'components/modelDeployment/detail';
+import {renderTime, renderInstanceType} from 'ee/components/modelDeployment/detail';
 import Field from 'components/share/field';
-import {HistoryItem} from 'components/modelDeployment/common';
-import Metadata from 'components/modelDeployment/metadata';
+import {HistoryItem} from 'ee/components/modelDeployment/common';
+import Metadata from 'ee/components/modelDeployment/metadata';
 import moment from 'moment';
 import styled from 'styled-components';
 

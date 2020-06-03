@@ -7,10 +7,10 @@ import {get} from 'lodash';
 import {withRouter, Link} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
-import ScheduleList from 'components/schedule/list';
-import {errorHandler} from 'components/job/errorHandler';
-import {Group} from 'components/job/groupFilter';
-import withPath, { PathComponentProps } from 'components/job/withPath';
+import ScheduleList from '../components/schedule/list';
+import {errorHandler} from '../components/job/errorHandler';
+import {Group} from '../components/job/groupFilter';
+import withPath, { PathComponentProps } from '../components/job/withPath';
 import {appPrefix} from 'utils/env';
 
 export const PhScheduleFragment = gql`

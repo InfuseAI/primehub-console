@@ -1,7 +1,7 @@
 import React from 'react';
 import { get } from 'lodash';
 import Logs from 'components/share/log';
-import {DeploymentInfo, Phase} from 'components/modelDeployment/common';
+import {DeploymentInfo, Phase} from 'ee/components/modelDeployment/common';
 import { Select } from 'antd';
 
 type Props = {

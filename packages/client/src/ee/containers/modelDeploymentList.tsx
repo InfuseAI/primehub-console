@@ -9,9 +9,9 @@ import {RouteComponentProps} from 'react-router';
 import {appPrefix} from 'utils/env';
 import Pagination from 'components/share/pagination';
 import PageTitle from 'components/pageTitle';
-import DeploymentBreadcrumb from 'components/modelDeployment/breadcrumb';
-import DeploymentCard from 'components/modelDeployment/card';
-import { PhDeploymentFragment, DeploymentConnection } from 'components/modelDeployment/common';
+import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';
+import DeploymentCard from 'ee/components/modelDeployment/card';
+import { PhDeploymentFragment, DeploymentConnection } from 'ee/components/modelDeployment/common';
 import InfuseButton from 'components/infuseButton';
 
 const PAGE_SIZE = 8;

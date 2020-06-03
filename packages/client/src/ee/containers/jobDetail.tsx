@@ -3,10 +3,10 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {RouteComponentProps} from 'react-router-dom';
 import {compose} from 'recompose';
-import JobDetail from 'components/job/detail';
-import {errorHandler} from 'components/job/errorHandler';
+import JobDetail from '../components/job/detail';
+import {errorHandler} from '../components/job/errorHandler';
 import {PhJobFragment} from './jobList';
-import {RERUN_JOB, CANCEL_JOB} from 'containers/jobList';
+import {RERUN_JOB, CANCEL_JOB} from './jobList';
 import {get} from 'lodash';
 import {appPrefix} from 'utils/env';
 

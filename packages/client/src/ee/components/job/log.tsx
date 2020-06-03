@@ -1,6 +1,6 @@
 import React from 'react';
 import { get } from 'lodash';
-import Log from 'components/share/log';
+import Log from '../../../components/share/log';
 import {Phase} from './phase';
 
 type Props = {

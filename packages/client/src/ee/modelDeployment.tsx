@@ -6,20 +6,20 @@ import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlCli
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {Layout, notification, Button} from 'antd';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
-import Header from 'components/header';
+import Header from '../components/header';
 import styled from 'styled-components';
-import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
-import ModelDeploymentListContainer from 'containers/modelDeploymentList';
-import DeploymentDetailContainer from 'containers/deploymentDetail';
-import DeploymentCreatePage from 'containers/deploymentCreatePage';
-import DeploymentEditPage from 'containers/deploymentEditPage';
+import {BackgroundTokenSyncer} from '../workers/backgroundTokenSyncer';
+import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
+import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
+import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
+import DeploymentEditPage from 'ee/containers/deploymentEditPage';
 import {appPrefix} from 'utils/env';
-import {dict} from '../schema/utils';
+import {dict} from 'schema/utils.js';
 import en from 'react-intl/locale-data/en';
 import 'moment/locale/zh-tw';
 import {IntlProvider, addLocaleData} from 'react-intl';
 addLocaleData([...en])
-import myLocales from './utils/locales';
+import myLocales from '../utils/locales';
 const locale = (window as any).LOCALE || 'en';
 
 

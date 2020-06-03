@@ -6,13 +6,13 @@ import {compose} from 'recompose';
 import {get, unionBy, isEqual, pick} from 'lodash';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
-import {errorHandler} from 'components/job/errorHandler';
-import DeploymentCreateForm from 'components/modelDeployment/createForm';
+import {errorHandler} from 'ee/components/job/errorHandler';
+import DeploymentCreateForm from 'ee/components/modelDeployment/createForm';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
-import DeploymentBreadcrumb from 'components/modelDeployment/breadcrumb';
-import {PhDeploymentFragment} from 'components/modelDeployment/common';
-import {GET_PH_DEPLOYMENT, getMessage} from './deploymentDetail';
+import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';
+import {PhDeploymentFragment} from 'ee/components/modelDeployment/common';
+import {GET_PH_DEPLOYMENT, getMessage} from 'ee/containers/deploymentDetail';
 import {GET_MY_GROUPS} from './deploymentCreatePage';
 
 export const UPDATE_DEPLOYMENT = gql`

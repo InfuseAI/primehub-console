@@ -2,14 +2,14 @@ import React from 'react';
 import { Modal, Card, Divider, Row, Col, Tabs, Input, Button, message} from 'antd';
 import { DeploymentInfo, Status } from './common';
 import PageTitle from 'components/pageTitle';
-import DeploymentBreadcrumb from 'components/modelDeployment/breadcrumb';
+import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';
 import InfuseButton from 'components/infuseButton';
 import { appPrefix } from 'utils/env';
 import {Link} from 'react-router-dom';
 import Field from 'components/share/field';
-import ModelDeploymentLogs from 'components/modelDeployment/logs';
-import ModelDeploymentHistory from 'components/modelDeployment/history';
-import Metadata from 'components/modelDeployment/metadata';
+import ModelDeploymentLogs from 'ee/components/modelDeployment/logs';
+import ModelDeploymentHistory from 'ee/components/modelDeployment/history';
+import Metadata from 'ee/components/modelDeployment/metadata';
 import Message from 'components/share/message';
 import moment from 'moment';
 

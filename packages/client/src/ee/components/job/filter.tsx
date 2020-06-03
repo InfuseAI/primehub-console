@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {Checkbox, Col, Divider} from 'antd';
 import styled from 'styled-components';
-import GroupFilter, {Group} from 'components/job/groupFilter';
-import {FilterRow, FilterPlugins, ButtonCol} from '../../cms-toolbar/filter';
-import {Label} from '../../cms-toolbar/share';
+import GroupFilter, {Group} from 'ee/components/job/groupFilter';
+import {FilterRow, FilterPlugins, ButtonCol} from 'root/cms-toolbar/filter';
+import {Label} from 'root/cms-toolbar/share';
 
 type Props = {
   groups: Group[];

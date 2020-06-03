@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import {get, startCase} from 'lodash';
-import RecurrenceInput, {RecurrenceType, recurrenceValidator} from 'components/schedule/recurrence';
+import RecurrenceInput, {RecurrenceType, recurrenceValidator} from 'ee/components/schedule/recurrence';
 import Message from 'components/share/message';
 
 const { Option } = Select;
