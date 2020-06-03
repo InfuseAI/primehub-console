@@ -60,6 +60,8 @@ commands:
 
 jobs:
   latest:
+    docker:
+      - image: circleci/node:lts
     steps:
       - checkout
       - setup_remote_docker
@@ -67,6 +69,8 @@ jobs:
           tag: 'latest'
 
   release:
+    docker:
+      - image: circleci/node:lts
     steps:
       - checkout
       - setup_remote_docker
