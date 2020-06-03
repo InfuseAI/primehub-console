@@ -1,6 +1,6 @@
 import { Context } from './interface';
 import {
-  toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser, mergeVariables, validateLicense
+  toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, mergeVariables, validateLicense
 } from './utils';
 import {
   PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, client as kubeClient
@@ -467,11 +467,10 @@ export interface PhDeploymentClient {
 export interface PhDeploymentClientMutationInput {
   deploymentId: string;
   name: string;
-  token: string;
 }
 
-const htpasswd = (username: string, password: string) => {
-  return `${username}:${md5(password)}`;
+const genRandomString = () => {
+  return Math.random().toString(36).slice(2);
 };
 
 export const createClient = async (root, args, context: Context) => {
@@ -488,9 +487,10 @@ export const createClient = async (root, args, context: Context) => {
 
   // remove the same name client
   clients = clients.filter(client => client.name !== data.name);
+  const plainTextToken = genRandomString();
   const newClient = {
     name: data.name,
-    token: htpasswd(data.name, data.token)
+    token: md5(plainTextToken)
   };
   clients.push(newClient);
 
@@ -500,16 +500,19 @@ export const createClient = async (root, args, context: Context) => {
     userName: phDeployment.spec.userName,
     displayName: phDeployment.spec.displayName,
     description: phDeployment.spec.description,
-    stop: false,
+    stop: phDeployment.spec.stop || false,
     predictors: [predictor],
     endpoint: {
       accessType,
       clients,
     }
   };
-  const updated = await context.crdClient.phDeployments.patch(data.deploymentId, {spec});
+  await context.crdClient.phDeployments.patch(data.deploymentId, {spec});
 
-  return transform(updated, context.kcAdminClient);
+  return {
+    name: data.name,
+    plainTextToken
+  };
 };
 
 export const destroyClient = async (root, args, context: Context) => {
@@ -533,7 +536,7 @@ export const destroyClient = async (root, args, context: Context) => {
     userName: phDeployment.spec.userName,
     displayName: phDeployment.spec.displayName,
     description: phDeployment.spec.description,
-    stop: false,
+    stop: phDeployment.spec.stop || false,
     predictors: [predictor],
     endpoint: {
       accessType,

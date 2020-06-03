@@ -40,7 +40,6 @@ export default class ApiTokenPage extends React.Component<Props, State> {
 
 
   copyToken = () => {
-    console.log("happy")
     if (this.refToken && this.refToken.current) {
       const input = this.refToken.current.input;
       input.select();

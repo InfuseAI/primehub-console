@@ -34,6 +34,15 @@ export interface HistoryItem {
   time: string;
 }
 
+export interface ClientItem {
+  client: string;
+}
+
+export interface ClientResult {
+  name: string;
+  plainTextToken: string;
+}
+
 export interface DeploymentInfo {
   id: string;
   user: {name: string};
@@ -47,6 +56,8 @@ export interface DeploymentInfo {
   creationTime: string
   lastUpdatedTime: string;
   endpoint: string;
+  endpointAccessType: string;
+  endpointClients: Array<ClientItem>;
   modelImage: string;
   pods: Array<{
     name: string;
@@ -80,6 +91,10 @@ fragment PhDeploymentInfo on PhDeployment {
   creationTime
   lastUpdatedTime
   endpoint
+  endpointAccessType
+  endpointClients {
+    name
+  }
   modelImage
   pods {
     name

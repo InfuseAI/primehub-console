@@ -1,7 +1,6 @@
 import KcAdminClient from 'keycloak-admin';
 import {
   toRelay,
-  getFromAttr,
   mutateRelation,
   parseDiskQuota,
   stringifyDiskQuota,
@@ -9,16 +8,14 @@ import {
   stringifyMemory,
   filter,
   paginate,
-  extractPagination,
-  parseBoolean
-} from './utils';
-import { pick, first, isNil, omit, get } from 'lodash';
+  extractPagination} from './utils';
+import { pick, isNil, omit, get, isEmpty, mapValues } from 'lodash';
 import { crd as instanceTypeResolver } from './instanceType';
 import { crd as datasetResolver } from './dataset';
 import { crd as imageResolver } from './image';
 import { Context } from './interface';
 import { Attributes, FieldType } from './attr';
-import { keycloakMaxCount, defaultWorkspaceId } from './constant';
+import { keycloakMaxCount } from './constant';
 import { ApolloError } from 'apollo-server';
 import * as logger from '../logger';
 import Boom from 'boom';
@@ -26,6 +23,7 @@ import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspac
 import { isKeycloakGroupNameWorkspace } from '../workspace/api';
 import GroupRepresentation from 'keycloak-admin/lib/defs/groupRepresentation';
 import {createConfig} from '../config';
+import { transform } from './groupUtils';
 
 const config = createConfig();
 
@@ -96,7 +94,7 @@ export const create = async (root, args, context: Context) => {
       enabledDeployment: true
     });
   }
-  
+
   const groups = await kcAdminClient.groups.find();
   // max group validation need minus everyone group.
   if (groups.length > config.maxGroup) {
@@ -289,12 +287,38 @@ export const destroy = async (root, args, context: Context) => {
  * Query
  */
 
+const quotaComparator = (fieldName: string) => (group: any) => {
+  const fieldValue = group[fieldName];
+  if (isNil(fieldValue)) {
+    return Number.POSITIVE_INFINITY;
+  }
+  return fieldValue;
+};
+
+const customComparators: Record<string, (group: any) => number> = {
+  quotaCpu: quotaComparator('quotaCpu'),
+  quotaGpu: quotaComparator('quotaGpu'),
+  projectQuotaCpu: quotaComparator('projectQuotaCpu'),
+  projectQuotaGpu: quotaComparator('projectQuotaGpu'),
+};
+
 const listQuery = async (
-  kcAdminClient: KcAdminClient, where: any, order: any, currentWorkspace: CurrentWorkspace, context: Context) => {
+  kcAdminClient: KcAdminClient,
+  where: any,
+  order: any,
+  currentWorkspace: CurrentWorkspace,
+  context: Context
+): Promise<{fetched: boolean, groups: any[]}> => {
   const idWhere = get(where, 'id');
   if (idWhere) {
     const group = await kcAdminClient.groups.findOne({id: idWhere});
-    return group ? [injectWorkspace(group, currentWorkspace)] : [];
+    return group ? {
+      fetched: true,
+      groups: [transform(group)]
+     } : {
+       fetched: false,
+       groups: [],
+     };
   }
 
   const whereWithoutWorkspace = omit(where, 'workspaceId');
@@ -309,34 +333,66 @@ const listQuery = async (
   groups = groups.filter(group => group.id !== everyoneGroupId);
   // filter workspace groups
   groups = groups.filter(group => !isKeycloakGroupNameWorkspace(group.name));
-  groups = filter(groups, whereWithoutWorkspace, order);
-  return groups.map(group => injectWorkspace(group, currentWorkspace));
+
+  // do not need to sort, so we do pagination first and then map
+  if (isEmpty(order)) {
+    groups = filter(groups, whereWithoutWorkspace, order);
+    return {
+      fetched: false,
+      groups,
+    };
+  } else {
+    // need to sort, we fetch all groups first
+    const fetchedGroups = await Promise.all(
+      groups.map(group => context.kcAdminClient.groups.findOne({id: group.id})));
+    const transformed = fetchedGroups.map(transform);
+    groups = filter(transformed, whereWithoutWorkspace, order, customComparators);
+    return {
+      fetched: true,
+      groups,
+    };
+  }
 };
 
 export const query = async (root, args, context: Context) => {
   const currentWorkspace = createInResolver(root, args, context);
-  const groups =
+  const groupQuery =
     await listQuery(context.kcAdminClient, args && args.where, args && args.orderBy, currentWorkspace, context);
-  const paginatedGroups = paginate(groups, extractPagination(args));
-  const fetchedGroups = await Promise.all(
-    paginatedGroups.map(group => context.kcAdminClient.groups.findOne({id: group.id})));
-  return fetchedGroups.map(group => injectWorkspace(group, currentWorkspace));
+
+  // if not fetched, we paginate first then map
+  let fetchedAndPagedGroups;
+  if (!groupQuery.fetched) {
+    const pageGroups = paginate(groupQuery.groups, extractPagination(args));
+    fetchedAndPagedGroups = await Promise.all(
+      pageGroups.map(group => context.kcAdminClient.groups.findOne({id: group.id})));
+  } else {
+    // map already, just paginate
+    fetchedAndPagedGroups = paginate(groupQuery.groups, extractPagination(args)).map(transform);
+  }
+
+  return fetchedAndPagedGroups.map(group => injectWorkspace(group, currentWorkspace));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
   const currentWorkspace = createInResolver(root, args, context);
-  const groups =
+  const groupQuery =
     await listQuery(context.kcAdminClient, args && args.where, args && args.orderBy, currentWorkspace, context);
-  const relayResponse = toRelay(groups, extractPagination(args));
+
+  const relayResponse = toRelay(groupQuery.groups, extractPagination(args));
   relayResponse.edges = await Promise.all(relayResponse.edges.map(
     async edge => {
-      const group = await context.kcAdminClient.groups.findOne({id: edge.node.id});
+      // if fetched, we dont fetch again
+      const fetchedNode = groupQuery.fetched ?
+        edge.node
+        : transform(await context.kcAdminClient.groups.findOne({id: edge.node.id}));
+
       return {
         cursor: edge.cursor,
-        node: injectWorkspace(group, currentWorkspace)
+        node: injectWorkspace(fetchedNode, currentWorkspace)
       };
     })
   );
+
   return relayResponse;
 };
 
@@ -345,50 +401,10 @@ export const queryOne = async (root, args, context: Context) => {
   const groupId = args.where.id;
   const kcAdminClient = context.kcAdminClient;
   const group = await kcAdminClient.groups.findOne({id: groupId});
-  return group ? injectWorkspace(group, currentWorkspace) : null;
+  return group ? injectWorkspace(transform(group), currentWorkspace) : null;
 };
 
 export const typeResolvers = {
-  quotaCpu: async (parent, args, context: Context) =>
-    getFromAttr('quota-cpu', parent.attributes, null, parseFloat),
-
-  quotaGpu: async (parent, args, context: Context) =>
-    getFromAttr('quota-gpu', parent.attributes, null, parseInt),
-
-  quotaMemory: async (parent, args, context: Context) =>
-    getFromAttr('quota-memory', parent.attributes, null, parseMemory),
-
-  userVolumeCapacity: async (parent, args, context: Context) =>
-    getFromAttr('user-volume-capacity', parent.attributes, null, parseDiskQuota),
-
-  projectQuotaCpu: async (parent, args, context: Context) =>
-    getFromAttr('project-quota-cpu', parent.attributes, null, parseFloat),
-
-  projectQuotaGpu: async (parent, args, context: Context) =>
-    getFromAttr('project-quota-gpu', parent.attributes, null, parseInt),
-
-  projectQuotaMemory: async (parent, args, context: Context) =>
-    getFromAttr('project-quota-memory', parent.attributes, null, parseMemory),
-
-  // shared volume
-  enabledSharedVolume: async (parent, args, context: Context) =>
-    getFromAttr('enabled-shared-volume', parent.attributes, false, parseBoolean),
-
-  sharedVolumeCapacity: async (parent, args, context: Context) =>
-    getFromAttr('shared-volume-capacity', parent.attributes, null, parseDiskQuota),
-
-  homeSymlink: async (parent, args, context: Context) =>
-    getFromAttr('home-symlink', parent.attributes, null, parseBoolean),
-
-  launchGroupOnly: async (parent, args, context: Context) =>
-    getFromAttr('launch-group-only', parent.attributes, null, parseBoolean),
-
-  enabledDeployment: async (parent, args, context: Context) =>
-    getFromAttr('enabled-deployment', parent.attributes, null, parseBoolean),
-
-  displayName: async (parent, args, context: Context) =>
-    getFromAttr('displayName', parent.attributes, null),
-
   users: async (parent, args, context: Context) => {
     try {
       return context.kcAdminClient.groups.listMembers({

@@ -21,7 +21,7 @@ const config = createConfig();
 const LICENSE_ERROR = 'LICENSE_ERROR';
 
 export const validateLicense = () => {
-    let status = config.licenseStatus.toLowerCase();
+    const status = config.licenseStatus.toLowerCase();
     switch (status) {
       case 'unexpired':
         return;
@@ -32,7 +32,7 @@ export const validateLicense = () => {
       default:
         return;
     }
-}
+};
 
 const ITEMS_PER_PAGE = 10;
 
@@ -160,7 +160,7 @@ export const toRelayWithCursor = (rows: any[], pagination?: Pagination) => {
   };
 };
 
-export const filter = (rows: any[], where?: any, order?: any) => {
+export const filter = (rows: any[], where?: any, order?: any, comparators?: Record<string, (row: any) => number>) => {
   if (!isEmpty(where)) {
     Object.keys(where).forEach(field => {
       if (field === 'id') {
@@ -191,18 +191,22 @@ export const filter = (rows: any[], where?: any, order?: any) => {
 
   // sorting
   if (!isEmpty(order)) {
-    const sortField: string = Object.keys(order)[0];
+    let iteratee: any = Object.keys(order)[0];
 
     let orderValue: 'asc' | 'desc';
-    if (order[sortField] === 'asc') {
+    if (order[iteratee] === 'asc') {
       orderValue = 'asc';
-    } else if (order[sortField] === 'desc') {
+    } else if (order[iteratee] === 'desc') {
       orderValue = 'desc';
     } else {
-      throw new Error(`order value (${order[sortField]}) not valid. Should be 'asc' or 'desc'`);
+      throw new Error(`order value (${order[iteratee]}) not valid. Should be 'asc' or 'desc'`);
     }
 
-    rows = orderBy(rows, [sortField], [orderValue]);
+    if (comparators && comparators[iteratee]) {
+      iteratee = comparators[iteratee];
+    }
+
+    rows = orderBy(rows, [iteratee], [orderValue]);
   }
 
   return rows;
