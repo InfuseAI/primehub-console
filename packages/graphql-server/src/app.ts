@@ -100,8 +100,7 @@ const ceResolvers = {
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),
-    ...ann.resolvers()
-  },
+    ...ann.resolvers()  },
   Mutation: {
     updateSystem: system.update,
     createUser: user.create,
