@@ -61,7 +61,7 @@ import Boom from 'boom';
 // graphql middlewares
 import readOnlyMiddleware from '../middlewares/readonly';
 // Basic Auth middleware
-import { permissions as authMiddleware } from '../middlewares/auth';
+import { permissions as authMiddleware } from './middlewares/auth';
 import TokenSyncer from '../oidc/syncer';
 import K8sSecret from '../k8sResource/k8sSecret';
 import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
