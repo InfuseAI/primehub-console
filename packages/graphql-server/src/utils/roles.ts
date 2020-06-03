@@ -1,4 +1,4 @@
-import { rule } from 'graphql-shield'
+import { rule } from 'graphql-shield';
 import { Context, Role } from '../resolvers/interface';
 
 export const isAdmin = rule({ cache: 'contextual' })(

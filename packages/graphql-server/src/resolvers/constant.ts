@@ -31,4 +31,3 @@ export const createDefaultSystemSettings = (defaultUserVolumeCapacity: string) =
 export const keycloakMaxCount = 10000;
 
 export const defaultWorkspaceId = 'default';
-

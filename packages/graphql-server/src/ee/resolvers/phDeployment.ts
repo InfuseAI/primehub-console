@@ -2,7 +2,7 @@ import { Context } from '../../resolvers/interface';
 import {
   toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory,  mergeVariables
 } from '../../resolvers/utils';
-import { validateLicense } from './utils'
+import { validateLicense } from './utils';
 import {
   PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, client as kubeClient
 } from '../../crdClient/crdClientImpl';
