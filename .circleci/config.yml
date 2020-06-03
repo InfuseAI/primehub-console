@@ -90,17 +90,19 @@ jobs:
 
 workflows:
   version: 2
-  tests:
-    jobs:
-      - graphql-lint
   build_and_push:
     jobs:
+      - graphql-lint
       - latest:
+          requires:
+            - graphql-lint
           filters:
             branches:
               only:
                 - master
       - release:
+          requires:
+            - graphql-lint
           filters:
             tags:
               only: /.*/
