@@ -379,7 +379,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
           try {
             tokenPayload = await oidcTokenVerifier.verify(apiToken);
-            if (tokenPayload.typ === "Offline") {
+            if (tokenPayload.typ === 'Offline') {
               checkOfflineToken = true;
             }
           } catch (err) {

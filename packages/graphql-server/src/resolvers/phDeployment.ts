@@ -1,6 +1,6 @@
 import { Context } from './interface';
 import {
-  toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser, mergeVariables, validateLicense
+  toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, mergeVariables, validateLicense
 } from './utils';
 import {
   PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, client as kubeClient

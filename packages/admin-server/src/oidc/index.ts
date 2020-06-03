@@ -314,11 +314,11 @@ export class OidcCtrl {
 
   public requestApiToken = async (ctx: any) => {
     const nonce = this.saveNonceSecret(ctx);
-    const redirectUri = `${this.cmsHost}${this.appPrefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`
+    const redirectUri = `${this.cmsHost}${this.appPrefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`;
 
     const apiTokenUrl = this.oidcClient.authorizationUrl({
       redirect_uri: redirectUri,
-      scope: "openid offline_access",
+      scope: 'openid offline_access',
       nonce
     });
     return ctx.redirect(apiTokenUrl);
@@ -326,13 +326,14 @@ export class OidcCtrl {
 
   public requestApiTokenCallback = async (ctx: any) => {
     const query = ctx.query;
-    const redirectUri = `${this.cmsHost}${this.appPrefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`
+    const redirectUri = `${this.cmsHost}${this.appPrefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`;
     const nonce = this.createNonceFromSecret(ctx);
     const tokenSet = await this.oidcClient.authorizationCallback(redirectUri, query, {nonce});
 
     // redirect to frontend
     const secureRequest = ctx.request.secure;
-    ctx.cookies.set('apiToken', tokenSet.refresh_token, {expires: new Date(Date.now() + 60000), signed: true, secure: secureRequest});
+    const opts = {expires: new Date(Date.now() + 60000), signed: true, secure: secureRequest};
+    ctx.cookies.set('apiToken', tokenSet.refresh_token, opts);
 
     const backUrl = query.backUrl || this.defaultReturnPath;
 
@@ -341,7 +342,7 @@ export class OidcCtrl {
       type: 'REQUEST_API_TOKEN'
     });
 
-    return ctx.redirect(`${this.cmsHost}${this.appPrefix}/api-token?result=1`)
+    return ctx.redirect(`${this.cmsHost}${this.appPrefix}/api-token?result=1`);
   }
 
   private buildBackUrl = (currentUrl?: string) => {

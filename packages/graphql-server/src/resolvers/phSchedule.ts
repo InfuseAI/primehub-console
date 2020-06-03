@@ -1,5 +1,6 @@
 import { Context } from './interface';
-import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser, validateLicense } from './utils';
+import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory,
+  getGroupIdsByUser, validateLicense } from './utils';
 import { PhScheduleSpec, PhScheduleStatus } from '../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../crdClient/customResource';
 import { orderBy, omit, get, isUndefined, isNil, isEmpty } from 'lodash';
