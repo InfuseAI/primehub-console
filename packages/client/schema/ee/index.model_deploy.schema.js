@@ -1,19 +1,19 @@
 /** @jsx builder */
 import builder, {Body} from 'canner-script';
-import System from './system.schema';
-import Idp from './idp/identityProvider.schema';
-import UserFederation from './userFederation.schema';
-import User from './user.schema';
-import Group from './group.schema';
-import InstanceType from './instanceType.schema';
-import Announcement from './announcement.schema';
-import Secret from './secret.schema';
-import Workspaces from './workspace.schema';
+import System from 'schema/system.schema';
+import Idp from 'schema/idp/identityProvider.schema';
+import UserFederation from 'schema/userFederation.schema';
+import User from 'schema/user.schema';
+import Group from 'schema/group.schema';
+import InstanceType from 'schema/instanceType.schema';
+import Announcement from 'schema/announcement.schema';
+import Secret from 'schema/secret.schema';
+import Workspaces from 'schema/workspace.schema';
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {createFakeData} from 'canner-helpers';
-import {dict, graphqlClient, imageStorage} from './utils';
-import CommonBody from '../src/cms-layouts/commonBody';
-import UserBody from '../src/cms-layouts/userBody';
+import {dict, graphqlClient, imageStorage} from 'schema/utils';
+import CommonBody from '../../src/cms-layouts/commonBody';
+import UserBody from '../../src/cms-layouts/userBody';
 
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>

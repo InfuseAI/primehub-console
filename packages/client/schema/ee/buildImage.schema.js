@@ -1,10 +1,10 @@
 /** @jsx builder */
 import builder, {Condition, Layout, Tabs, Default, Row, Col, Block} from 'canner-script';
-import Filter from '../src/cms-toolbar/filter';
+import Filter from '../../src/cms-toolbar/filter';
 import {Tag} from 'antd';
-import {renderCopyableText, InvalidChError} from './utils';
-import {CustomizedStringImagePullSecret, ImagePackages} from './utils.schema';
-import BuildImageTab from '../src/cms-layouts/buildImageTab';
+import {renderCopyableText, InvalidChError} from 'schema/utils';
+import {CustomizedStringImagePullSecret, ImagePackages} from 'schema/utils.schema';
+import BuildImageTab from '../../src/cms-layouts/buildImageTab';
 
 export default () => (
   <array keyName="buildImage"
@@ -12,7 +12,7 @@ export default () => (
     cannerDataType="array"
     controlDeployAndResetButtons={true}
     cacheActions={true}
-    packageName="../src/cms-components/customize-array-table_route"
+    packageName="../../src/cms-components/customize-array-table_route"
     uiParams={{
       columns: [{
         title: '${buildImage.name}',
@@ -82,7 +82,7 @@ export default () => (
           keyName="baseImage"
           title="${buildImage.baseImage}"
           uiParams={{style: {width: 300}}}
-          packageName="../src/cms-components/customize-string-base_image"
+          packageName="../../src/cms-components/customize-string-base_image"
         />
         <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${buildImage.useImagePullSecret}" />
         <ImagePackages
@@ -121,7 +121,7 @@ export default () => (
       <Default keyName="jobs" title="${buildImage.tabs.jobs}">
         <array
           keyName="buildImageJobs"
-          packageName="../src/cms-components/customize-array-nested_job"
+          packageName="../../src/cms-components/customize-array-nested_job"
           uiParams={{
             columns: [{
               title: '${buildImageJob.updateTime}',
@@ -155,7 +155,7 @@ export default () => (
           <string keyName="targetImage" title="${buildImageJob.targetImage" />
           <dateTime
             keyName="updateTime"
-            title="${buildImageJob.updateTime}" packageName="../src/cms-components/customize-string-date.tsx"
+            title="${buildImageJob.updateTime}" packageName="../../src/cms-components/customize-string-date.tsx"
           />
         </array>
       </Default>

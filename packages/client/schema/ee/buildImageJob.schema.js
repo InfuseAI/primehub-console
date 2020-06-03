@@ -1,9 +1,9 @@
 /** @jsx builder */
 import builder, {Condition, Layout, Block, Row, Col, Default} from 'canner-script';
 import {Tag} from 'antd';
-import {InvalidChError} from './utils';
-import {ImagePackages} from './utils.schema';
-import BuilImageJobRefetchHelper from '../src/cms-layouts/buildImageJobRefetchHelper';
+import {InvalidChError} from 'schema/utils';
+import {ImagePackages} from 'schema/utils.schema';
+import BuilImageJobRefetchHelper from '../../src/cms-layouts/buildImageJobRefetchHelper';
 
 export default () => (
   <array keyName="buildImageJob"
@@ -22,7 +22,7 @@ export default () => (
         <dateTime
           keyName="updateTime"
           title="${buildImageJob.updateTime}"
-          packageName="../src/cms-components/customize-string-date.tsx"
+          packageName="../../src/cms-components/customize-string-date.tsx"
           hidden
         />
         <string keyName="status" title="${buildImageJob.status}"/>
@@ -64,7 +64,7 @@ export default () => (
         <string
           keyName="logEndpoint"
           title="${buildImageJob.logEndpoint}"
-          packageName="../src/cms-components/customize-string-log"
+          packageName="../../src/cms-components/customize-string-log"
           uiParams={{
             rows: 30
           }}

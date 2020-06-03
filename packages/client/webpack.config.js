@@ -9,7 +9,7 @@ const webpack = require('webpack');
 const devMode = process.env.NODE_ENV !== 'production';
 const CompressionPlugin = require('compression-webpack-plugin');
 
-resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/index.schema.js');
+resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/ee/index.schema.js');
 
 module.exports = {
   entry: {
