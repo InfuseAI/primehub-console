@@ -28,6 +28,7 @@ import { crd as annCrdResolver } from '../resolvers/announcement';
 import moment from 'moment';
 import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspace';
 import UserRepresentation from 'keycloak-admin/lib/defs/userRepresentation';
+import { transform as transformGroup } from './groupUtils';
 
 /**
  * utils
@@ -725,7 +726,9 @@ export const typeResolvers = {
       const fetchedGroups = await Promise.all(groups.map(async group => {
         return context.kcAdminClient.groups.findOne({id: group.id});
       }));
-      return fetchedGroups.map(group => ({
+      return fetchedGroups
+      .map(transformGroup)
+      .map(group => ({
         ...group,
         currentWorkspace: parent.currentWorkspace
       }));
