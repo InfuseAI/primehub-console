@@ -7,6 +7,8 @@ WORKDIR /usr/src/app
 COPY lerna.json package.json tsconfig.json tslint.json yarn.lock ./
 COPY packages/graphql-server packages/graphql-server
 
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
 RUN cd packages/graphql-server \
   && yarn install --ignore-engines --production=false \
   && npm run build:prod \
