@@ -34,7 +34,7 @@ export default class Token {
    * @return {boolean} `true` if it is expired, otherwise `false`.
    */
   public isExpired(): boolean {
-    return (this.content.exp != 0 && (this.content.exp * 1000) < Date.now());
+    return (this.content.exp !== 0 && (this.content.exp * 1000) < Date.now());
   }
 
   /**
