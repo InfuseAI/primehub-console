@@ -7,9 +7,9 @@ const isAdmin = rule({ cache: 'contextual' })(
   },
 );
 
-const isJobUser = rule({ cache: 'contextual' })(
+const isUser = rule({ cache: 'contextual' })(
   async (parent, args, ctx, info) => {
-    return ctx.role === Role.JOB_USER;
+    return ctx.role === Role.USER;
   },
 );
 
@@ -24,35 +24,35 @@ export const permissions = shield({
   Query: {
     '*': isAdmin,
     'system': or(isAdmin, isClient),
-    'me': or(isAdmin, isJobUser),
+    'me': or(isAdmin, isUser),
     'user': or(isAdmin, isClient),
     'group': or(isAdmin, isClient),
     'groups': or(isAdmin, isClient),
     'instanceType': or(isAdmin, isClient),
-    'phJob': or(isAdmin, isJobUser),
-    'phJobs': or(isAdmin, isJobUser),
-    'phJobsConnection': or(isAdmin, isJobUser),
-    'phSchedule': or(isAdmin, isJobUser),
-    'phSchedules': or(isAdmin, isJobUser),
-    'phSchedulesConnection': or(isAdmin, isJobUser),
-    'phDeployment': or(isAdmin, isJobUser),
-    'phDeployments': or(isAdmin, isJobUser),
-    'phDeploymentsConnection': or(isAdmin, isJobUser)
+    'phJob': or(isAdmin, isUser),
+    'phJobs': or(isAdmin, isUser),
+    'phJobsConnection': or(isAdmin, isUser),
+    'phSchedule': or(isAdmin, isUser),
+    'phSchedules': or(isAdmin, isUser),
+    'phSchedulesConnection': or(isAdmin, isUser),
+    'phDeployment': or(isAdmin, isUser),
+    'phDeployments': or(isAdmin, isUser),
+    'phDeploymentsConnection': or(isAdmin, isUser)
   },
   Mutation: {
     '*': isAdmin,
-    'createPhJob': or(isAdmin, isJobUser),
-    'rerunPhJob': or(isAdmin, isJobUser),
-    'cancelPhJob': or(isAdmin, isJobUser),
-    'createPhSchedule': or(isAdmin, isJobUser),
-    'updatePhSchedule': or(isAdmin, isJobUser),
-    'deletePhSchedule': or(isAdmin, isJobUser),
-    'runPhSchedule': or(isAdmin, isJobUser),
-    'createPhDeployment': or(isAdmin, isJobUser),
-    'updatePhDeployment': or(isAdmin, isJobUser),
-    'deletePhDeployment': or(isAdmin, isJobUser),
-    'stopPhDeployment': or(isAdmin, isJobUser),
-    'deployPhDeployment': or(isAdmin, isJobUser),
+    'createPhJob': or(isAdmin, isUser),
+    'rerunPhJob': or(isAdmin, isUser),
+    'cancelPhJob': or(isAdmin, isUser),
+    'createPhSchedule': or(isAdmin, isUser),
+    'updatePhSchedule': or(isAdmin, isUser),
+    'deletePhSchedule': or(isAdmin, isUser),
+    'runPhSchedule': or(isAdmin, isUser),
+    'createPhDeployment': or(isAdmin, isUser),
+    'updatePhDeployment': or(isAdmin, isUser),
+    'deletePhDeployment': or(isAdmin, isUser),
+    'stopPhDeployment': or(isAdmin, isUser),
+    'deployPhDeployment': or(isAdmin, isUser),
   },
 }, {
   allowExternalErrors: true

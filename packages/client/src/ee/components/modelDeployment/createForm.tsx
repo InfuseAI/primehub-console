@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon, InputNumber} from 'antd';
+import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon, InputNumber, Switch} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import {get, snakeCase, debounce} from 'lodash';
 import DynamicFields from 'components/share/dynamicFields';
@@ -52,6 +52,8 @@ type FormValue = {
   metadata: object;
   description: string;
   replicas: number;
+  privateAccess: boolean;
+  endpointAccessType: string;
 };
 
 const dashOrNumber = value => value === null ? '-' : value;
@@ -104,6 +106,8 @@ class DeploymentCreateForm extends React.Component<Props, State> {
     form.validateFields(async (err, values: FormValue) => {
       if (err) return;
       if (!values.metadata) values.metadata = {}
+      values.endpointAccessType = values.privateAccess ? 'private' : 'public';
+      delete values.privateAccess;
       onSubmit(values);
     });
   }
@@ -126,6 +130,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
 
   handleNameChange = debounce(() => {
     const {form} = this.props;
+    const values = form.getFieldsValue();
     form.validateFields(['name'], (err, values) => {
       if (err) return form.setFieldsValue({ id: '' });
       const id = autoGenId(values.name);
@@ -157,6 +162,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       imagePullSecret,
       description,
       metadata,
+      endpointAccessType,
     } = initialValue || {};
     const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
     const groupLabel = this.renderLabel(
@@ -164,9 +170,9 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       invalidInitialGroup,
       <span>The group <b>{groupName}</b> was deleted.</span>
     )
-    
-    const invalidInitialInstanceType = !invalidInitialGroup && 
-      instanceTypeId && 
+
+    const invalidInitialInstanceType = !invalidInitialGroup &&
+      instanceTypeId &&
       !form.getFieldValue('instanceType') &&
       !instanceTypes.find(it => it.id === instanceTypeId);
     const instanceTypeLabel = this.renderLabel(
@@ -250,7 +256,18 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   <InputNumber min={1} precision={0} />
                 )}
               </Form.Item>
-              
+
+              <h3>Endpoint</h3>
+              <Divider />
+              <Form.Item label="Private Access">
+                {form.getFieldDecorator('privateAccess', {
+                  initialValue: (endpointAccessType === 'private'),
+                  valuePropName: 'checked'
+                })(
+                  <Switch></Switch>
+                )}
+              </Form.Item>
+
             </Card>
           </Col>
           <Col xs={24} sm={16} lg={16}>

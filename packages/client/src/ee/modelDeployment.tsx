@@ -133,6 +133,15 @@ const fakeData = {
     groupId: 'everyone',
     groupName: 'groupName',
     endpoint: 'https://endpoint/modedeployment/example/test/1',
+    endpointAccessType: "private",
+    endpointClients: [
+      {
+        client: "ios"
+      },
+      {
+        client: "android"
+      }
+    ],
     modelImage: 'imageurl',
     pods: [
       {name: 'model-deployment',logEndpoint: '/model-deployment'},
@@ -193,6 +202,8 @@ const fakeData = {
     groupId: 'everyone',
     groupName: 'groupName',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
+    endpointAccessType: "private",
+    endpointClients: [],
     modelImage: 'imageurl',
     pods: [
       {name: 'model-deployment',logEndpoint: '/model-deployment'},

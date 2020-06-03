@@ -74,7 +74,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.state.locale = config.locale;
     ctx.state.cmsHost = config.cmsHost;
     ctx.state.graphqlEndpoint = config.graphqlEndpoint;
-    ctx.state.requestApiTokenEndpoint = config.appPrefix ? `${config.appPrefix}/oidc/request-api-token` : '/oidc/request-api-token',
+    ctx.state.requestApiTokenEndpoint = config.appPrefix ? `${config.appPrefix}/oidc/request-api-token` : '/oidc/request-api-token';
     ctx.state.disableMode = config.readOnlyOnInstanceTypeAndImage;
     ctx.state.enableDatasetUpload = config.enableDatasetUpload;
     ctx.state.enableWorkspace = config.enableWorkspace;
@@ -181,6 +181,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   // api token
   rootRouter.get('/api-token', oidcCtrl.loggedIn, async ctx => {
     ctx.state.apiToken = ctx.cookies.get('apiToken', {signed: true});
+    ctx.cookies.set('apiToken', null);
 
     await ctx.render('api-token', {
       title: 'API Token',

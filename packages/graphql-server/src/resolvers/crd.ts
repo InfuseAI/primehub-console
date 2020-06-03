@@ -12,7 +12,8 @@ import * as logger from '../logger';
 import WorkspaceApi from '../workspace/api';
 import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspace';
 import { defaultWorkspaceId, keycloakMaxCount } from './constant';
-import { parseResourceRole, ResourceNamePrefix, ResourceRole } from './resourceRole';
+import { parseResourceRole, ResourceRole } from './resourceRole';
+import { transform as transformGroup } from './groupUtils';
 
 // utils
 const config = createConfig();
@@ -139,7 +140,7 @@ export class Crd<SpecType> {
             });
             const findRole = roles.find(role => role.name === `${this.getPrefix(currentWorkspace)}${resourceId}`);
             return findRole
-              ? context.kcAdminClient.groups.findOne({id: group.id})
+              ? transformGroup(await context.kcAdminClient.groups.findOne({id: group.id}))
               : null;
           })
         );

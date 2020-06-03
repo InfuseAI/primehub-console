@@ -15,9 +15,13 @@ type Props = {
   stopPhDeployment: Function;
   deletePhDeployment: Function;
   deployPhDeployment: Function;
+  createPhDeploymentClient: Function
+  deletePhDeploymentClient: Function;
   stopPhDeploymentResult: any;
   deletePhDeploymentResult: any;
   deployPhDeploymentResult: any;
+  createPhDeploymentClientResult: any;
+  deletePhDeploymentClientResult: any;
 } & RouteComponentProps<{
   deploymentId: string;
 }>;
@@ -59,11 +63,36 @@ export const DEPLOY_DEPLOYMENT = gql`
   ${PhDeploymentFragment}
 `;
 
+export const ADD_CLIENT = gql`
+  mutation createPhDeploymentClient($data: PhDeploymentClientCreateInput!) {
+    createPhDeploymentClient(data: $data) {
+      name
+      plainTextToken
+    }
+  }
+`;
+
+export const REMOVE_CLIENT = gql`
+  mutation deletePhDeploymentClient($where: PhDeploymentClientWhereUniqueInput!) {
+    deletePhDeploymentClient(where: $where) {
+      ...PhDeploymentInfo
+    }
+  }
+  ${PhDeploymentFragment}
+`;
+
 export const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 
-class JobDetailContainer extends React.Component<Props> {
+class DeploymentDetailContainer extends React.Component<Props> {
   render() {
-    const {getPhDeployment, history, stopPhDeployment, deletePhDeployment, stopPhDeploymentResult, deletePhDeploymentResult, deployPhDeployment, deployPhDeploymentResult} = this.props;
+    const {getPhDeployment, history} = this.props;
+    const {stopPhDeployment, stopPhDeploymentResult} = this.props;
+    const {deletePhDeployment, deletePhDeploymentResult} = this.props;
+    const {deployPhDeployment, deployPhDeploymentResult} = this.props;
+    const {createPhDeploymentClient, createPhDeploymentClientResult} = this.props;
+    const {deletePhDeploymentClient, deletePhDeploymentClientResult} = this.props;
+
+
     if (!getPhDeployment.phDeployment) return null;
     if (getPhDeployment.error) {
       return getMessage(getPhDeployment.error)
@@ -73,11 +102,15 @@ class JobDetailContainer extends React.Component<Props> {
         history={history}
         refetchPhDeployment={getPhDeployment.refetch}
         stopPhDeployment={stopPhDeployment}
-        deletePhDeployment={deletePhDeployment}
-        deployPhDeployment={deployPhDeployment}
         stopPhDeploymentResult={stopPhDeploymentResult}
+        deletePhDeployment={deletePhDeployment}
         deletePhDeploymentResult={deletePhDeploymentResult}
+        deployPhDeployment={deployPhDeployment}
         deployPhDeploymentResult={deployPhDeploymentResult}
+        createPhDeploymentClient={createPhDeploymentClient}
+        createPhDeploymentClientResult={createPhDeploymentClientResult}
+        deletePhDeploymentClient={deletePhDeploymentClient}
+        deletePhDeploymentClientResult={deletePhDeploymentClientResult}
         phDeployment={getPhDeployment.phDeployment || {id: 'test'}}
       />
     );
@@ -144,5 +177,39 @@ export default compose(
       onError: errorHandler
     }),
     name: 'deployPhDeployment'
+  }),
+  graphql(ADD_CLIENT, {
+    options: (props: Props) => ({
+      refetchQueries: [{
+        query: GET_PH_DEPLOYMENT,
+        variables: {where: {id: props.match.params.deploymentId}}
+      }],
+      onCompleted: () => {
+        notification.success({
+          duration: 10,
+          placement: 'bottomRight',
+          message: 'The client has been added.'
+        })
+      },
+      onError: errorHandler
+    }),
+    name: 'createPhDeploymentClient'
+  }),
+  graphql(REMOVE_CLIENT, {
+    options: (props: Props) => ({
+      refetchQueries: [{
+        query: GET_PH_DEPLOYMENT,
+        variables: {where: {id: props.match.params.deploymentId}}
+      }],
+      onCompleted: () => {
+        notification.success({
+          duration: 10,
+          placement: 'bottomRight',
+          message: 'The client has been removed.'
+        })
+      },
+      onError: errorHandler
+    }),
+    name: 'deletePhDeploymentClient'
   })
-)(JobDetailContainer)
+)(DeploymentDetailContainer)

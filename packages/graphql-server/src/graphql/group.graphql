@@ -34,10 +34,10 @@ type Group {
 input GroupOrderByInput {
   name: String
   displayName: String
-  userVolumeCapacity: String
-  enabledSharedVolume: String
+  sharedVolumeCapacity: String
   quotaCpu: String
   quotaGpu: String
+  projectQuotaCpu: String
   projectQuotaGpu: String
 }
 
