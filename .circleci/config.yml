@@ -60,8 +60,6 @@ commands:
 
 jobs:
   latest:
-    docker:
-      - image: docker:18-dind
     steps:
       - checkout
       - setup_remote_docker
@@ -69,8 +67,6 @@ jobs:
           tag: 'latest'
 
   release:
-    docker:
-      - image: docker:18-dind
     steps:
       - checkout
       - setup_remote_docker
