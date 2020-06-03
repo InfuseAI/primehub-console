@@ -98,7 +98,7 @@ workflows:
               only: /.*/
       - release:
           requires:
-            - graphql
+            - graphql-lint
           filters:
             tags:
               only: /.*/
