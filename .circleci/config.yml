@@ -186,6 +186,13 @@ workflows:
             branches:
               only:
                 - master
+      - latest-console-others:
+          requires:
+            - graphql-lint
+          filters:
+            branches:
+              only:
+                - master
       - latest-graphql:
           requires:
             - graphql-lint
@@ -201,6 +208,14 @@ workflows:
               only:
                 - master
       - release-console:
+          requires:
+            - graphql-lint
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
+      - release-console-others:
           requires:
             - graphql-lint
           filters:
