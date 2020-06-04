@@ -19,6 +19,13 @@ commands:
           step-name: 'Docker push: primehub-console'
           image: 'infuseai/primehub-console'
           tag: << parameters.tag >>
+  build_console_others:
+    description: "Build primehub-console images and Push to dockerhub"
+    parameters:
+      tag:
+        type: string
+    steps:
+      - docker/check
       # Build and push Primehub-console EE(Model Deployment only version) image
       - docker/build:
           step-name: 'Docker build: primehub-console(model-deployment only)'
@@ -94,6 +101,14 @@ jobs:
       - setup_remote_docker
       - build_console:
           tag: 'latest'
+  latest-console-others:
+    docker:
+      - image: circleci/node:lts
+    steps:
+      - checkout
+      - setup_remote_docker
+      - build_console_others:
+          tag: 'latest'
   latest-graphql:
     docker:
       - image: circleci/node:lts
@@ -118,6 +133,14 @@ jobs:
       - checkout
       - setup_remote_docker
       - build_console:
+          tag: $CIRCLE_TAG
+  release-console-others:
+    docker:
+      - image: circleci/node:lts
+    steps:
+      - checkout
+      - setup_remote_docker
+      - build_console_others:
           tag: $CIRCLE_TAG
   release-graphql:
     docker:
