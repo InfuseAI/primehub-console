@@ -1,11 +1,87 @@
 # Development
 
+## Develop on local
+
+We recommend to use node version 10 lts for primehub-console development, you can use [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md) to install and manage differnet node runtime on the local machine.
+
+```shell
+$ nvm install v10
+```
+
+First, make sure you have node enviroment and install yarn in your local machine already.
+
+```shell
+$ npm install -g yarn
+$ cd path/to/primehub-console
+$ yarn install
+```
+### Overview
+
+In PrimeHub Console, we have 4 sub components in `packages`, the web server, graphql server, front-end client and watcher.
+All components can run as a standalone server for test individual, you also can combine them together as a compelete primehub-console on the local machine. 
+
+### Graphql dev server
+
+#### Prerequisite
+
+For graphql local server, we need an exist primehub cluster includes all primehub crd and keycloak component, please see our [primehub ce](https://github.com/InfuseAI/primehub) for more details about primehub cluster installation.
+
+#### Start the local primehub-console-graphql
+
+1. Go to `packages/graphql-server` and install the dependencies of the graphql sub component
+
+```shell
+$ cd ./packages/graphql-server
+$ yarn install
+```
+
+2. Setup the required env variable
+
+* KC_API_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. Ex: 'http://127.0.0.1:8080/auth'. For API usage.
+* KC_OIDC_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. For oidc usage.
+* KC_REALM: the realm name of keycloak
+* KC_EVERYONE_GROUP_ID: the everyone group id in keycloak
+* K8S_CRD_NAMESPACE: specify what namespace to use for crd
+* KC_GRANT_TYPE: `password` or `authorization_code`
+* KC_CLIENT_SECRET: client secret
+* KC_CLIENT_ID: client id
+* SHARED_GRAPHQL_SECRET_KEY: secret key to request read-only graphql with. Client should put this shared key in header `Authorization: "Bearer <SHARED_GRAPHQL_SECRET_KEY>"`
+* APP_PREFIX: ex: `/admin`
+
+You can check the graphql deployment's env setup as an example for local enviroment setup in your local cluster by following command:
+
+```shell
+$ kubectl describe deploy -n hub primehub-graphql
+Name:                   primehub-graphql
+Namespace:              hub
+...
+Pod Template:
+  ...
+  Enviroment:
+    KC_API_BASEURL: ...
+    KC_OIDC_BASEURL: ...
+    # etc.
+   ...
+```
+
+3. Start the CE server.
+
+```
+$ yarn start:ce
+```
+
+4. Open the graphql playground on browser.
+
+In default development setup, we enable graphql playground for standalone graphql server, you can use it for test graphql query manually, please go to server host after server launched.
+
+
 ## Folder architecture
 ### Server
 Graphql API and hosting cms pages
 
 ### Client
-Canner CMS
+
+`packages/client`
 
 ## Requirement
 * keycloak
