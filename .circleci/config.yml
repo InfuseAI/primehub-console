@@ -91,8 +91,7 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - build_console:
           tag: 'latest'
   latest-graphql:
@@ -100,8 +99,7 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - build_graphql:
           tag: 'latest'
   latest-watcher:
@@ -109,8 +107,7 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - build_watcher:
           tag: 'latest'
   # Release
@@ -119,8 +116,7 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - build_console:
           tag: $CIRCLE_TAG
   release-graphql:
@@ -128,8 +124,7 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - build_graphql:
           tag: $CIRCLE_TAG
   release-watcher:
@@ -137,8 +132,7 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - build_watcher:
           tag: $CIRCLE_TAG
   # Tests
