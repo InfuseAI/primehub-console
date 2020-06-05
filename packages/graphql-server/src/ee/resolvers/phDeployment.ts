@@ -7,7 +7,7 @@ import {
   PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, client as kubeClient
 } from '../../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../../crdClient/customResource';
-import { orderBy, omit, get, isUndefined, isNil, isEmpty, isNull, capitalize } from 'lodash';
+import { orderBy, omit, get, isUndefined, isNil, isEmpty, isNull, capitalize, intersection } from 'lodash';
 import * as moment from 'moment';
 import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
@@ -289,9 +289,6 @@ export const typeResolvers = {
 };
 
 const canUserView = async (userId: string, phDeployment: PhDeployment, context: Context): Promise<boolean> => {
-  const isAdmin = await isUserAdmin(context.realm, userId, context.kcAdminClient);
-  if (isAdmin) { return true; }
-
   const members = await context.kcAdminClient.groups.listMembers({
     id: phDeployment.groupId,
     max: keycloakMaxCount
@@ -331,9 +328,8 @@ const listQuery = async (client: CustomResource<PhDeploymentSpec>, where: any, c
   //   where.userId_eq = currentUserId;
   // }
 
-  if (isEmpty(where.groupId_in)) {
-    where.groupId_in = await getGroupIdsByUser(context, currentUserId);
-  }
+  const userGroups = await getGroupIdsByUser(context, currentUserId);
+  where.groupId_in = isEmpty(where.groupId_in) ? userGroups : intersection(where.groupId_in, userGroups);
 
   // sort by updateTime
   transformedPhDeployments = orderBy(transformedPhDeployments, 'lastUpdatedTime', 'desc');
