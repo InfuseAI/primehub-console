@@ -13,6 +13,7 @@ export const permissions = shield({
   },
   Mutation: {
     '*': isAdmin,
+    'revokeApiToken': or(isAdmin, isUser),
   },
 }, {
   allowExternalErrors: true

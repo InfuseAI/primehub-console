@@ -1,6 +1,10 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import { Layout, Card, Breadcrumb, Icon, Button, Row, Col, Input } from 'antd';
+import {ApolloProvider} from 'react-apollo';
+import {genClient} from 'canner/lib/components/index';
+import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlClient';
+import {LocalStorageConnector} from 'canner-graphql-interface';
+import { Layout, Breadcrumb, Icon, Button, notification } from 'antd';
 import Header from 'components/header';
 import styled from 'styled-components';
 import PageTitle from 'components/pageTitle';
@@ -9,6 +13,7 @@ import PageTitle from 'components/pageTitle';
 
 import { appPrefix } from 'utils/env';
 import ApiTokenPage from 'containers/apiTokenPage';
+import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 
 const HEADER_HEIGHT = 64;
 
@@ -17,6 +22,27 @@ const Content = styled(Layout.Content)`
   padding: 64px;
   min-height: calc(100vh - 64px);
 `;
+
+const graphqlClient = new GraphqlClient({
+  uri: (window as any).graphqlEndpoint,
+  fetch: (uri, options) => {
+    const token = window.localStorage.getItem('canner.accessToken');
+    options.headers = {
+      Authorization: `Bearer ${token}`,
+      ...options.headers || {}
+    };
+    return fetch(uri, options);
+  },
+});
+
+const connector = new LocalStorageConnector({
+  defaultData: {},
+  localStorageKey: 'infuse-api-token'
+})
+
+const client = genClient(process.env.NODE_ENV === 'production' ?
+  {graphqlClient} :
+  {connector, schema: {}});
 
 const ApiTokenBreadCrumb = () => {
   return (
@@ -45,7 +71,9 @@ class ApiToken extends React.Component {
                   title={"API Token"}
                   style={{ paddingLeft: 64 }}
               />
-              <ApiTokenPage />
+              <ApolloProvider client={client}>
+                <ApiTokenPage />
+              </ApolloProvider>
           </Content>
         </Layout>
 
@@ -53,6 +81,52 @@ class ApiToken extends React.Component {
     )
   }
 }
+
+/**
+ * Background worker
+ */
+function checkStatus(response) {
+  if (response.status >= 200 && response.status < 300) {
+    return response;
+  } else {
+    const error = new Error(response.statusText);
+    (error as any).response = response;
+    throw error;
+  }
+}
+
+function parseJSON(response) {
+  return response.json();
+}
+
+const tokenSyncWorker = new BackgroundTokenSyncer({
+  appPrefix: (window as any).APP_PREFIX,
+  refreshTokenExp: (window as any).refreshTokenExp,
+  accessTokenExp: (window as any).accessTokenExp,
+  getNewTokenSet: () => {
+    return fetch(`${(window as any).APP_PREFIX}oidc/refresh-token-set`, {
+      method: 'POST'
+    })
+    .then(checkStatus)
+    .then(parseJSON);
+  },
+  reLoginNotify: ({loginUrl}) => {
+    // notify with fixed card
+    notification.warning({
+      message: 'Warning',
+      description: 'In less than 1 minute, you\'re going to be redirected to login page.',
+      placement: 'bottomRight',
+      duration: null,
+      btn: (
+        <Button type="primary" onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
+          Login Again
+        </Button>
+      ),
+      key: 'refreshWarning'
+    });
+  }
+})
+tokenSyncWorker.run().catch(console.error);
 
 // render
 ReactDOM.render(

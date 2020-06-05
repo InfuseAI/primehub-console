@@ -1,13 +1,25 @@
 import * as  React from "react";
-import { Layout, Card, Button, Row, Input, message, Modal } from 'antd';
+import { Layout, Card, Button, Row, Input, message, Modal, notification } from 'antd';
+import gql from 'graphql-tag';
+import { Mutation } from 'react-apollo';
+import { errorHandler } from "utils/errorHandler";
 
 type Props = {
+  revokeApiToken: Function;
 }
 
 type State = {
 }
 
-export default class ApiTokenPage extends React.Component<Props, State> {
+export const REVOKE_API_TOKEN = gql`
+  mutation revokeApiToken {
+    revokeApiToken {
+      id
+    }
+  }
+`;
+
+class ApiTokenPage extends React.Component<Props, State> {
   state = {
     modal: false
   }
@@ -32,12 +44,15 @@ export default class ApiTokenPage extends React.Component<Props, State> {
       title: 'Are you sure you want to request an API token?',
       content: 'Submitting a new request will revoke your existing token.',
       onOk: () => {
-        (window as any).location.href = this.requestApiTokenEndpoint;
+        const {revokeApiToken} = this.props;
+
+        revokeApiToken().then(() => {
+          (window as any).location.href = this.requestApiTokenEndpoint;
+        }, errorHandler)
       },
       onCancel() {},
-    });     
+    });
   }
-
 
   copyToken = () => {
     if (this.refToken && this.refToken.current) {
@@ -119,3 +134,13 @@ curl -X POST \\
     )
   }
 }
+
+export default () => (
+  <Mutation mutation={REVOKE_API_TOKEN}>
+    {
+      (revokeApiToken) => (
+        <ApiTokenPage revokeApiToken={revokeApiToken} />
+      )
+    }
+  </Mutation>
+)

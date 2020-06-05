@@ -20,6 +20,7 @@ export interface Context {
   realm: string;
   everyoneGroupId: string;
   kcAdminClient: KcAdminClient;
+  keycloakClientId: string;
   crdClient: CrdClient;
   getInstanceType: (name: string) => Promise<Item<InstanceTypeSpec>>;
   getImage: (name: string) => Promise<Item<ImageSpec>>;
