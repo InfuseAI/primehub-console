@@ -1,13 +1,13 @@
 import { Context } from '../../resolvers/interface';
 import {
-  toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory,  mergeVariables
+  toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, mergeVariables, getGroupIdsByUser
 } from '../../resolvers/utils';
 import { validateLicense } from './utils';
 import {
   PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, client as kubeClient
 } from '../../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../../crdClient/customResource';
-import { orderBy, omit, get, isUndefined, isNil, isEmpty, isNull, capitalize } from 'lodash';
+import { orderBy, omit, get, isUndefined, isNil, isEmpty, isNull, capitalize, intersection } from 'lodash';
 import * as moment from 'moment';
 import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
@@ -289,9 +289,6 @@ export const typeResolvers = {
 };
 
 const canUserView = async (userId: string, phDeployment: PhDeployment, context: Context): Promise<boolean> => {
-  const isAdmin = await isUserAdmin(context.realm, userId, context.kcAdminClient);
-  if (isAdmin) { return true; }
-
   const members = await context.kcAdminClient.groups.listMembers({
     id: phDeployment.groupId,
     max: keycloakMaxCount
@@ -331,9 +328,8 @@ const listQuery = async (client: CustomResource<PhDeploymentSpec>, where: any, c
   //   where.userId_eq = currentUserId;
   // }
 
-  // if (isEmpty(where.groupId_in)) {
-  //   where.groupId_in = await getGroupIdsByUser(context, currentUserId);
-  // }
+  const userGroups = await getGroupIdsByUser(context, currentUserId);
+  where.groupId_in = isEmpty(where.groupId_in) ? userGroups : intersection(where.groupId_in, userGroups);
 
   // sort by updateTime
   transformedPhDeployments = orderBy(transformedPhDeployments, 'lastUpdatedTime', 'desc');
@@ -371,7 +367,10 @@ export const create = async (root, args, context: Context) => {
   const data: PhDeploymentMutationInput = args.data;
   validateLicense();
   await validateQuota(context, data.groupId, data.instanceType);
-  await canUserMutate(context.userId, data.groupId, context);
+  const mutable = await canUserMutate(context.userId, data.groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
   const phDeployment = await createDeployment(context, data);
   return transform(phDeployment, context.kcAdminClient);
 };
@@ -384,7 +383,10 @@ export const update = async (root, args, context: Context) => {
   const groupId = phDeployment.spec.groupId;
   const instanceType = data.instanceType || phDeployment.spec.predictors[0].instanceType;
   await validateQuota(context, groupId, instanceType);
-  await canUserMutate(userId, groupId, context);
+  const mutable = await canUserMutate(userId, groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
 
   // metadata
   const predictor = phDeployment.spec.predictors[0];
@@ -424,7 +426,10 @@ export const deploy = async (root, args, context: Context) => {
   const {id} = args.where;
   const phDeployment = await crdClient.phDeployments.get(id);
   const groupId = phDeployment.spec.groupId;
-  await canUserMutate(userId, groupId, context);
+  const mutable = await canUserMutate(userId, groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
 
   const spec = {
     updateTime: moment.utc().toISOString(),
@@ -441,7 +446,10 @@ export const stop = async (root, args, context: Context) => {
   const {id} = args.where;
   const phDeployment = await crdClient.phDeployments.get(id);
   const groupId = phDeployment.spec.groupId;
-  await canUserMutate(userId, groupId, context);
+  const mutable = await canUserMutate(userId, groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
 
   const spec = {
     updateTime: moment.utc().toISOString(),
@@ -454,7 +462,15 @@ export const stop = async (root, args, context: Context) => {
 };
 
 export const destroy = async (root, args, context: Context) => {
+  const {crdClient, userId, username} = context;
   const {id} = args.where;
+  const phDeployment = await crdClient.phDeployments.get(id);
+  const groupId = phDeployment.spec.groupId;
+  const mutable = await canUserMutate(userId, groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
+
   await context.crdClient.phDeployments.del(id);
   return {id};
 };
@@ -479,7 +495,10 @@ export const createClient = async (root, args, context: Context) => {
   const {crdClient, userId, username} = context;
   const phDeployment = await crdClient.phDeployments.get(data.deploymentId);
 
-  await canUserMutate(context.userId, phDeployment.spec.groupId, context);
+  const mutable = await canUserMutate(userId, phDeployment.spec.groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
 
   const predictor = phDeployment.spec.predictors[0];
 
@@ -521,7 +540,10 @@ export const destroyClient = async (root, args, context: Context) => {
   const {crdClient, userId, username} = context;
   const phDeployment = await crdClient.phDeployments.get(deploymentId);
 
-  await canUserMutate(context.userId, phDeployment.spec.groupId, context);
+  const mutable = await canUserMutate(userId, phDeployment.spec.groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
 
   const predictor = phDeployment.spec.predictors[0];
 

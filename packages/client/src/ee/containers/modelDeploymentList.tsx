@@ -168,6 +168,7 @@ export default compose(
       return {
         variables: {
           first: PAGE_SIZE,
+          where: JSON.parse(params.where as string || '{}'),
         },
         fetchPolicy: 'cache-and-network'
       }
