@@ -35,7 +35,7 @@
     "agentkeepalive": "^3.5.1",
     "apache-md5": "^1.1.2",
     "apollo-server": "^2.6.7",
-    "apollo-server-koa": "^2.6.7",
+    "apollo-server-koa": "^2.14.2",
     "axios": "^0.18.0",
     "basic-auth": "^2.0.1",
     "bluebird": "^3.5.1",
