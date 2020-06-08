@@ -21,7 +21,17 @@
   },
   "resolutions": {
     "apollo-client": "2.4.7",
-    "apollo-boost": "0.1.22"
+    "apollo-boost": "0.1.22",
+    "**/**/yargs-parser": "^13.1.2",
+    "**/**/websocket-extensions": "^0.1.4"
   },
+  "author": "InfuseAI",
+  "license": "Apache-2.0",
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
   "private": true
 }

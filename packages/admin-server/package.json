@@ -93,7 +93,13 @@
     "typescript": "^3.5.2",
     "uuid": "^3.3.2"
   },
-  "author": "wwwy3y3",
-  "license": "ISC",
+  "author": "InfuseAI",
+  "license": "Apache-2.0",
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
   "private": true
 }
