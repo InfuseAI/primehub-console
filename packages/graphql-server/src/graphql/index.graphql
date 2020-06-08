@@ -186,6 +186,7 @@ type Mutation {
   sendEmail(id: String, resetActions: [String], expiresIn: Int): UserActionResponse
   sendMultiEmail(in: [String], resetActions: [String], expiresIn: Int): UserMultiEmailResponse
   resetPassword(id: String, password: String, temporary: Boolean): UserActionResponse
+  revokeApiToken: UserActionResponse
 
   """Group"""
   createGroup(data: GroupCreateInput!): Group!

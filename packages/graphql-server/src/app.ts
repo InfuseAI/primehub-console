@@ -96,6 +96,7 @@ const resolvers = {
     createUser: user.create,
     updateUser: user.update,
     deleteUser: user.destroy,
+    revokeApiToken: user.revokeApiToken,
     sendEmail: user.sendEmail,
     sendMultiEmail: user.sendMultiEmail,
     resetPassword: user.resetPassword,
@@ -268,6 +269,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       let getImage: (name: string) => Promise<Item<ImageSpec>>;
 
       const kcAdminClient = createKcAdminClient();
+      const keycloakClientId = config.keycloakClientId;
       const {authorization = ''}: {authorization: string} = ctx.header;
       const useCache = ctx.headers['x-primehub-use-cache'];
       const isJobClient = ctx.headers['x-primehub-job'];
@@ -376,6 +378,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         realm: config.keycloakRealmName,
         everyoneGroupId: config.keycloakEveryoneGroupId,
         kcAdminClient,
+        keycloakClientId,
         crdClient,
         getInstanceType: getInstanceType || memGetInstanceType(crdClient),
         getImage: getImage || memGetImage(crdClient),

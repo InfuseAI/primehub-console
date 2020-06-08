@@ -670,6 +670,36 @@ export const resetPassword = async (root, args, context: Context) => {
   return {id};
 };
 
+export const revokeApiToken = async (root, args, context: Context) => {
+  const id = context.userId;
+
+  try {
+    await context.kcAdminClient.users.revokeConsent({
+      id,
+      clientId: context.keycloakClientId
+    });
+  } catch (e) {
+    if (e.response && e.response.status === 404) {
+      // no offline token
+    } else {
+      logger.error({
+        type: 'REVOKE_API_TOKEN_FAILED',
+        id,
+        clientId: context.keycloakClientId,
+        error: e
+      });
+      throw new ApolloError('Cannot revoke API token', 'USER_REVOKE_FAILED');
+    }
+  }
+
+  logger.info({
+    component: logger.components.user,
+    type: 'REVOKE_API_TOKEN',
+    targetUserId: id
+  });
+  return {id};
+};
+
 /**
  * Type
  */
