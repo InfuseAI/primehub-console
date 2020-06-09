@@ -1,4 +1,3 @@
-'use strict';
 import * as k8s from '@kubernetes/client-node';
 import * as informer from '@kubernetes/client-node/dist/informer';
 import { watch, kubeConfig, phJobCrd, PhJobSpec, PhJobStatus } from '../../crdClient/crdClientImpl';
