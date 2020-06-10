@@ -3,7 +3,7 @@ import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory,
 import { validateLicense } from './utils';
 import { PhScheduleSpec, PhScheduleStatus } from '../../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../../crdClient/customResource';
-import { orderBy, omit, get, isUndefined, isNil, isEmpty } from 'lodash';
+import { orderBy, omit, get, isUndefined, isNil, isEmpty, intersection } from 'lodash';
 import * as moment from 'moment';
 import { escapeToPrimehubLabel } from '../../utils/escapism';
 import { ApolloError } from 'apollo-server';
@@ -202,9 +202,6 @@ export const typeResolvers = {
 };
 
 const canUserViewSchedule = async (userId: string, phSchedule: PhSchedule, context: Context): Promise<boolean> => {
-  const isAdmin = await isUserAdmin(context.realm, userId, context.kcAdminClient);
-  if (isAdmin) { return true; }
-
   const members = await context.kcAdminClient.groups.listMembers({
     id: phSchedule.groupId,
     max: keycloakMaxCount
@@ -244,9 +241,8 @@ const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any = {}
     where.userId_eq = currentUserId;
   }
 
-  if (isEmpty(where.groupId_in)) {
-    where.groupId_in = await getGroupIdsByUser(context, currentUserId);
-  }
+  const userGroups = await getGroupIdsByUser(context, currentUserId);
+  where.groupId_in = isEmpty(where.groupId_in) ? userGroups : intersection(where.groupId_in, userGroups);
 
   // sort by updateTime
   order = isEmpty(order) ? {updateTime: 'desc'} : order;
@@ -284,7 +280,10 @@ export const create = async (root, args, context: Context) => {
   const data: PhScheduleMutationInput = args.data;
   validateLicense();
   await validateQuota(context, data.groupId, data.instanceType);
-  await canUserMutate(context.userId, data.groupId, context);
+  const mutable = await canUserMutate(context.userId, data.groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
   const phSchedule = await createSchedule(context, data);
   return transform(phSchedule, context.namespace, context.graphqlHost, context.kcAdminClient);
 };
@@ -296,7 +295,17 @@ export const update = async (root, args, context: Context) => {
   const groupId = data.groupId || phSchedule.spec.jobTemplate.spec.groupId;
   const instanceType = data.instanceType || phSchedule.spec.jobTemplate.spec.instanceType;
   await validateQuota(context, groupId, instanceType);
-  await canUserMutate(userId, groupId, context);
+
+  const mutable = await canUserMutate(context.userId, phSchedule.spec.jobTemplate.spec.groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
+  if (data.groupId) {
+    const mutableInNewGroup = await canUserMutate(context.userId, data.groupId, context);
+    if (!mutableInNewGroup) {
+      throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+    }
+  }
 
   // construct metadata & spec
   const group = await kcAdminClient.groups.findOne({id: data.groupId});
@@ -337,6 +346,11 @@ export const run = async (root, args, context: Context) => {
   // get job template
   const jobTemplate = phSchedule.spec.jobTemplate;
 
+  const mutable = await canUserMutate(context.userId, jobTemplate.spec.groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
+
   // create job
   const job = await createJob(context, {
     command: jobTemplate.spec.command,
@@ -356,6 +370,14 @@ export const run = async (root, args, context: Context) => {
 
 export const destroy = async (root, args, context: Context) => {
   const {id} = args.where;
+
+  const phSchedule = await context.crdClient.phSchedules.get(id);
+  const jobTemplate = phSchedule.spec.jobTemplate;
+  const mutable = await canUserMutate(context.userId, jobTemplate.spec.groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
+
   await context.crdClient.phSchedules.del(id);
   return {id};
 };

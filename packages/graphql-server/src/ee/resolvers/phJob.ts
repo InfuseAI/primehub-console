@@ -4,7 +4,7 @@ import { validateLicense } from './utils';
 import { PhJobPhase, PhJobSpec, PhJobStatus } from '../../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../../crdClient/customResource';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
-import { orderBy, omit, get, isUndefined, isNil, isEmpty } from 'lodash';
+import { orderBy, omit, get, isUndefined, isNil, isEmpty, intersection } from 'lodash';
 import * as moment from 'moment';
 import { escapeToPrimehubLabel } from '../../utils/escapism';
 import { ApolloError } from 'apollo-server';
@@ -186,9 +186,6 @@ export const typeResolvers = {
 };
 
 const canUserViewJob = async (userId: string, phJob: PhJob, context: Context): Promise<boolean> => {
-  const isAdmin = await isUserAdmin(context.realm, userId, context.kcAdminClient);
-  if (isAdmin) { return true; }
-
   const members = await context.kcAdminClient.groups.listMembers({
     id: phJob.groupId,
     max: keycloakMaxCount
@@ -198,7 +195,7 @@ const canUserViewJob = async (userId: string, phJob: PhJob, context: Context): P
   return false;
 };
 
-const canUserCreate = async (userId: string, groupId: string, context: Context) => {
+const canUserMutate = async (userId: string, groupId: string, context: Context) => {
   const members = await context.kcAdminClient.groups.listMembers({
     id: groupId,
     max: keycloakMaxCount
@@ -228,9 +225,8 @@ const listQuery = async (client: CustomResource<PhJobSpec>, where: any = {}, ord
     where.userId_eq = currentUserId;
   }
 
-  if (isEmpty(where.groupId_in)) {
-    where.groupId_in = await getGroupIdsByUser(context, currentUserId);
-  }
+  const userGroups = await getGroupIdsByUser(context, currentUserId);
+  where.groupId_in = isEmpty(where.groupId_in) ? userGroups : intersection(where.groupId_in, userGroups);
 
   // sort by createTime
   order = isEmpty(order) ? {createTime: 'desc'} : order;
@@ -268,7 +264,10 @@ export const create = async (root, args, context: Context) => {
   const data: PhJobCreateInput = args.data;
   validateLicense();
   await validateQuota(context, data);
-  await canUserCreate(context.userId, data.groupId, context);
+  const mutable = await canUserMutate(context.userId, data.groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
   const phJob = await createJob(context, data);
 
   logger.info({
@@ -285,6 +284,10 @@ export const create = async (root, args, context: Context) => {
 export const rerun = async (root, args, context: Context) => {
   const {id} = args.where;
   const phJob = await context.crdClient.phJobs.get(id);
+  const mutable = await canUserMutate(context.userId, phJob.spec.groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
 
   if (!phJob) {
     return null;
@@ -313,6 +316,11 @@ export const rerun = async (root, args, context: Context) => {
 
 export const cancel = async (root, args, context: Context) => {
   const {id} = args.where;
+  const phJob = await context.crdClient.phJobs.get(id);
+  const mutable = await canUserMutate(context.userId, phJob.spec.groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
   await context.crdClient.phJobs.patch(id, {
     spec: {cancel: true} as any
   });
