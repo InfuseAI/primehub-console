@@ -121,6 +121,9 @@ fragment PhDeploymentInfo on PhDeployment {
       groupName
       description
       metadata
+      endpointClients {
+        name
+      }
       instanceType {
         id
         name

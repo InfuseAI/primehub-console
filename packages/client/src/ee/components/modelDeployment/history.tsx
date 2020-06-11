@@ -109,6 +109,12 @@ export default class History extends React.Component<Props, State> {
       dataIndex: 'time',
       render: time => <span>{time ? moment(time).format('YYYY-MM-DD HH:mm:ss') : '-'}</span>
     }, {
+      title: 'Clients',
+      key: 'clients',
+      width: '20%',
+      dataIndex: 'deployment.endpointClients',
+      render: clients => <span>{clients ? clients.map(client => client.name).join(", ") : '-'}</span>
+    }, {
       title: 'Detail',
       width: '10%',
       key: 'detail',
@@ -144,6 +150,7 @@ export default class History extends React.Component<Props, State> {
                       {deployment.description || '-'}
                     </div>
                   )} />
+                  <Field label="Clients" value={deployment.endpointClients ? deployment.endpointClients.map(client => client.name).join(", ") : '-'} />
                 </Col>
                 <Col span={12}>
                   <Field type="vertical" label="Metadata" value={<Metadata metadata={deployment.metadata} />} />
