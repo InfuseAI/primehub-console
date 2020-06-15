@@ -80,6 +80,7 @@ const transformSpec = (id: string, time: string, groupName: string, spec: any) =
       name: clientItem.name,
     };
   });
+  const endpointAccessType = get(spec, 'endpoint.accessType', 'public');
   return {
     id: `${id}-${time}`,
     name: spec.displayName,
@@ -92,6 +93,7 @@ const transformSpec = (id: string, time: string, groupName: string, spec: any) =
     lastUpdatedTime: spec.updateTime,
 
     endpointClients,
+    endpointAccessType,
 
     // predictator
     modelImage: predictator.modelImage,

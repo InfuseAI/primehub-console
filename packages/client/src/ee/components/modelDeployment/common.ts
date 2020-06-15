@@ -124,6 +124,7 @@ fragment PhDeploymentInfo on PhDeployment {
       endpointClients {
         name
       }
+      endpointAccessType
       instanceType {
         id
         name
