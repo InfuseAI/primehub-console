@@ -248,7 +248,7 @@ export default class ArrayBreadcrumb extends Component<Props & {
         render: (text, record) => {
           return (
             <ButtonGroup>
-              <Button icon={"search"}
+              <Button icon={"eye"}
                 data-testid="view-button"
                 onClick={() => goTo({
                   pathname: `buildImage/${record.id}`,
