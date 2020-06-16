@@ -75,6 +75,12 @@ const getFallbackPhase = (stopped: boolean, phase: PhDeploymentPhase) => {
 
 const transformSpec = (id: string, time: string, groupName: string, spec: any) => {
   const predictator = get(spec, 'predictors.0');
+  const endpointClients = get(spec, 'endpoint.clients', []).map(clientItem => {
+    return {
+      name: clientItem.name,
+    };
+  });
+  const endpointAccessType = get(spec, 'endpoint.accessType', 'public');
   return {
     id: `${id}-${time}`,
     name: spec.displayName,
@@ -85,6 +91,9 @@ const transformSpec = (id: string, time: string, groupName: string, spec: any) =
     groupId: spec.groupId,
     stop: isUndefined(spec.stop) ? false : spec.stop,
     lastUpdatedTime: spec.updateTime,
+
+    endpointClients,
+    endpointAccessType,
 
     // predictator
     modelImage: predictator.modelImage,

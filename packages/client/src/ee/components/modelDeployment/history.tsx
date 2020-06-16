@@ -144,6 +144,8 @@ export default class History extends React.Component<Props, State> {
                       {deployment.description || '-'}
                     </div>
                   )} />
+                  <Field label="Access Type" value={deployment.endpointAccessType ? deployment.endpointAccessType : 'public'} />
+                  <Field label="Clients" value={deployment.endpointClients ? deployment.endpointClients.map(client => client.name).join(", ") : '-'} />
                 </Col>
                 <Col span={12}>
                   <Field type="vertical" label="Metadata" value={<Metadata metadata={deployment.metadata} />} />
