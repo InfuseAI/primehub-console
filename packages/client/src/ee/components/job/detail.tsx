@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Tabs, Input, Modal, Divider} from 'antd';
+import {Button, Tabs, Input, Modal, Divider} from 'antd';
 import {Link} from 'react-router-dom';
 import {get} from 'lodash';
 import styled from 'styled-components';
@@ -102,6 +102,20 @@ export default class Detail extends React.Component<Props> {
     });
   }
 
+  cloneJob = () => {
+    const {job, history} = this.props;
+    const data = {
+      displayName: job.displayName,
+      groupId: job.groupId,
+      groupName: job.groupName,
+      instanceTypeId: get(job, 'instanceType.id'),
+      instanceTypeName: get(job, 'instanceType.displayName') || get(job, 'instanceType.name'),
+      image: job.image,
+      command: job.command,
+    }
+    history.push(`${appPrefix}job/create?defaultValue=${JSON.stringify(data)}`)
+  }
+
 
   render() {
     const {job, rerunPhJobResult, cancelPhJobResult, refetchPhJob} = this.props;
@@ -117,12 +131,21 @@ export default class Detail extends React.Component<Props> {
         />
         <PageBody>
           <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-            <InfuseButton
-              onClick={() => this.handleClick(action)}
-              loading={rerunPhJobResult.loading || cancelPhJobResult.loading}
-            >
-              {action}
-            </InfuseButton>
+            <Button.Group>
+              {
+                action.toLowerCase() === 'cancel' ? (
+                  <InfuseButton onClick={() => this.handleClick(action)} loading={rerunPhJobResult.loading || cancelPhJobResult.loading}>
+                    {action}
+                  </InfuseButton>
+                ) : [
+                  <InfuseButton onClick={() => this.handleClick(action)} loading={rerunPhJobResult.loading || cancelPhJobResult.loading}>
+                    {action}
+                  </InfuseButton>,
+                  <InfuseButton onClick={() => this.cloneJob()}>Clone</InfuseButton>
+                ]
+              }
+            </Button.Group>
+
           </div>
           <Tabs>
             <TabPane key="information" tab="Information">
