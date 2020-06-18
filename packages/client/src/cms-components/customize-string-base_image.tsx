@@ -34,12 +34,15 @@ query images($where: ImageWhereInput!) {
   images(where: $where) {
     id
     name
+    displayName
     url
     urlForGpu
   }
 }
 `
 const appPrefix = (window as any).APP_PREFIX || '/';
+
+const url_dict: { [key: string]: string; } = {};
 
 @injectIntl
 export default class SelectString extends PureComponent<Props> {
@@ -77,7 +80,7 @@ export default class SelectString extends PureComponent<Props> {
   }
 
   onChange = (val: string) => {
-    this.props.onChange(this.props.refId, "update", val);
+    this.props.onChange(this.props.refId, "update", (val in url_dict) ? url_dict[val] : val);
   };
 
   render() {
@@ -86,13 +89,17 @@ export default class SelectString extends PureComponent<Props> {
     const {images, searchText} = this.state;
     const {style} = uiParams;
     const dataSource = uniq(flatMap(images, image => {
-      const {urlForGpu, url} = image;
-      if (urlForGpu && url !== urlForGpu)
+      const {displayName, url, urlForGpu} = image;
+      if (urlForGpu && url !== urlForGpu) {
+        url_dict[`${displayName} (CPU)`] = url
+        url_dict[`${displayName} (GPU)`] = urlForGpu
         return [
-          url,
-          urlForGpu
+          `${displayName} (CPU)`,
+          `${displayName} (GPU)`
         ];
-      return url
+      }
+      url_dict[`${displayName} (CPU)`] = url
+      return `${displayName} (CPU)`
     }))
     .filter(url => url.indexOf(searchText) > -1)
     .map((url, i) => {
@@ -110,7 +117,7 @@ export default class SelectString extends PureComponent<Props> {
     })
     return (
       <AutoComplete
-        style={style || {}}
+        style={{width: '60%'}}
         dataSource={dataSource}
         disabled={disabled}
         showSearch
