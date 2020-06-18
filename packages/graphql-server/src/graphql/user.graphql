@@ -21,6 +21,7 @@ type User {
   federated: Boolean
   groups: [Group]
   announcements: [UserAnnouncement]
+  apiTokenCount: Int
 
   """todo: take following properties out when leo has time to implement customize component"""
   sendEmail: Boolean
