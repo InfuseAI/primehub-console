@@ -7,7 +7,7 @@ import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import JobList from '../components/job/list';
 import {errorHandler} from '../components/job/errorHandler';
-import {Group} from '../components/job/groupFilter';
+import {Group} from '../components/shared/groupFilter';
 import {appPrefix} from 'utils/env';
 
 export const PhJobFragment = gql`

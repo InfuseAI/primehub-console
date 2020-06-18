@@ -3,18 +3,24 @@ import {Row, Col, Button, Skeleton, Input, message, Spin} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
+import {get} from 'lodash';
 import {withRouter, Link} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {appPrefix} from 'utils/env';
 import Pagination from 'components/share/pagination';
 import PageTitle from 'components/pageTitle';
+import PageBody from 'components/pageBody';
 import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';
+import Filter from 'ee/components/shared/filter';
+import {Group} from 'ee/components/shared/groupFilter';
+import {errorHandler} from '../components/job/errorHandler';
 import DeploymentCard from 'ee/components/modelDeployment/card';
 import { PhDeploymentFragment, DeploymentConnection } from 'ee/components/modelDeployment/common';
 import InfuseButton from 'components/infuseButton';
 
 const PAGE_SIZE = 8;
+const Search = Input.Search
 
 export const GET_PH_DEPLOYMENT_CONNECTION = gql`
   query phDeploymentsConnection($where: PhDeploymentWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
@@ -50,6 +56,7 @@ type Props = {
     refetch: Function;
     phDeploymentsConnection: DeploymentConnection
   };
+  getMyGroups: any;
 } & RouteComponentProps;
 
 type State = {
@@ -94,14 +101,36 @@ class DeploymentListContainer extends React.Component<Props, State> {
     refetch(newVariables);
   }
 
+  changeFilter = ({
+    selectedGroups,
+    submittedByMe
+  }: {
+    selectedGroups: Array<string>;
+    submittedByMe: boolean;
+  }) => {
+    const {getPhDeploymentConnection} = this.props;
+    const {phDeploymentsConnection, refetch, variables} = getPhDeploymentConnection;
+    const newVariables = {
+      ...variables,
+      where: {
+        ...variables.where,
+        groupId_in: selectedGroups,
+        mine: submittedByMe,
+      }
+    };
+    refetch(newVariables);
+  }
+
   render() {
-    const { getPhDeploymentConnection, history } = this.props;
+    const { getPhDeploymentConnection, groups, history } = this.props;
     const {
       error,
       loading,
       phDeploymentsConnection,
+      variables,
       refetch
     } = getPhDeploymentConnection;
+
     if (error) {
       console.log(getPhDeploymentConnection.error);
       return 'Error';
@@ -118,18 +147,33 @@ class DeploymentListContainer extends React.Component<Props, State> {
           title={"Model Deployments"}
           style={{paddingLeft: 64}}
         />
-        <div style={{margin: '16px 64px'}}>
-          <div style={{textAlign: 'right', margin: '16px 0px 36px'}}>
-            <InfuseButton
-              icon="plus"
-              type="primary"
-              onClick={() => history.push(`${appPrefix}model-deployment/create`)}
-              style={{marginRight: 16, width: 'auto'}}
-            >
-              Create Deployment
-            </InfuseButton>
-            <InfuseButton onClick={() => refetch()}>Refresh</InfuseButton>
-          </div>
+          <PageBody>
+            <div style={{textAlign: 'right', margin: '16px 0px'}}>
+              <Search
+                placeholder="Search deploy name"
+                style={{width: 294}}
+                onSearch={value => console.log(value)}
+              />
+            </div>
+            <div style={{textAlign: 'right', margin: '16px 0px 5px'}}>
+              <InfuseButton
+                icon="plus"
+                type="primary"
+                onClick={() => history.push(`${appPrefix}model-deployment/create`)}
+                style={{marginRight: 16, width: 'auto'}}
+              >
+                Create Deployment
+              </InfuseButton>
+              <InfuseButton onClick={() => refetch()}>Refresh</InfuseButton>
+            </div>
+            <Filter
+              groups={groups}
+              selectedGroups={get(variables, 'where.groupId_in', [])}
+              submittedByMe={get(variables, 'where.mine', false)}
+              onChange={this.changeFilter}
+            />
+          </PageBody>
+          <div style={{margin: '16px 64px'}}>
           <Spin spinning={loading}>
             <Row gutter={36} type="flex">
               {phDeploymentsConnection.edges.map(edge => {

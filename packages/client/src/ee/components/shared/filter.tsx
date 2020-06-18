@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Checkbox, Col, Divider} from 'antd';
 import styled from 'styled-components';
-import GroupFilter, {Group} from 'ee/components/job/groupFilter';
+import GroupFilter, {Group} from 'ee/components/shared/groupFilter';
 import {FilterRow, FilterPlugins, ButtonCol} from 'root/cms-toolbar/filter';
 import {Label} from 'root/cms-toolbar/share';
 
