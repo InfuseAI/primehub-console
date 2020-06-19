@@ -36,13 +36,13 @@ const graphqlClient = new GraphqlClient({
 });
 
 const connector = new LocalStorageConnector({
-  defaultData: {},
+  defaultData: {me:{apiTokenCount: 1}},
   localStorageKey: 'infuse-api-token'
 })
 
 const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
-  {connector, schema: {}});
+  {connector, schema: {me: {type: 'object'}}});
 
 const ApiTokenBreadCrumb = () => {
   return (
