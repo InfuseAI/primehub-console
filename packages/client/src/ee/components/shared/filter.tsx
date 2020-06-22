@@ -9,6 +9,7 @@ type Props = {
   groups: Group[];
   selectedGroups: Array<string>;
   submittedByMe: boolean;
+  labelSubmittedByMe: string;
   onChange: ({
     selectedGroups,
     submittedByMe
@@ -40,7 +41,7 @@ export default class Filter extends React.Component<Props> {
   }
 
   render() {
-    const {groups, selectedGroups, submittedByMe} = this.props;
+    const {groups, selectedGroups, submittedByMe, labelSubmittedByMe} = this.props;
     return (
       <FilterRow type="flex" justify="space-between" align="bottom" style={{marginBottom: 32, marginTop: 32}}>
         <Col style={{flex: 1}}>
@@ -64,7 +65,7 @@ export default class Filter extends React.Component<Props> {
             checked={submittedByMe}
             onChange={this.handleSubmittedByMeChange}
           >
-            Submitted By Me
+            { labelSubmittedByMe || "Submitted By Me" }
           </Checkbox>
         </ButtonCol>
       </FilterRow>

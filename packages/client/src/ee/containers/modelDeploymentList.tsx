@@ -56,7 +56,6 @@ type Props = {
     refetch: Function;
     phDeploymentsConnection: DeploymentConnection
   };
-  getMyGroups: any;
 } & RouteComponentProps;
 
 type State = {
@@ -98,6 +97,20 @@ class DeploymentListContainer extends React.Component<Props, State> {
       first: undefined,
       after: undefined,
     };
+    refetch(newVariables);
+  }
+
+  searchHandler = (queryString) => {
+    const {getPhDeploymentConnection} = this.props;
+    const {phDeploymentsConnection, refetch, variables} = getPhDeploymentConnection;
+    const queries = ('' + queryString).split(' ');
+    const newVariables = {
+      ...variables,
+      where: {
+        ...variables.where,
+        name_contains: queries
+      }
+    }
     refetch(newVariables);
   }
 
@@ -152,7 +165,7 @@ class DeploymentListContainer extends React.Component<Props, State> {
               <Search
                 placeholder="Search deploy name"
                 style={{width: 294}}
-                onSearch={value => console.log(value)}
+                onSearch={this.searchHandler}
               />
             </div>
             <div style={{textAlign: 'right', margin: '16px 0px 5px'}}>
@@ -167,6 +180,7 @@ class DeploymentListContainer extends React.Component<Props, State> {
               <InfuseButton onClick={() => refetch()}>Refresh</InfuseButton>
             </div>
             <Filter
+              labelSubmittedByMe={"Deployed By Me"}
               groups={groups}
               selectedGroups={get(variables, 'where.groupId_in', [])}
               submittedByMe={get(variables, 'where.mine', false)}
