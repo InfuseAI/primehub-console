@@ -117,7 +117,7 @@ export default class SelectString extends PureComponent<Props> {
     })
     return (
       <AutoComplete
-        style={{width: '60%'}}
+        style={style || {}}
         dataSource={dataSource}
         disabled={disabled}
         showSearch

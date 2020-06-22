@@ -81,7 +81,7 @@ export default () => (
           required
           keyName="baseImage"
           title="${buildImage.baseImage}"
-          uiParams={{style: {width: 300}}}
+          uiParams={{style: {width: '60%'}}}
           packageName="../../src/cms-components/customize-string-base_image"
         />
         <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${buildImage.useImagePullSecret}" />
