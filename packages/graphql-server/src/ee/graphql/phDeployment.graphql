@@ -71,7 +71,7 @@ input PhDeploymentWhereUniqueInput {
 input PhDeploymentWhereInput {
   id: ID
   groupId_in: [String]
-  name_contains: [String]
+  name_contains: String
   mine: Boolean
 }
 

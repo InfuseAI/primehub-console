@@ -103,12 +103,11 @@ class DeploymentListContainer extends React.Component<Props, State> {
   searchHandler = (queryString) => {
     const {getPhDeploymentConnection} = this.props;
     const {phDeploymentsConnection, refetch, variables} = getPhDeploymentConnection;
-    const queries = ('' + queryString).split(' ');
     const newVariables = {
       ...variables,
       where: {
         ...variables.where,
-        name_contains: queries
+        name_contains: queryString
       }
     }
     refetch(newVariables);
