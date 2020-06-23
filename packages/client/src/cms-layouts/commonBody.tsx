@@ -141,7 +141,7 @@ export default class CommonBody extends React.Component<Props> {
         background: '#fff',
       }}>
         <Button
-          onClick={this.back}
+          onClick={this.reset}
           style={{
             marginBottom: 16,
             minWidth: 99,
