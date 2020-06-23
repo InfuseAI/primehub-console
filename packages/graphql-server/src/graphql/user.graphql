@@ -20,6 +20,7 @@ type User {
   volumeCapacity: Int
   federated: Boolean
   groups: [Group]
+  effectiveGroups: [Group]
   announcements: [UserAnnouncement]
 
   """todo: take following properties out when leo has time to implement customize component"""

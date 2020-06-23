@@ -287,7 +287,10 @@ export class Crd<SpecType> {
 
   private queryByGroup = async (parent, args, context: Context) => {
     const currentWorkspace = parent.currentWorkspace;
-    const roles = await this.listGroupRealmRoles(context.kcAdminClient, parent.id, currentWorkspace);
+    const roles = parent.realmRoles ?
+      await this.listGroupRealmRoles(context.kcAdminClient, parent.id, currentWorkspace,
+                                    parent.realmRoles.map(role => parseResourceRole(role))) :
+      await this.listGroupRealmRoles(context.kcAdminClient, parent.id, currentWorkspace);
 
     // todo: make this logic better
     const rows = await Promise.all(roles.map(role => {
@@ -469,13 +472,16 @@ export class Crd<SpecType> {
   private listGroupRealmRoles = async (
     kcAdminClient: KeycloakAdminClient,
     groupId: string,
-    currentWorkspace: CurrentWorkspace
+    currentWorkspace: CurrentWorkspace,
+    roles?: any
   ): Promise<ResourceRole[]> => {
-      const groupRoles = await kcAdminClient.groups.listRealmRoleMappings({
-        id: groupId
-      });
+      if (!roles) {
+        const groupRoles = await kcAdminClient.groups.listRealmRoleMappings({
+          id: groupId
+        });
+        roles = groupRoles.map(role => parseResourceRole(role.name));
+      }
 
-      let roles = groupRoles.map(role => parseResourceRole(role.name));
       roles = roles.filter(role =>
           role.resourcePrefix === this.prefixName &&
           currentWorkspace.getWorkspaceId() === role.workspaceId);

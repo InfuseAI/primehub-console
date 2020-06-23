@@ -4,6 +4,7 @@ import {
   isUndefined,
   first,
   get,
+  set,
   every,
   isEmpty,
   reduce,
@@ -13,7 +14,10 @@ import {
   isNil,
   omit,
   sortBy,
-  filter
+  filter,
+  intersection,
+  union,
+  includes
 } from 'lodash';
 import {
   mutateRelation, parseDiskQuota, stringifyDiskQuota, paginate, extractPagination, toRelay
@@ -757,6 +761,47 @@ export const typeResolvers = {
         return context.kcAdminClient.groups.findOne({id: group.id});
       }));
       return fetchedGroups
+      .map(transformGroup)
+      .map(group => ({
+        ...group,
+        currentWorkspace: parent.currentWorkspace
+      }));
+    } catch (err) {
+      return [];
+    }
+  },
+
+  effectiveGroups: async (parent, args, context: Context) => {
+    try {
+      const groups = await context.kcAdminClient.users.listGroups({
+        id: parent.id
+      });
+      const fetchedGroups = await Promise.all(groups.map(async group => {
+        return context.kcAdminClient.groups.findOne({id: group.id});
+      }));
+      const everyoneGroupId = process.env.KC_EVERYONE_GROUP_ID;
+      const everyoneGroup = fetchedGroups.find(group => group.id === everyoneGroupId);
+
+      let userGroups = fetchedGroups.filter(group => group.id !== everyoneGroupId);
+      userGroups = userGroups
+      .map(group => {
+        // merge the realmRoles from everyoneGroup
+        let realmRoles = union(
+          get(group, 'realmRoles', []),
+          get(everyoneGroup, 'realmRoles', [])
+        );
+        const noRWRealmRoles = realmRoles.map(role => {
+          return role.replace(':rw', '');
+        });
+        const duplicatedRealmRoles = filter(noRWRealmRoles, (val, i, iteratee) => includes(iteratee, val, i + 1));
+        realmRoles = realmRoles.filter(role => {
+          return !duplicatedRealmRoles.includes(role);
+        });
+        set(group, 'realmRoles', realmRoles);
+        return group;
+      });
+
+      return userGroups
       .map(transformGroup)
       .map(group => ({
         ...group,
