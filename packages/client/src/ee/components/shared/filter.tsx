@@ -43,7 +43,7 @@ export default class Filter extends React.Component<Props> {
   render() {
     const {groups, selectedGroups, submittedByMe, labelSubmittedByMe} = this.props;
     return (
-      <FilterRow type="flex" justify="space-between" align="bottom" style={{marginBottom: 32, marginTop: 32}}>
+      <FilterRow type="flex" justify="space-between" align="bottom" style={{marginBottom: 16, marginTop: 16}}>
         <Col style={{flex: 1}}>
           <FilterPlugins style={{marginRight: 0}}>
             <Label>Group</Label>

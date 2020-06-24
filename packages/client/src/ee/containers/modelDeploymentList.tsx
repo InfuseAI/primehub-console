@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Row, Col, Button, Skeleton, Input, message, Spin} from 'antd';
+import {Row, Col, Button, Skeleton, Input, message, Spin, Divider} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -160,14 +160,12 @@ class DeploymentListContainer extends React.Component<Props, State> {
           style={{paddingLeft: 64}}
         />
           <PageBody>
-            <div style={{textAlign: 'right', margin: '16px 0px'}}>
+            <div style={{textAlign: 'right', margin: '16px 0px 5px'}}>
               <Search
                 placeholder="Search deploy name"
-                style={{width: 294}}
+                style={{width: 295, margin: 'auto 16px'}}
                 onSearch={this.searchHandler}
               />
-            </div>
-            <div style={{textAlign: 'right', margin: '16px 0px 5px'}}>
               <InfuseButton
                 icon="plus"
                 type="primary"
