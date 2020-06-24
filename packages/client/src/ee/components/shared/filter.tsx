@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Checkbox, Col, Divider} from 'antd';
 import styled from 'styled-components';
-import GroupFilter, {Group} from 'ee/components/job/groupFilter';
+import GroupFilter, {Group} from 'ee/components/shared/groupFilter';
 import {FilterRow, FilterPlugins, ButtonCol} from 'root/cms-toolbar/filter';
 import {Label} from 'root/cms-toolbar/share';
 
@@ -9,6 +9,7 @@ type Props = {
   groups: Group[];
   selectedGroups: Array<string>;
   submittedByMe: boolean;
+  labelSubmittedByMe: string;
   onChange: ({
     selectedGroups,
     submittedByMe
@@ -40,9 +41,9 @@ export default class Filter extends React.Component<Props> {
   }
 
   render() {
-    const {groups, selectedGroups, submittedByMe} = this.props;
+    const {groups, selectedGroups, submittedByMe, labelSubmittedByMe} = this.props;
     return (
-      <FilterRow type="flex" justify="space-between" align="bottom" style={{marginBottom: 32, marginTop: 32}}>
+      <FilterRow type="flex" justify="space-between" align="bottom" style={{marginBottom: 16, marginTop: 16}}>
         <Col style={{flex: 1}}>
           <FilterPlugins style={{marginRight: 0}}>
             <Label>Group</Label>
@@ -64,7 +65,7 @@ export default class Filter extends React.Component<Props> {
             checked={submittedByMe}
             onChange={this.handleSubmittedByMeChange}
           >
-            Submitted By Me
+            { labelSubmittedByMe || "Submitted By Me" }
           </Checkbox>
         </ButtonCol>
       </FilterRow>

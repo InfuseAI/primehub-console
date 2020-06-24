@@ -13,6 +13,7 @@ import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
+import ListContainer from '../containers/list';
 import {appPrefix} from 'utils/env';
 import {dict} from 'schema/utils.js';
 import en from 'react-intl/locale-data/en';
@@ -349,7 +350,7 @@ class Job extends React.Component {
                 <ApolloProvider client={client}>
                   <Switch>
                     <Route path={`${appPrefix}model-deployment`} exact>
-                      <ModelDeploymentListContainer />
+                      <ListContainer Com={ModelDeploymentListContainer} />
                     </Route>
                     <Route path={`${appPrefix}model-deployment/create`} exact>
                       <DeploymentCreatePage />
