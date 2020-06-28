@@ -4,7 +4,6 @@ import {
   isUndefined,
   first,
   get,
-  set,
   every,
   isEmpty,
   reduce,
@@ -15,9 +14,6 @@ import {
   omit,
   sortBy,
   filter,
-  intersection,
-  union,
-  includes
 } from 'lodash';
 import {
   mutateRelation, parseDiskQuota, stringifyDiskQuota, paginate, extractPagination, toRelay
@@ -733,6 +729,50 @@ export const isUserAdmin = async (realm: string, userId: string, kcAdminClient: 
   }
 };
 
+const queryGroupsByUser = (effectiveGroup: boolean) => {
+  return async (parent, args, context: Context) => {
+    try {
+      const userId = parent.id;
+      let realmRolesEveryone = null;
+      let realmRolesUser = null;
+
+      if (effectiveGroup) {
+        realmRolesEveryone = await context.kcAdminClient.groups.listRealmRoleMappings({
+          id: context.everyoneGroupId
+        });
+        realmRolesUser = await context.kcAdminClient.users.listCompositeRealmRoleMappings({
+          id: userId
+        });
+      }
+
+      const groups = await context.kcAdminClient.users.listGroups({
+        id: userId
+      });
+      const fetchedGroups = await Promise.all(groups.map(async group => {
+        return context.kcAdminClient.groups.findOne({id: group.id});
+      }));
+      return fetchedGroups
+      .filter(group => {
+        if (effectiveGroup) {
+          return group.id !== context.everyoneGroupId;
+        } else {
+          return true;
+        }
+      })
+      .map(transformGroup)
+      .map(group => ({
+        ...group,
+        effectiveGroup,
+        realmRolesEveryone,
+        realmRolesUser,
+        currentWorkspace: parent.currentWorkspace
+      }));
+    } catch (err) {
+      return [];
+    }
+  };
+};
+
 export const typeResolvers = {
   federated: (parent, args, context: Context) => {
     return !isUndefined(parent.federationLink);
@@ -752,65 +792,9 @@ export const typeResolvers = {
     return parseDiskQuota(volumeCapacity);
   },
 
-  groups: async (parent, args, context: Context) => {
-    try {
-      const groups = await context.kcAdminClient.users.listGroups({
-        id: parent.id
-      });
-      const fetchedGroups = await Promise.all(groups.map(async group => {
-        return context.kcAdminClient.groups.findOne({id: group.id});
-      }));
-      return fetchedGroups
-      .map(transformGroup)
-      .map(group => ({
-        ...group,
-        currentWorkspace: parent.currentWorkspace
-      }));
-    } catch (err) {
-      return [];
-    }
-  },
+  groups: queryGroupsByUser(false),
 
-  effectiveGroups: async (parent, args, context: Context) => {
-    try {
-      const groups = await context.kcAdminClient.users.listGroups({
-        id: parent.id
-      });
-      const fetchedGroups = await Promise.all(groups.map(async group => {
-        return context.kcAdminClient.groups.findOne({id: group.id});
-      }));
-      const everyoneGroupId = process.env.KC_EVERYONE_GROUP_ID;
-      const everyoneGroup = fetchedGroups.find(group => group.id === everyoneGroupId);
-
-      let userGroups = fetchedGroups.filter(group => group.id !== everyoneGroupId);
-      userGroups = userGroups
-      .map(group => {
-        // merge the realmRoles from everyoneGroup
-        let realmRoles = union(
-          get(group, 'realmRoles', []),
-          get(everyoneGroup, 'realmRoles', [])
-        );
-        const noRWRealmRoles = realmRoles.map(role => {
-          return role.replace(':rw', '');
-        });
-        const duplicatedRealmRoles = filter(noRWRealmRoles, (val, i, iteratee) => includes(iteratee, val, i + 1));
-        realmRoles = realmRoles.filter(role => {
-          return !duplicatedRealmRoles.includes(role);
-        });
-        set(group, 'realmRoles', realmRoles);
-        return group;
-      });
-
-      return userGroups
-      .map(transformGroup)
-      .map(group => ({
-        ...group,
-        currentWorkspace: parent.currentWorkspace
-      }));
-    } catch (err) {
-      return [];
-    }
-  },
+  effectiveGroups: queryGroupsByUser(true),
 
   announcements: async (parent, args, context: Context) => {
     try {
