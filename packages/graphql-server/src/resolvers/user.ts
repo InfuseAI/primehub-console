@@ -821,5 +821,31 @@ export const typeResolvers = {
     } catch (err) {
       return [];
     }
-  }
+  },
+
+  apiTokenCount: async (parent, args, context: Context) => {
+    const userId = parent.id;
+
+    try {
+      // find the client
+      const clients = await context.kcAdminClient.clients.find({clientId: context.keycloakClientId});
+      const client = first(clients);
+
+      // find the offline session
+      const sessions = await context.kcAdminClient.users.listOfflineSessions({
+        id: userId,
+        clientId: client.id,
+      });
+
+      return sessions.length;
+    } catch (e) {
+      logger.error({
+        type: 'GET_API_TOKEN_COUNT_FAILED',
+        userId,
+        clientId: context.keycloakClientId,
+        message: e.message,
+      });
+      throw new ApolloError('Cannot get API token count', 'USER_API_TOKEN_COUNT');
+    }
+  },
 };

@@ -1,17 +1,26 @@
 import * as  React from "react";
 import { Layout, Card, Button, Row, Input, message, Modal, notification } from 'antd';
 import gql from 'graphql-tag';
-import { Mutation } from 'react-apollo';
+import { ApolloConsumer } from 'react-apollo';
+import { ApolloClient } from 'apollo-client';
 import { errorHandler } from "utils/errorHandler";
 
 type Props = {
-  revokeApiToken: Function;
+  client: ApolloClient<any>;
 }
 
 type State = {
 }
 
-export const REVOKE_API_TOKEN = gql`
+const GET_API_TOKEN_COUNT = gql`
+  query getApiTokenCount {
+    me {
+      apiTokenCount
+    }
+  }
+`;
+
+const REVOKE_API_TOKEN = gql`
   mutation revokeApiToken {
     revokeApiToken {
       id
@@ -40,18 +49,34 @@ class ApiTokenPage extends React.Component<Props, State> {
   }
 
   handleRequestApiToken = () => {
-    Modal.confirm({
-      title: 'Are you sure you want to request an API token?',
-      content: 'Submitting a new request will revoke your existing token.',
-      onOk: () => {
-        const {revokeApiToken} = this.props;
+    const {client} = this.props;
+    client.query<any>({query: GET_API_TOKEN_COUNT, fetchPolicy: 'network-only'})
+    .then((result) => {
+      if (result.data.me.apiTokenCount == 0) {
+        // request token right away
+        this.requestToken();
+      } else {
+        // show dialog if there is existing token
+        Modal.confirm({
+          title: 'Are you sure you want to request an API token?',
+          content: 'Submitting a new request will revoke your existing token.',
+          onOk: () => {
+            this.requestToken();
+          },
+          onCancel() {},
+        });
+      }
+    })
+    .catch(errorHandler);
+  }
 
-        revokeApiToken().then(() => {
-          (window as any).location.href = this.requestApiTokenEndpoint;
-        }, errorHandler)
-      },
-      onCancel() {},
-    });
+  requestToken = () => {
+    const {client} = this.props;
+    client.mutate({mutation: REVOKE_API_TOKEN})
+    .then(() => {
+      (window as any).location.href = this.requestApiTokenEndpoint;
+    })
+    .catch(errorHandler);
   }
 
   copyToken = () => {
@@ -136,11 +161,7 @@ curl -X POST \\
 }
 
 export default () => (
-  <Mutation mutation={REVOKE_API_TOKEN}>
-    {
-      (revokeApiToken) => (
-        <ApiTokenPage revokeApiToken={revokeApiToken} />
-      )
-    }
-  </Mutation>
+  <ApolloConsumer>
+    {client => <ApiTokenPage client={client} />}
+  </ApolloConsumer>
 )
