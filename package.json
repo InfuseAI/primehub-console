@@ -24,7 +24,8 @@
     "apollo-boost": "0.1.22",
     "**/**/yargs-parser": "^13.1.2",
     "**/**/websocket-extensions": "^0.1.4",
-    "**/**/canner": "2.1.7"
+    "**/**/canner": "2.1.7",
+    "**/**/typescript": "3.5.2"
   },
   "author": "InfuseAI",
   "license": "Apache-2.0",
