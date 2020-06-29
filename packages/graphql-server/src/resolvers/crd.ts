@@ -306,7 +306,8 @@ export class Crd<SpecType> {
     const datasetsMap = {};
 
     // dataset in this group
-    let datasets = await this.queryResourcesByRoles(resourceRoles, context, currentWorkspace);
+    let datasets =
+    await this.queryResourcesByRoles(resourceRoles, context, currentWorkspace);
     datasets.forEach(dataset => {
       datasetsMap[dataset.id] = dataset;
     });
@@ -521,7 +522,18 @@ export class Crd<SpecType> {
   private async queryResourcesByRoles(resourceRoles: ResourceRole[], context: Context, currentWorkspace: any) {
     // map the resource roles to resources
     // todo: make this logic better
+
     let rows = await Promise.all(resourceRoles.map(role => {
+      const onError = () => {
+        logger.error({
+          type: 'FAIL_QUERY_RESOURCE_FROM_K8S_API',
+          resource: this.resourceName,
+          name: role.resourceName,
+        });
+
+        return null;
+      };
+
       if (this.resourceName === 'dataset') {
         return context.getDataset(role.resourceName)
           .then(dataset => {
@@ -530,17 +542,19 @@ export class Crd<SpecType> {
               roleName: role.originalName,
               ...dataset
             } as any;
-          });
+          }).catch(onError);
       }
       if (this.resourceName === 'image') {
-        return context.getImage(role.resourceName);
+        return context.getImage(role.resourceName).catch(onError);
       }
       if (this.resourceName === 'instanceType') {
-        return context.getInstanceType(role.resourceName);
+        return context.getInstanceType(role.resourceName).catch(onError);
       }
       // return context.crdClient[this.customResourceMethod].get(name);
     }));
-    rows = rows.map(row => this.internalPropMapping(row, currentWorkspace));
+    rows = rows
+    .filter(row => row !== null)  // filter out the failed resource
+    .map(row => this.internalPropMapping(row, currentWorkspace));
     return rows;
   }
 }
