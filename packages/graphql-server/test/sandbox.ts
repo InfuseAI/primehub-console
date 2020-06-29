@@ -12,7 +12,7 @@ import CrdClient from '../src/crdClient/crdClientImpl';
 const crdClient = new CrdClient();
 (global as any).crdClient = crdClient;
 
-const loadCrd = (name: string) =>
+const loadCrd = (name: string): any =>
   yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, `../crd/${name}.spec.yaml`), 'utf8'));
 
 const datasetCrd = loadCrd('dataset');

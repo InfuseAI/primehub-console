@@ -498,8 +498,7 @@ export class Crd<SpecType> {
   private listGroupResourceRoles = async (
     kcAdminClient: KeycloakAdminClient,
     groupId: string,
-    currentWorkspace: CurrentWorkspace,
-    roles?: any
+    currentWorkspace: CurrentWorkspace
   ): Promise<ResourceRole[]> => {
     const groupRoles = await kcAdminClient.groups.listRealmRoleMappings({
       id: groupId
