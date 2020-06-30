@@ -77,7 +77,7 @@ describe('user effectiveGroups graphql', function() {
     // create image
     // img1 (g1, g2, g3)
     const img1 = await createImage(this.graphqlRequest, {global: true});
-    // img2 (g1, g2, g3)
+    // img2 (g1)
     const img2 = await createImage(this.graphqlRequest);
     await assignImageToGroup(this.graphqlRequest, img2, group1);
 
