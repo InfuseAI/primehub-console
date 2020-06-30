@@ -166,7 +166,7 @@ export const create = async (root, args, context: Context) => {
     workspaceId: currentWorkspace.getWorkspaceId()
   });
 
-  return injectWorkspace(group, currentWorkspace);
+  return injectWorkspace(transform(group), currentWorkspace);
 };
 
 export const update = async (root, args, context: Context) => {
@@ -256,7 +256,7 @@ export const update = async (root, args, context: Context) => {
     workspaceId: currentWorkspace.getWorkspaceId()
   });
 
-  return injectWorkspace(group, currentWorkspace);
+  return injectWorkspace(transform(group), currentWorkspace);
 };
 
 export const destroy = async (root, args, context: Context) => {
@@ -280,7 +280,7 @@ export const destroy = async (root, args, context: Context) => {
     workspaceId: currentWorkspace.getWorkspaceId()
   });
 
-  return injectWorkspace(group, currentWorkspace);
+  return injectWorkspace(transform(group), currentWorkspace);
 };
 
 /**

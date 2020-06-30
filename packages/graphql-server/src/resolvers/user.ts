@@ -13,7 +13,7 @@ import {
   isNil,
   omit,
   sortBy,
-  filter
+  filter,
 } from 'lodash';
 import {
   mutateRelation, parseDiskQuota, stringifyDiskQuota, paginate, extractPagination, toRelay
@@ -729,6 +729,50 @@ export const isUserAdmin = async (realm: string, userId: string, kcAdminClient: 
   }
 };
 
+const queryGroupsByUser = (effectiveGroup: boolean) => {
+  return async (parent, args, context: Context) => {
+    try {
+      const userId = parent.id;
+      let realmRolesEveryone = null;
+      let realmRolesUser = null;
+
+      if (effectiveGroup) {
+        realmRolesEveryone = await context.kcAdminClient.groups.listRealmRoleMappings({
+          id: context.everyoneGroupId
+        });
+        realmRolesUser = await context.kcAdminClient.users.listCompositeRealmRoleMappings({
+          id: userId
+        });
+      }
+
+      const groups = await context.kcAdminClient.users.listGroups({
+        id: userId
+      });
+      const fetchedGroups = await Promise.all(groups.map(async group => {
+        return context.kcAdminClient.groups.findOne({id: group.id});
+      }));
+      return fetchedGroups
+      .filter(group => {
+        if (effectiveGroup) {
+          return group.id !== context.everyoneGroupId;
+        } else {
+          return true;
+        }
+      })
+      .map(transformGroup)
+      .map(group => ({
+        ...group,
+        effectiveGroup,
+        realmRolesEveryone,
+        realmRolesUser,
+        currentWorkspace: parent.currentWorkspace
+      }));
+    } catch (err) {
+      return [];
+    }
+  };
+};
+
 export const typeResolvers = {
   federated: (parent, args, context: Context) => {
     return !isUndefined(parent.federationLink);
@@ -748,24 +792,9 @@ export const typeResolvers = {
     return parseDiskQuota(volumeCapacity);
   },
 
-  groups: async (parent, args, context: Context) => {
-    try {
-      const groups = await context.kcAdminClient.users.listGroups({
-        id: parent.id
-      });
-      const fetchedGroups = await Promise.all(groups.map(async group => {
-        return context.kcAdminClient.groups.findOne({id: group.id});
-      }));
-      return fetchedGroups
-      .map(transformGroup)
-      .map(group => ({
-        ...group,
-        currentWorkspace: parent.currentWorkspace
-      }));
-    } catch (err) {
-      return [];
-    }
-  },
+  groups: queryGroupsByUser(false),
+
+  effectiveGroups: queryGroupsByUser(true),
 
   announcements: async (parent, args, context: Context) => {
     try {

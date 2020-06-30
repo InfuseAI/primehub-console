@@ -175,6 +175,14 @@ describe('dataset graphql', function() {
       id: process.env.KC_EVERYONE_GROUP_ID
     });
     expect(roles.find(role => role.name === `ds:${data.name}`)).to.be.ok;
+
+    // delete global dataset
+    await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!){
+      deleteDataset (where: $where) { id }
+    }`, {
+      where: {id: data.name}
+    });
   });
 
   it('create a dataset with props with global = false', async () => {
@@ -313,7 +321,8 @@ describe('dataset graphql', function() {
     expect(queryOne.dataset).to.be.eql(this.currentDataset);
   });
 
-  it('should create with name-only and update', async () => {
+  it.skip('should create with name-only and update', async () => {
+    // xxx: should not support create a dataset without type
     const createMutation = await this.graphqlRequest(`
     mutation($data: DatasetCreateInput!){
       createDataset (data: $data) { id }
@@ -358,6 +367,14 @@ describe('dataset graphql', function() {
       id: process.env.KC_EVERYONE_GROUP_ID
     });
     expect(roles.find(role => role.name === `ds:${datasetId}`)).to.be.ok;
+
+    // delete global dataset
+    await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!){
+      deleteDataset (where: $where) { id }
+    }`, {
+      where: {id: datasetId}
+    });
   });
 
   it('should create with props and update', async () => {
@@ -369,7 +386,7 @@ describe('dataset graphql', function() {
         name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
         displayName: faker.internet.userName(),
         description: faker.lorem.sentence(),
-        global: true,
+        global: false,
         type: 'git',
         url: faker.internet.url()
       }
@@ -482,6 +499,14 @@ describe('dataset graphql', function() {
       id: process.env.KC_EVERYONE_GROUP_ID
     });
     expect(roles.find(role => role.name === `ds:${datasetId}`)).to.be.ok;
+
+    // delete global dataset
+    await this.graphqlRequest(`
+    mutation($where: DatasetWhereUniqueInput!){
+      deleteDataset (where: $where) { id }
+    }`, {
+      where: {id: datasetId}
+    });
   });
 
   it('should delete dataset', async () => {
@@ -842,7 +867,7 @@ describe('dataset graphql', function() {
       name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
-      global: true,
+      global: false,
       url: faker.internet.url(),
       mountRoot: '/datasets',
       launchGroupOnly: false

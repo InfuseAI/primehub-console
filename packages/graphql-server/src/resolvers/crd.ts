@@ -2,7 +2,7 @@ import { Context } from './interface';
 import { toRelay, paginate, extractPagination, filter } from './utils';
 import CustomResource, { Item } from '../crdClient/customResource';
 import pluralize from 'pluralize';
-import { isEmpty, omit, mapValues, find, get, isNil } from 'lodash';
+import { isEmpty, omit, mapValues, find, get, isNil, unionBy } from 'lodash';
 import KeycloakAdminClient from 'keycloak-admin';
 import { ApolloError } from 'apollo-server';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
@@ -178,7 +178,7 @@ export class Crd<SpecType> {
 
   // tslint:disable-next-line:max-line-length
   public findInGroup = async (groupId: string, resource: string, kcAdminClient: KeycloakAdminClient, currentWorkspace: CurrentWorkspace) => {
-    const roles = await this.listGroupRealmRoles(kcAdminClient, groupId, currentWorkspace);
+    const roles = await this.listGroupResourceRoles(kcAdminClient, groupId, currentWorkspace);
     return Boolean(find(roles, role => {
       return role.resourceName === resource;
     }));
@@ -287,31 +287,60 @@ export class Crd<SpecType> {
 
   private queryByGroup = async (parent, args, context: Context) => {
     const currentWorkspace = parent.currentWorkspace;
-    const roles = await this.listGroupRealmRoles(context.kcAdminClient, parent.id, currentWorkspace);
+    const groupId = parent.id;
 
-    // todo: make this logic better
-    const rows = await Promise.all(roles.map(role => {
-      if (this.resourceName === 'dataset') {
-        return context.getDataset(role.resourceName)
-          .then(dataset => {
-            // todo: deal with the complex type cast here
-            return {
-              roleName: role.originalName,
-              ...dataset
-            } as any;
-          });
-      }
+    let resourceRoles = await this.listGroupResourceRoles(context.kcAdminClient, groupId, currentWorkspace);
+    if (!parent.effectiveGroup) {
+      return this.queryResourcesByRoles(resourceRoles, context, currentWorkspace);
+    }
 
-      if (this.resourceName === 'image') {
-        return context.getImage(role.resourceName);
-      }
+    // Effective Roles, we need to merge resource in this group and the everyone group.
+    const resourceRolesEveryone = this.transfromResourceRoles(parent.realmRolesEveryone, currentWorkspace);
 
-      if (this.resourceName === 'instanceType') {
-        return context.getInstanceType(role.resourceName);
+    if (this.resourceName !== 'dataset')  {
+      resourceRoles = unionBy(resourceRoles, resourceRolesEveryone, resourceRole => resourceRole.originalName);
+      return this.queryResourcesByRoles(resourceRoles, context, currentWorkspace);
+    }
+
+    // For datasets in effectiveGroups, we need to merge datasets with non-launch-group datasets
+    const datasetsMap = {};
+
+    // dataset in this group
+    let datasets =
+    await this.queryResourcesByRoles(resourceRoles, context, currentWorkspace);
+    datasets.forEach(dataset => {
+      datasetsMap[dataset.id] = dataset;
+    });
+
+    // dataset in everyone group
+    datasets = await this.queryResourcesByRoles(resourceRolesEveryone, context, currentWorkspace);
+    datasets.forEach(dataset => {
+      if (datasetsMap[dataset.id]) {
+        if (dataset.writable) {
+          datasetsMap[dataset.id] = dataset;
+        }
+      } else {
+        datasetsMap[dataset.id] = dataset;
       }
-      // return context.crdClient[this.customResourceMethod].get(name);
-    }));
-    return rows.map(row => this.internalPropMapping(row, currentWorkspace));
+    });
+
+    // dataset in other groups. but launchGroupOnly = false
+    const resourceRolesUser = this.transfromResourceRoles(parent.realmRolesUser, currentWorkspace);
+    datasets = await this.queryResourcesByRoles(resourceRolesUser, context, currentWorkspace);
+    datasets.forEach(dataset => {
+      if (dataset.launchGroupOnly) {
+        return;
+      }
+      if (datasetsMap[dataset.id]) {
+        if (dataset.writable) {
+          datasetsMap[dataset.id] = dataset;
+        }
+      } else {
+        datasetsMap[dataset.id] = dataset;
+      }
+    });
+
+    return Object.values(datasetsMap);
   }
 
   /**
@@ -466,24 +495,65 @@ export class Crd<SpecType> {
     };
   }
 
-  private listGroupRealmRoles = async (
+  private listGroupResourceRoles = async (
     kcAdminClient: KeycloakAdminClient,
     groupId: string,
     currentWorkspace: CurrentWorkspace
   ): Promise<ResourceRole[]> => {
-      const groupRoles = await kcAdminClient.groups.listRealmRoleMappings({
-        id: groupId
-      });
+    const groupRoles = await kcAdminClient.groups.listRealmRoleMappings({
+      id: groupId
+    });
 
-      let roles = groupRoles.map(role => parseResourceRole(role.name));
-      roles = roles.filter(role =>
-          role.resourcePrefix === this.prefixName &&
-          currentWorkspace.getWorkspaceId() === role.workspaceId);
+    return this.transfromResourceRoles(groupRoles, currentWorkspace);
+  }
 
-      // if rolePrefix not exist, filter only roles without rolePrefix
-      // else, filter only roles with rolePrefix
-      return this.rolePrefix ?
-        roles.filter(role => role.rolePrefix === this.rolePrefix) :
-        roles.filter(role => isNil(role.rolePrefix));
+  private transfromResourceRoles(realmRoles: any[], currentWorkspace: CurrentWorkspace) {
+    let resourceRoles = realmRoles.map(role => parseResourceRole(role.name));
+    resourceRoles = resourceRoles.filter(role =>
+      role.resourcePrefix === this.prefixName && currentWorkspace.getWorkspaceId() === role.workspaceId);
+    // if rolePrefix not exist, filter only roles without rolePrefix
+    // else, filter only roles with rolePrefix
+    return this.rolePrefix ?
+      resourceRoles.filter(role => role.rolePrefix === this.rolePrefix) :
+      resourceRoles.filter(role => isNil(role.rolePrefix));
+  }
+
+  private async queryResourcesByRoles(resourceRoles: ResourceRole[], context: Context, currentWorkspace: any) {
+    // map the resource roles to resources
+    // todo: make this logic better
+
+    let rows = await Promise.all(resourceRoles.map(role => {
+      const onError = () => {
+        logger.error({
+          type: 'FAIL_QUERY_RESOURCE_FROM_K8S_API',
+          resource: this.resourceName,
+          name: role.resourceName,
+        });
+
+        return null;
+      };
+
+      if (this.resourceName === 'dataset') {
+        return context.getDataset(role.resourceName)
+          .then(dataset => {
+            // todo: deal with the complex type cast here
+            return {
+              roleName: role.originalName,
+              ...dataset
+            } as any;
+          }).catch(onError);
+      }
+      if (this.resourceName === 'image') {
+        return context.getImage(role.resourceName).catch(onError);
+      }
+      if (this.resourceName === 'instanceType') {
+        return context.getInstanceType(role.resourceName).catch(onError);
+      }
+      // return context.crdClient[this.customResourceMethod].get(name);
+    }));
+    rows = rows
+    .filter(row => row !== null)  // filter out the failed resource
+    .map(row => this.internalPropMapping(row, currentWorkspace));
+    return rows;
   }
 }
