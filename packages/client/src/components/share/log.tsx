@@ -213,8 +213,11 @@ export default class Logs extends React.Component<Props, State> {
   }
 
   render() {
-    const {rows = 40, style = {}} = this.props;
+    const {endpoint, rows = 40, style = {}} = this.props;
     const {log, downloading} = this.state;
+    let hint_message = 'Please download the log to view more than 2000 lines.';
+    if (endpoint.includes('model-deployment'))
+      hint_message += ' Timestamp reflects Universal Time Coordinated (UTC).';
     return <>
       <div style={{float: 'right', marginBottom: 4, display: 'flex'}}>
         <Button
@@ -234,7 +237,7 @@ export default class Logs extends React.Component<Props, State> {
       </div>
       <div style={{position: 'relative', marginTop: 48, ...style}}>
         <Hint>
-          Please download to check out more than 2000 lines.
+          {hint_message}
         </Hint>
         <List
           style={{
