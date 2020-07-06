@@ -216,7 +216,7 @@ export default class Logs extends React.Component<Props, State> {
     const {endpoint, rows = 40, style = {}} = this.props;
     const {log, downloading} = this.state;
     let hint_message = 'Please download the log to view more than 2000 lines.';
-    if (endpoint.includes('model-deployment'))
+    if (endpoint.includes('phdeployments'))
       hint_message += ' Timestamp reflects Universal Time Coordinated (UTC).';
     return <>
       <div style={{float: 'right', marginBottom: 4, display: 'flex'}}>
