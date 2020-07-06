@@ -18,7 +18,7 @@ $ yarn install
 ### Overview
 
 In PrimeHub Console, we have 4 sub components in `packages`, the web server, graphql server, front-end client and watcher.
-All components can run as a standalone server for test individual, you also can combine them together as a compelete primehub-console on the local machine. 
+All components can run as a standalone server for test individual, you also can combine them together as a compelete primehub-console on the local machine.
 
 ### Graphql dev server
 
@@ -30,49 +30,47 @@ For graphql local server, we need an exist primehub cluster includes all primehu
 
 1. Go to `packages/graphql-server` and install the dependencies of the graphql sub component
 
-```shell
-$ cd ./packages/graphql-server
-$ yarn install
-```
+    ```shell
+    $ cd ./packages/graphql-server
+    $ yarn install
+    ```
 
 2. Setup the required env variable
 
-* KC_API_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. Ex: 'http://127.0.0.1:8080/auth'. For API usage.
-* KC_OIDC_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. For oidc usage.
-* KC_REALM: the realm name of keycloak
-* KC_EVERYONE_GROUP_ID: the everyone group id in keycloak
-* K8S_CRD_NAMESPACE: specify what namespace to use for crd
-* KC_GRANT_TYPE: `password` or `authorization_code`
-* KC_CLIENT_SECRET: client secret
-* KC_CLIENT_ID: client id
-* SHARED_GRAPHQL_SECRET_KEY: secret key to request read-only graphql with. Client should put this shared key in header `Authorization: "Bearer <SHARED_GRAPHQL_SECRET_KEY>"`
-* APP_PREFIX: ex: `/admin`
-
-You can check the graphql deployment's env setup as an example for local enviroment setup in your local cluster by following command:
-
-```shell
-$ kubectl describe deploy -n hub primehub-graphql
-Name:                   primehub-graphql
-Namespace:              hub
-...
-Pod Template:
-  ...
-  Enviroment:
-    KC_API_BASEURL: ...
-    KC_OIDC_BASEURL: ...
-    # etc.
-   ...
-```
+    * KC_API_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. Ex: 'http://127.0.0.1:8080/auth'. For API usage.
+    * KC_OIDC_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. For oidc usage.
+    * KC_REALM: the realm name of keycloak
+    * KC_EVERYONE_GROUP_ID: the everyone group id in keycloak
+    * K8S_CRD_NAMESPACE: specify what namespace to use for crd
+    * KC_GRANT_TYPE: `password` or `authorization_code`
+    * KC_CLIENT_SECRET: client secret
+    * KC_CLIENT_ID: client id
+    * SHARED_GRAPHQL_SECRET_KEY: secret key to request read-only graphql with. Client should put this shared key in header `Authorization: "Bearer <SHARED_GRAPHQL_SECRET_KEY>"`
+    * APP_PREFIX: ex: `/admin
+    You can check the graphql deployment's env setup as an example for local enviroment setup in your local cluster by following command
+    ```shell
+    $ kubectl describe deploy -n hub primehub-graphql
+    Name:                   primehub-graphql
+    Namespace:              hub
+    ...
+    Pod Template:
+      ...
+      Enviroment:
+        KC_API_BASEURL: ...
+        KC_OIDC_BASEURL: ...
+        # etc.
+       ...
+    ```
 
 3. Start the CE server.
 
-```
-$ yarn start:ce
-```
+    ```
+    $ yarn start:ce
+    ```
 
 4. Open the graphql playground on browser.
 
-In default development setup, we enable graphql playground for standalone graphql server, you can use it for test graphql query manually, please go to server host after server launched.
+    In default development setup, we enable graphql playground for standalone graphql server, you can use it for test graphql query manually, please go to server host after server     launched.
 
 
 ## Folder architecture
@@ -166,6 +164,46 @@ $ cd ./server && yarn && npm run build:prod
 // start server
 $ npm run start:prod
 ```
+
+## Test
+
+### Graphql-server
+
+**Unit test**
+
+```sh
+$ cd packages/graphql-server
+$ yarn test:unit
+```
+
+**Integration test**
+
+Run local keycloak
+```sh
+$ docker run -d --rm --name keycloak \
+    -p 8080:8080 \
+    -e KEYCLOAK_USER=wwwy3y3 \
+    -e KEYCLOAK_PASSWORD=wwwy3y3 \
+    jboss/keycloak
+```
+
+Run local kuberentes cluster by k3d
+```sh
+// isntall k3d
+$ brew install k3d
+$ k3d create
+$ export KUBECONFIG="$(k3d get-kubeconfig --name='k3s-default')"
+
+// wait for the node ready
+$ kubectl get nodes
+```
+
+Run integration test
+```sh
+$ yarn test
+```
+
+> Note: please run the integration test on local dev kuberentes, or it may delete the CRDs in the cluster.
 
 ## Docker run
 After building the image, here's an example of docker run cmd
