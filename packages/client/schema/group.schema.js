@@ -34,14 +34,16 @@ export default () => (
         sorter: true,
         render: text => {
           return text === null ? '∞' : text;
-        }
+        },
+        visible: !modelDeploymentOnly
       }, {
         title: '${gpuQuotaListTitle}',
         dataIndex: 'quotaGpu',
         sorter: true,
         render: text => {
           return text === null ? '∞' : text;
-        }
+        },
+        visible: !modelDeploymentOnly
       }, {
         title: '${projectCpuQuota}',
         dataIndex: 'projectQuotaCpu',
@@ -57,11 +59,6 @@ export default () => (
           return text === null ? '∞' : text;
         }
       },
-      // {
-      //   title: '${users}',
-      //   dataIndex: 'users',
-      //   render: renderRelationField
-      // }
       ],
       disableCreate: true
     }}
