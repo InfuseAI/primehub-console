@@ -1,9 +1,10 @@
 import Router from 'koa-router';
 import CrdClientImpl, { client as kubeClient } from '../../crdClient/crdClientImpl';
 import { ParameterizedContext } from 'koa';
-import { Stream } from 'stream';
+import { Stream, Readable } from 'stream';
 import { get } from 'lodash';
 import * as logger from '../../logger';
+import PersistLog from '../../utils/persistLog';
 
 const MODEL = 'model';
 
@@ -12,6 +13,7 @@ export class JobLogCtrl {
   private kubeClient: any;
   private crdClient: CrdClientImpl;
   private appPrefix: string;
+  private persistLog: PersistLog;
 
   constructor({
     namespace,
@@ -26,6 +28,12 @@ export class JobLogCtrl {
     this.kubeClient = kubeClient;
     this.crdClient = crdClient;
     this.appPrefix = appPrefix;
+    this.persistLog = new PersistLog({
+      endpoint: 'http://loclhost:9000',
+      bucket: 'primehub',
+      accessKey: '',
+      secrekKey: '',
+    });
   }
 
   public streamLogs = async (ctx: ParameterizedContext) => {
@@ -49,21 +57,28 @@ export class JobLogCtrl {
   }
 
   public streamPhJobLogs = async (ctx: ParameterizedContext) => {
-    const {follow, tailLines} = ctx.query;
+    const {follow, tailLines, persist} = ctx.query;
     const namespace = ctx.params.namespace || this.namespace;
     const jobId = ctx.params.jobId;
     const phjob = await this.crdClient.phJobs.get(jobId);
     const podName = phjob.status.podName;
-    const stream = this.getStream(namespace, podName, {follow, tailLines});
-    stream.on('error', err => {
-      logger.error({
-        component: logger.components.internal,
-        type: 'K8S_STREAM_LOG',
-        message: err.message
-      });
 
-      ctx.res.end();
-    });
+    let stream: Stream;
+    if (this.persistLog && persist === 'true') {
+      const prefix = `/logs/phjob/${jobId}`;
+      stream = this.persistLog.getStream(prefix);
+    } else {
+      stream = this.getStream(namespace, podName, {follow, tailLines});
+      stream.on('error', err => {
+        logger.error({
+          component: logger.components.internal,
+          type: 'K8S_STREAM_LOG',
+          message: err.message
+        });
+
+        ctx.res.end();
+      });
+    }
     ctx.body = stream;
   }
 

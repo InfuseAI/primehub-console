@@ -599,7 +599,25 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     if (!isEmpty(config.sharedGraphqlSecretKey) && config.sharedGraphqlSecretKey === apiToken) {
       return next();
     } else {
-      await oidcTokenVerifier.verify(apiToken);
+
+      let checkOfflineToken = false;
+
+      try {
+        const tokenPayload = await oidcTokenVerifier.verify(apiToken);
+        if (tokenPayload.typ === 'Offline') {
+          checkOfflineToken = true;
+        }
+      } catch (err) {
+        // in keycloak8, the offline token JWT is always verified failed.
+        checkOfflineToken = true;
+      }
+
+      if (checkOfflineToken) {
+        // API Token is a offline token. Refresh it to get the real access token
+        const accessToken = await apiTokenCache.getAccessToken(apiToken);
+        await oidcTokenVerifier.verify(accessToken);
+      }
+
       return next();
     }
   };
