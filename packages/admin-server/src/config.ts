@@ -53,6 +53,9 @@ export interface Config {
   enableLicenseCheck: boolean;
   // model deployment feature
   enableModelDeployment: boolean;
+  // persistence log feature
+  enableLogPersistence: boolean;
+
   // maximux group
   licenseStatus: string;
   maxGroup: number;
@@ -83,6 +86,7 @@ const defaultConfigs = {
   customImageSetup: false,
   enableLicenseCheck: false,
   enableModelDeployment: false,
+  enableLogPersistence: false,
   licenseStatus: 'invalid',
   maxGroup: 999
 };
@@ -135,6 +139,8 @@ export const createConfig = (): Config => {
     enableModelDeployment:
       process.env.PRIMEHUB_FEATURE_MODEL_DEPLOYMENT &&
       process.env.PRIMEHUB_FEATURE_MODEL_DEPLOYMENT.toString() === 'true',
+    enableLogPersistence:
+      process.env.PRIMEHUB_FEATURE_LOG_PERSISTENCE.toString() === 'true',
     licenseStatus: process.env.EXPIRED,
     maxGroup: process.env.MAX_GROUP
   });
