@@ -28,13 +28,15 @@ export const groupColumns = [{
   dataIndex: 'quotaCpu',
   render: text => {
     return text === null ? '∞' : text;
-  }
+  },
+  visible: !modelDeploymentOnly
 }, {
   title: '${gpuQuota}',
   dataIndex: 'quotaGpu',
   render: text => {
     return text === null ? '∞' : text;
-  }
+  },
+  visible: !modelDeploymentOnly
 }, {
   title: '${userVolumeCapacity}',
   dataIndex: 'userVolumeCapacity',

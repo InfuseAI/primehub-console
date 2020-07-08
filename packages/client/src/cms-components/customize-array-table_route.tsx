@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {get, mapValues} from 'lodash';
+import {get, mapValues, remove} from 'lodash';
 import { Table, Button, Modal, Icon, notification } from "antd";
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from "react-intl";
@@ -195,7 +195,7 @@ export default class ArrayBreadcrumb extends Component<Props & {
       onSelect: this.onSelectChange,
       onSelectAll: this.onSelectAll
     } : undefined;
-  
+
     let {
       createKeys,
       columns = [],
@@ -205,6 +205,10 @@ export default class ArrayBreadcrumb extends Component<Props & {
       buildImageCustomActions,
       disableCreate,
     } = uiParams;
+
+    remove(columns, (obj) => {
+      return obj.visible === false;
+    });
 
     const newColumnsRender = renderValue(columns, items.items, this.props);
     if (keyName === 'dataset' && (window as any).enableUploadServer) {

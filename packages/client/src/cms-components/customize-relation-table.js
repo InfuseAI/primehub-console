@@ -1,6 +1,7 @@
 import React, { PureComponent } from "react";
 import { Tag, Tooltip, Icon, Table, Button } from "antd";
 import template from 'lodash/template';
+import { remove } from 'lodash';
 import difference from "lodash/difference";
 import get from 'lodash/get';
 import Picker from './relation-picker';
@@ -67,8 +68,18 @@ export default class RelationTable extends PureComponent {
       schema, Toolbar, relationValue, goTo, rootValue, title, isRelationFetching,
       relationArgs, updateRelationQuery,
     } = this.props;
-    const columnsRender = renderValue(uiParams.columns, schema[relation.to].items.items, this.props);
-    const pickerColumnsRender = renderValue(uiParams.pickerColumns || uiParams.columns, schema[relation.to].items.items, this.props);
+    let { columns, pickerColumns } = uiParams;
+
+    remove(columns, (obj) => {
+      return obj && obj.visible === false;
+    });
+
+    remove(pickerColumns, (obj) => {
+      return obj && obj.visible === false;
+    });
+
+    const columnsRender = renderValue(columns, schema[relation.to].items.items, this.props);
+    const pickerColumnsRender = renderValue(pickerColumns || uiParams.columns, schema[relation.to].items.items, this.props);
     const recordValue = getRecordValue(rootValue, refId);
     // hack
     const isHidden = uiParams.isHidden ? uiParams.isHidden(recordValue) : false;
