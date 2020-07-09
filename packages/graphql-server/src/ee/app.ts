@@ -74,6 +74,7 @@ import K8sUploadServerSecret from '../k8sResource/k8sUploadServerSecret';
 import { Role } from '../resolvers/interface';
 import Token from '../oidc/token';
 import ApiTokenCache from '../oidc/apiTokenCache';
+import PersistLog from '../utils/persistLog';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, '../graphql/index.graphql')));
@@ -270,10 +271,21 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
 
   // log
+  let persistLog: PersistLog;
+  if (config.enableStore && config.enableLogPersistence) {
+    persistLog = new PersistLog({
+      endpoint: config.storeEndpoint,
+      bucket: config.storeBucket,
+      accessKey: config.storeAccessKey,
+      secretKey: config.storeSecretKey,
+    });
+  }
+
   const logCtrl = new JobLogCtrl({
     namespace: config.k8sCrdNamespace,
     crdClient,
-    appPrefix: config.appPrefix
+    appPrefix: config.appPrefix,
+    persistLog,
   });
 
   // ann

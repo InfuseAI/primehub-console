@@ -18,22 +18,19 @@ export class JobLogCtrl {
   constructor({
     namespace,
     crdClient,
-    appPrefix
+    appPrefix,
+    persistLog
   }: {
     namespace: string,
     crdClient: CrdClientImpl,
-    appPrefix?: string
+    appPrefix?: string,
+    persistLog?: PersistLog,
   }) {
     this.namespace = namespace || 'default';
     this.kubeClient = kubeClient;
     this.crdClient = crdClient;
     this.appPrefix = appPrefix;
-    this.persistLog = new PersistLog({
-      endpoint: 'http://loclhost:9000',
-      bucket: 'primehub',
-      accessKey: '',
-      secrekKey: '',
-    });
+    this.persistLog = persistLog;
   }
 
   public streamLogs = async (ctx: ParameterizedContext) => {
