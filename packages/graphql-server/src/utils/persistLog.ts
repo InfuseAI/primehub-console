@@ -57,24 +57,27 @@ export default class PersistLog {
       objs.sort((obj1, obj2) => {
         return obj1.lastModified.getUTCMilliseconds() - obj2.lastModified.getUTCMilliseconds();
       });
-      if (objs.length > 10) {
-        objs = objs.slice(objs.length - 10, objs.length);
+      if (objs.length > 32) {
+        objs = objs.slice(objs.length - 32, objs.length);
       }
       return objs;
     }).then(objs => {
       // tslint:disable-next-line: no-console
       console.log(objs);
       return Promise.all(objs.map(async obj => {
-        let stream = await this.minioClient.getObject(this.bucket, obj.name);
-        if (obj.name.endsWith('.gz')) {
-          stream = stream.pipe(createGunzip());
-        }
-        return stream;
+        return next => {
+          this.minioClient.getObject(this.bucket, obj.name).then(stream => {
+            if (obj.name.endsWith('.gz')) {
+              stream = stream.pipe(createGunzip());
+            }
+            next(stream);
+          });
+        };
       }));
     }).then(readStream => {
         const combinedStream = CombinedStream.create();
         readStream.forEach(stream => {
-            combinedStream.append(stream as Readable);
+            combinedStream.append(stream);
         });
 
         if (tailLines > 0) {
