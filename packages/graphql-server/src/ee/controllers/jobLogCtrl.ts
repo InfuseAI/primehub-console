@@ -62,8 +62,12 @@ export class JobLogCtrl {
 
     let stream: Stream;
     if (this.persistLog && persist === 'true') {
+      let tail = 0;
+      if (tailLines) {
+        tail = parseInt(tailLines, 10);
+      }
       const prefix = `/logs/phjob/${jobId}`;
-      stream = this.persistLog.getStream(prefix);
+      stream = await this.persistLog.getStream(prefix, {tailLines: tail});
     } else {
       stream = this.getStream(namespace, podName, {follow, tailLines});
       stream.on('error', err => {
