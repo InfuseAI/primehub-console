@@ -1,4 +1,10 @@
 import { Stream, Readable } from 'stream';
+import {Client, BucketItem} from 'minio';
+import CombinedStream from 'combined-stream';
+import { createGunzip } from 'zlib';
+import split from 'split';
+import TailStream from './stream';
+// import getStream from 'get-stream';
 
 const makeStream = (str: string): Readable => {
   const stream = new Readable();
@@ -15,31 +21,83 @@ interface PersistLogOptions {
 }
 
 export default class PersistLog {
-  private endpoint: string;
+  private minioClient: Client;
   private bucket: string;
-  private accessKey: string;
-  private secretKey: string;
 
   constructor(options: PersistLogOptions) {
-    this.endpoint = options.endpoint;
     this.bucket = options.bucket;
-    this.accessKey = options.accessKey;
-    this.secretKey = options.secretKey;
+    const url = new URL(options.endpoint);
+    let port = 80;
+    if (url.port === 'http') {
+      port = 80;
+    } else if (url.port === 'https') {
+      port = 443;
+    } else {
+      port = parseInt(url.port, 10);
+    }
+
+    const useSSL = (url.protocol === 'https');
+
+    this.minioClient = new Client({
+        endPoint: url.hostname,
+        port,
+        useSSL,
+        accessKey: options.accessKey,
+        secretKey: options.secretKey
+    });
   }
 
-  public getStream(
+  public async getStream(
     prefix: string,
     options?: {tailLines?: number}
-  ): Stream {
-    const {tailLines} = options || {};
+  ): Promise<Stream> {
+    const {tailLines} = options || {tailLines: 0};
 
-    return makeStream(
-`endpoint: ${this.endpoint}
-bucket: ${this.bucket}
-accessKey: ${this.accessKey}
-secretKey: ${this.secretKey}
-prefix: ${prefix}
-tailLines: ${tailLines}
-`);
+    return this.getAllFiles(prefix).then(objs => {
+      objs.sort((obj1, obj2) => {
+        return obj1.lastModified.getUTCMilliseconds() - obj2.lastModified.getUTCMilliseconds();
+      });
+      if (objs.length > 10) {
+        objs = objs.slice(objs.length - 10, objs.length);
+      }
+      return objs;
+    }).then(objs => {
+      // tslint:disable-next-line: no-console
+      console.log(objs);
+      return Promise.all(objs.map(async obj => {
+        let stream = await this.minioClient.getObject(this.bucket, obj.name);
+        if (obj.name.endsWith('.gz')) {
+          stream = stream.pipe(createGunzip());
+        }
+        return stream;
+      }));
+    }).then(readStream => {
+        const combinedStream = CombinedStream.create();
+        readStream.forEach(stream => {
+            combinedStream.append(stream as Readable);
+        });
+
+        if (tailLines > 0) {
+          return combinedStream.pipe(split()).pipe(new TailStream(tailLines));
+        } else {
+          return combinedStream;
+        }
+    });
+  }
+
+  private getAllFiles(dirname) {
+    return new Promise<BucketItem[]>((resolve, reject) => {
+        const list: BucketItem[] = [];
+        const stream = this.minioClient.listObjects(this.bucket, dirname, true);
+        stream.on('data', (obj: BucketItem) => {
+            list.push(obj);
+        });
+        stream.on('error', (error: Error) => {
+            reject(error);
+        });
+        stream.on('end', () => {
+            resolve(list);
+        });
+    });
   }
 }
