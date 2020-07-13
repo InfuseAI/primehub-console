@@ -36,7 +36,7 @@ import basicAuth from 'basic-auth';
 import koaMount from 'koa-mount';
 import { OidcTokenVerifier } from '../oidc/oidcTokenVerifier';
 import cors from '@koa/cors';
-import { JobLogCtrl, mount as mountJobLogCtrl } from './controllers/jobLogCtrl';
+import { JobLogCtrl } from './controllers/jobLogCtrl';
 import { PhJobCacheList } from './crdClient/phJobCacheList';
 
 // cache
