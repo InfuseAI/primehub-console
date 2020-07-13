@@ -119,9 +119,3 @@ export class JobLogCtrl {
       .pods(podName).log.getStream({ qs: { container, follow, tailLines } });
   }
 }
-
-export const mount = (rootRouter: Router, middleware: any, ctrl: JobLogCtrl) => {
-  rootRouter.get(ctrl.getRoute(), middleware, ctrl.streamLogs);
-  rootRouter.get(ctrl.getPhJobRoute(), middleware, ctrl.streamPhJobLogs);
-  rootRouter.get(ctrl.getPhDeploymentRoute(), middleware, ctrl.streamPhDeploymentLogs);
-};
