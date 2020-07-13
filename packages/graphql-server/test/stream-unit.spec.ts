@@ -81,7 +81,7 @@ last one line
     const stream =
     makeStream(str)
     .pipe(split())
-    .pipe(new TailStream());
+    .pipe(new TailStream(3));
     // .pipe(stdout);
 
     // expect(await getStream(stream)).to.be.equals(str2);
@@ -89,7 +89,7 @@ last one line
     const stream2 =
     makeMultilineStream('hello', 100)
     .pipe(split())
-    .pipe(new TailStream());
+    .pipe(new TailStream(3));
 
     expect(await getStream(stream2)).to.be.equals('');
   });
