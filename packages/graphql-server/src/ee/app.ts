@@ -594,12 +594,28 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       throw Boom.forbidden('request not authorized');
     }
 
-    const apiToken = authorization.replace('Bearer ', '');
+    let apiToken = authorization.replace('Bearer ', '');
 
     if (!isEmpty(config.sharedGraphqlSecretKey) && config.sharedGraphqlSecretKey === apiToken) {
       return next();
     } else {
-      await oidcTokenVerifier.verify(apiToken);
+      let tokenPayload;
+      let checkOfflineToken = false;
+      try {
+        tokenPayload = await oidcTokenVerifier.verify(apiToken);
+        if (tokenPayload.typ === 'Offline') {
+          checkOfflineToken = true;
+        }
+      } catch (err) {
+        // in keycloak8, the offline token JWT is always verified failed.
+        checkOfflineToken = true;
+      }
+
+      if (checkOfflineToken) {
+        // API Token is a offline token. Refresh it to get the real access token
+        apiToken = await apiTokenCache.getAccessToken(apiToken);
+        tokenPayload = await oidcTokenVerifier.verify(apiToken);
+      }
       return next();
     }
   };
