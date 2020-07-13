@@ -4,6 +4,7 @@ import CombinedStream from 'combined-stream';
 import { createGunzip } from 'zlib';
 import split from 'split';
 import TailStream from './stream';
+import {URL} from 'url';
 
 const MAX_SIZE = 64 * 1024 * 1024;
 const MAX_FILES = 7 * 24;
