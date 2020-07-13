@@ -4,14 +4,9 @@ import CombinedStream from 'combined-stream';
 import { createGunzip } from 'zlib';
 import split from 'split';
 import TailStream from './stream';
-// import getStream from 'get-stream';
 
-const makeStream = (str: string): Readable => {
-  const stream = new Readable();
-  stream.push(str);
-  stream.push(null);
-  return stream;
-};
+const MAX_SIZE = 64 * 1024 * 1024;
+const MAX_FILES = 7 * 24;
 
 interface PersistLogOptions {
   endpoint: string;
@@ -49,21 +44,41 @@ export default class PersistLog {
 
   public async getStream(
     prefix: string,
-    options?: {tailLines?: number}
+    options: {tailLines?: number} = {}
   ): Promise<Stream> {
-    const {tailLines} = options || {tailLines: 0};
+    const {tailLines} = {
+      tailLines: 0,
+      ...options
+    };
 
     return this.getAllFiles(prefix).then(objs => {
       objs.sort((obj1, obj2) => {
-        return obj1.lastModified.getUTCMilliseconds() - obj2.lastModified.getUTCMilliseconds();
+        return obj1.lastModified.getTime() - obj2.lastModified.getTime();
       });
-      if (objs.length > 32) {
-        objs = objs.slice(objs.length - 32, objs.length);
+
+      let byteCount = 0;
+      let objCount = 0;
+
+      const maxSize = tailLines === 0 ?
+        MAX_SIZE :
+        Math.min(32 * tailLines, MAX_SIZE);
+
+      for (let i = objs.length - 1; i >= 0; i--) {
+          const obj = objs[i];
+          byteCount += obj.name.endsWith('.gz') ? obj.size * 8 : obj.size;
+          objCount ++;
+
+          if (byteCount >= maxSize || objCount >= MAX_FILES) {
+            break;
+          }
+      }
+
+      if (objs.length !== objCount) {
+        objs = objs.slice(objs.length - objCount, objs.length);
       }
       return objs;
     }).then(objs => {
       // tslint:disable-next-line: no-console
-      console.log(objs);
       return Promise.all(objs.map(async obj => {
         return next => {
           this.minioClient.getObject(this.bucket, obj.name).then(stream => {

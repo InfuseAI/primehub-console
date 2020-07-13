@@ -21,7 +21,7 @@
     "copy:views": "cp -R src/views lib/views",
     "copy:graphql": "cp -R src/graphql lib/graphql; cp -R src/ee/graphql lib/ee/graphql",
     "test": "npm run test:integration",
-    "test:unit": "TEST=true mocha -r ts-node/register --recursive \"test/**/*-unit.spec.ts\"",
+    "test:unit": "TEST=true mocha -r ts-node/register --timeout 600000 --recursive \"test/**/*-unit.spec.ts\"",
     "test:integration": "TEST=true mocha -r ts-node/register --exit --timeout 600000 --file \"test/setup.ts\"  --recursive \"test/**/*.spec.ts\"",
     "test:grep": "TEST=true mocha -r ts-node/register --exit --timeout 600000 --file \"test/setup.ts\" --recursive",
     "test:e2e": "TEST=true cucumber-js ./test/features/*.feature  --require ./test/features/support/**/*.ts --require-module ts-node/register",

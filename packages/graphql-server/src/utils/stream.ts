@@ -11,6 +11,10 @@ export default class TailStream extends Transform {
 
   public _transform(chunk: any, encoding: string, callback: TransformCallback): void {
     this.lines.push(chunk);
+
+    if (this.lines.length === this.tailLine * 2) {
+      this.lines = this.lines.slice(this.tailLine, this.lines.length);
+    }
     callback();
   }
 
