@@ -19,6 +19,7 @@ type State = {
   topmost: boolean;
   autoScroll: boolean;
   tailLines?: number;
+  loading: boolean;
   downloading: boolean;
   fromPersist: boolean;
 }
@@ -56,6 +57,7 @@ export default class Logs extends React.Component<Props, State> {
       log: [],
       autoScroll: true,
       tailLines: INITIAL_LENGTH,
+      loading: true,
       downloading: false,
       topmost: false,
       fromPersist: false,
@@ -73,6 +75,7 @@ export default class Logs extends React.Component<Props, State> {
     if (prevProps.endpoint !== this.props.endpoint) {
       this.setState({
         log: [],
+        loading: true,
         autoScroll: true,
         tailLines: INITIAL_LENGTH
       }, () => {
@@ -151,11 +154,15 @@ export default class Logs extends React.Component<Props, State> {
             const content = await res.json();
             const reason = get(content, 'message', 'of internal error');
             that.setState(() => ({
-              log: [`Error: cannot get log due to ${reason}`]
+              log: [`Error: cannot get log due to ${reason}`],
+              loading: false
             }));
             return;
           }
         }
+        this.setState({
+          loading: false
+        })
         break;
       } catch (err) {
         if (err.message === 'The user aborted a request.') {
@@ -243,9 +250,20 @@ export default class Logs extends React.Component<Props, State> {
 
   render() {
     const {endpoint, rows = 40, style = {}} = this.props;
-    const {log, downloading, fromPersist} = this.state;
+    const {log, loading, downloading, fromPersist} = this.state;
     const hints = [];
     hints.push('Please download the log to view more than 2000 lines.');
+
+    let listItems = log;
+    if (listItems.length == 0) {
+      listItems = loading ? ['loading...'] : ['(no data)'];
+    }
+    const listStyle = {
+      background: 'black',
+      color: log.length > 0 ? '#ddd' : '#888',
+      fontFamily: 'monospace',
+      border: 0,
+    };
 
     if (endpoint.includes('phdeployments'))
       hints.push('Timestamp reflects Universal Time Coordinated (UTC).');
@@ -276,27 +294,22 @@ export default class Logs extends React.Component<Props, State> {
             </div>))
           }
         </Hint>
+
         <List
-          style={{
-            background: 'black',
-            color: '#ddd',
-            fontFamily: 'monospace',
-            border: 0,
-          }}
+          style={listStyle}
           onScroll={this.onScroll}
           ref={this.listRef}
           outerRef={this.outerRef}
           height={rows * LINE_HEIGHT}
-          itemCount={log.length}
+          itemCount={listItems.length}
           itemSize={LINE_HEIGHT}
         >
           {({index, style}) => <div key={index} style={{
             ...style,
             padding: '0px 12px',
             overflow: 'visible',
-          }}>{handleLong(log[index])}</div>}
+          }}>{handleLong(listItems[index])}</div>}
         </List>
-
       </div>
     </>;
   }
