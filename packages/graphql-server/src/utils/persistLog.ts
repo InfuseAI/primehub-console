@@ -7,7 +7,7 @@ import TailStream from './stream';
 import {URL} from 'url';
 
 const MAX_SIZE = 64 * 1024 * 1024;
-const MAX_FILES = 7 * 24;
+const MAX_FILES = 2000;
 
 interface PersistLogOptions {
   endpoint: string;
