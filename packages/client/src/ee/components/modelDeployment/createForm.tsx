@@ -184,10 +184,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
     return (
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
-          <Col xs={24} sm={8} lg={8}>
-            <Card loading={loading} style={{overflow: 'auto'}}>
-              <h3>Environment Settings</h3>
-              <Divider />
+          <Col xs={24} sm={16} lg={16}>
               {
                 groups.length ? (
                   <Form.Item label={groupLabel}>
@@ -212,7 +209,29 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   </Form.Item>
                 )
               }
+            <Form.Item label={`Deployment name`}>
+              {form.getFieldDecorator('name', {
+                initialValue: name,
+                rules: [
+                  { whitespace: true, required: true, message: 'Please input a name!' },
+                  { pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*/, message: `alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`}
+                ],
+              })(
+                <Input disabled={type === 'edit'} onChange={this.handleNameChange} />
+              )}
+            </Form.Item>
+            <Form.Item label={`Deployment ID`}>
+              {form.getFieldDecorator('id', {
+                initialValue: id
+              })(
+                <Input disabled />
+              )}
+            </Form.Item>
+            <Card loading={loading} style={{overflow: 'auto'}}>
+              <h3>Environment Settings</h3>
 
+              <Row gutter={16}>
+                <Col span={12}>
               <Form.Item label={instanceTypeLabel}>
                 {form.getFieldDecorator('instanceType', {
                   initialValue: instanceTypeId,
@@ -247,7 +266,8 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   )
                 )}
               </Form.Item>
-
+                </Col>
+                <Col span={12}>
               <Form.Item label="Replicas">
                 {form.getFieldDecorator('replicas', {
                   initialValue: replicas || 1,
@@ -256,9 +276,11 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   <InputNumber min={1} precision={0} />
                 )}
               </Form.Item>
+                </Col>
+              </Row>
+
 
               <h3>Endpoint</h3>
-              <Divider />
               <Form.Item label="Private Access">
                 {form.getFieldDecorator('privateAccess', {
                   initialValue: (endpointAccessType === 'private'),
@@ -268,30 +290,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                 )}
               </Form.Item>
 
-            </Card>
-          </Col>
-          <Col xs={24} sm={16} lg={16}>
-            <Card loading={loading}>
               <h3>Deployment Details</h3>
-              <Divider />
-              <Form.Item label={`Deployment name`}>
-                {form.getFieldDecorator('name', {
-                  initialValue: name,
-                  rules: [
-                    { whitespace: true, required: true, message: 'Please input a name!' },
-                    { pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*/, message: `alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`}
-                  ],
-                })(
-                  <Input disabled={type === 'edit'} onChange={this.handleNameChange} />
-                )}
-              </Form.Item>
-              <Form.Item label={`Deployment ID`}>
-                {form.getFieldDecorator('id', {
-                  initialValue: id
-                })(
-                  <Input disabled />
-                )}
-              </Form.Item>
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item label={`Model Image`}>
@@ -334,6 +333,19 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                 )}
               </Form.Item>
             </Card>
+      <Row style={{marginTop: 24}}>
+            <Card>
+            <Form.Item label="Update Message" >
+              {form.getFieldDecorator('updateMessage', {
+                initialValue: ''
+              })(
+                <Input.TextArea
+                  rows={4}
+                />
+              )}
+            </Form.Item>
+            </Card>
+      </Row>
             <Form.Item style={{textAlign: 'right', marginRight: 8, marginTop: 24}}>
               {
                 type === 'edit' ? (
