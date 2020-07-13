@@ -52,7 +52,7 @@ export class JobLogCtrl {
     const {follow, tailLines} = ctx.query;
     const namespace = ctx.params.namespace || this.namespace;
     const jobId = ctx.params.jobId;
-    const phjob = await this.crdClient.phJobs.get(jobId);
+    const phjob = await this.crdClient.phJobs.get(jobId, namespace);
     const podName = phjob.status.podName;
     const stream = this.getStream(namespace, podName, {follow, tailLines});
     stream.on('error', err => {

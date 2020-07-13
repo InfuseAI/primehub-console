@@ -13,8 +13,9 @@ import * as GraphQLJSON from 'graphql-type-json';
 import { makeExecutableSchema, mergeSchemas } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
 import WorkspaceApi from '../workspace/api';
+import { keycloakMaxCount } from '../resolvers/constant';
 
-import CrdClient, { InstanceTypeSpec, ImageSpec } from '../crdClient/crdClientImpl';
+import CrdClient, { InstanceTypeSpec, ImageSpec, client as kubeClient } from '../crdClient/crdClientImpl';
 import * as system from '../resolvers/system';
 import * as user from '../resolvers/user';
 import * as group from '../resolvers/group';
@@ -568,7 +569,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     app.use(morgan(morganFormat));
   }
 
-  app.use(views(path.join(__dirname, './views'), {
+  app.use(views(path.join(__dirname, '../views'), {
     extension: 'pug'
   }));
   const serveClientStatic = config.appPrefix
@@ -616,11 +617,78 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         apiToken = await apiTokenCache.getAccessToken(apiToken);
         tokenPayload = await oidcTokenVerifier.verify(apiToken);
       }
+
+      // Prepare keycloak admin client
+      const kcAdminClient = createKcAdminClient();
+      kcAdminClient.setAccessToken(apiToken);
+      ctx.kcAdminClient = kcAdminClient;
+
+      // get user role
+      const roles = get(tokenPayload, ['resource_access', 'realm-management', 'roles'], []);
+      const role = (roles.indexOf('realm-admin') >= 0) ? Role.ADMIN : Role.USER;
+      ctx.role = role;
+      ctx.userId = tokenPayload.sub;
+
       return next();
     }
   };
+
+  const checkIsAdmin = async (ctx: Koa.ParameterizedContext, next: any) => {
+    if (ctx.role === Role.ADMIN) {
+      return next();
+    }
+    throw Boom.forbidden('request not authorized');
+  };
+
+  const checkUserGroup = async (ctx: Koa.ParameterizedContext, next: any) => {
+    const canUserView = async (userId, groupId): Promise<boolean> => {
+      const members = await ctx.kcAdminClient.groups.listMembers({
+        id: groupId,
+        max: keycloakMaxCount
+      });
+      const memberIds = members.map(u => u.id);
+      if (memberIds.indexOf(userId) >= 0) { return true; }
+      return false;
+    };
+
+    const namespace = ctx.params.namespace;
+    const jobId = ctx.params.jobId || '';
+    let resource;
+    if (jobId !== '')  {
+      // PhJob
+      resource = await crdClient.phJobs.get(jobId, namespace);
+    } else {
+      // PhDeployment
+      const podName = ctx.params.podName;
+      const pod = await kubeClient.api.v1.namespace(namespace).pods(podName).get();
+      const phDeploymentName = pod.body.metadata.labels['primehub.io/phdeployment'] || '';
+      if (phDeploymentName === '') { throw Boom.notFound(); }
+      resource = await crdClient.phDeployments.get(phDeploymentName, namespace);
+    }
+
+    if (resource.spec.groupId === '') {
+      throw Boom.notFound();
+    }
+
+    if (await canUserView(ctx.userId, resource.spec.groupId) === false) {
+      throw Boom.forbidden('request not authorized');
+    }
+
+    return next();
+  };
+
   mountAnn(rootRouter, annCtrl);
-  mountJobLogCtrl(rootRouter, authenticateMiddleware, logCtrl);
+
+  // Log Ctrl
+  rootRouter.get(logCtrl.getRoute(),
+                 authenticateMiddleware, checkIsAdmin,
+                 logCtrl.streamLogs);
+  rootRouter.get(logCtrl.getPhJobRoute(),
+                 authenticateMiddleware, checkUserGroup,
+                 logCtrl.streamPhJobLogs);
+  rootRouter.get(logCtrl.getPhDeploymentRoute(),
+                 authenticateMiddleware, checkUserGroup,
+                 logCtrl.streamPhDeploymentLogs);
 
   // health check
   rootRouter.get('/health', async ctx => {
