@@ -70,6 +70,16 @@ export interface Config {
   expiredAt?: string;
 
   primehubMode?: string;
+
+  // primehub store
+  enableStore: boolean;
+  storeAccessKey?: string;
+  storeSecretKey?: string;
+  storeBucket?: string;
+  storeEndpoint?: string;
+
+  // log persistence
+  enableLogPersistence: boolean;
 }
 
 const defaultConfigs = {
@@ -100,6 +110,8 @@ const defaultConfigs = {
   licenseStatus: 'invalid',
   maxGroup: 999,
   graphqlHost: 'http://localhost:3001',
+  enableStore: false,
+  enableLogPersistence: false,
 };
 
 const prodConfigs = {
@@ -169,7 +181,17 @@ export const createConfig = (): Config => {
     startedAt: process.env.STARTED_AT,
     expiredAt: process.env.EXPIRED_AT,
     licenseStatus: process.env.EXPIRED,
-    primehubMode: process.env.PRIMEHUB_MODE
+    primehubMode: process.env.PRIMEHUB_MODE,
+    enableStore:
+      process.env.PRIMEHUB_FEATURE_STORE &&
+      process.env.PRIMEHUB_FEATURE_STORE.toString() === 'true',
+    storeAccessKey: process.env.PRIMEHUB_STORE_ACCESS_KEY,
+    storeSecretKey: process.env.PRIMEHUB_STORE_SECRET_KEY,
+    storeBucket: process.env.PRIMEHUB_STORE_BUCKET,
+    storeEndpoint: process.env.PRIMEHUB_STORE_ENDPOINT,
+    enableLogPersistence:
+      process.env.PRIMEHUB_FEATURE_LOG_PERSISTENCE &&
+      process.env.PRIMEHUB_FEATURE_LOG_PERSISTENCE.toString() === 'true',
   });
 
   const env = process.env.NODE_ENV || 'development';

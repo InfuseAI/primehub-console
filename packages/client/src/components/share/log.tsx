@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {FixedSizeList as List} from 'react-window';
-import {Button} from 'antd';
+import {Button, Icon} from 'antd';
 import {get} from 'lodash';
 import downloadjs from 'downloadjs';
 import styled from 'styled-components';
@@ -8,6 +8,7 @@ import moment from 'moment';
 
 type Props = {
   endpoint: string;
+  enableLogPersistence?: boolean;
   rows?: number;
   style?: object;
   shouldRetryAfterFetched?: Function;
@@ -18,7 +19,9 @@ type State = {
   topmost: boolean;
   autoScroll: boolean;
   tailLines?: number;
+  loading: boolean;
   downloading: boolean;
+  fromPersist: boolean;
 }
 
 const Hint = styled.div`
@@ -37,6 +40,10 @@ const INITIAL_LENGTH = 2000;
 
 const LINE_HEIGHT = 21;
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export default class Logs extends React.Component<Props, State> {
   retryCount: number;
   listRef: React.RefObject<any>;
@@ -50,8 +57,10 @@ export default class Logs extends React.Component<Props, State> {
       log: [],
       autoScroll: true,
       tailLines: INITIAL_LENGTH,
+      loading: true,
       downloading: false,
       topmost: false,
+      fromPersist: false,
     };
     this.listRef = React.createRef();
     this.outerRef = React.createRef();
@@ -66,6 +75,7 @@ export default class Logs extends React.Component<Props, State> {
     if (prevProps.endpoint !== this.props.endpoint) {
       this.setState({
         log: [],
+        loading: true,
         autoScroll: true,
         tailLines: INITIAL_LENGTH
       }, () => {
@@ -92,7 +102,7 @@ export default class Logs extends React.Component<Props, State> {
     if (!newLog[newLog.length - 1]) newLog.pop();
     this.setState((prevState: any) => {
       const log = prevState.log.length >= 2000 ?
-      prevState.log.slice(newLog.length) : 
+      prevState.log.slice(newLog.length) :
       prevState.log;
       return {
         log: [...log, ...newLog],
@@ -104,7 +114,7 @@ export default class Logs extends React.Component<Props, State> {
     });
   }
 
-  fetchLog = () => {
+  fetchLog = async () => {
     const token = window.localStorage.getItem('canner.accessToken');
     const {endpoint, shouldRetryAfterFetched = () => {}} = this.props;
     const {tailLines} = this.state;
@@ -114,62 +124,83 @@ export default class Logs extends React.Component<Props, State> {
     this.controller = controller
     const signal = controller.signal;
     if (!endpoint) return;
-    return fetch(`${endpoint}?tailLines=${tailLines}`, {
-      signal,
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer ' + token
-      },
-    }).then(res => {
-      this.retryCount = 0;
-      if (res.status >= 400)
-        return res.json().then(content => {
-          const reason = get(content, 'message', 'of internal error');
-          that.setState(() => ({
-            log: [`Error: cannot get log due to ${reason}`]
-          }));
+
+
+    let retryCount = 0;
+    let res: Response;
+
+    // Fetch the log
+    while (true) {
+      try {
+        res = await fetch(`${endpoint}?tailLines=${tailLines}`, {
+          signal,
+          method: 'GET',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          },
         });
-      that.setState({log: []});
-      
-      const reader = res.body.getReader();
-      
-      function readChunk() {
-        return reader.read().then(appendChunks);
-      }
 
-      function appendChunks(result) {
-        if (result.done)
-          return 'done';
-        const chunk = new TextDecoder().decode(result.value.buffer);
-        that.showNewLog(chunk);
+        if (res.status >= 400) {
+          if (this.props.enableLogPersistence) {
+            this.setState({fromPersist: true});
+            res = await fetch(`${endpoint}?tailLines=${tailLines}&persist=true`, {
+              signal,
+              method: 'GET',
+              headers: {
+                'Authorization': 'Bearer ' + token
+              },
+            });
+          } else {
+            const content = await res.json();
+            const reason = get(content, 'message', 'of internal error');
+            that.setState(() => ({
+              log: [`Error: cannot get log due to ${reason}`],
+              loading: false
+            }));
+            return;
+          }
+        }
+        this.setState({
+          loading: false
+        })
+        break;
+      } catch (err) {
+        if (err.message === 'The user aborted a request.') {
+          return;
+        }
+        console.log(err);
+        that.setState(() => ({
+          log: [`Error: cannot fetch the log`]
+        }));
 
-        return readChunk();
+        retryCount++;
+        if (retryCount === 5) {
+          console.log(`stop retrying fetching logs`);
+          return;
+        }
+
+        await sleep(3000);
       }
+    }
+
+    // Keep reading the trunk
+    that.setState({log: []});
+    const reader = res.body.getReader();
+
+    function readChunk() {
+      return reader.read().then(appendChunks);
+    }
+
+    function appendChunks(result) {
+      if (result.done)
+        return 'done';
+      const chunk = new TextDecoder().decode(result.value.buffer);
+      that.showNewLog(chunk);
 
       return readChunk();
-    })
-    .then(async () => {
-      const retryAfterFetched = await shouldRetryAfterFetched();
-      if (retryAfterFetched) {
-        setTimeout(() => {
-          this.fetchLog();
-        }, 10000);
-      }
-    })
-    .catch(err => {
-      if (err.message === 'The user aborted a request.') {
-        return;
-      }
-      console.log(err);
-      setTimeout(() => {
-        if (this.retryCount <= 5) {
-          this.retryCount += 1;
-          this.fetchLog();
-        } else {
-          console.log(`stop retrying fetching logs`);
-        }
-      }, 1000 * (this.retryCount + 1));
-    });
+    }
+
+    readChunk();
   }
 
   onScroll = ({
@@ -197,7 +228,12 @@ export default class Logs extends React.Component<Props, State> {
     const {endpoint} = this.props;
     const token = window.localStorage.getItem('canner.accessToken');
     this.setState({downloading: true});
-    fetch(`${endpoint}?follow=false`, {
+    let url = `${endpoint}?follow=false`;
+    if (this.state.fromPersist) {
+      url += '&persist=true';
+    }
+
+    fetch(url, {
       method: 'GET',
       headers: {
         'Authorization': 'Bearer ' + token
@@ -214,10 +250,25 @@ export default class Logs extends React.Component<Props, State> {
 
   render() {
     const {endpoint, rows = 40, style = {}} = this.props;
-    const {log, downloading} = this.state;
-    let hint_message = 'Please download the log to view more than 2000 lines.';
+    const {log, loading, downloading, fromPersist} = this.state;
+    const hints = [];
+    hints.push('Please download the log to view more than 2000 lines.');
+
+    let listItems = log;
+    if (listItems.length == 0) {
+      listItems = loading ? ['loading...'] : ['(no data)'];
+    }
+    const listStyle = {
+      background: 'black',
+      color: log.length > 0 ? '#ddd' : '#888',
+      fontFamily: 'monospace',
+      border: 0,
+    };
+
     if (endpoint.includes('phdeployments'))
-      hint_message += ' Timestamp reflects Universal Time Coordinated (UTC).';
+      hints.push('Timestamp reflects Universal Time Coordinated (UTC).');
+    if (fromPersist)
+      hints.push('The pod has been deleted so we retrieve the log from the persistence store. The content may delay for at most 1 hour.');
     return <>
       <div style={{float: 'right', marginBottom: 4, display: 'flex'}}>
         <Button
@@ -237,27 +288,27 @@ export default class Logs extends React.Component<Props, State> {
       </div>
       <div style={{position: 'relative', marginTop: 48, ...style}}>
         <Hint>
-          {hint_message}
+          {hints.map((hint) => (
+            <div style={{display: "flex"}}>
+              <Icon type="info-circle" theme="twoTone" style={{marginTop: 4}}/><div style={{marginLeft: 4, flex: "0 0 100%"}}>{hint}</div>
+            </div>))
+          }
         </Hint>
+
         <List
-          style={{
-            background: 'black',
-            color: '#ddd',
-            fontFamily: 'monospace',
-            border: 0,
-          }}
+          style={listStyle}
           onScroll={this.onScroll}
           ref={this.listRef}
           outerRef={this.outerRef}
           height={rows * LINE_HEIGHT}
-          itemCount={log.length}
+          itemCount={listItems.length}
           itemSize={LINE_HEIGHT}
         >
           {({index, style}) => <div key={index} style={{
             ...style,
             padding: '0px 12px',
             overflow: 'visible',
-          }}>{handleLong(log[index])}</div>}
+          }}>{handleLong(listItems[index])}</div>}
         </List>
       </div>
     </>;

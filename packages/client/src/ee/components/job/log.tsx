@@ -22,9 +22,11 @@ export default class JobLog extends React.Component<Props, State> {
 
   render() {
     const {endpoint} = this.props;
+    const enableLogPersistence = (window as any).enableLogPersistence || false;
     return (
       <Log
         endpoint={endpoint}
+        enableLogPersistence={enableLogPersistence}
         shouldRetryAfterFetched={this.shouldRetryAfterFetched}
       />
     );
