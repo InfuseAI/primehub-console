@@ -140,6 +140,7 @@ export const createConfig = (): Config => {
       process.env.PRIMEHUB_FEATURE_MODEL_DEPLOYMENT &&
       process.env.PRIMEHUB_FEATURE_MODEL_DEPLOYMENT.toString() === 'true',
     enableLogPersistence:
+      process.env.PRIMEHUB_FEATURE_LOG_PERSISTENCE &&
       process.env.PRIMEHUB_FEATURE_LOG_PERSISTENCE.toString() === 'true',
     licenseStatus: process.env.EXPIRED,
     maxGroup: process.env.MAX_GROUP
