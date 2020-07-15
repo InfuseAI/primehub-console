@@ -27,6 +27,7 @@ type PhDeployment {
   message: String
   name: String
   description: String
+  updateMessage: String
   metadata: JSON
   stop: Boolean
   userId: String
@@ -88,6 +89,7 @@ input PhDeploymentCreateInput {
   modelImage: String
   imagePullSecret: String
   description: String
+  updateMessage: String
   metadata: JSON
   groupId: String
   instanceType: String
@@ -99,6 +101,7 @@ input PhDeploymentUpdateInput {
   modelImage: String
   imagePullSecret: String
   description: String
+  updateMessage: String
   metadata: JSON
   instanceType: String
   endpointAccessType: String

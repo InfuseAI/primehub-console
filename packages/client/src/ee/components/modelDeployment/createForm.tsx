@@ -51,6 +51,7 @@ type FormValue = {
   imagePullSecret: string;
   metadata: object;
   description: string;
+  updateMessage: string;
   replicas: number;
   privateAccess: boolean;
   endpointAccessType: string;
