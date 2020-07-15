@@ -14,7 +14,7 @@ html
       window.refreshTokenExp = #{refreshTokenExp};
       window.newAccessToken = "#{newAccessToken}";
       window.EVERYONE_GROUP_ID = "#{everyoneGroupId}";
-      window.enableLogPersistence = "#{enableLogPersistence}";
+      window.enableLogPersistence = #{enableLogPersistence};
 
       if (window.newAccessToken) {
         console.log('using new access token');
