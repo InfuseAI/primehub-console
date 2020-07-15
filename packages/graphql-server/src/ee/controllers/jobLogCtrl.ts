@@ -66,7 +66,7 @@ export class JobLogCtrl {
       if (tailLines) {
         tail = parseInt(tailLines, 10);
       }
-      const prefix = `/logs/phjob/${jobId}`;
+      const prefix = `logs/phjob/${jobId}`;
       stream = await this.persistLog.getStream(prefix, {tailLines: tail});
     } else {
       stream = this.getStream(namespace, podName, {follow, tailLines});
