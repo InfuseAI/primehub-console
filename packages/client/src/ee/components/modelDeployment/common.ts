@@ -50,6 +50,7 @@ export interface DeploymentInfo {
   message: string;
   name: string;
   description: string;
+  updateMessage: string;
   metadata: object;
   groupId: string;
   groupName: string;
@@ -85,6 +86,7 @@ fragment PhDeploymentInfo on PhDeployment {
   message
   name
   description
+  updateMessage
   metadata
   groupId
   groupName
@@ -120,6 +122,7 @@ fragment PhDeploymentInfo on PhDeployment {
       replicas
       groupName
       description
+      updateMessage
       metadata
       endpointClients {
         name

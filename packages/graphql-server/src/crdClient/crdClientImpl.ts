@@ -193,6 +193,7 @@ export interface PhDeploymentSpec {
   groupName: string;
   stop: boolean;
   description: string;
+  updateMessage: string;
   updateTime: string;
   predictors: Array<{
     name: string;

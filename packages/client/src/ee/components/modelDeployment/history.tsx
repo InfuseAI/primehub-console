@@ -78,23 +78,19 @@ export default class History extends React.Component<Props, State> {
     const {visible, historyItem} = this.state;
     const {deployment = {}, time} = historyItem || {};
     const columns = [{
-      title: 'Description',
+      title: 'Update Message',
       dataIndex: 'deployment',
-      key: 'description',
+      key: 'updateMessage',
       width: 300,
       // ellipsis: true,
       render: deployment => (
-        deployment.stop ? (
-          <div>Deployment Stopped</div>
-        ): (
-          <Tooltip placement="topLeft" style={{...textOverflowStyle}} title={deployment.description}>
-            <div className="cell">
-              <div className="cell-overflow">
-                {deployment.description || '-'}
-              </div>
+        <Tooltip placement="topLeft" style={{...textOverflowStyle}} title={deployment.updateMessage}>
+          <div className="cell">
+            <div className="cell-overflow">
+              {deployment.updateMessage || '-'}
             </div>
-          </Tooltip>
-        )
+          </div>
+        </Tooltip>
       )
     }, {
       title: 'User',

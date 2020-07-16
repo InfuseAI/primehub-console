@@ -26,6 +26,7 @@ export interface PhDeployment {
   message: string;
   name: string;
   description: string;
+  updateMessage: string;
   metadata: Record<string, any>;
   stop: boolean;
   userId: string;
@@ -52,6 +53,7 @@ export interface PhDeploymentMutationInput {
   modelImage: string;
   imagePullSecret: string;
   description: string;
+  updateMessage: string;
   metadata: Record<string, any>;
   groupId: string;
   instanceType: string;
@@ -85,6 +87,7 @@ const transformSpec = (id: string, time: string, groupName: string, spec: any) =
     id: `${id}-${time}`,
     name: spec.displayName,
     description: spec.description,
+    updateMessage: spec.updateMessage,
     userId: spec.userId,
     userName: spec.userName,
     groupName,
@@ -129,6 +132,7 @@ export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>
     id: item.metadata.name,
     name: item.spec.displayName,
     description: item.spec.description,
+    updateMessage: item.spec.updateMessage,
     userId: item.spec.userId,
     userName: item.spec.userName,
     groupId: item.spec.groupId,
@@ -175,6 +179,7 @@ const createDeployment = async (context: Context, data: PhDeploymentMutationInpu
     groupName: group.name,
     stop: false,
     description: data.description,
+    updateMessage: data.updateMessage,
     predictors: [{
       name: 'predictor1',
       replicas: data.replicas,
@@ -397,6 +402,7 @@ export const update = async (root, args, context: Context) => {
     userName: username,
     displayName: data.name,
     description: data.description,
+    updateMessage: data.updateMessage,
     stop: false,
     predictors: [{
       name: 'predictor1',
@@ -429,6 +435,7 @@ export const deploy = async (root, args, context: Context) => {
     updateTime: moment.utc().toISOString(),
     userId,
     userName: username,
+    updateMessage: 'Deployment Started',
     stop: false
   } as any;
   const updated = await context.crdClient.phDeployments.patch(args.where.id, {spec});
@@ -449,6 +456,7 @@ export const stop = async (root, args, context: Context) => {
     updateTime: moment.utc().toISOString(),
     userId,
     userName: username,
+    updateMessage: 'Deployment Stopped',
     stop: true
   } as any;
   const updated = await context.crdClient.phDeployments.patch(args.where.id, {spec});
@@ -514,6 +522,7 @@ export const createClient = async (root, args, context: Context) => {
     userName: phDeployment.spec.userName,
     displayName: phDeployment.spec.displayName,
     description: phDeployment.spec.description,
+    updateMessage: 'Create the client ' + data.name,
     stop: phDeployment.spec.stop || false,
     predictors: [predictor],
     endpoint: {
@@ -553,6 +562,7 @@ export const destroyClient = async (root, args, context: Context) => {
     userName: phDeployment.spec.userName,
     displayName: phDeployment.spec.displayName,
     description: phDeployment.spec.description,
+    updateMessage: 'Delete the client ' + name,
     stop: phDeployment.spec.stop || false,
     predictors: [predictor],
     endpoint: {
