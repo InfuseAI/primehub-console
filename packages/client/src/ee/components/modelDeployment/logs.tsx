@@ -35,7 +35,7 @@ export default class ModelDeploymentLogs extends React.Component<Props, State> {
   render() {
     const {podName} = this.state;
     const {pods = []} = this.props;
-    const selectedPod = pods.find(pod => pod.name === podName);
+    const selectedPod = pods.find(pod => pod.name === podName) || {};
     return (
       <>
         <span>Replicas: </span>
