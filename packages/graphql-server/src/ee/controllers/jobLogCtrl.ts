@@ -57,7 +57,7 @@ export class JobLogCtrl {
     const {follow, tailLines, persist} = ctx.query;
     const namespace = ctx.params.namespace || this.namespace;
     const jobId = ctx.params.jobId;
-    const phjob = await this.crdClient.phJobs.get(jobId);
+    const phjob = await this.crdClient.phJobs.get(jobId, namespace);
     const podName = phjob.status.podName;
 
     let stream: Stream;
@@ -135,9 +135,3 @@ export class JobLogCtrl {
       .pods(podName).log.getStream({ qs: { container, follow, tailLines } });
   }
 }
-
-export const mount = (rootRouter: Router, middleware: any, ctrl: JobLogCtrl) => {
-  rootRouter.get(ctrl.getRoute(), middleware, ctrl.streamLogs);
-  rootRouter.get(ctrl.getPhJobRoute(), middleware, ctrl.streamPhJobLogs);
-  rootRouter.get(ctrl.getPhDeploymentRoute(), middleware, ctrl.streamPhDeploymentLogs);
-};
