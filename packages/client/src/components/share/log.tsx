@@ -268,7 +268,7 @@ export default class Logs extends React.Component<Props, State> {
     if (endpoint.includes('phdeployments'))
       hints.push('Timestamp reflects Universal Time Coordinated (UTC).');
     if (fromPersist)
-      hints.push('The pod has been deleted so we retrieve the log from the persistence store. The content may delay for at most 1 hour.');
+      hints.push('Log content may be delayed by up to 1 hour because the pod was deleted.');
     return <>
       <div style={{float: 'right', marginBottom: 4, display: 'flex'}}>
         <Button
