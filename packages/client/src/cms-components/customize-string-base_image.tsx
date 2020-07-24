@@ -98,8 +98,12 @@ export default class SelectString extends PureComponent<Props> {
           `${displayName} (GPU)`
         ];
       }
-      url_dict[`${displayName} (CPU)`] = url
-      return `${displayName} (CPU)`
+      else if (url) {
+        url_dict[`${displayName} (CPU)`] = url
+        return `${displayName} (CPU)`
+      }
+      url_dict[`${displayName} (GPU)`] = urlForGpu
+      return `${displayName} (GPU)`
     }))
     .filter(url => url.indexOf(searchText) > -1)
     .map((url, i) => {
