@@ -14,6 +14,7 @@ resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/ee/index.schema.
 module.exports = {
   entry: {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
+    'new-entry': './src/ee/new-entry.tsx',
     landing: './src/landing.tsx',
     job: devMode ? './src/ee/job.tsx' : ['./src/public-import.js', './src/ee/job.tsx'],
     'model-deployment': devMode ? './src/ee/modelDeployment.tsx' : ['./src/public-import.js', './src/ee/modelDeployment.tsx'],
@@ -37,6 +38,7 @@ module.exports = {
         { from: /^\/app-prefix\/schedule/, to: '/job.html' },
         { from: /^\/schedule/, to: '/job.html' },
         { from: /^\/app-prefix\/landing/, to: '/landing.html' },
+        { from: /^\/new-entry$/, to: '/new-entry.html' },
         { from: /^\/landing$/, to: '/landing.html' },
         { from: /^\/model-deployment/, to: '/model-deployment.html' },
         { from: /^\/app-prefix\/model-deployment/, to: './model-deployment.html' },
@@ -99,6 +101,11 @@ module.exports = {
       chunks: ['index'],
       template: 'docs/index.html',
       filename: 'index.html'
+    }),
+    new HtmlWebPackPlugin({
+      chunks: ['new-entry'],
+      template: 'docs/index.html',
+      filename: 'new-entry.html'
     }),
     new HtmlWebPackPlugin({
       chunks: ['landing'],
