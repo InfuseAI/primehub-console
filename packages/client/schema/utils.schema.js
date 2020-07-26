@@ -9,7 +9,7 @@ exports.GroupRelation = () => (
     relation={{
       to: 'group',
       type: 'toMany',
-      fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu', 'userVolumeCapacity']
+      fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu']
     }}
     uiParams={{
       columns: groupColumns,
