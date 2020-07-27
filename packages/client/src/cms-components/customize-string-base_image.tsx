@@ -35,6 +35,7 @@ query images($where: ImageWhereInput!) {
     id
     name
     displayName
+    type
     url
     urlForGpu
   }
@@ -89,8 +90,8 @@ export default class SelectString extends PureComponent<Props> {
     const {images, searchText} = this.state;
     const {style} = uiParams;
     const dataSource = uniq(flatMap(images, image => {
-      const {displayName, url, urlForGpu} = image;
-      if (urlForGpu && url !== urlForGpu) {
+      const {displayName, type, url, urlForGpu} = image;
+      if (type === 'both' && url !== urlForGpu) {
         url_dict[`${displayName} (CPU)`] = url
         url_dict[`${displayName} (GPU)`] = urlForGpu
         return [
@@ -98,12 +99,14 @@ export default class SelectString extends PureComponent<Props> {
           `${displayName} (GPU)`
         ];
       }
-      else if (url) {
+      else if (type === 'gpu') {
+        url_dict[`${displayName} (GPU)`] = url
+        return `${displayName} (GPU)`
+      }
+      else {
         url_dict[`${displayName} (CPU)`] = url
         return `${displayName} (CPU)`
       }
-      url_dict[`${displayName} (GPU)`] = urlForGpu
-      return `${displayName} (GPU)`
     }))
     .filter(url => url.indexOf(searchText) > -1)
     .map((url, i) => {
