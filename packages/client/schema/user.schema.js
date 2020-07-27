@@ -148,8 +148,8 @@ export default () => (
           <string keyName="username" title="${username}"
             validation={{
               validator: (value, cb) => {
-                if (!value.match(/^[a-z][-a-z0-9_.@]*$/)) {
-                  return cb(`only lower case alphanumeric characters, '-', '.', and underscores ("_") are allowed, and must start with a letter.`);
+                if (!value.match(/^[a-z0-9][-a-z0-9_.@]*$/)) {
+                  return cb(`Only lower case alphanumeric characters, '-', '.', and underscores ("_") are allowed, and must start with a letter or numeric.`);
                 }
               }
             }}
