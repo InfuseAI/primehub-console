@@ -22,6 +22,7 @@ export default () => (
         title: "${group.sharedVolumeCapacity}",
         dataIndex: 'sharedVolumeCapacity',
         sorter: true,
+        visible: !modelDeploymentOnly,
         render: (value) => {
           if (value) {
             return `${value}G`
@@ -32,18 +33,18 @@ export default () => (
         title: '${cpuQuotaListTitle}',
         dataIndex: 'quotaCpu',
         sorter: true,
+        visible: !modelDeploymentOnly,
         render: text => {
           return text === null ? '∞' : text;
         },
-        visible: !modelDeploymentOnly
       }, {
         title: '${gpuQuotaListTitle}',
         dataIndex: 'quotaGpu',
         sorter: true,
+        visible: !modelDeploymentOnly,
         render: text => {
           return text === null ? '∞' : text;
         },
-        visible: !modelDeploymentOnly
       }, {
         title: '${projectCpuQuota}',
         dataIndex: 'projectQuotaCpu',

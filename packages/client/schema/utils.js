@@ -37,13 +37,8 @@ export const groupColumns = [{
     return text === null ? '∞' : text;
   },
   visible: !modelDeploymentOnly
-}, {
-  title: '${userVolumeCapacity}',
-  dataIndex: 'userVolumeCapacity',
-  render: text => {
-    return text === null ? '-' : text;
-  }
-}];
+}
+];
 
 export const groupPickerColumns =  [{
   title: '${name}',
