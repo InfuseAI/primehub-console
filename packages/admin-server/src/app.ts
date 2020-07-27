@@ -190,6 +190,14 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     });
   });
 
+  // hub
+  rootRouter.get('/hub', oidcCtrl.loggedIn, async ctx => {
+    await ctx.render('hub', {
+      title: 'PrimeHub Jupterhub',
+      staticPath
+    });
+  });
+
   // job
   rootRouter.get('/job', oidcCtrl.loggedIn, async ctx => {
     await ctx.render('job', {

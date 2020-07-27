@@ -18,6 +18,7 @@ module.exports = {
     job: devMode ? './src/ee/job.tsx' : ['./src/public-import.js', './src/ee/job.tsx'],
     'model-deployment': devMode ? './src/ee/modelDeployment.tsx' : ['./src/public-import.js', './src/ee/modelDeployment.tsx'],
     'api-token': './src/apiToken.tsx',
+    'hub': './src/hub.tsx',
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -42,6 +43,8 @@ module.exports = {
         { from: /^\/app-prefix\/model-deployment/, to: './model-deployment.html' },
         { from: /^\/api-token$/, to: '/api-token.html' },
         { from: /^\/app-prefix\/api-token$/, to: './api-token.html' },
+        { from: /^\/hub$/, to: '/hub.html' },
+        { from: /^\/app-prefix\/hub$/, to: './hub.html' },
         { from: /./, to: '/index.html' }
       ]
     }
@@ -119,6 +122,11 @@ module.exports = {
       chunks: ['api-token'],
       template: 'docs/index.html',
       filename: 'api-token.html'
+    }),
+    new HtmlWebPackPlugin({
+      chunks: ['hub'],
+      template: 'docs/index.html',
+      filename: 'hub.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({
