@@ -11,8 +11,7 @@ import Sidebar from 'components/hub/sidebar';
 import styled from 'styled-components';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import {appPrefix} from 'utils/env';
-import Home from 'components/hub/home';
-import Admin from 'components/hub/admin';
+import HubIframe from 'components/hub/iframe';
 const HEADER_HEIGHT = 64;
 
 const Content = styled(Layout.Content)`
@@ -44,7 +43,7 @@ const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
   {connector, schema: {}});
 
-class Job extends React.Component {
+class Hub extends React.Component {
   render() {
     return (
       <BrowserRouter>
@@ -56,14 +55,25 @@ class Job extends React.Component {
                 <ApolloProvider client={client}>
                   <Switch>
                     <Route
-                      path={`${appPrefix}hub/home`}
+                      path={`${appPrefix}hub/phusers`}
                       exact
-                      component={Home}
+                      render={(props) => (
+                        <HubIframe {...props} src="/hub/primehub/home?group=phusers"></HubIframe>
+                      )}
+                    />
+                    <Route
+                      path={`${appPrefix}hub/test`}
+                      exact
+                      render={(props) => (
+                        <HubIframe {...props} src="/hub/primehub/home?group=test"></HubIframe>
+                      )}
                     />
                     <Route
                       path={`${appPrefix}hub/admin`}
                       exact
-                      component={Admin}
+                      render={(props) => (
+                        <HubIframe {...props} src="/hub/admin"></HubIframe>
+                      )}
                     />
                   </Switch>
                 </ApolloProvider>
@@ -123,5 +133,5 @@ tokenSyncWorker.run().catch(console.error);
 
 // render
 ReactDOM.render(
-  <Job />
+  <Hub />
 , document.getElementById('root'));

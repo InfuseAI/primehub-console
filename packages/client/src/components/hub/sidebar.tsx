@@ -15,9 +15,14 @@ class Sidebar extends React.Component<Props> {
           theme="dark"
           selectedKeys={[key]}
         >
-          <Menu.Item key="JupyterHub">
-            <Link to={`${appPrefix}hub/home`}>
-              JupyterHub
+          <Menu.Item key="JupyterHub (phusers)">
+            <Link to={`${appPrefix}hub/phusers`}>
+              JupyterHub (phusers)
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="JupyterHub (test)">
+            <Link to={`${appPrefix}hub/test`}>
+              JupyterHub (test)
             </Link>
           </Menu.Item>
           <Menu.Item key="JupyterHubAdmin">
