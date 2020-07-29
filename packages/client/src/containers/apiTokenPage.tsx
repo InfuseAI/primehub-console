@@ -100,7 +100,7 @@ class ApiTokenPage extends React.Component<Props, State> {
   }
 
   render = () => {
-    const example = `API_TOKEN="${this.apiToken ? this.apiToken : '<API TOKEN>'}"
+    const example = `\nAPI_TOKEN="${this.apiToken ? this.apiToken : '<API TOKEN>'}"
 
 curl -X POST \\
     -H 'Content-Type: application/json' \\
@@ -151,7 +151,7 @@ curl -X POST \\
               fontFamily: 'monospace',
             }}
             ref={this.refExample}
-            rows={8}
+            rows={9}
             value={example}
           />
         </Card>
