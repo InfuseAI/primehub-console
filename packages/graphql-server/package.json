@@ -76,6 +76,7 @@
     "p-is-promise": "^2.0.0",
     "pluralize": "^7.0.0",
     "pug": "^2.0.3",
+    "request": "^2.88.2",
     "shortid": "^2.2.14",
     "split": "^1.0.1",
     "uuid": "^3.3.3"
