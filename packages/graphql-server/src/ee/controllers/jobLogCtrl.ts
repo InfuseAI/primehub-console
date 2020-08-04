@@ -1,10 +1,11 @@
 import Router from 'koa-router';
-import CrdClientImpl, { client as kubeClient } from '../../crdClient/crdClientImpl';
+import CrdClientImpl, { kubeConfig, client as kubeClient } from '../../crdClient/crdClientImpl';
 import { ParameterizedContext } from 'koa';
-import { Stream, Readable } from 'stream';
+import { Stream, PassThrough } from 'stream';
 import { get } from 'lodash';
 import * as logger from '../../logger';
 import PersistLog from '../../utils/persistLog';
+import { Log } from '@kubernetes/client-node';
 
 const MODEL = 'model';
 
@@ -127,11 +128,22 @@ export class JobLogCtrl {
   private getStream = (
     namespace: string,
     podName: string,
-    options?: {follow?: number, tailLines?: number, container?: string}): Stream => {
+    options?: {follow?: boolean, tailLines?: number, container?: string}): Stream => {
     const container = get(options, 'container');
     const follow = get(options, 'follow', true);
     const tailLines = get(options, 'tailLines');
-    return this.kubeClient.api.v1.namespaces(namespace)
-      .pods(podName).log.getStream({ qs: { container, follow, tailLines } });
+
+    // Use the 'kubernetes@client-nodes' Log API to tail the log.
+    // https://github.com/kubernetes-client/javascript/blob/0.11.1/src/log.ts
+    const logApi = new Log(kubeConfig);
+    const pass = new PassThrough();
+    // tslint:disable-next-line: no-empty
+    const done = (err: any) => {};
+
+    logApi.log(namespace, podName, container, pass, done, {
+      follow,
+      tailLines
+    });
+    return pass;
   }
 }
