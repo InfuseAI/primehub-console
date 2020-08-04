@@ -1,11 +1,11 @@
 import Router from 'koa-router';
 import CrdClientImpl, { kubeConfig, client as kubeClient } from '../../crdClient/crdClientImpl';
 import { ParameterizedContext } from 'koa';
-import { Stream, PassThrough } from 'stream';
+import { Stream } from 'stream';
 import { get } from 'lodash';
 import * as logger from '../../logger';
 import PersistLog from '../../utils/persistLog';
-import { Log } from '@kubernetes/client-node';
+import request from 'request';
 
 const MODEL = 'model';
 
@@ -134,16 +134,27 @@ export class JobLogCtrl {
     const tailLines = get(options, 'tailLines');
 
     // Use the 'kubernetes@client-nodes' Log API to tail the log.
-    // https://github.com/kubernetes-client/javascript/blob/0.11.1/src/log.ts
-    const logApi = new Log(kubeConfig);
-    const pass = new PassThrough();
-    // tslint:disable-next-line: no-empty
-    const done = (err: any) => {};
+    // Ref: https://github.com/kubernetes-client/javascript/blob/0.11.1/src/log.ts
+    const path = `/api/v1/namespaces/${namespace}/pods/${podName}/log`;
 
-    logApi.log(namespace, podName, container, pass, done, {
-      follow,
-      tailLines
-    });
-    return pass;
+    const cluster = kubeConfig.getCurrentCluster();
+    if (!cluster) {
+        throw new Error('No currently active cluster');
+    }
+    const url = cluster.server + path;
+
+    const requestOptions: request.Options = {
+        method: 'GET',
+        qs: {
+          container,
+          follow,
+          tailLines,
+        },
+        uri: url,
+    };
+
+    kubeConfig.applyToRequest(requestOptions);
+
+    return request(requestOptions);
   }
 }
