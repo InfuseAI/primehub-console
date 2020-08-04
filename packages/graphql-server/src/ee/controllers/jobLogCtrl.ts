@@ -138,7 +138,16 @@ export class JobLogCtrl {
     const logApi = new Log(kubeConfig);
     const pass = new PassThrough();
     // tslint:disable-next-line: no-empty
-    const done = (err: any) => {};
+    const done = (err: any) => {
+      if (err) {
+        if (typeof err === 'string') {
+          pass.write(err);
+        } else if (err.stack && err.message) {
+          pass.destroy(err);
+        }
+        pass.end();
+      }
+    };
 
     logApi.log(namespace, podName, container, pass, done, {
       follow,
