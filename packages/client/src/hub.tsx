@@ -4,7 +4,7 @@ import {ApolloProvider} from 'react-apollo';
 import {genClient} from 'canner/lib/components/index';
 import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlClient';
 import {LocalStorageConnector} from 'canner-graphql-interface';
-import {Layout, notification, Button} from 'antd';
+import {Layout, notification, Button, Skeleton} from 'antd';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import Header from 'components/header';
 import Sidebar from 'components/hub/sidebar';
@@ -65,45 +65,21 @@ class Hub extends React.Component {
             <Content>
                 <ApolloProvider client={client}>
                   <Switch>
+                    <Route path={`${appPrefix}console`} exact>
+                      <Skeleton />
+                    </Route>
+                    <Route path={`${appPrefix}console/g/:groupId/:actionKey`} exact>
+                      <Skeleton />
+                    </Route>
                     <Route path={`${appPrefix}model-deployment`} exact>
-                      <ListContainer Com={ModelDeploymentListContainer} />
-                    </Route>
-                    <Route path={`${appPrefix}model-deployment/create`} exact>
-                      <DeploymentCreatePage />
-                    </Route>
-                    <Route
-                      path={`${appPrefix}model-deployment/:deploymentId`}
-                      exact
-                      component={DeploymentDetailContainer}
-                    />
-                    <Route
-                      path={`${appPrefix}model-deployment/edit/:deploymentId`}
-                      exact
-                    >
-                      <DeploymentEditPage />
+                      <Skeleton />
                     </Route>
                     <Route path={`${appPrefix}job`} exact>
-                      <ListContainer Com={JobListContainer} />
+                      <Skeleton />
                     </Route>
-                    <Route path={`${appPrefix}job/create`} exact>
-                      <JobCreatePage />
-                    </Route>
-                    <Route
-                      path={`${appPrefix}job/:jobId`}
-                      exact
-                      component={JobDetailContainer}
-                    />
                     <Route path={`${appPrefix}schedule`} exact>
-                      <ListContainer Com={ScheduleListContainer} />
+                      <Skeleton />
                     </Route>
-                    <Route path={`${appPrefix}schedule/create`} exact>
-                      <ScheduleCreatePage />
-                    </Route>
-                    <Route
-                      path={`${appPrefix}schedule/:scheduleId`}
-                      exact
-                      component={ScheduleDetailContainer}
-                    />
                     <Route
                       path={`${appPrefix}hub/phusers`}
                       exact

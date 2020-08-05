@@ -14,12 +14,11 @@ resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/ee/index.schema.
 module.exports = {
   entry: {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
-    'new-entry': './src/ee/new-entry.tsx',
     landing: './src/landing.tsx',
     job: devMode ? './src/ee/job.tsx' : ['./src/public-import.js', './src/ee/job.tsx'],
     'model-deployment': devMode ? './src/ee/modelDeployment.tsx' : ['./src/public-import.js', './src/ee/modelDeployment.tsx'],
     'api-token': './src/apiToken.tsx',
-    'hub': './src/hub.tsx',
+    'console': './src/hub.tsx',
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -39,14 +38,13 @@ module.exports = {
         { from: /^\/app-prefix\/schedule/, to: '/job.html' },
         { from: /^\/schedule/, to: '/job.html' },
         { from: /^\/app-prefix\/landing/, to: '/landing.html' },
-        { from: /^\/new-entry$/, to: '/new-entry.html' },
         { from: /^\/landing$/, to: '/landing.html' },
         { from: /^\/model-deployment/, to: '/model-deployment.html' },
         { from: /^\/app-prefix\/model-deployment/, to: './model-deployment.html' },
         { from: /^\/api-token$/, to: '/api-token.html' },
         { from: /^\/app-prefix\/api-token$/, to: './api-token.html' },
-        { from: /^\/hub$/, to: '/hub.html' },
-        { from: /^\/app-prefix\/hub$/, to: './hub.html' },
+        { from: /^\/console$/, to: '/console.html' },
+        { from: /^\/app-prefix\/console$/, to: './console.html' },
         { from: /./, to: '/index.html' }
       ]
     }
@@ -106,11 +104,6 @@ module.exports = {
       filename: 'index.html'
     }),
     new HtmlWebPackPlugin({
-      chunks: ['new-entry'],
-      template: 'docs/index.html',
-      filename: 'new-entry.html'
-    }),
-    new HtmlWebPackPlugin({
       chunks: ['landing'],
       template: 'docs/index.html',
       filename: 'landing.html'
@@ -131,9 +124,9 @@ module.exports = {
       filename: 'api-token.html'
     }),
     new HtmlWebPackPlugin({
-      chunks: ['hub'],
+      chunks: ['console'],
       template: 'docs/index.html',
-      filename: 'hub.html'
+      filename: 'console.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({
