@@ -94,6 +94,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
       // tslint:disable-next-line:max-line-length
       changePasswordLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account/password?referrer=${config.keycloakClientId}&referrer_uri=${referrer}`,
       apiTokenLink: config.appPrefix ? `${config.appPrefix}/api-token` : '/api-token',
+      adminPortalLink: config.appPrefix ? `${config.appPrefix}/cms` : '/cms',
       logoutLink: config.appPrefix ? `${config.appPrefix}/oidc/logout` : '/oidc/logout',
     });
     return next();

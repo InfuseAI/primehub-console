@@ -40,6 +40,7 @@ export default class HeaderContainer extends React.Component<Props, {}> {
       userProfileLink: '',
       changePasswordLink: '',
       apiTokenLink: '/api-token',
+      adminPortalLink: '/cms',
       logoutLink: '',
     }
     switch (item.key) {
@@ -55,6 +56,10 @@ export default class HeaderContainer extends React.Component<Props, {}> {
         (window as any).location.href = links.apiTokenLink;
         break;
       }
+      case 'adminPortal': {
+        (window as any).location.href = links.adminPortalLink;
+        break;
+      }
       case 'logout': {
         (window as any).location.href = links.logoutLink;
       }
@@ -64,6 +69,7 @@ export default class HeaderContainer extends React.Component<Props, {}> {
   render() {
     const {pagePadding} = this.props;
     const thumbnail = (window as any).thumbnail;
+    const isUserAdmin = (window as any).isUserAdmin;
     return (
       <Header pagePadding={pagePadding}>
         <a href="/" style={{display: "flex"}}>
@@ -86,6 +92,9 @@ export default class HeaderContainer extends React.Component<Props, {}> {
             </Menu.Item>
             <Menu.Item key="apiToken">
               API Token
+            </Menu.Item>
+            <Menu.Item key="adminPortal" style={{display: isUserAdmin? undefined : 'none'}}>
+              Admin Portal
             </Menu.Item>
             <Menu.Item key="logout" style={{borderTop: '1px solid #f1f1f1'}}>
               Logout
