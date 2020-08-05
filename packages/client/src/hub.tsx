@@ -5,7 +5,7 @@ import {genClient} from 'canner/lib/components/index';
 import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlClient';
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {Layout, notification, Button, Skeleton} from 'antd';
-import {BrowserRouter, Route, Switch} from 'react-router-dom';
+import {BrowserRouter, Router, Route, Switch} from 'react-router-dom';
 import Header from 'components/header';
 import Sidebar from 'components/hub/sidebar';
 import styled from 'styled-components';
@@ -23,7 +23,10 @@ import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
+import { createBrowserHistory } from 'history';
 const HEADER_HEIGHT = 64;
+
+const history = createBrowserHistory();
 
 const Content = styled(Layout.Content)`
   margin-top: ${HEADER_HEIGHT}px;
@@ -121,12 +124,17 @@ const client = genClient(process.env.NODE_ENV === 'production' ?
   {connector, schema: {}});
 
 class Hub extends React.Component {
+  onSelectGroup (id) {
+    history.push(`${(window as any).APP_PREFIX}console/g/${id}/home`);
+  }
+
   render() {
     return (
-      <BrowserRouter>
+      <Router history={history}>
         <Layout>
           <Header
             groups={fakeData.groups}
+            onSelectGroup={this.onSelectGroup}
           />
           <Layout>
             <Sidebar />
@@ -174,7 +182,7 @@ class Hub extends React.Component {
             </Content>
           </Layout>
         </Layout>
-      </BrowserRouter>
+      </Router>
     )
   }
 }
