@@ -43,8 +43,8 @@ module.exports = {
         { from: /^\/app-prefix\/model-deployment/, to: './model-deployment.html' },
         { from: /^\/api-token$/, to: '/api-token.html' },
         { from: /^\/app-prefix\/api-token$/, to: './api-token.html' },
-        { from: /^\/console$/, to: '/console.html' },
-        { from: /^\/app-prefix\/console$/, to: './console.html' },
+        { from: /^\/console/, to: '/console.html' },
+        { from: /^\/app-prefix\/console/, to: './console.html' },
         { from: /./, to: '/index.html' }
       ]
     }
