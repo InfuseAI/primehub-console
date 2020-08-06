@@ -80,6 +80,8 @@ export interface Config {
 
   // log persistence
   enableLogPersistence: boolean;
+
+  usageReportAPIHost: string;
 }
 
 const defaultConfigs = {
@@ -112,6 +114,7 @@ const defaultConfigs = {
   graphqlHost: 'http://localhost:3001',
   enableStore: false,
   enableLogPersistence: false,
+  usageReportAPIHost: 'http://localhost:5000'
 };
 
 const prodConfigs = {
@@ -192,6 +195,7 @@ export const createConfig = (): Config => {
     enableLogPersistence:
       process.env.PRIMEHUB_FEATURE_LOG_PERSISTENCE &&
       process.env.PRIMEHUB_FEATURE_LOG_PERSISTENCE.toString() === 'true',
+    usageReportAPIHost: process.env.PRIMEHUB_USAGE_REPORT_API_HOST
   });
 
   const env = process.env.NODE_ENV || 'development';
