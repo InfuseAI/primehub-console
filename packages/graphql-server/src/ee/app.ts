@@ -14,8 +14,9 @@ import { makeExecutableSchema, mergeSchemas } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
 import WorkspaceApi from '../workspace/api';
 import { keycloakMaxCount } from '../resolvers/constant';
+import request from 'request';
 
-import CrdClient, { InstanceTypeSpec, ImageSpec, client as kubeClient } from '../crdClient/crdClientImpl';
+import CrdClient, { InstanceTypeSpec, ImageSpec, client as kubeClient, kubeConfig } from '../crdClient/crdClientImpl';
 import * as system from '../resolvers/system';
 import * as user from '../resolvers/user';
 import * as group from '../resolvers/group';
@@ -706,6 +707,51 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   rootRouter.get('/health', async ctx => {
     ctx.status = 200;
   });
+
+  rootRouter.get('/report/monthly', authenticateMiddleware, checkIsAdmin,
+    async ctx => {
+      const requestOptions: request.Options = {
+        method: 'GET',
+        uri: config.usageReportAPIHost + '/report/monthly',
+      };
+      kubeConfig.applyToRequest(requestOptions);
+      const req = request(requestOptions);
+
+      req.on('error', err => {
+        logger.error({
+          component: logger.components.internal,
+          type: 'USAGE_REPORT_LIST_ERROR',
+          message: err.message
+        });
+        ctx.res.end();
+      });
+
+      ctx.body = req;
+    }
+  );
+
+  rootRouter.get('/report/monthly/:month/:day', authenticateMiddleware, checkIsAdmin,
+    async ctx => {
+      const requestOptions: request.Options = {
+        method: 'GET',
+        uri: config.usageReportAPIHost + '/report/monthly/' + ctx.params.month + '/' + ctx.params.day,
+      };
+      kubeConfig.applyToRequest(requestOptions);
+      const req = request(requestOptions);
+
+      req.on('error', err => {
+        logger.error({
+          component: logger.components.internal,
+          type: 'USAGE_REPORT_GET_REPORT_ERROR',
+          message: err.message
+        });
+        ctx.res.end();
+      });
+
+      ctx.body = req;
+    }
+  );
+
   app.use(rootRouter.routes());
   server.applyMiddleware({ app, path: config.appPrefix ? `${config.appPrefix}/graphql` : '/graphql' });
   return {app, server, config};
