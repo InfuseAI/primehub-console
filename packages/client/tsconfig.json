@@ -9,7 +9,9 @@
       "images/*": ["./src/images/*"],
       "components/*": ["./src/components/*"],
       "containers/*": ["./src/containers/*"],
-      "styledShare/*": ["./src/styled_share/*"]
+      "styledShare/*": ["./src/styled_share/*"],
+      "context/*": ["./src/context/*"],
+      "ee/*": ["./src/ee/*"]
     }
   },
   "exclude": ["dist", "build", "node_modules"]

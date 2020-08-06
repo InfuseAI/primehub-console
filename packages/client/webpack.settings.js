@@ -22,6 +22,7 @@ module.exports = {
       images: path.resolve(__dirname, 'src/images'),
       components: path.resolve(__dirname, 'src/components'),
       containers: path.resolve(__dirname, 'src/containers'),
+      context: path.resolve(__dirname, 'src/context'),
       ee: path.resolve(__dirname, 'src/ee'),
       root: path.resolve(__dirname, 'src'),
       schema: path.resolve(__dirname, 'schema')

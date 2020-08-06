@@ -8,6 +8,7 @@ import {withRouter} from 'react-router';
 import {RouteComponentProps} from 'react-router-dom';
 import withPath, { PathComponentProps } from 'ee/components/job/withPath';
 import {appPrefix} from 'utils/env';
+import {withGroupContext, GroupContextComponentProps} from 'context/group';
 
 export const GroupFragment = gql`
   fragment GroupInfo on Group {
@@ -34,7 +35,8 @@ type Props = {
   getMyGroups: any;
   Com: any;
 } & RouteComponentProps
-  & PathComponentProps;
+  & PathComponentProps
+  & GroupContextComponentProps;
 
 class ListContainer extends React.Component<Props> {
   render() {
@@ -60,6 +62,7 @@ class ListContainer extends React.Component<Props> {
 export default compose(
   withRouter,
   withPath,
+  withGroupContext,
   graphql(GET_MY_GROUPS, {
     name: 'getMyGroups',
     options: (props: Props) => ({
