@@ -18,6 +18,7 @@ import ScheduleDetailContainer from 'ee/containers/scheduleDetail';
 import ScheduleCreatePage from 'ee/containers/scheduleCreatePage';
 import ScheduleListContainer from 'ee/containers/scheduleList';
 import {appPrefix} from 'utils/env';
+import { GroupContext, GroupContextValue } from 'context/group';
 const HEADER_HEIGHT = 64;
 
 const Content = styled(Layout.Content)`
@@ -224,6 +225,8 @@ const client = genClient(process.env.NODE_ENV === 'production' ?
 
 class Job extends React.Component {
   render() {
+    const groupContext: GroupContextValue = JSON.parse(window.localStorage.getItem("group-context"));
+
     return (
       <BrowserRouter>
         <Layout>
@@ -231,6 +234,7 @@ class Job extends React.Component {
           <Layout>
             <Sidebar />
             <Content>
+              <GroupContext.Provider value={groupContext}>
                 <ApolloProvider client={client}>
                   <Switch>
                     <Route path={`${appPrefix}job`} exact>
@@ -257,6 +261,7 @@ class Job extends React.Component {
                     />
                   </Switch>
                 </ApolloProvider>
+              </GroupContext.Provider>
             </Content>
           </Layout>
         </Layout>
