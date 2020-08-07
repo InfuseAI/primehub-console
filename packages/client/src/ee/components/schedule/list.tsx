@@ -10,10 +10,10 @@ import {Group} from '../shared/groupFilter';
 import Pagination from 'components/share/pagination';
 import ScheduleBreadCrumb from './breadcrumb';
 import {renderRecurrence} from './recurrence';
-import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
+import { GroupContextComponentProps } from 'context/group';
 
 const {confirm} = Modal;
 
@@ -60,7 +60,7 @@ type JobsConnection = {
   }>
 }
 
-type Props = RouteComponentProps & {
+type Props = RouteComponentProps & GroupContextComponentProps & {
   groups: Array<Group>;
   schedulesLoading: boolean;
   schedulesError: any;
@@ -103,7 +103,7 @@ class ScheduleList extends React.Component<Props> {
 
   editJob = (id: string) => {
     const {history, location} = this.props;
-    history.push(`${appPrefix}schedule/${id}`, {
+    history.push(`schedule/${id}`, {
       prevPathname: location.pathname,
       prevSearch: location.search,
     });
@@ -111,15 +111,18 @@ class ScheduleList extends React.Component<Props> {
 
   scheduleJob = () => {
     const {history} = this.props;
-    history.push(`${appPrefix}schedule/create`);
+    history.push(`schedule/create`);
   }
 
   refresh = () => {
-    const {schedulesVariables, schedulesRefetch} = this.props;
+    const {groupContext, schedulesVariables, schedulesRefetch} = this.props;
     const newVariables = {
       ...schedulesVariables,
       page: 1,
     };
+    if (groupContext && newVariables.where) {
+      newVariables.where.group_in = undefined;
+    }
     schedulesRefetch(newVariables);
   }
 
@@ -130,15 +133,16 @@ class ScheduleList extends React.Component<Props> {
     selectedGroups: Array<string>;
     submittedByMe: boolean;
   }) => {
-    const {schedulesVariables, schedulesRefetch} = this.props;
+    const {groupContext, schedulesVariables, schedulesRefetch} = this.props;
     const newVariables = {
       ...schedulesVariables,
       where: {
         ...schedulesVariables.where,
-        groupId_in: selectedGroups,
+        group_in: groupContext ? undefined : selectedGroups,
         mine: submittedByMe,
       }
     };
+
     schedulesRefetch(newVariables);
   }
 
@@ -156,7 +160,7 @@ class ScheduleList extends React.Component<Props> {
 
 
   render() {
-    const {groups, schedulesConnection, schedulesLoading, schedulesVariables, deletePhScheduleResult, runPhScheduleResult} = this.props;
+    const {groupContext, groups, schedulesConnection, schedulesLoading, schedulesVariables, deletePhScheduleResult, runPhScheduleResult} = this.props;
     const renderAction = (id: string, record) => {
       return (
         <Button.Group>
@@ -214,6 +218,7 @@ class ScheduleList extends React.Component<Props> {
             </div>
           </div>
           <Filter
+            groupContext={groupContext}
             groups={groups}
             selectedGroups={get(schedulesVariables, 'where.groupId_in', [])}
             submittedByMe={get(schedulesVariables, 'where.mine', false)}

@@ -6,10 +6,11 @@ import {FilterRow, FilterPlugins, ButtonCol} from 'root/cms-toolbar/filter';
 import {Label} from 'root/cms-toolbar/share';
 
 type Props = {
+  groupContext?: any;
   groups: Group[];
   selectedGroups: Array<string>;
   submittedByMe: boolean;
-  labelSubmittedByMe: string;
+  labelSubmittedByMe?: string;
   onChange: ({
     selectedGroups,
     submittedByMe
@@ -41,20 +42,31 @@ export default class Filter extends React.Component<Props> {
   }
 
   render() {
-    const {groups, selectedGroups, submittedByMe, labelSubmittedByMe} = this.props;
+    const {groupContext, groups, selectedGroups, submittedByMe, labelSubmittedByMe} = this.props;
+
+    const filterComps = []
+    if( !groupContext ) {
+      // Not in group context
+      filterComps.push(<Col style={{flex: 1}}>
+        <FilterPlugins style={{marginRight: 0}}>
+          <Label>Group</Label>
+          <GroupFilter
+            groups={groups}
+            selectedGroups={selectedGroups}
+            onChange={this.handleSelectedGroupsChange}
+          />
+        </FilterPlugins>
+      </Col>);
+      filterComps.push(
+        <div style={{borderLeft: '1px solid #d9d9d9', margin: '0px 8px 2px', height: 28}} />
+      )
+    } else {
+      filterComps.push(<Col style={{flex: 1}} />);
+    }
+
     return (
       <FilterRow type="flex" justify="space-between" align="bottom" style={{marginBottom: 16, marginTop: 16}}>
-        <Col style={{flex: 1}}>
-          <FilterPlugins style={{marginRight: 0}}>
-            <Label>Group</Label>
-            <GroupFilter
-              groups={groups}
-              selectedGroups={selectedGroups}
-              onChange={this.handleSelectedGroupsChange}
-            />
-          </FilterPlugins>
-        </Col>
-        <div style={{borderLeft: '1px solid #d9d9d9', margin: '0px 8px 2px', height: 28}} />
+        { ...filterComps }
         <ButtonCol>
           <Checkbox
             style={{

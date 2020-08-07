@@ -13,6 +13,7 @@ import JobBreadcrumb from '../components/job/breadcrumb';
 import {GroupFragment} from 'containers/list';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
+import { withGroupContext, GroupContextComponentProps } from 'context/group';
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -53,8 +54,8 @@ const sortItems = (items) => {
   return copiedItems;
 }
 
-type Props = RouteComponentProps & {
-  getGroups: any; 
+type Props = RouteComponentProps & GroupContextComponentProps & {
+  getGroups: any;
   createPhJob: any;
   createPhJobResult: any;
   defaultValue?: object;
@@ -86,10 +87,12 @@ class JobCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {getGroups, createPhJobResult, defaultValue} = this.props;
+    const {groupContext, getGroups, createPhJobResult, defaultValue} = this.props;
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
-    const groups = allGroups.filter(group => group.id !== everyoneGroupId);
+    const groups = allGroups
+      .filter(group => group.id !== everyoneGroupId)
+      .filter(group => !groupContext || groupContext.id === group.id );
     const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
     const group = groups
       .find(group => group.id === selectedGroup);
@@ -132,6 +135,7 @@ class JobCreatePage extends React.Component<Props, State> {
             </Row>
           ) : (
             <JobCreateForm
+              groupContext={groupContext}
               initialValue={defaultValue}
               onSelectGroup={this.onChangeGroup}
               selectedGroup={selectedGroup}
@@ -142,7 +146,7 @@ class JobCreatePage extends React.Component<Props, State> {
               loading={createPhJobResult.loading}
             />
           )}
-          
+
         </div>
       </React.Fragment>
     );
@@ -151,6 +155,7 @@ class JobCreatePage extends React.Component<Props, State> {
 
 export default compose(
   withRouter,
+  withGroupContext,
   graphql(GET_MY_GROUPS, {
     name: 'getGroups'
   }),

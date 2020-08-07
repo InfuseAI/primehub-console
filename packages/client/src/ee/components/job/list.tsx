@@ -14,6 +14,7 @@ import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
+import { GroupContextComponentProps } from 'context/group';
 
 const {confirm} = Modal;
 
@@ -34,7 +35,7 @@ const renderJobName = (text, record) => (
         prevPathname: location.pathname,
         prevSearch: location.search,
       },
-      pathname: `${appPrefix}job/${record.id}`
+      pathname: `job/${record.id}`
     }} >
       {text}
     </Link>
@@ -42,7 +43,7 @@ const renderJobName = (text, record) => (
 );
 
 const renderSchedule = text => text ? (
-  <Link to={`${appPrefix}schedule/${text}`}>
+  <Link to={`schedule/${text}`}>
     {text}
   </Link>
 ) : '-'
@@ -70,7 +71,7 @@ const getCreateTimeAndFinishTime = (startTime, finishTime, phase: Phase) => {
         startTime: renderTimeIfValid(startTime),
         finishTime: '-'
       };
-  
+
     default:
       return {
         startTime: renderTimeIfValid(startTime),
@@ -130,7 +131,7 @@ type JobsConnection = {
   }>
 }
 
-type Props = RouteComponentProps & {
+type Props = RouteComponentProps & GroupContextComponentProps & {
   groups: Array<Group>;
   jobsLoading: boolean;
   jobsError: any;
@@ -188,15 +189,18 @@ class JobList extends React.Component<Props> {
 
   createPhJob = () => {
     const {history} = this.props;
-    history.push(`${appPrefix}job/create`);
+    history.push(`job/create`);
   }
 
   refresh = () => {
-    const {jobsVariables, jobsRefetch} = this.props;
+    const {groupContext, jobsVariables, jobsRefetch} = this.props;
     const newVariables = {
       ...jobsVariables,
       page: 1,
     };
+    if (groupContext && newVariables.where) {
+      newVariables.where.group_in = undefined;
+    }
     jobsRefetch(newVariables);
   }
 
@@ -207,12 +211,12 @@ class JobList extends React.Component<Props> {
     selectedGroups: Array<string>;
     submittedByMe: boolean;
   }) => {
-    const {jobsVariables, jobsRefetch} = this.props;
+    const {groupContext, jobsVariables, jobsRefetch} = this.props;
     const newVariables = {
       ...jobsVariables,
       where: {
         ...jobsVariables.where,
-        groupId_in: selectedGroups,
+        group_in: groupContext ? undefined : selectedGroups,
         mine: submittedByMe,
       }
     };
@@ -233,21 +237,21 @@ class JobList extends React.Component<Props> {
   }
 
   cloneJob = (record) => {
-    const {history} = this.props;
-    const data = {
+    const {groupContext, history} = this.props;
+    let data: any = {
       displayName: record.displayName,
-      groupId: record.groupId,
-      groupName: record.groupName,
+      groupId: !groupContext ? record.groupId : groupContext.id,
+      groupName: !groupContext ? record.groupName : groupContext.name,
       instanceTypeId: get(record, 'instanceType.id'),
       instanceTypeName: get(record, 'instanceType.displayName') || get(record, 'instanceType.name'),
       image: record.image,
       command: record.command,
     }
-    history.push(`${appPrefix}job/create?defaultValue=${JSON.stringify(data)}`)
+    history.push(`job/create?defaultValue=${JSON.stringify(data)}`)
   }
 
   render() {
-    const {groups, jobsConnection, jobsLoading, jobsVariables, cancelPhJobResult, rerunPhJobResult} = this.props;
+    const {groupContext, groups, jobsConnection, jobsLoading, jobsVariables, cancelPhJobResult, rerunPhJobResult} = this.props;
     const {currentId} = this.state;
     const renderAction = (phase: Phase, record) => {
       const action = getActionByPhase(phase);
@@ -330,6 +334,7 @@ class JobList extends React.Component<Props> {
             </div>
           </div>
           <Filter
+            groupContext={groupContext}
             groups={groups}
             selectedGroups={get(jobsVariables, 'where.groupId_in', [])}
             submittedByMe={get(jobsVariables, 'where.mine', false)}
