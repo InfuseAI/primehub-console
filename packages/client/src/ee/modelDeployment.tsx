@@ -21,6 +21,7 @@ import 'moment/locale/zh-tw';
 import {IntlProvider, addLocaleData} from 'react-intl';
 addLocaleData([...en])
 import myLocales from '../utils/locales';
+import { GroupContextValue, GroupContext } from 'context/group';
 const locale = (window as any).LOCALE || 'en';
 
 
@@ -340,6 +341,8 @@ const client = genClient(process.env.NODE_ENV === 'production' ?
 
 class Job extends React.Component {
   render() {
+    const groupContext: GroupContextValue = JSON.parse(window.localStorage.getItem("group-context"));
+
     return (
       <IntlProvider locale={locale} messages={{...dict[locale], ...myLocales[locale]}}>
         <BrowserRouter>
@@ -347,27 +350,29 @@ class Job extends React.Component {
             <Header />
             <Layout>
               <Content style={{padding: 0}}>
-                <ApolloProvider client={client}>
-                  <Switch>
-                    <Route path={`${appPrefix}model-deployment`} exact>
-                      <ListContainer Com={ModelDeploymentListContainer} />
-                    </Route>
-                    <Route path={`${appPrefix}model-deployment/create`} exact>
-                      <DeploymentCreatePage />
-                    </Route>
-                    <Route
-                      path={`${appPrefix}model-deployment/:deploymentId`}
-                      exact
-                      component={DeploymentDetailContainer}
-                    />
-                    <Route
-                      path={`${appPrefix}model-deployment/edit/:deploymentId`}
-                      exact
-                    >
-                      <DeploymentEditPage />
-                    </Route>
-                  </Switch>
-                </ApolloProvider>
+                <GroupContext.Provider value={groupContext}>
+                  <ApolloProvider client={client}>
+                    <Switch>
+                      <Route path={`${appPrefix}model-deployment`} exact>
+                        <ListContainer Com={ModelDeploymentListContainer} />
+                      </Route>
+                      <Route path={`${appPrefix}model-deployment/create`} exact>
+                        <DeploymentCreatePage />
+                      </Route>
+                      <Route
+                        path={`${appPrefix}model-deployment/:deploymentId`}
+                        exact
+                        component={DeploymentDetailContainer}
+                      />
+                      <Route
+                        path={`${appPrefix}model-deployment/edit/:deploymentId`}
+                        exact
+                      >
+                        <DeploymentEditPage />
+                      </Route>
+                    </Switch>
+                  </ApolloProvider>
+                </GroupContext.Provider>
               </Content>
             </Layout>
           </Layout>

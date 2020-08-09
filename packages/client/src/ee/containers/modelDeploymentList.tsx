@@ -18,6 +18,7 @@ import {errorHandler} from '../components/job/errorHandler';
 import DeploymentCard from 'ee/components/modelDeployment/card';
 import { PhDeploymentFragment, DeploymentConnection } from 'ee/components/modelDeployment/common';
 import InfuseButton from 'components/infuseButton';
+import { GroupContextComponentProps } from 'context/group';
 
 const PAGE_SIZE = 8;
 const Search = Input.Search
@@ -56,7 +57,7 @@ type Props = {
     refetch: Function;
     phDeploymentsConnection: DeploymentConnection
   };
-} & RouteComponentProps;
+} & RouteComponentProps & GroupContextComponentProps;
 
 type State = {
   value: string;
@@ -134,7 +135,7 @@ class DeploymentListContainer extends React.Component<Props, State> {
   }
 
   render() {
-    const { getPhDeploymentConnection, groups, history } = this.props;
+    const { groupContext, getPhDeploymentConnection, groups, history } = this.props;
     const {
       error,
       loading,
@@ -177,6 +178,7 @@ class DeploymentListContainer extends React.Component<Props, State> {
               <InfuseButton onClick={() => refetch()}>Refresh</InfuseButton>
             </div>
             <Filter
+              groupContext={groupContext}
               labelSubmittedByMe={"Deployed By Me"}
               groups={groups}
               selectedGroups={get(variables, 'where.groupId_in', [])}
@@ -220,10 +222,16 @@ export default compose(
   graphql(GET_PH_DEPLOYMENT_CONNECTION, {
     options: (props: Props) => {
       const params = queryString.parse(props.location.search.replace(/^\?/, ''));
+      const {groupContext} = props;
+      const where = JSON.parse(params.where as string || '{}');
+      if (groupContext) {
+        where.groupId_in = [groupContext.id];
+      }
+
       return {
         variables: {
           first: PAGE_SIZE,
-          where: JSON.parse(params.where as string || '{}'),
+          where,
         },
         fetchPolicy: 'cache-and-network'
       }
