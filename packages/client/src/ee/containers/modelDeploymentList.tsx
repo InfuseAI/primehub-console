@@ -200,7 +200,7 @@ class DeploymentListContainer extends React.Component<Props, State> {
       } else if ( group.enabledDeployment == false ) {
         pageBody = <Alert
           message="Feature not available"
-          description={'Model Deployment is not enabled for this group. Please tell the adminstrator to enable it.'}
+          description="Model Deployment is not enabled for this group. Please contact your administrator to enable it."
           type="warning"
           showIcon/>;
         showContent = false;
