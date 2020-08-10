@@ -55,7 +55,7 @@ const fakeData = {
   me: {
     groups: [{
       id: 'groupId1',
-      name: 'Group',
+      name: 'Group1',
       enabledDeployment: true,
       displayName: 'c-Group 1',
       instanceTypes: [{
@@ -70,8 +70,8 @@ const fakeData = {
       }]
     }, {
       id: 'groupId2',
-      name: 'Group',
-      enabledDeployment: true,
+      name: 'Group2',
+      enabledDeployment: false,
       displayName: 'Group 2',
       instanceTypes: [{
         id: 'ggit1',
@@ -85,7 +85,7 @@ const fakeData = {
       }]
     }, {
       id: 'everyone',
-      name: 'Group',
+      name: 'everyone',
       enabledDeployment: true,
       displayName: 'Group DisplayName',
       instanceTypes: [{
@@ -132,8 +132,8 @@ const fakeData = {
     batch3
     batch4
     `,
-    groupId: 'everyone',
-    groupName: 'groupName',
+    groupId: 'groupId1',
+    groupName: 'Group1',
     endpoint: 'https://endpoint/modedeployment/example/test/1',
     endpointAccessType: "private",
     endpointClients: [
@@ -172,7 +172,7 @@ const fakeData = {
         },
         name: 'd0',
         description: 'fdksoapfkeowpfadsangisoagdsagsgeiwagegiowagegeianogigeanogeiaogneiasogensioagenifdksoapfkeowpfadsangisoagdsagsgeiwagegiowagegeianogigeanogeiaogneiasogensioageni',
-        groupName: 'groupName',
+        groupName: 'Group1',
         modelImage: 'imageurl',
         replicas: 4,
         instanceType: {
@@ -201,8 +201,8 @@ const fakeData = {
     batch3
     batch4
     `,
-    groupId: 'everyone',
-    groupName: 'groupName',
+    groupId: 'groupId1',
+    groupName: 'Group1',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
     endpointAccessType: "private",
     endpointClients: [],
@@ -237,8 +237,8 @@ const fakeData = {
     batch3
     batch4
     `,
-    groupId: 'everyone',
-    groupName: 'groupName',
+    groupId: 'groupId1',
+    groupName: 'Group1',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
     pods: [
@@ -272,8 +272,8 @@ const fakeData = {
     batch3
     batch4
     `,
-    groupId: 'everyone',
-    groupName: 'groupName',
+    groupId: 'groupId1',
+    groupName: 'Group1',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
     pods: [
@@ -307,8 +307,8 @@ const fakeData = {
     batch3
     batch4
     `,
-    groupId: 'everyone',
-    groupName: 'groupName',
+    groupId: 'groupId1',
+    groupName: 'Group1',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
     pods: [],
