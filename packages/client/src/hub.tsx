@@ -7,6 +7,7 @@ import {LocalStorageConnector} from 'canner-graphql-interface';
 import {Layout, notification, Button, Skeleton} from 'antd';
 import {BrowserRouter, Router, Route, Switch} from 'react-router-dom';
 import Header from 'components/header';
+import GroupSelector from 'components/groupSelector';
 import Sidebar from 'components/hub/sidebar';
 import styled from 'styled-components';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
@@ -23,10 +24,7 @@ import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
-import { createBrowserHistory } from 'history';
 const HEADER_HEIGHT = 64;
-
-const history = createBrowserHistory();
 
 const Content = styled(Layout.Content)`
   margin-top: ${HEADER_HEIGHT}px;
@@ -47,71 +45,35 @@ const graphqlClient = new GraphqlClient({
 });
 
 const fakeData = {
-  groups: [{
-    id: 'groupId1',
-    name: 'Group',
-    enabledDeployment: true,
-    displayName: 'c-Group 1',
-    instanceTypes: [{
-      id: 'g-it1',
-      name: 'IT1',
-      displayName: 'group1 it'
-    }],
-    images: [{
-      id: 'g-it1',
-      name: 'IT1',
-      displayName: 'group1 im',
-    }]
-  }, {
-    id: 'groupId2',
-    name: 'Group',
-    enabledDeployment: true,
-    displayName: 'Group 2',
-    instanceTypes: [{
-      id: 'ggit1',
-      name: 'IT1',
-      displayName: 'group2 it'
-    }],
-    images: [{
-      id: 'ggit2',
-      name: 'IT1',
-      displayName: 'group2 im',
-    }]
-  }, {
-    id: 'everyone',
-    name: 'Group',
-    enabledDeployment: true,
-    displayName: 'DevGru',
-    instanceTypes: [{
-      id: 'everyone-it',
-      name: 'it',
-      displayName: 'gpu0',
-      gpuLimit: 0,
-      cpuLimit: 0.5,
-      memoryLimit: 4,
-    }, {
-      id: 'everyone-it2',
-      name: 'it',
-      displayName: 'gpu1',
-      gpuLimit: 1
-    }],
-    images: [{
-      id: 'everyone-image',
-      name: 'b-cpu',
-      displayName: 'b-cpu',
-      type: 'cpu'
-    }, {
-      id: 'everyone-image2',
-      name: 'a-gpu',
-      displayName: 'a-gpu',
-      type: 'gpu'
-    }, {
-      id: 'everyone-image3',
-      name: 'c-img',
-      displayName: 'c-img',
-      type: 'both'
-    }]
-  }]
+  "me": {
+    "groups": [
+      {
+        "id": "927406f6-88b0-490e-8e36-7835224fdf13",
+        "displayName": "Dev Team",
+        "name": "devteam"
+      },
+      {
+        "id": "e940f720-3fb7-43bf-b24f-f41076fe9d5e",
+        "displayName": "InfuseAI",
+        "name": "infuseai"
+      },
+      {
+        "id": "ddcbf952-0335-4074-ab52-74ac99a44b52",
+        "displayName": "",
+        "name": "model-deployment-test-group"
+      },
+      {
+        "id": "bc0dc0e6-04d4-4ab0-a64c-71d298a9c0ad",
+        "displayName": null,
+        "name": "Project_at100_group1"
+      },
+      {
+        "id": "5a705edf-69a0-4fed-bc39-c54bdace72e8",
+        "displayName": "VIP",
+        "name": "vip"
+      }
+    ]
+  }
 }
 
 const connector = new LocalStorageConnector({
@@ -121,68 +83,38 @@ const connector = new LocalStorageConnector({
 
 const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
-  {connector, schema: {}});
+  {connector, schema: {me: {type: 'object'}}});
 
 class Hub extends React.Component {
-  onSelectGroup (id) {
-    history.push(`${(window as any).APP_PREFIX}console/g/${id}/home`);
-  }
-
   render() {
     return (
-      <Router history={history}>
+      <BrowserRouter>
         <Layout>
-          <Header
-            groups={fakeData.groups}
-            onSelectGroup={this.onSelectGroup}
-          />
+          <ApolloProvider client={client}>
+            <Switch>
+              <Route path={[`${appPrefix}console/g/:groupId/:actionKey` ,`${appPrefix}console`]} exact>
+                <Header
+                  GroupSelectorCom={GroupSelector}
+                  onSelectGroup={this.onSelectGroup}
+                />
+              </Route>
+            </Switch>
+          </ApolloProvider>
           <Layout>
             <Sidebar />
             <Content>
-                <ApolloProvider client={client}>
-                  <Switch>
-                    <Route path={`${appPrefix}console`} exact>
-                      <Skeleton />
-                    </Route>
-                    <Route path={`${appPrefix}console/g/:groupId/:actionKey`} exact>
-                      <Skeleton />
-                    </Route>
-                    <Route path={`${appPrefix}model-deployment`} exact>
-                      <Skeleton />
-                    </Route>
-                    <Route path={`${appPrefix}job`} exact>
-                      <Skeleton />
-                    </Route>
-                    <Route path={`${appPrefix}schedule`} exact>
-                      <Skeleton />
-                    </Route>
-                    <Route
-                      path={`${appPrefix}hub/phusers`}
-                      exact
-                      render={(props) => (
-                        <HubIframe {...props} src="/hub/primehub/home?group=phusers"></HubIframe>
-                      )}
-                    />
-                    <Route
-                      path={`${appPrefix}hub/test`}
-                      exact
-                      render={(props) => (
-                        <HubIframe {...props} src="/hub/primehub/home?group=test"></HubIframe>
-                      )}
-                    />
-                    <Route
-                      path={`${appPrefix}hub/admin`}
-                      exact
-                      render={(props) => (
-                        <HubIframe {...props} src="/hub/admin"></HubIframe>
-                      )}
-                    />
-                  </Switch>
-                </ApolloProvider>
+                <Switch>
+                  <Route path={`${appPrefix}console`} exact>
+                    <Skeleton />
+                  </Route>
+                  <Route path={`${appPrefix}console/g/:groupId/:actionKey`} exact>
+                    <Skeleton />
+                  </Route>
+                </Switch>
             </Content>
           </Layout>
         </Layout>
-      </Router>
+      </BrowserRouter>
     )
   }
 }

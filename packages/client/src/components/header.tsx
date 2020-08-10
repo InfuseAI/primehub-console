@@ -71,7 +71,7 @@ export default class HeaderContainer extends React.Component<Props, {}> {
   }
 
   render() {
-    const {pagePadding, groups, onSelectGroup} = this.props;
+    const {pagePadding, GroupSelectorCom, onSelectGroup} = this.props;
     const thumbnail = (window as any).thumbnail;
     const isUserAdmin = (window as any).isUserAdmin;
     return (
@@ -80,21 +80,8 @@ export default class HeaderContainer extends React.Component<Props, {}> {
           <Logo />
         </a>
         {
-          groups && groups.length ? (
-            <div
-              style={{ lineHeight: '64px'}}
-            >
-              <label style={{marginRight: '5px'}}>
-                Group:
-              </label>
-              <Select size={'small'} placeholder="Please select a group" onChange={id => onSelectGroup(id)} style={{width: "160px", fontSize: "12px"}}>
-                {groups.map(group => (
-                  <Option key={group.id} value={group.id}>
-                    {group.displayName || group.name}
-                  </Option>
-                ))}
-              </Select>
-            </div>
+          GroupSelectorCom ? (
+            <GroupSelectorCom onSelectGroup={onSelectGroup} />
           ) : (
             <span/>
           )
