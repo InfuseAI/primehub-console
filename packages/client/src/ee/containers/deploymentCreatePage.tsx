@@ -85,10 +85,10 @@ class DeploymentCreatePage extends React.Component<Props, State> {
     const {selectedGroup} = this.state;
     const {groupContext, getGroups, createPhDeploymentResult, history} = this.props;
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
-    const allGroups = get(getGroups, 'me.groups', [])
-      .filter(group => group.enabledDeployment || group.id === everyoneGroupId)
+    const allGroups = get(getGroups, 'me.groups', []).filter(group => group.enabledDeployment || group.id === everyoneGroupId);
+    const groups = allGroups
+      .filter(group => group.id !== everyoneGroupId)
       .filter(group => !groupContext || groupContext.id === group.id );
-    const groups = allGroups.filter(group => group.id !== everyoneGroupId);
     const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
     const group = groups
       .find(group => group.id === selectedGroup);
