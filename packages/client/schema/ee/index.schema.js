@@ -48,7 +48,6 @@ const schema = (
     <Body component={CommonBody}>
       <Secret />
     </Body>
-    {/* <Announcement /> */}
   </root>
 )
 if (process.env.NODE_ENV === 'production') {

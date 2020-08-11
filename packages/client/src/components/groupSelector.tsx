@@ -36,38 +36,48 @@ export const GET_MY_GROUPS = gql`
 
 type Props = {
   getMyGroups: any;
+  onSelectGroup: Function;
 } & RouteComponentProps
   & PathComponentProps;
 
 type State = {
-  currentGroupId: string
+  currentGroupName: string;
 }
 
-class GroupSelector extends React.Component<Props> {
+class GroupSelector extends React.Component<Props, State> {
   groups = [];
   constructor(props) {
     super(props);
 
     this.state = {
-      currentGroupId: ''
+      currentGroupName: ''
     };
   }
 
-  onSelectGroup (id) {
+  onSelectGroup (groupName) {
     const {history} = this.props;
-    history.push(`${(window as any).APP_PREFIX}console/g/${id}/home`);
+    history.push(`${(window as any).APP_PREFIX}g/${groupName}/home`);
   }
 
-  handleChange = (id) => {
-    this.onSelectGroup(id);
-    this.setState({currentGroupId: id});
+  handleChange = (groupName) => {
+    const {onSelectGroup} = this.props;
+    this.onSelectGroup(groupName);
+    this.setState({currentGroupName: groupName});
+
+    if (onSelectGroup) {
+      onSelectGroup(groupName);
+    }
   }
 
   componentDidMount() {
-    const {match} = this.props;
-    const currentGroupId = (match.params as any).groupId || null;
-    if (currentGroupId) {
-      this.setState({currentGroupId});
+    const {onSelectGroup, match} = this.props;
+    const currentGroupName = (match.params as any).groupName || null;
+
+    if (currentGroupName) {
+      this.setState({currentGroupName});
+      if (onSelectGroup) {
+        onSelectGroup(currentGroupName);
+      }
     }
   }
 
@@ -93,9 +103,9 @@ class GroupSelector extends React.Component<Props> {
         <label style={{marginRight: '5px'}}>
           Group:
         </label>
-        <Select size={'small'} value={this.state.currentGroupId} placeholder="Please select a group" onChange={this.handleChange} style={{width: "160px", fontSize: "12px"}}>
+        <Select size={'small'} value={this.state.currentGroupName} placeholder="Please select a group" onChange={this.handleChange} style={{width: "160px", fontSize: "12px"}}>
           {groups.map(group => (
-            <Option key={group.id} value={group.id}>
+            <Option key={group.id} value={group.name}>
               {group.displayName || group.name}
             </Option>
           ))}
@@ -113,9 +123,11 @@ export default compose(
     options: (props: Props) => ({
       onCompleted: data => {
         if (!data.me && !data.me.groups) return;
-        if (props.match.params.groupId) return;
+        const groups: Array<any> = data.me.groups;
+        const groupName= props.match.params.groupName;
+        if (groupName && groups.find(group => group.name === groupName)) return;
         let firstGroup = data.me.groups[0];
-        (window as any).location.href = `${appPrefix}console/g/${firstGroup.id}/home`;
+        (window as any).location.href = `${appPrefix}g/${firstGroup.name}/home`;
       },
       fetchPolicy: 'cache-and-network'
     }),

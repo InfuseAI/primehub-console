@@ -7,7 +7,7 @@ import { withRouter, RouteComponentProps } from 'react-router';
 type Props = RouteComponentProps & {};
 class Sidebar extends React.Component<Props> {
   render() {
-    const {history} = this.props;
+    const {history, match} = this.props;
     const pathKeyList = ['home', 'hub', 'job', 'schedule', 'model-deployment'];
     let key = '';
     pathKeyList.forEach((val) => {
@@ -15,6 +15,7 @@ class Sidebar extends React.Component<Props> {
         key = val;
       }
     });
+    const group = match.params.groupName;
 
     return (
       <Layout.Sider style={{paddingTop: 64}}>
@@ -23,12 +24,12 @@ class Sidebar extends React.Component<Props> {
           selectedKeys={[key]}
         >
           <Menu.Item key="home">
-            <Link to={`${appPrefix}console/g/default/home`}>
+            <Link to={`${appPrefix}g/${group}/home`}>
               Home
             </Link>
           </Menu.Item>
           <Menu.Item key="hub">
-            <Link to={`${appPrefix}console/g/default/hub`}>
+            <Link to={`${appPrefix}g/${group}/hub`}>
               JupyterHub
             </Link>
           </Menu.Item>

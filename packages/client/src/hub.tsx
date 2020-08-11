@@ -24,6 +24,7 @@ import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
+import { Redirect } from 'react-router';
 const HEADER_HEIGHT = 64;
 
 const Content = styled(Layout.Content)`
@@ -85,30 +86,52 @@ const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
   {connector, schema: {me: {type: 'object'}}});
 
-class Hub extends React.Component {
+type Props = {
+
+}
+type State = {
+  currentGroupName: string;
+}
+
+
+class Hub extends React.Component<Props, State> {
+  state = {
+    currentGroupName: ''
+  }
+
+  onSelectGroup = (groupName) => {
+    if (this.state.currentGroupName !== groupName) {
+      this.setState({
+        currentGroupName: groupName
+      })
+    }
+  }
+
   render() {
+    const {currentGroupName} = this.state;
     return (
       <BrowserRouter>
         <Layout>
           <ApolloProvider client={client}>
             <Switch>
-              <Route path={[`${appPrefix}console/g/:groupId/:actionKey` ,`${appPrefix}console`]} exact>
+              <Route path={[`${appPrefix}g/:groupName/:actionKey` ,`${appPrefix}g`]} exact>
                 <Header
                   GroupSelectorCom={GroupSelector}
                   onSelectGroup={this.onSelectGroup}
                 />
               </Route>
+              <Redirect to={`${appPrefix}g`}/>
             </Switch>
           </ApolloProvider>
           <Layout>
             <Sidebar />
             <Content>
                 <Switch>
-                  <Route path={`${appPrefix}console`} exact>
+                  <Route path={`${appPrefix}`} exact>
                     <Skeleton />
                   </Route>
-                  <Route path={`${appPrefix}console/g/:groupId/:actionKey`} exact>
-                    <Skeleton />
+                  <Route path={`${appPrefix}g/:groupName/:actionKey`} exact>
+                    <div>{currentGroupName}</div>
                   </Route>
                 </Switch>
             </Content>
