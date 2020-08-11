@@ -9,6 +9,7 @@ import ImagePullSecret from 'components/share/ImagePullSecret';
 const { Option } = Select;
 
 type Props = FormComponentProps & {
+  groupContext: any;
   groups: Array<Record<string, any>>;
   onSelectGroup?: Function;
   selectedGroup: string;
@@ -142,6 +143,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
 
   render() {
     const {
+      groupContext,
       groups,
       onSelectGroup,
       instanceTypes,
@@ -188,7 +190,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
           <Col xs={24} sm={16} lg={16}>
               {
                 groups.length ? (
-                  <Form.Item label={groupLabel}>
+                  <Form.Item label={groupLabel} style={ groupContext ? { display: 'none' } : {} }>
                     {form.getFieldDecorator('groupId', {
                       initialValue: invalidInitialGroup ? '' : groupId,
                       rules: [{ required: true, message: 'Please select a group!' }],

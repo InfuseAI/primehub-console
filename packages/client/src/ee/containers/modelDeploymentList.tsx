@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Row, Col, Button, Skeleton, Input, message, Spin, Divider} from 'antd';
+import {Row, Col, Button, Skeleton, Input, message, Spin, Divider, Alert} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -18,6 +18,7 @@ import {errorHandler} from '../components/job/errorHandler';
 import DeploymentCard from 'ee/components/modelDeployment/card';
 import { PhDeploymentFragment, DeploymentConnection } from 'ee/components/modelDeployment/common';
 import InfuseButton from 'components/infuseButton';
+import { GroupContextComponentProps } from 'context/group';
 
 const PAGE_SIZE = 8;
 const Search = Input.Search
@@ -43,6 +44,12 @@ export const GET_PH_DEPLOYMENT_CONNECTION = gql`
 `;
 
 type Props = {
+  groups: Array<{
+    id: string;
+    name: string;
+    displayName: string;
+    enabledDeployment: boolean;
+  }>;
   getPhDeploymentConnection: {
     error?: any;
     loading: boolean;
@@ -56,7 +63,7 @@ type Props = {
     refetch: Function;
     phDeploymentsConnection: DeploymentConnection
   };
-} & RouteComponentProps;
+} & RouteComponentProps & GroupContextComponentProps;
 
 type State = {
   value: string;
@@ -134,7 +141,7 @@ class DeploymentListContainer extends React.Component<Props, State> {
   }
 
   render() {
-    const { getPhDeploymentConnection, groups, history } = this.props;
+    const { groupContext, getPhDeploymentConnection, groups, history } = this.props;
     const {
       error,
       loading,
@@ -152,6 +159,81 @@ class DeploymentListContainer extends React.Component<Props, State> {
       return <Skeleton />
     }
 
+    let showContent = true;
+
+    let pageBody = <>
+      <div style={{textAlign: 'right', margin: '16px 0px 5px'}}>
+        <Search
+          placeholder="Search deploy name"
+          style={{width: 295, margin: 'auto 16px'}}
+          onSearch={this.searchHandler}
+        />
+        <InfuseButton
+          icon="plus"
+          type="primary"
+          onClick={() => history.push(`${appPrefix}model-deployment/create`)}
+          style={{marginRight: 16, width: 'auto'}}
+        >
+          Create Deployment
+        </InfuseButton>
+        <InfuseButton onClick={() => refetch()}>Refresh</InfuseButton>
+      </div>
+      <Filter
+        groupContext={groupContext}
+        labelSubmittedByMe={"Deployed By Me"}
+        groups={groups}
+        selectedGroups={get(variables, 'where.groupId_in', [])}
+        submittedByMe={get(variables, 'where.mine', false)}
+        onChange={this.changeFilter}
+      />
+    </>;
+
+    if ( groupContext ) {
+      const group = groups.find(group => group.id === groupContext.id);
+      if ( !group ) {
+        pageBody = <Alert
+          message="Group not found"
+          description={`Group ${groupContext.name} is not found or not authorized.`}
+          type="error"
+          showIcon/>;
+          showContent = false;
+      } else if ( group.enabledDeployment == false ) {
+        pageBody = <Alert
+          message="Feature not available"
+          description="Model Deployment is not enabled for this group. Please contact your administrator to enable it."
+          type="warning"
+          showIcon/>;
+        showContent = false;
+      }
+    }
+
+    const content = <div style={{margin: '16px 64px'}}>
+        <Spin spinning={loading}>
+          <Row gutter={36} type="flex">
+            {phDeploymentsConnection.edges.map(edge => {
+              return (
+                <Col span={6} key={edge.cursor} style={{marginBottom: 36}}>
+                  <DeploymentCard
+                    deployment={edge.node}
+                    copyClipBoard={this.copyClipBoard}
+                  />
+                </Col>
+              );
+            })}
+          </Row>
+        </Spin>
+        <Input
+          ref={this.textArea}
+          style={{position: 'absolute', left: '-1000px', top: '-1000px'}}
+        />
+        <Pagination
+          hasNextPage={phDeploymentsConnection.pageInfo.hasNextPage}
+          hasPreviousPage={phDeploymentsConnection.pageInfo.hasPreviousPage}
+          nextPage={this.nextPage}
+          previousPage={this.previousPage}
+        />
+      </div>
+
     return (
       <>
         <PageTitle
@@ -159,57 +241,8 @@ class DeploymentListContainer extends React.Component<Props, State> {
           title={"Model Deployments"}
           style={{paddingLeft: 64}}
         />
-          <PageBody>
-            <div style={{textAlign: 'right', margin: '16px 0px 5px'}}>
-              <Search
-                placeholder="Search deploy name"
-                style={{width: 295, margin: 'auto 16px'}}
-                onSearch={this.searchHandler}
-              />
-              <InfuseButton
-                icon="plus"
-                type="primary"
-                onClick={() => history.push(`${appPrefix}model-deployment/create`)}
-                style={{marginRight: 16, width: 'auto'}}
-              >
-                Create Deployment
-              </InfuseButton>
-              <InfuseButton onClick={() => refetch()}>Refresh</InfuseButton>
-            </div>
-            <Filter
-              labelSubmittedByMe={"Deployed By Me"}
-              groups={groups}
-              selectedGroups={get(variables, 'where.groupId_in', [])}
-              submittedByMe={get(variables, 'where.mine', false)}
-              onChange={this.changeFilter}
-            />
-          </PageBody>
-          <div style={{margin: '16px 64px'}}>
-          <Spin spinning={loading}>
-            <Row gutter={36} type="flex">
-              {phDeploymentsConnection.edges.map(edge => {
-                return (
-                  <Col span={6} key={edge.cursor} style={{marginBottom: 36}}>
-                    <DeploymentCard
-                      deployment={edge.node}
-                      copyClipBoard={this.copyClipBoard}
-                    />
-                  </Col>
-                );
-              })}
-            </Row>
-          </Spin>
-          <Input
-            ref={this.textArea}
-            style={{position: 'absolute', left: '-1000px', top: '-1000px'}}
-          />
-          <Pagination
-            hasNextPage={phDeploymentsConnection.pageInfo.hasNextPage}
-            hasPreviousPage={phDeploymentsConnection.pageInfo.hasPreviousPage}
-            nextPage={this.nextPage}
-            previousPage={this.previousPage}
-          />
-        </div>
+        <PageBody>{pageBody}</PageBody>
+        { showContent ? content : <></> }
       </>
     );
   }
@@ -220,10 +253,16 @@ export default compose(
   graphql(GET_PH_DEPLOYMENT_CONNECTION, {
     options: (props: Props) => {
       const params = queryString.parse(props.location.search.replace(/^\?/, ''));
+      const {groupContext} = props;
+      const where = JSON.parse(params.where as string || '{}');
+      if (groupContext) {
+        where.groupId_in = [groupContext.id];
+      }
+
       return {
         variables: {
           first: PAGE_SIZE,
-          where: JSON.parse(params.where as string || '{}'),
+          where,
         },
         fetchPolicy: 'cache-and-network'
       }

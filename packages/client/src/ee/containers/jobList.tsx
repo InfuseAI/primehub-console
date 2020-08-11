@@ -5,10 +5,11 @@ import {compose} from 'recompose';
 import {withRouter} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
-import JobList from '../components/job/list';
-import {errorHandler} from '../components/job/errorHandler';
-import {Group} from '../components/shared/groupFilter';
+import JobList from 'ee/components/job/list';
+import {errorHandler} from 'ee/components/job/errorHandler';
+import {Group} from 'ee/components/shared/groupFilter';
 import {appPrefix} from 'utils/env';
+import { withGroupContext, GroupContextComponentProps } from 'context/group';
 
 export const PhJobFragment = gql`
   fragment PhJobInfo on PhJob {
@@ -82,7 +83,7 @@ type Props = {
   cancelPhJob: any;
   rerunPhJobResult: any;
   cancelPhJobResult: any;
-} & RouteComponentProps;
+} & RouteComponentProps & GroupContextComponentProps;
 
 class JobListContainer extends React.Component<Props> {
   jobsRefetch = (payload) => {
@@ -105,9 +106,10 @@ class JobListContainer extends React.Component<Props> {
   }
 
   render() {
-    const {getPhJobConnection, rerunPhJob, rerunPhJobResult,cancelPhJobResult, cancelPhJob, groups } = this.props;
+    const {groupContext, getPhJobConnection, rerunPhJob, rerunPhJobResult,cancelPhJobResult, cancelPhJob, groups } = this.props;
     return (
       <JobList
+        groupContext={groupContext}
         jobsLoading={getPhJobConnection.loading}
         jobsError={getPhJobConnection.error}
         jobsConnection={getPhJobConnection.phJobsConnection || {pageInfo: {}, edges: []}}
@@ -128,9 +130,15 @@ export default compose(
   graphql(GET_PH_JOB_CONNECTION, {
     options: (props: Props) => {
       const params = queryString.parse(props.location.search.replace(/^\?/, ''));
+      const {groupContext} = props;
+      const where = JSON.parse(params.where as string || '{}');
+      if (groupContext) {
+        where.groupId_in = [groupContext.id];
+      }
+
       return {
         variables: {
-          where: JSON.parse(params.where as string || '{}'),
+          where,
           orderBy: JSON.parse(params.orderBy as string || '{}'),
           page: Number(params.page || 1),
         },

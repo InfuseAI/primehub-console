@@ -21,6 +21,7 @@ import 'moment/locale/zh-tw';
 import {IntlProvider, addLocaleData} from 'react-intl';
 addLocaleData([...en])
 import myLocales from '../utils/locales';
+import { GroupContextValue, GroupContext } from 'context/group';
 const locale = (window as any).LOCALE || 'en';
 
 
@@ -54,7 +55,7 @@ const fakeData = {
   me: {
     groups: [{
       id: 'groupId1',
-      name: 'Group',
+      name: 'Group1',
       enabledDeployment: true,
       displayName: 'c-Group 1',
       instanceTypes: [{
@@ -69,8 +70,8 @@ const fakeData = {
       }]
     }, {
       id: 'groupId2',
-      name: 'Group',
-      enabledDeployment: true,
+      name: 'Group2',
+      enabledDeployment: false,
       displayName: 'Group 2',
       instanceTypes: [{
         id: 'ggit1',
@@ -84,7 +85,7 @@ const fakeData = {
       }]
     }, {
       id: 'everyone',
-      name: 'Group',
+      name: 'everyone',
       enabledDeployment: true,
       displayName: 'Group DisplayName',
       instanceTypes: [{
@@ -131,8 +132,8 @@ const fakeData = {
     batch3
     batch4
     `,
-    groupId: 'everyone',
-    groupName: 'groupName',
+    groupId: 'groupId1',
+    groupName: 'Group1',
     endpoint: 'https://endpoint/modedeployment/example/test/1',
     endpointAccessType: "private",
     endpointClients: [
@@ -171,7 +172,7 @@ const fakeData = {
         },
         name: 'd0',
         description: 'fdksoapfkeowpfadsangisoagdsagsgeiwagegiowagegeianogigeanogeiaogneiasogensioagenifdksoapfkeowpfadsangisoagdsagsgeiwagegiowagegeianogigeanogeiaogneiasogensioageni',
-        groupName: 'groupName',
+        groupName: 'Group1',
         modelImage: 'imageurl',
         replicas: 4,
         instanceType: {
@@ -200,8 +201,8 @@ const fakeData = {
     batch3
     batch4
     `,
-    groupId: 'everyone',
-    groupName: 'groupName',
+    groupId: 'groupId1',
+    groupName: 'Group1',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
     endpointAccessType: "private",
     endpointClients: [],
@@ -236,8 +237,8 @@ const fakeData = {
     batch3
     batch4
     `,
-    groupId: 'everyone',
-    groupName: 'groupName',
+    groupId: 'groupId1',
+    groupName: 'Group1',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
     pods: [
@@ -271,8 +272,8 @@ const fakeData = {
     batch3
     batch4
     `,
-    groupId: 'everyone',
-    groupName: 'groupName',
+    groupId: 'groupId1',
+    groupName: 'Group1',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
     pods: [
@@ -306,8 +307,8 @@ const fakeData = {
     batch3
     batch4
     `,
-    groupId: 'everyone',
-    groupName: 'groupName',
+    groupId: 'groupId1',
+    groupName: 'Group1',
     endpoint: 'https://endpoint/mode-deployment/example/test/1',
     modelImage: 'imageurl',
     pods: [],
@@ -340,6 +341,8 @@ const client = genClient(process.env.NODE_ENV === 'production' ?
 
 class Job extends React.Component {
   render() {
+    const groupContext: GroupContextValue = JSON.parse(window.localStorage.getItem("group-context"));
+
     return (
       <IntlProvider locale={locale} messages={{...dict[locale], ...myLocales[locale]}}>
         <BrowserRouter>
@@ -347,27 +350,29 @@ class Job extends React.Component {
             <Header />
             <Layout>
               <Content style={{padding: 0}}>
-                <ApolloProvider client={client}>
-                  <Switch>
-                    <Route path={`${appPrefix}model-deployment`} exact>
-                      <ListContainer Com={ModelDeploymentListContainer} />
-                    </Route>
-                    <Route path={`${appPrefix}model-deployment/create`} exact>
-                      <DeploymentCreatePage />
-                    </Route>
-                    <Route
-                      path={`${appPrefix}model-deployment/:deploymentId`}
-                      exact
-                      component={DeploymentDetailContainer}
-                    />
-                    <Route
-                      path={`${appPrefix}model-deployment/edit/:deploymentId`}
-                      exact
-                    >
-                      <DeploymentEditPage />
-                    </Route>
-                  </Switch>
-                </ApolloProvider>
+                <GroupContext.Provider value={groupContext}>
+                  <ApolloProvider client={client}>
+                    <Switch>
+                      <Route path={`${appPrefix}model-deployment`} exact>
+                        <ListContainer Com={ModelDeploymentListContainer} />
+                      </Route>
+                      <Route path={`${appPrefix}model-deployment/create`} exact>
+                        <DeploymentCreatePage />
+                      </Route>
+                      <Route
+                        path={`${appPrefix}model-deployment/:deploymentId`}
+                        exact
+                        component={DeploymentDetailContainer}
+                      />
+                      <Route
+                        path={`${appPrefix}model-deployment/edit/:deploymentId`}
+                        exact
+                      >
+                        <DeploymentEditPage />
+                      </Route>
+                    </Switch>
+                  </ApolloProvider>
+                </GroupContext.Provider>
               </Content>
             </Layout>
           </Layout>
