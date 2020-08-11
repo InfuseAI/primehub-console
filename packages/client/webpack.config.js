@@ -18,7 +18,7 @@ module.exports = {
     job: devMode ? './src/ee/job.tsx' : ['./src/public-import.js', './src/ee/job.tsx'],
     'model-deployment': devMode ? './src/ee/modelDeployment.tsx' : ['./src/public-import.js', './src/ee/modelDeployment.tsx'],
     'api-token': './src/apiToken.tsx',
-    'hub': './src/hub.tsx',
+    'hub': devMode ? './src/hub.tsx' : ['./src/public-import.js', './src/hub.tsx'],
   },
   output: {
     path: path.join(__dirname, 'dist'),

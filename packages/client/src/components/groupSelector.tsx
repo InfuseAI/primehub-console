@@ -123,10 +123,11 @@ export default compose(
     options: (props: Props) => ({
       onCompleted: data => {
         if (!data.me && !data.me.groups) return;
-        const groups: Array<any> = data.me.groups;
+        const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+        const groups: Array<any> = data.me.groups.filter(group => group.id !== everyoneGroupId);
         const groupName= props.match.params.groupName;
         if (groupName && groups.find(group => group.name === groupName)) return;
-        let firstGroup = data.me.groups[0];
+        let firstGroup = groups[0];
         (window as any).location.href = `${appPrefix}g/${firstGroup.name}/home`;
       },
       fetchPolicy: 'cache-and-network'
