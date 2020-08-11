@@ -1,8 +1,10 @@
 import * as React from 'react';
-import {Menu, Layout, Avatar} from 'antd';
+import {Menu, Layout, Avatar, Select, Form} from 'antd';
 import {LayoutProps} from 'antd/lib/layout';
 import styled from 'styled-components';
 import logo from 'images/primehub-logo.svg';
+
+const { Option } = Select;
 
 const HEADER_HEIGHT = 64;
 const PAGE_PADDING = 64;
@@ -18,7 +20,7 @@ const Logo = styled.div`
 const Header = styled<Props & LayoutProps>(Layout.Header)`
   background: #fff;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   .ant-menu-item .anticon, .ant-menu-submenu-title .anticon {
     margin: 0;
   }
@@ -31,6 +33,8 @@ const Header = styled<Props & LayoutProps>(Layout.Header)`
 ` as any;
 
 export interface Props {
+  groups: Array<Record<string, any>>;
+  onSelectGroup?: Function;
   pagePadding?: number;
 }
 
@@ -67,14 +71,21 @@ export default class HeaderContainer extends React.Component<Props, {}> {
   }
 
   render() {
-    const {pagePadding} = this.props;
+    const {pagePadding, GroupSelectorCom, onSelectGroup} = this.props;
     const thumbnail = (window as any).thumbnail;
     const isUserAdmin = (window as any).isUserAdmin;
     return (
       <Header pagePadding={pagePadding}>
-        <a href="/" style={{display: "flex"}}>
+        <a href="/" style={{display: "flex", marginRight: "auto"}}>
           <Logo />
         </a>
+        {
+          GroupSelectorCom ? (
+            <GroupSelectorCom onSelectGroup={onSelectGroup} />
+          ) : (
+            <span/>
+          )
+        }
         <Menu
           onClick={this.onClickMenu}
           theme="light"
