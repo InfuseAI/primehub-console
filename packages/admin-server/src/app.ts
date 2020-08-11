@@ -199,7 +199,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     });
   });
 
-  rootRouter.get('/g/:path', oidcCtrl.loggedIn, async ctx => {
+  rootRouter.get('/g/*', oidcCtrl.loggedIn, async ctx => {
     await ctx.render('hub', {
       title: 'PrimeHub Jupterhub',
       staticPath
