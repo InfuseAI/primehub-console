@@ -22,19 +22,31 @@ import CommonBody from '../../src/cms-layouts/commonBody';
 import UserBody from '../../src/cms-layouts/userBody';
 import {isArray} from 'lodash';
 
+const maintenance = (
+  (typeof enableMaintenanceNotebook !== 'undefined' && enableMaintenanceNotebook) ? 
+    <object keyName="maintenance"></object> : 
+    {}
+);
+const grafana = (
+  (typeof enableGrafana !== 'undefined' && enableGrafana) ? 
+    <object keyName="grafana"></object> : 
+    {}
+);
+
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
-    <System/>
     <Body component={CommonBody}>
       {/* <Idp/> */}
       {/* <UserFederation/> */}
       <Workspaces />
     </Body>
+    <Body component={CommonBody}>
+      <Group/>
+    </Body>
     <Body component={UserBody}>
       <User/>
     </Body>
     <Body component={CommonBody}>
-      <Group/>
       <InstanceType/>
       <Image/>
       <BuildImage />
@@ -48,6 +60,9 @@ const schema = (
     <Body component={CommonBody}>
       <Secret />
     </Body>
+    <System/>
+    {maintenance}
+    {grafana}
     {/* <Announcement /> */}
   </root>
 )
