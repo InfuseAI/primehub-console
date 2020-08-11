@@ -38,10 +38,8 @@ const schema = (
     <Body component={CommonBody}>
       {/* <Idp/> */}
       {/* <UserFederation/> */}
-      <Workspaces />
-    </Body>
-    <Body component={CommonBody}>
       <Group/>
+      <Workspaces />
     </Body>
     <Body component={UserBody}>
       <User/>
