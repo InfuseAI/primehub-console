@@ -18,7 +18,7 @@ module.exports = {
     job: devMode ? './src/ee/job.tsx' : ['./src/public-import.js', './src/ee/job.tsx'],
     'model-deployment': devMode ? './src/ee/modelDeployment.tsx' : ['./src/public-import.js', './src/ee/modelDeployment.tsx'],
     'api-token': './src/apiToken.tsx',
-    'console': './src/hub.tsx',
+    'hub': './src/hub.tsx',
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -40,11 +40,11 @@ module.exports = {
         { from: /^\/app-prefix\/landing/, to: '/landing.html' },
         { from: /^\/landing$/, to: '/landing.html' },
         { from: /^\/model-deployment/, to: '/model-deployment.html' },
-        { from: /^\/app-prefix\/model-deployment/, to: './model-deployment.html' },
+        { from: /^\/app-prefix\/model-deployment/, to: '/model-deployment.html' },
         { from: /^\/api-token$/, to: '/api-token.html' },
-        { from: /^\/app-prefix\/api-token$/, to: './api-token.html' },
-        { from: /^\/g/, to: '/console.html' },
-        { from: /^\/app-prefix\/g/, to: './console.html' },
+        { from: /^\/app-prefix\/api-token$/, to: '/api-token.html' },
+        { from: /^\/g/, to: '/hub.html' },
+        { from: /^\/app-prefix\/g/, to: '/hub.html' },
         { from: /./, to: '/index.html' }
       ]
     }
@@ -124,9 +124,9 @@ module.exports = {
       filename: 'api-token.html'
     }),
     new HtmlWebPackPlugin({
-      chunks: ['console'],
+      chunks: ['hub'],
       template: 'docs/index.html',
-      filename: 'console.html'
+      filename: 'hub.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({
