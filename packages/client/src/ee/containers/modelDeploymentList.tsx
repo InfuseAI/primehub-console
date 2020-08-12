@@ -206,12 +206,12 @@ class DeploymentListContainer extends React.Component<Props, State> {
       }
     }
 
-    const content = <div style={{margin: '16px 64px'}}>
+    const content = <div style={{margin: '16px 16px'}}>
         <Spin spinning={loading}>
-          <Row gutter={36} type="flex">
+          <Row gutter={24} type="flex">
             {phDeploymentsConnection.edges.map(edge => {
               return (
-                <Col span={6} key={edge.cursor} style={{marginBottom: 36}}>
+                <Col xs={24} md={12} xl={8} xxl={6} key={edge.cursor} style={{marginBottom: 16}}>
                   <DeploymentCard
                     deployment={edge.node}
                     copyClipBoard={this.copyClipBoard}
