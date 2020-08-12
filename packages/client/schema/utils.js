@@ -231,6 +231,21 @@ exports.renderActions = function(text, record, cannerProps) {
   )
 }
 
+exports.renderTextWithTooltip = function(text, tooltipText) {
+  return <>
+    {text}
+    <Tooltip
+      title={tooltipText}
+    >
+      <Icon
+        type="info-circle"
+        theme="filled"
+        style={{marginLeft: 8}}
+      />
+    </Tooltip>
+  </>
+}
+
 exports.SendEmailTitle = <FormattedMessage
   id="sendEmail"
   defaultMessage="Send Email"
@@ -505,6 +520,11 @@ exports.dict = {
     'buildImageJob.pip': 'Pip',
     'buildImageJob.conda': 'Conda',
     'buildImageJob.logEndpoint': 'Logs',
+
+    'usageReport.download.modal.title': 'This month is not over yet!',
+    'usageReport.download.modal.content': 'This report will only contain usage from the 1st of this month until today. Would you like to continue to download?',
+    'usageReport.table.id': 'Date',
+
     // maintenance notebook
     'maintenance.title': 'Maintenance',
     'maintenance.externalLink': '/maintenance',
@@ -752,6 +772,11 @@ exports.dict = {
     'buildImageJob.pip': 'Pip',
     'buildImageJob.conda': 'Conda',
     'buildImageJob.logEndpoint': 'Logs',
+
+    'usageReport.download.modal.title': 'This month is not over yet!',
+    'usageReport.download.modal.content': 'This report will only contain usage from the 1st of this month until today. Would you like to continue to download?',
+    'usageReport.table.id': 'Date',
+
     // maintenance notebook
     'maintenance.title': 'Maintenance',
     'maintenance.externalLink': '/maintenance',

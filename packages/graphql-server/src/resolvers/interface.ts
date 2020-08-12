@@ -37,7 +37,9 @@ export interface Context {
   k8sUploadServerSecret: K8sUploadServerSecret;
   k8sGroupPvc: K8sGroupPvc;
   namespace: string;
+  appPrefix: string;
   graphqlHost: string;
   jobLogCtrl: JobLogCtrl;
   phJobCacheList: PhJobCacheList;
+  usageReportAPIHost: string;
 }
