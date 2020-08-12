@@ -13,6 +13,7 @@ import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';
 import {GroupFragment} from 'containers/list';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
+import { GroupContextComponentProps, withGroupContext } from 'context/group';
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -53,8 +54,8 @@ export const sortItems = (items) => {
   return copiedItems;
 }
 
-type Props = RouteComponentProps & {
-  getGroups: any; 
+type Props = RouteComponentProps & GroupContextComponentProps & {
+  getGroups: any;
   createPhDeployment: any;
   createPhDeploymentResult: any;
 }
@@ -82,10 +83,12 @@ class DeploymentCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {getGroups, createPhDeploymentResult, history} = this.props;
+    const {groupContext, getGroups, createPhDeploymentResult, history} = this.props;
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []).filter(group => group.enabledDeployment || group.id === everyoneGroupId);
-    const groups = allGroups.filter(group => group.id !== everyoneGroupId);
+    const groups = allGroups
+      .filter(group => group.id !== everyoneGroupId)
+      .filter(group => !groupContext || groupContext.id === group.id );
     const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
     const group = groups
       .find(group => group.id === selectedGroup);
@@ -108,6 +111,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
         />
         <div style={{margin: '16px 64px'}}>
           <DeploymentCreateForm
+            groupContext={groupContext}
             onSelectGroup={this.onChangeGroup}
             selectedGroup={selectedGroup}
             groups={sortItems(groups)}
@@ -124,6 +128,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
 
 export default compose(
   withRouter,
+  withGroupContext,
   graphql(GET_MY_GROUPS, {
     name: 'getGroups'
   }),

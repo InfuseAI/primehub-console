@@ -14,16 +14,17 @@ import {GET_MY_GROUPS, GET_TIMEZONE, sortItems} from './scheduleCreatePage';
 import {get, unionBy, isEqual} from 'lodash';
 import {appPrefix} from '../../utils/env';
 import PageTitle from '../../components/pageTitle';
+import { withGroupContext, GroupContextComponentProps } from 'context/group';
 
 type Props = {
-  getGroups: any; 
+  getGroups: any;
   getPhSchedule: any;
   updatePhSchedule: Function;
   updatePhScheduleResult: any;
   getTimezone: Function;
 } & RouteComponentProps<{
   scheduleId: string;
-}>;
+}> & GroupContextComponentProps;
 
 export const GET_PH_SCHEDULE = gql`
   query phSchedule($where: PhScheduleWhereUniqueInput!) {
@@ -105,7 +106,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
   }
 
   render() {
-    const {getPhSchedule, getTimezone, getGroups, history, updatePhScheduleResult} = this.props;
+    const {groupContext, getPhSchedule, getTimezone, getGroups, history, updatePhScheduleResult} = this.props;
     if (getPhSchedule.loading) return null;
     if (getPhSchedule.error) {
       return getMessage(getPhSchedule.error)
@@ -135,6 +136,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
         />
         <div style={{margin: 16}}>
           <ScheduleUpdateForm
+            groupContext={groupContext}
             onSelectGroup={this.onChangeGroup}
             selectedGroup={selectedGroup}
             groups={sortItems(groups)}
@@ -160,6 +162,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
 
 export default compose(
   withRouter,
+  withGroupContext,
   graphql(GET_MY_GROUPS, {
     name: 'getGroups'
   }),

@@ -7,11 +7,12 @@ import {get} from 'lodash';
 import {withRouter, Link} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
-import ScheduleList from '../components/schedule/list';
-import {errorHandler} from '../components/job/errorHandler';
-import {Group} from '../components/job/groupFilter';
+import ScheduleList from 'ee/components/schedule/list';
+import {errorHandler} from 'ee/components/job/errorHandler';
+import {Group} from 'ee/components/shared/groupFilter';
 import withPath, { PathComponentProps } from '../components/job/withPath';
 import {appPrefix} from 'utils/env';
+import {GroupContextComponentProps} from 'context/group';
 
 export const PhScheduleFragment = gql`
   fragment PhScheduleInfo on PhSchedule {
@@ -86,7 +87,7 @@ type Props = {
   deletePhSchedule: any;
   runPhScheduleResult: any;
   deletePhScheduleResult: any;
-} & RouteComponentProps & PathComponentProps;
+} & RouteComponentProps & PathComponentProps & GroupContextComponentProps;
 
 class ScheduleListContainer extends React.Component<Props> {
   scheduleRefetch = (payload) => {
@@ -110,7 +111,7 @@ class ScheduleListContainer extends React.Component<Props> {
   }
 
   render() {
-    const {getPhScheduleConnection, runPhSchedule, runPhScheduleResult,deletePhScheduleResult, deletePhSchedule, groups, pathname} = this.props;
+    const {getPhScheduleConnection, runPhSchedule, runPhScheduleResult,deletePhScheduleResult, deletePhSchedule, groups, pathname, groupContext} = this.props;
     return (
       <ScheduleList
         schedulesLoading={getPhScheduleConnection.loading}
@@ -123,6 +124,7 @@ class ScheduleListContainer extends React.Component<Props> {
         deletePhScheduleResult={deletePhScheduleResult}
         deletePhSchedule={deletePhSchedule}
         groups={groups}
+        groupContext={groupContext}
       />
     );
   }
@@ -134,9 +136,15 @@ export default compose(
   graphql(GET_PH_SCHEDULE_CONNECTION, {
     options: (props: Props) => {
       const params = queryString.parse(props.location.search.replace(/^\?/, ''));
+      const {groupContext} = props;
+      const where = JSON.parse(params.where as string || '{}');
+      if (groupContext) {
+        where.groupId_in = [groupContext.id];
+      }
+
       return {
         variables: {
-          where: JSON.parse(params.where as string || '{}'),
+          where,
           orderBy: JSON.parse(params.orderBy as string || '{}'),
           page: Number(params.page || 1)
         },
