@@ -9,6 +9,7 @@ import iconJupyterHub from '../../images/icon-jupyterhub.svg'
 import iconJobs from '../../images/icon-jobs.svg'
 import iconSchedule from '../../images/icon-schedule.svg'
 import iconModels from '../../images/icon-models.svg'
+import {get} from 'lodash'
 
 const Icon = styled.img`
   width: 30px;
@@ -17,7 +18,7 @@ const Icon = styled.img`
 
 const Title = styled.span`
   margin-left: 16px;
-`
+`;
 
 const BadgeBeta = styled.sup`
   background-color: #52c41a;
@@ -27,7 +28,7 @@ const BadgeBeta = styled.sup`
   height: 12px;
   border-radius: 3px;
   padding: 6px 2px 2px 2px;
-`
+`;
 
 const BadgeAlpha = styled.sup`
   background-color: #b50606;
@@ -37,7 +38,8 @@ const BadgeAlpha = styled.sup`
   height: 12px;
   border-radius: 3px;
   padding: 6px 2px 2px 2px;
-`
+`;
+
 
 type Props = RouteComponentProps & {};
 class Sidebar extends React.Component<Props> {
@@ -50,7 +52,7 @@ class Sidebar extends React.Component<Props> {
         key = val;
       }
     });
-    const group = match.params.groupName;
+    const group = get(match, 'params.groupName', '');
 
     return (
       <Layout.Sider style={{paddingTop: 64}}>
