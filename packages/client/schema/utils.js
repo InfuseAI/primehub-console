@@ -265,7 +265,7 @@ exports.dict = {
     // common
     quotaForNewly: 'It only works for newly created volume.',
     // system
-    system: 'System',
+    system: 'System Settings',
     timezone: 'Timezone',
     name: 'Name',
     logo: 'Logo',
@@ -504,7 +504,13 @@ exports.dict = {
     'buildImageJob.apt': 'APT',
     'buildImageJob.pip': 'Pip',
     'buildImageJob.conda': 'Conda',
-    'buildImageJob.logEndpoint': 'Logs'
+    'buildImageJob.logEndpoint': 'Logs',
+    // maintenance notebook
+    'maintenance.title': 'Maintenance',
+    'maintenance.externalLink': '/maintenance',
+    // grafana
+    'grafana.title': 'Grafana',
+    'grafana.externalLink': '/grafana/login/generic_oauth'
   },
   zh: {
     // common
@@ -745,6 +751,12 @@ exports.dict = {
     'buildImageJob.apt': 'APT',
     'buildImageJob.pip': 'Pip',
     'buildImageJob.conda': 'Conda',
-    'buildImageJob.logEndpoint': 'Logs'
+    'buildImageJob.logEndpoint': 'Logs',
+    // maintenance notebook
+    'maintenance.title': 'Maintenance',
+    'maintenance.externalLink': '/maintenance',
+    // grafana
+    'grafana.title': 'Grafana',
+    'grafana.externalLink': '/grafana/login/generic_oauth'
   }
 }

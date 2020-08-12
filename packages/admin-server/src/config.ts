@@ -49,6 +49,9 @@ export interface Config {
   // image builder should have registry setup, use env.PRIMEHUB_CUSTOM_IMAGE_REGISTRY_ENDPOINT to determine it.
   customImageSetup: boolean;
 
+  enableMaintenanceNotebook: boolean;
+  enableGrafana: boolean;
+
   // license check
   enableLicenseCheck: boolean;
   // model deployment feature
@@ -83,6 +86,8 @@ const defaultConfigs = {
   enableDatasetUpload: false,
   enableWorkspace: false,
   enableCustomImage: false,
+  enableMaintenanceNotebook: false,
+  enableGrafana: false,
   customImageSetup: false,
   enableLicenseCheck: false,
   enableModelDeployment: false,
@@ -133,6 +138,10 @@ export const createConfig = (): Config => {
       process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE.toString() === 'true',
     enableCustomImage:
       process.env.PRIMEHUB_FEATURE_CUSTOM_IMAGE && process.env.PRIMEHUB_FEATURE_CUSTOM_IMAGE.toString() === 'true',
+    enableMaintenanceNotebook:
+      process.env.PRIMEHUB_FEATURE_MAINTENANCE_NOTEBOOK && process.env.PRIMEHUB_FEATURE_MAINTENANCE_NOTEBOOK.toString() === 'true',
+    enableGrafana:
+      process.env.PRIMEHUB_FEATURE_GRAFANA && process.env.PRIMEHUB_FEATURE_GRAFANA.toString() === 'true',
     customImageSetup: process.env.PRIMEHUB_CUSTOM_IMAGE_REGISTRY_ENDPOINT ? true : false,
     enableLicenseCheck:
       process.env.PRIMEHUB_FEATURE_LICENSE && process.env.PRIMEHUB_FEATURE_LICENSE.toString() === 'true',

@@ -13,6 +13,8 @@ import {RouteComponentProps} from 'react-router';
 import myLocales from './utils/locales';
 import get from 'lodash.get';
 import update from 'lodash/update';
+import {dict} from 'schema/utils';
+import iconNewTab from 'images/icon-new-tab.svg'
 const {Sider, Content} = Layout;
 const confirm = Modal.confirm;
 declare global {
@@ -357,6 +359,8 @@ export default class CMSPage extends React.Component<Props, State> {
     } else if (key === 'workspace') {
       const defaultWorkspaceId = (workspaceList.find(ws => ws.isDefault) || {}).id || 'default';
       history.push(`${(window as any).APP_PREFIX}cms/${defaultWorkspaceId}/${key}`);
+    } else if (dict['en'][`${key}.externalLink`]) {
+      // add this condition to keep page content not change when opening external link
     } else {
       history.push(`${(window as any).APP_PREFIX}cms/${workspaceId}/${key}`);
     }
@@ -416,11 +420,21 @@ export default class CMSPage extends React.Component<Props, State> {
                 return false;
               }
               return key !== 'workspace';
-            }).map(key => (
-              <Menu.Item key={key}>
-                {this.schema.schema[key].title}
-              </Menu.Item>
-            ))
+            }).map(key => dict['en'][`${key}.externalLink`]?
+              (
+                <Menu.Item key={key}>
+                  <a href={dict['en'][`${key}.externalLink`]} target='_blank'>
+                    {dict['en'][`${key}.title`]}&nbsp;&nbsp;&nbsp;
+                    <img src={iconNewTab} width='10px' height='10px'/>
+                  </a>
+                </Menu.Item>
+              ):
+              (
+                <Menu.Item key={key}>
+                  {this.schema.schema[key].title}
+                </Menu.Item>
+              )
+            )
         }
       </Menu>
     );

@@ -79,6 +79,8 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.state.enableDatasetUpload = config.enableDatasetUpload;
     ctx.state.enableWorkspace = config.enableWorkspace;
     ctx.state.enableCustomImage = config.enableCustomImage;
+    ctx.state.enableMaintenanceNotebook = config.enableMaintenanceNotebook;
+    ctx.state.enableGrafana = config.enableGrafana;
     ctx.state.customImageSetup = config.customImageSetup;
     ctx.state.enableLicenseCheck = config.enableLicenseCheck;
     ctx.state.enableModelDeployment = config.enableModelDeployment;

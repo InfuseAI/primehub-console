@@ -17,22 +17,20 @@ import UserBody from '../../src/cms-layouts/userBody';
 
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
-    <System/>
     <Body component={CommonBody}>
       {/* <Idp/> */}
       {/* <UserFederation/> */}
+      <Group/>
       <Workspaces />
     </Body>
     <Body component={UserBody}>
       <User/>
     </Body>
     <Body component={CommonBody}>
-      <Group/>
       <InstanceType/>
-    </Body>
-    <Body component={CommonBody}>
       <Secret />
     </Body>
+    <System/>
     {/* <Announcement /> */}
   </root>
 )

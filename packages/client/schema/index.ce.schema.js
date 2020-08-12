@@ -21,17 +21,16 @@ import {isArray} from 'lodash';
 
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
-    <System/>
     <Body component={CommonBody}>
       {/* <Idp/> */}
       {/* <UserFederation/> */}
+      <Group/>
       <Workspaces />
     </Body>
     <Body component={UserBody}>
       <User/>
     </Body>
     <Body component={CommonBody}>
-      <Group/>
       <InstanceType/>
       <Image/>
     </Body>
@@ -41,6 +40,7 @@ const schema = (
     <Body component={CommonBody}>
       <Secret />
     </Body>
+    <System/>
     {/* <Announcement /> */}
   </root>
 )
