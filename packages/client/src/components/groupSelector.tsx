@@ -33,8 +33,9 @@ class GroupSelector extends React.Component<GroupSelectorProps, State> {
   };
 
   handleChange = (groupName) => {
-    const {onSelectGroup, history} = this.props;
-    history.push(`${appPrefix}g/${groupName}/home`);
+    const {history, match} = this.props;
+    const subPath = get(match, 'params.subPath', 'home')
+    history.push(`${appPrefix}g/${groupName}/${subPath}`);
   }
 
   componentDidMount() {

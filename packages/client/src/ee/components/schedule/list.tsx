@@ -208,14 +208,12 @@ class ScheduleList extends React.Component<Props> {
         />
         <PageBody>
           <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
-            <div style={{marginBottom: 16}}>
-              <InfuseButton icon="plus" onClick={this.scheduleJob} style={{width: 140}} type="primary">
-                Schedule Job
-              </InfuseButton>
-              <InfuseButton onClick={this.refresh} style={{marginLeft: 16}}>
-                Refresh
-              </InfuseButton>
-            </div>
+            <InfuseButton icon="plus" onClick={this.scheduleJob} style={{width: 140}} type="primary">
+              Schedule Job
+            </InfuseButton>
+            <InfuseButton onClick={this.refresh} style={{marginLeft: 16}}>
+              Refresh
+            </InfuseButton>
           </div>
           <Filter
             groupContext={groupContext}

@@ -111,7 +111,16 @@ export class Main extends React.Component<Props, State> {
               <Header />
             }
           </Route>
-          <Route path={`${appPrefix}g/:groupName`}>
+          <Route path={`${appPrefix}g/:groupName`} exact>
+            <Header
+              GroupSelectorCom={GroupSelector}
+              groupSelectorProps={{
+                groups,
+                onSelectGroup: this.onSelectGroup
+              }}
+            />
+          </Route>
+          <Route path={`${appPrefix}g/:groupName/:subPath`}>
             <Header
               GroupSelectorCom={GroupSelector}
               groupSelectorProps={{

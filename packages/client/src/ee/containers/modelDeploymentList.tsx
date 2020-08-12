@@ -161,7 +161,7 @@ class DeploymentListContainer extends React.Component<Props, State> {
     let showContent = true;
 
     let pageBody = <>
-      <div style={{textAlign: 'right', margin: '16px 0px 5px'}}>
+      <div style={{textAlign: 'right'}}>
         <Search
           placeholder="Search deploy name"
           style={{width: 295, margin: 'auto 16px'}}
@@ -238,7 +238,6 @@ class DeploymentListContainer extends React.Component<Props, State> {
         <PageTitle
           breadcrumb={<DeploymentBreadcrumb />}
           title={"Model Deployments"}
-          style={{paddingLeft: 64}}
         />
         <PageBody>{pageBody}</PageBody>
         { showContent ? content : <></> }

@@ -319,19 +319,17 @@ class JobList extends React.Component<Props> {
         />
         <PageBody>
           <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
-            <div style={{marginBottom: 16}}>
-              <InfuseButton
-                icon="plus"
-                onClick={this.createPhJob}
-                style={{marginRight: 16, width: 120}}
-                type="primary"
-              >
-                Create Job
-              </InfuseButton>
-              <InfuseButton onClick={this.refresh}>
-                Refresh
-              </InfuseButton>
-            </div>
+            <InfuseButton
+              icon="plus"
+              onClick={this.createPhJob}
+              style={{marginRight: 16, width: 120}}
+              type="primary"
+            >
+              Create Job
+            </InfuseButton>
+            <InfuseButton onClick={this.refresh}>
+              Refresh
+            </InfuseButton>
           </div>
           <Filter
             groupContext={groupContext}
