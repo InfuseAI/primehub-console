@@ -72,7 +72,7 @@ export default compose(
         // default  page=1
         if (props.location.search) return;
         props.history.replace({
-          pathname: `${appPrefix}${props.pathname}`,
+          pathname: props.location.pathname,
           search: queryString.stringify({page: 1})
         });
       },

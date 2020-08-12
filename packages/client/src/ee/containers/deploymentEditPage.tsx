@@ -8,7 +8,6 @@ import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'ee/components/job/errorHandler';
 import DeploymentCreateForm from 'ee/components/modelDeployment/createForm';
-import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';
 import {PhDeploymentFragment} from 'ee/components/modelDeployment/common';
@@ -42,7 +41,7 @@ export const sortItems = (items) => {
 }
 
 type Props = RouteComponentProps<{deploymentId: string}> & {
-  getGroups: any; 
+  getGroups: any;
   updatePhDeployment: any;
   updatePhDeploymentResult: any;
   getPhDeployment: any;
@@ -77,14 +76,14 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       updateMessage: get(getPhDeployment, 'phDeployment.updateMessage'),
     }
     if (isEqual(values, initialValue))
-      return history.push(`${appPrefix}model-deployment`);
+      return history.goBack();
 
     Modal.confirm({
       title: 'Do you want to discard the changes?',
       content: 'Your changes will be lost. Are you sure?',
       okText: 'Discard',
       cancelText: 'Cancel',
-      onOk: () => history.push(`${appPrefix}model-deployment`),
+      onOk: () => history.goBack(),
       cancelButtonProps: {
         style: {
           float: 'right',
@@ -161,7 +160,7 @@ export default compose(
     options: (props: Props) => ({
       onCompleted: (data: any) => {
         const {history} = props;
-        history.push(`${appPrefix}model-deployment`);
+        history.push(`../../model-deployment`);
         notification.success({
           duration: 10,
           placement: 'bottomRight',
@@ -169,7 +168,7 @@ export default compose(
           description: (
             <>
               Your update has begun deploying.
-              Click <a onClick={() => history.push(`${appPrefix}model-deployment/${data.updatePhDeployment.id}`)}>here</a> to view.
+              Click <a onClick={() => history.push(`model-deployment/${data.updatePhDeployment.id}`)}>here</a> to view.
             </>
           )
         });

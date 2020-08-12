@@ -137,7 +137,7 @@ export default compose(
       onCompleted: (data: any) => {
         const {history} = props;
         history.push({
-          pathname: `${appPrefix}model-deployment`,
+          pathname: `../model-deployment`,
           search: queryString.stringify({first: 8})
         });
         notification.success({
@@ -147,7 +147,7 @@ export default compose(
           description: (
             <>
               Your model has begun deploying.
-              Click <a onClick={() => history.push(`${appPrefix}model-deployment/${data.createPhDeployment.id}`)}>here</a> to view.
+              Click <a onClick={() => history.push(`model-deployment/${data.createPhDeployment.id}`)}>here</a> to view.
             </>
           )
         });

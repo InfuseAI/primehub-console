@@ -44,24 +44,11 @@ class Sidebar extends React.Component<Props> {
               Schedule
             </Link>
           </Menu.Item>
-
-          {
-          //<Menu.Item key="job">
-            //<Link to={`${appPrefix}job`}>
-              //Job
-            //</Link>
-          //</Menu.Item>
-          //<Menu.Item key="schedule">
-            //<Link to={`${appPrefix}schedule`}>
-              //Schedule
-            //</Link>
-          //</Menu.Item>
-          //<Menu.Item key="model-deployment">
-            //<Link to={`${appPrefix}model-deployment`}>
-              //Model Deployment
-            //</Link>
-          //</Menu.Item>
-          }
+          <Menu.Item key="model-deployment">
+            <Link to={`${appPrefix}g/${group}/model-deployment`}>
+              Model Deployment
+            </Link>
+          </Menu.Item>
         </Menu>
       </Layout.Sider>
     );
