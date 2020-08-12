@@ -72,7 +72,7 @@ export default class Detail extends React.Component<Props> {
   handleClick = (action: 'Cancel' | 'Rerun') => {
     const {job, rerunPhJob, cancelPhJob} = this.props;
     const {id} = job;
-    if (action === 'Cancel') 
+    if (action === 'Cancel')
       return confirm({
         title: `Cancel`,
         content: `Do you want to cancel '${job.displayName || job.name}'?`,
@@ -157,7 +157,7 @@ export default class Detail extends React.Component<Props> {
               <Field labelCol={4} valueCol={20} label="Job name" value={job.displayName || '-'} />
               <Field labelCol={4} valueCol={20} label="Schedule" value={
                 job.schedule ? (
-                  <Link to={`${appPrefix}schedule/${job.schedule}`}>
+                  <Link to={`../schedule/${job.schedule}`}>
                     {job.schedule}
                   </Link>
                 ) : '-'

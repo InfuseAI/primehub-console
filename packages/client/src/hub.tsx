@@ -30,35 +30,183 @@ const graphqlClient = new GraphqlClient({
 });
 
 const fakeData = {
-  "me": {
-    "groups": [
-      {
-        "id": "927406f6-88b0-490e-8e36-7835224fdf13",
-        "displayName": "Dev Team",
-        "name": "devteam"
-      },
-      {
-        "id": "e940f720-3fb7-43bf-b24f-f41076fe9d5e",
-        "displayName": "InfuseAI",
-        "name": "infuseai"
-      },
-      {
-        "id": "ddcbf952-0335-4074-ab52-74ac99a44b52",
-        "displayName": "",
-        "name": "model-deployment-test-group"
-      },
-      {
-        "id": "bc0dc0e6-04d4-4ab0-a64c-71d298a9c0ad",
-        "displayName": null,
-        "name": "Project_at100_group1"
-      },
-      {
-        "id": "5a705edf-69a0-4fed-bc39-c54bdace72e8",
-        "displayName": "VIP",
-        "name": "vip"
-      }
-    ]
-  }
+  me: {
+    groups: [{
+      id: 'group1',
+      name: 'group1',
+      displayName: 'c-Group 1',
+      instanceTypes: [{
+        id: 'g-it1',
+        name: 'IT1',
+        displayName: 'group1 it'
+      }],
+      images: [{
+        id: 'g-it1',
+        name: 'IT1',
+        displayName: 'group1 im',
+      }]
+    }, {
+      id: 'group2',
+      name: 'group2',
+      displayName: 'Group 2',
+      instanceTypes: [{
+        id: 'ggit1',
+        name: 'IT1',
+        displayName: 'group2 it'
+      }],
+      images: [{
+        id: 'ggit2',
+        name: 'IT1',
+        displayName: 'group2 im',
+      }]
+    }, {
+      id: 'everyone',
+      name: 'everyone',
+      displayName: 'Group DisplayName',
+      instanceTypes: [{
+        id: 'everyone-it',
+        name: 'it',
+        displayName: 'gpu0',
+        gpuLimit: 0,
+        cpuLimit: 0.5,
+        memoryLimit: 4,
+      }, {
+        id: 'everyone-it2',
+        name: 'it',
+        displayName: 'gpu1',
+        gpuLimit: 1
+      }],
+      images: [{
+        id: 'everyone-image',
+        name: 'b-cpu',
+        displayName: 'b-cpu',
+        type: 'cpu'
+      }, {
+        id: 'everyone-image2',
+        name: 'a-gpu',
+        displayName: 'a-gpu',
+        type: 'gpu'
+      }, {
+        id: 'everyone-image3',
+        name: 'c-img',
+        displayName: 'c-img',
+        type: 'both'
+      }]
+    }]
+  },
+  phJobs: [{
+    id: 'it1',
+    name: 'IT1',
+    displayName: 'IT1',
+    schedule: 'it1',
+    phase: 'Running',
+    groupId: 'group1',
+    groupName: 'group1',
+    createTime: '2019-10-04T14:48:00.000Z',
+    startTime: '2019-10-04T14:48:00.000Z',
+    finishTime: '2019-10-04T15:48:00.000Z',
+    message: `batch1
+    batch2
+    batch3
+    batch4
+    `,
+    command: `fdsf`,
+    instanceType: {
+      id: 'everyone-it',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    }
+  }, {
+    id: 'it2',
+    name: 'IT2',
+    groupId: 'group2',
+    groupName: 'group2',
+    instanceType: {
+      id: 'no-instanceType',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    },
+    displayName: 'IT2',
+    phase: 'Failed',
+    message: `
+    batch1
+    batch2
+    batch3
+    batch4`,
+    reason: 'PodFailed'
+  }, {
+    id: 'it3',
+    name: 'IT3',
+    displayName: 'IT3',
+    groupId: 'group1',
+    groupName: 'group1',
+    phase: 'Failed',
+    message: `
+    batch1
+    batch2
+    batch3
+    batch4
+    Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "<stdin>", line 3, in divide
+  TypeError: unsupported operand type(s) for /: 'str' and 'str'`
+  }, {
+    id: 'it4',
+    name: 'IT4',
+    displayName: 'IT4',
+    groupId: 'group1',
+    groupName: 'group1',
+    phase: 'Failed',
+    message: `Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "<stdin>", line 3, in divide
+  TypeError: unsupported operand type(s) for /: 'str' and 'str'TypeError: unsupported operand type(s) for /: 'str' and 'str'
+`
+  }, {
+    id: 'it5',
+    name: 'IT5',
+    displayName: 'IT5',
+    groupId: 'group1',
+    groupName: 'group1',
+    phase: 'Cancelled',
+    message: `Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "<stdin>", line 3, in divide
+  TypeError: unsupported operand type(s) for /: 'str' and 'str'TypeError: unsupported operand type(s) for /: 'str' and 'str'
+`
+  }],
+  phSchedules: [{
+    id: 'it1',
+    name: 'IT1',
+    displayName: 'IT1',
+    nextRunTime: '2019-12-26T14:24:22Z',
+    recurrence: {
+      type: 'weekly',
+      cron: '* */2 * * *',
+    },
+    invalid: true,
+    message: 'Something happened',
+    command: 'haha',
+    userId: 'userId',
+    userName: 'phadmin',
+    groupId: 'groupId1',
+    groupName: 'groupName1',
+    image: 'image name',
+    instanceType: {
+      id: 'g-it1',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    },
+  }]
 }
 
 const connector = new LocalStorageConnector({
@@ -68,7 +216,14 @@ const connector = new LocalStorageConnector({
 
 const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
-  {connector, schema: {me: {type: 'object'}}});
+  {
+    connector,
+    schema: {
+      me: {type: 'object'},
+      phJobs: {type: 'array',items: {type: 'object'}},
+      phSchedules: {type: 'array',items: {type: 'object'}}
+    }
+  });
 
 
 class Hub extends React.Component {

@@ -34,6 +34,17 @@ class Sidebar extends React.Component<Props> {
               JupyterHub
             </Link>
           </Menu.Item>
+          <Menu.Item key="job">
+            <Link to={`${appPrefix}g/${group}/job?page=1`}>
+              Jobs
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="schedule">
+            <Link to={`${appPrefix}g/${group}/schedule?page=1`}>
+              Schedule
+            </Link>
+          </Menu.Item>
+
           {
           //<Menu.Item key="job">
             //<Link to={`${appPrefix}job`}>

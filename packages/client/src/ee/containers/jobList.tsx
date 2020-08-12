@@ -99,7 +99,7 @@ class JobListContainer extends React.Component<Props> {
       getPhJobConnection.refetch(payload);
     } else {
       history.replace({
-        pathname: `${appPrefix}job`,
+        pathname: `job`,
         search
       });
     }

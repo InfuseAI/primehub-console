@@ -12,7 +12,15 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {withRouter} from 'react-router';
-import withPath from 'ee/components/job/withPath';
+import { GroupContextValue, GroupContext } from 'context/group';
+
+import ListContainer from 'containers/list';
+import JobDetailContainer from 'ee/containers/jobDetail';
+import JobCreatePage from 'ee/containers/jobCreatePage';
+import JobListContainer from 'ee/containers/jobList';
+import ScheduleDetailContainer from 'ee/containers/scheduleDetail';
+import ScheduleCreatePage from 'ee/containers/scheduleCreatePage';
+import ScheduleListContainer from 'ee/containers/scheduleList';
 
 const HEADER_HEIGHT = 64;
 
@@ -57,22 +65,37 @@ export class Main extends React.Component<Props, State> {
   }
 
   onSelectGroup = (groupName) => {
-    if (this.state.currentGroupName !== groupName) {
+    const {currentGroupName} = this.state;
+
+    if ( currentGroupName !== groupName) {
       this.setState({
         currentGroupName: groupName
-      })
+      });
     }
   }
 
-  render() {
-    const {location, getMyGroups} = this.props;
-    const {currentGroupName} = this.state;
+  getGroups(): {
+    loading: boolean,
+    error: any,
+    groups: Array<GroupContextValue>
+  } {
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
-
+    const {getMyGroups} = this.props;
     const {loading, error, me} = getMyGroups;
-    const groups = loading || error ?
-      undefined :
-      me.groups.filter(group => group.id !== everyoneGroupId);
+    const groups = !loading && !error ?
+      me.groups.filter(group => group.id !== everyoneGroupId) :
+      undefined;
+    return {loading, error, groups};
+  }
+
+  render() {
+    const {location} = this.props;
+    const {currentGroupName} = this.state;
+    const {loading, error, groups} = this.getGroups();
+
+    const currentGroup = groups ?
+      groups.find(group => group.name === currentGroupName) :
+      undefined;
 
     return (
       <Layout>
@@ -88,7 +111,6 @@ export class Main extends React.Component<Props, State> {
               GroupSelectorCom={GroupSelector}
               groupSelectorProps={{
                 groups,
-                currentGroupName,
                 onSelectGroup: this.onSelectGroup
               }}
             />
@@ -99,14 +121,38 @@ export class Main extends React.Component<Props, State> {
             <Sidebar />
           </Route>
           <Content>
-            <Switch>
-              <Route path={`${appPrefix}g/:groupName`} exact>
-                <Redirect to={`${location.pathname}/home`} />
-              </Route>
-              <Route path={`${appPrefix}g/:groupName/:actionKey`}>
-                <div>{currentGroupName}</div>
-              </Route>
-            </Switch>
+            <GroupContext.Provider value={currentGroup}>
+              <Switch>
+                <Route path={`${appPrefix}g/:groupName`} exact>
+                  <Redirect to={`${location.pathname}/home`} />
+                </Route>
+                <Route path={`${appPrefix}g/:groupName/job`} exact>
+                  <ListContainer Com={JobListContainer} />
+                </Route>
+                <Route path={`${appPrefix}g/:groupName/job/create`} exact>
+                  <JobCreatePage />
+                </Route>
+                <Route
+                  path={`${appPrefix}g/:groupName/job/:jobId`}
+                  exact
+                  component={JobDetailContainer}
+                />
+                <Route path={`${appPrefix}g/:groupName/schedule`} exact>
+                  <ListContainer Com={ScheduleListContainer} />
+                </Route>
+                <Route path={`${appPrefix}g/:groupName/schedule/create`} exact>
+                  <ScheduleCreatePage />
+                </Route>
+                <Route
+                  path={`${appPrefix}g/:groupName/schedule/:scheduleId`}
+                  exact
+                  component={ScheduleDetailContainer}
+                />
+                <Route path={`${appPrefix}g/:groupName/:actionKey`}>
+                  <div>{currentGroupName}</div>
+                </Route>
+              </Switch>
+            </GroupContext.Provider>
           </Content>
         </Layout>
       </Layout>
