@@ -3,7 +3,7 @@ import {Layout, Menu} from 'antd';
 import {Link} from 'react-router-dom';
 import {appPrefix} from 'utils/env';
 import { withRouter, RouteComponentProps } from 'react-router';
-import {createConfig} from '@infuseai/graphql-server/src/config';
+import {createConfig} from '../../../../graphql-server/src/config';
 import styled from 'styled-components';
 import iconHome from '../../images/icon-home.svg'
 import iconJupyterHub from '../../images/icon-jupyterhub.svg'
