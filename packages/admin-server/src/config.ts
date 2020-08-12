@@ -51,6 +51,7 @@ export interface Config {
 
   enableMaintenanceNotebook: boolean;
   enableGrafana: boolean;
+  enableUsageReport: boolean;
 
   // license check
   enableLicenseCheck: boolean;
@@ -87,6 +88,7 @@ const defaultConfigs = {
   enableWorkspace: false,
   enableCustomImage: false,
   enableMaintenanceNotebook: false,
+  enableUsageReport: false, 
   enableGrafana: false,
   customImageSetup: false,
   enableLicenseCheck: false,
@@ -142,6 +144,8 @@ export const createConfig = (): Config => {
       process.env.PRIMEHUB_FEATURE_MAINTENANCE_NOTEBOOK && process.env.PRIMEHUB_FEATURE_MAINTENANCE_NOTEBOOK.toString() === 'true',
     enableGrafana:
       process.env.PRIMEHUB_FEATURE_GRAFANA && process.env.PRIMEHUB_FEATURE_GRAFANA.toString() === 'true',
+    enableUsageReport:
+      process.env.PRIMEHUB_FEATURE_USAGE && process.env.PRIMEHUB_FEATURE_USAGE.toString() === 'true',
     customImageSetup: process.env.PRIMEHUB_CUSTOM_IMAGE_REGISTRY_ENDPOINT ? true : false,
     enableLicenseCheck:
       process.env.PRIMEHUB_FEATURE_LICENSE && process.env.PRIMEHUB_FEATURE_LICENSE.toString() === 'true',
