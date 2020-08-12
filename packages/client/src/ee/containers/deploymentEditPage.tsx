@@ -117,7 +117,6 @@ class DeploymentCreatePage extends React.Component<Props, State> {
         <PageTitle
           title={`Update Deployment`}
           breadcrumb={<DeploymentBreadcrumb deploymentName={get(getPhDeployment, 'phDeployment.name')} />}
-          style={{paddingLeft: 64}}
         />
         <div style={{margin: '16px 64px'}}>
           <DeploymentCreateForm
