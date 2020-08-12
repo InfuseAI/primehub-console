@@ -365,7 +365,7 @@ class Job extends React.Component {
                         component={DeploymentDetailContainer}
                       />
                       <Route
-                        path={`${appPrefix}model-deployment/edit/:deploymentId`}
+                        path={`${appPrefix}model-deployment/:deploymentId/edit`}
                         exact
                       >
                         <DeploymentEditPage />
