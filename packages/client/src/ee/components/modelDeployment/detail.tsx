@@ -264,7 +264,7 @@ export default class Detail extends React.Component<Props, State> {
             }
             {
               <InfuseButton>
-                <Link to={`${appPrefix}model-deployment/edit/${phDeployment.id}`}>
+                <Link to={`${phDeployment.id}/edit`}>
                   Update
                 </Link>
               </InfuseButton>

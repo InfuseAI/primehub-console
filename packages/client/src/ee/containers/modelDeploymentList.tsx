@@ -7,7 +7,6 @@ import {get} from 'lodash';
 import {withRouter, Link} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
-import {appPrefix} from 'utils/env';
 import Pagination from 'components/share/pagination';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
@@ -171,7 +170,7 @@ class DeploymentListContainer extends React.Component<Props, State> {
         <InfuseButton
           icon="plus"
           type="primary"
-          onClick={() => history.push(`${appPrefix}model-deployment/create`)}
+          onClick={() => history.push(`model-deployment/create`)}
           style={{marginRight: 16, width: 'auto'}}
         >
           Create Deployment
