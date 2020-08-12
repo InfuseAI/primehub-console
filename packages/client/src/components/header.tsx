@@ -33,9 +33,10 @@ const Header = styled<Props & LayoutProps>(Layout.Header)`
 ` as any;
 
 export interface Props {
-  groups: Array<Record<string, any>>;
   onSelectGroup?: Function;
   pagePadding?: number;
+  GroupSelectorCom?: any;
+  groupSelectorProps?: any;
 }
 
 export default class HeaderContainer extends React.Component<Props, {}> {
@@ -71,7 +72,7 @@ export default class HeaderContainer extends React.Component<Props, {}> {
   }
 
   render() {
-    const {pagePadding, GroupSelectorCom, onSelectGroup} = this.props;
+    const {pagePadding, GroupSelectorCom, groupSelectorProps} = this.props;
     const thumbnail = (window as any).thumbnail;
     const isUserAdmin = (window as any).isUserAdmin;
     return (
@@ -81,7 +82,7 @@ export default class HeaderContainer extends React.Component<Props, {}> {
         </a>
         {
           GroupSelectorCom ? (
-            <GroupSelectorCom onSelectGroup={onSelectGroup} />
+            <GroupSelectorCom {...groupSelectorProps} />
           ) : (
             <span/>
           )

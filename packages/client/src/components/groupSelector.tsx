@@ -12,89 +12,59 @@ import {appPrefix} from 'utils/env';
 
 const { Option } = Select;
 
-export const GroupFragment = gql`
-  fragment GroupInfo on Group {
-    id
-    displayName
-    name
-    enabledDeployment
-  }
-`;
 
-export const GET_MY_GROUPS = gql`
-  query me {
-    me {
-      id
-      groups {
-        ...GroupInfo
-      }
-    }
-  }
-  ${GroupFragment}
-`
-
-
-type Props = {
-  getMyGroups: any;
+export type GroupSelectorProps = {
+  groups: Array<{
+    id: string;
+    name: string;
+    displayName: string;
+  }>
   onSelectGroup: Function;
-} & RouteComponentProps
-  & PathComponentProps;
+} & RouteComponentProps;
+
 
 type State = {
   currentGroupName: string;
 }
 
-class GroupSelector extends React.Component<Props, State> {
-  groups = [];
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      currentGroupName: ''
-    };
-  }
-
-  onSelectGroup (groupName) {
-    const {history} = this.props;
-    history.push(`${(window as any).APP_PREFIX}g/${groupName}/home`);
-  }
+class GroupSelector extends React.Component<GroupSelectorProps, State> {
+  state = {
+    currentGroupName: undefined
+  };
 
   handleChange = (groupName) => {
-    const {onSelectGroup} = this.props;
-    this.onSelectGroup(groupName);
-    this.setState({currentGroupName: groupName});
-
-    if (onSelectGroup) {
-      onSelectGroup(groupName);
-    }
+    const {onSelectGroup, history} = this.props;
+    history.push(`${appPrefix}g/${groupName}/home`);
   }
 
   componentDidMount() {
-    const {onSelectGroup, match} = this.props;
-    const currentGroupName = (match.params as any).groupName || null;
+    this.syncCurrentGroupName();
+  }
 
-    if (currentGroupName) {
-      this.setState({currentGroupName});
-      if (onSelectGroup) {
-        onSelectGroup(currentGroupName);
+  componentDidUpdate(prevProps, prevState) {
+    this.syncCurrentGroupName();
+  }
+
+  syncCurrentGroupName() {
+    const {onSelectGroup, groups, match, history} = this.props;
+    const {currentGroupName} = this.state;
+    const matchGroupName = (match.params as any).groupName || null;
+
+    if (groups && groups.length > 0) {
+      if (groups.find(group => group.name === matchGroupName)) {
+        if (currentGroupName != matchGroupName) {
+          this.setState({currentGroupName: matchGroupName});
+          onSelectGroup(matchGroupName);
+        }
+      } else {
+        history.push(`${appPrefix}g/${groups[0].name}/home`);
       }
     }
   }
 
   render() {
-    const {
-      getMyGroups,
-      history,
-      match
-    } = this.props;
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
-    if (getMyGroups.loading) return null;
-    if (getMyGroups.error) return 'Error';
-
-    const groups = get(getMyGroups, 'me.groups', [])
-      .filter(group => group.id !== everyoneGroupId);
-
-    this.groups = groups;
+    const {groups} = this.props;
+    const {currentGroupName} = this.state;
 
     return (
       <div
@@ -103,12 +73,12 @@ class GroupSelector extends React.Component<Props, State> {
         <label style={{marginRight: '5px'}}>
           Group:
         </label>
-        <Select size={'small'} value={this.state.currentGroupName} placeholder="Please select a group" onChange={this.handleChange} style={{width: "160px", fontSize: "12px"}}>
-          {groups.map(group => (
+        <Select size={'small'} value={currentGroupName} placeholder="Please select a group" onChange={this.handleChange} style={{width: "160px", fontSize: "12px"}}>
+          {groups ? groups.map(group => (
             <Option key={group.id} value={group.name}>
               {group.displayName || group.name}
             </Option>
-          ))}
+          )) : [] }
         </Select>
       </div>
     )
@@ -116,21 +86,5 @@ class GroupSelector extends React.Component<Props, State> {
 }
 
 export default compose(
-  withRouter,
-  withPath,
-  graphql(GET_MY_GROUPS, {
-    name: 'getMyGroups',
-    options: (props: Props) => ({
-      onCompleted: data => {
-        if (!data.me && !data.me.groups) return;
-        const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
-        const groups: Array<any> = data.me.groups.filter(group => group.id !== everyoneGroupId);
-        const groupName= props.match.params.groupName;
-        if (groupName && groups.find(group => group.name === groupName)) return;
-        let firstGroup = groups[0];
-        (window as any).location.href = `${appPrefix}g/${firstGroup.name}/home`;
-      },
-      fetchPolicy: 'cache-and-network'
-    }),
-  })
+  withRouter
 )(GroupSelector)
