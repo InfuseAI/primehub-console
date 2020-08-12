@@ -1,0 +1,32 @@
+type UsageReport {
+  id: ID!
+  url: String
+}
+
+"""order"""
+input UsageReportOrderByInput {
+  id: ID
+}
+
+"""An edge in a connection."""
+type UsageReportEdge {
+  """The item at the end of the edge."""
+  node: UsageReport!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type UsageReportConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [UsageReportEdge]!
+}
+
+input UsageReportWhereInput {
+  id_contains: String
+  # workspace
+  workspaceId: String
+}

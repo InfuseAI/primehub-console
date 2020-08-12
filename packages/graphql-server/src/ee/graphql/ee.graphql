@@ -2,6 +2,7 @@
 # import PhJob, PhJobOrderByInput, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput, PhJobCreateInput, PhJobCancelResponse from "./phJob.graphql"
 # import PhSchedule, PhScheduleOrderByInput, PhScheduleConnection, PhScheduleWhereUniqueInput, PhScheduleWhereInput, PhScheduleCreateInput, PhScheduleUpdateInput, PhScheduleDeleteResponse, PhScheduleRunResponse from "./phSchedule.graphql"
 # import PhDeployment, PhDeploymentConnection, PhDeploymentWhereUniqueInput, PhDeploymentWhereInput, PhDeploymentCreateInput, PhDeploymentUpdateInput, PhDeploymentClientCreateInput, PhDeploymentClientCreateResponse, PhDeploymentClientWhereUniqueInput from "./phDeployment.graphql"
+# import UsageReport, UsageReportOrderByInput, UsageReportConnection, UsageReportWhereInput from "./usageReport.graphql"
 
 scalar JSON
 
@@ -104,6 +105,26 @@ type Query {
     first: Int
     last: Int
   ): PhDeploymentConnection!
+
+  """UsageReport"""
+  usageReports(
+    where: UsageReportWhereInput
+    page: Int
+    orderBy: UsageReportOrderByInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [UsageReport]!
+  usageReportsConnection(
+    where: UsageReportWhereInput
+    page: Int
+    orderBy: UsageReportOrderByInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): UsageReportConnection!
 }
 
 type Mutation {
