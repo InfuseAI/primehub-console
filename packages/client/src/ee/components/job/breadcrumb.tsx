@@ -9,19 +9,6 @@ type Props = RouteComponentProps & {
 };
 
 
-function getBreadcrumbName(url: string, jobName: string) {
-  switch (url) {
-    case `${appPrefix}job`:
-      return 'Job Submission'
-    case `${appPrefix}job/create`:
-      return 'Create Job';
-  }
-
-  return `Job: ${jobName}`
-
-}
-
-
 class JobBreadcrumb extends React.Component<Props> {
 
   render() {

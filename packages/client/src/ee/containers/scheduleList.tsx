@@ -11,7 +11,6 @@ import ScheduleList from 'ee/components/schedule/list';
 import {errorHandler} from 'ee/components/job/errorHandler';
 import {Group} from 'ee/components/shared/groupFilter';
 import withPath, { PathComponentProps } from '../components/job/withPath';
-import {appPrefix} from 'utils/env';
 import {GroupContextComponentProps} from 'context/group';
 
 export const PhScheduleFragment = gql`
@@ -104,7 +103,7 @@ class ScheduleListContainer extends React.Component<Props> {
       getPhScheduleConnection.refetch(payload);
     } else {
       history.replace({
-        pathname: `${appPrefix}${pathname}`,
+        pathname: `schedule`,
         search
       });
     }
@@ -168,7 +167,7 @@ export default compose(
             <div>
               {jobName} has been submitted! You can
               <a onClick={() => {
-                props.history.push(`${appPrefix}job/${jobId}`)
+                props.history.push(`job/${jobId}`)
                 modal.destroy();
               }}>
                 {` `}

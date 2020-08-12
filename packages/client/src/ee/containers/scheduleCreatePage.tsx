@@ -11,7 +11,6 @@ import ScheduleBreadCrumb from 'ee/components/schedule/breadcrumb';
 import {errorHandler} from 'ee/components/job/errorHandler';
 import ScheduleCreateForm from 'ee/components/job/createForm';
 import {GroupFragment} from 'containers/list';
-import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
 
@@ -154,7 +153,7 @@ export default compose(
     options: (props: Props) => ({
       onCompleted: () => {
         props.history.push({
-          pathname: `${appPrefix}schedule`,
+          pathname: `../schedule`,
           search: queryString.stringify({page: 1})
         });
       },
