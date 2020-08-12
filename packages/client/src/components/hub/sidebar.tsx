@@ -3,6 +3,7 @@ import {Layout, Menu} from 'antd';
 import {Link} from 'react-router-dom';
 import {appPrefix} from 'utils/env';
 import { withRouter, RouteComponentProps } from 'react-router';
+import {get} from 'lodash'
 
 type Props = RouteComponentProps & {};
 class Sidebar extends React.Component<Props> {
@@ -15,7 +16,7 @@ class Sidebar extends React.Component<Props> {
         key = val;
       }
     });
-    const group = match.params.groupName;
+    const group = get(match, 'params.groupName', '');
 
     return (
       <Layout.Sider style={{paddingTop: 64}}>

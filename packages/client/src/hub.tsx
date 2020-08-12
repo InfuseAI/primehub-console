@@ -6,25 +6,9 @@ import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlCli
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {Layout, notification, Button, Skeleton} from 'antd';
 import {BrowserRouter, Router, Route, Switch} from 'react-router-dom';
-import Header from 'components/header';
-import GroupSelector from 'components/groupSelector';
-import Sidebar from 'components/hub/sidebar';
 import styled from 'styled-components';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
-import {appPrefix} from 'utils/env';
-import HubIframe from 'components/hub/iframe';
-import ListContainer from './containers/list';
-import JobDetailContainer from 'ee/containers/jobDetail';
-import JobCreatePage from 'ee/containers/jobCreatePage';
-import JobListContainer from 'ee/containers/jobList';
-import ScheduleDetailContainer from 'ee/containers/scheduleDetail';
-import ScheduleCreatePage from 'ee/containers/scheduleCreatePage';
-import ScheduleListContainer from 'ee/containers/scheduleList';
-import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
-import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
-import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
-import DeploymentEditPage from 'ee/containers/deploymentEditPage';
-import { Redirect } from 'react-router';
+import Main from 'containers/main';
 const HEADER_HEIGHT = 64;
 
 const Content = styled(Layout.Content)`
@@ -86,57 +70,14 @@ const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
   {connector, schema: {me: {type: 'object'}}});
 
-type Props = {
 
-}
-type State = {
-  currentGroupName: string;
-}
-
-
-class Hub extends React.Component<Props, State> {
-  state = {
-    currentGroupName: ''
-  }
-
-  onSelectGroup = (groupName) => {
-    if (this.state.currentGroupName !== groupName) {
-      this.setState({
-        currentGroupName: groupName
-      })
-    }
-  }
-
+class Hub extends React.Component {
   render() {
-    const {currentGroupName} = this.state;
     return (
       <BrowserRouter>
-        <Layout>
-          <ApolloProvider client={client}>
-            <Switch>
-              <Route path={[`${appPrefix}g/:groupName/:actionKey` ,`${appPrefix}g`]} exact>
-                <Header pagePadding={8}
-                  GroupSelectorCom={GroupSelector}
-                  onSelectGroup={this.onSelectGroup}
-                />
-              </Route>
-              <Redirect to={`${appPrefix}g`}/>
-            </Switch>
-          </ApolloProvider>
-          <Layout>
-            <Sidebar />
-            <Content>
-                <Switch>
-                  <Route path={`${appPrefix}`} exact>
-                    <Skeleton />
-                  </Route>
-                  <Route path={`${appPrefix}g/:groupName/:actionKey`} exact>
-                    <div>{currentGroupName}</div>
-                  </Route>
-                </Switch>
-            </Content>
-          </Layout>
-        </Layout>
+        <ApolloProvider client={client}>
+          <Main />
+        </ApolloProvider>
       </BrowserRouter>
     )
   }
