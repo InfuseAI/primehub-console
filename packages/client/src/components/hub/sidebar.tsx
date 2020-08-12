@@ -4,7 +4,6 @@ import {Link} from 'react-router-dom';
 import {appPrefix} from 'utils/env';
 import { withRouter, RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
-import {createConfig} from '../../config';
 import iconHome from '../../images/icon-home.svg'
 import iconJupyterHub from '../../images/icon-jupyterhub.svg'
 import iconJobs from '../../images/icon-jobs.svg'
@@ -47,25 +46,25 @@ class Sidebar extends React.Component<Props> {
               <Title>Home</Title>
             </Link>
           </Menu.Item>
-          <Menu.Item key="hub" style={{display: config.primehubMode !== 'deploy' ? undefined : 'none'}}>
+          <Menu.Item key="hub">
             <Link to={`${appPrefix}g/${group}/hub`}>
               <Icon src={iconJupyterHub}/>
               <Title>JupyterHub</Title>
             </Link>
           </Menu.Item>
-          <Menu.Item key="job" style={{display: config.primehubMode === 'ee' ? undefined : 'none'}}>
+          <Menu.Item key="job">
             <Link to={`${appPrefix}g/${group}/job`}>
               <Icon src={iconJobs}/>
               <Title>Jobs</Title>
             </Link>
           </Menu.Item>
-          <Menu.Item key="schedule" style={{display: config.primehubMode === 'ee' ? undefined : 'none'}}>
+          <Menu.Item key="schedule">
             <Link to={`${appPrefix}g/${group}/schedule`}>
               <Icon src={iconSchedule}/>
               <Title>Schedule</Title>
             </Link>
           </Menu.Item>
-          <Menu.Item key="model-deployment" style={{display: config.primehubMode !== 'ce' ? undefined : 'none'}}>
+          <Menu.Item key="model-deployment">
             <Link to={`${appPrefix}g/${group}/model-deployment`}>
               <Icon src={iconModels}/>
               <Title>Models</Title>
