@@ -8,43 +8,38 @@ type Props = RouteComponentProps & {
   scheduleName?: string
 };
 
-function getBreadcrumbName(url: string, scheduleName: string) {
-  switch (url) {
-    case `${appPrefix}schedule`:
-      return 'Job Scheduler'
-    case `${appPrefix}schedule/create`:
-      return 'Create Schedule';
-  }
-
-  return `Schedule: ${scheduleName}`
-
-}
-
-
 class JobScheduleBreadcrumb extends React.Component<Props> {
 
   render() {
-    const { location, scheduleName } = this.props;
-    const pathSnippets = location.pathname.split('/').filter(i => i && i !== appPrefix.replace(/\//g, ''));
-    const extraBreadcrumbItems = pathSnippets.map((_, index) => {
-      const url = `${appPrefix}${pathSnippets.slice(0, index + 1).join('/')}`;
-      return (
-        <Breadcrumb.Item key={url}>
-          {
-            pathSnippets.length === index + 1 ?
-            getBreadcrumbName(url, scheduleName) :
-            <Link to={url}>{getBreadcrumbName(url, scheduleName)}</Link>
-          }
-        </Breadcrumb.Item>
-      );
-    });
+    const { match, scheduleName } = this.props;
+    const params = match.params as any
+
+    const basename = params.groupName ? `${appPrefix}g/${params.groupName}` : `${appPrefix}`;
+
     const breadcrumbItems = [
       <Breadcrumb.Item key="home">
-        <a href={`${appPrefix}`}>
-          <Icon type="home" />
-        </a>
+        {
+          params.groupName ?
+          <Link to={`${basename}`}><Icon type="home" /></Link> :
+          <a href={`${basename}`}><Icon type="home" /></a>
+        }
+
       </Breadcrumb.Item>,
-    ].concat(extraBreadcrumbItems);
+      <Breadcrumb.Item key="schedule">
+        <Link to={`${basename}/schedule?page=1`}>Job Scheduler</Link>
+      </Breadcrumb.Item>
+    ];
+
+    if (params.scheduleId) {
+      breadcrumbItems.push(<Breadcrumb.Item key="detail">
+        Schedule: {scheduleName}
+      </Breadcrumb.Item>)
+    } else if (match.url.endsWith('schedule/create')) {
+      breadcrumbItems.push(<Breadcrumb.Item key="create">
+        Create Schedule
+      </Breadcrumb.Item>)
+    }
+
     return (
       <Breadcrumb style={{marginBottom: 8}}>
         {breadcrumbItems}

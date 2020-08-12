@@ -102,7 +102,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
     const search = get(history, 'location.state.prevSearch');
     if (pathname)
       return history.push(`${pathname}${search}`)
-    history.push(`${appPrefix}schedule`)
+    history.push(`$../schedule`)
   }
 
   render() {
@@ -173,7 +173,7 @@ export default compose(
     options: (props: Props) => ({
       onCompleted: () => {
         props.history.push({
-          pathname: `${appPrefix}schedule`,
+          pathname: `../schedule`,
           search: queryString.stringify({page: 1})
         });
       },
