@@ -168,7 +168,7 @@ const createDeployment = async (context: Context, data: PhDeploymentMutationInpu
   const {crdClient, kcAdminClient, userId, username} = context;
   const group = await kcAdminClient.groups.findOne({id: data.groupId});
   const metadata = {
-    name: data.id,
+    name: data.id.toLowerCase(),
   };
   const spec = {
     updateTime: moment.utc().toISOString(),
