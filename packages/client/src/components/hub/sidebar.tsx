@@ -1,5 +1,5 @@
 import React from 'react';
-import {Layout, Menu} from 'antd';
+import {Layout, Menu, Badge} from 'antd';
 import {Link} from 'react-router-dom';
 import {appPrefix} from 'utils/env';
 import { withRouter, RouteComponentProps } from 'react-router';
@@ -9,8 +9,6 @@ import iconJupyterHub from '../../images/icon-jupyterhub.svg'
 import iconJobs from '../../images/icon-jobs.svg'
 import iconSchedule from '../../images/icon-schedule.svg'
 import iconModels from '../../images/icon-models.svg'
-
-const config = createConfig();
 
 const Icon = styled.img`
   width: 25px;
@@ -55,19 +53,31 @@ class Sidebar extends React.Component<Props> {
           <Menu.Item key="job">
             <Link to={`${appPrefix}g/${group}/job`}>
               <Icon src={iconJobs}/>
-              <Title>Jobs</Title>
+              <Badge count={'Beta'} offset={[0, 8]} style={{backgroundColor: '#adafbe'}}>
+                <div style={{width: "120px"}}>
+                  <Title>Jobs</Title>
+                </div>
+              </Badge>
             </Link>
           </Menu.Item>
           <Menu.Item key="schedule">
             <Link to={`${appPrefix}g/${group}/schedule`}>
               <Icon src={iconSchedule}/>
-              <Title>Schedule</Title>
+              <Badge count={'Beta'} offset={[0, 8]} style={{backgroundColor: '#adafbe'}}>
+                <div style={{width: "120px"}}>
+                  <Title>Schedule</Title>
+                </div>
+              </Badge>
             </Link>
           </Menu.Item>
           <Menu.Item key="model-deployment">
             <Link to={`${appPrefix}g/${group}/model-deployment`}>
               <Icon src={iconModels}/>
-              <Title>Models</Title>
+              <Badge count={'Alpha'} offset={[0, 8]} style={{backgroundColor: '#adafbe'}}>
+                <div style={{width: "120px"}}>
+                  <Title>Models</Title>
+                </div>
+              </Badge>
             </Link>
           </Menu.Item>
         </Menu>
