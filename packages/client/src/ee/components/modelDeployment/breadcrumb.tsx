@@ -30,21 +30,20 @@ class DeploymentBreadcrumb extends React.Component<Props> {
       </Breadcrumb.Item>
     ];
 
-    if (params.deploymentId) {
-      breadcrumbItems.push(<Breadcrumb.Item key="detail">
-        Deployment: {deploymentName}
-      </Breadcrumb.Item>)
-    }
-
     if (match.url.endsWith('/create')) {
       breadcrumbItems.push(<Breadcrumb.Item key="create">
         Create Deployment
       </Breadcrumb.Item>)
-    }
-
-    if (match.url.endsWith('/edit')) {
-      breadcrumbItems.push(<Breadcrumb.Item key="create">
+    } else if (match.url.endsWith('/edit')) {
+      breadcrumbItems.push(<Breadcrumb.Item key="deployment">
+        <Link to={`../${params.deploymentId}`}>Deployment: {deploymentName}</Link>
+      </Breadcrumb.Item>)
+      breadcrumbItems.push(<Breadcrumb.Item key="edit">
         Update Deployment
+      </Breadcrumb.Item>)
+    } else if (params.deploymentId) {
+      breadcrumbItems.push(<Breadcrumb.Item key="detail">
+        Deployment: {deploymentName}
       </Breadcrumb.Item>)
     }
 
