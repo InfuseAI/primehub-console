@@ -11,25 +11,27 @@ import Dataset from 'schema/dataset.schema';
 import Announcement from 'schema/announcement.schema';
 import Secret from 'schema/secret.schema';
 import Workspaces from 'schema/workspace.schema';
+import Jupyterhub from 'schema/jupyterhub.schema';
 import BuildImage from 'schema/ee/buildImage.schema';
 import BuildImageJob from 'schema/ee/buildImageJob.schema';
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {createFakeData} from 'canner-helpers';
 import {dict, graphqlClient, imageStorage} from 'schema/utils';
-import BuildImageJobBody from '../../src/cms-layouts/buildImageJobBody';
-import DatasetBody from '../../src/cms-layouts/datasetBody';
-import CommonBody from '../../src/cms-layouts/commonBody';
-import UserBody from '../../src/cms-layouts/userBody';
+import BuildImageJobBody from 'cms-layouts/buildImageJobBody';
+import DatasetBody from 'cms-layouts/datasetBody';
+import CommonBody from 'cms-layouts/commonBody';
+import UserBody from 'cms-layouts/userBody';
+import JupyterhubBody from 'cms-layouts/jupyterhubBody';
 import {isArray} from 'lodash';
 
 const maintenance = (
-  (typeof enableMaintenanceNotebook !== 'undefined' && enableMaintenanceNotebook) ? 
-    <object keyName="maintenance"></object> : 
+  (typeof enableMaintenanceNotebook !== 'undefined' && enableMaintenanceNotebook) ?
+    <object keyName="maintenance"></object> :
     {}
 );
 const grafana = (
-  (typeof enableGrafana !== 'undefined' && enableGrafana) ? 
-    <object keyName="grafana"></object> : 
+  (typeof enableGrafana !== 'undefined' && enableGrafana) ?
+    <object keyName="grafana"></object> :
     {}
 );
 
@@ -57,6 +59,9 @@ const schema = (
     </Body>
     <Body component={CommonBody}>
       <Secret />
+    </Body>
+    <Body component={JupyterhubBody}>
+      <Jupyterhub />
     </Body>
     <System/>
     {maintenance}
