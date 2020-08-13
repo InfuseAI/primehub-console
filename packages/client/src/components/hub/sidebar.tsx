@@ -46,7 +46,7 @@ class Sidebar extends React.Component<Props> {
           </Menu.Item>
           <Menu.Item key="model-deployment">
             <Link to={`${appPrefix}g/${group}/model-deployment`}>
-              Model Deployment
+              Models
             </Link>
           </Menu.Item>
         </Menu>

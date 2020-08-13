@@ -27,7 +27,7 @@ class JobBreadcrumb extends React.Component<Props> {
 
       </Breadcrumb.Item>,
       <Breadcrumb.Item key="job">
-        <Link to={`${basename}/job?page=1`}>Job Submission</Link>
+        <Link to={`${basename}/job?page=1`}>Jobs</Link>
       </Breadcrumb.Item>
     ];
 
