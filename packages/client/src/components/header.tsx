@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Menu, Layout, Avatar, Select, Form} from 'antd';
+import {Menu, Layout, Avatar, Select, Form, Tag} from 'antd';
 import {LayoutProps} from 'antd/lib/layout';
 import styled from 'styled-components';
 import logo from 'images/primehub-logo.svg';
@@ -76,8 +76,16 @@ export default class HeaderContainer extends React.Component<Props, {}> {
     const isUserAdmin = (window as any).isUserAdmin;
     return (
       <Header pagePadding={pagePadding}>
-        <a href="/" style={{display: "flex", marginRight: "auto"}}>
+        <a href="/" style={{display: "flex", marginRight: "auto", position: "relative"}}>
           <Logo />
+          <Tag title="Primehub Version" style={{
+            position: "absolute",
+            bottom: "5px",
+            right: 0,
+            fontSize: "7pt",
+            height: "16px",
+            lineHeight: "14px"
+          }}>{(window as any).primehubVersion}</Tag>
         </a>
         {
           GroupSelectorCom ? (

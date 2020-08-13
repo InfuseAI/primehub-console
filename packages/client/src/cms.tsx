@@ -478,7 +478,7 @@ export default class CMSPage extends React.Component<Props, State> {
 
     return (
       <Layout style={{minHeight: '100vh'}}>
-        <ContentHeader pagePadding={24}/>
+        <ContentHeader pagePadding={8}/>
         <Layout style={{marginTop: 64}}>
           <Sider breakpoint="sm"
             style={{

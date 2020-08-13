@@ -5,6 +5,7 @@ html
     include ./utils/head.pug
     script.
       window.APP_PREFIX = "#{staticPath}";
+      window.primehubVersion = "#{primehubVersion}"
     block head
   body
     //- script(src="https://cdnjs.cloudflare.com/ajax/libs/react/16.4.0/umd/react.production.min.js")

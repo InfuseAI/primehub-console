@@ -62,6 +62,8 @@ export interface Config {
   // maximux group
   licenseStatus: string;
   maxGroup: number;
+  // primehub version
+  primehubVersion: string;
 }
 
 const defaultConfigs = {
@@ -94,6 +96,7 @@ const defaultConfigs = {
   enableLogPersistence: false,
   licenseStatus: 'invalid',
   maxGroup: 999
+  primehubVersion: 'development';
 };
 
 const prodConfigs = {
@@ -153,6 +156,7 @@ export const createConfig = (): Config => {
       process.env.PRIMEHUB_FEATURE_LOG_PERSISTENCE.toString() === 'true',
     licenseStatus: process.env.EXPIRED,
     maxGroup: process.env.MAX_GROUP
+    primehubVersion: process.env.PH_VERSION
   });
 
   const env = process.env.NODE_ENV || 'development';

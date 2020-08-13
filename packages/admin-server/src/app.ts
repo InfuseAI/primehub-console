@@ -87,6 +87,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.state.enableLogPersistence = config.enableLogPersistence;
     ctx.state.disableGroup = config.enableLicenseCheck ? config.licenseStatus !== 'unexpired' : false;
     ctx.state.everyoneGroupId = config.keycloakEveryoneGroupId;
+    ctx.state.primehubVersion = config.primehubVersion;
 
     // referrer
     const referrer = `${config.cmsHost}${ctx.path}`;
