@@ -115,7 +115,7 @@ class Hub extends React.Component<Props, State> {
           <ApolloProvider client={client}>
             <Switch>
               <Route path={[`${appPrefix}g/:groupName/:actionKey` ,`${appPrefix}g`]} exact>
-                <Header
+                <Header pagePadding={8}
                   GroupSelectorCom={GroupSelector}
                   onSelectGroup={this.onSelectGroup}
                 />
