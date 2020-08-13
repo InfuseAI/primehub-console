@@ -11,12 +11,12 @@ import iconSchedule from '../../images/icon-schedule.svg'
 import iconModels from '../../images/icon-models.svg'
 
 const Icon = styled.img`
-  width: 25px;
-  height: 25px;
+  width: 30px;
+  height: 30px;
 `;
 
 const Title = styled.span`
-  margin-left: 16px;
+  margin-left: 46px;
 `
 
 type Props = RouteComponentProps & {};
@@ -52,32 +52,26 @@ class Sidebar extends React.Component<Props> {
           </Menu.Item>
           <Menu.Item key="job">
             <Link to={`${appPrefix}g/${group}/job`}>
-              <Icon src={iconJobs}/>
-              <Badge count={'Beta'} offset={[0, 8]} style={{backgroundColor: '#adafbe'}}>
-                <div style={{width: "120px"}}>
-                  <Title>Jobs</Title>
-                </div>
+              <Badge count={'Beta'} offset={[10, 20]} style={{backgroundColor: '#adafbe'}}>
+                <Icon src={iconJobs}/>
               </Badge>
+              <Title>Jobs</Title>
             </Link>
           </Menu.Item>
           <Menu.Item key="schedule">
             <Link to={`${appPrefix}g/${group}/schedule`}>
-              <Icon src={iconSchedule}/>
-              <Badge count={'Beta'} offset={[0, 8]} style={{backgroundColor: '#adafbe'}}>
-                <div style={{width: "120px"}}>
-                  <Title>Schedule</Title>
-                </div>
-              </Badge>
+              <Badge count={'Beta'} offset={[10, 20]} style={{backgroundColor: '#adafbe'}}>
+                <Icon src={iconSchedule}/>
+              </Badge>  
+              <Title>Schedule</Title>
             </Link>
           </Menu.Item>
           <Menu.Item key="model-deployment">
             <Link to={`${appPrefix}g/${group}/model-deployment`}>
-              <Icon src={iconModels}/>
-              <Badge count={'Alpha'} offset={[0, 8]} style={{backgroundColor: '#adafbe'}}>
-                <div style={{width: "120px"}}>
-                  <Title>Models</Title>
-                </div>
+              <Badge count={'Alpha'} offset={[10, 20]} style={{backgroundColor: '#adafbe'}}>
+                <Icon src={iconModels}/>
               </Badge>
+              <Title>Models</Title>
             </Link>
           </Menu.Item>
         </Menu>
