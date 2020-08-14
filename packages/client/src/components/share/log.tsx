@@ -308,6 +308,7 @@ export default class Logs extends React.Component<Props, State> {
             ...style,
             padding: '0px 12px',
             overflow: 'visible',
+            whiteSpace: 'nowrap'
           }}>{handleLong(listItems[index])}</div>}
         </List>
       </div>
