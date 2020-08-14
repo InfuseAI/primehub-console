@@ -11,12 +11,14 @@ import Dataset from './dataset.schema';
 import Announcement from './announcement.schema';
 import Secret from './secret.schema';
 import Workspaces from './workspace.schema';
+import Jupyterhub from 'schema/jupyterhub.schema';
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {createFakeData} from 'canner-helpers';
 import {dict, graphqlClient, imageStorage} from './utils';
-import DatasetBody from '../src/cms-layouts/datasetBody';
-import CommonBody from '../src/cms-layouts/commonBody';
-import UserBody from '../src/cms-layouts/userBody';
+import DatasetBody from 'cms-layouts/datasetBody';
+import CommonBody from 'cms-layouts/commonBody';
+import UserBody from 'cms-layouts/userBody';
+import JupyterhubBody from 'cms-layouts/jupyterhubBody';
 import {isArray} from 'lodash';
 
 const schema = (
@@ -41,6 +43,9 @@ const schema = (
       <Secret />
     </Body>
     <System/>
+    <Body component={JupyterhubBody}>
+      <Jupyterhub />
+    </Body>
     {/* <Announcement /> */}
   </root>
 )
