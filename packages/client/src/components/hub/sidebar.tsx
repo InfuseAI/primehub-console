@@ -19,6 +19,26 @@ const Title = styled.span`
   margin-left: 16px;
 `
 
+const BadgeBeta = styled.sup`
+  background-color: #52c41a;
+  position: absolute;
+  top: 28px;
+  left: 32px;
+  height: 12px;
+  border-radius: 3px;
+  padding: 6px 2px 2px 2px;
+`
+
+const BadgeAlpha = styled.sup`
+  background-color: #b50606;
+  position: absolute;
+  top: 28px;
+  left: 32px;
+  height: 12px;
+  border-radius: 3px;
+  padding: 6px 2px 2px 2px;
+`
+
 type Props = RouteComponentProps & {};
 class Sidebar extends React.Component<Props> {
   render() {
@@ -53,18 +73,21 @@ class Sidebar extends React.Component<Props> {
           <Menu.Item key="job">
             <Link to={`${appPrefix}g/${group}/job`}>
               <Icon src={iconJobs}/>
+              <BadgeBeta>beta</BadgeBeta>
               <Title>Jobs</Title>
             </Link>
           </Menu.Item>
           <Menu.Item key="schedule">
             <Link to={`${appPrefix}g/${group}/schedule`}>
               <Icon src={iconSchedule}/>
+              <BadgeBeta>beta</BadgeBeta>
               <Title>Schedule</Title>
             </Link>
           </Menu.Item>
           <Menu.Item key="model-deployment">
             <Link to={`${appPrefix}g/${group}/model-deployment`}>
               <Icon src={iconModels}/>
+              <BadgeAlpha>alpha</BadgeAlpha>
               <Title>Models</Title>
             </Link>
           </Menu.Item>
