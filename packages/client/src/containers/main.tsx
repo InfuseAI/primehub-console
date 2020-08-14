@@ -15,6 +15,7 @@ import {withRouter} from 'react-router';
 import { GroupContextValue, GroupContext } from 'context/group';
 
 // Components
+import Jupyterhub from 'containers/jupyterhub';
 import ListContainer from 'containers/list';
 import JobDetailContainer from 'ee/containers/jobDetail';
 import JobCreatePage from 'ee/containers/jobCreatePage';
@@ -140,6 +141,11 @@ export class Main extends React.Component<Props, State> {
                 {/* Home */}
                 <Route path={`${appPrefix}g/:groupName`} exact>
                   <Redirect to={`${location.pathname}/home`} />
+                </Route>
+
+                {/* Jupyterhub */}
+                <Route path={`${appPrefix}g/:groupName/hub`} exact>
+                  <Jupyterhub />
                 </Route>
 
                 {/* Job Submission */}

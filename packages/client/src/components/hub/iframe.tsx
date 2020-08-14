@@ -1,19 +1,10 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 type Props = {
   src: string
 };
 
-type State = {
-};
-
-export default class Home extends React.Component<Props,State> {
-
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+export default class IFrame extends React.Component<Props> {
 
   render() {
     const {src} = this.props;
