@@ -16,6 +16,7 @@ module.exports = {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
     'api-token': './src/apiToken.tsx',
+    'main': devMode ? './src/main-ce.tsx' : ['./src/public-import.js', './src/main-ce.tsx'],
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -30,13 +31,16 @@ module.exports = {
     contentBase: path.join(__dirname, 'dist'),
     historyApiFallback: {
       rewrites: [
-        { from: /^\/app-prefix\/landing/, to: '/landing.html' },
+        { from: /^\/g/, to: '/main.html' },
+        { from: /^\/app-prefix\/g/, to: '/main.html' },
         { from: /^\/landing$/, to: '/landing.html' },
+        { from: /^\/app-prefix\/landing/, to: '/landing.html' },
         { from: /^\/api-token$/, to: '/api-token.html' },
-        { from: /^\/app-prefix\/api-token$/, to: './api-token.html' },
+        { from: /^\/app-prefix\/api-token$/, to: '/api-token.html' },
         { from: /./, to: '/index.html' }
       ]
-    }
+    },
+    https: false
   },
   module: {
     rules: [
@@ -101,6 +105,11 @@ module.exports = {
       chunks: ['api-token'],
       template: 'docs/index.html',
       filename: 'api-token.html'
+    }),
+    new HtmlWebPackPlugin({
+      chunks: ['main'],
+      template: 'docs/index.html',
+      filename: 'main.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({
