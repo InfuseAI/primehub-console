@@ -25,7 +25,8 @@ export enum components {
   buildImage = 'BuildImage',
   phJob = 'PhJob',
   phDeployment = 'PhDeployment',
-  internal = 'Internal'
+  internal = 'Internal',
+  usageReport = 'UsageReport'
 }
 
 export const log = (levelType: level = level.info, payload?: any) => {

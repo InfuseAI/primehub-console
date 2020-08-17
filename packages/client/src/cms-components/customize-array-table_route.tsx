@@ -8,9 +8,12 @@ import EmailForm from '../cms-toolbar/sendEmailModal';
 import {renderUploadServerLink} from '../../schema/utils';
 import {Props} from './types';
 import styled from 'styled-components';
+import downloadjs from 'downloadjs';
+import moment from 'moment';
 
 const ButtonGroup = Button.Group;
 const confirm = Modal.confirm;
+const warning = Modal.warning;
 const GLOBAL_DISABLE = (window as any).disableMode || false;
 const DISABLE_GROUP = (window as any).disableGroup || false;
 const StyledTable = styled(Table)`
@@ -149,6 +152,40 @@ export default class ArrayBreadcrumb extends Component<Props & {
     });
   }
 
+  confirmDownloadUsageReport = (intl, id, url) => {
+    const downloadUsageReport = (id, url) => {
+      const token = window.localStorage.getItem('canner.accessToken');
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        },
+      }).then(res => res.blob())
+      .then(blob => {
+        return downloadjs(
+          blob, `${id.replace('/', '_')}.csv`, 'text/plain');
+      })
+      .finally(() => {
+      })
+    }
+
+    if (moment(id).isValid() && moment(new Date().toISOString()).format('YYYY/M')==id) {
+      warning({
+        title: intl.formatMessage({id: 'usageReport.download.modal.title'}),
+        content: intl.formatMessage({id: 'usageReport.download.modal.content'}),
+        okType: 'primary',
+        okText: 'Confirm',
+        okCancel: true,
+        cancelText: 'Cancel',
+        onOk() {
+          downloadUsageReport(id, url);
+        }
+      });
+    } else {
+      downloadUsageReport(id, url);
+    }
+  }
+
   render() {
     const {
       uiParams,
@@ -203,6 +240,7 @@ export default class ArrayBreadcrumb extends Component<Props & {
       announcementCustomActions,
       datasetsInGroupsActions,
       buildImageCustomActions,
+      usageReportCustomActions,
       disableCreate,
     } = uiParams;
 
@@ -271,6 +309,24 @@ export default class ArrayBreadcrumb extends Component<Props & {
                 disabled={disabled === true}
                 onClick={() => this.remove(record.__index)}
               />
+            </ButtonGroup>
+          );
+        }
+      });
+    }
+
+    if (usageReportCustomActions) {
+      newColumnsRender.push({
+        title: intl.formatMessage({ id: "array.table.actions" }),
+        dataIndex: "__settings",
+        key: "__settings",
+        render: (text, record) => {
+          return (
+            <ButtonGroup>
+              <Button icon={"download"}
+                data-testid="view-button"
+                onClick={() => this.confirmDownloadUsageReport(intl, record.id, record.url)}
+              ></Button>
             </ButtonGroup>
           );
         }
