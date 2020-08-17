@@ -107,7 +107,6 @@ class DeploymentCreatePage extends React.Component<Props, State> {
         <PageTitle
           breadcrumb={<DeploymentBreadcrumb />}
           title={"Create Deployment"}
-          style={{paddingLeft: 64}}
         />
         <div style={{margin: '16px 64px'}}>
           <DeploymentCreateForm
@@ -137,7 +136,7 @@ export default compose(
       onCompleted: (data: any) => {
         const {history} = props;
         history.push({
-          pathname: `${appPrefix}model-deployment`,
+          pathname: `../model-deployment`,
           search: queryString.stringify({first: 8})
         });
         notification.success({
@@ -147,7 +146,7 @@ export default compose(
           description: (
             <>
               Your model has begun deploying.
-              Click <a onClick={() => history.push(`${appPrefix}model-deployment/${data.createPhDeployment.id}`)}>here</a> to view.
+              Click <a onClick={() => history.push(`model-deployment/${data.createPhDeployment.id}`)}>here</a> to view.
             </>
           )
         });

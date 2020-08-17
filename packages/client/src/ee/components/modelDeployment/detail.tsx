@@ -244,9 +244,8 @@ export default class Detail extends React.Component<Props, State> {
         <PageTitle
           title={`Deployment: ${phDeployment.name}`}
           breadcrumb={<DeploymentBreadcrumb deploymentName={phDeployment.name} />}
-          style={{paddingLeft: 64}}
         />
-        <Card style={{margin: '16px 64px'}} loading={stopPhDeploymentResult.loading || deletePhDeploymentResult.loading || deployPhDeploymentResult.loading}>
+        <Card style={{margin: '16px 16px'}} loading={stopPhDeploymentResult.loading || deletePhDeploymentResult.loading || deployPhDeploymentResult.loading}>
           <div style={{marginBottom: 16, textAlign: 'right'}}>
             <InfuseButton onClick={this.handleDelete} style={{marginRight: 16}}>
               Delete
@@ -264,7 +263,7 @@ export default class Detail extends React.Component<Props, State> {
             }
             {
               <InfuseButton>
-                <Link to={`${appPrefix}model-deployment/edit/${phDeployment.id}`}>
+                <Link to={`${phDeployment.id}/edit`}>
                   Update
                 </Link>
               </InfuseButton>

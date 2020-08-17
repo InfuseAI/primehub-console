@@ -8,51 +8,45 @@ type Props = RouteComponentProps & {
   deploymentName?: string
 };
 
-
-function getBreadcrumbName(url: string, deploymentName: string) {
-  switch (url) {
-    case `${appPrefix}model-deployment`:
-      return 'Model Deployments'
-    case `${appPrefix}model-deployment/create`:
-      return 'Create Deployment';
-  }
-  // edit
-  if (url === `${appPrefix}model-deployment/edit`)
-    return null;
-  if (url.indexOf(`${appPrefix}model-deployment/edit`) > -1)
-    return 'Update Deployment';
-
-  // detail
-  return `Deployment: ${deploymentName}`
-
-}
-
-
 class DeploymentBreadcrumb extends React.Component<Props> {
 
   render() {
-    const { location, deploymentName } = this.props;
-    const pathSnippets = location.pathname.split('/').filter(i => i && i !== appPrefix.replace(/\//g, ''));
-    const extraBreadcrumbItems = pathSnippets.map((_, index) => {
-      const url = `${appPrefix}${pathSnippets.slice(0, index + 1).join('/')}`;
-      const breadcrumbName = getBreadcrumbName(url, deploymentName);
-      return (
-        <Breadcrumb.Item key={url}>
-          {
-            pathSnippets.length === index + 1 ?
-            breadcrumbName :
-            breadcrumbName && <Link to={url}>{breadcrumbName}</Link>
-          }
-        </Breadcrumb.Item>
-      );
-    });
+    const { match, deploymentName } = this.props;
+    const params = match.params as any
+
+    const basename = params.groupName ? `${appPrefix}g/${params.groupName}` : `${appPrefix}`;
+
     const breadcrumbItems = [
       <Breadcrumb.Item key="home">
-        <a href={`${appPrefix}`}>
-          <Icon type="home" />
-        </a>
+        {
+          params.groupName ?
+          <Link to={`${basename}`}><Icon type="home" /></Link> :
+          <a href={`${basename}`}><Icon type="home" /></a>
+        }
+
       </Breadcrumb.Item>,
-    ].concat(extraBreadcrumbItems);
+      <Breadcrumb.Item key="deployment">
+        <Link to={`${basename}/model-deployment?page=1`}>Model Deployments</Link>
+      </Breadcrumb.Item>
+    ];
+
+    if (match.url.endsWith('/create')) {
+      breadcrumbItems.push(<Breadcrumb.Item key="create">
+        Create Deployment
+      </Breadcrumb.Item>)
+    } else if (match.url.endsWith('/edit')) {
+      breadcrumbItems.push(<Breadcrumb.Item key="deployment">
+        <Link to={`../${params.deploymentId}`}>Deployment: {deploymentName}</Link>
+      </Breadcrumb.Item>)
+      breadcrumbItems.push(<Breadcrumb.Item key="edit">
+        Update Deployment
+      </Breadcrumb.Item>)
+    } else if (params.deploymentId) {
+      breadcrumbItems.push(<Breadcrumb.Item key="detail">
+        Deployment: {deploymentName}
+      </Breadcrumb.Item>)
+    }
+
     return (
       <Breadcrumb style={{marginBottom: 8}}>
         {breadcrumbItems}

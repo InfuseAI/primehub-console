@@ -22,6 +22,8 @@ module.exports = {
       images: path.resolve(__dirname, 'src/images'),
       components: path.resolve(__dirname, 'src/components'),
       containers: path.resolve(__dirname, 'src/containers'),
+      'cms-layouts': path.resolve(__dirname, 'src/cms-layouts'),
+      'cms-components': path.resolve(__dirname, 'src/cms-components'),
       context: path.resolve(__dirname, 'src/context'),
       ee: path.resolve(__dirname, 'src/ee'),
       root: path.resolve(__dirname, 'src'),

@@ -11,7 +11,6 @@ import {errorHandler} from '../components/job/errorHandler';
 import JobCreateForm from '../components/job/createForm';
 import JobBreadcrumb from '../components/job/breadcrumb';
 import {GroupFragment} from 'containers/list';
-import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
 
@@ -163,7 +162,7 @@ export default compose(
     options: (props: Props) => ({
       onCompleted: () => {
         props.history.push({
-          pathname: `${appPrefix}job`,
+          pathname: `../job`,
           search: queryString.stringify({page: 1})
         });
       },

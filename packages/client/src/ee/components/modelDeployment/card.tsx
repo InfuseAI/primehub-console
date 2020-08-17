@@ -4,7 +4,6 @@ import {isEmpty} from 'lodash';
 import {RouteComponentProps, withRouter} from 'react-router-dom';
 import {DeploymentInfo, Status} from 'ee/components/modelDeployment/common';
 import moment from 'moment';
-import { appPrefix } from 'utils/env';
 import Field from 'components/share/field';
 
 type Props = RouteComponentProps & {
@@ -45,7 +44,7 @@ class DeploymentCard extends React.Component<Props> {
           borderLeft: `8px solid ${getCardColor(deployment)}`
         }}
         hoverable
-        onClick={() => history.push(`${appPrefix}model-deployment/${deployment.id}`)}
+        onClick={() => history.push(`model-deployment/${deployment.id}`)}
       >
         <h2 style={{
           overflow: 'hidden',

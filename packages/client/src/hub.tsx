@@ -6,25 +6,9 @@ import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlCli
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {Layout, notification, Button, Skeleton} from 'antd';
 import {BrowserRouter, Router, Route, Switch} from 'react-router-dom';
-import Header from 'components/header';
-import GroupSelector from 'components/groupSelector';
-import Sidebar from 'components/hub/sidebar';
 import styled from 'styled-components';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
-import {appPrefix} from 'utils/env';
-import HubIframe from 'components/hub/iframe';
-import ListContainer from './containers/list';
-import JobDetailContainer from 'ee/containers/jobDetail';
-import JobCreatePage from 'ee/containers/jobCreatePage';
-import JobListContainer from 'ee/containers/jobList';
-import ScheduleDetailContainer from 'ee/containers/scheduleDetail';
-import ScheduleCreatePage from 'ee/containers/scheduleCreatePage';
-import ScheduleListContainer from 'ee/containers/scheduleList';
-import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
-import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
-import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
-import DeploymentEditPage from 'ee/containers/deploymentEditPage';
-import { Redirect } from 'react-router';
+import Main from 'containers/main';
 const HEADER_HEIGHT = 64;
 
 const Content = styled(Layout.Content)`
@@ -46,35 +30,397 @@ const graphqlClient = new GraphqlClient({
 });
 
 const fakeData = {
-  "me": {
-    "groups": [
+  secrets: [{
+    id: 'secret1',
+    name: 'secret name',
+    type: 'secret',
+    ifDockerConfigJson: true,
+  }],
+  me: {
+    groups: [{
+      id: 'groupId1',
+      name: 'group1',
+      displayName: 'c-Group 1',
+      instanceTypes: [{
+        id: 'g-it1',
+        name: 'IT1',
+        displayName: 'group1 it'
+      }],
+      images: [{
+        id: 'g-it1',
+        name: 'IT1',
+        displayName: 'group1 im',
+      }]
+    }, {
+      id: 'groupId2',
+      name: 'group2',
+      displayName: 'Group 2',
+      instanceTypes: [{
+        id: 'ggit1',
+        name: 'IT1',
+        displayName: 'group2 it'
+      }],
+      images: [{
+        id: 'ggit2',
+        name: 'IT1',
+        displayName: 'group2 im',
+      }]
+    }, {
+      id: 'everyone',
+      name: 'everyone',
+      displayName: 'Group DisplayName',
+      instanceTypes: [{
+        id: 'everyone-it',
+        name: 'it',
+        displayName: 'gpu0',
+        gpuLimit: 0,
+        cpuLimit: 0.5,
+        memoryLimit: 4,
+      }, {
+        id: 'everyone-it2',
+        name: 'it',
+        displayName: 'gpu1',
+        gpuLimit: 1
+      }],
+      images: [{
+        id: 'everyone-image',
+        name: 'b-cpu',
+        displayName: 'b-cpu',
+        type: 'cpu'
+      }, {
+        id: 'everyone-image2',
+        name: 'a-gpu',
+        displayName: 'a-gpu',
+        type: 'gpu'
+      }, {
+        id: 'everyone-image3',
+        name: 'c-img',
+        displayName: 'c-img',
+        type: 'both'
+      }]
+    }]
+  },
+  phJobs: [{
+    id: 'it1',
+    name: 'IT1',
+    displayName: 'IT1',
+    schedule: 'it1',
+    phase: 'Running',
+    groupid: 'groupId1',
+    groupName: 'group1',
+    createTime: '2019-10-04T14:48:00.000Z',
+    startTime: '2019-10-04T14:48:00.000Z',
+    finishTime: '2019-10-04T15:48:00.000Z',
+    message: `batch1
+    batch2
+    batch3
+    batch4
+    `,
+    command: `fdsf`,
+    instanceType: {
+      id: 'everyone-it',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    }
+  }, {
+    id: 'it2',
+    name: 'IT2',
+    groupId: 'group2',
+    groupName: 'group2',
+    instanceType: {
+      id: 'no-instanceType',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    },
+    displayName: 'IT2',
+    phase: 'Failed',
+    message: `
+    batch1
+    batch2
+    batch3
+    batch4`,
+    reason: 'PodFailed'
+  }, {
+    id: 'it3',
+    name: 'IT3',
+    displayName: 'IT3',
+    groupid: 'groupId1',
+    groupName: 'group1',
+    phase: 'Failed',
+    message: `
+    batch1
+    batch2
+    batch3
+    batch4
+    Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "<stdin>", line 3, in divide
+  TypeError: unsupported operand type(s) for /: 'str' and 'str'`
+  }, {
+    id: 'it4',
+    name: 'IT4',
+    displayName: 'IT4',
+    groupid: 'groupId1',
+    groupName: 'group1',
+    phase: 'Failed',
+    message: `Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "<stdin>", line 3, in divide
+  TypeError: unsupported operand type(s) for /: 'str' and 'str'TypeError: unsupported operand type(s) for /: 'str' and 'str'
+`
+  }, {
+    id: 'it5',
+    name: 'IT5',
+    displayName: 'IT5',
+    groupid: 'groupId1',
+    groupName: 'group1',
+    phase: 'Cancelled',
+    message: `Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "<stdin>", line 3, in divide
+  TypeError: unsupported operand type(s) for /: 'str' and 'str'TypeError: unsupported operand type(s) for /: 'str' and 'str'
+`
+  }],
+  phSchedules: [{
+    id: 'it1',
+    name: 'IT1',
+    displayName: 'IT1',
+    nextRunTime: '2019-12-26T14:24:22Z',
+    recurrence: {
+      type: 'weekly',
+      cron: '* */2 * * *',
+    },
+    invalid: true,
+    message: 'Something happened',
+    command: 'haha',
+    userId: 'userId',
+    userName: 'phadmin',
+    groupId: 'groupId1',
+    groupName: 'groupName1',
+    image: 'image name',
+    instanceType: {
+      id: 'g-it1',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    },
+  }],
+  phDeployments: [{
+    id: 'd0',
+    name: 'd0',
+    description: 'd0',
+    schedule: 'd0',
+    status: 'Failed',
+    creationTIme: '2019-10-04T14:48:00.000Z',
+    lastUpdatedTime: '2019-10-04T14:48:00.000Z',
+    message: `batch1
+    batch2
+    batch3
+    batch4
+    `,
+    groupId: 'groupId1',
+    groupName: 'Group1',
+    endpoint: 'https://endpoint/modedeployment/example/test/1',
+    endpointAccessType: "private",
+    endpointClients: [
       {
-        "id": "927406f6-88b0-490e-8e36-7835224fdf13",
-        "displayName": "Dev Team",
-        "name": "devteam"
+        client: "ios"
       },
       {
-        "id": "e940f720-3fb7-43bf-b24f-f41076fe9d5e",
-        "displayName": "InfuseAI",
-        "name": "infuseai"
-      },
-      {
-        "id": "ddcbf952-0335-4074-ab52-74ac99a44b52",
-        "displayName": "",
-        "name": "model-deployment-test-group"
-      },
-      {
-        "id": "bc0dc0e6-04d4-4ab0-a64c-71d298a9c0ad",
-        "displayName": null,
-        "name": "Project_at100_group1"
-      },
-      {
-        "id": "5a705edf-69a0-4fed-bc39-c54bdace72e8",
-        "displayName": "VIP",
-        "name": "vip"
+        client: "android"
       }
-    ]
-  }
+    ],
+    modelImage: 'imageurl',
+    pods: [
+      {name: 'model-deployment',logEndpoint: '/model-deployment'},
+      {name: 'job', logEndpoint: '/job'},
+      {name: 'landing', logEndpoint: '/landing'}
+    ],
+    availableReplicas: 3,
+    replicas: 4,
+    instanceType: {
+      id: 'everyone-it',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    },
+    metadata: {
+      'hello': 123
+    },
+    history: [{
+      time: new Date().toISOString(),
+      deployment: {
+        id: 'd0',
+        user: {
+          name: 'Leo'
+        },
+        name: 'd0',
+        description: 'fdksoapfkeowpfadsangisoagdsagsgeiwagegiowagegeianogigeanogeiaogneiasogensioagenifdksoapfkeowpfadsangisoagdsagsgeiwagegiowagegeianogigeanogeiaogneiasogensioageni',
+        groupName: 'Group1',
+        modelImage: 'imageurl',
+        replicas: 4,
+        instanceType: {
+          id: 'everyone-it',
+          name: 'it',
+          displayName: 'gpu0',
+          gpuLimit: 0,
+          cpuLimit: 0.5,
+          memoryLimit: 4,
+        },
+        metadata: {
+          'hello': 123
+        },
+      }
+    }]
+  }, {
+    id: 'd1',
+    name: 'd1',
+    description: 'd1',
+    schedule: 'd1',
+    status: 'Deployed',
+    creationTIme: '2019-10-04T14:48:00.000Z',
+    lastUpdatedTime: '2019-10-04T14:48:00.000Z',
+    message: `batch1
+    batch2
+    batch3
+    batch4
+    `,
+    groupId: 'groupId1',
+    groupName: 'Group1',
+    endpoint: 'https://endpoint/mode-deployment/example/test/1',
+    endpointAccessType: "private",
+    endpointClients: [],
+    modelImage: 'imageurl',
+    pods: [
+      {name: 'model-deployment',logEndpoint: '/model-deployment'},
+      {name: 'job', logEndpoint: '/job'},
+      {name: 'landing', logEndpoint: '/landing'}
+    ],
+    availableReplicas: 3,
+    replicas: 4,
+    instanceType: {
+      id: 'everyone-it',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    },
+    metadata: {
+      'hello': 123
+    }
+  }, {
+    id: 'id2',
+    name: 'd2',
+    description: 'd2',
+    status: 'Deploying',
+    creationTIme: '2019-10-04T14:48:00.000Z',
+    lastUpdatedTime: '2019-10-04T14:48:00.000Z',
+    message: `batch1
+    batch2
+    batch3
+    batch4
+    `,
+    groupId: 'groupId1',
+    groupName: 'Group1',
+    endpoint: 'https://endpoint/mode-deployment/example/test/1',
+    modelImage: 'imageurl',
+    pods: [
+      {name: 'model-deployment',logEndpoint: '/model-deployment'},
+      {name: 'job', logEndpoint: '/job'},
+      {name: 'landing', logEndpoint: '/landing'}
+    ],
+    availableReplicas: 3,
+    replicas: 4,
+    instanceType: {
+      id: 'everyone-it',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    },
+    metadata: {
+      'hello': 123,
+      'new': 'fdsafdsafdsafdsafdsafdsafdsagdsags'
+    }
+  }, {
+    id: 'id2-stopping',
+    name: 'd2',
+    description: 'd2',
+    status: 'Stopping',
+    creationTIme: '2019-10-04T14:48:00.000Z',
+    lastUpdatedTime: '2019-10-04T14:48:00.000Z',
+    message: `batch1
+    batch2
+    batch3
+    batch4
+    `,
+    groupId: 'groupId1',
+    groupName: 'Group1',
+    endpoint: 'https://endpoint/mode-deployment/example/test/1',
+    modelImage: 'imageurl',
+    pods: [
+      {name: 'model-deployment',logEndpoint: '/model-deployment'},
+      {name: 'job', logEndpoint: '/job'},
+      {name: 'landing', logEndpoint: '/landing'}
+    ],
+    availableReplicas: 3,
+    replicas: 4,
+    instanceType: {
+      id: 'everyone-it',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    },
+    metadata: {
+      'hello': 123,
+      'new': 'fdsafdsafdsafdsafdsafdsafdsagdsags'
+    }
+  }, {
+    id: 'id3',
+    name: 'd3',
+    description: 'd3',
+    status: 'Stopped',
+    creationTIme: '2019-10-04T14:48:00.000Z',
+    lastUpdatedTime: '2019-10-04T14:48:00.000Z',
+    message: `batch1 ffsdafn fdksoanfkosafdns kofdsnaiofdnsnfsodnfidosanfdisoafidsfndsio
+    batch2
+    batch3
+    batch4
+    `,
+    groupId: 'groupId1',
+    groupName: 'Group1',
+    endpoint: 'https://endpoint/mode-deployment/example/test/1',
+    modelImage: 'imageurl',
+    pods: [],
+    availableReplicas: 3,
+    replicas: 4,
+    instanceType: {
+      id: 'everyone-it',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    },
+    metadata: {
+      'hello': 123,
+      'new': 'fdsafdsafdsafdsafdsafdsafdsagdsags'
+    }
+  }]
 }
 
 const connector = new LocalStorageConnector({
@@ -84,59 +430,24 @@ const connector = new LocalStorageConnector({
 
 const client = genClient(process.env.NODE_ENV === 'production' ?
   {graphqlClient} :
-  {connector, schema: {me: {type: 'object'}}});
-
-type Props = {
-
-}
-type State = {
-  currentGroupName: string;
-}
-
-
-class Hub extends React.Component<Props, State> {
-  state = {
-    currentGroupName: ''
-  }
-
-  onSelectGroup = (groupName) => {
-    if (this.state.currentGroupName !== groupName) {
-      this.setState({
-        currentGroupName: groupName
-      })
+  {
+    connector,
+    schema: {
+      me: {type: 'object'},
+      secrets: {type: 'array',items: {type: 'object'}},
+      phJobs: {type: 'array',items: {type: 'object'}},
+      phSchedules: {type: 'array',items: {type: 'object'}},
+      phDeployments: {type: 'array',items: {type: 'object'}}
     }
-  }
+  });
 
+class Hub extends React.Component {
   render() {
-    const {currentGroupName} = this.state;
     return (
       <BrowserRouter>
-        <Layout>
-          <ApolloProvider client={client}>
-            <Switch>
-              <Route path={[`${appPrefix}g/:groupName/:actionKey` ,`${appPrefix}g`]} exact>
-                <Header pagePadding={8}
-                  GroupSelectorCom={GroupSelector}
-                  onSelectGroup={this.onSelectGroup}
-                />
-              </Route>
-              <Redirect to={`${appPrefix}g`}/>
-            </Switch>
-          </ApolloProvider>
-          <Layout>
-            <Sidebar />
-            <Content>
-                <Switch>
-                  <Route path={`${appPrefix}`} exact>
-                    <Skeleton />
-                  </Route>
-                  <Route path={`${appPrefix}g/:groupName/:actionKey`} exact>
-                    <div>{currentGroupName}</div>
-                  </Route>
-                </Switch>
-            </Content>
-          </Layout>
-        </Layout>
+        <ApolloProvider client={client}>
+          <Main />
+        </ApolloProvider>
       </BrowserRouter>
     )
   }

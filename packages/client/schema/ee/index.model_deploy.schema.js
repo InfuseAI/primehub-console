@@ -12,8 +12,8 @@ import Workspaces from 'schema/workspace.schema';
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {createFakeData} from 'canner-helpers';
 import {dict, graphqlClient, imageStorage} from 'schema/utils';
-import CommonBody from '../../src/cms-layouts/commonBody';
-import UserBody from '../../src/cms-layouts/userBody';
+import CommonBody from 'cms-layouts/commonBody';
+import UserBody from 'cms-layouts/userBody';
 
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>

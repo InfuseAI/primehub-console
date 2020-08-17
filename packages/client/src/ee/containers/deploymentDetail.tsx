@@ -8,7 +8,6 @@ import {errorHandler} from 'ee/components/job/errorHandler';
 import DeploymentDetail from 'ee/components/modelDeployment/detail';
 import {PhDeploymentFragment} from 'ee/components/modelDeployment/common';
 import {get} from 'lodash';
-import {appPrefix} from 'utils/env';
 
 type Props = {
   getPhDeployment: any;
@@ -150,7 +149,7 @@ export default compose(
   graphql(DELETE_DEPLOYMENT, {
     options: (props: Props) => ({
       onCompleted: () => {
-        props.history.push(`${appPrefix}model-deployment`);
+        props.history.push(`../model-deployment`);
         notification.success({
           duration: 10,
           placement: 'bottomRight',
