@@ -3,7 +3,7 @@ import {Layout, Skeleton} from 'antd';
 import {Route, Switch, RouteComponentProps} from 'react-router-dom';
 import Header from 'components/header';
 import GroupSelector from 'components/groupSelector';
-import Sidebar from 'components/hub/sidebar';
+import Sidebar from 'components/main/sidebar';
 import styled from 'styled-components';
 import { Redirect } from 'react-router';
 import {appPrefix} from 'utils/env';
