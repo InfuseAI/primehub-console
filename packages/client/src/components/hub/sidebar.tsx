@@ -4,12 +4,9 @@ import {Link} from 'react-router-dom';
 import {appPrefix} from 'utils/env';
 import { withRouter, RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
-import iconHome from '../../images/icon-home.svg'
-import iconJupyterHub from '../../images/icon-jupyterhub.svg'
-import iconJobs from '../../images/icon-jobs.svg'
-import iconSchedule from '../../images/icon-schedule.svg'
-import iconModels from '../../images/icon-models.svg'
+import iconHome from 'images/icon-home.svg'
 import {get} from 'lodash'
+import { MainPageSidebarItem } from 'containers/main';
 
 const Icon = styled.img`
   width: 30px;
@@ -20,31 +17,38 @@ const Title = styled.span`
   margin-left: 16px;
 `;
 
-const BadgeBeta = styled.sup`
-  background-color: #52c41a;
-  position: absolute;
-  top: 28px;
-  left: 32px;
-  height: 12px;
-  border-radius: 3px;
-  padding: 6px 2px 2px 2px;
-`;
+type Props = RouteComponentProps & {
+  sidebarItems: MainPageSidebarItem[]
+};
 
-const BadgeAlpha = styled.sup`
-  background-color: #b50606;
-  position: absolute;
-  top: 28px;
-  left: 32px;
-  height: 12px;
-  border-radius: 3px;
-  padding: 6px 2px 2px 2px;
-`;
-
-
-type Props = RouteComponentProps & {};
 class Sidebar extends React.Component<Props> {
+  renderStageBadge(item: MainPageSidebarItem) {
+    const badgeStyle =  {
+      position: 'absolute',
+      top: 28,
+      left: 32,
+      height: 12,
+      borderRadius: 3,
+      padding: '6px 2px 2px 2px',
+    }
+
+    if (item.stage === 'beta' ) {
+      return <sup style={{
+        ...badgeStyle,
+        backgroundColor: '#52c41a',
+      }}>beta</sup>
+    } else if (item.stage === 'alpha' ) {
+      return <sup style={{
+        ...badgeStyle,
+        backgroundColor: '#b50606',
+      }}>alpha</sup>
+    } else {
+      return <></>
+    }
+  }
+
   render() {
-    const {history, match} = this.props;
+    const {sidebarItems, history, match} = this.props;
     const pathKeyList = ['home', 'hub', 'job', 'schedule', 'model-deployment'];
     let key = '';
     pathKeyList.forEach((val) => {
@@ -66,33 +70,18 @@ class Sidebar extends React.Component<Props> {
               <Title>Home</Title>
             </Link>
           </Menu.Item>
-          <Menu.Item key="hub">
-            <Link to={`${appPrefix}g/${group}/hub`}>
-              <Icon src={iconJupyterHub}/>
-              <Title>JupyterHub</Title>
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="job">
-            <Link to={`${appPrefix}g/${group}/job`}>
-              <Icon src={iconJobs}/>
-              <BadgeBeta>beta</BadgeBeta>
-              <Title>Jobs</Title>
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="schedule">
-            <Link to={`${appPrefix}g/${group}/schedule`}>
-              <Icon src={iconSchedule}/>
-              <BadgeBeta>beta</BadgeBeta>
-              <Title>Schedule</Title>
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="model-deployment">
-            <Link to={`${appPrefix}g/${group}/model-deployment`}>
-              <Icon src={iconModels}/>
-              <BadgeAlpha>alpha</BadgeAlpha>
-              <Title>Models</Title>
-            </Link>
-          </Menu.Item>
+
+          {
+            sidebarItems ? sidebarItems.map(item => (
+              <Menu.Item key={item.subPath}>
+                <Link to={`${appPrefix}g/${group}/${item.subPath}`}>
+                  <Icon src={item.icon}/>
+                  <Title>{item.title}</Title>
+                  {this.renderStageBadge(item)}
+                </Link>
+              </Menu.Item>
+            )) : []
+          }
         </Menu>
       </Layout.Sider>
     );
