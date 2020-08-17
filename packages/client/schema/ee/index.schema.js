@@ -13,6 +13,7 @@ import Secret from 'schema/secret.schema';
 import Workspaces from 'schema/workspace.schema';
 import BuildImage from 'schema/ee/buildImage.schema';
 import BuildImageJob from 'schema/ee/buildImageJob.schema';
+import UsageReport from 'schema/ee/usageReport.schema';
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {createFakeData} from 'canner-helpers';
 import {dict, graphqlClient, imageStorage} from 'schema/utils';
@@ -20,6 +21,7 @@ import BuildImageJobBody from '../../src/cms-layouts/buildImageJobBody';
 import DatasetBody from '../../src/cms-layouts/datasetBody';
 import CommonBody from '../../src/cms-layouts/commonBody';
 import UserBody from '../../src/cms-layouts/userBody';
+import UsageReportBody from '../../src/cms-layouts/usageReportBody';
 import {isArray} from 'lodash';
 
 const maintenance = (
@@ -30,6 +32,13 @@ const maintenance = (
 const grafana = (
   (typeof enableGrafana !== 'undefined' && enableGrafana) ? 
     <object keyName="grafana"></object> : 
+    {}
+);
+const usageReport = (
+  (typeof enableUsageReport !== 'undefined' && enableUsageReport) ? 
+    <Body component={UsageReportBody}>
+      <UsageReport />
+    </Body> : 
     {}
 );
 
@@ -58,6 +67,7 @@ const schema = (
     <Body component={CommonBody}>
       <Secret />
     </Body>
+    {usageReport}
     <System/>
     {maintenance}
     {grafana}

@@ -14,8 +14,9 @@ import { makeExecutableSchema, mergeSchemas } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
 import WorkspaceApi from '../workspace/api';
 import { keycloakMaxCount } from '../resolvers/constant';
+import request from 'request';
 
-import CrdClient, { InstanceTypeSpec, ImageSpec, client as kubeClient } from '../crdClient/crdClientImpl';
+import CrdClient, { InstanceTypeSpec, ImageSpec, client as kubeClient, kubeConfig } from '../crdClient/crdClientImpl';
 import * as system from '../resolvers/system';
 import * as user from '../resolvers/user';
 import * as group from '../resolvers/group';
@@ -26,6 +27,7 @@ import * as buildImageJob from './resolvers/buildImageJob';
 import * as phJob from './resolvers/phJob';
 import * as phSchedule from './resolvers/phSchedule';
 import * as phDeployment from './resolvers/phDeployment';
+import * as usageReport from './resolvers/usageReport';
 import { crd as instanceType} from '../resolvers/instanceType';
 import { crd as dataset, regenerateUploadSecret} from '../resolvers/dataset';
 import { crd as image} from '../resolvers/image';
@@ -160,6 +162,8 @@ const eeResolvers = {
     phDeployment: phDeployment.queryOne,
     phDeployments: phDeployment.query,
     phDeploymentsConnection: phDeployment.connectionQuery,
+    usageReports: usageReport.query,
+    usageReportsConnection: usageReport.connectionQuery,
   },
   Mutation: {
     createBuildImage: buildImage.create,
@@ -490,9 +494,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         k8sGroupPvc: groupPvc,
         k8sUploadServerSecret,
         namespace: config.k8sCrdNamespace,
+        appPrefix: config.appPrefix,
         graphqlHost: config.graphqlHost,
         jobLogCtrl: logCtrl,
         phJobCacheList,
+        usageReportAPIHost: config.usageReportAPIHost
       };
     },
     formatError: (error: any) => {
@@ -706,6 +712,30 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   rootRouter.get('/health', async ctx => {
     ctx.status = 200;
   });
+
+  // usage report
+  rootRouter.get('/report/monthly/:month/:day', authenticateMiddleware, checkIsAdmin,
+    async ctx => {
+      const requestOptions: request.Options = {
+        method: 'GET',
+        uri: config.usageReportAPIHost + '/report/monthly/' + ctx.params.month + '/' + ctx.params.day,
+      };
+      kubeConfig.applyToRequest(requestOptions);
+      const req = request(requestOptions);
+
+      req.on('error', err => {
+        logger.error({
+          component: logger.components.internal,
+          type: 'USAGE_REPORT_GET_REPORT_ERROR',
+          message: err.message
+        });
+        ctx.res.end();
+      });
+
+      ctx.body = req;
+    }
+  );
+
   app.use(rootRouter.routes());
   server.applyMiddleware({ app, path: config.appPrefix ? `${config.appPrefix}/graphql` : '/graphql' });
   return {app, server, config};
