@@ -16,7 +16,7 @@ module.exports = {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
     'api-token': './src/apiToken.tsx',
-    'main': devMode ? './src/main-ce.tsx' : ['./src/public-import.js', './src/main-ce.tsx'],
+    'main': devMode ? './src/main.ce.tsx' : ['./src/public-import.js', './src/main.ce.tsx'],
   },
   output: {
     path: path.join(__dirname, 'dist'),
