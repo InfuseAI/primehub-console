@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Layout, Skeleton} from 'antd';
+import {Layout} from 'antd';
 import {Route, Switch, RouteComponentProps} from 'react-router-dom';
 import Header from 'components/header';
 import GroupSelector from 'components/groupSelector';
@@ -7,7 +7,6 @@ import Sidebar from 'components/main/sidebar';
 import styled from 'styled-components';
 import { Redirect } from 'react-router';
 import {appPrefix} from 'utils/env';
-import {get} from 'lodash';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -58,7 +57,7 @@ export type MainPageState = {
   currentGroupName: string;
 };
 
-export class Main extends React.Component<MainPageProps, MainPageState> {
+export class MainPage extends React.Component<MainPageProps, MainPageState> {
   state = {
     currentGroupName: ''
   }
@@ -160,4 +159,4 @@ export default compose(
       fetchPolicy: 'cache-and-network'
     }),
   })
-)(Main)
+)(MainPage)

@@ -1,15 +1,13 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import {ApolloProvider} from 'react-apollo';
-import {genClient} from 'canner/lib/components/index';
-import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlClient';
-import {LocalStorageConnector} from 'canner-graphql-interface';
 import {notification, Button} from 'antd';
 import {BrowserRouter, Route} from 'react-router-dom';
 import {BackgroundTokenSyncer} from '../workers/backgroundTokenSyncer';
-import Main, { MainPageSidebarItem } from 'containers/mainPage';
+import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
-import {fakeData, schema} from './fakeData';
+import { fakeData, schema } from './fakeData';
+import { createGraphqlClient } from 'utils/graphqlClient';
 
 // Icons
 import iconJupyterHub from 'images/icon-jupyterhub.svg'
@@ -31,31 +29,12 @@ import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
 
-const graphqlClient = new GraphqlClient({
-  uri: (window as any).graphqlEndpoint,
-  fetch: (uri, options) => {
-    const token = window.localStorage.getItem('canner.accessToken');
-    options.headers = {
-      Authorization: `Bearer ${token}`,
-      ...options.headers || {}
-    };
-    return fetch(uri, options);
-  },
+const client = createGraphqlClient({
+  fakeData,
+  schema
 });
 
-const connector = new LocalStorageConnector({
-  defaultData: fakeData,
-  localStorageKey: 'infuse-main'
-})
-
-const client = genClient(process.env.NODE_ENV === 'production' ?
-  {graphqlClient} :
-  {
-    connector,
-    schema,
-  });
-
-class Hub extends React.Component {
+class Main extends React.Component {
   render() {
     const sidebarItems: MainPageSidebarItem[] = [
       {
@@ -86,7 +65,7 @@ class Hub extends React.Component {
     return (
       <BrowserRouter>
         <ApolloProvider client={client}>
-          <Main sidebarItems={sidebarItems}>
+          <MainPage sidebarItems={sidebarItems}>
             {/* Jupyterhub */}
             <Route path={`${appPrefix}g/:groupName/hub`} exact>
               <Jupyterhub />
@@ -136,7 +115,7 @@ class Hub extends React.Component {
             >
               <DeploymentEditPage />
             </Route>
-          </Main>
+          </MainPage>
         </ApolloProvider>
       </BrowserRouter>
     )
@@ -191,5 +170,5 @@ tokenSyncWorker.run().catch(console.error);
 
 // render
 ReactDOM.render(
-  <Hub />
+  <Main />
 , document.getElementById('root'));
