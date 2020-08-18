@@ -6,7 +6,7 @@ import { withRouter, RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import iconHome from 'images/icon-home.svg'
 import {get} from 'lodash'
-import { MainPageSidebarItem } from 'containers/main';
+import { MainPageSidebarItem } from 'containers/mainPage';
 
 const Icon = styled.img`
   width: 30px;

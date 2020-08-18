@@ -50,7 +50,7 @@ class ApiTokenPage extends React.Component<Props, State> {
 
   handleRequestApiToken = () => {
     const {client} = this.props;
-    client.query<any>({query: GET_API_TOKEN_COUNT, fetchPolicy: 'network-only'})
+    client.query<any>({query: GET_API_TOKEN_COUNT, fetchPolicy: 'no-cache'})
     .then((result) => {
       if (result.data.me.apiTokenCount == 0) {
         // request token right away
@@ -74,7 +74,8 @@ class ApiTokenPage extends React.Component<Props, State> {
     const {client} = this.props;
     client.mutate({mutation: REVOKE_API_TOKEN})
     .then(() => {
-      (window as any).location.href = this.requestApiTokenEndpoint;
+      const backUrl = encodeURIComponent(window.location.pathname);
+      (window as any).location.href = `${this.requestApiTokenEndpoint}?backUrl=${backUrl}`;
     })
     .catch(errorHandler);
   }

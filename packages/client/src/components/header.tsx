@@ -3,6 +3,8 @@ import {Menu, Layout, Avatar, Select, Form, Tag} from 'antd';
 import {LayoutProps} from 'antd/lib/layout';
 import styled from 'styled-components';
 import logo from 'images/primehub-logo.svg';
+import { withGroupContext, GroupContextComponentProps } from 'context/group';
+import { appPrefix } from 'utils/env';
 
 const { Option } = Select;
 
@@ -32,14 +34,14 @@ const Header = styled<Props & LayoutProps>(Layout.Header)`
   width: 100%;
 ` as any;
 
-export interface Props {
+export interface Props extends GroupContextComponentProps {
   onSelectGroup?: Function;
   pagePadding?: number;
   GroupSelectorCom?: any;
   groupSelectorProps?: any;
 }
 
-export default class HeaderContainer extends React.Component<Props, {}> {
+class HeaderContainer extends React.Component<Props, {}> {
   onClickMenu = (item: any) => {
     const links = (window as any).links || {
       userProfileLink: '',
@@ -58,7 +60,9 @@ export default class HeaderContainer extends React.Component<Props, {}> {
         break;
       }
       case 'apiToken': {
-        (window as any).location.href = links.apiTokenLink;
+        const {groupContext} = this.props;
+        const link = `${appPrefix}g/${groupContext.name}/api-token`;
+        (window as any).location.href = link;
         break;
       }
       case 'adminPortal': {
@@ -72,7 +76,7 @@ export default class HeaderContainer extends React.Component<Props, {}> {
   }
 
   render() {
-    const {pagePadding, GroupSelectorCom, groupSelectorProps} = this.props;
+    const {groupContext, pagePadding, GroupSelectorCom, groupSelectorProps} = this.props;
     const thumbnail = (window as any).thumbnail;
     const isUserAdmin = (window as any).isUserAdmin;
     return (
@@ -110,9 +114,9 @@ export default class HeaderContainer extends React.Component<Props, {}> {
             <Menu.Item key="changePassword">
               Change Password
             </Menu.Item>
-            <Menu.Item key="apiToken">
+            {groupContext ? <Menu.Item key="apiToken">
               API Token
-            </Menu.Item>
+            </Menu.Item> : <></>}
             <Menu.Item key="adminPortal" style={{display: isUserAdmin? undefined : 'none'}}>
               Admin Portal
             </Menu.Item>
@@ -125,3 +129,5 @@ export default class HeaderContainer extends React.Component<Props, {}> {
     );
   }
 }
+
+export default withGroupContext(HeaderContainer)

@@ -314,7 +314,11 @@ export class OidcCtrl {
 
   public requestApiToken = async (ctx: any) => {
     const nonce = this.saveNonceSecret(ctx);
-    const redirectUri = `${this.cmsHost}${this.appPrefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`;
+    const query = ctx.query;
+    let redirectUri = `${this.cmsHost}${this.appPrefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`;
+    if (query.backUrl) {
+      redirectUri = `${redirectUri}?backUrl=${encodeURIComponent(query.backUrl)}`;
+    }
 
     const apiTokenUrl = this.oidcClient.authorizationUrl({
       redirect_uri: redirectUri,
@@ -325,9 +329,12 @@ export class OidcCtrl {
   }
 
   public requestApiTokenCallback = async (ctx: any) => {
-    const query = ctx.query;
-    const redirectUri = `${this.cmsHost}${this.appPrefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`;
     const nonce = this.createNonceFromSecret(ctx);
+    const query = ctx.query;
+    let redirectUri = `${this.cmsHost}${this.appPrefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`;
+    if (query.backUrl) {
+      redirectUri = `${redirectUri}?backUrl=${encodeURIComponent(query.backUrl)}`;
+    }
     const tokenSet = await this.oidcClient.authorizationCallback(redirectUri, query, {nonce});
 
     // redirect to frontend
@@ -335,14 +342,14 @@ export class OidcCtrl {
     const opts = {expires: new Date(Date.now() + 60000), signed: true, secure: secureRequest};
     ctx.cookies.set('apiToken', tokenSet.refresh_token, opts);
 
-    const backUrl = query.backUrl || this.defaultReturnPath;
+    const backUrl = query.backUrl || `${this.cmsHost}${this.appPrefix}/api-token`;
 
     logger.info({
       component: logger.components.user,
       type: 'REQUEST_API_TOKEN'
     });
 
-    return ctx.redirect(`${this.cmsHost}${this.appPrefix}/api-token?result=1`);
+    return ctx.redirect(backUrl);
   }
 
   private buildBackUrl = (currentUrl?: string) => {

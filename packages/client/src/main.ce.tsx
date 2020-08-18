@@ -16,6 +16,7 @@ import Jupyterhub from 'containers/jupyterhubPage';
 
 const fakeData = {
   me: {
+    apiTokenCount: 1,
     groups: [{
       id: 'groupId1',
       name: 'group1',

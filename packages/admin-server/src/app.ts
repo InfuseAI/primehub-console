@@ -204,6 +204,12 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   });
 
   rootRouter.get('/g/*', oidcCtrl.loggedIn, async ctx => {
+    const apiToken = ctx.cookies.get('apiToken', {signed: true});
+    if (apiToken) {
+      ctx.state.apiToken = ctx.cookies.get('apiToken', {signed: true});
+      ctx.cookies.set('apiToken', null);
+    }
+
     await ctx.render('main', {
       title: 'PrimeHub',
       staticPath
