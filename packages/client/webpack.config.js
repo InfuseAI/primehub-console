@@ -15,10 +15,10 @@ module.exports = {
   entry: {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
+    'api-token': './src/apiToken.tsx',
+    'main': devMode ? './src/ee/main.tsx' : ['./src/public-import.js', './src/ee/main.tsx'],
     job: devMode ? './src/ee/job.tsx' : ['./src/public-import.js', './src/ee/job.tsx'],
     'model-deployment': devMode ? './src/ee/modelDeployment.tsx' : ['./src/public-import.js', './src/ee/modelDeployment.tsx'],
-    'api-token': './src/apiToken.tsx',
-    'hub': devMode ? './src/hub.tsx' : ['./src/public-import.js', './src/hub.tsx'],
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -33,21 +33,23 @@ module.exports = {
     contentBase: path.join(__dirname, 'dist'),
     historyApiFallback: {
       rewrites: [
+        { from: /^\/g/, to: '/main.html' },
+        { from: /^\/app-prefix\/g/, to: '/main.html' },
+        { from: /^\/landing$/, to: '/landing.html' },
+        { from: /^\/app-prefix\/landing/, to: '/landing.html' },
+        { from: /^\/api-token$/, to: '/api-token.html' },
+        { from: /^\/app-prefix\/api-token$/, to: '/api-token.html' },
         { from: /^\/app-prefix\/job/, to: '/job.html' },
         { from: /^\/job/, to: '/job.html' },
         { from: /^\/app-prefix\/schedule/, to: '/job.html' },
         { from: /^\/schedule/, to: '/job.html' },
-        { from: /^\/app-prefix\/landing/, to: '/landing.html' },
-        { from: /^\/landing$/, to: '/landing.html' },
         { from: /^\/model-deployment/, to: '/model-deployment.html' },
         { from: /^\/app-prefix\/model-deployment/, to: '/model-deployment.html' },
-        { from: /^\/api-token$/, to: '/api-token.html' },
-        { from: /^\/app-prefix\/api-token$/, to: '/api-token.html' },
-        { from: /^\/g/, to: '/hub.html' },
-        { from: /^\/app-prefix\/g/, to: '/hub.html' },
+
         { from: /./, to: '/index.html' }
       ]
-    }
+    },
+    https: false
   },
   module: {
     rules: [
@@ -109,6 +111,16 @@ module.exports = {
       filename: 'landing.html'
     }),
     new HtmlWebPackPlugin({
+      chunks: ['api-token'],
+      template: 'docs/index.html',
+      filename: 'api-token.html'
+    }),
+    new HtmlWebPackPlugin({
+      chunks: ['main'],
+      template: 'docs/index.html',
+      filename: 'main.html'
+    }),
+    new HtmlWebPackPlugin({
       chunks: ['job'],
       template: 'docs/index.html',
       filename: 'job.html'
@@ -117,16 +129,6 @@ module.exports = {
       chunks: ['model-deployment'],
       template: 'docs/index.html',
       filename: 'model-deployment.html'
-    }),
-    new HtmlWebPackPlugin({
-      chunks: ['api-token'],
-      template: 'docs/index.html',
-      filename: 'api-token.html'
-    }),
-    new HtmlWebPackPlugin({
-      chunks: ['hub'],
-      template: 'docs/index.html',
-      filename: 'hub.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({

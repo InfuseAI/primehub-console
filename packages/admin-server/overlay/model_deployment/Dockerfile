@@ -10,6 +10,8 @@ COPY packages/client packages/client
 
 RUN npx lerna bootstrap
 
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
 RUN cd packages/admin-server \
   && npm run build:prod \
   && cd ../client \
