@@ -124,7 +124,7 @@ curl -X POST \\
     </> : <></>);
 
     return (
-      <Layout style={{ margin: "16px 64px" }}>
+      <Layout style={{ margin: "16px 24px" }}>
         <Card title="Token">
           {Token}
 
