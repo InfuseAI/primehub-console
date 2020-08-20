@@ -2,22 +2,22 @@ import * as React from 'react';
 import {Menu, Layout, Avatar, Select, Form, Tag} from 'antd';
 import {LayoutProps} from 'antd/lib/layout';
 import styled from 'styled-components';
-import logo from 'images/primehub-logo.svg';
+import logo from 'images/primehub-logo-w.svg';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
 import { appPrefix } from 'utils/env';
 
 const { Option } = Select;
 
 const HEADER_HEIGHT = 64;
-const PAGE_PADDING = 64;
 
 const Logo = styled.div`
   background-image: url(${logo});
-  background-size: contain;
-  background-position: left;
+  background-color: #373d62;
+  background-size: 65%;
+  background-position: 14px 13px;
   background-repeat: no-repeat;
   width: 200px;
-  margin: 8px 0;
+  height: ${HEADER_HEIGHT}px;
 ` as any;
 const Header = styled<Props & LayoutProps>(Layout.Header)`
   background: #fff;
@@ -27,7 +27,7 @@ const Header = styled<Props & LayoutProps>(Layout.Header)`
     margin: 0;
   }
   height: ${HEADER_HEIGHT}px;
-  padding: 0 ${props => props.pagePadding ? props.pagePadding : PAGE_PADDING}px;
+  padding: 0 0;
   border-bottom: 1px solid #dcdcdc;
   position: fixed;
   z-index: 12;
@@ -83,14 +83,6 @@ class HeaderContainer extends React.Component<Props, {}> {
       <Header pagePadding={pagePadding}>
         <a href="/" style={{display: "flex", marginRight: "auto", position: "relative"}}>
           <Logo />
-          <Tag title="Primehub Version" style={{
-            position: "absolute",
-            bottom: "5px",
-            right: 0,
-            fontSize: "7pt",
-            height: "16px",
-            lineHeight: "14px"
-          }}>{(window as any).primehubVersion}</Tag>
         </a>
         {
           GroupSelectorCom ? (
@@ -122,6 +114,17 @@ class HeaderContainer extends React.Component<Props, {}> {
             </Menu.Item>
             <Menu.Item key="logout" style={{borderTop: '1px solid #f1f1f1'}}>
               Logout
+            </Menu.Item>
+            <Menu.Divider/>
+            <Menu.Item key="phVersion" disabled={ true } style={{
+                fontSize: '12px',
+                height: '20px',
+                marginTop: 0,
+                lineHeight: '20px',
+                cursor: 'default',
+                color: '#999 !important'
+            }}>
+              version: {(window as any).primehubVersion}
             </Menu.Item>
           </Menu.SubMenu>
         </Menu>
