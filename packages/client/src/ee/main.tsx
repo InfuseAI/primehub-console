@@ -41,24 +41,52 @@ class Main extends React.Component {
         title: 'JupyterHub',
         subPath: 'hub',
         icon: iconJupyterHub,
+        style: {
+          width: 'auto',
+          height: 22,
+          marginRight: '-3px',
+          marginLeft: '-2px',
+          marginTop: '-2px'
+        }
       },
       {
         title: 'Jobs',
         subPath: 'job',
         icon: iconJobs,
         stage: 'beta',
+        style: {
+          width: 'auto',
+          height: 17,
+          marginLeft: '1px',
+          marginRight: '-1px',
+          marginTop: '-3px',
+        }
       },
       {
         title: 'Schedule',
         subPath: 'schedule',
         icon: iconSchedule,
         stage: 'beta',
+        style: {
+          width: 'auto',
+          height: 15,
+          marginLeft: '2px',
+          marginRight: '-1px',
+          marginTop: '-5px',
+        }
       },
       {
         title: 'Models',
         subPath: 'model-deployment',
         icon: iconModels,
         stage: 'alpha',
+        style: {
+          width: 'auto',
+          height: 16,
+          marginLeft: '2px',
+          marginRight: '-2px',
+          marginTop: '-5px',
+        }
       },
     ]
 

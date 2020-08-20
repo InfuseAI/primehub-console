@@ -9,12 +9,28 @@ import {get} from 'lodash'
 import { MainPageSidebarItem } from 'containers/mainPage';
 
 const Icon = styled.img`
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
 `;
 
 const Title = styled.span`
   margin-left: 16px;
+`;
+
+const Badge = styled.span`
+  position: absolute;
+  top: 12px;
+  left: 140px;
+  border-radius: 2px;
+  padding: 0px 5px;
+  line-height: 15px;
+  background: none;
+  border: 1px rgb(255,255,255, 0.5) solid;
+  font-size: 10px;
+
+  .ant-menu-item:hover &, .ant-menu-item-selected & {
+    border-color: #fff;
+  }
 `;
 
 type Props = RouteComponentProps & {
@@ -23,25 +39,11 @@ type Props = RouteComponentProps & {
 
 class Sidebar extends React.Component<Props> {
   renderStageBadge(item: MainPageSidebarItem) {
-    const badgeStyle =  {
-      position: 'absolute',
-      top: 28,
-      left: 32,
-      height: 12,
-      borderRadius: 3,
-      padding: '6px 2px 2px 2px',
-    }
 
     if (item.stage === 'beta' ) {
-      return <sup style={{
-        ...badgeStyle,
-        backgroundColor: '#52c41a',
-      }}>beta</sup>
+      return <Badge>beta</Badge>
     } else if (item.stage === 'alpha' ) {
-      return <sup style={{
-        ...badgeStyle,
-        backgroundColor: '#b50606',
-      }}>alpha</sup>
+      return <Badge>alpha</Badge>
     } else {
       return <></>
     }
@@ -64,18 +66,18 @@ class Sidebar extends React.Component<Props> {
           theme="dark"
           selectedKeys={[key]}
         >
-          <Menu.Item key="home">
+          <Menu.Item key="home" style={{marginTop: 0, paddingLeft: 26}}>
             <Link to={`${appPrefix}g/${group}/home`}>
-              <Icon src={iconHome}/>
+              <Icon src={iconHome} style={{width: 'auto', height: 16, marginTop: '-4px'}}/>
               <Title>Home</Title>
             </Link>
           </Menu.Item>
 
           {
             sidebarItems ? sidebarItems.map(item => (
-              <Menu.Item key={item.subPath}>
+              <Menu.Item key={item.subPath} style={{paddingLeft: 26}}>
                 <Link to={`${appPrefix}g/${group}/${item.subPath}`}>
-                  <Icon src={item.icon}/>
+                  <Icon src={item.icon} style={item.style}/>
                   <Title>{item.title}</Title>
                   {this.renderStageBadge(item)}
                 </Link>

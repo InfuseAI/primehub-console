@@ -45,6 +45,7 @@ export type MainPageSidebarItem = {
   title: string;
   subPath: string;
   icon: string;
+  style?: any;
   stage?: string;
 }
 
