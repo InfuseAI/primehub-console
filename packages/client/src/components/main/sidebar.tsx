@@ -9,8 +9,8 @@ import {get} from 'lodash'
 import { MainPageSidebarItem } from 'containers/mainPage';
 
 const Icon = styled.img`
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
 `;
 
 const Title = styled.span`
@@ -25,8 +25,8 @@ class Sidebar extends React.Component<Props> {
   renderStageBadge(item: MainPageSidebarItem) {
     const badgeStyle =  {
       position: 'absolute',
-      top: 28,
-      left: 32,
+      top: 14,
+      left: 148,
       height: 12,
       borderRadius: 3,
       padding: '6px 2px 2px 2px',
