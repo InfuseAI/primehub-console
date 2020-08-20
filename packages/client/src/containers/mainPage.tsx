@@ -12,6 +12,7 @@ import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {withRouter} from 'react-router';
 import { GroupContextValue, GroupContext } from 'context/group';
+import ApiTokenPage from 'containers/apiTokenPage';
 
 const HEADER_HEIGHT = 64;
 
@@ -96,43 +97,48 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
       undefined;
 
     return (
-      <Layout>
-        <Switch>
-          <Route path={`${appPrefix}g`} exact>
-            { groups && groups.length > 0 ?
-              <Redirect to={`${appPrefix}g/${groups[0].name}`} /> :
-              <Header />
-            }
-          </Route>
-          <Route path={`${appPrefix}g/:groupName`} exact>
-            <Header
-              GroupSelectorCom={GroupSelector}
-              groupSelectorProps={{
-                groups,
-                onSelectGroup: this.onSelectGroup
-              }}
-            />
-          </Route>
-          <Route path={`${appPrefix}g/:groupName/:subPath`}>
-            <Header
-              GroupSelectorCom={GroupSelector}
-              groupSelectorProps={{
-                groups,
-                onSelectGroup: this.onSelectGroup
-              }}
-            />
-          </Route>
-        </Switch>
+      <GroupContext.Provider value={currentGroup}>
         <Layout>
-          <Route path={`${appPrefix}g/:groupName`}>
-            <Sidebar sidebarItems={sidebarItems}/>
-          </Route>
-          <Content>
-            <GroupContext.Provider value={currentGroup}>
+          <Switch>
+            <Route path={`${appPrefix}g`} exact>
+              { groups && groups.length > 0 ?
+                <Redirect to={`${appPrefix}g/${groups[0].name}`} /> :
+                <Header />
+              }
+            </Route>
+            <Route path={`${appPrefix}g/:groupName`} exact>
+              <Header
+                GroupSelectorCom={GroupSelector}
+                groupSelectorProps={{
+                  groups,
+                  onSelectGroup: this.onSelectGroup
+                }}
+              />
+            </Route>
+            <Route path={`${appPrefix}g/:groupName/:subPath`}>
+              <Header
+                GroupSelectorCom={GroupSelector}
+                groupSelectorProps={{
+                  groups,
+                  onSelectGroup: this.onSelectGroup
+                }}
+              />
+            </Route>
+          </Switch>
+          <Layout>
+            <Route path={`${appPrefix}g/:groupName`}>
+              <Sidebar sidebarItems={sidebarItems}/>
+            </Route>
+            <Content>
               <Switch>
                 {/* Home */}
                 <Route path={`${appPrefix}g/:groupName`} exact>
                   <Redirect to={`${location.pathname}/home`} />
+                </Route>
+
+                {/* API Token */}
+                <Route path={`${appPrefix}g/:groupName/api-token`} exact>
+                  <ApiTokenPage />
                 </Route>
 
                 {/* Extra routing */}
@@ -143,10 +149,10 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
                   <div>{currentGroupName}</div>
                 </Route>
               </Switch>
-            </GroupContext.Provider>
-          </Content>
+            </Content>
+          </Layout>
         </Layout>
-      </Layout>
+      </GroupContext.Provider>
     )
   }
 }

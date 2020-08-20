@@ -6,6 +6,7 @@ html
     script.
       window.APP_PREFIX = "#{staticPath}";
       window.graphqlEndpoint = '#{graphqlEndpoint}';
+      window.absGraphqlEndpoint = '#{cmsHost}#{graphqlEndpoint}';
       window.username = "#{username}";
       window.thumbnail = "#{thumbnail}";
       window.isUserAdmin = #{isUserAdmin};
@@ -14,6 +15,8 @@ html
       window.refreshTokenExp = #{refreshTokenExp};
       window.newAccessToken = "#{newAccessToken}";
       window.EVERYONE_GROUP_ID = "#{everyoneGroupId}";
+      window.requestApiTokenEndpoint = '#{requestApiTokenEndpoint}';
+      window.apiToken = '#{apiToken}';
       window.enableLogPersistence = #{enableLogPersistence};
 
       if (window.newAccessToken) {

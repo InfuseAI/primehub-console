@@ -97,7 +97,6 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
       userProfileLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account?referrer=${config.keycloakClientId}&referrer_uri=${referrer}`,
       // tslint:disable-next-line:max-line-length
       changePasswordLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account/password?referrer=${config.keycloakClientId}&referrer_uri=${referrer}`,
-      apiTokenLink: config.appPrefix ? `${config.appPrefix}/api-token` : '/api-token',
       adminPortalLink: config.appPrefix ? `${config.appPrefix}/cms` : '/cms',
       logoutLink: config.appPrefix ? `${config.appPrefix}/oidc/logout` : '/oidc/logout',
     });
@@ -184,18 +183,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     });
   }
 
-  // api token
-  rootRouter.get('/api-token', oidcCtrl.loggedIn, async ctx => {
-    ctx.state.apiToken = ctx.cookies.get('apiToken', {signed: true});
-    ctx.cookies.set('apiToken', null);
-
-    await ctx.render('api-token', {
-      title: 'API Token',
-      staticPath
-    });
-  });
-
-  // hub
+  // main
   rootRouter.get('/g', oidcCtrl.loggedIn, async ctx => {
     await ctx.render('main', {
       title: 'PrimeHub',
@@ -204,6 +192,12 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   });
 
   rootRouter.get('/g/*', oidcCtrl.loggedIn, async ctx => {
+    const apiToken = ctx.cookies.get('apiToken', {signed: true});
+    if (apiToken) {
+      ctx.state.apiToken = ctx.cookies.get('apiToken', {signed: true});
+      ctx.cookies.set('apiToken', null);
+    }
+
     await ctx.render('main', {
       title: 'PrimeHub',
       staticPath

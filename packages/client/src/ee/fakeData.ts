@@ -6,6 +6,7 @@ export const fakeData = {
     ifDockerConfigJson: true,
   }],
   me: {
+    apiTokenCount: 1,
     groups: [{
       id: 'groupId1',
       name: 'group1',
