@@ -179,7 +179,7 @@ export default class CMSPage extends React.Component<Props, State> {
         if (data) client.clearStore();
       } catch {}
     }
-    
+
     return {
       query,
       variables: newVariables
@@ -480,8 +480,7 @@ export default class CMSPage extends React.Component<Props, State> {
       <Layout style={{minHeight: '100vh'}}>
         <ContentHeader/>
         <Layout style={{marginTop: 64}}>
-          <Sider breakpoint="sm"
-            style={{
+          <Sider style={{
               position: "fixed",
               height: "100%"
             }}

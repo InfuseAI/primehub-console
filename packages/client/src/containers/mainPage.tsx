@@ -15,14 +15,6 @@ import { GroupContextValue, GroupContext } from 'context/group';
 import { Landing } from '../landing';
 import ApiTokenPage from 'containers/apiTokenPage';
 
-const HEADER_HEIGHT = 64;
-
-const Content = styled(Layout.Content)`
-  margin-top: ${HEADER_HEIGHT}px;
-  padding: 24;
-  min-height: calc(100vh - 64px);
-`;
-
 export const GroupFragment = gql`
   fragment GroupInfo on Group {
     id
@@ -127,11 +119,11 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
               />
             </Route>
           </Switch>
-          <Layout>
+          <Layout style={{marginTop: 64}}>
             <Route path={`${appPrefix}g/:groupName`}>
               <Sidebar sidebarItems={sidebarItems}/>
             </Route>
-            <Content>
+            <Layout.Content style={{marginLeft: 200,  minHeight: 'calc(100vh - 64px)'}}>
               <Switch>
                 {/* Home */}
                 <Route path={`${appPrefix}g/:groupName`} exact>
@@ -151,7 +143,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
                   <Landing includeHeader={false} />
                 </Route>
               </Switch>
-            </Content>
+            </Layout.Content>
           </Layout>
         </Layout>
       </GroupContext.Provider>
