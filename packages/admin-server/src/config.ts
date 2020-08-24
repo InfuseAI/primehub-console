@@ -36,6 +36,7 @@ export interface Config {
   // user portal
   enableUserPortal: boolean;
   portalConfigPath: string;
+  homeConfigPath: string;
 
   // disable create/update/delete operation on instanceType/image ui
   readOnlyOnInstanceTypeAndImage?: boolean;
@@ -85,6 +86,7 @@ const defaultConfigs = {
   graphqlEndpoint: 'http://localhost:3001/graphql',
   enableUserPortal: false,
   portalConfigPath: resolve(__dirname, '../etc/portal-config.yaml'),
+  homeConfigPath: resolve(__dirname, '../etc/home-config.yaml'),
   readOnlyOnInstanceTypeAndImage: false,
   enableDatasetUpload: false,
   enableWorkspace: false,
@@ -135,6 +137,7 @@ export const createConfig = (): Config => {
     graphqlEndpoint: process.env.GRAPHQL_ENDPOINT,
     enableUserPortal: process.env.PRIMEHUB_FEATURE_USER_PORTAL,
     portalConfigPath: process.env.PORTAL_CONFIG_PATH,
+    homeConfigPath: process.env.HOME_CONFIG_PATH,
     readOnlyOnInstanceTypeAndImage: process.env.READ_ONLY_ON_INSTANCE_TYPE_AND_IMAGE,
     enableDatasetUpload:
       process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD && process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD.toString() === 'true',

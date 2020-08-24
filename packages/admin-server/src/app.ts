@@ -184,10 +184,15 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   }
 
   // main
+  const homeConfig = yaml.safeLoad(fs.readFileSync(config.homeConfigPath, 'utf8'));
   rootRouter.get('/g', oidcCtrl.loggedIn, async ctx => {
     await ctx.render('main', {
       title: 'PrimeHub',
-      staticPath
+      staticPath,
+      home: JSON.stringify({
+        services: homeConfig.services,
+        welcomeMessage: homeConfig.welcomeMessage
+      })
     });
   });
 
