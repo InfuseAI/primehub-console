@@ -11,7 +11,6 @@ export const transform = (group: any): any => {
     quotaCpu: getFromAttr('quota-cpu', group.attributes, null, parseFloat),
     quotaGpu: getFromAttr('quota-gpu', group.attributes, null, parseInt),
     quotaMemory: getFromAttr('quota-memory', group.attributes, null, parseMemory),
-    userVolumeCapacity: getFromAttr('user-volume-capacity', group.attributes, null, parseDiskQuota),
     projectQuotaCpu: getFromAttr('project-quota-cpu', group.attributes, null, parseFloat),
     projectQuotaGpu: getFromAttr('project-quota-gpu', group.attributes, null, parseInt),
     projectQuotaMemory: getFromAttr('project-quota-memory', group.attributes, null, parseMemory),

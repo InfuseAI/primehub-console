@@ -33,7 +33,6 @@ const fields = `
     displayName
     quotaCpu
     quotaGpu
-    userVolumeCapacity
     writable
   }`;
 
@@ -577,7 +576,6 @@ describe('dataset graphql', function() {
         displayName: null,
         name: group.name,
         quotaCpu: null,
-        userVolumeCapacity: null,
         quotaGpu: null,
         writable: false
       }],
@@ -620,7 +618,6 @@ describe('dataset graphql', function() {
       displayName: null,
       name: group.name,
       quotaCpu: null,
-      userVolumeCapacity: null,
       quotaGpu: null,
       writable: false
     }, {
@@ -628,83 +625,6 @@ describe('dataset graphql', function() {
       displayName: null,
       name: secGroup.name,
       quotaCpu: null,
-      userVolumeCapacity: null,
-      quotaGpu: null,
-      writable: true
-    }]);
-
-    // check keycloak
-    const roles = await this.kcAdminClient.groups.listRealmRoleMappings({
-      realm: process.env.KC_REALM,
-      id: group.id
-    });
-    expect(roles.find(role => role.name === `ds:${datasetId}`)).to.be.ok;
-    expect(roles.find(role => role.name === `ds:rw:${datasetId}`)).to.be.not.ok;
-    const secGroupRoles = await this.kcAdminClient.groups.listRealmRoleMappings({
-      realm: process.env.KC_REALM,
-      id: secGroup.id
-    });
-    expect(secGroupRoles.find(role => role.name === `ds:${datasetId}`)).to.be.not.ok;
-    expect(secGroupRoles.find(role => role.name === `ds:rw:${datasetId}`)).to.be.ok;
-  });
-
-  it('add a pv dataset and connect with writable groups, then disconnect', async () => {
-    const data = {
-      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
-      displayName: faker.internet.userName(),
-      description: faker.lorem.sentence(),
-      global: false,
-      type: 'pv',
-      volumeSize: 1,
-      url: faker.internet.url()
-    };
-    const createMutation = await this.graphqlRequest(`
-    mutation($data: DatasetCreateInput!){
-      createDataset (data: $data) { id }
-    }`, {
-      data
-    });
-
-    // update with connect
-    const group = await this.createGroup();
-    const secGroup = await this.createGroup();
-    const datasetId = createMutation.createDataset.id;
-    await this.graphqlRequest(`
-    mutation($where: DatasetWhereUniqueInput!, $data: DatasetUpdateInput!){
-      updateDataset (where: $where, data: $data) { id }
-    }`, {
-      where: {id: datasetId},
-      data: {
-        groups: {
-          connect: [{
-            id: group.id,
-            writable: false
-          }, {
-            id: secGroup.id,
-            writable: true
-          }]
-        }
-      }
-    });
-
-    // get one
-    const queryOne = await this.graphqlRequest(`
-    query($where: DatasetWhereUniqueInput!){
-      dataset (where: $where) { ${fields} }
-    }`, {
-      where: {id: datasetId}
-    });
-
-    expect(queryOne.dataset).to.be.deep.include({
-      id: data.name,
-      ...data,
-    });
-    expect(queryOne.dataset.groups).to.deep.include.members([{
-      id: group.id,
-      displayName: null,
-      name: group.name,
-      quotaCpu: null,
-      userVolumeCapacity: null,
       quotaGpu: null,
       writable: false
     }, {
@@ -712,7 +632,6 @@ describe('dataset graphql', function() {
       displayName: null,
       name: secGroup.name,
       quotaCpu: null,
-      userVolumeCapacity: null,
       quotaGpu: null,
       writable: true
     }]);
@@ -834,7 +753,6 @@ describe('dataset graphql', function() {
   //     displayName: null,
   //     name: group.name,
   //     quotaCpu: null,
-  //     userVolumeCapacity: null,
   //     quotaGpu: null,
   //     writable: false
   //   }, {
@@ -842,7 +760,6 @@ describe('dataset graphql', function() {
   //     displayName: null,
   //     name: secGroup.name,
   //     quotaCpu: null,
-  //     userVolumeCapacity: null,
   //     quotaGpu: null,
   //     writable: false
   //   }]);
