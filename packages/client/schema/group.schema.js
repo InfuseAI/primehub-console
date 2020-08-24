@@ -149,15 +149,6 @@ export default () => (
               nullable
             />
           </Col>
-          <Col sm={8} xs={24}>
-            <number keyName="userVolumeCapacity" title="${userVolumeCapacity}"
-              uiParams={{min: 1, step: 1, precision: 0, unit: ' GB', disableText: 'use default value'}}
-              defaultValue={() => null}
-              description="${quotaForNewly}"
-              packageName="../src/cms-components/customize-number-checkbox"
-              nullable
-            />
-          </Col>
         </Row>
       </Block>
     </Condition>
