@@ -198,9 +198,6 @@ class JobList extends React.Component<Props> {
       ...jobsVariables,
       page: 1,
     };
-    if (groupContext && newVariables.where) {
-      newVariables.where.groupId_in = undefined;
-    }
     jobsRefetch(newVariables);
   }
 
@@ -216,10 +213,14 @@ class JobList extends React.Component<Props> {
       ...jobsVariables,
       where: {
         ...jobsVariables.where,
-        groupId_in: groupContext ? undefined : selectedGroups,
         mine: submittedByMe,
       }
     };
+
+    if (!groupContext) {
+      newVariables.where.groupId_in = selectedGroups;
+    }
+
     jobsRefetch(newVariables);
   }
 
