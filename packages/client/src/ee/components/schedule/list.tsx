@@ -120,9 +120,6 @@ class ScheduleList extends React.Component<Props> {
       ...schedulesVariables,
       page: 1,
     };
-    if (groupContext && newVariables.where) {
-      newVariables.where.groupId_in = undefined;
-    }
     schedulesRefetch(newVariables);
   }
 
@@ -138,10 +135,13 @@ class ScheduleList extends React.Component<Props> {
       ...schedulesVariables,
       where: {
         ...schedulesVariables.where,
-        groupId_in: groupContext ? undefined : selectedGroups,
         mine: submittedByMe,
       }
     };
+
+    if (!groupContext) {
+      newVariables.where.groupId_in = selectedGroups;
+    }
 
     schedulesRefetch(newVariables);
   }
