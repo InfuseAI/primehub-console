@@ -151,7 +151,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   });
 
   // redirect
-  const home = config.enableUserPortal ? '/landing' : '/cms';
+  const home = '/g';
   rootRouter.get('/', async (ctx: any) => {
     return ctx.redirect(`${config.cmsHost}${config.appPrefix || ''}${home}`);
   });
@@ -168,26 +168,16 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   // ctrl
   mountOidc(rootRouter, oidcCtrl);
 
-  if (config.enableUserPortal) {
-    // read portal config
-    const portalConfig = yaml.safeLoad(fs.readFileSync(config.portalConfigPath, 'utf8'));
-    rootRouter.get('/landing', oidcCtrl.loggedIn, async ctx => {
-      await ctx.render('landing', {
-        title: 'PrimeHub',
-        staticPath,
-        portal: JSON.stringify({
-          services: portalConfig.services,
-          welcomeMessage: portalConfig.welcomeMessage
-        })
-      });
-    });
-  }
-
   // main
+  const homeConfig = yaml.safeLoad(fs.readFileSync(config.homeConfigPath, 'utf8'));
   rootRouter.get('/g', oidcCtrl.loggedIn, async ctx => {
     await ctx.render('main', {
       title: 'PrimeHub',
-      staticPath
+      staticPath,
+      home: JSON.stringify({
+        services: homeConfig.services,
+        welcomeMessage: homeConfig.welcomeMessage
+      })
     });
   });
 

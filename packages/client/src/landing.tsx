@@ -49,24 +49,28 @@ const Empty = (props: {height: number, description?: string}) => (
   </Card>
 )
 
-class Landing extends React.Component {
+export class Landing extends React.Component {
   render() {
+    const { includeHeader } = this.props;
     const isUserAdmin = (window as any).isUserAdmin || false;
-    const portal = (window as any).portal || {
+    const portal = ((includeHeader === false) ? (window as any).home : (window as any).portal) || {
       services: [],
       welcomeMessage: ''
     };
     const {services, welcomeMessage} = portal;
     const normalServices = services.filter(sv => !sv.adminOnly);
+    let header = (includeHeader === false) ? null : <Header />;
     return (
       <Layout>
-        <Header />
-        <Content>
+        { header }
+      <Content style={
+        (includeHeader === false) ? {marginTop: 24} : {}
+      }>
           <Section title="">
             <ServiceCards services={normalServices} colHeight={200} />
           </Section>
           {
-            isUserAdmin && (
+            isUserAdmin && services.filter(sv => sv.adminOnly).length > 0 && (
               <Section title="Admin Section">
                 <ServiceCards services={services.filter(sv => sv.adminOnly)} colHeight={200} />
               </Section>

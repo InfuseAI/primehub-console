@@ -12,6 +12,7 @@ import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {withRouter} from 'react-router';
 import { GroupContextValue, GroupContext } from 'context/group';
+import { Landing } from '../landing';
 import ApiTokenPage from 'containers/apiTokenPage';
 
 const HEADER_HEIGHT = 64;
@@ -147,7 +148,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
 
                 {/* Default */}
                 <Route path={`${appPrefix}g/:groupName/:actionKey`}>
-                  <div>{currentGroupName}</div>
+                  <Landing includeHeader={false} />
                 </Route>
               </Switch>
             </Content>
