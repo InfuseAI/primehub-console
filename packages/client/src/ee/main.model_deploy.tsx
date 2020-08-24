@@ -31,7 +31,14 @@ class Main extends React.Component {
       {
         title: 'Models',
         subPath: 'model-deployment',
-        icon: iconModels
+        icon: iconModels,
+        style: {
+          width: 'auto',
+          height: 16,
+          marginLeft: '2px',
+          marginRight: '-2px',
+          marginTop: '-5px',
+        }
       },
     ]
 

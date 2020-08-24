@@ -75,6 +75,10 @@ class Main extends React.Component {
           marginTop: '-5px',
         }
       },
+    ] ;
+
+    if ((window as any).enableModelDeployment) {
+      sidebarItems.push(
       {
         title: 'Models',
         subPath: 'model-deployment',
@@ -87,8 +91,8 @@ class Main extends React.Component {
           marginRight: '-2px',
           marginTop: '-5px',
         }
-      },
-    ]
+      });
+    }
 
     return (
       <BrowserRouter>

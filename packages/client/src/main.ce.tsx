@@ -99,6 +99,13 @@ class Main extends React.Component {
         title: 'JupyterHub',
         subPath: 'hub',
         icon: iconJupyterHub,
+        style: {
+          width: 'auto',
+          height: 22,
+          marginRight: '-3px',
+          marginLeft: '-2px',
+          marginTop: '-2px'
+        }
       },
     ]
 
