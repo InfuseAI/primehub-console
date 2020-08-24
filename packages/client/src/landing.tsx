@@ -70,7 +70,7 @@ export class Landing extends React.Component {
             <ServiceCards services={normalServices} colHeight={200} />
           </Section>
           {
-            isUserAdmin && (
+            isUserAdmin && services.filter(sv => sv.adminOnly).length > 0 && (
               <Section title="Admin Section">
                 <ServiceCards services={services.filter(sv => sv.adminOnly)} colHeight={200} />
               </Section>
