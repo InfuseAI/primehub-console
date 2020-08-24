@@ -126,16 +126,20 @@ class DeploymentListContainer extends React.Component<Props, State> {
     selectedGroups: Array<string>;
     submittedByMe: boolean;
   }) => {
-    const {getPhDeploymentConnection} = this.props;
-    const {phDeploymentsConnection, refetch, variables} = getPhDeploymentConnection;
+    const {groupContext, getPhDeploymentConnection} = this.props;
+    const {variables, refetch} = getPhDeploymentConnection;
     const newVariables = {
       ...variables,
       where: {
         ...variables.where,
-        groupId_in: selectedGroups,
         mine: submittedByMe,
       }
     };
+
+    if (!groupContext) {
+      newVariables.where.groupId_in = selectedGroups;
+    }
+
     refetch(newVariables);
   }
 
