@@ -33,7 +33,6 @@ const attrSchema = {
   quotaCpu: {type: FieldType.float, rename: 'quota-cpu'},
   quotaGpu: {type: FieldType.integer, rename: 'quota-gpu'},
   quotaMemory: {serialize: stringifyMemory, deserialize: parseMemory, rename: 'quota-memory'},
-  userVolumeCapacity: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota, rename: 'user-volume-capacity'},
   projectQuotaCpu: {type: FieldType.float, rename: 'project-quota-cpu'},
   projectQuotaGpu: {type: FieldType.integer, rename: 'project-quota-gpu'},
   projectQuotaMemory: {serialize: stringifyMemory, deserialize: parseMemory, rename: 'project-quota-memory'},
@@ -74,7 +73,7 @@ export const create = async (root, args, context: Context) => {
   const currentWorkspace = createInResolver(root, args, context);
 
   // create resource
-  // displayName, canUseGpu, quotaGpu, userVolumeCapacity in attributes
+  // displayName, canUseGpu, quotaGpu in attributes
   const payload = args.data;
 
   const attrs = new Attributes({
@@ -183,7 +182,7 @@ export const update = async (root, args, context: Context) => {
   });
 
   // merge attrs
-  // displayName, canUseGpu, quotaGpu, userVolumeCapacity in attributes
+  // displayName, canUseGpu, quotaGpu in attributes
   const attrs = new Attributes({
     keycloakAttr: group.attributes,
     schema: attrSchema

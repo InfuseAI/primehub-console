@@ -27,7 +27,6 @@ const fields = `
     displayName
     quotaCpu
     quotaGpu
-    userVolumeCapacity
   }`;
 
 declare module 'mocha' {
