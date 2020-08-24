@@ -323,9 +323,9 @@ const listQuery = async (client: CustomResource<PhDeploymentSpec>, where: any, c
   let transformedPhDeployments = await Promise.all(
     phDeployments.map(schedule => transform(schedule, kcAdminClient)));
 
-  // if (where && where.mine) {
-  //   where.userId_eq = currentUserId;
-  // }
+  if (where && where.mine) {
+    where.userId_eq = currentUserId;
+  }
 
   const userGroups = await getGroupIdsByUser(context, currentUserId);
   where.groupId_in = isEmpty(where.groupId_in) ? userGroups : intersection(where.groupId_in, userGroups);
