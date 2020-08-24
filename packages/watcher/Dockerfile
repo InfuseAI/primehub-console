@@ -10,6 +10,8 @@ COPY packages/watcher packages/watcher
 
 RUN npx lerna bootstrap --scope=@infuseai/watcher
 
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
 RUN cd packages/graphql-server \
   && npm run build:prod \
   && cd ../watcher \
