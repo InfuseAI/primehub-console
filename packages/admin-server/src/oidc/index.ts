@@ -59,7 +59,7 @@ export class OidcCtrl {
     this.enableUserPortal = enableUserPortal;
 
     // build default return path
-    const returnPath = enableUserPortal ? '/landing' : '/cms';
+    const returnPath = '/g';
     this.defaultReturnPath = appPrefix ?
       `${appPrefix}${returnPath}` :
       returnPath;
