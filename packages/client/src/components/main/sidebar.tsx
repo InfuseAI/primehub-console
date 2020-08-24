@@ -73,7 +73,7 @@ class Sidebar extends React.Component<Props> {
             </Link>
           </Menu.Item>
 
-          {
+          {group &&
             sidebarItems ? sidebarItems.map(item => (
               <Menu.Item key={item.subPath} style={{paddingLeft: 26}}>
                 <Link to={`${appPrefix}g/${group}/${item.subPath}`}>
