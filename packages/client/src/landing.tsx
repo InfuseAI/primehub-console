@@ -49,7 +49,7 @@ const Empty = (props: {height: number, description?: string}) => (
   </Card>
 )
 
-class Landing extends React.Component {
+export class Landing extends React.Component {
   render() {
     const isUserAdmin = (window as any).isUserAdmin || false;
     const portal = (window as any).portal || {
@@ -58,9 +58,11 @@ class Landing extends React.Component {
     };
     const {services, welcomeMessage} = portal;
     const normalServices = services.filter(sv => !sv.adminOnly);
+    const { includeHeader } = this.props;
+    let header = (includeHeader === false) ? null : <Header />;
     return (
       <Layout>
-        <Header />
+        { header }
         <Content>
           <Section title="">
             <ServiceCards services={normalServices} colHeight={200} />
