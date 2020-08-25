@@ -151,7 +151,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
                   { groups && groups.length > 0 ?
                     <Redirect to={`${appPrefix}g/${groups[0].name}`} /> :
                     <Alert
-                      message="No available group"
+                      message="No group is available"
                       description="Please contact your administrator to be added to a group."
                       type="warning"
                       showIcon
