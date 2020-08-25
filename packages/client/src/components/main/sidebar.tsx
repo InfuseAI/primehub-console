@@ -61,7 +61,7 @@ class Sidebar extends React.Component<Props> {
     const group = get(match, 'params.groupName', '');
 
     return (
-      <Layout.Sider style={{paddingTop: 64}}>
+      <Layout.Sider style={{position: 'fixed', height: '100%'}}>
         <Menu
           theme="dark"
           selectedKeys={[key]}
