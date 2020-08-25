@@ -190,7 +190,11 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
 
     await ctx.render('main', {
       title: 'PrimeHub',
-      staticPath
+      staticPath,
+      home: JSON.stringify({
+        services: homeConfig.services,
+        welcomeMessage: homeConfig.welcomeMessage
+      })
     });
   });
 
