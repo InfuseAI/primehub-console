@@ -19,7 +19,7 @@ import { PhDeploymentFragment, DeploymentConnection } from 'ee/components/modelD
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 12;
 const Search = Input.Search
 
 export const GET_PH_DEPLOYMENT_CONNECTION = gql`
