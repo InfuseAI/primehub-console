@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Layout} from 'antd';
+import {Layout, Alert} from 'antd';
 import {Route, Switch, RouteComponentProps} from 'react-router-dom';
 import Header from 'components/header';
 import GroupSelector from 'components/groupSelector';
@@ -102,10 +102,13 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
         <Layout>
           <Switch>
             <Route path={`${appPrefix}g`} exact>
-              { groups && groups.length > 0 ?
-                <Redirect to={`${appPrefix}g/${groups[0].name}`} /> :
-                <Header />
-              }
+              <Header
+                GroupSelectorCom={GroupSelector}
+                groupSelectorProps={{
+                  groups,
+                  onSelectGroup: this.onSelectGroup
+                }}
+              />
             </Route>
             <Route path={`${appPrefix}g/:groupName`} exact>
               <Header
@@ -148,6 +151,19 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
                 {/* Default */}
                 <Route path={`${appPrefix}g/:groupName/:actionKey`}>
                   <div>{currentGroupName}</div>
+                </Route>
+
+                {/* No available groups */}
+                <Route path={`${appPrefix}g`} exact>
+                  { groups && groups.length > 0 ?
+                    <Redirect to={`${appPrefix}g/${groups[0].name}`} /> :
+                    <Alert
+                      message="No available group"
+                      description="Please contact your administrator to be added to a group."
+                      type="warning"
+                      showIcon
+                    />
+                  }
                 </Route>
               </Switch>
             </Content>
