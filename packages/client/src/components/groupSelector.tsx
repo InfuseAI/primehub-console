@@ -76,7 +76,7 @@ class GroupSelector extends React.Component<GroupSelectorProps, State> {
         </label>
         <Select size={'small'} value={currentGroupName} placeholder="Please select a group" onChange={this.handleChange} style={{width: "160px", fontSize: "12px"}}>
           {groups ? groups.map(group => (
-            <Option key={group.id} value={group.name}>
+            <Option key={group.id} value={group.name} title={group.displayName}>
               {group.displayName || group.name}
             </Option>
           )) : [] }
