@@ -85,6 +85,8 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
     const {sidebarItems, location, children} = this.props;
     const {currentGroupName} = this.state;
     const {loading, error, groups} = this.getGroups();
+    console.log("loading: ", loading);
+    console.log("error: ", error);
 
     const currentGroup = groups ?
       groups.find(group => group.name === currentGroupName) :
