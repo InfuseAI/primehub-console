@@ -148,16 +148,24 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
                   <Landing includeHeader={false} />
                 </Route>
 
-                {/* No available groups */}
+                {/* No available groups or graphql is not running */}
                 <Route path={`${appPrefix}g`} exact>
                   { groups && groups.length > 0 ?
                     <Redirect to={`${appPrefix}g/${groups[0].name}`} /> :
-                    <Alert
-                      message="No group is available"
-                      description="Please contact your administrator to be added to a group."
-                      type="warning"
-                      showIcon
-                    />
+                    ( error ?
+                      <Alert
+                        message="GraphQL is not running"
+                        description="Please contact your administrator."
+                        type="error"
+                        showIcon
+                      /> :
+                      <Alert
+                        message="No group is available"
+                        description="Please contact your administrator to be added to a group."
+                        type="warning"
+                        showIcon
+                      />
+                    )
                   }
                 </Route>
               </Switch>
