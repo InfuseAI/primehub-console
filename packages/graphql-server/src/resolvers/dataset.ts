@@ -84,9 +84,9 @@ export const mapping = (item: Item<DatasetSpec>) => {
     mountRoot: get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/mountRoot`], ''),
     // default to false
     homeSymlink: parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/homeSymlink`], 'false')),
-    // default to true
+    // default to false
     launchGroupOnly:
-      parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/launchGroupOnly`], 'true')),
+      parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/launchGroupOnly`], 'false')),
     enableUploadServer,
     uploadServerLink:
       (uploadServerList.includes(item.spec.type) && enableUploadServer) ?
@@ -181,13 +181,11 @@ export const updateMapping = (data: any) => {
     gitSyncProp = {gitsync: null};
   }
 
-  // add launchGroupOnly
-  if (!isNil(data.launchGroupOnly)) {
-    annotations.annotations = {
-      ...annotations.annotations,
-      [`${ATTRIBUTE_PREFIX}/launchGroupOnly`]: data.launchGroupOnly.toString()
-    };
-  }
+  // always add launchGroupOnly when creating a new dataset and value is true
+  annotations.annotations = {
+    ...annotations.annotations,
+    [`${ATTRIBUTE_PREFIX}/launchGroupOnly`]: 'true'
+  };
 
   return {
     metadata: {
