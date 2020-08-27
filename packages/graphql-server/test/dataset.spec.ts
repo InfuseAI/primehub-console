@@ -111,7 +111,7 @@ describe('dataset graphql', function() {
       variables: null,
       mountRoot: '',
       homeSymlink: false,
-      launchGroupOnly: true,
+      launchGroupOnly: false,
       spec: {
         displayName: data.name,
         volumeName: data.name
@@ -161,7 +161,7 @@ describe('dataset graphql', function() {
       variables: null,
       mountRoot: '',
       homeSymlink: false,
-      launchGroupOnly: true,
+      launchGroupOnly: false,
       spec: {
         ...pick(data, ['displayName', 'description', 'type', 'url', 'variables']),
         volumeName: data.name
@@ -218,7 +218,7 @@ describe('dataset graphql', function() {
       variables: null,
       mountRoot: '',
       homeSymlink: false,
-      launchGroupOnly: true,
+      launchGroupOnly: false,
       spec: {
         ...pick(data, ['displayName', 'description', 'type', 'url', 'variables']),
         volumeName: data.name
@@ -870,7 +870,7 @@ describe('dataset graphql', function() {
       global: false,
       url: faker.internet.url(),
       mountRoot: '/datasets',
-      launchGroupOnly: true
+      launchGroupOnly: false
     };
 
     const createMutation = await this.graphqlRequest(`

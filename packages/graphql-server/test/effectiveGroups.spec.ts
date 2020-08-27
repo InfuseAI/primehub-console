@@ -90,13 +90,13 @@ describe('user effectiveGroups graphql', function() {
     await assignDatasetToGroup(this.graphqlRequest, ds2, group2, false);
     await assignDatasetToGroup(this.graphqlRequest, ds2, group3, true);
     // ds3 (g1:r. g2:r, g3:r)
-    const ds3 = await createDataset(this.graphqlRequest, {name: 'ds3', launchGroupOnly: true});
+    const ds3 = await createDataset(this.graphqlRequest, {name: 'ds3', launchGroupOnly: false});
     await assignDatasetToGroup(this.graphqlRequest, ds3, group3);
     // ds4 (g1:w. g2:w, g3:w)
-    const ds4 = await createDataset(this.graphqlRequest, {name: 'ds4', launchGroupOnly: true});
+    const ds4 = await createDataset(this.graphqlRequest, {name: 'ds4', launchGroupOnly: false});
     await assignDatasetToGroup(this.graphqlRequest, ds4, group3, true);
     // d5 (not accessible, because user is  not in group4)
-    const ds5 = await createDataset(this.graphqlRequest, {name: 'ds5', launchGroupOnly: true});
+    const ds5 = await createDataset(this.graphqlRequest, {name: 'ds5', launchGroupOnly: false});
     await assignDatasetToGroup(this.graphqlRequest, ds5, group4);
 
     // query by the user
