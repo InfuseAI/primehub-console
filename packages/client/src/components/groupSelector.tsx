@@ -51,8 +51,6 @@ class GroupSelector extends React.Component<GroupSelectorProps, State> {
     const {currentGroupName} = this.state;
     const matchGroupName = (match.params as any).groupName || null;
 
-    console.log("Group", groups);
-
     if (groups && groups.length > 0) {
       if (groups.find(group => group.name === matchGroupName)) {
         if (currentGroupName != matchGroupName) {
