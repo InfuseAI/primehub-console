@@ -26,7 +26,6 @@ exports.GroupRelation = () => (
             displayName
             quotaCpu
             quotaGpu
-            userVolumeCapacity
           }
         }
         pageInfo {

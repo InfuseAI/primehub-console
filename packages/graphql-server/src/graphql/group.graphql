@@ -113,8 +113,8 @@ input GroupUpdateInput {
   displayName: String
   quotaCpu: Float
   quotaGpu: Int
-  quotaMemory: Float
   userVolumeCapacity: Int
+  quotaMemory: Float
   projectQuotaCpu: Float
   projectQuotaGpu: Int
   projectQuotaMemory: Float

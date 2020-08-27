@@ -74,7 +74,7 @@ export const create = async (root, args, context: Context) => {
   const currentWorkspace = createInResolver(root, args, context);
 
   // create resource
-  // displayName, canUseGpu, quotaGpu, userVolumeCapacity in attributes
+  // displayName, canUseGpu, quotaGpu in attributes
   const payload = args.data;
 
   const attrs = new Attributes({
@@ -183,7 +183,7 @@ export const update = async (root, args, context: Context) => {
   });
 
   // merge attrs
-  // displayName, canUseGpu, quotaGpu, userVolumeCapacity in attributes
+  // displayName, canUseGpu, quotaGpu in attributes
   const attrs = new Attributes({
     keycloakAttr: group.attributes,
     schema: attrSchema

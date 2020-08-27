@@ -260,7 +260,7 @@ export default () => (
           relation={{
             to: 'group',
             type: 'toMany',
-            fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu', 'userVolumeCapacity', 'writable']
+            fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu', 'writable']
           }}
           uiParams={{
             columns: groupColumns,
@@ -277,7 +277,6 @@ export default () => (
                   displayName
                   quotaCpu
                   quotaGpu
-                  userVolumeCapacity
                 }
               }
               pageInfo {

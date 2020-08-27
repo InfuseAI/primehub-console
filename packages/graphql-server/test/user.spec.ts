@@ -26,7 +26,6 @@ const userFields = `
     displayName
     quotaCpu
     quotaGpu
-    userVolumeCapacity
   }`;
 
 // interface
