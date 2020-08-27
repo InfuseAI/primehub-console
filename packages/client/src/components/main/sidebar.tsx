@@ -67,7 +67,7 @@ class Sidebar extends React.Component<Props> {
           selectedKeys={[key]}
         >
           <Menu.Item key="home" style={{marginTop: 0, paddingLeft: 26}}>
-            <Link to={group ? `${appPrefix}g/${group}/home` : '/g'}>
+            <Link to={group ? `${appPrefix}g/${group}/home` : `${appPrefix}g`}>
               <Icon src={iconHome} style={{width: 'auto', height: 16, marginTop: '-4px'}}/>
               <Title>Home</Title>
             </Link>
