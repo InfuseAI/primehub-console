@@ -84,9 +84,9 @@ export const mapping = (item: Item<DatasetSpec>) => {
     mountRoot: get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/mountRoot`], ''),
     // default to false
     homeSymlink: parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/homeSymlink`], 'false')),
-    // default to false
+    // default to true
     launchGroupOnly:
-      parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/launchGroupOnly`], 'false')),
+      parseBoolean(get(item, ['metadata', 'annotations', `${ATTRIBUTE_PREFIX}/launchGroupOnly`], 'true')),
     enableUploadServer,
     uploadServerLink:
       (uploadServerList.includes(item.spec.type) && enableUploadServer) ?
