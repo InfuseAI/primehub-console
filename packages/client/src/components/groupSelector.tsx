@@ -51,6 +51,8 @@ class GroupSelector extends React.Component<GroupSelectorProps, State> {
     const {currentGroupName} = this.state;
     const matchGroupName = (match.params as any).groupName || null;
 
+    console.log("Group", groups);
+
     if (groups && groups.length > 0) {
       if (groups.find(group => group.name === matchGroupName)) {
         if (currentGroupName != matchGroupName) {
@@ -59,6 +61,10 @@ class GroupSelector extends React.Component<GroupSelectorProps, State> {
         }
       } else {
         history.push(`${appPrefix}g/${groups[0].name}/home`);
+      }
+    } else if (groups) {
+      if (matchGroupName) {
+        history.push(`${appPrefix}g`);
       }
     }
   }
@@ -74,7 +80,7 @@ class GroupSelector extends React.Component<GroupSelectorProps, State> {
         <label style={{marginRight: '5px'}}>
           Group:
         </label>
-        <Select size={'small'} value={currentGroupName} placeholder="Please select a group" onChange={this.handleChange} style={{width: "160px", fontSize: "12px"}}>
+        <Select size={'small'} value={groups && groups.length > 0 ? currentGroupName : "None"} disabled={!groups || groups.length <= 0} placeholder="Please select a group" onChange={this.handleChange} style={{width: "160px", fontSize: "12px"}}>
           {groups ? groups.map(group => (
             <Option key={group.id} value={group.name} title={group.displayName}>
               {group.displayName || group.name}
