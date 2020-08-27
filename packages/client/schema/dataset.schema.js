@@ -106,9 +106,6 @@ export default () => (
       />
     </Condition>
     <boolean keyName="global" title="${global}" />
-    <Condition match={(data, operator) => !data.global} defaultMode="hidden">
-      <boolean keyName="launchGroupOnly" title="${launchGroupOnly}" defaultValue={true} />
-    </Condition>
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
     <string keyName="type" 
       required

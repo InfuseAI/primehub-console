@@ -117,11 +117,12 @@ export const createMapping = (data: any) => {
     ? {'primehub-gitsync': 'true'}
     : {};
 
-  // add mountRoot & launchGroupOnly
+  // add mountRoot
   addToAnnotation(data, 'mountRoot', annotations);
-  addToAnnotation(data, 'launchGroupOnly', annotations);
   // homeSymlink is fixed to false
   annotations[`${ATTRIBUTE_PREFIX}/homeSymlink`] = 'false';
+  // always add launchGroupOnly when creating a new dataset and value is true
+  annotations[`${ATTRIBUTE_PREFIX}/launchGroupOnly`] = 'true';
 
   // mappings
   return {
