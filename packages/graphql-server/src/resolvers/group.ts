@@ -33,6 +33,7 @@ const attrSchema = {
   quotaCpu: {type: FieldType.float, rename: 'quota-cpu'},
   quotaGpu: {type: FieldType.integer, rename: 'quota-gpu'},
   quotaMemory: {serialize: stringifyMemory, deserialize: parseMemory, rename: 'quota-memory'},
+  userVolumeCapacity: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota, rename: 'user-volume-capacity'},
   projectQuotaCpu: {type: FieldType.float, rename: 'project-quota-cpu'},
   projectQuotaGpu: {type: FieldType.integer, rename: 'project-quota-gpu'},
   projectQuotaMemory: {serialize: stringifyMemory, deserialize: parseMemory, rename: 'project-quota-memory'},
