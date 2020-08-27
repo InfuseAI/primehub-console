@@ -158,6 +158,8 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
                     />
                   }
                 </Route>
+                {/* No matched route: redirect to home */}
+                <Redirect to={`${appPrefix}g`}/>
               </Switch>
             </Layout.Content>
           </Layout>
