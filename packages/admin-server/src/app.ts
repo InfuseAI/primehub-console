@@ -152,7 +152,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
 
   // redirect
   const home = '/g';
-  rootRouter.get('/', async (ctx: any) => {
+  rootRouter.get(['/', '/landing'], async (ctx: any) => {
     return ctx.redirect(`${config.cmsHost}${config.appPrefix || ''}${home}`);
   });
 
