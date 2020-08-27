@@ -51,6 +51,8 @@ class GroupSelector extends React.Component<GroupSelectorProps, State> {
     const {currentGroupName} = this.state;
     const matchGroupName = (match.params as any).groupName || null;
 
+    console.log("Group", groups);
+
     if (groups && groups.length > 0) {
       if (groups.find(group => group.name === matchGroupName)) {
         if (currentGroupName != matchGroupName) {
@@ -60,10 +62,9 @@ class GroupSelector extends React.Component<GroupSelectorProps, State> {
       } else {
         history.push(`${appPrefix}g/${groups[0].name}/home`);
       }
-    } else {
-      // Go to root if no groups
+    } else if (groups) {
       if (matchGroupName) {
-        history.push(`${appPrefix}g`)
+        history.push(`${appPrefix}g`);
       }
     }
   }
