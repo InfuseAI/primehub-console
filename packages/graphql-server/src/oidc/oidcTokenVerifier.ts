@@ -5,7 +5,6 @@ import Boom from 'boom';
 import { ErrorCodes } from '../errorCodes';
 import * as logger from '../logger';
 
-
 export class OidcTokenVerifier {
   private keystore: any;
   private issuer: Issuer;
@@ -30,7 +29,7 @@ export class OidcTokenVerifier {
 
     const token = new Token(accessToken);
     if (token.isExpired()) {
-      logger.error({'token-expired': {code: ErrorCodes.ACCESS_TOKEN_EXPIRED}})
+      logger.error({'token-expired': {code: ErrorCodes.ACCESS_TOKEN_EXPIRED}});
       throw Boom.forbidden('token expired', {code: ErrorCodes.ACCESS_TOKEN_EXPIRED});
     }
 
