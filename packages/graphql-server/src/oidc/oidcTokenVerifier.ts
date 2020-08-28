@@ -3,6 +3,8 @@ import { Issuer } from 'openid-client';
 import Token from './token';
 import Boom from 'boom';
 import { ErrorCodes } from '../errorCodes';
+import * as logger from '../logger';
+
 
 export class OidcTokenVerifier {
   private keystore: any;
@@ -22,13 +24,13 @@ export class OidcTokenVerifier {
 
   public verify = async (accessToken: string): Promise<any> => {
     if (!this.keystore) {
-      console.log('keystore err:', this.keystore);
+      logger.error({'keystore-err': this.keystore});
       throw new Error(`Call initKeystore() first to initialize the keystore`);
     }
 
     const token = new Token(accessToken);
     if (token.isExpired()) {
-      console.log('token expired', {code: ErrorCodes.ACCESS_TOKEN_EXPIRED})
+      logger.error({'token-expired': {code: ErrorCodes.ACCESS_TOKEN_EXPIRED}})
       throw Boom.forbidden('token expired', {code: ErrorCodes.ACCESS_TOKEN_EXPIRED});
     }
 

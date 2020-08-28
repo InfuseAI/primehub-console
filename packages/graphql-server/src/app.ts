@@ -303,7 +303,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
               checkOfflineToken = true;
             }
           } catch (err) {
-            console.log(err);
+            logger.error(err);
             // in keycloak8, the offline token JWT is always verified failed.
             checkOfflineToken = true;
           }
