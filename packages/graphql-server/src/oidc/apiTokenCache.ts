@@ -24,6 +24,7 @@ export default class ApiTokenCache {
       } catch (err) {
         accessToken = INVALID_API_TOKEN;
         this.cache.set(apiToken, accessToken, 1000 * 5);
+        throw err;
       }
     }
 
