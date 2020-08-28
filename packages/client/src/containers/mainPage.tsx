@@ -75,7 +75,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const {getMyGroups} = this.props;
     const {loading, error, me} = getMyGroups;
-    const groups = !loading && !error ?
+    const groups = !loading && !error && me ?
       me.groups.filter(group => group.id !== everyoneGroupId) :
       undefined;
     return {loading, error, groups};
@@ -89,6 +89,60 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
     const currentGroup = groups ?
       groups.find(group => group.name === currentGroupName) :
       undefined;
+
+    let content;
+
+    if (loading) {
+      content = <></>
+    } else if (error) {
+      content = <Switch>
+        <Route path={`${appPrefix}g`} exact>
+          <Alert
+            message='Failed to retrieve data'
+            description='Please contact your administrator.'
+            type='error'
+            showIcon
+          />
+        </Route>
+        <Route path='/'>
+          <Redirect to={`${appPrefix}g`} />
+        </Route>
+      </Switch>
+    } else if (groups && groups.length === 0) {
+      content = <Switch>
+        <Route path={`${appPrefix}g`} exact>
+          <Alert
+            message='No group is available'
+            description='Please contact your administrator to be added to a group.'
+            type='warning'
+            showIcon
+          />
+        </Route>
+        <Route path='/'>
+          <Redirect to={`${appPrefix}g`} />
+        </Route>
+      </Switch>
+    } else {
+      content = <Switch>
+        {/* Home */}
+        <Route path={`${appPrefix}g/:groupName`} exact>
+          <Redirect to={`${location.pathname}/home`} />
+        </Route>
+
+        {/* API Token */}
+        <Route path={`${appPrefix}g/:groupName/api-token`} exact>
+          <ApiTokenPage />
+        </Route>
+
+        {/* Extra routing */}
+        {children}
+
+        {/* Default */}
+        <Route path={`${appPrefix}g/:groupName/:actionKey`}>
+          <Landing includeHeader={false} />
+        </Route>
+      </Switch>;
+    }
 
     return (
       <GroupContext.Provider value={currentGroup}>
@@ -127,40 +181,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
               <Sidebar sidebarItems={sidebarItems}/>
             </Route>
             <Layout.Content style={{marginLeft: 200,  minHeight: 'calc(100vh - 64px)'}}>
-              <Switch>
-                {/* Home */}
-                <Route path={`${appPrefix}g/:groupName`} exact>
-                  <Redirect to={`${location.pathname}/home`} />
-                </Route>
-
-                {/* API Token */}
-                <Route path={`${appPrefix}g/:groupName/api-token`} exact>
-                  <ApiTokenPage />
-                </Route>
-
-                {/* Extra routing */}
-                {children}
-
-                {/* Default */}
-                <Route path={`${appPrefix}g/:groupName/:actionKey`}>
-                  <Landing includeHeader={false} />
-                </Route>
-
-                {/* No available groups */}
-                <Route path={`${appPrefix}g`} exact>
-                  { groups && groups.length > 0 ?
-                    <Redirect to={`${appPrefix}g/${groups[0].name}`} /> :
-                    <Alert
-                      message="No group is available"
-                      description="Please contact your administrator to be added to a group."
-                      type="warning"
-                      showIcon
-                    />
-                  }
-                </Route>
-                {/* No matched route: redirect to home */}
-                <Redirect to={`${appPrefix}g`}/>
-              </Switch>
+              {content}
             </Layout.Content>
           </Layout>
         </Layout>
