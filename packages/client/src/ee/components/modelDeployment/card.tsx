@@ -56,14 +56,6 @@ class DeploymentCard extends React.Component<Props> {
           {deployment.name}
         </h2>
         <Field
-          label="Group"
-          value={(
-            <div style={textOverflowStyle}>
-              {deployment.groupName || '-'}
-            </div>
-          )}
-        />
-        <Field
           label="Endpoint"
           value={deployment.status === Status.Deployed ? (
             <Tooltip title={(

@@ -176,11 +176,6 @@ class ScheduleList extends React.Component<Props> {
       sorter: true,
       render: name => name ? name : '-'
     }, {
-      title: 'Group',
-      dataIndex: 'groupName',
-      sorter: true,
-      render: name => name ? name : '-'
-    }, {
       title: 'Recurrence',
       dataIndex: 'recurrence',
       render: ({type, cron}) => renderRecurrence(type, cron),

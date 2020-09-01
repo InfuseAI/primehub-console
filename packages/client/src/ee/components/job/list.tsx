@@ -296,10 +296,6 @@ class JobList extends React.Component<Props> {
       sorter: true,
       dataIndex: 'userName'
     }, {
-      title: 'Group',
-      sorter: true,
-      dataIndex: 'groupName'
-    }, {
       title: 'Timing',
       sorter: true,
       key: 'timing',
