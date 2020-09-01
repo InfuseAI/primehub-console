@@ -15,6 +15,8 @@ import { applyMiddleware } from 'graphql-middleware';
 import WorkspaceApi from '../workspace/api';
 import { keycloakMaxCount } from '../resolvers/constant';
 import request from 'request';
+import {Client as minioClient} from 'minio';
+import mime from 'mime';
 
 import CrdClient, { InstanceTypeSpec, ImageSpec, client as kubeClient, kubeConfig } from '../crdClient/crdClientImpl';
 import * as system from '../resolvers/system';
@@ -668,6 +670,24 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       if (memberIds.indexOf(userId) >= 0) { return true; }
       return false;
     };
+    const isGroupBelongUser = async (userId, groupName): Promise<boolean> => {
+      const groups = await ctx.kcAdminClient.users.listGroups({
+        id: userId
+      });
+      const groupNames = groups.map(g => g.name);
+      if (groupNames.indexOf(groupName) >= 0) { return true; }
+      return false;
+    };
+
+    const fileDownloadAPIPrefix = `${config.appPrefix || ''}/files/groups/`;
+    if (ctx.request.path.startsWith(fileDownloadAPIPrefix)) {
+      const groupName = ctx.request.path.split(fileDownloadAPIPrefix)[0].split('/')[0];
+      if (await isGroupBelongUser(ctx.userId, groupName) === false) {
+        throw Boom.forbidden('request not authorized');
+      } else {
+        return next();
+      }
+    }
 
     const namespace = ctx.params.namespace;
     const jobId = ctx.params.jobId || '';
@@ -733,6 +753,47 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       });
 
       ctx.body = req;
+    }
+  );
+
+  const storeBucket = config.storeBucket;
+  const storeEndpoint = new URL(config.storeEndpoint);
+  let storePort = 80;
+  if (storeEndpoint.port === 'http') {
+    storePort = 80;
+  } else if (storeEndpoint.port === 'https') {
+    storePort = 443;
+  } else {
+    storePort = parseInt(storeEndpoint.port, 10);
+  }
+  const storeUseSSL = (storeEndpoint.protocol === 'https');
+  const mClient = new minioClient({
+    endPoint: storeEndpoint.hostname,
+    port: storePort,
+    useSSL: storeUseSSL,
+    accessKey: config.storeAccessKey,
+    secretKey: config.storeSecretKey
+  });
+  rootRouter.get(`${config.appPrefix || ''}/files/(.*)`, authenticateMiddleware, checkUserGroup,
+    async ctx => {
+      const objectPath = ctx.request.path.split('/groups').pop();
+      const req = await mClient.getObject(storeBucket, `groups${objectPath}`);
+
+      req.on('error', err => {
+        logger.error({
+          component: logger.components.internal,
+          type: 'MINIO_GET_OBJECT_ERROR',
+          message: err.message
+        });
+        ctx.res.end();
+      });
+
+      ctx.body = req;
+
+      const filename = ctx.request.path.split('/').pop();
+      ctx.set('Content-disposition', `attachment; filename=${filename}`);
+      const mimetype = mime.getType(objectPath);
+      ctx.set('Content-type', mimetype);
     }
   );
 

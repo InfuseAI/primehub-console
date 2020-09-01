@@ -68,6 +68,7 @@
     "kubernetes-client": "^8.3.6",
     "lodash": "^4.17.10",
     "lru-cache": "^5.1.1",
+    "mime": "^2.4.6",
     "minimist": "^1.2.0",
     "minio": "^7.0.16",
     "moment": "^2.23.0",
