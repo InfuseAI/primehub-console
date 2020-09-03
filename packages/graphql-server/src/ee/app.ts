@@ -17,6 +17,7 @@ import { keycloakMaxCount } from '../resolvers/constant';
 import request from 'request';
 import {Client as minioClient} from 'minio';
 import mime from 'mime';
+import {URL} from 'url';
 
 import CrdClient, { InstanceTypeSpec, ImageSpec, client as kubeClient, kubeConfig } from '../crdClient/crdClientImpl';
 import * as system from '../resolvers/system';
@@ -679,10 +680,12 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       return false;
     };
 
-    const fileDownloadAPIPrefix = `${config.appPrefix || ''}/files/groups/`;
+    let fileDownloadAPIPrefix = `${config.appPrefix || ''}/files/`;
     if (ctx.request.path.startsWith(fileDownloadAPIPrefix)) {
-      const groupName = ctx.request.path.split(fileDownloadAPIPrefix)[0].split('/')[0];
-      if (await isGroupBelongUser(ctx.userId, groupName) === false) {
+      fileDownloadAPIPrefix = fileDownloadAPIPrefix + 'groups/';
+      const groupName = ctx.request.path.split(fileDownloadAPIPrefix).pop().split('/')[0];
+      if (!ctx.request.path.startsWith(fileDownloadAPIPrefix) ||
+          await isGroupBelongUser(ctx.userId, groupName) === false) {
         throw Boom.forbidden('request not authorized');
       } else {
         return next();
@@ -734,11 +737,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
 
   // usage report
-  rootRouter.get('/report/monthly/:month/:day', authenticateMiddleware, checkIsAdmin,
+  rootRouter.get('/report/monthly/:year/:month', authenticateMiddleware, checkIsAdmin,
     async ctx => {
       const requestOptions: request.Options = {
         method: 'GET',
-        uri: config.usageReportAPIHost + '/report/monthly/' + ctx.params.month + '/' + ctx.params.day,
+        uri: config.usageReportAPIHost + '/report/monthly/' + ctx.params.year + '/' + ctx.params.month,
       };
       kubeConfig.applyToRequest(requestOptions);
       const req = request(requestOptions);
@@ -774,7 +777,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     accessKey: config.storeAccessKey,
     secretKey: config.storeSecretKey
   });
-  rootRouter.get(`${config.appPrefix || ''}/files/(.*)`, authenticateMiddleware, checkUserGroup,
+  rootRouter.get('/files/(.*)', authenticateMiddleware, checkUserGroup,
     async ctx => {
       const objectPath = ctx.request.path.split('/groups').pop();
       const req = await mClient.getObject(storeBucket, `groups${objectPath}`);
