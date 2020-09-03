@@ -4,16 +4,13 @@ import CombinedStream from 'combined-stream';
 import { createGunzip } from 'zlib';
 import split from 'split';
 import TailStream from './tailStream';
-import {URL} from 'url';
 
 const MAX_SIZE = 64 * 1024 * 1024;
 const MAX_FILES = 2000;
 
 interface PersistLogOptions {
-  endpoint: string;
+  minioClient: Client;
   bucket: string;
-  accessKey: string;
-  secretKey: string;
 }
 
 export default class PersistLog {
@@ -21,26 +18,8 @@ export default class PersistLog {
   private bucket: string;
 
   constructor(options: PersistLogOptions) {
+    this.minioClient = options.minioClient;
     this.bucket = options.bucket;
-    const url = new URL(options.endpoint);
-    let port = 80;
-    if (url.port === 'http') {
-      port = 80;
-    } else if (url.port === 'https') {
-      port = 443;
-    } else {
-      port = parseInt(url.port, 10);
-    }
-
-    const useSSL = (url.protocol === 'https');
-
-    this.minioClient = new Client({
-        endPoint: url.hostname,
-        port,
-        useSSL,
-        accessKey: options.accessKey,
-        secretKey: options.secretKey
-    });
   }
 
   public async getStream(

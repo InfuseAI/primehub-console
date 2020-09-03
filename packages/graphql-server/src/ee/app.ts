@@ -15,9 +15,7 @@ import { applyMiddleware } from 'graphql-middleware';
 import WorkspaceApi from '../workspace/api';
 import { keycloakMaxCount } from '../resolvers/constant';
 import request from 'request';
-import {Client as minioClient} from 'minio';
 import mime from 'mime';
-import {URL} from 'url';
 
 import CrdClient, { InstanceTypeSpec, ImageSpec, client as kubeClient, kubeConfig } from '../crdClient/crdClientImpl';
 import * as system from '../resolvers/system';
@@ -81,6 +79,7 @@ import { Role } from '../resolvers/interface';
 import Token from '../oidc/token';
 import ApiTokenCache from '../oidc/apiTokenCache';
 import PersistLog from '../utils/persistLog';
+import { createMinioClient } from '../utils/minioClient';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, '../graphql/index.graphql')));
@@ -278,14 +277,15 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     oidcClient
   });
 
+  // create minio client
+  const storeBucket = config.storeBucket;
+  const mClient = createMinioClient(config.storeEndpoint, config.storeAccessKey, config.storeSecretKey);
   // log
   let persistLog: PersistLog;
   if (config.enableStore && config.enableLogPersistence) {
     persistLog = new PersistLog({
-      endpoint: config.storeEndpoint,
-      bucket: config.storeBucket,
-      accessKey: config.storeAccessKey,
-      secretKey: config.storeSecretKey,
+      bucket: storeBucket,
+      minioClient: mClient
     });
   }
 
@@ -759,24 +759,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     }
   );
 
-  const storeBucket = config.storeBucket;
-  const storeEndpoint = new URL(config.storeEndpoint);
-  let storePort = 80;
-  if (storeEndpoint.port === 'http') {
-    storePort = 80;
-  } else if (storeEndpoint.port === 'https') {
-    storePort = 443;
-  } else {
-    storePort = parseInt(storeEndpoint.port, 10);
-  }
-  const storeUseSSL = (storeEndpoint.protocol === 'https');
-  const mClient = new minioClient({
-    endPoint: storeEndpoint.hostname,
-    port: storePort,
-    useSSL: storeUseSSL,
-    accessKey: config.storeAccessKey,
-    secretKey: config.storeSecretKey
-  });
+  // phfs file download api
   rootRouter.get('/files/(.*)', authenticateMiddleware, checkUserGroup,
     async ctx => {
       const objectPath = ctx.request.path.split('/groups').pop();
