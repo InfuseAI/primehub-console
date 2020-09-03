@@ -22,6 +22,7 @@
   "resolutions": {
     "apollo-client": "2.4.7",
     "apollo-boost": "0.1.22",
+    "puppeteer": "1.13.0",
     "**/**/yargs-parser": "^13.1.2",
     "**/**/websocket-extensions": "^0.1.4",
     "**/**/canner": "2.1.7"
