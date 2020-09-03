@@ -734,11 +734,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
 
   // usage report
-  rootRouter.get('/report/monthly/:month/:day', authenticateMiddleware, checkIsAdmin,
+  rootRouter.get('/report/monthly/:year/:month', authenticateMiddleware, checkIsAdmin,
     async ctx => {
       const requestOptions: request.Options = {
         method: 'GET',
-        uri: config.usageReportAPIHost + '/report/monthly/' + ctx.params.month + '/' + ctx.params.day,
+        uri: config.usageReportAPIHost + '/report/monthly/' + ctx.params.year + '/' + ctx.params.month,
       };
       kubeConfig.applyToRequest(requestOptions);
       const req = request(requestOptions);
@@ -774,7 +774,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     accessKey: config.storeAccessKey,
     secretKey: config.storeSecretKey
   });
-  rootRouter.get(`${config.appPrefix || ''}/files/(.*)`, authenticateMiddleware, checkUserGroup,
+  rootRouter.get('/files/(.*)', authenticateMiddleware, checkUserGroup,
     async ctx => {
       const objectPath = ctx.request.path.split('/groups').pop();
       const req = await mClient.getObject(storeBucket, `groups${objectPath}`);
