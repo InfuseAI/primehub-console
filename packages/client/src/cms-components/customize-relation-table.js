@@ -62,11 +62,12 @@ export default class RelationTable extends PureComponent {
   }
 
   render() {
+    const TYPE_GROUPS = 'groups';
     const { modalVisible } = this.state;
     let { disabled, value = [], uiParams = {}, refId, relation,
       fetch, fetchRelation, updateQuery, subscribe, intl, toolbar,
       schema, Toolbar, relationValue, goTo, rootValue, title, isRelationFetching,
-      relationArgs, updateRelationQuery,
+      relationArgs, updateRelationQuery, keyName,
     } = this.props;
     let { columns, pickerColumns } = uiParams;
 
@@ -77,6 +78,12 @@ export default class RelationTable extends PureComponent {
     remove(pickerColumns, (obj) => {
       return obj && obj.visible === false;
     });
+
+    // Hide everyone group in group relationship.
+    if (keyName === TYPE_GROUPS) {
+      const everyoneGroupId = window.everyoneGroupId;
+      value = value.filter( v => v.id !== everyoneGroupId );
+    }
 
     const columnsRender = renderValue(columns, schema[relation.to].items.items, this.props);
     const pickerColumnsRender = renderValue(pickerColumns || uiParams.columns, schema[relation.to].items.items, this.props);
