@@ -15,6 +15,7 @@ import { applyMiddleware } from 'graphql-middleware';
 import WorkspaceApi from '../workspace/api';
 import { keycloakMaxCount } from '../resolvers/constant';
 import request from 'request';
+import mime from 'mime';
 
 import CrdClient, { InstanceTypeSpec, ImageSpec, client as kubeClient, kubeConfig } from '../crdClient/crdClientImpl';
 import * as system from '../resolvers/system';
@@ -78,6 +79,7 @@ import { Role } from '../resolvers/interface';
 import Token from '../oidc/token';
 import ApiTokenCache from '../oidc/apiTokenCache';
 import PersistLog from '../utils/persistLog';
+import { createMinioClient } from '../utils/minioClient';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, '../graphql/index.graphql')));
@@ -275,14 +277,15 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     oidcClient
   });
 
+  // create minio client
+  const storeBucket = config.storeBucket;
+  const mClient = createMinioClient(config.storeEndpoint, config.storeAccessKey, config.storeSecretKey);
   // log
   let persistLog: PersistLog;
   if (config.enableStore && config.enableLogPersistence) {
     persistLog = new PersistLog({
-      endpoint: config.storeEndpoint,
-      bucket: config.storeBucket,
-      accessKey: config.storeAccessKey,
-      secretKey: config.storeSecretKey,
+      bucket: storeBucket,
+      minioClient: mClient
     });
   }
 
@@ -668,6 +671,26 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       if (memberIds.indexOf(userId) >= 0) { return true; }
       return false;
     };
+    const isGroupBelongUser = async (userId, groupName): Promise<boolean> => {
+      const groups = await ctx.kcAdminClient.users.listGroups({
+        id: userId
+      });
+      const groupNames = groups.map(g => g.name);
+      if (groupNames.indexOf(groupName) >= 0) { return true; }
+      return false;
+    };
+
+    let fileDownloadAPIPrefix = `${config.appPrefix || ''}/files/`;
+    if (ctx.request.path.startsWith(fileDownloadAPIPrefix)) {
+      fileDownloadAPIPrefix = fileDownloadAPIPrefix + 'groups/';
+      const groupName = ctx.request.path.split(fileDownloadAPIPrefix).pop().split('/')[0];
+      if (!ctx.request.path.startsWith(fileDownloadAPIPrefix) ||
+          await isGroupBelongUser(ctx.userId, groupName) === false) {
+        throw Boom.forbidden('request not authorized');
+      } else {
+        return next();
+      }
+    }
 
     const namespace = ctx.params.namespace;
     const jobId = ctx.params.jobId || '';
@@ -714,11 +737,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
 
   // usage report
-  rootRouter.get('/report/monthly/:month/:day', authenticateMiddleware, checkIsAdmin,
+  rootRouter.get('/report/monthly/:year/:month', authenticateMiddleware, checkIsAdmin,
     async ctx => {
       const requestOptions: request.Options = {
         method: 'GET',
-        uri: config.usageReportAPIHost + '/report/monthly/' + ctx.params.month + '/' + ctx.params.day,
+        uri: config.usageReportAPIHost + '/report/monthly/' + ctx.params.year + '/' + ctx.params.month,
       };
       kubeConfig.applyToRequest(requestOptions);
       const req = request(requestOptions);
@@ -733,6 +756,45 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       });
 
       ctx.body = req;
+    }
+  );
+
+  // phfs file download api
+  rootRouter.get('/files/(.*)', authenticateMiddleware, checkUserGroup,
+    async ctx => {
+      const objectPath = ctx.request.path.split('/groups').pop();
+      let req;
+      try {
+        req = await mClient.getObject(storeBucket, `groups${objectPath}`);
+      } catch (error) {
+        if (error.code === 'NoSuchKey') {
+          return ctx.status = 404;
+        } else {
+          logger.error({
+            component: logger.components.internal,
+            type: 'MINIO_GET_OBJECT_ERROR',
+            code: error.code,
+            message: error.message
+          });
+          ctx.res.end();
+        }
+      }
+
+      req.on('error', err => {
+        logger.error({
+          component: logger.components.internal,
+          type: 'MINIO_GET_OBJECT_ERROR',
+          message: err.message
+        });
+        ctx.res.end();
+      });
+
+      ctx.body = req;
+
+      const filename = ctx.request.path.split('/').pop();
+      ctx.set('Content-disposition', `attachment; filename=${filename}`);
+      const mimetype = mime.getType(objectPath);
+      ctx.set('Content-type', mimetype);
     }
   );
 

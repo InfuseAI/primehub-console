@@ -29,6 +29,7 @@ import basicAuth from 'basic-auth';
 import koaMount from 'koa-mount';
 import { OidcTokenVerifier } from './oidc/oidcTokenVerifier';
 import cors from '@koa/cors';
+import mime from 'mime';
 
 // cache
 import {
@@ -65,6 +66,7 @@ import K8sUploadServerSecret from './k8sResource/k8sUploadServerSecret';
 import { Role } from './resolvers/interface';
 import Token from './oidc/token';
 import ApiTokenCache from './oidc/apiTokenCache';
+import { createMinioClient } from './utils/minioClient';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -510,16 +512,15 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       throw Boom.forbidden('request not authorized');
     }
 
-    const apiToken = authorization.replace('Bearer ', '');
+    let apiToken = authorization.replace('Bearer ', '');
 
     if (!isEmpty(config.sharedGraphqlSecretKey) && config.sharedGraphqlSecretKey === apiToken) {
       return next();
     } else {
-
+      let tokenPayload;
       let checkOfflineToken = false;
-
       try {
-        const tokenPayload = await oidcTokenVerifier.verify(apiToken);
+        tokenPayload = await oidcTokenVerifier.verify(apiToken);
         if (tokenPayload.typ === 'Offline') {
           checkOfflineToken = true;
         }
@@ -530,19 +531,100 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
       if (checkOfflineToken) {
         // API Token is a offline token. Refresh it to get the real access token
-        const accessToken = await apiTokenCache.getAccessToken(apiToken);
-        await oidcTokenVerifier.verify(accessToken);
+        apiToken = await apiTokenCache.getAccessToken(apiToken);
+        tokenPayload = await oidcTokenVerifier.verify(apiToken);
       }
+
+      // Prepare keycloak admin client
+      const kcAdminClient = createKcAdminClient();
+      kcAdminClient.setAccessToken(apiToken);
+      ctx.kcAdminClient = kcAdminClient;
+
+      // get user role
+      const roles = get(tokenPayload, ['resource_access', 'realm-management', 'roles'], []);
+      const role = (roles.indexOf('realm-admin') >= 0) ? Role.ADMIN : Role.USER;
+      ctx.role = role;
+      ctx.userId = tokenPayload.sub;
 
       return next();
     }
   };
+
+  const checkUserGroup = async (ctx: Koa.ParameterizedContext, next: any) => {
+    const isGroupBelongUser = async (userId, groupName): Promise<boolean> => {
+      const groups = await ctx.kcAdminClient.users.listGroups({
+        id: userId
+      });
+      const groupNames = groups.map(g => g.name);
+      if (groupNames.indexOf(groupName) >= 0) { return true; }
+      return false;
+    };
+
+    let fileDownloadAPIPrefix = `${config.appPrefix || ''}/files/`;
+    if (ctx.request.path.startsWith(fileDownloadAPIPrefix)) {
+      fileDownloadAPIPrefix = fileDownloadAPIPrefix + 'groups/';
+      const groupName = ctx.request.path.split(fileDownloadAPIPrefix).pop().split('/')[0];
+      if (!ctx.request.path.startsWith(fileDownloadAPIPrefix) ||
+          await isGroupBelongUser(ctx.userId, groupName) === false) {
+        throw Boom.forbidden('request not authorized');
+      } else {
+        return next();
+      }
+    }
+
+    throw Boom.forbidden('request not authorized');
+  };
+
   mountAnn(rootRouter, annCtrl);
 
   // health check
   rootRouter.get('/health', async ctx => {
     ctx.status = 200;
   });
+
+  // create minio client
+  const storeBucket = config.storeBucket;
+  const mClient = createMinioClient(config.storeEndpoint, config.storeAccessKey, config.storeSecretKey);
+
+  // phfs file download api
+  rootRouter.get('/files/(.*)', authenticateMiddleware, checkUserGroup,
+    async ctx => {
+      const objectPath = ctx.request.path.split('/groups').pop();
+      let req;
+      try {
+        req = await mClient.getObject(storeBucket, `groups${objectPath}`);
+      } catch (error) {
+        if (error.code === 'NoSuchKey') {
+          return ctx.status = 404;
+        } else {
+          logger.error({
+            component: logger.components.internal,
+            type: 'MINIO_GET_OBJECT_ERROR',
+            code: error.code,
+            message: error.message
+          });
+          ctx.res.end();
+        }
+      }
+
+      req.on('error', err => {
+        logger.error({
+          component: logger.components.internal,
+          type: 'MINIO_GET_OBJECT_ERROR',
+          message: err.message
+        });
+        ctx.res.end();
+      });
+
+      ctx.body = req;
+
+      const filename = ctx.request.path.split('/').pop();
+      ctx.set('Content-disposition', `attachment; filename=${filename}`);
+      const mimetype = mime.getType(objectPath);
+      ctx.set('Content-type', mimetype);
+    }
+  );
+
   app.use(rootRouter.routes());
   server.applyMiddleware({ app, path: config.appPrefix ? `${config.appPrefix}/graphql` : '/graphql' });
   return {app, server, config};
