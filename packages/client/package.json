@@ -24,6 +24,7 @@
     "start": "npm run antd:dev && NODE_ENV=development webpack-dev-server -d",
     "start:ce": "npm run antd:dev && NODE_ENV=development webpack-dev-server --config webpack.config.ce.js -d",
     "start:model_deploy": "npm run antd:dev && NODE_ENV=development webpack-dev-server --config webpack.config.model_deploy.js -d",
+    "build:watch": "npm run antd && NODE_ENV=production webpack --watch",
     "build": "npm run antd && NODE_ENV=production webpack",
     "build:ce": "npm run antd && NODE_ENV=production webpack --config webpack.config.ce.js",
     "build:model_deploy": "npm run antd && NODE_ENV=production webpack --config webpack.config.model_deploy.js",
