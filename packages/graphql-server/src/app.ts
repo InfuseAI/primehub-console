@@ -590,7 +590,22 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   rootRouter.get('/files/(.*)', authenticateMiddleware, checkUserGroup,
     async ctx => {
       const objectPath = ctx.request.path.split('/groups').pop();
-      const req = await mClient.getObject(storeBucket, `groups${objectPath}`);
+      let req;
+      try {
+        req = await mClient.getObject(storeBucket, `groups${objectPath}`);
+      } catch (error) {
+        if (error.code === 'NoSuchKey') {
+          return ctx.status = 404;
+        } else {
+          logger.error({
+            component: logger.components.internal,
+            type: 'MINIO_GET_OBJECT_ERROR',
+            code: error.code,
+            message: error.message
+          });
+          ctx.res.end();
+        }
+      }
 
       req.on('error', err => {
         logger.error({
