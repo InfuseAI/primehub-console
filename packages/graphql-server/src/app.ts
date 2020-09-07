@@ -582,48 +582,49 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     ctx.status = 200;
   });
 
-  // create minio client
-  const storeBucket = config.storeBucket;
-  const mClient = createMinioClient(config.storeEndpoint, config.storeAccessKey, config.storeSecretKey);
+  if (config.enableStore) {
+    // create minio client
+    const storeBucket = config.storeBucket;
+    const mClient = createMinioClient(config.storeEndpoint, config.storeAccessKey, config.storeSecretKey);
+    // phfs file download api
+    rootRouter.get('/files/(.*)', authenticateMiddleware, checkUserGroup,
+      async ctx => {
+        const objectPath = ctx.request.path.split('/groups').pop();
+        let req;
+        try {
+          req = await mClient.getObject(storeBucket, `groups${objectPath}`);
+        } catch (error) {
+          if (error.code === 'NoSuchKey') {
+            return ctx.status = 404;
+          } else {
+            logger.error({
+              component: logger.components.internal,
+              type: 'MINIO_GET_OBJECT_ERROR',
+              code: error.code,
+              message: error.message
+            });
+            ctx.res.end();
+          }
+        }
 
-  // phfs file download api
-  rootRouter.get('/files/(.*)', authenticateMiddleware, checkUserGroup,
-    async ctx => {
-      const objectPath = ctx.request.path.split('/groups').pop();
-      let req;
-      try {
-        req = await mClient.getObject(storeBucket, `groups${objectPath}`);
-      } catch (error) {
-        if (error.code === 'NoSuchKey') {
-          return ctx.status = 404;
-        } else {
+        req.on('error', err => {
           logger.error({
             component: logger.components.internal,
             type: 'MINIO_GET_OBJECT_ERROR',
-            code: error.code,
-            message: error.message
+            message: err.message
           });
           ctx.res.end();
-        }
-      }
-
-      req.on('error', err => {
-        logger.error({
-          component: logger.components.internal,
-          type: 'MINIO_GET_OBJECT_ERROR',
-          message: err.message
         });
-        ctx.res.end();
-      });
 
-      ctx.body = req;
+        ctx.body = req;
 
-      const filename = ctx.request.path.split('/').pop();
-      ctx.set('Content-disposition', `attachment; filename=${filename}`);
-      const mimetype = mime.getType(objectPath);
-      ctx.set('Content-type', mimetype);
-    }
-  );
+        const filename = ctx.request.path.split('/').pop();
+        ctx.set('Content-disposition', `attachment; filename=${filename}`);
+        const mimetype = mime.getType(objectPath);
+        ctx.set('Content-type', mimetype);
+      }
+    );
+  }
 
   app.use(rootRouter.routes());
   server.applyMiddleware({ app, path: config.appPrefix ? `${config.appPrefix}/graphql` : '/graphql' });
