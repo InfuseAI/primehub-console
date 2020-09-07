@@ -172,6 +172,6 @@ export default compose(
   }),
   Com => props => {
     const {defaultValue}: {defaultValue?: string} = queryString.parse(props.location.search.replace(/^\?/, ''));
-    return <Com {...props} defaultValue={defaultValue ? JSON.parse(defaultValue) : undefined}  />
+    return <Com {...props} defaultValue={defaultValue ? JSON.parse(defaultValue.replace(/\n/g, "\\n")) : undefined}  />
   }
 )(JobCreatePage)
