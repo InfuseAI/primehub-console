@@ -96,7 +96,7 @@ class Main extends React.Component {
   render() {
     const sidebarItems: MainPageSidebarItem[] = [
       {
-        title: 'Notebook',
+        title: 'Notebooks',
         subPath: 'hub',
         icon: iconJupyterHub,
         style: {
