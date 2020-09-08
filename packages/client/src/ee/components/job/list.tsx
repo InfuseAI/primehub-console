@@ -246,9 +246,9 @@ class JobList extends React.Component<Props> {
       instanceTypeId: get(record, 'instanceType.id'),
       instanceTypeName: get(record, 'instanceType.displayName') || get(record, 'instanceType.name'),
       image: record.image,
-      command: encodeURIComponent(record.command),
+      command: record.command,
     }
-    history.push(`job/create?defaultValue=${JSON.stringify(data)}`)
+    history.push(`job/create?defaultValue=${encodeURIComponent(JSON.stringify(data))}`)
   }
 
   render() {

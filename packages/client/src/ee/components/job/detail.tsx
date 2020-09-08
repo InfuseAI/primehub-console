@@ -111,9 +111,9 @@ export default class Detail extends React.Component<Props> {
       instanceTypeId: get(job, 'instanceType.id'),
       instanceTypeName: get(job, 'instanceType.displayName') || get(job, 'instanceType.name'),
       image: job.image,
-      command: encodeURIComponent(job.command),
+      command: job.command,
     }
-    history.push(`../job/create?defaultValue=${JSON.stringify(data)}`)
+    history.push(`../job/create?defaultValue=${encodeURIComponent(JSON.stringify(data))}`)
   }
 
 
