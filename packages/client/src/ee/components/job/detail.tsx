@@ -113,7 +113,7 @@ export default class Detail extends React.Component<Props> {
       image: job.image,
       command: job.command,
     }
-    history.push(`${appPrefix}job/create?defaultValue=${JSON.stringify(data)}`)
+    history.push(`../job/create?defaultValue=${encodeURIComponent(JSON.stringify(data))}`)
   }
 
 
