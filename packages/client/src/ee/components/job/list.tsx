@@ -248,7 +248,7 @@ class JobList extends React.Component<Props> {
       image: record.image,
       command: record.command,
     }
-    history.push(`job/create?defaultValue=${JSON.stringify(data)}`)
+    history.push(`job/create?defaultValue=${encodeURIComponent(JSON.stringify(data))}`)
   }
 
   render() {
