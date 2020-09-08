@@ -11082,10 +11082,10 @@ jws@^3.2.2:
     jwa "^1.4.1"
     safe-buffer "^5.0.1"
 
-keycloak-admin@^1.6.1:
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/keycloak-admin/-/keycloak-admin-1.13.0.tgz#f6e6de0551155b228d8a551531096d7b4c9ff23f"
-  integrity sha512-FIQGEqlVYnegIcTia1o5UIAR6iJR7moixo9YwsNe8zGhqsdMTo1lbAsWcS5aaGzfprL5Zyjk4O8BfbI/55pwmg==
+"keycloak-admin@npm:@infuseai/keycloak-admin@1.12.3":
+  version "1.12.3"
+  resolved "https://registry.yarnpkg.com/@infuseai/keycloak-admin/-/keycloak-admin-1.12.3.tgz#e9c87d592c03ed897e1db01610e80bbd62e9bb28"
+  integrity sha512-0jbh8UIjCsRx54iKtgJQWQ7cJVIZRSjyCRXSd9NdJ4hXF9LIf9CbWSjMBP20Im1Wa2yZh+gLMZ61l6pkIIWvGw==
   dependencies:
     "@types/debug" "^0.0.30"
     axios "^0.18.0"
@@ -11967,10 +11967,15 @@ lodash.values@~2.4.1:
   dependencies:
     lodash.keys "~2.4.1"
 
-lodash@4, lodash@^4.0.1, lodash@^4.14.2, lodash@^4.16.2, lodash@^4.16.5, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.12, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0:
+lodash@4, lodash@^4.0.1, lodash@^4.14.2, lodash@^4.16.2, lodash@^4.16.5, lodash@^4.17.11, lodash@^4.17.12, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
+
+lodash@^4.17.10:
+  version "4.17.20"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
 
 lodash@~1.0.1:
   version "1.0.2"
