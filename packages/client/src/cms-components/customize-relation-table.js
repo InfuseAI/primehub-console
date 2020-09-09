@@ -64,6 +64,7 @@ export default class RelationTable extends PureComponent {
   render() {
     const TYPE_GROUPS = 'groups';
     const { modalVisible } = this.state;
+    let showValues = [];
     let { disabled, value = [], uiParams = {}, refId, relation,
       fetch, fetchRelation, updateQuery, subscribe, intl, toolbar,
       schema, Toolbar, relationValue, goTo, rootValue, title, isRelationFetching,
@@ -82,7 +83,9 @@ export default class RelationTable extends PureComponent {
     // Hide everyone group in group relationship.
     if (keyName === TYPE_GROUPS) {
       const everyoneGroupId = window.everyoneGroupId;
-      value = value.filter( v => v.id !== everyoneGroupId );
+      showValues = value.filter( v => v.id !== everyoneGroupId );
+    } else {
+      showValues = value;
     }
 
     const columnsRender = renderValue(columns, schema[relation.to].items.items, this.props);
@@ -113,7 +116,7 @@ export default class RelationTable extends PureComponent {
           </div>
         }
         <Table
-          dataSource={value}
+          dataSource={showValues}
           columns={columnsRender}
           style={{marginBottom: 16}}
         />
