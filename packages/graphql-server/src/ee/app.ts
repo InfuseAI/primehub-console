@@ -16,6 +16,7 @@ import WorkspaceApi from '../workspace/api';
 import { keycloakMaxCount } from '../resolvers/constant';
 import request from 'request';
 import mime from 'mime';
+import url from 'url';
 
 import CrdClient, { InstanceTypeSpec, ImageSpec, client as kubeClient, kubeConfig } from '../crdClient/crdClientImpl';
 import * as system from '../resolvers/system';
@@ -238,7 +239,13 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   };
 
   // tslint:disable-next-line:max-line-length
-  const issuer = await Issuer.discover(`${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/.well-known/openid-configuration`);
+  const issuer =  new Issuer({
+    issuer: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}`,
+    authorization_endpoint: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/auth`,
+    token_endpoint: `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/token`,
+    userinfo_endpoint: `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/userinfo`,
+    jwks_uri: `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/certs`,
+  });
   const oidcClient = new issuer.Client({
     client_id: config.keycloakClientId,
     client_secret: config.keycloakClientSecret
@@ -252,14 +259,22 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   // init
   await oidcTokenVerifier.initKeystore();
 
-  const createKcAdminClient = () => new KcAdminClient({
-    baseUrl: config.keycloakApiBaseUrl,
-    realmName: config.keycloakRealmName,
-    requestConfig: {
-      httpAgent,
-      httpsAgent
-    }
-  });
+  const createKcAdminClient = (tokenIssuer?: string) => {
+    const kcAdminClientHeaders = tokenIssuer ? {
+      'Host': url.parse(tokenIssuer).hostname,
+      'X-Forwarded-Proto': url.parse(tokenIssuer).protocol.slice(0, -1),
+    } : {};
+
+    return new KcAdminClient({
+      baseUrl: config.keycloakApiBaseUrl,
+      realmName: config.keycloakRealmName,
+      requestConfig: {
+        httpAgent,
+        httpsAgent,
+        headers: kcAdminClientHeaders,
+      }
+    });
+  };
 
   const crdClient = new CrdClient({
     namespace: config.k8sCrdNamespace
@@ -374,7 +389,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       let getInstanceType: (name: string) => Promise<Item<InstanceTypeSpec>>;
       let getImage: (name: string) => Promise<Item<ImageSpec>>;
 
-      const kcAdminClient = createKcAdminClient();
+      let kcAdminClient;
       const keycloakClientId = config.keycloakClientId;
       const {authorization = ''}: {authorization: string} = ctx.header;
       const useCache = ctx.headers['x-primehub-use-cache'];
@@ -391,6 +406,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           // since it's from jupyterHub
           // we use batch for crd resource get method
           const accessToken = await tokenSyncer.getAccessToken();
+          kcAdminClient = createKcAdminClient();
           kcAdminClient.setAccessToken(accessToken);
           getInstanceType = instCache.get;
           getImage = imageCache.get;
@@ -420,6 +436,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           }
           userId = tokenPayload.sub;
           username = tokenPayload.preferred_username;
+          kcAdminClient = createKcAdminClient(tokenPayload.iss);
 
           // check if user is admin
           const roles = get(tokenPayload, ['resource_access', 'realm-management', 'roles'], []);
@@ -644,7 +661,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       }
 
       // Prepare keycloak admin client
-      const kcAdminClient = createKcAdminClient();
+      const kcAdminClient = createKcAdminClient(tokenPayload.iss);
       kcAdminClient.setAccessToken(apiToken);
       ctx.kcAdminClient = kcAdminClient;
 

@@ -46,7 +46,14 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   };
 
   // tslint:disable-next-line:max-line-length
-  const issuer = await Issuer.discover(`${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/.well-known/openid-configuration`);
+  const issuer =  new Issuer({
+    issuer: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}`,
+    authorization_endpoint: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/auth`,
+    token_endpoint: `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/token`,
+    userinfo_endpoint: `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/userinfo`,
+    jwks_uri: `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/certs`,
+  });
+
   const oidcClient = new issuer.Client({
     client_id: config.keycloakClientId,
     client_secret: config.keycloakClientSecret
