@@ -24,6 +24,31 @@ const maxMessageLength = 60;
 
 const POD_FAILED = 'PodFailed';
 
+const JobStatus = styled.div`
+  table {
+    margin: 15px auto;
+    width: 80%;
+    border-collapse: separate;
+    border-spacing: 10px 0;
+  }
+  thead, tbody {
+    background: #F8F8F8;
+  }
+  thead th {
+    width: auto;
+    font-size: 9pt;
+    color: #999;
+    padding: 5px 10px;
+    font-weight: 400;
+  }
+  tbody td {
+    width: auto;
+    padding: 5px 10px;
+    padding-top: 0;
+    font-size: 14pt;
+  }
+`
+
 const renderMessage = (job: Record<string, any>) => {
   if (job.cancel || job.phase === 'Cancelled')
     return 'Cancelled by user';
@@ -145,8 +170,29 @@ export default class Detail extends React.Component<Props> {
                 ]
               }
             </Button.Group>
-
           </div>
+          <JobStatus>
+            <table>
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Duration</th>
+                  <th>Finished</th>
+                  <th>Schedule</th>
+                  <th>User</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Succeeded</td>
+                  <td>00:00:002</td>
+                  <td>-</td>
+                  <td>it1</td>
+                  <td>-</td>
+                </tr>
+              </tbody>
+            </table>
+          </JobStatus>
           <Tabs>
             <TabPane key="information" tab="Information">
             <div style={{padding: '16px 36px'}}>
