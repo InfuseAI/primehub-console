@@ -261,7 +261,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   const createKcAdminClient = (tokenIssuer?: string) => {
     const kcAdminClientHeaders = tokenIssuer ? {
-      'Host': url.parse(tokenIssuer).hostname,
+      'Host': url.parse(tokenIssuer).host,
       'X-Forwarded-Proto': url.parse(tokenIssuer).protocol.slice(0, -1),
     } : {};
 
