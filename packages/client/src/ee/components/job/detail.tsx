@@ -27,7 +27,8 @@ const POD_FAILED = 'PodFailed';
 const JobStatus = styled.div`
   table {
     margin: 15px auto;
-    width: 80%;
+    margin-bottom: 0;
+    width: 90%;
     border-collapse: separate;
     border-spacing: 10px 0;
   }
@@ -36,8 +37,8 @@ const JobStatus = styled.div`
   }
   thead th {
     width: auto;
-    font-size: 9pt;
-    color: #999;
+    font-size: 14px;
+    color: #aaaaaa;
     padding: 5px 10px;
     font-weight: 400;
   }
@@ -75,6 +76,13 @@ const renderFinishTime = (job: Record<string, any>) => {
   if (job.phase === Phase.Running) return '-'
   return job.finishTime ?
     moment(job.finishTime).format('YYYY-MM-DD HH:mm:ss') :
+    '-';
+}
+
+const renderFinishTimeFromNow = (job: Record<string, any>) => {
+  if (job.phase === Phase.Running) return '-'
+  return job.finishTime ?
+    moment(job.finishTime).fromNow() :
     '-';
 }
 
@@ -184,37 +192,34 @@ export default class Detail extends React.Component<Props> {
               </thead>
               <tbody>
                 <tr>
-                  <td>Succeeded</td>
-                  <td>00:00:002</td>
-                  <td>-</td>
-                  <td>it1</td>
-                  <td>-</td>
+                  <td>{job.phase}</td>
+                  <td>{computeDuration(startTime, finishTime)}</td>
+                  <td>{renderFinishTimeFromNow(job)}</td>
+                  <td>{
+                    job.schedule ? (
+                      <Link to={`../schedule/${job.schedule}`}>
+                        {job.schedule}
+                      </Link>
+                    ) : '-'
+                  }</td>
+                  <td>{job.userName || '-'}</td>
                 </tr>
               </tbody>
             </table>
           </JobStatus>
+          <Divider style={{margin: '14px 0 10px'}}/>
           <Tabs>
             <TabPane key="information" tab="Information">
             <div style={{padding: '16px 36px'}}>
-              <Field labelCol={4} valueCol={20} label="Status" value={<strong>{job.phase}</strong>} />
               <Field labelCol={4} valueCol={20} label="Message" value={renderMessage(job)} />
               <Divider />
               <Field labelCol={4} valueCol={20} label="Job ID" value={job.id} />
-              <Field labelCol={4} valueCol={20} label="Job name" value={job.displayName || '-'} />
-              <Field labelCol={4} valueCol={20} label="Schedule" value={
-                job.schedule ? (
-                  <Link to={`../schedule/${job.schedule}`}>
-                    {job.schedule}
-                  </Link>
-                ) : '-'
-              }/>
-              <Field labelCol={4} valueCol={20} label="User" value={job.userName || '-'} />
+              <Field labelCol={4} valueCol={20} label="Job Name" value={job.displayName || '-'} />
               <Field labelCol={4} valueCol={20} label="Creation Time" value={createTime ? createTime.format('YYYY-MM-DD HH:mm:ss') : '-'} />
               <Field labelCol={4} valueCol={20} label="Start Time" value={startTime ? startTime.format('YYYY-MM-DD HH:mm:ss') : '-'} />
               <Field labelCol={4} valueCol={20} label="Finished Time" value={renderFinishTime(job)} />
-              <Field labelCol={4} valueCol={20} label="Duration" style={blockStyle} value={computeDuration(startTime, finishTime)} />
               <Field labelCol={4} valueCol={20} label="Group" value={job.groupName || '-'} />
-              <Field labelCol={4} valueCol={20} label="Instance type" value={(
+              <Field labelCol={4} valueCol={20} label="Instance Type" value={(
                 <div>
                   {get(job, 'instanceType.displayName', '') || get(job, 'instanceType.name', '')}
                   <br />

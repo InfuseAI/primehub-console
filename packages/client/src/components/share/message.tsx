@@ -38,7 +38,6 @@ export default class Message extends React.Component<Props, State> {
     const texts = (text || '').split('\n');
     return (
       <div style={{
-        marginTop: '10px',
         lineHeight: '22px',
         ...style
       }}>
