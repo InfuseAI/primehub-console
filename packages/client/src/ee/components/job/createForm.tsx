@@ -4,8 +4,33 @@ import {FormComponentProps} from 'antd/lib/form';
 import {get, startCase} from 'lodash';
 import RecurrenceInput, {RecurrenceType, recurrenceValidator} from 'ee/components/schedule/recurrence';
 import Message from 'components/share/message';
+import styled from 'styled-components'
 
 const { Option } = Select;
+
+const Table = styled.table`
+  width: 100%;
+  td, th {
+    line-height: 2.5em;
+    padding-left: 5px;
+  }
+
+  th {
+    border-bottom: 2px solid #AAA;
+  }
+
+  td {
+    border-bottom: 1px solid #DDD;
+  }
+
+  tbody > tr:nth-child(odd) {
+    background-color: #FAFAFA;
+  }
+
+  tr > td:first-child {
+    font-weight: bold;
+  }
+`;
 
 type Props = FormComponentProps & {
   groupContext?: any;
@@ -248,7 +273,7 @@ class CreateForm extends React.Component<Props, State> {
     return (
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
-          <Col xs={24} sm={8} lg={8}>
+          <Col xs={24} sm={16} lg={16}>
             <Card loading={loading} style={{overflow: 'auto'}}>
               <h3>Environment Settings</h3>
               <Divider />
@@ -337,8 +362,6 @@ class CreateForm extends React.Component<Props, State> {
               </Form.Item>
 
             </Card>
-          </Col>
-          <Col xs={24} sm={16} lg={16}>
             <Card>
               <h3>{startCase(type || 'job')} Details</h3>
               <Divider />
@@ -404,17 +427,59 @@ class CreateForm extends React.Component<Props, State> {
               {
                 <Button
                   type="primary" htmlType="submit"
-                  style={{marginRight: onCancel ? 16 : 0}}
+                  style={{width: "100%"}}
                 >
                   {submitText || 'Submit'}
                 </Button>
               }
               {
-                onCancel && <Button onClick={this.cancel}>
+                onCancel && <Button onClick={this.cancel} style={{width: "100%"}}>
                   Cancel
                 </Button>
               }
             </Form.Item>
+          </Col>
+          <Col xs="24" sm="8" lg="8">
+            <Card style={{overflow: 'auto'}}>
+              <h3>Group Resource</h3>
+              <Table>
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Used</th>
+                    <th>Limit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>CPU</td>
+                    <td>3</td>
+                    <td>32</td>
+                  </tr>
+                  <tr>
+                    <td>Memory</td>
+                    <td>6 GB</td>
+                    <td>200 GB</td>
+                  </tr>
+                  <tr>
+                    <td>GPU</td>
+                    <td> 0 </td>
+                    <td> 4 </td>
+                  </tr>
+                </tbody>
+              </Table>
+            </Card>
+            <Card style={{overflow: 'auto'}}>
+              <h3>Datasets</h3>
+              <ul>
+                <li>test-env</li>
+                <li>praticalAI</li>
+                <li>tensorflow-dataset</li>
+                <li>test-mount</li>
+                <li>first-day-with-python</li>
+                <li>TensorBoard Demo</li>
+              </ul>
+            </Card>
           </Col>
         </Row>
       </Form>
