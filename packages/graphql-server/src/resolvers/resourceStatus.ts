@@ -8,16 +8,16 @@ const KiB = 1024;
 const converCpuValueToFloat = (value = '0') => {
   const regex = /\d+m$/;
   if (regex.test(value)) {
-    return parseFloat(value.replace('m', ''))/1000
+    return parseFloat(value.replace('m', '')) / 1000;
   } else {
     return parseFloat(value);
   }
-}
+};
 
 const converMemResourceToBytes = (mem = '0') => {
-  const regexGiB = /\d+Gi?$/
-  const regexMiB = /\d+Mi?$/
-  const regexKiB = /\d+(K|k)i?$/
+  const regexGiB = /\d+Gi?$/;
+  const regexMiB = /\d+Mi?$/;
+  const regexKiB = /\d+(K|k)i?$/;
 
   if (regexGiB.test(mem)) {
     return parseFloat(mem.replace('Gi?$', '')) * GiB;
@@ -29,7 +29,7 @@ const converMemResourceToBytes = (mem = '0') => {
     return parseFloat(mem.replace(/(K|k)i?$/, '')) * KiB;
   }
   return parseFloat(mem);
-}
+};
 
 const labelStringify = (labels: Record<string, string>) => {
   return Object.keys(labels).map(labelKey => {
@@ -50,9 +50,9 @@ export const query = async (group, args, context: Context) => {
   });
   const resourceUsing = (items || []).reduce((acc, current) => {
     (current.spec.containers || []).forEach(container => {
-      acc.cpuUsage += converCpuValueToFloat(container.resources.requests['cpu']);
+      acc.cpuUsage += converCpuValueToFloat(container.resources.requests.cpu);
       acc.gpuUsage += converCpuValueToFloat(container.resources.requests['nvidia.com/gpu']);
-      acc.memUsage += converMemResourceToBytes(container.resources.requests['memory']);
+      acc.memUsage += converMemResourceToBytes(container.resources.requests.memory);
     });
     return acc;
   }, {
