@@ -400,7 +400,7 @@ class CreateForm extends React.Component<Props, State> {
                 )
               }
             </Card>
-            <Form.Item style={{textAlign: 'right', marginRight: 8, marginTop: 24}}>
+            <Form.Item style={{textAlign: 'right', marginTop: 12}}>
               {
                 <Button
                   type="primary" htmlType="submit"
