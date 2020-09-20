@@ -241,6 +241,7 @@ class CreateForm extends React.Component<Props, State> {
       message,
     } = initialValue || {};
     let recurrenceLabel = `Recurrence Options`;
+    console.log(groupContext);
     if (timezone) {
       recurrenceLabel += `(${this.stringifyZone(timezone, 'GMT')})`;
     }
@@ -453,32 +454,35 @@ class CreateForm extends React.Component<Props, State> {
                 <tbody>
                   <tr>
                     <td>CPU</td>
-                    <td>3</td>
-                    <td>32</td>
+                    <td>{groupContext.resourceStatus.cpuUsage}</td>
+                    <td>{groupContext.quotaCpu == null ? '∞' : groupContext.quotaCpu}</td>
                   </tr>
                   <tr>
                     <td>Memory</td>
-                    <td>6 GB</td>
-                    <td>200 GB</td>
+                    <td>{groupContext.resourceStatus.memUsage} GB</td>
+                    <td>{groupContext.quotaMemory == null ? '∞' : `${groupContext.quotaMemory} GB`} </td>
                   </tr>
                   <tr>
                     <td>GPU</td>
-                    <td> 0 </td>
-                    <td> 4 </td>
+                    <td>{groupContext.resourceStatus.gpuUsage} </td>
+                    <td>{groupContext.quotaGpu == null ? '∞' : groupContext.quotaGpu}</td>
                   </tr>
                 </tbody>
               </Table>
             </Card>
             <Card style={{overflow: 'auto'}}>
               <h3>Datasets</h3>
-              <ul>
-                <li>test-env</li>
-                <li>praticalAI</li>
-                <li>tensorflow-dataset</li>
-                <li>test-mount</li>
-                <li>first-day-with-python</li>
-                <li>TensorBoard Demo</li>
-              </ul>
+              {
+                groupContext.datasets.length ? (
+                <ul>
+                  {
+                    groupContext.datasets.map(dataset =>(<li>{dataset.displayName}</li>))
+                  }
+                </ul>
+                ) : (
+                  <div> No available dataset </div>
+                )
+              }
             </Card>
           </Col>
         </Row>
