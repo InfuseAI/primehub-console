@@ -87,6 +87,6 @@ export default class ResrouceMonitor extends React.Component<Props, State> {
         </>
       );
     }
-    return <Card>Somthing Wrong.</Card>
+    return <Card style={{overflow: 'auto'}}>Oops, somthing wrong.</Card>
   }
 }
