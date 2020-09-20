@@ -13,6 +13,7 @@ import { pick, isNil, omit, get, isEmpty, mapValues } from 'lodash';
 import { crd as instanceTypeResolver } from './instanceType';
 import { crd as datasetResolver } from './dataset';
 import { crd as imageResolver } from './image';
+import * as resourceStatusResolver from './resourceStatus';
 import { Context } from './interface';
 import { Attributes, FieldType } from './attr';
 import { keycloakMaxCount } from './constant';
@@ -414,7 +415,7 @@ export const typeResolvers = {
       return [];
     }
   },
-
+  resourceStatus: resourceStatusResolver.query,
   ...instanceTypeResolver.resolveInGroup(),
   ...datasetResolver.resolveInGroup(),
   ...imageResolver.resolveInGroup()

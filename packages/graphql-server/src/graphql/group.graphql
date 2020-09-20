@@ -3,6 +3,7 @@
 # import InstanceType from "instanceType.graphql"
 # import Image from "image.graphql"
 # import Dataset from "dataset.graphql"
+# import ResourceStatus from "resourceStatus.graphql"
 
 type Group {
   id: ID!
@@ -19,6 +20,7 @@ type Group {
   instanceTypes: [InstanceType]
   images: [Image]
   datasets: [Dataset]
+  resourceStatus: ResourceStatus
   # for relation with dataset
   writable: Boolean
   # shared volume
