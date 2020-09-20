@@ -5,6 +5,7 @@ import {get, snakeCase, debounce} from 'lodash';
 import DynamicFields from 'components/share/dynamicFields';
 import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
+import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 
 const { Option } = Select;
 
@@ -371,6 +372,9 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                 )
               }
             </Form.Item>
+          </Col>
+          <Col xs="24" sm="8" lg="8">
+            <ResourceMonitor groupContext={groupContext}/>
           </Col>
         </Row>
       </Form>
