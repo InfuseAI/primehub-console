@@ -218,7 +218,6 @@ class CreateForm extends React.Component<Props, State> {
       message,
     } = initialValue || {};
     let recurrenceLabel = `Recurrence Options`;
-    console.log(groupContext);
     if (timezone) {
       recurrenceLabel += `(${this.stringifyZone(timezone, 'GMT')})`;
     }

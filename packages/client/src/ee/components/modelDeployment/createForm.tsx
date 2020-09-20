@@ -185,6 +185,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       <span>The instance type <b>{instanceTypeName}</b> was deleted.</span>
     )
 
+
     return (
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
