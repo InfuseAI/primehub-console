@@ -4,6 +4,11 @@ export interface GroupContextValue {
   id: string;
   name: string;
   displayName: string;
+  quotaCpu: string;
+  quotaGpu: string;
+  quotaMemory: string;
+  images: any;
+  resourceStatus: any;
 }
 
 

@@ -20,6 +20,17 @@ export const GroupFragment = gql`
     id
     displayName
     name
+    quotaCpu
+    quotaGpu
+    quotaMemory
+    datasets {
+      displayName
+    }
+    resourceStatus {
+      cpuUsage
+      memUsage
+      gpuUsage
+    }
   }
 `;
 
