@@ -436,12 +436,12 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           }
           userId = tokenPayload.sub;
           username = tokenPayload.preferred_username;
-          kcAdminClient = createKcAdminClient(tokenPayload.iss);
 
           // check if user is admin
           const roles = get(tokenPayload, ['resource_access', 'realm-management', 'roles'], []);
           if (roles.indexOf('realm-admin') >= 0) {
             role = Role.ADMIN;
+            kcAdminClient = createKcAdminClient(tokenPayload.iss);
             kcAdminClient.setAccessToken(apiToken);
           } else {
             role = Role.USER;
@@ -450,6 +450,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
             // this part rely on authMiddleware to control the permission
             // todo: maybe we can use other api to access personal account data?
             const accessToken = await tokenSyncer.getAccessToken();
+            kcAdminClient = createKcAdminClient();
             kcAdminClient.setAccessToken(accessToken);
           }
 
