@@ -134,6 +134,7 @@ class JobCreatePage extends React.Component<Props, State> {
             </Row>
           ) : (
             <JobCreateForm
+              showResources={true}
               refetchGroup={getGroups.refetch}
               groupContext={groupContext}
               initialValue={defaultValue}

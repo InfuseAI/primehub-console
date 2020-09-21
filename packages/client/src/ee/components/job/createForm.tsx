@@ -10,6 +10,7 @@ import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 const { Option } = Select;
 
 type Props = FormComponentProps & {
+  showResources: boolean;
   refetchGroup: Function;
   groupContext?: any;
   groups: Array<Record<string, any>>;
@@ -189,6 +190,7 @@ class CreateForm extends React.Component<Props, State> {
 
   render() {
     const {
+      showResources,
       refetchGroup,
       groupContext,
       groups,
@@ -420,12 +422,18 @@ class CreateForm extends React.Component<Props, State> {
             </Form.Item>
           </Col>
           <Col xs="24" sm="8" lg="8">
-            <ResourceMonitor
-              groupContext={groupContext}
-              refetchGroup={refetchGroup}
-              selectedGroup={selectedGroup}
-              showDataset={true}
-            />
+            {
+              showResources ? (
+                <ResourceMonitor
+                  groupContext={groupContext}
+                  refetchGroup={refetchGroup}
+                  selectedGroup={selectedGroup}
+                  showDataset={true}
+                />
+              ) : (
+                <></>
+              )
+            }
           </Col>
         </Row>
       </Form>
