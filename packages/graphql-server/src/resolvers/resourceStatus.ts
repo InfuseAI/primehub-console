@@ -14,6 +14,12 @@ const converCpuValueToFloat = (value = '0') => {
   }
 };
 
+const escapedGroupName = (groupName = '') => {
+  let result = groupName.toLowerCase();
+  result = escape(result);
+  return result.replace(/-/g,'-2d');
+}
+
 const converMemResourceToBytes = (mem = '0') => {
   const regexGiB = /\d+Gi?$/;
   const regexMiB = /\d+Mi?$/;
@@ -39,21 +45,29 @@ const labelStringify = (labels: Record<string, string>) => {
 };
 
 export const query = async (group, args, context: Context) => {
-  const fieldSelector = labelStringify({
-    'status.phase': 'Running'
+  const PENDING = 'Pending';
+  const RUNNING = 'Running';
+  const groupName = escapedGroupName(group.name);
+  logger.info({
+    component: logger.components.resourceStatus,
+    type: 'QUERY',
+    message: 'Query using resources of group',
+    groupName: groupName
   });
   const labelSelector = labelStringify({
-    'primehub.io/group': `escaped-${group.name}`,
+    'primehub.io/group': `escaped-${groupName}`,
   });
   const {body: {items}} = await kubeClient.api.v1.namespaces(context.crdNamespace).pods.get({
-    qs: {labelSelector, fieldSelector}
+    qs: {labelSelector}
   });
   const resourceUsing = (items || []).reduce((acc, current) => {
-    (current.spec.containers || []).forEach(container => {
-      acc.cpuUsage += converCpuValueToFloat(container.resources.requests.cpu);
-      acc.gpuUsage += converCpuValueToFloat(container.resources.requests['nvidia.com/gpu']);
-      acc.memUsage += converMemResourceToBytes(container.resources.requests.memory);
-    });
+    if (current.status.phase === PENDING || current.status.phase === RUNNING) {
+      (current.spec.containers || []).forEach(container => {
+        acc.cpuUsage += converCpuValueToFloat(container.resources.requests.cpu);
+        acc.gpuUsage += converCpuValueToFloat(container.resources.requests['nvidia.com/gpu']);
+        acc.memUsage += converMemResourceToBytes(container.resources.requests.memory);
+      });
+    }
     return acc;
   }, {
     cpuUsage: 0,
