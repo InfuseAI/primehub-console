@@ -108,7 +108,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
           breadcrumb={<DeploymentBreadcrumb />}
           title={"Create Deployment"}
         />
-        <div style={{margin: '16px 64px'}}>
+        <div style={{margin: '16px'}}>
           <DeploymentCreateForm
             groupContext={groupContext}
             onSelectGroup={this.onChangeGroup}

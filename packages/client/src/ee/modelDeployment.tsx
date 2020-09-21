@@ -29,7 +29,7 @@ const HEADER_HEIGHT = 64;
 
 const Content = styled(Layout.Content)`
   margin-top: ${HEADER_HEIGHT}px;
-  padding: 64px;
+  padding: 24px;
   min-height: calc(100vh - 64px);
 `;
 
