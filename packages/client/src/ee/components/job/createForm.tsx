@@ -10,6 +10,7 @@ import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 const { Option } = Select;
 
 type Props = FormComponentProps & {
+  refetchGroup: Function;
   groupContext?: any;
   groups: Array<Record<string, any>>;
   onSelectGroup: Function;
@@ -188,6 +189,7 @@ class CreateForm extends React.Component<Props, State> {
 
   render() {
     const {
+      refetchGroup,
       groupContext,
       groups,
       onSelectGroup,
@@ -200,6 +202,7 @@ class CreateForm extends React.Component<Props, State> {
       timezone,
       onCancel,
       submitText,
+      selectedGroup
     } = this.props;
     const {
       recurrenceError
@@ -417,7 +420,12 @@ class CreateForm extends React.Component<Props, State> {
             </Form.Item>
           </Col>
           <Col xs="24" sm="8" lg="8">
-            <ResourceMonitor groupContext={groupContext}/>
+            <ResourceMonitor
+              groupContext={groupContext}
+              refetchGroup={refetchGroup}
+              selectedGroup={selectedGroup}
+              showDataset={true}
+            />
           </Col>
         </Row>
       </Form>

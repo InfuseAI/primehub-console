@@ -95,7 +95,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
   }
 
   render() {
-    const {getGroups, updatePhDeploymentResult, history, getPhDeployment, groupContext} = this.props;
+    const {getGroups, updatePhDeploymentResult, history, getPhDeployment, groupContext, refetchGroup} = this.props;
     if (getPhDeployment.loading) return null;
     if (getPhDeployment.error) {
       return getMessage(getPhDeployment.error)
@@ -130,6 +130,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
             selectedGroup={selectedGroup}
             groups={sortItems(groups)}
             groupContext={groupContext}
+            refetchGroup={getGroups.refetch}
             instanceTypes={sortItems(instanceTypes)}
             onSubmit={this.onSubmit}
             onCancel={this.onCancel}

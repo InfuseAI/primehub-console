@@ -1,12 +1,17 @@
 import * as React from 'react';
-import {Card, Divider} from 'antd';
+import {Spin, Card, Divider} from 'antd';
+import {get} from 'lodash';
 import styled from 'styled-components'
 
 type Props = {
   groupContext: any;
+  refetchGroup: Function;
+  showDataset: Boolean;
+  selectedGroup: String;
 }
 
 type State = {
+  groupContext: any;
 }
 
 const Table = styled.table`
@@ -34,10 +39,41 @@ const Table = styled.table`
 `;
 
 export default class ResrouceMonitor extends React.Component<Props, State> {
+  constructor (props) {
+    super(props);
+    this.state = {
+      groupContext: null
+    }
+  }
+
+  componentDidMount() {
+    this.fetchGroup(this.props.selectedGroup);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.selectedGroup !== this.props.selectedGroup) {
+      this.fetchGroup(this.props.selectedGroup);
+    }
+  }
+
+  fetchGroup = async (groupId) => {
+    if (groupId) {
+      const { refetchGroup, groupContext } = this.props;
+      const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+      const fetchedResult = await refetchGroup();
+      const allGroups = get(fetchedResult, 'data.me.groups', []);
+      const groups = allGroups
+        .filter(group => group.id !== everyoneGroupId)
+        .filter(group => !groupContext || groupContext.id === group.id );
+      const group = groups
+        .find(group => group.id === groupId);
+      this.setState({groupContext: group});
+    }
+  }
+
   render() {
-    const {
-      groupContext,
-    } = this.props;
+    const { showDataset } = this.props;
+    const { groupContext } = this.state;
     if (groupContext) {
       return (
         <>
@@ -70,23 +106,29 @@ export default class ResrouceMonitor extends React.Component<Props, State> {
                 </tbody>
               </Table>
             </Card>
-            <Card style={{overflow: 'auto'}}>
-              <h3>Datasets</h3>
-              {
-                groupContext.datasets.length ? (
-                <ul>
+            {
+              (showDataset) ? (
+                <Card style={{overflow: 'auto'}}>
+                  <h3>Datasets</h3>
                   {
-                    groupContext.datasets.map(dataset =>(<li>{dataset.displayName}</li>))
+                    groupContext.datasets.length ? (
+                    <ul>
+                      {
+                        groupContext.datasets.map(dataset =>(<li>{dataset.displayName}</li>))
+                      }
+                    </ul>
+                    ) : (
+                      <div> No available dataset </div>
+                    )
                   }
-                </ul>
-                ) : (
-                  <div> No available dataset </div>
-                )
-              }
-            </Card>
+                </Card>
+              ) : (
+                <></>
+              )
+            }
         </>
       );
     }
-    return <Card style={{overflow: 'auto'}}>Oops, somthing wrong.</Card>
+    return <Card style={{overflow: 'auto'}}><Spin></Spin></Card>
   }
 }
