@@ -199,12 +199,12 @@ class ScheduleList extends React.Component<Props> {
       <>
         <PageTitle
           breadcrumb={<ScheduleBreadCrumb />}
-          title={"Job Schedule"}
+          title={"Schedule"}
         />
         <PageBody>
           <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
             <InfuseButton icon="plus" onClick={this.scheduleJob} style={{width: 140}} type="primary">
-              Schedule Job
+              New schedule
             </InfuseButton>
             <InfuseButton onClick={this.refresh} style={{marginLeft: 16}}>
               Refresh

@@ -26,7 +26,7 @@ class JobScheduleBreadcrumb extends React.Component<Props> {
 
       </Breadcrumb.Item>,
       <Breadcrumb.Item key="schedule">
-        <Link to={`${basename}/schedule?page=1`}>Job Scheduler</Link>
+        <Link to={`${basename}/schedule?page=1`}>Schedule</Link>
       </Breadcrumb.Item>
     ];
 
@@ -36,7 +36,7 @@ class JobScheduleBreadcrumb extends React.Component<Props> {
       </Breadcrumb.Item>)
     } else if (match.url.endsWith('schedule/create')) {
       breadcrumbItems.push(<Breadcrumb.Item key="create">
-        Create Schedule
+        New schedule
       </Breadcrumb.Item>)
     }
 

@@ -322,7 +322,7 @@ class JobList extends React.Component<Props> {
               style={{marginRight: 16, width: 120}}
               type="primary"
             >
-              Create Job
+              New job
             </InfuseButton>
             <InfuseButton onClick={this.refresh}>
               Refresh
