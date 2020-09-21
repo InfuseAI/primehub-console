@@ -17,8 +17,8 @@ const converCpuValueToFloat = (value = '0') => {
 const escapedGroupName = (groupName = '') => {
   let result = groupName.toLowerCase();
   result = escape(result);
-  return result.replace(/-/g,'-2d');
-}
+  return result.replace(/-/g, '-2d');
+};
 
 const converMemResourceToBytes = (mem = '0') => {
   const regexGiB = /\d+Gi?$/;
@@ -52,7 +52,7 @@ export const query = async (group, args, context: Context) => {
     component: logger.components.resourceStatus,
     type: 'QUERY',
     message: 'Query using resources of group',
-    groupName: groupName
+    groupName
   });
   const labelSelector = labelStringify({
     'primehub.io/group': `escaped-${groupName}`,
