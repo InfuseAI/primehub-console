@@ -11,6 +11,7 @@ const { Option } = Select;
 
 type Props = FormComponentProps & {
   groupContext: any;
+  refetchGroup: Function;
   groups: Array<Record<string, any>>;
   onSelectGroup?: Function;
   selectedGroup: string;
@@ -145,6 +146,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
   render() {
     const {
       groupContext,
+      refetchGroup,
       groups,
       onSelectGroup,
       instanceTypes,
@@ -375,7 +377,11 @@ class DeploymentCreateForm extends React.Component<Props, State> {
             </Form.Item>
           </Col>
           <Col xs="24" sm="8" lg="8">
-            <ResourceMonitor groupContext={groupContext}/>
+            <ResourceMonitor
+              selectedGroup={selectedGroup}
+              groupContext={groupContext}
+              refetchGroup={refetchGroup}
+            />
           </Col>
         </Row>
       </Form>

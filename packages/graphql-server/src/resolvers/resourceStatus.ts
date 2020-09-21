@@ -61,6 +61,13 @@ export const query = async (group, args, context: Context) => {
     qs: {labelSelector}
   });
   const resourceUsing = (items || []).reduce((acc, current) => {
+    logger.info({
+      component: logger.components.resourceStatus,
+      type: 'REDUCE',
+      message: 'Checkinng status phase:',
+      groupName,
+      phase: current.status.phase
+    });
     if (current.status.phase === PENDING || current.status.phase === RUNNING) {
       (current.spec.containers || []).forEach(container => {
         acc.cpuUsage += converCpuValueToFloat(container.resources.requests.cpu);

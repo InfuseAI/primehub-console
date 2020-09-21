@@ -111,6 +111,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
         <div style={{margin: '16px'}}>
           <DeploymentCreateForm
             groupContext={groupContext}
+            refetchGroup={getGroups.refetch}
             onSelectGroup={this.onChangeGroup}
             selectedGroup={selectedGroup}
             groups={sortItems(groups)}

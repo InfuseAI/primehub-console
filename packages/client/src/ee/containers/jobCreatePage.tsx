@@ -134,10 +134,11 @@ class JobCreatePage extends React.Component<Props, State> {
             </Row>
           ) : (
             <JobCreateForm
+              refetchGroup={getGroups.refetch}
               groupContext={groupContext}
               initialValue={defaultValue}
-              onSelectGroup={this.onChangeGroup}
               selectedGroup={selectedGroup}
+              onSelectGroup={this.onChangeGroup}
               groups={sortItems(groups)}
               instanceTypes={sortItems(instanceTypes)}
               images={sortItems(images)}
