@@ -129,6 +129,6 @@ export default class ResrouceMonitor extends React.Component<Props, State> {
         </>
       );
     }
-    return <Card style={{overflow: 'auto'}}><Spin></Spin></Card>
+    return <Card loading={true} style={{overflow: 'auto'}}></Card>
   }
 }
