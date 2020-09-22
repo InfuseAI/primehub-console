@@ -118,7 +118,7 @@ class ScheduleCreatePage extends React.Component<Props, State> {
     return (
       <React.Fragment>
         <PageTitle
-          title="Create Schedule"
+          title="New Schedule"
           breadcrumb={<ScheduleBreadCrumb />}
         />
         <div style={{margin: 16}}>

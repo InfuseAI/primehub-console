@@ -37,7 +37,7 @@ class JobBreadcrumb extends React.Component<Props> {
       </Breadcrumb.Item>)
     } else if (match.url.endsWith('job/create')) {
       breadcrumbItems.push(<Breadcrumb.Item key="create">
-        Create Job
+        New Job
       </Breadcrumb.Item>)
     }
 
