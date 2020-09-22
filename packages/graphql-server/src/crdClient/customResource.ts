@@ -1,7 +1,7 @@
 import { Watch } from '@kubernetes/client-node';
 import { pick } from 'lodash';
 import * as logger from '../logger';
-import { apiUnavailable } from '../k8sResource/k8sError';
+import { apiUnavailable, resourceNotFound } from '../k8sResource/k8sError';
 
 export interface Metadata {
   clusterName?: string;
@@ -59,6 +59,10 @@ export default class CustomResource<SpecType = any, StatusType = any> {
         name,
         error
       });
+      const CODE = 'code';
+      if (error[CODE] && error[CODE] === 404) {
+        throw resourceNotFound(error);
+      }
       throw apiUnavailable();
     }
   }
