@@ -4,6 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "NODE_ENV=development nodemon src/ee/bin/www.ts",
+    "dev:ce": "NODE_ENV=development nodemon src/ce/bin/www.ts",
+    "debug": "NODE_ENV=development nodemon --inspect=9229 -e ts,tsx --exec node -r ts-node/register src/ee/bin/www.ts",
+    "debug:ce": "NODE_ENV=development nodemon --inspect=9229 -e ts,tsx --exec node -r ts-node/register src/ce/bin/www.ts",
     "start": "NODE_ENV=development ts-node src/ee/bin/www.ts",
     "start:lib": "NODE_ENV=development node lib/ee/bin/www",
     "start:prod": "NODE_ENV=production node lib/ee/bin/www",
