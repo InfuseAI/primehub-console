@@ -1,0 +1,6 @@
+type ResourceStatus {
+  groupId: String
+  cpuUsage: String
+  memUsage: String
+  gpuUsage: String
+}

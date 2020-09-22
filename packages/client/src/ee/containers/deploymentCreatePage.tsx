@@ -108,9 +108,10 @@ class DeploymentCreatePage extends React.Component<Props, State> {
           breadcrumb={<DeploymentBreadcrumb />}
           title={"Create Deployment"}
         />
-        <div style={{margin: '16px 64px'}}>
+        <div style={{margin: '16px'}}>
           <DeploymentCreateForm
             groupContext={groupContext}
+            refetchGroup={getGroups.refetch}
             onSelectGroup={this.onChangeGroup}
             selectedGroup={selectedGroup}
             groups={sortItems(groups)}

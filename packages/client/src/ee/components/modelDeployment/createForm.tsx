@@ -5,11 +5,13 @@ import {get, snakeCase, debounce} from 'lodash';
 import DynamicFields from 'components/share/dynamicFields';
 import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
+import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 
 const { Option } = Select;
 
 type Props = FormComponentProps & {
   groupContext: any;
+  refetchGroup: Function;
   groups: Array<Record<string, any>>;
   onSelectGroup?: Function;
   selectedGroup: string;
@@ -144,6 +146,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
   render() {
     const {
       groupContext,
+      refetchGroup,
       groups,
       onSelectGroup,
       instanceTypes,
@@ -184,6 +187,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       <span>The instance type <b>{instanceTypeName}</b> was deleted.</span>
     )
 
+
     return (
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
@@ -212,25 +216,25 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   </Form.Item>
                 )
               }
-            <Form.Item label={`Deployment name`}>
-              {form.getFieldDecorator('name', {
-                initialValue: name,
-                rules: [
-                  { whitespace: true, required: true, message: 'Please input a name!' },
-                  { pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*/, message: `alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`}
-                ],
-              })(
-                <Input disabled={type === 'edit'} onChange={this.handleNameChange} />
-              )}
-            </Form.Item>
-            <Form.Item label={`Deployment ID`}>
-              {form.getFieldDecorator('id', {
-                initialValue: id
-              })(
-                <Input disabled />
-              )}
-            </Form.Item>
             <Card loading={loading} style={{overflow: 'auto'}}>
+              <Form.Item label={`Deployment name`} style={{marginBottom: '8px'}}>
+                {form.getFieldDecorator('name', {
+                  initialValue: name,
+                  rules: [
+                    { whitespace: true, required: true, message: 'Please input a name!' },
+                    { pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*/, message: `alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`}
+                  ],
+                })(
+                  <Input disabled={type === 'edit'} onChange={this.handleNameChange} />
+                )}
+              </Form.Item>
+              <Form.Item label={`Deployment ID`}>
+                {form.getFieldDecorator('id', {
+                  initialValue: id
+                })(
+                  <Input disabled />
+                )}
+              </Form.Item>
               <h3>Environment Settings</h3>
 
               <Row gutter={16}>
@@ -349,28 +353,35 @@ class DeploymentCreateForm extends React.Component<Props, State> {
             </Form.Item>
             </Card>
       </Row>
-            <Form.Item style={{textAlign: 'right', marginRight: 8, marginTop: 24}}>
+            <Form.Item style={{textAlign: 'right', marginTop: 12}}>
               {
                 type === 'edit' ? (
                   <>
                     <InfuseButton
                       type="primary"
                       htmlType="submit"
-                      style={{marginRight: 16, width: 'auto'}}
+                      style={{marginRight: 16, width: '100%'}}
                     >
                       Confirm and Deploy
                     </InfuseButton>
-                    <InfuseButton onClick={this.cancel}>
+                    <InfuseButton onClick={this.cancel} style={{width: "100%"}}>
                       Cancel
                     </InfuseButton>
                   </>
                 ) : (
-                  <InfuseButton type="primary" htmlType="submit">
+                  <InfuseButton type="primary" htmlType="submit" style={{width: "100%"}}>
                     Deploy
                   </InfuseButton>
                 )
               }
             </Form.Item>
+          </Col>
+          <Col xs="24" sm="8" lg="8">
+            <ResourceMonitor
+              selectedGroup={selectedGroup}
+              groupContext={groupContext}
+              refetchGroup={refetchGroup}
+            />
           </Col>
         </Row>
       </Form>

@@ -13,6 +13,7 @@ import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';
 import {PhDeploymentFragment} from 'ee/components/modelDeployment/common';
 import {GET_PH_DEPLOYMENT, getMessage} from 'ee/containers/deploymentDetail';
 import {GET_MY_GROUPS} from './deploymentCreatePage';
+import { GroupContextComponentProps, withGroupContext } from 'context/group';
 
 export const UPDATE_DEPLOYMENT = gql`
   mutation updatePhDeployment($where: PhDeploymentWhereUniqueInput!, $data: PhDeploymentUpdateInput!) {
@@ -94,7 +95,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
   }
 
   render() {
-    const {getGroups, updatePhDeploymentResult, history, getPhDeployment} = this.props;
+    const {getGroups, updatePhDeploymentResult, history, getPhDeployment, groupContext, refetchGroup} = this.props;
     if (getPhDeployment.loading) return null;
     if (getPhDeployment.error) {
       return getMessage(getPhDeployment.error)
@@ -118,7 +119,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
           title={`Update Deployment`}
           breadcrumb={<DeploymentBreadcrumb deploymentName={get(getPhDeployment, 'phDeployment.name')} />}
         />
-        <div style={{margin: '16px 32px'}}>
+        <div style={{margin: '16px'}}>
           <DeploymentCreateForm
             type="edit"
             initialValue={{
@@ -128,6 +129,8 @@ class DeploymentCreatePage extends React.Component<Props, State> {
             }}
             selectedGroup={selectedGroup}
             groups={sortItems(groups)}
+            groupContext={groupContext}
+            refetchGroup={getGroups.refetch}
             instanceTypes={sortItems(instanceTypes)}
             onSubmit={this.onSubmit}
             onCancel={this.onCancel}
@@ -141,6 +144,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
 
 export default compose(
   withRouter,
+  withGroupContext,
   graphql(GET_MY_GROUPS, {
     name: 'getGroups'
   }),

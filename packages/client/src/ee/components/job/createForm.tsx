@@ -4,10 +4,14 @@ import {FormComponentProps} from 'antd/lib/form';
 import {get, startCase} from 'lodash';
 import RecurrenceInput, {RecurrenceType, recurrenceValidator} from 'ee/components/schedule/recurrence';
 import Message from 'components/share/message';
+import styled from 'styled-components';
+import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 
 const { Option } = Select;
 
 type Props = FormComponentProps & {
+  showResources: boolean;
+  refetchGroup: Function;
   groupContext?: any;
   groups: Array<Record<string, any>>;
   onSelectGroup: Function;
@@ -186,6 +190,8 @@ class CreateForm extends React.Component<Props, State> {
 
   render() {
     const {
+      showResources,
+      refetchGroup,
       groupContext,
       groups,
       onSelectGroup,
@@ -198,6 +204,7 @@ class CreateForm extends React.Component<Props, State> {
       timezone,
       onCancel,
       submitText,
+      selectedGroup
     } = this.props;
     const {
       recurrenceError
@@ -248,7 +255,7 @@ class CreateForm extends React.Component<Props, State> {
     return (
       <Form onSubmit={this.submit}>
         <Row gutter={16}>
-          <Col xs={24} sm={8} lg={8}>
+          <Col xs={24} sm={16} lg={16}>
             <Card loading={loading} style={{overflow: 'auto'}}>
               <h3>Environment Settings</h3>
               <Divider />
@@ -337,8 +344,6 @@ class CreateForm extends React.Component<Props, State> {
               </Form.Item>
 
             </Card>
-          </Col>
-          <Col xs={24} sm={16} lg={16}>
             <Card>
               <h3>{startCase(type || 'job')} Details</h3>
               <Divider />
@@ -400,21 +405,35 @@ class CreateForm extends React.Component<Props, State> {
                 )
               }
             </Card>
-            <Form.Item style={{textAlign: 'right', marginRight: 8, marginTop: 24}}>
+            <Form.Item style={{textAlign: 'right', marginTop: 12}}>
               {
                 <Button
                   type="primary" htmlType="submit"
-                  style={{marginRight: onCancel ? 16 : 0}}
+                  style={{width: "100%"}}
                 >
                   {submitText || 'Submit'}
                 </Button>
               }
               {
-                onCancel && <Button onClick={this.cancel}>
+                onCancel && <Button onClick={this.cancel} style={{width: "100%"}}>
                   Cancel
                 </Button>
               }
             </Form.Item>
+          </Col>
+          <Col xs="24" sm="8" lg="8">
+            {
+              showResources ? (
+                <ResourceMonitor
+                  groupContext={groupContext}
+                  refetchGroup={refetchGroup}
+                  selectedGroup={selectedGroup}
+                  showDataset={true}
+                />
+              ) : (
+                <></>
+              )
+            }
           </Col>
         </Row>
       </Form>
