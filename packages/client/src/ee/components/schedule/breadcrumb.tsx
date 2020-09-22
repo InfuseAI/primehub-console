@@ -36,7 +36,7 @@ class JobScheduleBreadcrumb extends React.Component<Props> {
       </Breadcrumb.Item>)
     } else if (match.url.endsWith('schedule/create')) {
       breadcrumbItems.push(<Breadcrumb.Item key="create">
-        New schedule
+        New Schedule
       </Breadcrumb.Item>)
     }
 

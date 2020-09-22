@@ -204,7 +204,7 @@ class ScheduleList extends React.Component<Props> {
         <PageBody>
           <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
             <InfuseButton icon="plus" onClick={this.scheduleJob} style={{width: 140}} type="primary">
-              New schedule
+              New Schedule
             </InfuseButton>
             <InfuseButton onClick={this.refresh} style={{marginLeft: 16}}>
               Refresh

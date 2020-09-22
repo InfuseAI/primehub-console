@@ -109,7 +109,7 @@ class JobCreatePage extends React.Component<Props, State> {
       <React.Fragment>
         <PageTitle
           breadcrumb={<JobBreadcrumb />}
-          title={"New job"}
+          title={"New Job"}
         />
         <div style={{
           margin: '16px',
