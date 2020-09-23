@@ -25,8 +25,7 @@ export interface PhJob {
   cancel: boolean;
   command: string;
   groupId: string;
-  groupName: string; // Group Display Name
-  group: string; // Group Name
+  groupName: string;
   image: string;
   instanceType: string;
   userId: string;
@@ -52,16 +51,13 @@ export interface PhJobCreateInput {
 // tslint:disable-next-line:max-line-length
 export const transform = async (item: Item<PhJobSpec, PhJobStatus>, namespace: string, graphqlHost: string, jobLogCtrl: JobLogCtrl, kcAdminClient: KeycloakAdminClient): Promise<PhJob> => {
   const phase = item.spec.cancel ? PhJobPhase.Cancelled : get(item, 'status.phase', PhJobPhase.Pending);
-  const group = item.spec.groupId ? await kcAdminClient.groups.findOne({id: item.spec.groupId}) : null;
-  const groupName = get(group, 'attributes.displayName.0') || get(group, 'name');
   return {
     id: item.metadata.name,
     displayName: item.spec.displayName,
     cancel: item.spec.cancel,
     command: item.spec.command,
     groupId: item.spec.groupId,
-    group: item.spec.groupName,
-    groupName,
+    groupName: item.spec.groupName || '',
     image: item.spec.image,
     instanceType: item.spec.instanceType,
     userId: item.spec.userId,
@@ -189,8 +185,8 @@ export const typeResolvers = {
   async artifact(parent, args, context: Context) {
     const {minioClient, storeBucket} = context;
     const phjobID = parent.id;
-    const {group} = parent;
-    const prefix = `groups/${group}/jobArtifacts/${phjobID}`;
+    const {groupName} = parent;
+    const prefix = `groups/${groupName}/jobArtifacts/${phjobID}`;
 
     return new Promise<any>((resolve, reject) => {
       if (!minioClient) {
@@ -206,7 +202,7 @@ export const typeResolvers = {
       const stream = minioClient.listObjects(storeBucket, prefix, true);
       stream.on('data', (obj: BucketItem) => {
         list.push({
-          name: obj.name,
+          name: obj.name.substring(prefix.length + 1),
           size: obj.size,
           lastModified: obj.lastModified.toISOString(),
         });
