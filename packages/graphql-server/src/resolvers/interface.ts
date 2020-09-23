@@ -1,5 +1,6 @@
 import KcAdminClient from 'keycloak-admin';
 import CrdClient, { InstanceTypeSpec, ImageSpec, DatasetSpec } from '../crdClient/crdClientImpl';
+import {Client as MinioClient} from 'minio';
 import K8sSecret from '../k8sResource/k8sSecret';
 import { Item } from '../crdClient/customResource';
 import WorkspaceApi from '../workspace/api';
@@ -22,6 +23,8 @@ export interface Context {
   kcAdminClient: KcAdminClient;
   keycloakClientId: string;
   crdClient: CrdClient;
+  minioClient: MinioClient;
+  storeBucket: string;
   getInstanceType: (name: string) => Promise<Item<InstanceTypeSpec>>;
   getImage: (name: string) => Promise<Item<ImageSpec>>;
   getDataset: (name: string) => Promise<Item<DatasetSpec>>;

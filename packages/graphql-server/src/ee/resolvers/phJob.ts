@@ -14,6 +14,7 @@ import * as logger from '../../logger';
 import { keycloakMaxCount } from '../../resolvers/constant';
 import { isUserAdmin } from '../../resolvers/user';
 import { SCHEDULE_LABEL } from './phSchedule';
+import { BucketItem } from 'minio';
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 const NOT_AUTH_ERROR = 'NOT_AUTH';
@@ -24,7 +25,8 @@ export interface PhJob {
   cancel: boolean;
   command: string;
   groupId: string;
-  groupName: string;
+  groupName: string; // Group Display Name
+  group: string; // Group Name
   image: string;
   instanceType: string;
   userId: string;
@@ -58,6 +60,7 @@ export const transform = async (item: Item<PhJobSpec, PhJobStatus>, namespace: s
     cancel: item.spec.cancel,
     command: item.spec.command,
     groupId: item.spec.groupId,
+    group: item.spec.groupName,
     groupName,
     image: item.spec.image,
     instanceType: item.spec.instanceType,
@@ -182,6 +185,42 @@ export const typeResolvers = {
         tolerations: []
       };
     }
+  },
+  async artifact(parent, args, context: Context) {
+    const {minioClient, storeBucket} = context;
+    const phjobID = parent.id;
+    const {group} = parent;
+    const prefix = `groups/${group}/jobArtifacts/${phjobID}`;
+
+    return new Promise<any>((resolve, reject) => {
+      if (!minioClient) {
+        // Throw empty object if primehub store is not enabled
+        resolve({
+          prefix,
+          items: []
+        });
+        return;
+      }
+
+      const list: any[] = [];
+      const stream = minioClient.listObjects(storeBucket, prefix, true);
+      stream.on('data', (obj: BucketItem) => {
+        list.push({
+          name: obj.name,
+          size: obj.size,
+          lastModified: obj.lastModified.toISOString(),
+        });
+      });
+      stream.on('error', (error: Error) => {
+        reject(error);
+      });
+      stream.on('end', () => {
+        resolve({
+          prefix,
+          items: list
+        });
+      });
+    });
   }
 };
 
@@ -335,3 +374,4 @@ export const cancel = async (root, args, context: Context) => {
 
   return {id};
 };
+
