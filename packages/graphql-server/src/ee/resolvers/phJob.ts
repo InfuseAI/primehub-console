@@ -374,4 +374,3 @@ export const cancel = async (root, args, context: Context) => {
 
   return {id};
 };
-
