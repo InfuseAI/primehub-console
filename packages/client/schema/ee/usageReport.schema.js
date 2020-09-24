@@ -42,7 +42,8 @@ export default () => (
           cursor
           node {
             id
-            url
+            summaryUrl
+            detailedUrl
           }
         }
         pageInfo {
