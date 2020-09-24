@@ -759,27 +759,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
 
   // usage report
-  rootRouter.get('/report/monthly/:year/:month', authenticateMiddleware, checkIsAdmin,
-    async ctx => {
-      const requestOptions: request.Options = {
-        method: 'GET',
-        uri: config.usageReportAPIHost + '/report/monthly/' + ctx.params.year + '/' + ctx.params.month,
-      };
-      kubeConfig.applyToRequest(requestOptions);
-      const req = request(requestOptions);
-
-      req.on('error', err => {
-        logger.error({
-          component: logger.components.internal,
-          type: 'USAGE_REPORT_GET_REPORT_ERROR',
-          message: err.message
-        });
-        ctx.res.end();
-      });
-
-      ctx.body = req;
-    }
-  );
+  configureUsageReport(rootRouter,
+    config.usageReportAPIHost, '/report/monthly', authenticateMiddleware, checkIsAdmin);
+  configureUsageReport(rootRouter,
+    config.usageReportAPIHost, '/report/monthly/details', authenticateMiddleware, checkIsAdmin);
 
   if (config.enableStore) {
     // phfs file download api
@@ -826,3 +809,28 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   server.applyMiddleware({ app, path: config.appPrefix ? `${config.appPrefix}/graphql` : '/graphql' });
   return {app, server, config};
 };
+
+function configureUsageReport(rootRouter: Router, host: string, uriPrefix: string,
+                              authenticateMiddleware: any, checkIsAdmin: any) {
+  rootRouter.get(uriPrefix + '/:year/:month', authenticateMiddleware, checkIsAdmin,
+    async ctx => {
+      const requestOptions: request.Options = {
+        method: 'GET',
+        uri: host + uriPrefix + '/' + ctx.params.year + '/' + ctx.params.month,
+      };
+      kubeConfig.applyToRequest(requestOptions);
+      const req = request(requestOptions);
+
+      req.on('error', err => {
+        logger.error({
+          component: logger.components.internal,
+          type: 'USAGE_REPORT_GET_REPORT_ERROR',
+          message: err.message
+        });
+        ctx.res.end();
+      });
+
+      ctx.body = req;
+    }
+  );
+}

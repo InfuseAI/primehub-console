@@ -33,7 +33,12 @@ const listQuery = async (context: Context, where: any, order: any) => {
   try {
     const response = await makeRequest(requestOptions);
     const json = JSON.parse(response);
-    const elements = json.map(element => ({id: element, url: `${graphqlHost}${appPrefix || ''}/report/monthly/${element}`}));
+    const elements = json.map(element =>
+      ({
+        id: element,
+        summaryUrl: `${graphqlHost}${appPrefix || ''}/report/monthly/details/${element}`,
+        detailedUrl: `${graphqlHost}${appPrefix || ''}/report/monthly/${element}`
+    }));
     if (!order) {
       order = {
         id: 'desc'
