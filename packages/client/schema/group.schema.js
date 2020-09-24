@@ -1,9 +1,11 @@
 /** @jsx builder */
-import builder, {Condition, Block, Row, Col, Default, Layout} from 'canner-script';
+import builder, {Condition, Block, Row, Tabs, Col, Default, Layout} from 'canner-script';
 import {Tag} from 'antd';
 import Filter from '../src/cms-toolbar/filter';
 import {renderRelationField, parseToStepDot5} from './utils';
 import EnableModelDeployment from '../src/cms-layouts/enableModelDeployment';
+import BuildImageTab from 'cms-layouts/buildImageTab';
+
 export default () => (
   <array keyName="group" title="${group}"
     controlDeployAndResetButtons={true}
@@ -87,7 +89,9 @@ export default () => (
       }
     `}
   >
-     <toolbar async>
+    <Tabs component={BuildImageTab}>
+      <Default keyName="info" title="Info">
+    <toolbar async>
       <filter
         component={Filter}
         fields={[{
@@ -206,6 +210,36 @@ export default () => (
         </Col>
       </Row>
     </Block>
+    <Block title="${users}">
+      <relation keyName="users"
+        packageName='../src/cms-components/customize-relation-table'
+        relation={{
+          to: 'user',
+          type: 'toMany'
+        }}
+        uiParams={{
+          textCol: 'username',
+          columns: [{
+            title: '${username}',
+            dataIndex: 'username'
+          }]
+        }}
+      >
+        <toolbar async>
+          <filter
+            component={Filter}
+            fields={[{
+              type: 'text',
+              label: '${username}',
+              key: 'username'
+            }]}
+          />
+          <pagination/>
+        </toolbar>
+      </relation>
+    </Block>
+  </Default>
+    <Default keyName="dataset" title="Dataset">
     <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
       <Block title="${dataset}">
         <array keyName="datasets"
@@ -247,10 +281,14 @@ export default () => (
             }}
           />
           <string keyName="description" title="${description}" />
+    {/* writable is only used to check in dataset.groups table, no need to show */}
           <boolean keyName="writable" title="${groups.datasets.writable}" />
         </array>
       </Block>
+    <boolean keyName="writable" hidden />
     </Condition>
+    </Default>
+      <Default keyName="images" title="Images">
     <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
       <Block title="${images}">
         <array keyName="images"
@@ -285,36 +323,8 @@ export default () => (
         </array>
       </Block>
     </Condition>
-    <Block title="${users}">
-      <relation keyName="users"
-        packageName='../src/cms-components/customize-relation-table'
-        relation={{
-          to: 'user',
-          type: 'toMany'
-        }}
-        uiParams={{
-          textCol: 'username',
-          columns: [{
-            title: '${username}',
-            dataIndex: 'username'
-          }]
-        }}
-      >
-        <toolbar async>
-          <filter
-            component={Filter}
-            fields={[{
-              type: 'text',
-              label: '${username}',
-              key: 'username'
-            }]}
-          />
-          <pagination/>
-        </toolbar>
-      </relation>
-    </Block>
-    {/* writable is only used to check in dataset.groups table, no need to show */}
-    <boolean keyName="writable" hidden />
+      </Default>
+  </Tabs>
   </array>
 )
 
