@@ -208,9 +208,9 @@ export default class K8sSecret {
 
   private decodeDockerConfig = (dockerconfigjson: string) => {
     try {
-      const obj = JSON.parse(new Buffer(dockerconfigjson, 'base64').toString('utf8'));
+      const obj = JSON.parse(Buffer.from(dockerconfigjson, 'base64').toString('utf8'));
       const registryHost = Object.keys(obj.auths)[0];
-      const auth = new Buffer(obj.auths[registryHost].auth, 'base64').toString('utf8');
+      const auth = Buffer.from(obj.auths[registryHost].auth, 'base64').toString('utf8');
       const authSplit = auth.split(':');
       const username = authSplit[0];
       const password = authSplit.slice(1).join(':');
