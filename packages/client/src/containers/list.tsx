@@ -27,6 +27,7 @@ export const GroupFragment = gql`
       gpuUsage
     }
     enabledDeployment
+    jobDefaultActiveDeadlineSeconds
   }
 `;
 

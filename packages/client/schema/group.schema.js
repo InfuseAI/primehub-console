@@ -122,6 +122,33 @@ export default () => (
     </Condition>
     <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
       <ShareVolumn />
+      <number keyName="jobDefaultActiveDeadlineSeconds" 
+        title="${group.jobDefaultActiveDeadlineSeconds}"
+        packageName="../src/cms-components/customize-number-with_select_multiplier"
+        defaultValue={() => null}
+        nullable
+        uiParams={{
+          options: [{
+            text: 'Minutes',
+            value: 'm',
+            multiplier: 60
+          }, {
+            text: 'Hours',
+            value: 'h',
+            multiplier: 60*60
+          }, {
+            text: 'Days',
+            value: 'd',
+            multiplier: 60*60*24
+          }],
+          styleOnSelect: {width: 200},
+          defaultSelected: 1,
+          styleOnInput: {width: 100, marginRight: 10},
+          min: 0,
+          max: 999,
+          step: 1
+        }}
+      />
     </Condition>
     <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
       <Block title="User Quota">

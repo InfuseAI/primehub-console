@@ -88,6 +88,7 @@ class JobCreatePage extends React.Component<Props, State> {
     const {selectedGroup} = this.state;
     const {groupContext, getGroups, createPhJobResult, defaultValue} = this.props;
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+    const jobDefaultActiveDeadlineSeconds = (window as any).jobDefaultActiveDeadlineSeconds;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups
       .filter(group => group.id !== everyoneGroupId)
@@ -105,6 +106,7 @@ class JobCreatePage extends React.Component<Props, State> {
       get(everyoneGroup, 'images', []),
       'id'
     );
+    const jobActiveDeadlineSeconds = get(group, 'jobDefaultActiveDeadlineSeconds', null) || jobDefaultActiveDeadlineSeconds;
     return (
       <React.Fragment>
         <PageTitle
@@ -143,6 +145,7 @@ class JobCreatePage extends React.Component<Props, State> {
               groups={sortItems(groups)}
               instanceTypes={sortItems(instanceTypes)}
               images={sortItems(images)}
+              defaultActiveDeadlineSeconds={jobActiveDeadlineSeconds}
               onSubmit={this.onSubmit}
               loading={createPhJobResult.loading}
             />

@@ -43,7 +43,8 @@ const attrSchema = {
   sharedVolumeCapacity: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota, rename: 'shared-volume-capacity'},
   homeSymlink: {type: FieldType.boolean, rename: 'home-symlink'},
   launchGroupOnly: {type: FieldType.boolean, rename: 'launch-group-only'},
-  enabledDeployment: {type: FieldType.boolean, rename: 'enabled-deployment'}
+  enabledDeployment: {type: FieldType.boolean, rename: 'enabled-deployment'},
+  jobDefaultActiveDeadlineSeconds: {type: FieldType.integer, rename: 'job-default-active-deadline-seconds'}
 };
 
 const groupAttrs = Object.keys(attrSchema);

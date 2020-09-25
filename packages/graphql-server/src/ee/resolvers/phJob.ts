@@ -38,6 +38,7 @@ export interface PhJob {
   startTime: string;
   finishTime?: string;
   logEndpoint: string;
+  activeDeadlineSeconds?: number;
 }
 
 export interface PhJobCreateInput {
@@ -46,6 +47,7 @@ export interface PhJobCreateInput {
   instanceType: string;
   image: string;
   command: string;
+  activeDeadlineSeconds?: number;
 }
 
 // tslint:disable-next-line:max-line-length
@@ -69,7 +71,8 @@ export const transform = async (item: Item<PhJobSpec, PhJobStatus>, namespace: s
     createTime: item.metadata.creationTimestamp,
     startTime: get(item, 'status.startTime'),
     finishTime: get(item, 'status.finishTime'),
-    logEndpoint: `${graphqlHost}${jobLogCtrl.getPhJobEndpoint(namespace, item.metadata.name)}`
+    logEndpoint: `${graphqlHost}${jobLogCtrl.getPhJobEndpoint(namespace, item.metadata.name)}`,
+    activeDeadlineSeconds: get(item, 'spec.activeDeadlineSeconds', null)
   };
 };
 
@@ -103,6 +106,7 @@ export const createJob = async (context: Context, data: PhJobCreateInput, labels
     groupName: group.name,
     image: data.image,
     instanceType: data.instanceType,
+    activeDeadlineSeconds: data.activeDeadlineSeconds,
   };
   return crdClient.phJobs.create(metadata, spec);
 };

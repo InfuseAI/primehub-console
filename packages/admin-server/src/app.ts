@@ -95,6 +95,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.state.enableLogPersistence = config.enableLogPersistence;
     ctx.state.disableGroup = config.enableLicenseCheck ? config.licenseStatus !== 'unexpired' : false;
     ctx.state.everyoneGroupId = config.keycloakEveryoneGroupId;
+    ctx.state.jobDefaultActiveDeadlineSeconds = config.jobDefaultActiveDeadlineSeconds;
     ctx.state.primehubVersion = config.primehubVersion;
 
     // referrer
@@ -204,7 +205,6 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
       })
     });
   });
-
 
   // job
   rootRouter.get('/job', oidcCtrl.loggedIn, async ctx => {
