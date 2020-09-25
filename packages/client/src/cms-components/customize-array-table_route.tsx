@@ -317,7 +317,7 @@ export default class ArrayBreadcrumb extends Component<Props & {
 
     if (usageReportCustomActions) {
       newColumnsRender.push({
-        title: intl.formatMessage({ id: "array.table.actions" }),
+        title: intl.formatMessage({ id: "usageReport.download.details.actions" }),
         dataIndex: "__settings",
         key: "__settings",
         render: (text, record) => {
@@ -325,7 +325,22 @@ export default class ArrayBreadcrumb extends Component<Props & {
             <ButtonGroup>
               <Button icon={"download"}
                 data-testid="view-button"
-                onClick={() => this.confirmDownloadUsageReport(intl, record.id, record.url)}
+                onClick={() => this.confirmDownloadUsageReport(intl, record.id, record.detailedUrl)}
+              ></Button>
+            </ButtonGroup>
+          );
+        }
+      });
+      newColumnsRender.push({
+        title: intl.formatMessage({ id: "usageReport.download.summary.actions" }),
+        dataIndex: "__settings",
+        key: "__settings",
+        render: (text, record) => {
+          return (
+            <ButtonGroup>
+              <Button icon={"download"}
+                data-testid="view-button"
+                onClick={() => this.confirmDownloadUsageReport(intl, record.id, record.summaryUrl)}
               ></Button>
             </ButtonGroup>
           );

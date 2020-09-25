@@ -524,6 +524,8 @@ exports.dict = {
     'usageReport.download.modal.title': 'This month is not over yet!',
     'usageReport.download.modal.content': 'This report will only contain usage from the 1st of this month until today. Would you like to continue to download?',
     'usageReport.table.id': 'Date',
+    'usageReport.download.summary.actions': 'Summary Report',
+    'usageReport.download.details.actions': 'Detailed Report',
 
     // maintenance notebook
     'maintenance.title': 'Maintenance',
@@ -776,6 +778,8 @@ exports.dict = {
     'usageReport.download.modal.title': 'This month is not over yet!',
     'usageReport.download.modal.content': 'This report will only contain usage from the 1st of this month until today. Would you like to continue to download?',
     'usageReport.table.id': 'Date',
+    'usageReport.download.summary.actions': 'Summary Report',
+    'usageReport.download.details.actions': 'Detailed Report',
 
     // maintenance notebook
     'maintenance.title': 'Maintenance',

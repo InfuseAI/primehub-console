@@ -1,6 +1,7 @@
 type UsageReport {
   id: ID!
-  url: String
+  summaryUrl: String
+  detailedUrl: String
 }
 
 """order"""
