@@ -20,6 +20,7 @@ type PhJob {
   startTime: String
   finishTime: String
   logEndpoint: String
+  activeDeadlineSeconds: Int
 }
 
 """order"""
@@ -70,4 +71,5 @@ input PhJobCreateInput {
   instanceType: String
   image: String
   command: String
+  activeDeadlineSeconds: Int
 }

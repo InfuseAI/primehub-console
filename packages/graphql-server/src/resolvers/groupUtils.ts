@@ -21,5 +21,7 @@ export const transform = (group: any): any => {
     launchGroupOnly: getFromAttr('launch-group-only', group.attributes, null, parseBoolean),
     enabledDeployment: getFromAttr('enabled-deployment', group.attributes, null, parseBoolean),
     displayName: getFromAttr('displayName', group.attributes, null),
+    jobDefaultActiveDeadlineSeconds: getFromAttr('job-default-active-deadline-seconds',
+                                                  group.attributes, null, parseInt),
   };
 };

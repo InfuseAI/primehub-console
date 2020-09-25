@@ -20,7 +20,14 @@ export const fakeData = {
         id: 'g-it1',
         name: 'IT1',
         displayName: 'group1 im',
-      }]
+      }],
+      resourceStatus: {        
+        cpuUsage: 0,        
+        gpuUsage: 0,        
+        memUsage: 0      
+      },      
+      datasets: [],
+      jobDefaultActiveDeadlineSeconds: 86400,
     }, {
       id: 'groupId2',
       name: 'group2',
