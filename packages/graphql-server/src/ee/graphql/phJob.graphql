@@ -20,6 +20,18 @@ type PhJob {
   startTime: String
   finishTime: String
   logEndpoint: String
+  artifact: PhJobArtifact
+}
+
+type PhJobArtifact {
+  prefix: String
+  items: [PhJobArtifactItem]
+}
+
+type PhJobArtifactItem {
+  name: String
+  size: Int
+  lastModified: String
 }
 
 """order"""

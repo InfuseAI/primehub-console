@@ -109,9 +109,7 @@ const transformSpec = (id: string, time: string, groupName: string, spec: any) =
 
 // tslint:disable-next-line:max-line-length
 export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>, kcAdminClient: KeycloakAdminClient): Promise<PhDeployment> => {
-  const group = item.spec.groupId ?
-    await kcAdminClient.groups.findOne({id: item.spec.groupId}) : null;
-  const groupName = get(group, 'attributes.displayName.0') || get(group, 'name') || item.spec.groupName;
+  const groupName = item.spec.groupName;
   const predictator = item.spec.predictors[0];
   const phase = get(item, 'status.phase');
   const status = getFallbackPhase(item.spec.stop, phase);

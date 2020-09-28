@@ -55,9 +55,6 @@ export interface PhScheduleMutationInput {
 // tslint:disable-next-line:max-line-length
 export const transform = async (item: Item<PhScheduleSpec, PhScheduleStatus>, namespace: string, graphqlHost: string, kcAdminClient: KeycloakAdminClient): Promise<PhSchedule> => {
   const jobTemplate = item.spec.jobTemplate;
-  const group = jobTemplate.spec.groupId ?
-    await kcAdminClient.groups.findOne({id: jobTemplate.spec.groupId}) : null;
-  const groupName = get(group, 'attributes.displayName.0') || get(group, 'name') || jobTemplate.spec.groupName;
   return {
     id: item.metadata.name,
 
@@ -65,7 +62,7 @@ export const transform = async (item: Item<PhScheduleSpec, PhScheduleStatus>, na
     displayName: jobTemplate.spec.displayName,
     command: jobTemplate.spec.command,
     groupId: jobTemplate.spec.groupId,
-    groupName,
+    groupName: jobTemplate.spec.groupName || '',
     image: jobTemplate.spec.image,
     instanceType: jobTemplate.spec.instanceType,
     userId: jobTemplate.spec.userId,

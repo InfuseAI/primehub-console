@@ -14,6 +14,7 @@ import * as logger from '../../logger';
 import { keycloakMaxCount } from '../../resolvers/constant';
 import { isUserAdmin } from '../../resolvers/user';
 import { SCHEDULE_LABEL } from './phSchedule';
+import { BucketItem } from 'minio';
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 const NOT_AUTH_ERROR = 'NOT_AUTH';
@@ -50,15 +51,13 @@ export interface PhJobCreateInput {
 // tslint:disable-next-line:max-line-length
 export const transform = async (item: Item<PhJobSpec, PhJobStatus>, namespace: string, graphqlHost: string, jobLogCtrl: JobLogCtrl, kcAdminClient: KeycloakAdminClient): Promise<PhJob> => {
   const phase = item.spec.cancel ? PhJobPhase.Cancelled : get(item, 'status.phase', PhJobPhase.Pending);
-  const group = item.spec.groupId ? await kcAdminClient.groups.findOne({id: item.spec.groupId}) : null;
-  const groupName = get(group, 'attributes.displayName.0') || get(group, 'name');
   return {
     id: item.metadata.name,
     displayName: item.spec.displayName,
     cancel: item.spec.cancel,
     command: item.spec.command,
     groupId: item.spec.groupId,
-    groupName,
+    groupName: item.spec.groupName || '',
     image: item.spec.image,
     instanceType: item.spec.instanceType,
     userId: item.spec.userId,
@@ -182,6 +181,42 @@ export const typeResolvers = {
         tolerations: []
       };
     }
+  },
+  async artifact(parent, args, context: Context) {
+    const {minioClient, storeBucket} = context;
+    const phjobID = parent.id;
+    const {groupName} = parent;
+    const prefix = `groups/${groupName}/jobArtifacts/${phjobID}`;
+
+    return new Promise<any>((resolve, reject) => {
+      if (!minioClient) {
+        // Throw empty object if primehub store is not enabled
+        resolve({
+          prefix,
+          items: []
+        });
+        return;
+      }
+
+      const list: any[] = [];
+      const stream = minioClient.listObjects(storeBucket, prefix, true);
+      stream.on('data', (obj: BucketItem) => {
+        list.push({
+          name: obj.name.substring(prefix.length + 1),
+          size: obj.size,
+          lastModified: obj.lastModified.toISOString(),
+        });
+      });
+      stream.on('error', (error: Error) => {
+        reject(error);
+      });
+      stream.on('end', () => {
+        resolve({
+          prefix,
+          items: list
+        });
+      });
+    });
   }
 };
 
