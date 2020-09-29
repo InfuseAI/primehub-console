@@ -371,6 +371,14 @@ export default class CMSPage extends React.Component<Props, State> {
     const {match} = this.props;
     const {activeKey, workspaceId} = match.params as any;
     const currentWorkspace = workspaceList.find(ws => ws.id === workspaceId) || {};
+    const navigationMenu = (
+      <Menu.Item>
+        <a href='/'>
+          <Icon type="left"/>
+          Back to User Portal
+        </a>
+      </Menu.Item>
+    );
     const workspaceMenu = (
       <Menu.SubMenu
         key="workspace_list"
@@ -407,6 +415,7 @@ export default class CMSPage extends React.Component<Props, State> {
             WORKSPACE
           </span>
         )}
+        {navigationMenu}
         {ENABLE_WORKSPACE && workspaceMenu}
         {
           Object.keys(this.schema.schema)
@@ -482,7 +491,8 @@ export default class CMSPage extends React.Component<Props, State> {
         <Layout style={{marginTop: 64}}>
           <Sider style={{
               position: "fixed",
-              height: "100%"
+              height: "100%",
+              overflow: "auto"
             }}
           >
             {this.renderMenu()}
