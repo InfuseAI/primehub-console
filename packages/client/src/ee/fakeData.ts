@@ -82,7 +82,7 @@ export const fakeData = {
     name: 'IT1',
     displayName: 'IT1',
     schedule: 'it1',
-    phase: 'Running',
+    phase: 'Succeeded',
     groupid: 'groupId1',
     groupName: 'group1',
     createTime: '2019-10-04T14:48:00.000Z',
@@ -101,7 +101,22 @@ export const fakeData = {
       gpuLimit: 0,
       cpuLimit: 0.5,
       memoryLimit: 4,
-    }
+    },
+    artifact: {
+      prefix: 'groups/group1/jobArtifacts/it1',
+      items: [
+        {
+          name: 'sub/test.txt',
+          size: 32623,
+          lastModified: '2020-09-25T01:53:36.212Z'
+        },
+        {
+          name: 'test.txt',
+          size: 32852353,
+          lastModified: '2020-09-25T01:53:36.216Z'
+        }
+      ]
+    },
   }, {
     id: 'it2',
     name: 'IT2',
