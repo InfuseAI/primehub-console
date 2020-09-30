@@ -15,6 +15,7 @@ import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import Field from 'components/share/field';
+import JobArtifact from 'ee/containers/jobArtifact';
 
 const TabPane = Tabs.TabPane;
 
@@ -149,7 +150,6 @@ export default class Detail extends React.Component<Props> {
     history.push(`../job/create?defaultValue=${encodeURIComponent(JSON.stringify(data))}`)
   }
 
-
   render() {
     const {job, rerunPhJobResult, cancelPhJobResult, refetchPhJob} = this.props;
     const createTime = job.createTime ? moment(job.createTime) : '';
@@ -240,6 +240,13 @@ export default class Detail extends React.Component<Props> {
               )} />
             </div>
 
+            </TabPane>
+            <TabPane
+              key='artifact'
+              tab='Artifacts'
+              disabled={job.phase !== Phase.Failed && job.phase !== Phase.Succeeded}
+            >
+              <JobArtifact jobId={job.id}></JobArtifact>
             </TabPane>
             <TabPane
               key="logs"

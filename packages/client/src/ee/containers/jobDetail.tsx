@@ -36,7 +36,7 @@ class JobDetailContainer extends React.Component<Props> {
     const {getPhJob, history, rerunPhJob, cancelPhJob, rerunPhJobResult, cancelPhJobResult} = this.props;
     if (!getPhJob.phJob) return null;
     if (getPhJob.error) {
-      return getMessage(getPhJob.error)
+      return getMessage(getPhJob.error);
     };
     return (
       <JobDetail
