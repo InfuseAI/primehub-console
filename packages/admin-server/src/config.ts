@@ -64,6 +64,8 @@ export interface Config {
   // maximux group
   licenseStatus: string;
   maxGroup: number;
+
+  jobDefaultActiveDeadlineSeconds: number;
   // primehub version
   primehubVersion: string;
 }
@@ -92,7 +94,7 @@ const defaultConfigs = {
   enableWorkspace: false,
   enableCustomImage: false,
   enableMaintenanceNotebook: false,
-  enableUsageReport: false, 
+  enableUsageReport: false,
   enableGrafana: false,
   customImageSetup: false,
   enableLicenseCheck: false,
@@ -100,6 +102,7 @@ const defaultConfigs = {
   enableLogPersistence: false,
   licenseStatus: 'invalid',
   maxGroup: 999,
+  jobDefaultActiveDeadlineSeconds: 86400,
   primehubVersion: 'development'
 };
 
@@ -163,6 +166,7 @@ export const createConfig = (): Config => {
       process.env.PRIMEHUB_FEATURE_LOG_PERSISTENCE.toString() === 'true',
     licenseStatus: process.env.EXPIRED,
     maxGroup: process.env.MAX_GROUP,
+    jobDefaultActiveDeadlineSeconds: process.env.JOB_DEFAULT_ACTIVE_DEADLINE_SEC,
     primehubVersion: process.env.PH_VERSION
   });
 

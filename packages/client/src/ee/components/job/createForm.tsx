@@ -6,6 +6,7 @@ import RecurrenceInput, {RecurrenceType, recurrenceValidator} from 'ee/component
 import Message from 'components/share/message';
 import styled from 'styled-components';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
+import NumberWithSelectMultipler from '../../../cms-components/customize-number-with_select_multiplier';
 
 const { Option } = Select;
 
@@ -18,6 +19,7 @@ type Props = FormComponentProps & {
   selectedGroup: string;
   instanceTypes: Array<Record<string, any>>;
   images: Array<Record<string, any>>;
+  defaultActiveDeadlineSeconds: number;
   onSubmit: Function;
   onCancel?: Function;
   loading: boolean;
@@ -62,7 +64,8 @@ type FormValue = {
   recurrence: {
     cron: string;
     type: RecurrenceType;
-  }
+  };
+  activeDeadlineSeconds: number;
 };
 
 const transformImages = (images, instanceType) => {
@@ -204,7 +207,8 @@ class CreateForm extends React.Component<Props, State> {
       timezone,
       onCancel,
       submitText,
-      selectedGroup
+      selectedGroup,
+      defaultActiveDeadlineSeconds
     } = this.props;
     const {
       recurrenceError
@@ -377,6 +381,39 @@ class CreateForm extends React.Component<Props, State> {
                   <Input.TextArea
                     placeholder={commandPlaceHolder}
                     rows={10}
+                  />
+                )}
+              </Form.Item>
+              <Form.Item label={(
+                <span>
+                  Default Timeout
+                </span>
+              )} >
+                {form.getFieldDecorator('activeDeadlineSeconds', {
+                  initialValue: defaultActiveDeadlineSeconds,
+                })(
+                  <NumberWithSelectMultipler 
+                    uiParams={{
+                      options: [{
+                        text: 'Minutes',
+                        value: 'm',
+                        multiplier: 60
+                      }, {
+                        text: 'Hours',
+                        value: 'h',
+                        multiplier: 60*60
+                      }, {
+                        text: 'Days',
+                        value: 'd',
+                        multiplier: 60*60*24
+                      }],
+                      styleOnSelect: {width: 200},
+                      defaultSelected: 1,
+                      styleOnInput: {width: 100, marginRight: 10},
+                      min: 0,
+                      max: 999,
+                      step: 1
+                    }}
                   />
                 )}
               </Form.Item>
