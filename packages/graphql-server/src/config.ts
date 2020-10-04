@@ -144,6 +144,18 @@ const sanitizeUrl = (url: string, name: string) => {
   return url;
 };
 
+function getEnvBoolean(key: string, defaultValue: boolean): boolean {
+  const val = process.env[key];
+
+  if (val === 'true') {
+    return true;
+  } else if (val === 'false') {
+    return false;
+  } else {
+    return defaultValue;
+  }
+}
+
 export const createConfig = (): Config => {
   const envConfigs = pickBy({
     locale: process.env.CANNER_LOCALE,
@@ -173,11 +185,6 @@ export const createConfig = (): Config => {
     defaultUserVolumeCapacity: process.env.DEFAULT_USER_VOLUME_CAPACITY,
     primehubGroupSc: process.env.PRIMEHUB_GROUP_SC,
     groupVolumeStorageClass: process.env.PRIMEHUB_GROUP_VOLUME_STORAGE_CLASS,
-    enableDatasetUpload:
-      process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD && process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD.toString() === 'true',
-    enableWorkspace:
-      process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE &&
-      process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE.toString() === 'true',
     graphqlHost: process.env.GRAPHQL_HOST,
     maxGroup: process.env.MAX_GROUP,
     licensedTo: process.env.LICENSED_TO,
@@ -185,9 +192,6 @@ export const createConfig = (): Config => {
     expiredAt: process.env.EXPIRED_AT,
     licenseStatus: process.env.EXPIRED,
     primehubMode: process.env.PRIMEHUB_MODE,
-    enableStore:
-      process.env.PRIMEHUB_FEATURE_STORE &&
-      process.env.PRIMEHUB_FEATURE_STORE.toString() === 'true',
     storeAccessKey: process.env.PRIMEHUB_STORE_ACCESS_KEY,
     storeSecretKey: process.env.PRIMEHUB_STORE_SECRET_KEY,
     storeBucket: process.env.PRIMEHUB_STORE_BUCKET,
@@ -195,7 +199,12 @@ export const createConfig = (): Config => {
     enableLogPersistence:
       process.env.PRIMEHUB_FEATURE_LOG_PERSISTENCE &&
       process.env.PRIMEHUB_FEATURE_LOG_PERSISTENCE.toString() === 'true',
-    usageReportAPIHost: process.env.PRIMEHUB_USAGE_REPORT_API_HOST
+    usageReportAPIHost: process.env.PRIMEHUB_USAGE_REPORT_API_HOST,
+    // Feature flags
+    enableDatasetUpload: getEnvBoolean('PRIMEHUB_FEATURE_DATASET_UPLOAD', false),
+    enableWorkspace: getEnvBoolean('PRIMEHUB_FEATURE_ENABLE_WORKSPACE', false),
+    enableStore: getEnvBoolean('PRIMEHUB_FEATURE_STORE', false),
+    enableJobArtifact: getEnvBoolean('PRIMEHUB_FEATURE_JOB_ARTIFACT', false),
   });
 
   const env = process.env.NODE_ENV || 'development';
