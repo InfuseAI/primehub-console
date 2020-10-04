@@ -4,7 +4,8 @@ import {graphql} from 'react-apollo';
 import {errorHandler} from '../components/job/errorHandler';
 import {get} from 'lodash';
 import {appPrefix} from 'utils/env';
-import { Table } from 'antd';
+import { Table, Alert } from 'antd';
+import styled from 'styled-components';
 
 type Props = {
   jobId: string;
@@ -56,10 +57,19 @@ const humanFileSize = (bytes, si=false, dp=1) => {
 
 class JobArtifactContainer extends React.Component<Props> {
   public render = () => {
+    return <div style={{minHeight: 480}}>{this.renderContent()}</div>;
+  }
+
+  private renderContent = () => {
     const {data} = this.props;
 
     if (!isArtifactEnabled()) {
-      return 'Artifact is not enabled';
+      return <Alert
+      message='Warning'
+      description='Job artifact is not enabled. Please tell your administrator to enable it.'
+      type='warning'
+      showIcon
+      />;
     }
 
     if (!data.phJob) {
@@ -119,5 +129,6 @@ export default graphql(GET_PH_JOB_ARTIFACT, {
     fetchPolicy: 'network-only',
     onError: errorHandler,
     skip: !isArtifactEnabled(),
-  }),
-})(JobArtifactContainer);
+    })
+  })
+(JobArtifactContainer);
