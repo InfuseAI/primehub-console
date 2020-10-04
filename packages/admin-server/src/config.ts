@@ -60,7 +60,10 @@ export interface Config {
   enableModelDeployment: boolean;
   // persistence log feature
   enableLogPersistence: boolean;
-
+  // PHFS
+  enablePhfs: boolean;
+  // artifact
+  enableJobArtifact: boolean;
   // maximux group
   licenseStatus: string;
   maxGroup: number;
@@ -100,6 +103,8 @@ const defaultConfigs = {
   enableLicenseCheck: false,
   enableModelDeployment: false,
   enableLogPersistence: false,
+  enablePhfs: false,
+  enableJobArtifact: false,
   licenseStatus: 'invalid',
   maxGroup: 999,
   jobDefaultActiveDeadlineSeconds: 86400,
@@ -119,10 +124,21 @@ const sanitizePath = (path: string) => {
   return path;
 };
 
+function getEnvBoolean(key: string, defaultValue: boolean): boolean {
+  const val = process.env[key];
+
+  if (val === 'true') {
+    return true;
+  } else if (val === 'false') {
+    return false;
+  } else {
+    return defaultValue;
+  }
+}
+
 export const createConfig = (): Config => {
   const envConfigs = pickBy({
-    secure:
-      process.env.DEV_SECURE && process.env.DEV_SECURE.toString() === 'true',
+    secure: getEnvBoolean('DEV_SECURE', false),
     locale: process.env.CANNER_LOCALE,
     keycloakApiBaseUrl: process.env.KC_API_BASEURL,
     keycloakOidcBaseUrl: process.env.KC_OIDC_BASEURL,
@@ -142,32 +158,23 @@ export const createConfig = (): Config => {
     portalConfigPath: process.env.PORTAL_CONFIG_PATH,
     homeConfigPath: process.env.HOME_CONFIG_PATH,
     readOnlyOnInstanceTypeAndImage: process.env.READ_ONLY_ON_INSTANCE_TYPE_AND_IMAGE,
-    enableDatasetUpload:
-      process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD && process.env.PRIMEHUB_FEATURE_DATASET_UPLOAD.toString() === 'true',
-    enableWorkspace:
-      process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE &&
-      process.env.PRIMEHUB_FEATURE_ENABLE_WORKSPACE.toString() === 'true',
-    enableCustomImage:
-      process.env.PRIMEHUB_FEATURE_CUSTOM_IMAGE && process.env.PRIMEHUB_FEATURE_CUSTOM_IMAGE.toString() === 'true',
-    enableMaintenanceNotebook:
-      process.env.PRIMEHUB_FEATURE_MAINTENANCE_NOTEBOOK && process.env.PRIMEHUB_FEATURE_MAINTENANCE_NOTEBOOK.toString() === 'true',
-    enableGrafana:
-      process.env.PRIMEHUB_FEATURE_GRAFANA && process.env.PRIMEHUB_FEATURE_GRAFANA.toString() === 'true',
-    enableUsageReport:
-      process.env.PRIMEHUB_FEATURE_USAGE && process.env.PRIMEHUB_FEATURE_USAGE.toString() === 'true',
     customImageSetup: process.env.PRIMEHUB_CUSTOM_IMAGE_REGISTRY_ENDPOINT ? true : false,
-    enableLicenseCheck:
-      process.env.PRIMEHUB_FEATURE_LICENSE && process.env.PRIMEHUB_FEATURE_LICENSE.toString() === 'true',
-    enableModelDeployment:
-      process.env.PRIMEHUB_FEATURE_MODEL_DEPLOYMENT &&
-      process.env.PRIMEHUB_FEATURE_MODEL_DEPLOYMENT.toString() === 'true',
-    enableLogPersistence:
-      process.env.PRIMEHUB_FEATURE_LOG_PERSISTENCE &&
-      process.env.PRIMEHUB_FEATURE_LOG_PERSISTENCE.toString() === 'true',
     licenseStatus: process.env.EXPIRED,
     maxGroup: process.env.MAX_GROUP,
     jobDefaultActiveDeadlineSeconds: process.env.JOB_DEFAULT_ACTIVE_DEADLINE_SEC,
-    primehubVersion: process.env.PH_VERSION
+    primehubVersion: process.env.PH_VERSION,
+    // Feature Flags
+    enableDatasetUpload: getEnvBoolean('PRIMEHUB_FEATURE_DATASET_UPLOAD', false),
+    enableWorkspace: getEnvBoolean('PRIMEHUB_FEATURE_ENABLE_WORKSPACE', false),
+    enableCustomImage: getEnvBoolean('PRIMEHUB_FEATURE_CUSTOM_IMAGE', false),
+    enableMaintenanceNotebook: getEnvBoolean('PRIMEHUB_FEATURE_MAINTENANCE_NOTEBOOK', false),
+    enableGrafana: getEnvBoolean('PRIMEHUB_FEATURE_GRAFANA', false),
+    enableUsageReport: getEnvBoolean('PRIMEHUB_FEATURE_USAGE', false),
+    enableLicenseCheck: getEnvBoolean('PRIMEHUB_FEATURE_LICENSE', false),
+    enableModelDeployment: getEnvBoolean('PRIMEHUB_FEATURE_MODEL_DEPLOYMENT', false),
+    enableLogPersistence: getEnvBoolean('PRIMEHUB_FEATURE_LOG_PERSISTENCE', false),
+    enablePhfs: getEnvBoolean('PRIMEHUB_FEATURE_PHFS', false),
+    enableJobArtifact: getEnvBoolean('PRIMEHUB_FEATURE_JOB_ARTIFACT', false),
   });
 
   const env = process.env.NODE_ENV || 'development';
