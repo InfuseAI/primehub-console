@@ -353,7 +353,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     const roles = get(tokenPayload, ['resource_access', 'realm-management', 'roles'], []);
     if (roles.indexOf('realm-admin') >= 0) {
       role = Role.ADMIN;
-      kcAdminClient = createKcAdminClient(tokenPayload.iss);
+      kcAdminClient = createKcAdminClient();
       kcAdminClient.setAccessToken(apiToken);
     } else {
       role = Role.USER;
