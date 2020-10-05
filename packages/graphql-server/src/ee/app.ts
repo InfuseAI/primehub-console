@@ -347,6 +347,27 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     ],
   });
 
+  const getUserRoleAndKcAdminClient = async (apiToken: string, tokenPayload: any) => {
+    let role;
+    let kcAdminClient;
+    const roles = get(tokenPayload, ['resource_access', 'realm-management', 'roles'], []);
+    if (roles.indexOf('realm-admin') >= 0) {
+      role = Role.ADMIN;
+      kcAdminClient = createKcAdminClient(tokenPayload.iss);
+      kcAdminClient.setAccessToken(apiToken);
+    } else {
+      role = Role.USER;
+
+      // also, we need admin token to access keycloak api
+      // this part rely on authMiddleware to control the permission
+      // todo: maybe we can use other api to access personal account data?
+      const accessToken = await tokenSyncer.getAccessToken();
+      kcAdminClient = createKcAdminClient();
+      kcAdminClient.setAccessToken(accessToken);
+    }
+    return [ role, kcAdminClient ];
+  };
+
   const schemaWithMiddleware = applyMiddleware(schema, readOnlyMiddleware, authMiddleware);
   const server = new ApolloServer({
     playground: config.graphqlPlayground,
@@ -363,7 +384,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       let getInstanceType: (name: string) => Promise<Item<InstanceTypeSpec>>;
       let getImage: (name: string) => Promise<Item<ImageSpec>>;
 
-      const kcAdminClient = createKcAdminClient();
+      let kcAdminClient;
       const keycloakClientId = config.keycloakClientId;
       const {authorization = ''}: {authorization: string} = ctx.header;
       const useCache = ctx.headers['x-primehub-use-cache'];
@@ -380,6 +401,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           // since it's from jupyterHub
           // we use batch for crd resource get method
           const accessToken = await tokenSyncer.getAccessToken();
+          kcAdminClient = createKcAdminClient();
           kcAdminClient.setAccessToken(accessToken);
           getInstanceType = instCache.get;
           getImage = imageCache.get;
@@ -411,19 +433,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           username = tokenPayload.preferred_username;
 
           // check if user is admin
-          const roles = get(tokenPayload, ['resource_access', 'realm-management', 'roles'], []);
-          if (roles.indexOf('realm-admin') >= 0) {
-            role = Role.ADMIN;
-            kcAdminClient.setAccessToken(apiToken);
-          } else {
-            role = Role.USER;
-
-            // also, we need admin token to access keycloak api
-            // this part rely on authMiddleware to control the permission
-            // todo: maybe we can use other api to access personal account data?
-            const accessToken = await tokenSyncer.getAccessToken();
-            kcAdminClient.setAccessToken(accessToken);
-          }
+          [role, kcAdminClient] = await getUserRoleAndKcAdminClient(apiToken, tokenPayload);
 
           // if request comes from /jobs or other pages not cms
           // performance would be important.
@@ -436,6 +446,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       } else if (config.keycloakGrantType === 'password'
           && authorization.indexOf('Basic') >= 0
       ) {
+        kcAdminClient = createKcAdminClient();
         // basic auth and specified grant type to password
         // used for test
         const credentials = basicAuth(ctx.req);
@@ -630,15 +641,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         tokenPayload = await oidcTokenVerifier.verify(apiToken);
       }
 
-      // Prepare keycloak admin client
-      const kcAdminClient = createKcAdminClient();
-      kcAdminClient.setAccessToken(apiToken);
-      ctx.kcAdminClient = kcAdminClient;
-
-      // get user role
-      const roles = get(tokenPayload, ['resource_access', 'realm-management', 'roles'], []);
-      const role = (roles.indexOf('realm-admin') >= 0) ? Role.ADMIN : Role.USER;
-      ctx.role = role;
+      // check if user is admin
+      [ctx.role, ctx.kcAdminClient] = await getUserRoleAndKcAdminClient(apiToken, tokenPayload);
       ctx.userId = tokenPayload.sub;
 
       return next();
@@ -654,12 +658,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   const checkUserGroup = async (ctx: Koa.ParameterizedContext, next: any) => {
     const canUserView = async (userId, groupId): Promise<boolean> => {
-      const members = await ctx.kcAdminClient.groups.listMembers({
-        id: groupId,
-        max: keycloakMaxCount
+      const groups = await ctx.kcAdminClient.users.listGroups({
+        id: userId,
       });
-      const memberIds = members.map(u => u.id);
-      if (memberIds.indexOf(userId) >= 0) { return true; }
+      const groupIds = groups.map(g => g.id);
+      if (groupIds.indexOf(groupId) >= 0) { return true; }
       return false;
     };
 
