@@ -155,7 +155,7 @@ export default class ArrayBreadcrumb extends Component<Props & {
   confirmDownloadUsageReport = (intl, id, url) => {
     const downloadUsageReport = (id, url) => {
       const token = window.localStorage.getItem('canner.accessToken');
-      const prefix = url.includes('details') ? 'PrimeHub_Usage_Summary' : 'PrimeHub_Usage_Detailed';
+      const prefix = url.includes('details') ? 'PrimeHub_Usage_Detailed' : 'PrimeHub_Usage_Summary';
       // example of detailedUrl: "https://hub.a.demo.primehub.io/api/report/monthly/2020/9"
       // example of summaryUrl : "https://hub.a.demo.primehub.io/api/report/monthly/details/2020/9"
       id = id.split('/')[0] + '_' + ("0" + id.split('/')[1]).slice(-2);
