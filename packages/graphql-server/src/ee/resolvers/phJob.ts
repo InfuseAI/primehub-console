@@ -15,6 +15,7 @@ import { keycloakMaxCount } from '../../resolvers/constant';
 import { isUserAdmin } from '../../resolvers/user';
 import { SCHEDULE_LABEL } from './phSchedule';
 import { BucketItem } from 'minio';
+import JobArtifactCleaner from '../utils/jobArtifactCleaner';
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 const NOT_AUTH_ERROR = 'NOT_AUTH';
@@ -374,3 +375,11 @@ export const cancel = async (root, args, context: Context) => {
 
   return {id};
 };
+
+export const artifactCleanUp = async (root, args, context: Context) => {
+  const {minioClient, storeBucket} = context;
+
+  const cleaner = new JobArtifactCleaner(minioClient, storeBucket);
+  await cleaner.cleanUp();
+  return 0;
+}
