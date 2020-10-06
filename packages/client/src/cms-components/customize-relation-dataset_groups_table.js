@@ -1,5 +1,6 @@
 import React, { PureComponent } from "react";
 import { Tag, Tooltip, Icon, Table, Button } from "antd";
+import { remove } from 'lodash';
 import template from 'lodash/template';
 import difference from "lodash/difference";
 import get from 'lodash/get';
@@ -80,6 +81,15 @@ export default class DatesetGroupTable extends PureComponent {
       relationArgs, toolbar, updateRelationQuery,
       writable, readOnly
     } = this.props;
+
+    remove(uiParams.columns, (obj) => {
+      return obj && ['quotaCpu', 'quotaGpu'].includes(obj.dataIndex);
+    })
+
+    remove(uiParams.pickerColumns, (obj) => {
+      return obj && ['quotaCpu', 'quotaGpu'].includes(obj.dataIndex);
+    })
+
     const columnsRender = renderValue(uiParams.columns, schema[relation.to].items.items, this.props);
     const pickerColumnsRender = renderValue(uiParams.pickerColumns || uiParams.columns, schema[relation.to].items.items, this.props);
     const recordValue = getRecordValue(rootValue, refId);
