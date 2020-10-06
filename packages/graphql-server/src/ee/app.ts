@@ -175,6 +175,7 @@ const eeResolvers = {
     createPhJob: phJob.create,
     rerunPhJob: phJob.rerun,
     cancelPhJob: phJob.cancel,
+    cleanupPhJobArtifact: phJob.artifactCleanUp,
     createPhSchedule: phSchedule.create,
     updatePhSchedule: phSchedule.update,
     deletePhSchedule: phSchedule.destroy,

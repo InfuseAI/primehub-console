@@ -1,4 +1,4 @@
-# import BuildImageJob, BuildImageOrderByInput, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql" 
+# import BuildImageJob, BuildImageOrderByInput, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql"
 # import PhJob, PhJobOrderByInput, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput, PhJobCreateInput, PhJobCancelResponse from "./phJob.graphql"
 # import PhSchedule, PhScheduleOrderByInput, PhScheduleConnection, PhScheduleWhereUniqueInput, PhScheduleWhereInput, PhScheduleCreateInput, PhScheduleUpdateInput, PhScheduleDeleteResponse, PhScheduleRunResponse from "./phSchedule.graphql"
 # import PhDeployment, PhDeploymentConnection, PhDeploymentWhereUniqueInput, PhDeploymentWhereInput, PhDeploymentCreateInput, PhDeploymentUpdateInput, PhDeploymentClientCreateInput, PhDeploymentClientCreateResponse, PhDeploymentClientWhereUniqueInput from "./phDeployment.graphql"
@@ -137,6 +137,7 @@ type Mutation {
   createPhJob(data: PhJobCreateInput!): PhJob!
   rerunPhJob(where: PhJobWhereUniqueInput!): PhJob!
   cancelPhJob(where: PhJobWhereUniqueInput!): PhJobCancelResponse!
+  cleanupPhJobArtifact: Int
 
   """PhSchedule"""
   createPhSchedule(data: PhScheduleCreateInput!): PhSchedule!
