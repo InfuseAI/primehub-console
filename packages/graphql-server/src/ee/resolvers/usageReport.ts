@@ -36,8 +36,8 @@ const listQuery = async (context: Context, where: any, order: any) => {
     const elements = json.map(element =>
       ({
         id: element,
-        summaryUrl: `${graphqlHost}${appPrefix || ''}/report/monthly/details/${element}`,
-        detailedUrl: `${graphqlHost}${appPrefix || ''}/report/monthly/${element}`
+        detailedUrl: `${graphqlHost}${appPrefix || ''}/report/monthly/details/${element}`,
+        summaryUrl: `${graphqlHost}${appPrefix || ''}/report/monthly/${element}`
     }));
     if (!order) {
       order = {
