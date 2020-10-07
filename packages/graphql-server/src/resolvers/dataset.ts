@@ -13,6 +13,7 @@ import { ResourceRole, ResourceNamePrefix } from './resourceRole';
 import {createConfig} from '../config';
 import { ApolloError } from 'apollo-server';
 import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
+import { transform } from './groupUtils';
 
 export const ATTRIBUTE_PREFIX = 'dataset.primehub.io';
 
@@ -586,7 +587,7 @@ export const resolveType = {
       })
     );
     // filter out
-    return groupsWithRole.filter(v => v);
+    return groupsWithRole.filter(v => v).map(transform);
   },
   ...resolveInDataSet
 };
