@@ -359,8 +359,9 @@ export default class CMSPage extends React.Component<Props, State> {
     } else if (key === 'workspace') {
       const defaultWorkspaceId = (workspaceList.find(ws => ws.isDefault) || {}).id || 'default';
       history.push(`${(window as any).APP_PREFIX}cms/${defaultWorkspaceId}/${key}`);
-    } else if (dict['en'][`${key}.externalLink`]) {
-      // add this condition to keep page content not change when opening external link
+    } else if (dict['en'][`${key}.externalLink`] || key === 'backToUserPortal') {
+      // add this condition to keep page content not change when 
+      // opening external link or backing to user portal
     } else {
       history.push(`${(window as any).APP_PREFIX}cms/${workspaceId}/${key}`);
     }
@@ -372,7 +373,7 @@ export default class CMSPage extends React.Component<Props, State> {
     const {activeKey, workspaceId} = match.params as any;
     const currentWorkspace = workspaceList.find(ws => ws.id === workspaceId) || {};
     const navigationMenu = (
-      <Menu.Item>
+      <Menu.Item key="backToUserPortal">
         <a href='/'>
           <Icon type="left"/>
           Back to User Portal
