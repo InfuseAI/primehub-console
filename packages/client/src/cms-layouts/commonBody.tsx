@@ -161,7 +161,7 @@ export default class CommonBody extends React.Component<Props> {
         />
         <Spin tip={loadingTip} spinning={loading}>
           <Item hideBackButton hideButtons/>
-          <ButtonWrapper visible={(routes.length > 1 || routerParams.operator === 'create') && routes[0] != 'buildImage'}>
+          <ButtonWrapper visible={(routes.length > 1 || routerParams.operator === 'create') && routes[0] != 'buildImage' && routes[0] != 'group'}>
             <Button href="#" style={{marginRight: 16}} type="primary" onClick={this.deploy} data-testid="confirm-button">
               {intl.formatMessage({id: 'hocs.route.confirmText'})}
             </Button>
