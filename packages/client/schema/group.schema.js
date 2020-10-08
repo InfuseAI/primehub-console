@@ -239,7 +239,7 @@ export default () => (
         </relation>
       </Block>
     </Default>
-    <Default keyName="dataset"  match={() => !modelDeploymentOnly} title="Dataset">
+    <Default keyName="dataset"  match={() => !modelDeploymentOnly} title="Datasets">
       <Block title="${dataset}">
         <array keyName="datasets"
           packageName="../src/cms-components/customize-array-datasets_in_groups"
@@ -322,7 +322,7 @@ export default () => (
       </Block>
     </Default>
     { /* Instance Type tabular */}
-    <Default keyName="instanceTypes" title="Instance Type">
+    <Default keyName="instanceTypes" title="Instance Types">
       <Block title="${instanceTypes}">
         <array keyName="instanceTypes"
           packageName="../src/cms-components/customize-array-instance_in_groups"
