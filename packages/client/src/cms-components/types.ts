@@ -1,4 +1,5 @@
 export interface Props {
+  client: any,
   onChange: Function,
   refId: any,
   value: any,
