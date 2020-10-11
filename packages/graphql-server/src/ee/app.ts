@@ -42,6 +42,7 @@ import { OidcTokenVerifier } from '../oidc/oidcTokenVerifier';
 import cors from '@koa/cors';
 import { JobLogCtrl } from './controllers/jobLogCtrl';
 import { PhJobCacheList } from './crdClient/phJobCacheList';
+import JobArtifactCleaner from './utils/jobArtifactCleaner';
 
 // cache
 import {
@@ -315,6 +316,12 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     appPrefix: config.appPrefix,
     persistLog,
   });
+
+  // job artifact cleaner
+  if (config.enableStore) {
+    const jobArtifactCleaner = new JobArtifactCleaner(mClient, storeBucket);
+    jobArtifactCleaner.start();
+  }
 
   // ann
   const annCtrl = new AnnCtrl({

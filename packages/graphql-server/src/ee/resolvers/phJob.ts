@@ -382,4 +382,4 @@ export const artifactCleanUp = async (root, args, context: Context) => {
   const cleaner = new JobArtifactCleaner(minioClient, storeBucket);
   await cleaner.cleanUp();
   return 0;
-}
+};
