@@ -206,8 +206,12 @@ export const typeResolvers = {
       const list: any[] = [];
       const stream = minioClient.listObjects(storeBucket, prefix, true);
       stream.on('data', (obj: BucketItem) => {
+        const name = obj.name.substring(prefix.length + 1);
+        if (name.startsWith('.metadata/')) {
+          return;
+        }
         list.push({
-          name: obj.name.substring(prefix.length + 1),
+          name,
           size: obj.size,
           lastModified: obj.lastModified.toISOString(),
         });
