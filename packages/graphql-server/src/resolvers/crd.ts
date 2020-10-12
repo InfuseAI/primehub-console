@@ -208,7 +208,7 @@ export class Crd<SpecType> {
     const {kcAdminClient} = context;
     // create role on keycloak
     const currentWorkspace = new CurrentWorkspace(
-      context.workspaceApi, context.everyoneGroupId, false, defaultWorkspaceId, context.defaultNamespace);
+      context.workspaceApi, context.everyoneGroupId, true, defaultWorkspaceId, context.defaultNamespace);
     const roleName = `${this.getPrefix(currentWorkspace)}${name}`;
     await kcAdminClient.roles.create({
       name: roleName
