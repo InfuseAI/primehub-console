@@ -5,6 +5,8 @@ import views from 'koa-views';
 import serve from 'koa-static';
 import Router from 'koa-router';
 import morgan from 'koa-morgan';
+import proxies from 'koa-proxies';
+import cookie from 'cookie';
 
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import koaMount from 'koa-mount';
@@ -159,6 +161,21 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   const rootRouter = new Router({
     prefix: config.appPrefix
   });
+
+
+
+  // file proxy
+  // @ts-ignore
+  proxies.proxy.on('proxyReq', function(proxyReq, req, res, options) {
+    let cookies = cookie.parse(req.headers['cookie'] || '');
+    const accessToken = cookies.accessToken || '';
+    proxyReq.setHeader('Authorization', `Bearer ${accessToken}`);
+  });
+  app.use(proxies('/files', {
+    target: config.graphqlEndpoint.replace('/graphql', ''),
+    changeOrigin: true,
+    logs: true
+  }));
 
   // redirect
   const home = '/g';
