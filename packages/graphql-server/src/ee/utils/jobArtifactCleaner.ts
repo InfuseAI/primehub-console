@@ -73,7 +73,18 @@ export default class JobArtifactCleaner {
       });
     });
 
-    return Promise.all(promises);
+    return Promise.all(promises)
+    .then(values => {
+      // sum up all the results
+      let jobDeleted = 0;
+      for (const value of values) {
+        jobDeleted += value;
+      }
+      logger.info({type: 'JOB_ARTIFACT_CLEAN_GROUP_COMPLETED', group, jobDeleted});
+    })
+    .catch(e => {
+      logger.error({type: 'JOB_ARTIFACT_CLEAN_JOB_FAILED', group});
+    });
   }
 
   private cleanArtifactsByJob = async jobObj => {
@@ -98,10 +109,13 @@ export default class JobArtifactCleaner {
 
         await this.minioClient.removeObjects(this.bucket, objs);
         logger.info({type: 'JOB_ARTIFACT_CLEAN_JOB_COMPLETED', job});
+        return 1;
       } catch (e) {
         logger.error({type: 'JOB_ARTIFACT_CLEAN_JOB_FAILED', job, error: e});
+        return 0;
       }
     }
+    return 0;
   }
 
   private getExpiredAt = async (jobPrefix): Promise<number> => {
