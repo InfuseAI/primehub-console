@@ -28,7 +28,7 @@ export default () => (
       columns: [{
         title: '${usageReport.table.id}',
         dataIndex: 'id',
-        sorter: (a, b) => (b.id || '').localeCompare(a.id || ''),
+        sorter: (a, b) => (a.id || '').localeCompare(b.id || ''),
         render: (text, record) => renderDate(text, record),
       }],
       removeActions: true,
