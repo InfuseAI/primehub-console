@@ -8,9 +8,9 @@ COPY lerna.json package.json tsconfig.json tslint.json yarn.lock ./
 COPY packages/graphql-server packages/graphql-server
 COPY packages/watcher packages/watcher
 
-RUN npx lerna bootstrap --scope=@infuseai/watcher
-
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
+RUN npx lerna bootstrap --scope=@infuseai/watcher
 
 RUN cd packages/graphql-server \
   && npm run build:prod \
