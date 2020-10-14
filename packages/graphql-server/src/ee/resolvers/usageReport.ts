@@ -4,6 +4,7 @@ import * as logger from '../../logger';
 import { omit } from 'lodash';
 import request from 'request';
 import { kubeConfig } from '../../crdClient/crdClientImpl';
+import moment from 'moment';
 
 /**
  * Query
@@ -35,7 +36,7 @@ const listQuery = async (context: Context, where: any, order: any) => {
     const json = JSON.parse(response);
     const elements = json.map(element =>
       ({
-        id: element,
+        id: moment(element).format('YYYY/MM'),
         detailedUrl: `${graphqlHost}${appPrefix || ''}/report/monthly/details/${element}`,
         summaryUrl: `${graphqlHost}${appPrefix || ''}/report/monthly/${element}`
     }));
