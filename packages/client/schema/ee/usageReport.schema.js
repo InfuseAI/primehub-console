@@ -6,7 +6,7 @@ import Filter from '../../src/cms-toolbar/filter';
 
 const renderDate = (text, record) => {
   if(moment(text).isValid()) {
-    if(moment(new Date().toISOString()).format('YYYY/M')==record.id) {
+    if(moment(new Date().toISOString()).format('YYYY/MM')==record.id) {
       return renderTextWithTooltip(moment(text).format('MMMM YYYY'), 'This report only includes usage up until today, as this month is not over yet.');
     } else {
       return moment(text).format('MMMM YYYY');
@@ -62,7 +62,7 @@ export default () => (
           type: 'text',
           label: '${usageReport.table.id}',
           key: 'id',
-          placeholder: 'YYYY/M'
+          placeholder: 'YYYY/MM'
         }]}
       />
       <pagination number />
