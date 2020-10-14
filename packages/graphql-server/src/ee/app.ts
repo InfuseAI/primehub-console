@@ -777,7 +777,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     // phfs file download api
     rootRouter.get('/files/(.*)', authenticateMiddleware, checkUserGroup,
       async ctx => {
-        const objectPath = ctx.request.path.split('/groups').pop();
+        const objectPath = decodeURIComponent(ctx.request.path.split('/groups').pop());
         let req;
         try {
           req = await mClient.getObject(storeBucket, `groups${objectPath}`);
