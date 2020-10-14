@@ -32,6 +32,7 @@ export interface Config {
 
   // standalone graphql endpoint
   graphqlEndpoint: string;
+  graphqlSvcEndpoint: string;
 
   // user portal
   enableUserPortal: boolean;
@@ -89,6 +90,7 @@ const defaultConfigs = {
   keycloakRetries: 0,
   keycloakTimeout: 3000,
   graphqlEndpoint: 'http://localhost:3001/graphql',
+  graphqlSvcEndpoint: 'http://localhost:3001/graphql',
   enableUserPortal: false,
   portalConfigPath: resolve(__dirname, '../etc/portal-config.yaml'),
   homeConfigPath: resolve(__dirname, '../etc/home-config.yaml'),
@@ -154,6 +156,7 @@ export const createConfig = (): Config => {
     keycloakTimeout: process.env.KC_OIDC_TIMEOUT ? parseInt(process.env.KC_OIDC_TIMEOUT, 10) : undefined,
     appPrefix: sanitizePath(process.env.APP_PREFIX),
     graphqlEndpoint: process.env.GRAPHQL_ENDPOINT,
+    graphqlSvcEndpoint: process.env.GRAPHQL_SVC_ENDPOINT,
     enableUserPortal: process.env.PRIMEHUB_FEATURE_USER_PORTAL,
     portalConfigPath: process.env.PORTAL_CONFIG_PATH,
     homeConfigPath: process.env.HOME_CONFIG_PATH,

@@ -777,7 +777,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     // phfs file download api
     rootRouter.get('/files/(.*)', authenticateMiddleware, checkUserGroup,
       async ctx => {
-        const objectPath = ctx.request.path.split('/groups').pop();
+        const objectPath = decodeURIComponent(ctx.request.path.split('/groups').pop());
         let req;
         try {
           req = await mClient.getObject(storeBucket, `groups${objectPath}`);
@@ -806,8 +806,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
         ctx.body = req;
 
-        const filename = ctx.request.path.split('/').pop();
-        ctx.set('Content-disposition', `attachment; filename=${filename}`);
         const mimetype = mime.getType(objectPath);
         ctx.set('Content-type', mimetype);
       }
