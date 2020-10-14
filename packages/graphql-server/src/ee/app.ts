@@ -806,8 +806,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
         ctx.body = req;
 
-        const filename = ctx.request.path.split('/').pop();
-        ctx.set('Content-disposition', `attachment; filename=${filename}`);
         const mimetype = mime.getType(objectPath);
         ctx.set('Content-type', mimetype);
       }
