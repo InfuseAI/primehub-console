@@ -162,17 +162,15 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     prefix: config.appPrefix
   });
 
-
-
   // file proxy
   // @ts-ignore
-  proxies.proxy.on('proxyReq', function(proxyReq, req, res, options) {
-    let cookies = cookie.parse(req.headers['cookie'] || '');
+  proxies.proxy.on('proxyReq', (proxyReq, req, res, options) => {
+    const cookies = cookie.parse(req.headers.cookie || '');
     const accessToken = cookies.accessToken || '';
     proxyReq.setHeader('Authorization', `Bearer ${accessToken}`);
   });
   app.use(proxies('/files', {
-    target: config.graphqlEndpoint.replace('/graphql', ''),
+    target: config.graphqlSvcEndpoint.replace('/graphql', ''),
     changeOrigin: true,
     logs: true
   }));
