@@ -172,7 +172,8 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   app.use(proxies(`${staticPath}files`, {
     target: config.graphqlSvcEndpoint.replace('/graphql', ''),
     changeOrigin: true,
-    logs: true
+    logs: true,
+    rewrite: path => path.replace(staticPath, '/')
   }));
 
   // redirect
