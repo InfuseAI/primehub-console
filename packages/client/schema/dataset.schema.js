@@ -11,7 +11,6 @@ export default () => (
     controlDeployAndResetButtons={true}
     cacheActions={true}
     packageName="../src/cms-components/customize-array-table_route"
-    hideBackButton={true}
     uiParams={{
       columns: [{
         title: '${name}',
@@ -41,8 +40,6 @@ export default () => (
       }],
       disableCreate: true
     }}
-    refetch
-    hideButtons
     graphql={
       `
       query($datasetPage: Int, $datasetOrderBy: DatasetOrderByInput, $datasetWhere: DatasetWhereInput) {

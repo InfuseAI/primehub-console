@@ -9,7 +9,7 @@ const DISABLE_BUILD_IMAGE = !(window as any).customImageSetup;
 type Props = {
   add: () => void;
   display: string;
-  style: Object;
+  style?: Object;
 }
 
 export default class AddButton extends React.Component<Props> {

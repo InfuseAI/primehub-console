@@ -1,11 +1,13 @@
 import * as React from 'react';
-import {Breadcrumb, Icon, Button, Spin, Alert} from 'antd';
+import {Breadcrumb, Icon, Button, Spin, Alert, Modal} from 'antd';
 import {Item} from 'canner-helpers';
 import {injectIntl} from 'react-intl';
 import styled from 'styled-components';
 import {get, startCase} from 'lodash';
 import AddButton from './addButtton';
 import {Props} from '../cms-components/types';
+
+const confirm = Modal.confirm;
 
 const DISABLE_BUILD_IMAGE = !(window as any).customImageSetup;
 
@@ -70,6 +72,30 @@ export default class CommonBody extends React.Component<Props> {
     reset(routes[0])
       .then(this.success)
       .catch(this.fail);
+  }
+
+  discard = () => {
+    const {goTo, routes, routerParams, reset, refId, dataChanged, intl} = this.props;
+    if (dataChanged && Object.keys(dataChanged).length > 0) {
+      confirm({
+        title: intl.formatMessage({id: 'hocs.route.confirm.title'}),
+        content: intl.formatMessage({id: 'hocs.route.confirm.content'}),
+        okText: intl.formatMessage({id: 'hocs.route.confirm.okText'}),
+        cancelText: intl.formatMessage({id: 'hocs.route.confirm.cancelText'}),
+        onOk: () => {
+          return new Promise(resolve => {
+            setTimeout(resolve, 200);
+          }).then()
+            .then(() => {
+              this.reset();
+            });
+        },
+        onCancel: () => {
+        },
+      });
+    } else {
+      this.reset();
+    }
   }
 
   success = () => {
@@ -141,7 +167,7 @@ export default class CommonBody extends React.Component<Props> {
         background: '#fff',
       }}>
         <Button
-          onClick={this.reset}
+          onClick={this.discard}
           style={{
             marginBottom: 16,
             minWidth: 99,
