@@ -53,7 +53,6 @@ class Main extends React.Component {
         title: 'Jobs',
         subPath: 'job',
         icon: iconJobs,
-        stage: 'beta',
         style: {
           width: 'auto',
           height: 17,
@@ -66,7 +65,6 @@ class Main extends React.Component {
         title: 'Schedule',
         subPath: 'schedule',
         icon: iconSchedule,
-        stage: 'beta',
         style: {
           width: 'auto',
           height: 15,
