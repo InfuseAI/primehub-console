@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "dev": "NODE_ENV=development nodemon src/bin/www.ts",
     "start": "NODE_ENV=development ts-node src/bin/www.ts",
     "start:lib": "NODE_ENV=development node lib/bin/www",
     "start:prod": "NODE_ENV=production node lib/bin/www",
