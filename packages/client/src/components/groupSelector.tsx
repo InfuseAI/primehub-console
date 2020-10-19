@@ -29,7 +29,7 @@ type State = {
 
 class GroupSelector extends React.Component<GroupSelectorProps, State> {
   state = {
-    currentGroupName: undefined
+    currentGroupName: localStorage.getItem('currentGroupName') || undefined
   };
 
   handleChange = (groupName) => {
@@ -57,6 +57,8 @@ class GroupSelector extends React.Component<GroupSelectorProps, State> {
           this.setState({currentGroupName: matchGroupName});
           onSelectGroup(matchGroupName);
         }
+      } else if (currentGroupName) {
+        history.push(`${appPrefix}g/${currentGroupName}/home`);
       } else {
         history.push(`${appPrefix}g/${groups[0].name}/home`);
       }

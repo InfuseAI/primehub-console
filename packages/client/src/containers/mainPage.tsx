@@ -54,7 +54,7 @@ export type MainPageState = {
 
 export class MainPage extends React.Component<MainPageProps, MainPageState> {
   state = {
-    currentGroupName: ''
+    currentGroupName: localStorage.getItem('currentGroupName') || ''
   }
 
   onSelectGroup = (groupName) => {
@@ -64,6 +64,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
       this.setState({
         currentGroupName: groupName
       });
+      window.localStorage.setItem('currentGroupName', groupName);
     }
   }
 
