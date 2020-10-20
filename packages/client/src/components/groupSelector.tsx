@@ -29,7 +29,7 @@ type State = {
 
 class GroupSelector extends React.Component<GroupSelectorProps, State> {
   state = {
-    currentGroupName: undefined
+    currentGroupName: localStorage.getItem('currentGroupName') || undefined
   };
 
   handleChange = (groupName) => {
@@ -52,11 +52,13 @@ class GroupSelector extends React.Component<GroupSelectorProps, State> {
     const matchGroupName = (match.params as any).groupName || null;
 
     if (groups && groups.length > 0) {
-      if (groups.find(group => group.name === matchGroupName)) {
+      if (matchGroupName && groups.find(group => group.name === matchGroupName)) {
         if (currentGroupName != matchGroupName) {
           this.setState({currentGroupName: matchGroupName});
           onSelectGroup(matchGroupName);
         }
+      } else if (currentGroupName && groups.find(group => group.name === currentGroupName)) {
+        history.push(`${appPrefix}g/${currentGroupName}/home`);
       } else {
         history.push(`${appPrefix}g/${groups[0].name}/home`);
       }
