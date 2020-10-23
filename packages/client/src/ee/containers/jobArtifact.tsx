@@ -102,7 +102,7 @@ class JobArtifactContainer extends React.Component<Props> {
       const prefix = data.phJob.artifact.prefix;
       dataSource = data.phJob.artifact.items.map(item =>
         ({
-          name: <a href={`${appPrefix}files/${prefix}/${item.name}`}>{item.name}</a>,
+          name: <a href={`${appPrefix}files/${prefix}/${item.name}`} target='_blank' rel='noopener noreferrer'>{item.name}</a>,
           size: humanFileSize(item.size, true, 1),
         })
       );
