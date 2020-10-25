@@ -66,6 +66,7 @@ input PhScheduleWhereUniqueInput {
 input PhScheduleWhereInput {
   id: ID
   groupId_in: [String]
+  displayName_contains: String
   mine: Boolean
 }
 
@@ -82,6 +83,7 @@ input PhScheduleCreateInput {
   image: String
   command: String
   recurrence: RecurrenceInput
+  activeDeadlineSeconds: Int
 }
 
 input PhScheduleUpdateInput {
@@ -91,4 +93,5 @@ input PhScheduleUpdateInput {
   image: String
   command: String
   recurrence: RecurrenceInput
+  activeDeadlineSeconds: Int
 }

@@ -17,7 +17,6 @@ import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
 
 const {confirm} = Modal;
-
 const Table = styled(AntTable as any)`
   background: white;
   .ant-pagination.ant-table-pagination {
@@ -224,6 +223,21 @@ class JobList extends React.Component<Props> {
     jobsRefetch(newVariables);
   }
 
+  searchHandler = (queryString) => {
+    const {groupContext, jobsVariables, jobsRefetch} = this.props;
+    if (queryString && queryString.length > 0) {
+      const newVariables = {
+        ...jobsVariables,
+        where: {
+          ...jobsVariables.where,
+          displayName_contains: queryString
+        }
+      }
+    }
+    jobsRefetch(newVariables);
+  }
+
+
   handleTableChange = (pagination, _filters, sorter) => {
     const {jobsVariables, jobsRefetch} = this.props;
     const orderBy: any = {}
@@ -308,6 +322,7 @@ class JobList extends React.Component<Props> {
       render: renderAction,
       width: 200
     }]
+
     return (
       <>
         <PageTitle
@@ -333,6 +348,8 @@ class JobList extends React.Component<Props> {
             groups={groups}
             selectedGroups={get(jobsVariables, 'where.groupId_in', [])}
             submittedByMe={get(jobsVariables, 'where.mine', false)}
+            resourceKey="job"
+            searchHandler={this.searchHandler}
             onChange={this.changeFilter}
           />
           <Table
