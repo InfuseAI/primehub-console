@@ -146,6 +146,19 @@ class ScheduleList extends React.Component<Props> {
     schedulesRefetch(newVariables);
   }
 
+  searchHandler = (queryString) => {
+    const {groupContext, schedulesVariables, schedulesRefetch} = this.props;
+    if (queryString && queryString.length > 0) {
+      const newVariables = {
+      ...schedulesVariables,
+      where: {
+        ...schedulesVariables.where,
+          displayName_contains: queryString
+        }
+      }
+    }
+    schedulesRefetch(newVariables);
+  }
 
   handleTableChange = (pagination, _filters, sorter) => {
     const {schedulesVariables, schedulesRefetch} = this.props;
@@ -213,6 +226,8 @@ class ScheduleList extends React.Component<Props> {
           <Filter
             groupContext={groupContext}
             groups={groups}
+            searchHandler={this.searchHandler}
+            resourceKey='schedule'
             selectedGroups={get(schedulesVariables, 'where.groupId_in', [])}
             submittedByMe={get(schedulesVariables, 'where.mine', false)}
             onChange={this.changeFilter}

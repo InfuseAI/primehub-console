@@ -1,9 +1,11 @@
 import * as React from 'react';
-import {Checkbox, Col, Divider} from 'antd';
+import {Checkbox, Input, Col, Divider} from 'antd';
 import styled from 'styled-components';
 import GroupFilter, {Group} from 'ee/components/shared/groupFilter';
 import {FilterRow, FilterPlugins, ButtonCol} from 'root/cms-toolbar/filter';
 import {Label} from 'root/cms-toolbar/share';
+
+const Search = Input.Search;
 
 type Props = {
   groupContext?: any;
@@ -42,7 +44,7 @@ export default class Filter extends React.Component<Props> {
   }
 
   render() {
-    const {groupContext, groups, selectedGroups, submittedByMe, labelSubmittedByMe} = this.props;
+    const {groupContext, groups, selectedGroups, submittedByMe, labelSubmittedByMe, searchHandler, resourceKey} = this.props;
 
     const filterComps = []
     if( !groupContext ) {
@@ -60,6 +62,16 @@ export default class Filter extends React.Component<Props> {
       filterComps.push(
         <div style={{borderLeft: '1px solid #d9d9d9', margin: '0px 8px 2px', height: 28}} />
       )
+    } else if (searchHandler) {
+      filterComps.push(<Col style={{flex: 1}}>
+        <FilterPlugins style={{marginRight: '10px'}}>
+          <Search
+            placeholder={`Search ${resourceKey} name`}
+            onSearch={searchHandler}
+          />
+        </FilterPlugins>
+      </Col>);
+
     } else {
       filterComps.push(<Col style={{flex: 1}} />);
     }
@@ -72,7 +84,7 @@ export default class Filter extends React.Component<Props> {
             style={{
               border: '1px solid #d9d9d9',
               borderRadius: 4,
-              padding: '4px 8px'
+              padding: '4.5px 8px'
             }}
             checked={submittedByMe}
             onChange={this.handleSubmittedByMeChange}
