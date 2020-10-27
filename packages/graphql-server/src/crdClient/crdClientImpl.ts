@@ -130,6 +130,7 @@ export interface PhJobSpec {
   instanceType: string;
   userId: string;
   userName: string;
+  activeDeadlineSeconds?: number;
 }
 
 export interface PhScheduleSpec {

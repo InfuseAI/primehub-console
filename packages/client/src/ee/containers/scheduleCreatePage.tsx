@@ -115,6 +115,8 @@ class ScheduleCreatePage extends React.Component<Props, State> {
       'id'
     );
 
+    const jobActiveDeadlineSeconds = get(group, 'jobDefaultActiveDeadlineSeconds', null) || jobDefaultActiveDeadlineSeconds;
+
     return (
       <React.Fragment>
         <PageTitle
@@ -129,6 +131,7 @@ class ScheduleCreatePage extends React.Component<Props, State> {
             groups={sortItems(groups)}
             instanceTypes={sortItems(instanceTypes)}
             images={sortItems(images)}
+            defaultActiveDeadlineSeconds={jobActiveDeadlineSeconds}
             onSubmit={this.onSubmit}
             loading={getGroups.loading || createPhScheduleResult.loading}
             timezone={get(getTimezone, 'system.timezone')}

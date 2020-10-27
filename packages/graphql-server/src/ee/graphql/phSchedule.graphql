@@ -23,6 +23,7 @@ type PhSchedule {
   nextRunTime: String
   invalid: Boolean
   message: String
+  activeDeadlineSeconds: Int
 }
 
 """order"""

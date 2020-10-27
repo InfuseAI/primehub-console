@@ -225,6 +225,7 @@ class CreateForm extends React.Component<Props, State> {
       recurrence = {},
       invalid,
       message,
+      activeDeadlineSeconds,
     } = initialValue || {};
     let recurrenceLabel = `Recurrence Options`;
     if (timezone) {
@@ -390,7 +391,7 @@ class CreateForm extends React.Component<Props, State> {
                 </span>
               )} >
                 {form.getFieldDecorator('activeDeadlineSeconds', {
-                  initialValue: defaultActiveDeadlineSeconds,
+                  initialValue: activeDeadlineSeconds ? activeDeadlineSeconds : defaultActiveDeadlineSeconds,
                 })(
                   <NumberWithSelectMultipler 
                     uiParams={{

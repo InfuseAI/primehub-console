@@ -39,6 +39,7 @@ export const PhScheduleFragment = gql`
     userId
     userName
     nextRunTime
+    activeDeadlineSeconds
  }
 `
 
