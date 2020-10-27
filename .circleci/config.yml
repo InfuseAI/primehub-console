@@ -218,9 +218,26 @@ jobs:
             cd packages/graphql-server
             npm install
             npm run test:build
+  graphql-unit-test:
+    machine:
+      #image: infuseai/primehub-ci:0.7.0-e2e
+      image: ubuntu-1604:202007-01
+    steps:
+      - checkout
+      - run:
+          name: Setup
+          command: |
+            ./ci/setup_env.sh
+      - run:
+          name: Graphql unit tests
+          command: |
+            ./ci/ci-test.sh
 
 workflows:
   version: 2
+  test:
+    jobs:
+      - graphql-unit-test
   build_and_push:
     jobs:
       - graphql-lint:
