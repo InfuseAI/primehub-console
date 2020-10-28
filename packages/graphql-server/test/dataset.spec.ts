@@ -602,7 +602,7 @@ describe('dataset graphql', function() {
     });
 
     // get one
-    const queryOneAgain = await this.graphqlRequest(`
+    let queryOneAgain = await this.graphqlRequest(`
     query($where: DatasetWhereUniqueInput!){
       dataset (where: $where) { ${fields} }
     }`, {
@@ -668,7 +668,7 @@ describe('dataset graphql', function() {
     });
 
     // get one
-    const queryOneAgain = await this.graphqlRequest(`
+    queryOneAgain = await this.graphqlRequest(`
     query($where: DatasetWhereUniqueInput!){
       dataset (where: $where) { ${fields} }
     }`, {

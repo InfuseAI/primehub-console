@@ -155,10 +155,17 @@ check_commands
 setup_k3d
 setup_keycloak
 
-echo "run tests"
+echo "run integration tests"
 source ~/.bashrc
 nvm install ${NODE_VERSION}
 npm install -g yarn
+
 cd ~/project/packages/graphql-server
+cat <<EOF > ci.env
+K8S_CRD_NAMESPACE=hub
+KC_API_BASEURL=http://${KC_DOMAIN}:${KC_PORT}/auth
+EOF
+set -a; source ci.env; set +a
+
 yarn install
-yarn test:unit
+yarn test:integration

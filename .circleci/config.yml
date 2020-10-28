@@ -219,6 +219,19 @@ jobs:
             npm install
             npm run test:build
   graphql-unit-test:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - run:
+          name: Unit tests
+          command: |
+            cd ~/project/packages/graphql-server
+            npm install yarn
+            yarn install
+            yarn test:unit
+
+  graphql-integration-test:
     machine:
       #image: infuseai/primehub-ci:0.7.0-e2e
       image: ubuntu-1604:202007-01
@@ -229,7 +242,7 @@ jobs:
           command: |
             ./ci/setup_env.sh
       - run:
-          name: Graphql unit tests
+          name: Integration tests
           command: |
             ./ci/ci-test.sh
 
@@ -238,6 +251,7 @@ workflows:
   test:
     jobs:
       - graphql-unit-test
+      - graphql-integration-test
   build_and_push:
     jobs:
       - graphql-lint:
