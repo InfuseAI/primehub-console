@@ -38,7 +38,7 @@ describe('readonly graphql', function() {
     this.secret = process.env.SHARED_GRAPHQL_SECRET_KEY;
   });
 
-  it('should query user', async () => {
+  xit('should query user', async () => {
     const data = await this.graphqlRequestWithAuth(`{
       user (where: {id: "${this.currentUserId}"}) {
         id

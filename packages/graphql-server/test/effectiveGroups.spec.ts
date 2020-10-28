@@ -51,7 +51,7 @@ describe('user effectiveGroups graphql', function() {
     await cleaupAllCrd();
   });
 
-  it('should expect effectiveGroups merge the instanceTypes, images, datasets correctly', async () => {
+  xit('should expect effectiveGroups merge the instanceTypes, images, datasets correctly', async () => {
     // craete user
     const user = await createUser(this.graphqlRequest);
 

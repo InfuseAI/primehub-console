@@ -316,7 +316,7 @@ describe('user graphql', function() {
     expect(backQuery.user.isAdmin).to.be.equals(false);
   });
 
-  it('should update an user with volumeCapacity', async () => {
+  xit('should update an user with volumeCapacity', async () => {
     const user = this.currentUser;
     await this.graphqlRequest(`
     mutation ($where: UserWhereUniqueInput!, $data: UserUpdateInput!){

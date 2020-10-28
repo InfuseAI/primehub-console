@@ -128,7 +128,7 @@ describe('Many users graphql', function() {
     });
   });
 
-  describe('pagination on > 2k users', () => {
+  describe.skip('pagination on > 2k users', () => {
     before(async () => {
       this.timeout(10 * 60 * 1000);
       await this.addUsers(2000);
