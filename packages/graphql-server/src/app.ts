@@ -371,6 +371,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         role = Role.ADMIN;
 
         // use password grant type if specified, or basic auth provided
+        kcAdminClient = createKcAdminClient();
         await kcAdminClient.auth({
           username: credentials.name,
           password: credentials.pass,
