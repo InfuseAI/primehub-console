@@ -31,11 +31,13 @@ export enum components {
 }
 
 export const log = (levelType: level = level.info, payload?: any) => {
-  console.log(JSON.stringify({
-    time: new Date().toISOString(),
-    level: levelType,
-    ...payload
-  }));
+  if (!process.env.CI || levelType !== level.info) {
+    console.log(JSON.stringify({
+      time: new Date().toISOString(),
+      level: levelType,
+      ...payload
+    }));
+  }
 };
 
 export const info = (payload: any) => {
