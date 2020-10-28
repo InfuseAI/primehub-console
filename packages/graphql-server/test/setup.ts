@@ -52,5 +52,5 @@ before(async () => {
 });
 
 after(async () => {
-  //await destroySandbox();
+  await destroySandbox();
 });
