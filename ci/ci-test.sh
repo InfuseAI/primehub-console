@@ -157,7 +157,7 @@ setup_keycloak
 
 echo "run integration tests"
 source ~/.bashrc
-nvm install ${NODE_VERSION}
+nvm install ${NODE_VERSION} --lts
 npm install -g yarn
 
 cd ~/project/packages/graphql-server
