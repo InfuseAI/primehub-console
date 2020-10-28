@@ -38,6 +38,7 @@ export interface PhSchedule {
   nextRunTime: string;
   invalid: boolean;
   message: string;
+  activeDeadlineSeconds?: number;
 }
 
 export interface PhScheduleMutationInput {
@@ -50,6 +51,7 @@ export interface PhScheduleMutationInput {
     type: string;
     cron?: string;
   };
+  activeDeadlineSeconds?: number;
 }
 
 // tslint:disable-next-line:max-line-length
@@ -67,6 +69,7 @@ export const transform = async (item: Item<PhScheduleSpec, PhScheduleStatus>, na
     instanceType: jobTemplate.spec.instanceType,
     userId: jobTemplate.spec.userId,
     userName: jobTemplate.spec.userName,
+    activeDeadlineSeconds: jobTemplate.spec.activeDeadlineSeconds,
 
     // from spec & status
     recurrence: item.spec.recurrence,
@@ -116,6 +119,7 @@ const createSchedule = async (context: Context, data: PhScheduleMutationInput) =
         groupName: group.name,
         image: data.image,
         instanceType: data.instanceType,
+        activeDeadlineSeconds: data.activeDeadlineSeconds,
       }
     }
   };
@@ -329,6 +333,7 @@ export const update = async (root, args, context: Context) => {
         // image & instanceType
         image: data.image,
         instanceType: data.instanceType,
+        activeDeadlineSeconds: data.activeDeadlineSeconds,
       }
     }
   };
@@ -355,6 +360,7 @@ export const run = async (root, args, context: Context) => {
     groupId: jobTemplate.spec.groupId,
     image: jobTemplate.spec.image,
     instanceType: jobTemplate.spec.instanceType,
+    activeDeadlineSeconds: jobTemplate.spec.activeDeadlineSeconds,
   });
 
   return {
