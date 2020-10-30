@@ -238,10 +238,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Setup
-          command: |
-            ./ci/setup_env.sh
-      - run:
           name: Integration tests
           command: |
             ./ci/ci-test.sh
