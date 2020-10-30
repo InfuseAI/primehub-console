@@ -515,7 +515,7 @@ describe('instanceType graphql', function() {
     expect(queryOne.instanceType.tolerations[1]).to.include(requestBody.tolerations.set[1]);
   });
 
-  it('should create with tolerations and nodeSelector and update', async () => {
+  xit('should create with tolerations and nodeSelector and update', async () => {
     const requestBody = {
       name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
       cpuLimit: 2.5,

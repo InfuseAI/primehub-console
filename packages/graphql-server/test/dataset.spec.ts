@@ -77,7 +77,7 @@ describe('dataset graphql', function() {
     expect(data.datasets).to.be.eql([]);
   });
 
-  it('create a dataset with only name', async () => {
+  xit('create a dataset with only name', async () => {
     const data = {
       name: faker.internet.userName().toLowerCase().replace(/_/g, '-')
     };
@@ -127,7 +127,7 @@ describe('dataset graphql', function() {
     expect(roles.find(role => role.name === `ds:${data.name}`)).to.be.not.ok;
   });
 
-  it('create a dataset with props with global = true', async () => {
+  xit('create a dataset with props with global = true', async () => {
     const data = {
       name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
       displayName: faker.internet.userName(),
@@ -184,7 +184,7 @@ describe('dataset graphql', function() {
     });
   });
 
-  it('create a dataset with props with global = false', async () => {
+  xit('create a dataset with props with global = false', async () => {
     const data = {
       name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
       displayName: faker.internet.userName(),
@@ -309,7 +309,7 @@ describe('dataset graphql', function() {
     });
   });
 
-  it('should query with where', async () => {
+  xit('should query with where', async () => {
     const queryOne = await this.graphqlRequest(`
     query($where: DatasetWhereUniqueInput!){
       dataset (where: $where) { ${fields} }
@@ -508,7 +508,7 @@ describe('dataset graphql', function() {
     });
   });
 
-  it('should delete dataset', async () => {
+  xit('should delete dataset', async () => {
     await this.graphqlRequest(`
     mutation($where: DatasetWhereUniqueInput!){
       deleteDataset (where: $where) { id }
@@ -527,7 +527,7 @@ describe('dataset graphql', function() {
     expect(data.dataset).to.be.null;
   });
 
-  it('add a pv dataset and connect with groups', async () => {
+  xit('add a pv dataset and connect with groups', async () => {
     const data = {
       name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
       displayName: faker.internet.userName(),
@@ -602,7 +602,7 @@ describe('dataset graphql', function() {
     });
 
     // get one
-    const queryOneAgain = await this.graphqlRequest(`
+    let queryOneAgain = await this.graphqlRequest(`
     query($where: DatasetWhereUniqueInput!){
       dataset (where: $where) { ${fields} }
     }`, {
@@ -668,7 +668,7 @@ describe('dataset graphql', function() {
     });
 
     // get one
-    const queryOneAgain = await this.graphqlRequest(`
+    queryOneAgain = await this.graphqlRequest(`
     query($where: DatasetWhereUniqueInput!){
       dataset (where: $where) { ${fields} }
     }`, {
@@ -779,7 +779,7 @@ describe('dataset graphql', function() {
   //   expect(secGroupRoles.find(role => role.name === `ds:rw:${datasetId}`)).to.be.not.ok;
   // });
 
-  it('should create with dataset options and update', async () => {
+  xit('should create with dataset options and update', async () => {
     const data = {
       name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
       displayName: faker.internet.userName(),

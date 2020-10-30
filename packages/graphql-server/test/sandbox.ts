@@ -21,8 +21,8 @@ const imageCrd = loadCrd('image');
 const phJobCrd = loadCrd('phJob');
 
 const masterRealmCred = {
-  username: 'wwwy3y3',
-  password: 'wwwy3y3',
+  username: 'keycloak',
+  password: 'keycloak',
   grantType: 'password',
   clientId: 'admin-cli'
 };
