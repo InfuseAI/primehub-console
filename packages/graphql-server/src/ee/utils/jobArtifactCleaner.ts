@@ -55,6 +55,7 @@ export default class JobArtifactCleaner {
   }
 
   private cleanArtifactsByGroup = async group => {
+    group = `${group}`.toLowerCase();
     const prefix = `groups/${group}/jobArtifacts/`;
     const promises = [];
     await new Promise<string[]> ((resolve, reject) => {

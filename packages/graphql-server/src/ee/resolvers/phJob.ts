@@ -190,7 +190,7 @@ export const typeResolvers = {
   async artifact(parent, args, context: Context) {
     const {minioClient, storeBucket} = context;
     const phjobID = parent.id;
-    const {groupName} = parent;
+    const groupName = `${parent.groupName}`.toLowerCase();
     const prefix = `groups/${groupName}/jobArtifacts/${phjobID}`;
 
     return new Promise<any>((resolve, reject) => {
