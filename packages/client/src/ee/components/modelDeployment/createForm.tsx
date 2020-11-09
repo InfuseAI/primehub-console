@@ -52,6 +52,7 @@ type FormValue = {
   id: string;
   modelImage: string;
   imagePullSecret: string;
+  env: object;
   metadata: object;
   description: string;
   updateMessage: string;
@@ -167,6 +168,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       modelImage,
       imagePullSecret,
       description,
+      env,
       metadata,
       endpointAccessType,
     } = initialValue || {};
@@ -235,69 +237,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   <Input disabled />
                 )}
               </Form.Item>
-              <h3>Environment Settings</h3>
 
-              <Row gutter={16}>
-                <Col span={12}>
-              <Form.Item label={instanceTypeLabel}>
-                {form.getFieldDecorator('instanceType', {
-                  initialValue: instanceTypeId,
-                  rules: [{ required: true, message: 'Please select a instance type!' }],
-                })(
-                  instanceTypes.length ? (
-                    <Radio.Group style={radioGroupStyle}>
-                      {instanceTypes.map(instanceType => (
-                        <Radio style={radioStyle} value={instanceType.id} key={instanceType.id}>
-                          <div style={radioContentStyle}>
-                            <h4>
-                              {instanceType.displayName || instanceType.name}
-                              <Tooltip
-                                title={`CPU: ${dashOrNumber(instanceType.cpuLimit)} / Memory: ${dashOrNumber(instanceType.memoryLimit)} G / GPU: ${dashOrNumber(instanceType.gpuLimit)}`}
-                              >
-                                <Icon
-                                  type="info-circle"
-                                  theme="filled"
-                                  style={{marginLeft: 8}}
-                                />
-                              </Tooltip>
-                            </h4>
-                            {instanceType.description}
-                          </div>
-                        </Radio>
-                      ))}
-                    </Radio.Group>
-                  ) : (
-                    <Card>
-                      No instance in this group.
-                    </Card>
-                  )
-                )}
-              </Form.Item>
-                </Col>
-                <Col span={12}>
-              <Form.Item label="Replicas">
-                {form.getFieldDecorator('replicas', {
-                  initialValue: replicas || 1,
-                  rules: [{ required: true, message: 'Please input replicas!' }],
-                })(
-                  <InputNumber min={1} precision={0} />
-                )}
-              </Form.Item>
-                </Col>
-              </Row>
-
-
-              <h3>Endpoint</h3>
-              <Form.Item label="Private Access">
-                {form.getFieldDecorator('privateAccess', {
-                  initialValue: (endpointAccessType === 'private'),
-                  valuePropName: 'checked'
-                })(
-                  <Switch></Switch>
-                )}
-              </Form.Item>
-
-              <h3>Deployment Details</h3>
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item label={`Model Image`}>
@@ -321,6 +261,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   </Form.Item>
                 </Col>
               </Row>
+
               <Form.Item label="Description" >
                 {form.getFieldDecorator('description', {
                   initialValue: description
@@ -330,8 +271,18 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   />
                 )}
               </Form.Item>
-              <h3>Metadata</h3>
+
               <Divider />
+              <h3>Environment Variables</h3>
+              <Form.Item >
+                {form.getFieldDecorator('env', {
+                  initialValue: env
+                })(
+                  <DynamicFields empty={null}/>
+                )}
+              </Form.Item>
+              <Divider />
+              <h3>Metadata</h3>
               <Form.Item >
                 {form.getFieldDecorator('metadata', {
                   initialValue: metadata
@@ -339,20 +290,82 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   <DynamicFields empty={null}/>
                 )}
               </Form.Item>
+
+              <Divider />
+              <h3>Resources</h3>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item label={instanceTypeLabel}>
+                    {form.getFieldDecorator('instanceType', {
+                      initialValue: instanceTypeId,
+                      rules: [{ required: true, message: 'Please select a instance type!' }],
+                    })(
+                      instanceTypes.length ? (
+                        <Radio.Group style={radioGroupStyle}>
+                          {instanceTypes.map(instanceType => (
+                            <Radio style={radioStyle} value={instanceType.id} key={instanceType.id}>
+                              <div style={radioContentStyle}>
+                                <h4>
+                                  {instanceType.displayName || instanceType.name}
+                                  <Tooltip
+                                    title={`CPU: ${dashOrNumber(instanceType.cpuLimit)} / Memory: ${dashOrNumber(instanceType.memoryLimit)} G / GPU: ${dashOrNumber(instanceType.gpuLimit)}`}
+                                  >
+                                    <Icon
+                                      type="info-circle"
+                                      theme="filled"
+                                      style={{marginLeft: 8}}
+                                    />
+                                  </Tooltip>
+                                </h4>
+                                {instanceType.description}
+                              </div>
+                            </Radio>
+                          ))}
+                        </Radio.Group>
+                      ) : (
+                        <Card>
+                          No instance in this group.
+                        </Card>
+                      )
+                    )}
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="Replicas">
+                    {form.getFieldDecorator('replicas', {
+                      initialValue: replicas || 1,
+                      rules: [{ required: true, message: 'Please input replicas!' }],
+                    })(
+                      <InputNumber min={1} precision={0} />
+                    )}
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Divider />
+              <h3>Endpoint</h3>
+              <Form.Item label="Private Access">
+                {form.getFieldDecorator('privateAccess', {
+                  initialValue: (endpointAccessType === 'private'),
+                  valuePropName: 'checked'
+                })(
+                  <Switch></Switch>
+                )}
+              </Form.Item>
+
             </Card>
-      <Row style={{marginTop: 24}}>
-            <Card>
-            <Form.Item label="Update Message" >
-              {form.getFieldDecorator('updateMessage', {
-                initialValue: ''
-              })(
-                <Input.TextArea
-                  rows={4}
-                />
-              )}
-            </Form.Item>
-            </Card>
-      </Row>
+            <Row style={{marginTop: 24}}>
+              <Card>
+                <Form.Item label="Update Message" >
+                  {form.getFieldDecorator('updateMessage', {
+                    initialValue: ''
+                  })(
+                    <Input.TextArea
+                      rows={4}
+                    />
+                  )}
+                </Form.Item>
+              </Card>
+            </Row>
             <Form.Item style={{textAlign: 'right', marginTop: 12}}>
               {
                 type === 'edit' ? (
