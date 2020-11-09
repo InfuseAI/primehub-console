@@ -103,6 +103,13 @@ export const create = async (root, args, context: Context) => {
     throw Boom.badData(`Max group limit: ${config.maxGroup} exceeded`);
   }
 
+  // check existing groups with the same name
+  groups.map(g => {
+    if (payload.name.toLowerCase() === g.name.toLowerCase()) {
+      throw new ApolloError('Group exists with same name', 'GROUP_CONFLICT_NAME');
+    }
+  });
+
   let groupId: string;
   try {
     if (currentWorkspace.checkIsDefault()) {
