@@ -3,6 +3,7 @@ import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Ic
 import {FormComponentProps} from 'antd/lib/form';
 import {get, snakeCase, debounce} from 'lodash';
 import DynamicFields from 'components/share/dynamicFields';
+import EnvFields from 'components/share/envFields';
 import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
@@ -52,7 +53,7 @@ type FormValue = {
   id: string;
   modelImage: string;
   imagePullSecret: string;
-  env: object;
+  env: Array<{name: string, value: string}>;
   metadata: object;
   description: string;
   updateMessage: string;
@@ -172,6 +173,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       metadata,
       endpointAccessType,
     } = initialValue || {};
+    console.log('object initvalue', initialValue);
     const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
     const groupLabel = this.renderLabel(
       'Group',
@@ -278,7 +280,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                 {form.getFieldDecorator('env', {
                   initialValue: env
                 })(
-                  <DynamicFields empty={null}/>
+                  <EnvFields empty={null}/>
                 )}
               </Form.Item>
               <Divider />
@@ -298,7 +300,6 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   <Form.Item label={instanceTypeLabel}>
                     {form.getFieldDecorator('instanceType', {
                       initialValue: instanceTypeId,
-                      rules: [{ required: true, message: 'Please select a instance type!' }],
                     })(
                       instanceTypes.length ? (
                         <Radio.Group style={radioGroupStyle}>

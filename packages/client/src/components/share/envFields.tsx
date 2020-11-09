@@ -1,0 +1,157 @@
+import React from 'react';
+import {Input, Icon, Button} from 'antd';
+import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
+import {Empty} from '../empty';
+
+const InputGroup = Input.Group;
+
+type Props = {
+  onChange?: (value: object) => void;
+  disabled?: boolean;
+  value?: object;
+  empty?: React.ReactNode;
+}
+
+type State = {
+  fields: Array<any>,
+  errorIndex?: number,
+  errorMessage?: string,
+}
+
+export default class EnvFields extends React.Component<Props, State> {
+  private callbackId: string;
+
+  constructor(props) {
+    super(props);
+    const {value, onDeploy, refId, onChange} = props;
+    console.log('envs', value);
+    this.state = {
+      fields: value || []
+    };
+    this.callbackId = null;
+  }
+
+  add = () => {
+    const {onChange} = this.props;
+    this.setState({
+      fields: this.state.fields.concat({name: '', value: ''}),
+      errorIndex: -1,
+    }, () => {
+      onChange(this.state.fields);
+    });
+  }
+
+  remove = index => {
+    const {fields} = this.state;
+    const {onChange} = this.props;
+    fields.splice(index, 1)
+    this.setState({
+      fields,
+      errorIndex: -1,
+    }, () => {
+      onChange(this.state.fields);
+    });
+  }
+
+  changeValue = (newValue, index) => {
+    const {fields} = this.state;
+    const {onChange} = this.props;
+    fields[index].value = newValue;
+    this.setState({
+      fields,
+      errorIndex: -1
+    }, () => {
+      onChange(this.state.fields);
+    });
+  }
+
+  changeName = (name, index) => {
+    const {fields} = this.state;
+    const {onChange} = this.props;
+    fields[index].name = name;
+    this.setState({
+      fields,
+      errorIndex: -1
+    }, () => {
+      onChange(this.state.fields);
+    });
+  }
+
+  render() {
+    const {fields, errorIndex, errorMessage} = this.state;
+    const {disabled, empty = <Empty
+      style={{ width: 'calc(50% + 16px)'}}
+      height={200}
+      description="Empty."
+    />} = this.props;
+
+    return (
+      <React.Fragment>
+        {
+          fields.length === 0 ? empty :fields.map((field, i) => (
+            <React.Fragment key={i}>
+              <div style={{display: 'flex', alignItems: 'center', marginBottom: 8}}>
+                <div style={{marginRight: 16}}>{i + 1}.</div>
+                <InputGroup compact style={{width: '50%', marginRight: 16}}>
+                  <Input disabled={disabled} data-testid={`key-input-${i}`} placeholder="name" style={{ width: '40%'}} value={field.name} onChange={e => this.changeName(e.target.value, i)}/>
+                  <Input disabled={disabled} data-testid={`value-input-${i}`} placeholder="value" style={{ width: '60%'}} value={field.value} onChange={e => this.changeValue(e.target.value, i)}/>
+                </InputGroup>
+                {
+                  disabled ? null :(
+                    <a href="javascript:;" onClick={() => this.remove(i)}>
+                      <Icon type="close-circle-o"/>
+                    </a>
+                  )
+                }
+              </div>
+              {
+                errorIndex === i && (
+                  <p style={{color: 'red'}}>
+                    {errorMessage}
+                  </p>
+                )
+              }
+            </React.Fragment>
+          ))
+        }
+        {
+          disabled === true ? (
+            null
+          ) : (
+            <Button type="dashed" data-testid="add-field-button" onClick={this.add} style={{ width: 'calc(50% + 16px)', marginTop: 16 }}>
+              <Icon type="plus" /> Add field
+            </Button>
+          )
+        }
+      </React.Fragment>
+    )
+  }
+}
+
+//function objectToArray(obj) {
+  //return Object.keys(obj).reduce((result, key) => {
+    //if (key === '__typename') {
+      //return result;
+    //}
+    //result.push({
+      //key,
+      //value: obj[key]
+    //});
+    //return result;
+  //}, []);
+//}
+
+//function arrayToObject(arr) {
+  //const result = arr.reduce((result, item) => {
+    //if (item.key === '__typename') {
+      //return result;
+    //} 
+    //result[item.key] = item.value;
+    //return result;
+  //}, {});
+  //if (isEmpty(result)) {
+    //return null;
+  //}
+  //return result;
+//}

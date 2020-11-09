@@ -27,6 +27,7 @@ export interface PhDeployment {
   name: string;
   description: string;
   updateMessage: string;
+  env: Array<{name: string, value: string}>;
   metadata: Record<string, any>;
   stop: boolean;
   userId: string;
@@ -55,6 +56,7 @@ export interface PhDeploymentMutationInput {
   description: string;
   updateMessage: string;
   metadata: Record<string, any>;
+  env: Array<{name: string, value: string}>;
   groupId: string;
   instanceType: string;
   endpointAccessType: string;
@@ -94,6 +96,7 @@ const transformSpec = (id: string, time: string, groupName: string, spec: any) =
     groupId: spec.groupId,
     stop: isUndefined(spec.stop) ? false : spec.stop,
     lastUpdatedTime: spec.updateTime,
+    env: spec.env,
 
     endpointClients,
     endpointAccessType,
@@ -135,6 +138,7 @@ export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>
     userName: item.spec.userName,
     groupId: item.spec.groupId,
     stop: item.spec.stop,
+    env: item.spec.env,
     groupName,
 
     // status
@@ -178,6 +182,7 @@ const createDeployment = async (context: Context, data: PhDeploymentMutationInpu
     stop: false,
     description: data.description,
     updateMessage: data.updateMessage,
+    env: data.env,
     predictors: [{
       name: 'predictor1',
       replicas: data.replicas,

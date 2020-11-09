@@ -51,6 +51,7 @@ export interface DeploymentInfo {
   name: string;
   description: string;
   updateMessage: string;
+  env: Array<{name: string, value: string}>;
   metadata: object;
   groupId: string;
   groupName: string;
@@ -87,6 +88,10 @@ fragment PhDeploymentInfo on PhDeployment {
   name
   description
   updateMessage
+  env {
+    name
+    value
+  }
   metadata
   groupId
   groupName

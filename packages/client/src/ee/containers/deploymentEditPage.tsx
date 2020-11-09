@@ -72,6 +72,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       replicas: get(getPhDeployment, 'phDeployment.replicas'),
       groupId: get(getPhDeployment, 'phDeployment.groupId'),
       name: get(getPhDeployment, 'phDeployment.name'),
+      env: get(getPhDeployment, 'phDeployment.env'),
       metadata: get(getPhDeployment, 'phDeployment.metadata'),
       description: get(getPhDeployment, 'phDeployment.description'),
       updateMessage: get(getPhDeployment, 'phDeployment.updateMessage'),

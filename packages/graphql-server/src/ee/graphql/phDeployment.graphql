@@ -12,6 +12,11 @@ type HistoryItem {
   deployment: PhDeployment
 }
 
+type EnvVar {
+  name: String
+  value: String
+}
+
 type PhDeploymentClient {
   name: String
 }
@@ -44,6 +49,7 @@ type PhDeployment {
   lastUpdatedTime: String
   pods: [Pod]
   history: [HistoryItem]
+  env: [EnvVar]
   endpointAccessType: String
   endpointClients: [PhDeploymentClient]
 }
@@ -91,6 +97,7 @@ input PhDeploymentCreateInput {
   description: String
   updateMessage: String
   metadata: JSON
+  env: JSON
   groupId: String
   instanceType: String
   endpointAccessType: String
