@@ -406,6 +406,7 @@ export const update = async (root, args, context: Context) => {
     displayName: data.name,
     description: data.description,
     updateMessage: data.updateMessage,
+    env: data.env,
     stop: false,
     predictors: [{
       name: 'predictor1',

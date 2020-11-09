@@ -109,6 +109,7 @@ input PhDeploymentUpdateInput {
   imagePullSecret: String
   description: String
   updateMessage: String
+  env: JSON
   metadata: JSON
   instanceType: String
   endpointAccessType: String
