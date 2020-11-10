@@ -129,6 +129,10 @@ fragment PhDeploymentInfo on PhDeployment {
       description
       updateMessage
       metadata
+      env {
+        name
+        value
+      }
       endpointClients {
         name
       }

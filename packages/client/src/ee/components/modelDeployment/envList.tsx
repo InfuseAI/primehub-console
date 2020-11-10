@@ -1,14 +1,15 @@
 import React from 'react';
 import {Table} from 'antd';
 
-export default function Metadata({metadata}: {metadata: object}) {
-  const metadataList = Object.keys(metadata || {}).map(key => ({
-    key,
-    value: metadata[key]
-  }));
+interface EnvVar {
+  name: string;
+  value: string;
+}
+
+export default function EnvList({envList}: {envList: EnvVar[]}) {
   const columns = [{
     title: 'Name',
-    dataIndex: 'key',
+    dataIndex: 'name',
     width: 20,
     render: value => <div style={{wordBreak: 'break-word'}}>{value}</div>
   }, {
@@ -20,7 +21,7 @@ export default function Metadata({metadata}: {metadata: object}) {
   return (
     <Table
       columns={columns}
-      dataSource={metadataList}
+      dataSource={envList}
       scroll={{y: 120}}
       size="small"
       pagination={false}

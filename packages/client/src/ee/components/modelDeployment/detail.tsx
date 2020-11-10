@@ -10,6 +10,7 @@ import Field from 'components/share/field';
 import ModelDeploymentLogs from 'ee/components/modelDeployment/logs';
 import ModelDeploymentHistory from 'ee/components/modelDeployment/history';
 import Metadata from 'ee/components/modelDeployment/metadata';
+import EnvList from 'ee/components/modelDeployment/envList';
 import Message from 'components/share/message';
 import moment from 'moment';
 import ModelDeploymentClients from './client';
@@ -155,29 +156,27 @@ export default class Detail extends React.Component<Props, State> {
           <Col span={24}>
             <Field labelCol={4} valueCol={20} label="Status" value={<strong>{phDeployment.status}</strong>} />
             <Field labelCol={4} valueCol={20} label="Message" value={getMessage(phDeployment)} />
+            <Field labelCol={4} valueCol={20} label="Creation Time" value={renderTime(phDeployment.creationTime)} />
+            <Field labelCol={4} valueCol={20} label="Last Updated" value={renderTime(phDeployment.lastUpdatedTime)} />
           </Col>
         </Row>
         <Divider />
         <Row gutter={36}>
           <Col span={12}>
-            <Field label="Endpoint" value={phDeployment.status === Status.Deployed ? phDeployment.endpoint : '-'} />
-            <Field label="Access Type" value={phDeployment.endpointAccessType === 'private' ? 'private' : 'public'} />
             <Field label="Model Image" value={phDeployment.status !== Status.Stopped ? phDeployment.modelImage : '-'} />
-            <Field label="Replicas" value={`${(phDeployment.availableReplicas || 0)}/${phDeployment.replicas}`} />
-            <Field label="Deployment Name" value={phDeployment.name} />
-            <Field label="Group" value={phDeployment.groupName} />
-            <Field label="Instance Type" value={phDeployment.status !== Status.Stopped ? renderInstanceType(phDeployment.instanceType || {}) : '-'} />
-            <Field label="Creation Time" value={renderTime(phDeployment.creationTime)} />
-            <Field label="Last Updated" value={renderTime(phDeployment.lastUpdatedTime)} />
+            <Field label="Image Pull Secret" value={phDeployment.imagePullSecret ? phDeployment.imagePullSecret : '-'} />
             <Field label="Description" value={(
               <div style={{whiteSpace: 'pre-line'}}>
                 {phDeployment.description || '-'}
               </div>
             )} />
+            <Field label="Instance Type" value={phDeployment.status !== Status.Stopped ? renderInstanceType(phDeployment.instanceType || {}) : '-'} />
+            <Field label="Replicas" value={`${(phDeployment.availableReplicas || 0)}/${phDeployment.replicas}`} />
+            <Field label="Access Type" value={phDeployment.endpointAccessType === 'private' ? 'private' : 'public'} />
           </Col>
           <Col span={12}>
             <Field type="vertical" label="Metadata" value={<Metadata metadata={phDeployment.metadata} />} />
-
+            <Field type="vertical" label="Environment Variables" value={<EnvList envList={phDeployment.env} />} />
           </Col>
         </Row>
         <Field style={{marginTop: 32}} type="vertical" label="Run an Example" value={(
