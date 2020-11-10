@@ -33,7 +33,7 @@ export interface PhDeployment {
   name: string;
   description: string;
   updateMessage: string;
-  env: Array<EnvVar>;
+  env: EnvVar[];
   metadata: Record<string, any>;
   stop: boolean;
   userId: string;
@@ -62,7 +62,7 @@ export interface PhDeploymentMutationInput {
   description: string;
   updateMessage: string;
   metadata: Record<string, any>;
-  env: Array<EnvVar>;
+  env: EnvVar[];
   groupId: string;
   instanceType: string;
   endpointAccessType: string;
@@ -240,13 +240,13 @@ const validateQuota = async (context: Context, groupId: string, instanceTypeId: 
   }
 };
 
-const validateEnvVars = (envList: Array<EnvVar>) => {
+const validateEnvVars = (envList: EnvVar[]) => {
   const msg = (name: string) => {
     return `EnvVar: "${name}" is invalid. Name of EnvVar only allow uppercase alphanumeric characters or '_' , and must start with an alphabet character.`;
   };
   const rules = /^[A-Z][A-Z0-9\s_]*/;
 
-  envList.forEach( env => {
+  envList.forEach(env => {
     if (!rules.test(env.name)) {
       throw new ApolloError(msg(env.name), ILLEGAL_ENV_NAME);
     }
