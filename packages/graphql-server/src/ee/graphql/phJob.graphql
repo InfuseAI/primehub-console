@@ -22,7 +22,7 @@ type PhJob {
   logEndpoint: String
   artifact: PhJobArtifact
   activeDeadlineSeconds: Int
-  monitoringData: String
+  monitoring: JSON
 }
 
 type PhJobArtifact {

@@ -227,7 +227,7 @@ export const typeResolvers = {
       });
     });
   },
-  async monitoringData(parent, args, context: Context) {
+  async monitoring(parent, args, context: Context) {
     const { minioClient, storeBucket } = context;
     const phjobID = parent.id;
     const groupName = `${parent.groupName}`.toLowerCase();
@@ -253,7 +253,12 @@ export const typeResolvers = {
           reject(error);
         });
         dataStream.on('end', () => {
-          resolve(body);
+          try {
+            const result = JSON.parse(body);
+            resolve(result);
+          } catch (error) {
+            reject(error);
+          }
         });
       });
     });
