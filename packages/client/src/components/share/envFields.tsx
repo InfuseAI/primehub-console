@@ -25,9 +25,12 @@ export default class EnvFields extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     const {value, onDeploy, refId, onChange} = props;
-    console.log('envs', value);
+    const envs = value.map( env => {
+      return {name: env.name, value: env.value};
+    });
+    console.log(envs);
     this.state = {
-      fields: value || []
+      fields: envs || []
     };
     this.callbackId = null;
   }
