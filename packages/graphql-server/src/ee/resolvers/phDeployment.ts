@@ -19,6 +19,12 @@ import md5 = require('apache-md5');
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 const NOT_AUTH_ERROR = 'NOT_AUTH';
+const ILLEGAL_ENV_NAME = 'ILLEGAL_ENV_NAME';
+
+interface EnvVar {
+  name: string;
+  value: string;
+}
 
 export interface PhDeployment {
   id: string;
@@ -27,7 +33,7 @@ export interface PhDeployment {
   name: string;
   description: string;
   updateMessage: string;
-  env: Array<{name: string, value: string}>;
+  env: Array<EnvVar>;
   metadata: Record<string, any>;
   stop: boolean;
   userId: string;
@@ -56,7 +62,7 @@ export interface PhDeploymentMutationInput {
   description: string;
   updateMessage: string;
   metadata: Record<string, any>;
-  env: Array<{name: string, value: string}>;
+  env: Array<EnvVar>;
   groupId: string;
   instanceType: string;
   endpointAccessType: string;
@@ -234,6 +240,19 @@ const validateQuota = async (context: Context, groupId: string, instanceTypeId: 
   }
 };
 
+const validateEnvVars = (envList: Array<EnvVar>) => {
+  const msg = (name: string) => {
+    return `EnvVar: "${name}" is invalid. Name of EnvVar only allow uppercase alphanumeric characters or '_' , and must start with an alphabet character.`;
+  };
+  const rules = /^[A-Z][A-Z0-9\s_]*/;
+
+  envList.forEach( env => {
+    if (!rules.test(env.name)) {
+      throw new ApolloError(msg(env.name), ILLEGAL_ENV_NAME);
+    }
+  });
+};
+
 /**
  * Query
  */
@@ -369,6 +388,9 @@ export const create = async (root, args, context: Context) => {
   const data: PhDeploymentMutationInput = args.data;
   validateLicense();
   await validateQuota(context, data.groupId, data.instanceType);
+  if (data.env && data.env.length > 0) {
+    validateEnvVars(data.env);
+  }
   const mutable = await canUserMutate(context.userId, data.groupId, context);
   if (!mutable) {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
@@ -385,6 +407,9 @@ export const update = async (root, args, context: Context) => {
   const groupId = phDeployment.spec.groupId;
   const instanceType = data.instanceType || phDeployment.spec.predictors[0].instanceType;
   await validateQuota(context, groupId, instanceType);
+  if (data.env && data.env.length > 0) {
+    validateEnvVars(data.env);
+  }
   const mutable = await canUserMutate(userId, groupId, context);
   if (!mutable) {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);

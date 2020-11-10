@@ -173,7 +173,6 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       metadata,
       endpointAccessType,
     } = initialValue || {};
-    console.log('object initvalue', initialValue);
     const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
     const groupLabel = this.renderLabel(
       'Group',
