@@ -226,6 +226,42 @@ export const typeResolvers = {
         });
       });
     });
+  },
+  async monitoring(parent, args, context: Context) {
+    const { minioClient, storeBucket } = context;
+    const phjobID = parent.id;
+    const groupName = `${parent.groupName}`.toLowerCase();
+    const objectName = `groups/${groupName}/jobArtifacts/${phjobID}/.metadata/monitoring`;
+
+    return new Promise<any>((resolve, reject) => {
+      if (!minioClient) {
+        reject(new Error('primehub-store is not enabled.'));
+        return;
+      }
+
+      minioClient.getObject(storeBucket, objectName, (err, dataStream) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        let body = '';
+        dataStream.on('data', buffer => {
+          body += buffer.toString();
+        });
+        dataStream.on('error', error => {
+          reject(error);
+        });
+        dataStream.on('end', () => {
+          try {
+            const result = JSON.parse(body);
+            resolve(result);
+          } catch (error) {
+            reject(error);
+          }
+        });
+      });
+    });
   }
 };
 
