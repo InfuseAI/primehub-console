@@ -65,6 +65,8 @@ export interface Config {
   enablePhfs: boolean;
   // artifact
   enableJobArtifact: boolean;
+  // monitoring
+  enableJobMonitoring: boolean;
   // maximux group
   licenseStatus: string;
   maxGroup: number;
@@ -107,6 +109,7 @@ const defaultConfigs = {
   enableLogPersistence: false,
   enablePhfs: false,
   enableJobArtifact: false,
+  enableJobMonitoring: false,
   licenseStatus: 'invalid',
   maxGroup: 999,
   jobDefaultActiveDeadlineSeconds: 86400,
@@ -178,6 +181,7 @@ export const createConfig = (): Config => {
     enableLogPersistence: getEnvBoolean('PRIMEHUB_FEATURE_LOG_PERSISTENCE', false),
     enablePhfs: getEnvBoolean('PRIMEHUB_FEATURE_PHFS', false),
     enableJobArtifact: getEnvBoolean('PRIMEHUB_FEATURE_JOB_ARTIFACT', false),
+    enableJobMonitoring: getEnvBoolean('PRIMEHUB_FEATURE_JOB_MONITORING', false),
   });
 
   const env = process.env.NODE_ENV || 'development';
