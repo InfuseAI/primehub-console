@@ -84,7 +84,7 @@ class JobMonitoringContainer extends React.Component<Props> {
   }
 
   shouldComponentUpdate = (nextProps, nextState) => {
-    if (!this.props.data.phJob && nextProps.data.phJob) {
+    if ((!this.props.data.phJob && nextProps.data.phJob) || (this.props.data.phJob && nextProps.data.phJob && this.state.period === null)) {
       this.state.period = Object.keys(periods)[0];
       return true;
     }
@@ -146,7 +146,7 @@ class JobMonitoringContainer extends React.Component<Props> {
       }]
       mem_datasets = [{
         borderColor: colors.green,
-        data: datasets[period].map(d => d.mem_used),
+        data: datasets[period].map(d => d.mem_used / 1024),
       }]
       // prepare datasets for gpu
       const gpus = {}
@@ -156,7 +156,7 @@ class JobMonitoringContainer extends React.Component<Props> {
             gpus[g.index] = {gpu: [], mem: []}
           }
           gpus[g.index].gpu.push(g.gpu_util);
-          gpus[g.index].mem.push(g.mem_used);
+          gpus[g.index].mem.push(g.mem_used / 1024);
         });
       });
       Object.keys(gpus).forEach(index => {
@@ -187,7 +187,7 @@ class JobMonitoringContainer extends React.Component<Props> {
                 labels={labels} />
             </div>
             <div className="chart">
-              <LineChart title={'Memory'}
+              <LineChart title={'Memory (MB)'}
                 datasets={mem_datasets}
                 labels={labels} />
             </div>
@@ -201,7 +201,7 @@ class JobMonitoringContainer extends React.Component<Props> {
                 multiple={true} />
             </div>
             <div className="chart">
-              <LineChart title={'Memory'}
+              <LineChart title={'Memory (MB)'}
                 datasets={gpu_mem_datasets}
                 labels={labels}
                 multiple={true} />
