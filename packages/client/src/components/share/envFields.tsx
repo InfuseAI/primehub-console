@@ -27,9 +27,9 @@ export default class EnvFields extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     const {value, onDeploy, refId, onChange} = props;
-    const envs = value.map( env => {
+    const envs = value ? value.map( env => {
       return {name: env.name, value: env.value};
-    });
+    }) : [];
     this.state = {
       fields: envs || [],
     };
@@ -103,9 +103,11 @@ export default class EnvFields extends React.Component<Props, State> {
                   />;
             const hiddenValueItem = <Input
                     type="password"
+                    disabled={disabled}
                     placeholder="value"
                     style={{ width: '60%'}}
                     value={field.value}
+                    onChange={e => this.changeValue(e.target.value, i)}
                   />;
             return (
               <React.Fragment key={i}>

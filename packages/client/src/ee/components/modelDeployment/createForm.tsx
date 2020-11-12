@@ -127,7 +127,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
     onCancel(values);
   }
 
-  switchEnvVisibilty = () => {
+  toggleEnvVisibilty = () => {
     const revealEnv = !this.state.revealEnv;
     this.setState({
       revealEnv
@@ -202,10 +202,8 @@ class DeploymentCreateForm extends React.Component<Props, State> {
     )
 
     const revealBtn = (
-      <span onClick={this.switchEnvVisibilty} style={{cursor: 'pointer'}}>
-        {
-          revealEnv ? <Icon type="eye" /> : <Icon type="eye-invisible" />
-        }
+      <span onClick={this.toggleEnvVisibilty} style={{cursor: 'pointer'}}>
+        { revealEnv ? <Icon type="eye" title='Hide value' /> : <Icon type="eye-invisible" title="Show value" /> }
       </span>
     );
 

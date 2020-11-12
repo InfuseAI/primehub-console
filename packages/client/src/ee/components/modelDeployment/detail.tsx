@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Card, Divider, Row, Col, Tabs, Input, Button, message} from 'antd';
+import { Icon, Modal, Card, Divider, Row, Col, Tabs, Input, Button, message} from 'antd';
 import { DeploymentInfo, Status, ClientResult } from './common';
 import PageTitle from 'components/pageTitle';
 import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';
@@ -40,7 +40,8 @@ type Props = {
 }
 
 type State = {
-  clientAdded: ClientResult
+  clientAdded: ClientResult;
+  revealEnv: boolean;
 }
 
 export default class Detail extends React.Component<Props, State> {
@@ -133,15 +134,22 @@ export default class Detail extends React.Component<Props, State> {
     });
   }
 
+  toggleEnvVisibilty = () => {
+    const revealEnv = !this.state.revealEnv;
+    this.setState({revealEnv});
+  }
+
   constructor(props) {
     super(props);
 
     this.state = {
-      clientAdded: null
+      clientAdded: null,
+      revealEnv: false
     };
   }
 
   renderInformation = () => {
+    const {revealEnv} = this.state;
     const {phDeployment} = this.props;
     const example = `curl -X POST \\\n` +
     (phDeployment.endpointAccessType === 'private' ?
@@ -149,6 +157,11 @@ export default class Detail extends React.Component<Props, State> {
     `    -d '{"data":{"names":["a","b"],"tensor":{"shape":[2,2],"values":[0,0,1,1]}}}' \\\n`+
     `    -H "Content-Type: application/json" \\\n` +
     `    ${phDeployment.endpoint || '<endpoint>'}`;
+    const revealBtn = (
+      <span onClick={this.toggleEnvVisibilty} style={{cursor: 'pointer', verticalAlign: '-0.05em'}}>
+      { revealEnv ? <Icon type="eye" title='Hide value' /> : <Icon type="eye-invisible" title="Show value" /> }
+      </span>
+    )
 
     return (
       <div style={{padding: '16px 36px'}}>
@@ -176,7 +189,7 @@ export default class Detail extends React.Component<Props, State> {
           </Col>
           <Col span={12}>
             <Field type="vertical" label="Metadata" value={<Metadata metadata={phDeployment.metadata} />} />
-            <Field type="vertical" label="Environment Variables" value={<EnvList envList={phDeployment.env} />} />
+            <Field type="vertical" label={<span>Environment Variables {revealBtn}</span>} value={<EnvList envList={phDeployment.env} valueVisibility={revealEnv} />} />
           </Col>
         </Row>
         <Field style={{marginTop: 32}} type="vertical" label="Run an Example" value={(

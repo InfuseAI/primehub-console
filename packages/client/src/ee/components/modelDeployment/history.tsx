@@ -1,5 +1,5 @@
 import React from 'react';
-import {Table, Modal, Row, Col, Tooltip} from 'antd';
+import {Icon, Table, Modal, Row, Col, Tooltip} from 'antd';
 import {renderTime, renderInstanceType} from 'ee/components/modelDeployment/detail';
 import Field from 'components/share/field';
 import {HistoryItem} from 'ee/components/modelDeployment/common';
@@ -15,6 +15,7 @@ type Props = {
 type State = {
   historyItem: HistoryItem;
   visible: boolean;
+  revealEnv: boolean;
 }
 
 const textOverflowStyle: React.CSSProperties = {
@@ -58,6 +59,7 @@ export default class History extends React.Component<Props, State> {
   state = {
     historyItem: null,
     visible: false,
+    revealEnv: false
   }
 
   viewDetail = (historyItem: HistoryItem) => {
@@ -74,10 +76,21 @@ export default class History extends React.Component<Props, State> {
     })
   }
 
+  toggleEnvVisibilty = () => {
+    const revealEnv = !this.state.revealEnv;
+    this.setState({revealEnv});
+  }
+
+
   render() {
     const {history} = this.props;
-    const {visible, historyItem} = this.state;
+    const {visible, historyItem, revealEnv} = this.state;
     const {deployment = {}, time} = historyItem || {};
+    const revealBtn = (
+      <span onClick={this.toggleEnvVisibilty} style={{cursor: 'pointer', verticalAlign: '-0.05em'}}>
+      { revealEnv ? <Icon type="eye" title='Hide value' /> : <Icon type="eye-invisible" title="Show value" /> }
+      </span>
+    )
     const columns = [{
       title: 'Update Message',
       dataIndex: 'deployment',
@@ -146,7 +159,7 @@ export default class History extends React.Component<Props, State> {
                 </Col>
                 <Col span={12}>
                   <Field type="vertical" label="Metadata" value={<Metadata metadata={deployment.metadata} />} />
-                  <Field type="vertical" label="Environment Variables" value={<EnvList envList={deployment.env} />} />
+                  <Field type="vertical" label={<span>Environment Variables {revealBtn}</span>} value={<EnvList envList={deployment.env} valueVisibility={revealEnv} />} />
                 </Col>
               </Row>
             )

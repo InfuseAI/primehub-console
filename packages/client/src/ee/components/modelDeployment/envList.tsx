@@ -1,13 +1,14 @@
 import React from 'react';
-import {Table} from 'antd';
+import {Icon, Table} from 'antd';
 
 interface EnvVar {
   name: string;
   value: string;
 }
 
-export default function EnvList({envList}: {envList: EnvVar[]}) {
-  const columns = [{
+export default function EnvList({envList, valueVisibility}: {envList: EnvVar[], valueVisibility: boolean}) {
+  const columns = [
+  {
     title: 'Name',
     dataIndex: 'name',
     width: 20,
@@ -16,8 +17,9 @@ export default function EnvList({envList}: {envList: EnvVar[]}) {
     title: 'Value',
     dataIndex: 'value',
     width: 80,
-    render: value => <div style={{wordBreak: 'break-word'}}>{value}</div>
-  }];
+    render: value => <div style={{wordBreak: 'break-word'}}>{valueVisibility ? value : value.replace(/([\w\W])/g, '*')}</div>
+  }
+  ];
   return (
     <Table
       columns={columns}
