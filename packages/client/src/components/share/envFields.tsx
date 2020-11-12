@@ -11,6 +11,8 @@ type Props = {
   disabled?: boolean;
   value?: object;
   empty?: React.ReactNode;
+  reveal: boolean;
+  enableReveal: boolean;
 }
 
 type State = {
@@ -28,9 +30,8 @@ export default class EnvFields extends React.Component<Props, State> {
     const envs = value.map( env => {
       return {name: env.name, value: env.value};
     });
-    console.log(envs);
     this.state = {
-      fields: envs || []
+      fields: envs || [],
     };
     this.callbackId = null;
   }
@@ -83,7 +84,7 @@ export default class EnvFields extends React.Component<Props, State> {
 
   render() {
     const {fields, errorIndex, errorMessage} = this.state;
-    const {disabled, empty = <Empty
+    const {enableReveal, reveal, disabled, empty = <Empty
       style={{ width: 'calc(50% + 16px)'}}
       height={200}
       description="Empty."
@@ -92,31 +93,51 @@ export default class EnvFields extends React.Component<Props, State> {
     return (
       <React.Fragment>
         {
-          fields.length === 0 ? empty :fields.map((field, i) => (
-            <React.Fragment key={i}>
-              <div style={{display: 'flex', alignItems: 'center', marginBottom: 8}}>
-                <div style={{marginRight: 16}}>{i + 1}.</div>
-                <InputGroup compact style={{width: '50%', marginRight: 16}}>
-                  <Input disabled={disabled} data-testid={`key-input-${i}`} placeholder="name" style={{ width: '40%'}} value={field.name} onChange={e => this.changeName(e.target.value, i)}/>
-                  <Input disabled={disabled} data-testid={`value-input-${i}`} placeholder="value" style={{ width: '60%'}} value={field.value} onChange={e => this.changeValue(e.target.value, i)}/>
-                </InputGroup>
+          fields.length === 0 ? empty :fields.map((field, i) => {
+            const valueItem = <Input
+                    disabled={disabled}
+                    placeholder="value"
+                    style={{ width: '60%'}}
+                    value={field.value}
+                    onChange={e => this.changeValue(e.target.value, i)}
+                  />;
+            const hiddenValueItem = <Input
+                    type="password"
+                    placeholder="value"
+                    style={{ width: '60%'}}
+                    value={field.value}
+                  />;
+            return (
+              <React.Fragment key={i}>
+                <div style={{display: 'flex', alignItems: 'center', marginBottom: 8, userSelect: 'none'}}>
+                  <div style={{marginRight: 16}}>{i + 1}</div>
+                  <InputGroup compact style={{width: '50%', marginRight: 16}}>
+                    <Input
+                      disabled={disabled}
+                      placeholder="name" style={{ width: '40%'}}
+                      value={field.name}
+                      onChange={e => this.changeName(e.target.value, i)}
+                    />
+                    { enableReveal && !reveal ? hiddenValueItem : valueItem }
+                  </InputGroup>
+                  {
+                    disabled ? null :(
+                      <a href="javascript:;" onClick={() => this.remove(i)}>
+                        <Icon type="close-circle-o"/>
+                      </a>
+                    )
+                  }
+                </div>
                 {
-                  disabled ? null :(
-                    <a href="javascript:;" onClick={() => this.remove(i)}>
-                      <Icon type="close-circle-o"/>
-                    </a>
+                  errorIndex === i && (
+                    <p style={{color: 'red'}}>
+                      {errorMessage}
+                    </p>
                   )
                 }
-              </div>
-              {
-                errorIndex === i && (
-                  <p style={{color: 'red'}}>
-                    {errorMessage}
-                  </p>
-                )
-              }
-            </React.Fragment>
-          ))
+              </React.Fragment>
+            );
+          })
         }
         {
           disabled === true ? (

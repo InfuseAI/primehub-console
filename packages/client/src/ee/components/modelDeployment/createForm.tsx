@@ -25,6 +25,7 @@ type Props = FormComponentProps & {
 };
 
 type State = {
+  revealEnv: boolean;
 }
 
 const radioStyle = {
@@ -72,7 +73,8 @@ const autoGenId = (name: string) => {
 
 class DeploymentCreateForm extends React.Component<Props, State> {
   state = {
-    recurrenceError: ''
+    recurrenceError: '',
+    revealEnv: false
   };
 
   componentDidMount() {
@@ -125,6 +127,13 @@ class DeploymentCreateForm extends React.Component<Props, State> {
     onCancel(values);
   }
 
+  switchEnvVisibilty = () => {
+    const revealEnv = !this.state.revealEnv;
+    this.setState({
+      revealEnv
+    });
+  }
+
   renderLabel = (defaultLabel: string, invalid: boolean, message: any) => {
     let label = <span>{defaultLabel}</span>;
     if (invalid)
@@ -173,6 +182,8 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       metadata,
       endpointAccessType,
     } = initialValue || {};
+    const { revealEnv } = this.state;
+    const showRevealBtn = !!(type === 'edit')
     const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
     const groupLabel = this.renderLabel(
       'Group',
@@ -189,6 +200,14 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       invalidInitialInstanceType,
       <span>The instance type <b>{instanceTypeName}</b> was deleted.</span>
     )
+
+    const revealBtn = (
+      <span onClick={this.switchEnvVisibilty} style={{cursor: 'pointer'}}>
+        {
+          revealEnv ? <Icon type="eye" /> : <Icon type="eye-invisible" />
+        }
+      </span>
+    );
 
 
     return (
@@ -274,12 +293,12 @@ class DeploymentCreateForm extends React.Component<Props, State> {
               </Form.Item>
 
               <Divider />
-              <h3>Environment Variables</h3>
+              <h3>Environment Variables { showRevealBtn == true ? revealBtn : null }</h3>
               <Form.Item >
                 {form.getFieldDecorator('env', {
                   initialValue: env
                 })(
-                  <EnvFields empty={null}/>
+                  <EnvFields empty={null} enableReveal={showRevealBtn} reveal={revealEnv} />
                 )}
               </Form.Item>
               <Divider />
