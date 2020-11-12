@@ -242,9 +242,9 @@ const validateQuota = async (context: Context, groupId: string, instanceTypeId: 
 
 const validateEnvVars = (envList: EnvVar[]) => {
   const msg = (name: string) => {
-    return `EnvVar: "${name}" is invalid. Name of EnvVar only allow uppercase alphanumeric characters or '_' , and must start with an alphabet character.`;
+    return `EnvVar name "${name}" is invalid, a valid environment variable name must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit (e.g. 'my.env-name',  or 'MY_ENV.NAME',  or 'MyEnvName1', regex used for validation is '[-._a-zA-Z][-._a-zA-Z0-9]*')"}`;
   };
-  const rules = /^[A-Z][A-Z0-9\s_]*/;
+  const rules = /^[-\._a-zA-Z][-\._a-zA-Z0-9]*$/;
 
   envList.forEach(env => {
     if (!rules.test(env.name)) {
