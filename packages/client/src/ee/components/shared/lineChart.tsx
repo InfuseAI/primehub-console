@@ -39,9 +39,15 @@ class LineChart extends React.Component<Props> {
             },
             type: 'time',
             time: {
+              unit: 'minute',
               displayFormats: {
                 minute: 'HH:mm'
-              }
+              },
+              minUnit: 'minute'
+            },
+            scaleLabel: {
+              display: true,
+              labelString: 'Time'
             }
           }],
           yAxes: [{
