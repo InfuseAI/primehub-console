@@ -3,6 +3,7 @@ import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Ic
 import {FormComponentProps} from 'antd/lib/form';
 import {get, snakeCase, debounce} from 'lodash';
 import DynamicFields from 'components/share/dynamicFields';
+import EnvFields from 'components/share/envFields';
 import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
@@ -24,6 +25,7 @@ type Props = FormComponentProps & {
 };
 
 type State = {
+  revealEnv: boolean;
 }
 
 const radioStyle = {
@@ -52,6 +54,7 @@ type FormValue = {
   id: string;
   modelImage: string;
   imagePullSecret: string;
+  env: Array<{name: string, value: string}>;
   metadata: object;
   description: string;
   updateMessage: string;
@@ -70,7 +73,8 @@ const autoGenId = (name: string) => {
 
 class DeploymentCreateForm extends React.Component<Props, State> {
   state = {
-    recurrenceError: ''
+    recurrenceError: '',
+    revealEnv: false
   };
 
   componentDidMount() {
@@ -123,6 +127,13 @@ class DeploymentCreateForm extends React.Component<Props, State> {
     onCancel(values);
   }
 
+  toggleEnvVisibilty = () => {
+    const revealEnv = !this.state.revealEnv;
+    this.setState({
+      revealEnv
+    });
+  }
+
   renderLabel = (defaultLabel: string, invalid: boolean, message: any) => {
     let label = <span>{defaultLabel}</span>;
     if (invalid)
@@ -167,9 +178,12 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       modelImage,
       imagePullSecret,
       description,
+      env,
       metadata,
       endpointAccessType,
     } = initialValue || {};
+    const { revealEnv } = this.state;
+    const showRevealBtn = !!(type === 'edit')
     const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
     const groupLabel = this.renderLabel(
       'Group',
@@ -186,6 +200,12 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       invalidInitialInstanceType,
       <span>The instance type <b>{instanceTypeName}</b> was deleted.</span>
     )
+
+    const revealBtn = (
+      <span onClick={this.toggleEnvVisibilty} style={{cursor: 'pointer'}}>
+        { revealEnv ? <Icon type="eye" title='Hide value' /> : <Icon type="eye-invisible" title="Show value" /> }
+      </span>
+    );
 
 
     return (
@@ -235,69 +255,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   <Input disabled />
                 )}
               </Form.Item>
-              <h3>Environment Settings</h3>
 
-              <Row gutter={16}>
-                <Col span={12}>
-              <Form.Item label={instanceTypeLabel}>
-                {form.getFieldDecorator('instanceType', {
-                  initialValue: instanceTypeId,
-                  rules: [{ required: true, message: 'Please select a instance type!' }],
-                })(
-                  instanceTypes.length ? (
-                    <Radio.Group style={radioGroupStyle}>
-                      {instanceTypes.map(instanceType => (
-                        <Radio style={radioStyle} value={instanceType.id} key={instanceType.id}>
-                          <div style={radioContentStyle}>
-                            <h4>
-                              {instanceType.displayName || instanceType.name}
-                              <Tooltip
-                                title={`CPU: ${dashOrNumber(instanceType.cpuLimit)} / Memory: ${dashOrNumber(instanceType.memoryLimit)} G / GPU: ${dashOrNumber(instanceType.gpuLimit)}`}
-                              >
-                                <Icon
-                                  type="info-circle"
-                                  theme="filled"
-                                  style={{marginLeft: 8}}
-                                />
-                              </Tooltip>
-                            </h4>
-                            {instanceType.description}
-                          </div>
-                        </Radio>
-                      ))}
-                    </Radio.Group>
-                  ) : (
-                    <Card>
-                      No instance in this group.
-                    </Card>
-                  )
-                )}
-              </Form.Item>
-                </Col>
-                <Col span={12}>
-              <Form.Item label="Replicas">
-                {form.getFieldDecorator('replicas', {
-                  initialValue: replicas || 1,
-                  rules: [{ required: true, message: 'Please input replicas!' }],
-                })(
-                  <InputNumber min={1} precision={0} />
-                )}
-              </Form.Item>
-                </Col>
-              </Row>
-
-
-              <h3>Endpoint</h3>
-              <Form.Item label="Private Access">
-                {form.getFieldDecorator('privateAccess', {
-                  initialValue: (endpointAccessType === 'private'),
-                  valuePropName: 'checked'
-                })(
-                  <Switch></Switch>
-                )}
-              </Form.Item>
-
-              <h3>Deployment Details</h3>
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item label={`Model Image`}>
@@ -321,6 +279,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   </Form.Item>
                 </Col>
               </Row>
+
               <Form.Item label="Description" >
                 {form.getFieldDecorator('description', {
                   initialValue: description
@@ -330,8 +289,18 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   />
                 )}
               </Form.Item>
-              <h3>Metadata</h3>
+
               <Divider />
+              <h3>Environment Variables { showRevealBtn == true ? revealBtn : null }</h3>
+              <Form.Item >
+                {form.getFieldDecorator('env', {
+                  initialValue: env
+                })(
+                  <EnvFields empty={null} enableReveal={showRevealBtn} reveal={revealEnv} />
+                )}
+              </Form.Item>
+              <Divider />
+              <h3>Metadata</h3>
               <Form.Item >
                 {form.getFieldDecorator('metadata', {
                   initialValue: metadata
@@ -339,20 +308,81 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   <DynamicFields empty={null}/>
                 )}
               </Form.Item>
+
+              <Divider />
+              <h3>Resources</h3>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item label={instanceTypeLabel}>
+                    {form.getFieldDecorator('instanceType', {
+                      initialValue: instanceTypeId,
+                    })(
+                      instanceTypes.length ? (
+                        <Radio.Group style={radioGroupStyle}>
+                          {instanceTypes.map(instanceType => (
+                            <Radio style={radioStyle} value={instanceType.id} key={instanceType.id}>
+                              <div style={radioContentStyle}>
+                                <h4>
+                                  {instanceType.displayName || instanceType.name}
+                                  <Tooltip
+                                    title={`CPU: ${dashOrNumber(instanceType.cpuLimit)} / Memory: ${dashOrNumber(instanceType.memoryLimit)} G / GPU: ${dashOrNumber(instanceType.gpuLimit)}`}
+                                  >
+                                    <Icon
+                                      type="info-circle"
+                                      theme="filled"
+                                      style={{marginLeft: 8}}
+                                    />
+                                  </Tooltip>
+                                </h4>
+                                {instanceType.description}
+                              </div>
+                            </Radio>
+                          ))}
+                        </Radio.Group>
+                      ) : (
+                        <Card>
+                          No instance in this group.
+                        </Card>
+                      )
+                    )}
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="Replicas">
+                    {form.getFieldDecorator('replicas', {
+                      initialValue: replicas || 1,
+                      rules: [{ required: true, message: 'Please input replicas!' }],
+                    })(
+                      <InputNumber min={1} precision={0} />
+                    )}
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Divider />
+              <h3>Endpoint</h3>
+              <Form.Item label="Private Access">
+                {form.getFieldDecorator('privateAccess', {
+                  initialValue: (endpointAccessType === 'private'),
+                  valuePropName: 'checked'
+                })(
+                  <Switch></Switch>
+                )}
+              </Form.Item>
+
             </Card>
-      <Row style={{marginTop: 24}}>
-            <Card>
-            <Form.Item label="Update Message" >
-              {form.getFieldDecorator('updateMessage', {
-                initialValue: ''
-              })(
-                <Input.TextArea
-                  rows={4}
-                />
-              )}
-            </Form.Item>
-            </Card>
-      </Row>
+            <Row style={{marginTop: 24}}>
+              <Card>
+                <Form.Item label="Update Message" >
+                  {form.getFieldDecorator('updateMessage', {
+                    initialValue: ''
+                  })(
+                    <Input.TextArea
+                      rows={4}
+                    />
+                  )}
+                </Form.Item>
+              </Card>
+            </Row>
             <Form.Item style={{textAlign: 'right', marginTop: 12}}>
               {
                 type === 'edit' ? (

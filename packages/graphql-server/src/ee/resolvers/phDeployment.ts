@@ -19,6 +19,12 @@ import md5 = require('apache-md5');
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 const NOT_AUTH_ERROR = 'NOT_AUTH';
+const ILLEGAL_ENV_NAME = 'ILLEGAL_ENV_NAME';
+
+interface EnvVar {
+  name: string;
+  value: string;
+}
 
 export interface PhDeployment {
   id: string;
@@ -27,6 +33,7 @@ export interface PhDeployment {
   name: string;
   description: string;
   updateMessage: string;
+  env: EnvVar[];
   metadata: Record<string, any>;
   stop: boolean;
   userId: string;
@@ -55,6 +62,7 @@ export interface PhDeploymentMutationInput {
   description: string;
   updateMessage: string;
   metadata: Record<string, any>;
+  env: EnvVar[];
   groupId: string;
   instanceType: string;
   endpointAccessType: string;
@@ -94,6 +102,7 @@ const transformSpec = (id: string, time: string, groupName: string, spec: any) =
     groupId: spec.groupId,
     stop: isUndefined(spec.stop) ? false : spec.stop,
     lastUpdatedTime: spec.updateTime,
+    env: spec.env,
 
     endpointClients,
     endpointAccessType,
@@ -135,6 +144,7 @@ export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>
     userName: item.spec.userName,
     groupId: item.spec.groupId,
     stop: item.spec.stop,
+    env: item.spec.env,
     groupName,
 
     // status
@@ -178,6 +188,7 @@ const createDeployment = async (context: Context, data: PhDeploymentMutationInpu
     stop: false,
     description: data.description,
     updateMessage: data.updateMessage,
+    env: data.env,
     predictors: [{
       name: 'predictor1',
       replicas: data.replicas,
@@ -227,6 +238,19 @@ const validateQuota = async (context: Context, groupId: string, instanceTypeId: 
       throw new ApolloError('Group Memory exceeded', EXCEED_QUOTA_ERROR);
     }
   }
+};
+
+const validateEnvVars = (envList: EnvVar[]) => {
+  const msg = (name: string) => {
+    return `EnvVar name "${name}" is invalid, a valid environment variable name must consist of alphabetic characters, digits, '_', '-', or '.', and must not start with a digit (e.g. 'my.env-name',  or 'MY_ENV.NAME',  or 'MyEnvName1', regex used for validation is '[-._a-zA-Z][-._a-zA-Z0-9]*')"}`;
+  };
+  const rules = /^[-\._a-zA-Z][-\._a-zA-Z0-9]*$/;
+
+  envList.forEach(env => {
+    if (!rules.test(env.name)) {
+      throw new ApolloError(msg(env.name), ILLEGAL_ENV_NAME);
+    }
+  });
 };
 
 /**
@@ -364,6 +388,9 @@ export const create = async (root, args, context: Context) => {
   const data: PhDeploymentMutationInput = args.data;
   validateLicense();
   await validateQuota(context, data.groupId, data.instanceType);
+  if (data.env && data.env.length > 0) {
+    validateEnvVars(data.env);
+  }
   const mutable = await canUserMutate(context.userId, data.groupId, context);
   if (!mutable) {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
@@ -380,6 +407,9 @@ export const update = async (root, args, context: Context) => {
   const groupId = phDeployment.spec.groupId;
   const instanceType = data.instanceType || phDeployment.spec.predictors[0].instanceType;
   await validateQuota(context, groupId, instanceType);
+  if (data.env && data.env.length > 0) {
+    validateEnvVars(data.env);
+  }
   const mutable = await canUserMutate(userId, groupId, context);
   if (!mutable) {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
@@ -401,6 +431,7 @@ export const update = async (root, args, context: Context) => {
     displayName: data.name,
     description: data.description,
     updateMessage: data.updateMessage,
+    env: data.env,
     stop: false,
     predictors: [{
       name: 'predictor1',

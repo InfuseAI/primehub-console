@@ -196,6 +196,7 @@ export interface PhDeploymentSpec {
   description: string;
   updateMessage: string;
   updateTime: string;
+  env: any;
   predictors: Array<{
     name: string;
     replicas: number;

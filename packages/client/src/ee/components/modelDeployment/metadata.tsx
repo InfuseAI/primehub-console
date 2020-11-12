@@ -9,21 +9,20 @@ export default function Metadata({metadata}: {metadata: object}) {
   const columns = [{
     title: 'Name',
     dataIndex: 'key',
-    width: '30%',
+    width: 20,
     render: value => <div style={{wordBreak: 'break-word'}}>{value}</div>
   }, {
     title: 'Value',
     dataIndex: 'value',
-    width: '70%',
+    width: 80,
     render: value => <div style={{wordBreak: 'break-word'}}>{value}</div>
   }];
   return (
     <Table
-      style={{border: '1px solid #eee'}}
       columns={columns}
       dataSource={metadataList}
-      scroll={{y: 207}}
-      size="middle"
+      scroll={{y: 120}}
+      size="small"
       pagination={false}
     />
   )
