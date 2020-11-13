@@ -16,6 +16,7 @@ import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import Field from 'components/share/field';
 import JobArtifact from 'ee/containers/jobArtifact';
+import JobMonitoring from 'ee/containers/jobMonitoring';
 
 const TabPane = Tabs.TabPane;
 
@@ -247,6 +248,12 @@ export default class Detail extends React.Component<Props> {
               disabled={job.phase !== Phase.Failed && job.phase !== Phase.Succeeded}
             >
               <JobArtifact jobId={job.id}></JobArtifact>
+            </TabPane>
+            <TabPane
+              key='monitoring'
+              tab='Monitoring'
+            >
+              <JobMonitoring jobId={job.id}></JobMonitoring>
             </TabPane>
             <TabPane
               key="logs"

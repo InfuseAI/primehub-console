@@ -239,8 +239,12 @@ export const typeResolvers = {
         return;
       }
 
-      minioClient.getObject(storeBucket, objectName, (err, dataStream) => {
+      minioClient.getObject(storeBucket, objectName, (err: any, dataStream) => {
         if (err) {
+          if (err.code === 'NoSuchKey') {
+            resolve(null);
+            return;
+          }
           reject(err);
           return;
         }
