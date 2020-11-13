@@ -14,6 +14,9 @@ type Props = {
 };
 
 const Charts = styled.div`
+  div.hidden {
+    display: none;
+  }
   .chart-row-header {
     text-align: center
     margin-top: 25px;
@@ -88,7 +91,21 @@ class JobMonitoringContainer extends React.Component<Props> {
       this.state.period = Object.keys(periods)[0];
       return true;
     }
-    return (this.state.period !== nextState.period);
+    if (this.state.period !== nextState.period) { return true; }
+    if (nextProps.data.phJob
+      && nextProps.data.phJob.monitoring
+      && nextProps.data.phJob.monitoring.datasets
+      && this.props.data.phJob
+      && this.props.data.phJob.monitoring
+      && this.props.data.phJob.monitoring.datasets) {
+      const period = this.state.period;
+      const thisDatasets = this.props.data.phJob.monitoring.datasets;
+      const nextDatasets = nextProps.data.phJob.monitoring.datasets;
+      const t1 = thisDatasets[period][thisDatasets[period].length - 1].timestamp;
+      const t2 = nextDatasets[period][nextDatasets[period].length - 1].timestamp;
+      if (t2 > t1) { return true }
+    }
+    return false;
   }
 
   public render = () => {
@@ -173,38 +190,44 @@ class JobMonitoringContainer extends React.Component<Props> {
       })
     }
 
+    const gpu_class_name = (gpu_datasets.length === 0 && gpu_mem_datasets.length === 0) ? 'hidden' : '';
+
     return (
       <div>
         <div style={{display: 'flex', justifyContent: 'flex-end'}}>
           {this.renderButtons()}
         </div>
         <Charts>
-          <h3 className="chart-row-header">Overall Usage</h3>
-          <div className="chart-row">
-            <div className="chart">
-              <LineChart title={'CPU'}
-                datasets={cpu_datasets}
-                labels={labels} />
-            </div>
-            <div className="chart">
-              <LineChart title={'Memory (MB)'}
-                datasets={mem_datasets}
-                labels={labels} />
+          <div>
+            <h3 className="chart-row-header">Overall Usage</h3>
+            <div className="chart-row">
+              <div className="chart">
+                <LineChart title={'CPU'}
+                  datasets={cpu_datasets}
+                  labels={labels} />
+              </div>
+              <div className="chart">
+                <LineChart title={'Memory (MB)'}
+                  datasets={mem_datasets}
+                  labels={labels} />
+              </div>
             </div>
           </div>
-          <h3 className="chart-row-header">GPU Device Usage</h3>
-          <div className="chart-row">
-            <div className="chart">
-              <LineChart title={'GPU'}
-                datasets={gpu_datasets}
-                labels={labels}
-                multiple={true} />
-            </div>
-            <div className="chart">
-              <LineChart title={'Memory (MB)'}
-                datasets={gpu_mem_datasets}
-                labels={labels}
-                multiple={true} />
+          <div className={gpu_class_name}>
+            <h3 className="chart-row-header">GPU Device Usage</h3>
+            <div className="chart-row">
+              <div className="chart">
+                <LineChart title={'GPU'}
+                  datasets={gpu_datasets}
+                  labels={labels}
+                  multiple={true} />
+              </div>
+              <div className="chart">
+                <LineChart title={'Memory (MB)'}
+                  datasets={gpu_mem_datasets}
+                  labels={labels}
+                  multiple={true} />
+              </div>
             </div>
           </div>
         </Charts>
@@ -221,6 +244,7 @@ export default graphql(GET_PH_JOB_MONITORING, {
       }
     },
     fetchPolicy: 'network-only',
+    pollInterval: 10000,
     onError: errorHandler,
     skip: !isMonitoringEnabled(),
     })
