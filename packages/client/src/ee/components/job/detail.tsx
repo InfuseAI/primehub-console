@@ -252,7 +252,6 @@ export default class Detail extends React.Component<Props> {
             <TabPane
               key='monitoring'
               tab='Monitoring'
-              disabled={job.phase !== Phase.Failed && job.phase !== Phase.Succeeded}
             >
               <JobMonitoring jobId={job.id}></JobMonitoring>
             </TabPane>
