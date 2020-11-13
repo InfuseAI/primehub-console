@@ -169,6 +169,7 @@ export default class Detail extends React.Component<Props, State> {
           <Col span={24}>
             <Field labelCol={4} valueCol={20} label="Status" value={<strong>{phDeployment.status}</strong>} />
             <Field labelCol={4} valueCol={20} label="Message" value={getMessage(phDeployment)} />
+            <Field labelCol={4} valueCol={20} label="Endpoint" value={phDeployment.status === Status.Deployed ? phDeployment.endpoint : '-'} />
             <Field labelCol={4} valueCol={20} label="Creation Time" value={renderTime(phDeployment.creationTime)} />
             <Field labelCol={4} valueCol={20} label="Last Updated" value={renderTime(phDeployment.lastUpdatedTime)} />
           </Col>
@@ -194,17 +195,21 @@ export default class Detail extends React.Component<Props, State> {
         </Row>
         <Field style={{marginTop: 32}} type="vertical" label="Run an Example" value={(
           <>
-            <Button icon="copy" onClick={() => this.copyClipBoard()}
+            <Button
+              icon="copy"
+              ghost={true}
+              size="small"
               style={{
                 float: 'right',
-                top: 32,
+                top: 35,
+                right: 3,
                 marginTop: -32,
                 zIndex: 10,
                 position: 'relative',
                 color: '#ccc',
                 borderColor: '#ccc'
               }}
-              type="ghost"
+              onClick={() => this.copyClipBoard()}
             >
               Copy
             </Button>
