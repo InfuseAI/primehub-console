@@ -101,9 +101,11 @@ class JobMonitoringContainer extends React.Component<Props> {
       const period = this.state.period;
       const thisDatasets = this.props.data.phJob.monitoring.datasets;
       const nextDatasets = nextProps.data.phJob.monitoring.datasets;
-      const t1 = thisDatasets[period][thisDatasets[period].length - 1].timestamp;
-      const t2 = nextDatasets[period][nextDatasets[period].length - 1].timestamp;
-      if (t2 > t1) { return true }
+      if (thisDatasets[period].length > 0 && nextDatasets[period].length > 0) {
+        const t1 = thisDatasets[period][thisDatasets[period].length - 1].timestamp;
+        const t2 = nextDatasets[period][nextDatasets[period].length - 1].timestamp;
+        if (t2 > t1) { return true }
+      }
     }
     return false;
   }
