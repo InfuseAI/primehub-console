@@ -48,6 +48,9 @@ const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'N
 const isMonitoringEnabled = (): boolean => {
   return (window as any).enablePhfs && (window as any).enableJobArtifact && (window as any).enableJobMonitoring;
 };
+const convertToMB = (value: number) => {
+  return Math.round(value / 1024 / 1024 * 100) / 100;
+}
 
 const colors = {
   red: 'rgb(255, 99, 132)',
@@ -165,7 +168,7 @@ class JobMonitoringContainer extends React.Component<Props> {
       }]
       mem_datasets = [{
         borderColor: colors.green,
-        data: datasets[period].map(d => Math.round(d.mem_used / 1024 * 100) / 100),
+        data: datasets[period].map(d => convertToMB(d.mem_used)),
       }]
       // prepare datasets for gpu
       const gpus = {}
@@ -175,7 +178,7 @@ class JobMonitoringContainer extends React.Component<Props> {
             gpus[g.index] = {gpu: [], mem: []}
           }
           gpus[g.index].gpu.push(g.gpu_util);
-          gpus[g.index].mem.push(Math.round(g.mem_used / 1024 * 100) / 100);
+          gpus[g.index].mem.push(convertToMB(g.mem_used));
         });
       });
       Object.keys(gpus).forEach(index => {
@@ -209,7 +212,7 @@ class JobMonitoringContainer extends React.Component<Props> {
                   labels={labels} />
               </div>
               <div className="chart">
-                <LineChart title={'Memory (KB)'}
+                <LineChart title={'Memory (MB)'}
                   datasets={mem_datasets}
                   labels={labels} />
               </div>
@@ -225,7 +228,7 @@ class JobMonitoringContainer extends React.Component<Props> {
                   multiple={true} />
               </div>
               <div className="chart">
-                <LineChart title={'Memory (KB)'}
+                <LineChart title={'Memory (MB)'}
                   datasets={gpu_mem_datasets}
                   labels={labels}
                   multiple={true} />
