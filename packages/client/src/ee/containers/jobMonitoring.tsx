@@ -165,7 +165,7 @@ class JobMonitoringContainer extends React.Component<Props> {
       }]
       mem_datasets = [{
         borderColor: colors.green,
-        data: datasets[period].map(d => d.mem_used / 1024),
+        data: datasets[period].map(d => Math.round(d.mem_used / 1024 * 100) / 100),
       }]
       // prepare datasets for gpu
       const gpus = {}
@@ -175,7 +175,7 @@ class JobMonitoringContainer extends React.Component<Props> {
             gpus[g.index] = {gpu: [], mem: []}
           }
           gpus[g.index].gpu.push(g.gpu_util);
-          gpus[g.index].mem.push(g.mem_used / 1024);
+          gpus[g.index].mem.push(Math.round(g.mem_used / 1024 * 100) / 100);
         });
       });
       Object.keys(gpus).forEach(index => {
@@ -209,7 +209,7 @@ class JobMonitoringContainer extends React.Component<Props> {
                   labels={labels} />
               </div>
               <div className="chart">
-                <LineChart title={'Memory (MB)'}
+                <LineChart title={'Memory (KB)'}
                   datasets={mem_datasets}
                   labels={labels} />
               </div>
@@ -225,7 +225,7 @@ class JobMonitoringContainer extends React.Component<Props> {
                   multiple={true} />
               </div>
               <div className="chart">
-                <LineChart title={'Memory (MB)'}
+                <LineChart title={'Memory (KB)'}
                   datasets={gpu_mem_datasets}
                   labels={labels}
                   multiple={true} />
