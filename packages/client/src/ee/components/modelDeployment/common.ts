@@ -61,6 +61,7 @@ export interface DeploymentInfo {
   endpointAccessType: string;
   endpointClients: Array<ClientItem>;
   modelImage: string;
+  modelURI: string;
   pods: Array<{
     name: string;
     logEndpoint: string;
@@ -103,6 +104,7 @@ fragment PhDeploymentInfo on PhDeployment {
     name
   }
   modelImage
+  modelURI
   pods {
     name
     logEndpoint
@@ -124,6 +126,7 @@ fragment PhDeploymentInfo on PhDeployment {
       userName
       stop
       modelImage
+      modelURI
       replicas
       groupName
       description

@@ -42,6 +42,7 @@ export interface PhDeployment {
   groupName: string;
   endpoint: string;
   modelImage: string;
+  modelURI: string;
   replicas: number;
   availableReplicas: number;
   imagePullSecret: string;
@@ -58,6 +59,7 @@ export interface PhDeploymentMutationInput {
   name: string;
   replicas: number;
   modelImage: string;
+  modelURI: string;
   imagePullSecret: string;
   description: string;
   updateMessage: string;
@@ -109,6 +111,7 @@ const transformSpec = (id: string, time: string, groupName: string, spec: any) =
 
     // predictator
     modelImage: predictator.modelImage,
+    modelURI: predictator.modelURI,
     replicas: predictator.replicas,
     imagePullSecret: predictator.imagePullSecret,
     instanceType: predictator.instanceType,
@@ -155,6 +158,7 @@ export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>
 
     // predictator
     modelImage: predictator.modelImage,
+    modelURI: predictator.modelURI,
     replicas: predictator.replicas,
     imagePullSecret: predictator.imagePullSecret,
     instanceType: predictator.instanceType,
@@ -193,6 +197,7 @@ const createDeployment = async (context: Context, data: PhDeploymentMutationInpu
       name: 'predictor1',
       replicas: data.replicas,
       modelImage: data.modelImage,
+      modelURI: data.modelURI,
       instanceType: data.instanceType,
       imagePullSecret: data.imagePullSecret,
       metadata: data.metadata,
@@ -437,6 +442,7 @@ export const update = async (root, args, context: Context) => {
       name: 'predictor1',
       replicas: isUndefined(data.replicas) ? predictor.replicas : data.replicas ,
       modelImage: data.modelImage || predictor.modelImage,
+      modelURI: data.modelURI || predictor.modelURI,
       instanceType: data.instanceType || predictor.instanceType,
       imagePullSecret: isNull(data.imagePullSecret) ? null : data.imagePullSecret || predictor.imagePullSecret,
       metadata: mergedMetadata,

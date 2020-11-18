@@ -41,6 +41,7 @@ type PhDeployment {
   groupName: String
   endpoint: String
   modelImage: String
+  modelURI: String
   replicas: Int
   availableReplicas: Int
   imagePullSecret: String
@@ -93,6 +94,7 @@ input PhDeploymentCreateInput {
   name: String
   replicas: Int
   modelImage: String
+  modelURI: String
   imagePullSecret: String
   description: String
   updateMessage: String
@@ -106,6 +108,7 @@ input PhDeploymentCreateInput {
 input PhDeploymentUpdateInput {
   replicas: Int
   modelImage: String
+  modelURI: String
   imagePullSecret: String
   description: String
   updateMessage: String
