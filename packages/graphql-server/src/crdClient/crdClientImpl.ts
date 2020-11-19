@@ -201,6 +201,7 @@ export interface PhDeploymentSpec {
     name: string;
     replicas: number;
     modelImage: string;
+    modelURI: string;
     instanceType: string;
     imagePullSecret: string;
     metadata: Record<string, any>;

@@ -53,6 +53,7 @@ type FormValue = {
   name: string;
   id: string;
   modelImage: string;
+  modelURI: string;
   imagePullSecret: string;
   env: Array<{name: string, value: string}>;
   metadata: object;
@@ -176,6 +177,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       replicas,
       id,
       modelImage,
+      modelURI,
       imagePullSecret,
       description,
       env,
@@ -279,6 +281,35 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   </Form.Item>
                 </Col>
               </Row>
+
+              <Form.Item label={(
+                <span>
+                  Model URI&nbsp;
+                  <Tooltip title={(
+                    <React.Fragment>
+                      <div>{`Supported URIs are: `}</div>
+                      <ul>
+                        <li>{`phfs (e.g. phfs:///path/to/my/model, the path is mapped to /phfs/path/to/the/model in notebook)`}</li>
+                        <li>{`gs (e.g. gs://mybucket/path/to/my/model)`}</li>
+                      </ul>
+                    </React.Fragment>
+                  )}>
+                    <Icon type="question-circle-o" />
+                  </Tooltip>
+                </span>
+              )}>
+                {form.getFieldDecorator('modelURI', {
+                  initialValue: modelURI,
+                  rules: [
+                    {
+                      message: 'PHFS is not supported in this installation.', 
+                      validator: (rule, value, callback) => (value.substring(0, 4) === 'phfs' && !(window as any).enablePhfs ? callback('PHFS is not supported in this installation.') : callback())
+                    }
+                  ],
+                })(
+                  <Input />
+                )}
+              </Form.Item>
 
               <Form.Item label="Description" >
                 {form.getFieldDecorator('description', {

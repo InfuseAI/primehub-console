@@ -145,6 +145,7 @@ export default class History extends React.Component<Props, State> {
                   <Field label="User" value={deployment.userName ? deployment.userName : '-'} />
                   <Field label="Deployment Stopped" value={deployment.stop ? 'True' : 'False'} />
                   <Field label="Model Image" value={deployment.modelImage || '-'} />
+                  <Field label="Model URI" value={deployment.modelURI || '-'} />
                   <Field label="Replicas" value={deployment.replicas} />
                   <Field label="Group" value={deployment.groupName} />
                   <Field label="Instance Type" value={renderInstanceType(deployment.instanceType || {})} />

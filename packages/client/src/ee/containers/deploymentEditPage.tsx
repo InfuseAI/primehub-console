@@ -57,7 +57,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
     updatePhDeployment({
       variables: {
         where: {id: payload.id},
-        data: pick(payload, ['instanceType', 'modelImage', 'imagePullSecret', 'replicas', 'metadata', 'description', 'updateMessage', 'endpointAccessType', 'env'])
+        data: pick(payload, ['instanceType', 'modelImage', 'imagePullSecret', 'modelURI', 'replicas', 'metadata', 'description', 'updateMessage', 'endpointAccessType', 'env'])
       }
     });
   }
@@ -69,6 +69,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       instanceType: get(getPhDeployment, 'phDeployment.instanceType.id'),
       modelImage: get(getPhDeployment, 'phDeployment.modelImage'),
       imagePullSecret: get(getPhDeployment, 'phDeployment.imagePullSecret'),
+      modelURI: get(getPhDeployment, 'phDeployment.modelURI'),
       replicas: get(getPhDeployment, 'phDeployment.replicas'),
       groupId: get(getPhDeployment, 'phDeployment.groupId'),
       name: get(getPhDeployment, 'phDeployment.name'),
