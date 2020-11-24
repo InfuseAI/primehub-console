@@ -179,7 +179,7 @@ export default class Detail extends React.Component<Props, State> {
           <Col span={12}>
             <Field label="Model Image" value={phDeployment.status !== Status.Stopped ? phDeployment.modelImage : '-'} />
             <Field label="Image Pull Secret" value={phDeployment.imagePullSecret ? phDeployment.imagePullSecret : '-'} />
-            <Field label="Model URI" value={phDeployment.status !== Status.Stopped ? phDeployment.modelURI : '-'} />
+            <Field label="Model URI" value={(phDeployment.status !== Status.Stopped && phDeployment.modelURI) ? phDeployment.modelURI : '-'} />
             <Field label="Description" value={(
               <div style={{whiteSpace: 'pre-line'}}>
                 {phDeployment.description || '-'}
