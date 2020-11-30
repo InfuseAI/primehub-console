@@ -10,7 +10,6 @@ import Image from './image.schema';
 import Dataset from './dataset.schema';
 import Announcement from './announcement.schema';
 import Secret from './secret.schema';
-import Workspaces from './workspace.schema';
 import Jupyterhub from 'schema/jupyterhub.schema';
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {createFakeData} from 'canner-helpers';
@@ -27,7 +26,6 @@ const schema = (
       {/* <Idp/> */}
       {/* <UserFederation/> */}
       <Group/>
-      <Workspaces />
     </Body>
     <Body component={UserBody}>
       <User/>
@@ -53,15 +51,7 @@ if (process.env.NODE_ENV === 'production') {
   schema.graphqlClient = graphqlClient;
 } else {
   const fakeData = createFakeData(schema.schema, 12);
-  // ensure workspaceId:default in fakeData
-  fakeData.workspace[0].id = 'default';
-  fakeData.workspace[0].displayName = 'Default';
-  Object.keys(fakeData).forEach(key => {
-    if (key === 'workspace') return;
-    if (isArray(fakeData[key])) {
-      fakeData[key] = fakeData[key].map(row => ({...row, workspaceId: 'default'}));
-    }
-  })
+
   schema.connector = new LocalStorageConnector({
     defaultData: fakeData,
     localStorageKey: 'infuse'

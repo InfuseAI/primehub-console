@@ -64,16 +64,12 @@ input ResetActionInput {
 
 input UserWhereUniqueInput {
   id: ID!
-  # workspace
-  workspaceId: String
 }
 
 input UserWhereInput {
   id: ID
   username_contains: String
   email_contains: String
-  # workspace
-  workspaceId: String
 }
 
 """Mutation input"""
@@ -92,8 +88,6 @@ input UserCreateInput {
   sendEmail: Boolean
   resetActions: ResetActionInput
   expiresIn: Int
-  # workspace
-  workspaceId: String
 }
 
 input UserUpdateInput {

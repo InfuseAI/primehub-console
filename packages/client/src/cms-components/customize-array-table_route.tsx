@@ -106,11 +106,7 @@ export default class ArrayBreadcrumb extends Component<Props & {
     const {onChange, deploy, refId, value, intl, keyName} = this.props;
     let recordId = value[index].id;
     let actualIndex = index;
-    if (keyName === 'workspace') {
-      const dataSource = value.filter(dataSource => !dataSource.isDefault);
-      recordId = dataSource[index].id;
-      actualIndex = value.findIndex(record => record.id === recordId);
-    }
+
     confirm({
       title: intl.formatMessage({ id: "array.table.delete.confirm" }),
       okType: 'danger',
@@ -208,9 +204,7 @@ export default class ArrayBreadcrumb extends Component<Props & {
     } = this.props;
 
     let dataSource = value;
-    if (keyName === 'workspace') {
-      dataSource = value.filter(ws => !ws.isDefault);
-    }
+
     const disabled = ((keyName === 'image' || keyName === 'instanceType') && GLOBAL_DISABLE) ||
                      (keyName === 'group' && DISABLE_GROUP) ||
                      (keyName === 'buildImage' && DISABLE_BUILD_IMAGE);

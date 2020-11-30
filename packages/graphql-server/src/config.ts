@@ -56,9 +56,6 @@ export interface Config {
   enableDatasetUpload: boolean;
   groupVolumeStorageClass: string;
 
-  // workspace feature
-  enableWorkspace: boolean;
-
   // graphql host
   graphqlHost: string;
 
@@ -108,7 +105,6 @@ const defaultConfigs = {
   defaultUserVolumeCapacity: '20G',
   groupVolumeStorageClass: '',
   enableDatasetUpload: false,
-  enableWorkspace: false,
   licenseStatus: 'invalid',
   maxGroup: 999,
   graphqlHost: 'http://localhost:3001',
@@ -199,7 +195,6 @@ export const createConfig = (): Config => {
     usageReportAPIHost: process.env.PRIMEHUB_USAGE_REPORT_API_HOST,
     // Feature flags
     enableDatasetUpload: getEnvBoolean('PRIMEHUB_FEATURE_DATASET_UPLOAD', false),
-    enableWorkspace: getEnvBoolean('PRIMEHUB_FEATURE_ENABLE_WORKSPACE', false),
     enableStore: getEnvBoolean('PRIMEHUB_FEATURE_STORE', false),
     enableLogPersistence: getEnvBoolean('PRIMEHUB_FEATURE_LOG_PERSISTENCE', false),
   });

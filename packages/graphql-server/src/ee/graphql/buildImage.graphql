@@ -25,8 +25,6 @@ type BuildImageJob {
   packages: Packages
   logEndpoint: String
   updateTime: String
-  # workspace
-  workspaceId: String
 }
 
 """An edge in a connection."""
@@ -48,14 +46,10 @@ type BuildImageJobConnection {
 
 input BuildImageJobWhereUniqueInput {
   id: ID!
-  # workspace
-  workspaceId: String
 }
 
 input BuildImageJobWhereInput {
   id: ID!
-  # workspace
-  workspaceId: String
 }
 
 # BuildImage
@@ -69,8 +63,6 @@ type BuildImage {
   useImagePullSecret: String
   packages: Packages
   buildImageJobs: [BuildImageJob]
-  # workspace
-  workspaceId: String
 }
 
 """order"""
@@ -99,15 +91,11 @@ type BuildImageConnection {
 
 input BuildImageWhereUniqueInput {
   id: ID!
-  # workspace
-  workspaceId: String
 }
 
 input BuildImageWhereInput {
   id: ID
   name_contains: String
-  # workspace
-  workspaceId: String
 }
 
 """Mutation input"""
@@ -118,8 +106,6 @@ input BuildImageCreateInput {
   baseImage: String
   useImagePullSecret: String
   packages: PackagesInput
-  # workspace
-  workspaceId: String
 }
 
 input BuildImageUpdateInput {

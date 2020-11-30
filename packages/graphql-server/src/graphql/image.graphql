@@ -42,16 +42,12 @@ type ImageConnection {
 
 input ImageWhereUniqueInput {
   id: ID!
-  # workspace
-  workspaceId: String
 }
 
 input ImageWhereInput {
   id: ID
   name_contains: String
   displayName_contains: String
-  # workspace
-  workspaceId: String
 }
 
 """Mutation input"""
@@ -65,8 +61,6 @@ input ImageCreateInput {
   global: Boolean
   useImagePullSecret: String
   groups: GroupCreateManyInput
-  # workspace
-  workspaceId: String
 }
 
 input ImageUpdateInput {
