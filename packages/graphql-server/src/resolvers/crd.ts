@@ -11,6 +11,7 @@ import { CrdCache } from '../cache/crdCache';
 import * as logger from '../logger';
 import { parseResourceRole, ResourceRole } from './resourceRole';
 import { transform as transformGroup } from './groupUtils';
+import { keycloakMaxCount } from './constant';
 
 // utils
 const config = createConfig();
