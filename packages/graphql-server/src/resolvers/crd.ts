@@ -238,7 +238,7 @@ export class Crd<SpecType> {
   private query = async (root, args, context: Context) => {
     const customResource = context.crdClient[this.customResourceMethod];
     const where = this.parseWhere(args.where);
-    let rows = await this.listQuery(customResource, where, args && args.orderBy);
+    const rows = await this.listQuery(customResource, where, args && args.orderBy);
 
     return paginate(rows, extractPagination(args));
   }
@@ -246,7 +246,7 @@ export class Crd<SpecType> {
   private connectionQuery = async (root, args, context: Context) => {
     const customResource = context.crdClient[this.customResourceMethod];
     const where = this.parseWhere(args.where);
-    let rows = await this.listQuery(customResource, where, args && args.orderBy);
+    const rows = await this.listQuery(customResource, where, args && args.orderBy);
 
     return toRelay(rows, extractPagination(args));
   }
@@ -453,7 +453,7 @@ export class Crd<SpecType> {
     const everyoneGroupId = context.everyoneGroupId;
     // filter out everyone
     groups = groups.filter(group => group.id !== everyoneGroupId);
-    
+
     return groups;
   }
 
