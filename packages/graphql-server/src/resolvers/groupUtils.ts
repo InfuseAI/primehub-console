@@ -1,5 +1,6 @@
 import {
   getFromAttr,
+  getMultivaluedFromAttr,
   parseDiskQuota,
   parseMemory,
   parseBoolean
@@ -23,5 +24,6 @@ export const transform = (group: any): any => {
     displayName: getFromAttr('displayName', group.attributes, null),
     jobDefaultActiveDeadlineSeconds: getFromAttr('job-default-active-deadline-seconds',
                                                   group.attributes, null, parseInt),
+    admins: getMultivaluedFromAttr('admins', group.attributes, []),
   };
 };

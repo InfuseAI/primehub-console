@@ -44,7 +44,9 @@ const attrSchema = {
   homeSymlink: {type: FieldType.boolean, rename: 'home-symlink'},
   launchGroupOnly: {type: FieldType.boolean, rename: 'launch-group-only'},
   enabledDeployment: {type: FieldType.boolean, rename: 'enabled-deployment'},
-  jobDefaultActiveDeadlineSeconds: {type: FieldType.integer, rename: 'job-default-active-deadline-seconds'}
+  jobDefaultActiveDeadlineSeconds: {type: FieldType.integer, rename: 'job-default-active-deadline-seconds'},
+  // group admin
+  admins: {type: FieldType.string, multivalued: true}
 };
 
 const groupAttrs = Object.keys(attrSchema);
