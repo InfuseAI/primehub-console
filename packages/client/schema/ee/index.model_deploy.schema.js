@@ -8,7 +8,6 @@ import Group from 'schema/group.schema';
 import InstanceType from 'schema/instanceType.schema';
 import Announcement from 'schema/announcement.schema';
 import Secret from 'schema/secret.schema';
-import Workspaces from 'schema/workspace.schema';
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {createFakeData} from 'canner-helpers';
 import {dict, graphqlClient, imageStorage} from 'schema/utils';
@@ -21,7 +20,6 @@ const schema = (
       {/* <Idp/> */}
       {/* <UserFederation/> */}
       <Group/>
-      <Workspaces />
     </Body>
     <Body component={UserBody}>
       <User/>
@@ -38,8 +36,6 @@ if (process.env.NODE_ENV === 'production') {
   schema.graphqlClient = graphqlClient;
 } else {
   const fakeData = createFakeData(schema.schema, 12);
-  fakeData.workspace[0].id = 'default';
-  fakeData.workspace[0].displayName = 'Default';
   schema.connector = new LocalStorageConnector({
     defaultData: fakeData,
     localStorageKey: 'infuse'

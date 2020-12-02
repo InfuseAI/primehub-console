@@ -5,7 +5,6 @@ import { mutateRelation } from './utils';
 import { Crd } from './crd';
 import { isUndefined, isNil, isNull, get, omit } from 'lodash';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
-import CurrentWorkspace from '../workspace/currentWorkspace';
 import { ResourceNamePrefix } from './resourceRole';
 
 export const mapping = (item: Item<ImageSpec>) => {
@@ -25,17 +24,16 @@ export const mapping = (item: Item<ImageSpec>) => {
 export const resolveType = {
   async global(parent, args, context: Context) {
     const {kcAdminClient} = context;
-    const currentWorkspace: CurrentWorkspace = parent.currentWorkspace;
-    const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
+    const everyoneGroupId = context.everyoneGroupId;
     // find in everyOne group
-    return this.findInGroup(everyoneGroupId, parent.id, kcAdminClient, currentWorkspace);
+    return this.findInGroup(everyoneGroupId, parent.id, kcAdminClient);
   }
 };
 
 export const onCreate = async (
-  {role, resource, data, context, currentWorkspace}:
-  {role: RoleRepresentation, resource: any, data: any, context: Context, currentWorkspace: CurrentWorkspace}) => {
-  const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
+  {role, resource, data, context}:
+  {role: RoleRepresentation, resource: any, data: any, context: Context}) => {
+  const everyoneGroupId = context.everyoneGroupId;
   if (data && data.global) {
     // assign role to everyone
     await context.kcAdminClient.groups.addRealmRoleMappings({
@@ -65,9 +63,9 @@ export const onCreate = async (
 };
 
 export const onUpdate = async (
-  {role, resource, data, context, currentWorkspace}:
-  {role: RoleRepresentation, resource: any, data: any, context: Context, currentWorkspace: CurrentWorkspace}) => {
-  const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
+  {role, resource, data, context}:
+  {role: RoleRepresentation, resource: any, data: any, context: Context}) => {
+  const everyoneGroupId = context.everyoneGroupId;
   if (data && !isUndefined(data.global)) {
     if (data.global) {
       // assign role to everyone

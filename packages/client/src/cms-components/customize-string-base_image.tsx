@@ -60,14 +60,10 @@ export default class SelectString extends PureComponent<Props> {
 
   componentDidMount() {
     const {client} = this.props;
-    const regex = new RegExp(`${appPrefix}cms/([^/]+)/buildImage`);
-    const result = location.pathname.match(regex)
     client.query({
       query: IMAGES,
       variables: {
-        where: {
-          workspaceId: result && result[1]
-        }
+        where: {}
       }
     }).then(result => {
       this.setState({

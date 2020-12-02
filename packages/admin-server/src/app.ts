@@ -86,7 +86,6 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.state.requestApiTokenEndpoint = config.appPrefix ? `${config.appPrefix}/oidc/request-api-token` : '/oidc/request-api-token';
     ctx.state.disableMode = config.readOnlyOnInstanceTypeAndImage;
     ctx.state.enableDatasetUpload = config.enableDatasetUpload;
-    ctx.state.enableWorkspace = config.enableWorkspace;
     ctx.state.enableCustomImage = config.enableCustomImage;
     ctx.state.enableMaintenanceNotebook = config.enableMaintenanceNotebook;
     ctx.state.enableGrafana = config.enableGrafana;

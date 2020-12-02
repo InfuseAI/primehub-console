@@ -7,7 +7,6 @@ import { Context } from './interface';
 import { omit, get, isUndefined, last, isNil } from 'lodash';
 import { resolveInDataSet } from './secret';
 import KeycloakAdminClient from 'keycloak-admin';
-import CurrentWorkspace, { createInResolver } from '../workspace/currentWorkspace';
 import { keycloakMaxCount } from './constant';
 import { ResourceRole, ResourceNamePrefix } from './resourceRole';
 import {createConfig} from '../config';
@@ -210,16 +209,15 @@ export const updateMapping = (data: any) => {
 };
 
 export const onCreate = async (
-  {role, resource, data, context, getPrefix, currentWorkspace}:
+  {role, resource, data, context, getPrefix}:
   {
     role: RoleRepresentation,
     resource: any,
     data: any,
     context: Context,
-    getPrefix: (customizePrefix?: string) => string,
-    currentWorkspace: CurrentWorkspace
+    getPrefix: (customizePrefix?: string) => string
   }) => {
-  const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
+  const everyoneGroupId = context.everyoneGroupId;
   // dataset pv, create pvc
   if (resource.spec.type === 'pv' && (!resource.spec.pv || resource.spec.pv.provisioning === 'auto')) {
     if (isNil(data.volumeSize) || data.volumeSize <= 0) {
@@ -270,20 +268,19 @@ export const onCreate = async (
 };
 
 export const onUpdate = async (
-  {role, resource, data, context, getPrefix, currentWorkspace}:
+  {role, resource, data, context, getPrefix}:
   {
     role: RoleRepresentation,
     resource: any,
     data: any,
     context: Context,
-    getPrefix: (customizePrefix?: string) => string,
-    currentWorkspace: CurrentWorkspace
+    getPrefix: (customizePrefix?: string) => string
   }) => {
   if (!data) {
     return;
   }
 
-  const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
+  const everyoneGroupId = context.everyoneGroupId;
   if (data && !isUndefined(data.global)) {
     if (data.global) {
       // assign role to everyone
@@ -418,18 +415,17 @@ export const onDelete = async ({
 };
 
 const customUpdate = async ({
-  name, metadata, spec, customResource, context, getPrefix, currentWorkspace
+  name, metadata, spec, customResource, context, getPrefix
 }: {
   name: string,
   metadata: any,
   spec: any,
   customResource: any,
   context: Context,
-  getPrefix: (customizePrefix?: string) => string,
-  currentWorkspace: CurrentWorkspace
+  getPrefix: (customizePrefix?: string) => string
 }) => {
   // find original variables first
-  const row = await customResource.get(name, currentWorkspace.getK8sNamespace());
+  const row = await customResource.get(name);
   const originalVariables = row.spec.variables || {};
   const newVariables = spec.variables || {};
   spec.variables = mergeVariables(originalVariables, newVariables);
@@ -467,7 +463,7 @@ const customUpdate = async ({
   const res = await customResource.patch(name, {
     metadata: omit(metadata, 'name'),
     spec
-  }, currentWorkspace.getK8sNamespace());
+  });
 
   // if changing from pv to other types
   // change all rw roles to normal roles
@@ -475,17 +471,11 @@ const customUpdate = async ({
   const changedType = res.spec.type;
   if (originType !== changedType && originType === 'pv') {
     // find all groups with this role and change them
-    const groups = (currentWorkspace.checkIsDefault()) ?
-      await context.kcAdminClient.groups.find({
-        max: keycloakMaxCount
-      }) :
-      await context.workspaceApi.listGroups(currentWorkspace.getWorkspaceId());
+    const groups = await context.kcAdminClient.groups.find({ max: keycloakMaxCount });
     // find each role-mappings
     await Promise.all(
       groups
-      // list groups from workspace will not have everyoneGroupId anyway
       .filter(group => group.id !== context.everyoneGroupId)
-      .filter(group => !group.attributes.isWorkspace)
       .map(async group => {
         const roles = await context.kcAdminClient.groups.listRealmRoleMappings({
           id: group.id
@@ -533,10 +523,9 @@ const customUpdate = async ({
 export const resolveType = {
   async global(parent, args, context: Context) {
     const {kcAdminClient} = context;
-    const currentWorkspace: CurrentWorkspace = parent.currentWorkspace;
     // find in everyOne group
-    const everyoneGroupId = await currentWorkspace.getEveryoneGroupId();
-    return this.findInGroup(everyoneGroupId, parent.id, kcAdminClient, currentWorkspace);
+    const everyoneGroupId = context.everyoneGroupId;
+    return this.findInGroup(everyoneGroupId, parent.id, kcAdminClient);
   },
   async volumeSize(parent, args, context: Context) {
     const {k8sDatasetPvc} = context;
@@ -554,17 +543,11 @@ export const resolveType = {
   async groups(parent, args, context: Context) {
     const resourceId = parent.id;
     // find all groups
-    const currentWorkspace: CurrentWorkspace = parent.currentWorkspace;
-    const groups = (currentWorkspace.checkIsDefault()) ?
-      await context.kcAdminClient.groups.find({
-        max: keycloakMaxCount
-      }) :
-      await context.workspaceApi.listGroups(currentWorkspace.getWorkspaceId());
+    const groups = await context.kcAdminClient.groups.find({ max: keycloakMaxCount });
     // find each role-mappings
     const groupsWithRole = await Promise.all(
       groups
       .filter(group => group.id !== context.everyoneGroupId)
-      .filter(group => !group.attributes || !group.attributes.isWorkspace)
       .map(async group => {
         const roles = await context.kcAdminClient.groups.listRealmRoleMappings({
           id: group.id
@@ -572,8 +555,8 @@ export const resolveType = {
 
         // find roles with prefix:ds && prefix:rw:ds
         const findRole = roles.find(role =>
-            role.name === `${this.getPrefix(currentWorkspace)}${resourceId}`
-            || role.name === `${this.getPrefix(currentWorkspace, 'rw:')}${resourceId}`);
+            role.name === `${this.getPrefix()}${resourceId}`
+            || role.name === `${this.getPrefix('rw:')}${resourceId}`);
 
         // no role
         if (!findRole) {

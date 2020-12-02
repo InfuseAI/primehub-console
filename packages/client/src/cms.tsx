@@ -17,11 +17,6 @@ import {dict} from 'schema/utils';
 import iconNewTab from 'images/icon-new-tab.svg'
 const {Sider, Content} = Layout;
 const confirm = Modal.confirm;
-declare global {
-  interface Window {
-    workspaceId?: string;
-  }
-}
 
 const updateDatasetMutation = `
   mutation($payload: DatasetUpdateInput!, $where: DatasetWhereUniqueInput!){
@@ -53,8 +48,6 @@ export const Logo = styled.img`
   width: 100%;
 `;
 
-const ENABLE_WORKSPACE = (window as any).enableWorkspace;
-
 injectGlobal`
   .ant-menu-dark.ant-menu-submenu-popup {
     position: fixed;
@@ -69,8 +62,7 @@ export interface State {
   prepare: boolean;
   hasError: boolean;
   deploying: boolean;
-  dataChanged: Object;
-  workspaceList: Array<any>
+  dataChanged: Object
 }
 
 @injectIntl
@@ -81,8 +73,7 @@ export default class CMSPage extends React.Component<Props, State> {
     prepare: false,
     hasError: false,
     deploying: false,
-    dataChanged: {},
-    workspaceList: []
+    dataChanged: {}
   };
 
   cannerRef: any;
@@ -98,18 +89,6 @@ export default class CMSPage extends React.Component<Props, State> {
       delete schema.schema.buildImageJob;
     }
     return schema;
-  }
-
-  componentDidMount() {
-    const {match} = this.props;
-    window.workspaceId = (match.params as any).workspaceId || null;
-    if (!ENABLE_WORKSPACE) return;
-    this.fetchWorkspaceList()
-      .then(wss => {
-        this.setState({
-          workspaceList: wss
-        });
-      });
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -128,22 +107,6 @@ export default class CMSPage extends React.Component<Props, State> {
     console.log(error, info);
   }
 
-  fetchWorkspaceList = async () => {
-    const client = genClient(this.schema);
-    const result = await client.query({
-      query: gql`query {
-        workspaces {
-          id
-          name
-          displayName
-          isDefault
-        }
-      }`
-    })
-    const workspaceList = result.data.workspaces;
-    return workspaceList;
-  }
-
   dataDidChange = (dataChanged: object) => {
     this.setState({
       dataChanged
@@ -151,29 +114,13 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   beforeFetch = (key, {client, query, variables}) => {
-    const {match} = this.props;
-    const {workspaceId} = match.params as any;
-    const whereKey = `${key}Where`;
-
-    if (key === 'workspace') {
-      return {
-        query,
-        variables
-      };
-    }
-
-    const newVariables = update(variables, [whereKey], where => ({
-      ...where,
-      workspaceId
-    }));
-
     // refetch the buildImage list after update
     if (key === "buildImage" && !query) {
       try {
         const query = gql`${this.schema.schema.buildImage.graphql}`;
         const data = client.readQuery({
           query,
-          variables: newVariables
+          variables: variables
         });
         // if cached, clean it
         if (data) client.clearStore();
@@ -182,21 +129,11 @@ export default class CMSPage extends React.Component<Props, State> {
 
     return {
       query,
-      variables: newVariables
+      variables: variables
     };
   }
 
   beforeDeploy = (key, {mutation, variables}) => {
-    const {match} = this.props;
-    const {workspaceId} = match.params as any;
-
-    if (key === 'workspace') {
-      return {
-        mutation,
-        variables
-      };
-    }
-
     if (key === 'dataset') {
       // we replace the mutation since there will be a external field `uploadServerSecret`
       mutation = this.replaceDatasetMutation(mutation);
@@ -210,51 +147,22 @@ export default class CMSPage extends React.Component<Props, State> {
       // update or delete
       return {
         mutation,
-        variables: update(variables, ['where'], where => {
-          return {
-            ...where,
-            workspaceId
-          };
-        })
+        variables: variables
       };
     } else {
       // create
       return {
         mutation,
-        variables: update(variables, ['payload'], payload => {
-          return {
-            ...payload,
-            workspaceId
-          };
-        })
+        variables: variables
       };
     }
   }
 
   afterDeploy = (data) => {
-    const {intl, history, match} = this.props;
-    const {workspaceId} = match.params as any;
+    const {intl, history} = this.props;
     const actionType = get(data, 'actions.0.type');
-    if (actionType === 'DELETE_ARRAY' || actionType === 'UPDATE_ARRAY') {
-      if (data.key === 'workspace') {
-        this.fetchWorkspaceList()
-          .then(wss => {
-            this.setState({
-              workspaceList: wss
-            });
-          });
-      }
-    } else if (actionType === 'CREATE_ARRAY') {
-      let link = `${(window as any).APP_PREFIX}cms/${workspaceId}/${data.key}/${getCreateId(data.result)}`;
-      if (data.key === 'workspace') {
-        this.fetchWorkspaceList()
-          .then(wss => {
-            this.setState({
-              workspaceList: wss
-            });
-          });
-        link = `${(window as any).APP_PREFIX}cms/${workspaceId}/${data.key}/${getCreateId(data.result)}`;
-      }
+     if (actionType === 'CREATE_ARRAY') {
+      let link = `${(window as any).APP_PREFIX}cms/${data.key}/${getCreateId(data.result)}`;
       setTimeout(() => {
         this.setState({
           deploying: false
@@ -320,9 +228,8 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   siderMenuOnClick = (menuItem: {key: string}) => {
-    const {history, intl, match} = this.props;
-    const {workspaceId} = match.params as any;
-    const {dataChanged, workspaceList} = this.state;
+    const {history, intl} = this.props;
+    const {dataChanged} = this.state;
     const {key} = menuItem;
     if (dataChanged && Object.keys(dataChanged).length > 0) {
       confirm({
@@ -347,31 +254,22 @@ export default class CMSPage extends React.Component<Props, State> {
             resolve();
           }).then(this.reset)
             .then(() => {
-              history.push(`${(window as any).APP_PREFIX}cms/${workspaceId}/${key}`);
+              history.push(`${(window as any).APP_PREFIX}cms/${key}`);
             });
         },
         onCancel: () => undefined
       });
-    } else if (key.indexOf('workspace/') >= 0) {
-      const wsId = key.split('/')[1];
-      const currentWorkspace = workspaceList.find(ws => ws.id === wsId) || {} as any;
-      history.push(`${(window as any).APP_PREFIX}cms/${wsId}/${currentWorkspace.isDefault ? 'system' : 'group'}`);
-    } else if (key === 'workspace') {
-      const defaultWorkspaceId = (workspaceList.find(ws => ws.isDefault) || {}).id || 'default';
-      history.push(`${(window as any).APP_PREFIX}cms/${defaultWorkspaceId}/${key}`);
     } else if (dict['en'][`${key}.externalLink`] || key === 'backToUserPortal') {
       // add this condition to keep page content not change when 
       // opening external link or backing to user portal
     } else {
-      history.push(`${(window as any).APP_PREFIX}cms/${workspaceId}/${key}`);
+      history.push(`${(window as any).APP_PREFIX}cms/${key}`);
     }
   }
 
   renderMenu = () => {
-    const {workspaceList = []} = this.state;
     const {match} = this.props;
-    const {activeKey, workspaceId} = match.params as any;
-    const currentWorkspace = workspaceList.find(ws => ws.id === workspaceId) || {};
+    const {activeKey} = match.params as any;
     const navigationMenu = (
       <Menu.Item key="backToUserPortal">
         <a href='/'>
@@ -380,57 +278,19 @@ export default class CMSPage extends React.Component<Props, State> {
         </a>
       </Menu.Item>
     );
-    const workspaceMenu = (
-      <Menu.SubMenu
-        key="workspace_list"
-        style={{
-          paddingTop: 36,
-          paddingBottom: 12
-        }}
-        title={currentWorkspace.displayName || 'Default'}
-      >
-        {workspaceList.map(ws => (
-          <Menu.Item key={`workspace/${ws.id}`}>
-            {ws.displayName}
-          </Menu.Item>
-        ))}
-        <Menu.Item key="workspace">
-          <Icon type="setting" /> <FormattedMessage id="workspace.management" />
-        </Menu.Item>
-      </Menu.SubMenu>
-    );
+
     return (
       <Menu
         onClick={this.siderMenuOnClick}
-        selectedKeys={[activeKey, `workspace/${workspaceId}`].concat(activeKey === 'buildImageJob' ? 'buildImage' : '')}
+        selectedKeys={[activeKey].concat(activeKey === 'buildImageJob' ? 'buildImage' : '')}
         theme="dark"
         mode="vertical"
       >
-        {ENABLE_WORKSPACE && (
-          <span style={{
-            left: '16px',
-            position: 'relative',
-            top: '36px',
-            fontSize: '14px'
-          }}>
-            WORKSPACE
-          </span>
-        )}
         {navigationMenu}
-        {ENABLE_WORKSPACE && workspaceMenu}
         {
           Object.keys(this.schema.schema)
             .filter(key => key !== 'buildImageJob')
-            .filter(key => {
-              if (!ENABLE_WORKSPACE && key !== 'workspace') return true;
-              if (
-                !currentWorkspace.isDefault &&
-                (key === 'system' || key === 'user')
-              ) {
-                return false;
-              }
-              return key !== 'workspace';
-            }).map(key => dict['en'][`${key}.externalLink`]?
+            .map(key => dict['en'][`${key}.externalLink`]?
               (
                 <Menu.Item key={key}>
                   <a href={dict['en'][`${key}.externalLink`]} target='_blank'>
@@ -466,16 +326,15 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   render() {
-    const {history, match} = this.props;
+    const {history} = this.props;
     const {hasError} = this.state;
     if (hasError) {
       return <Error/>;
     }
 
-    const {workspaceId} = match.params as any;
     const router = new R({
       history,
-      baseUrl: `${(window as any).APP_PREFIX || '/'}cms/${workspaceId}`
+      baseUrl: `${(window as any).APP_PREFIX || '/'}cms`
     });
     const routes = router.getRoutes();
     const routerParams = {
@@ -500,9 +359,6 @@ export default class CMSPage extends React.Component<Props, State> {
           </Sider>
           <Content style={{marginLeft: 200}}>
             <Canner
-              // use workspaceId as the key. So, if the workspaceId changed,
-              // the Canner component will re-mount to fetch correct data
-              key={workspaceId}
               schema={this.schema}
               goTo={router.goTo}
               routes={routes}
