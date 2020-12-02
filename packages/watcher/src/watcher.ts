@@ -38,6 +38,7 @@ export default class Watcher<T> {
     this.everyoneGroupId = everyoneGroupId;
     this.getAccessToken = getAccessToken;
     this.k8sCrdNamespace = k8sCrdNamespace;
+  }
 
   public watch = (options?: {rewatch?: boolean}) => {
     const prefix = this.crd.getPrefix();
