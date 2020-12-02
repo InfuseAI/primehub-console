@@ -65,16 +65,12 @@ type InstanceTypeConnection {
 
 input InstanceTypeWhereUniqueInput {
   id: ID!
-  # workspace
-  workspaceId: String
 }
 
 input InstanceTypeWhereInput {
   id: ID
   name_contains: String
   displayName_contains: String
-  # workspace
-  workspaceId: String
 }
 
 """Mutation input"""
@@ -91,8 +87,6 @@ input InstanceTypeCreateInput {
   groups: GroupCreateManyInput
   tolerations: TolerationArrayInput
   nodeSelector: JSON
-  # workspace
-  workspaceId: String
 }
 
 input InstanceTypeUpdateInput {

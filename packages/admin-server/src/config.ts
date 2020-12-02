@@ -43,8 +43,6 @@ export interface Config {
   readOnlyOnInstanceTypeAndImage?: boolean;
   enableDatasetUpload: boolean;
 
-  // workspace feature
-  enableWorkspace: boolean;
   // image builder
   // TODO: need rename variable to image builder for consistently
   enableCustomImage: boolean;
@@ -98,7 +96,6 @@ const defaultConfigs = {
   homeConfigPath: resolve(__dirname, '../etc/home-config.yaml'),
   readOnlyOnInstanceTypeAndImage: false,
   enableDatasetUpload: false,
-  enableWorkspace: false,
   enableCustomImage: false,
   enableMaintenanceNotebook: false,
   enableUsageReport: false,
@@ -171,7 +168,6 @@ export const createConfig = (): Config => {
     primehubVersion: process.env.PH_VERSION,
     // Feature Flags
     enableDatasetUpload: getEnvBoolean('PRIMEHUB_FEATURE_DATASET_UPLOAD', false),
-    enableWorkspace: getEnvBoolean('PRIMEHUB_FEATURE_ENABLE_WORKSPACE', false),
     enableCustomImage: getEnvBoolean('PRIMEHUB_FEATURE_CUSTOM_IMAGE', false),
     enableMaintenanceNotebook: getEnvBoolean('PRIMEHUB_FEATURE_MAINTENANCE_NOTEBOOK', false),
     enableGrafana: getEnvBoolean('PRIMEHUB_FEATURE_GRAFANA', false),

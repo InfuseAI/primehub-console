@@ -10,7 +10,6 @@ import Image from 'schema/image.schema';
 import Dataset from 'schema/dataset.schema';
 import Announcement from 'schema/announcement.schema';
 import Secret from 'schema/secret.schema';
-import Workspaces from 'schema/workspace.schema';
 import Jupyterhub from 'schema/jupyterhub.schema';
 import BuildImage from 'schema/ee/buildImage.schema';
 import BuildImageJob from 'schema/ee/buildImageJob.schema';
@@ -50,7 +49,6 @@ const schema = (
       {/* <Idp/> */}
       {/* <UserFederation/> */}
       <Group/>
-      <Workspaces />
     </Body>
     <Body component={UserBody}>
       <User/>
@@ -83,15 +81,7 @@ if (process.env.NODE_ENV === 'production') {
   schema.graphqlClient = graphqlClient;
 } else {
   const fakeData = createFakeData(schema.schema, 12);
-  // ensure workspaceId:default in fakeData
-  fakeData.workspace[0].id = 'default';
-  fakeData.workspace[0].displayName = 'Default';
-  Object.keys(fakeData).forEach(key => {
-    if (key === 'workspace') return;
-    if (isArray(fakeData[key])) {
-      fakeData[key] = fakeData[key].map(row => ({...row, workspaceId: 'default'}));
-    }
-  })
+
   schema.connector = new LocalStorageConnector({
     defaultData: fakeData,
     localStorageKey: 'infuse'

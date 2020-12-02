@@ -12,7 +12,6 @@ import morgan from 'koa-morgan';
 import * as GraphQLJSON from 'graphql-type-json';
 import { makeExecutableSchema } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
-import WorkspaceApi from './workspace/api';
 import mime from 'mime';
 import url from 'url';
 import CrdClient, { InstanceTypeSpec, ImageSpec } from './crdClient/crdClientImpl';
@@ -20,7 +19,6 @@ import * as system from './resolvers/system';
 import * as user from './resolvers/user';
 import * as group from './resolvers/group';
 import * as secret from './resolvers/secret';
-import * as workspace from './resolvers/workspace';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset, regenerateUploadSecret} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
@@ -86,9 +84,6 @@ const resolvers = {
     secret: secret.queryOne,
     secrets: secret.query,
     secretsConnection: secret.connectionQuery,
-    workspace: workspace.queryOne,
-    workspaces: workspace.query,
-    workspacesConnection: workspace.connectionQuery,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),
@@ -109,9 +104,6 @@ const resolvers = {
     createSecret: secret.create,
     updateSecret: secret.update,
     deleteSecret: secret.destroy,
-    createWorkspace: workspace.create,
-    updateWorkspace: workspace.update,
-    deleteWorkspace: workspace.destroy,
     regenerateUploadServerSecret: regenerateUploadSecret,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
@@ -123,7 +115,6 @@ const resolvers = {
   },
   User: user.typeResolvers,
   Group: group.typeResolvers,
-  Workspace: workspace.typeResolvers,
   ...instanceType.typeResolver(),
   ...dataset.typeResolver(),
   ...image.typeResolver(),
@@ -388,13 +379,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       // cache layer
       addCacheLayerToKc(kcAdminClient);
 
-      // workspace
-      const workspaceApi = new WorkspaceApi({
-        defaultNamespace: config.k8sCrdNamespace,
-        enableWorkspace: config.enableWorkspace,
-        kcAdminClient
-      });
-
       return {
         realm: config.keycloakRealmName,
         everyoneGroupId: config.keycloakEveryoneGroupId,
@@ -410,7 +394,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         username,
         role,
         defaultUserVolumeCapacity: config.defaultUserVolumeCapacity,
-        workspaceApi,
         crdNamespace: config.k8sCrdNamespace,
         k8sDatasetPvc: datasetPvc,
         k8sGroupPvc: groupPvc,

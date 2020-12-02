@@ -3,9 +3,6 @@ import { Crd } from '@infuseai/graphql-server/lib/resolvers/crd';
 import CustomResource from '@infuseai/graphql-server/lib/crdClient/customResource';
 import { isUndefined } from 'lodash';
 import * as logger from './logger';
-import CurrentWorkspace from '@infuseai/graphql-server/lib/workspace/currentWorkspace';
-import WorkspaceApi from '@infuseai/graphql-server/lib/workspace/api';
-import { defaultWorkspaceId } from '@infuseai/graphql-server/lib/resolvers/constant';
 
 export default class Watcher<T> {
   private crd: Crd<T>;
@@ -15,8 +12,6 @@ export default class Watcher<T> {
   private everyoneGroupId: string;
   private request: any;
   private getAccessToken: () => Promise<string>;
-  private currentWorkspace: CurrentWorkspace;
-  private workspaceApi: WorkspaceApi;
   private k8sCrdNamespace: string;
 
   constructor({
@@ -43,17 +38,9 @@ export default class Watcher<T> {
     this.everyoneGroupId = everyoneGroupId;
     this.getAccessToken = getAccessToken;
     this.k8sCrdNamespace = k8sCrdNamespace;
-    this.workspaceApi = new WorkspaceApi({
-      defaultNamespace: k8sCrdNamespace,
-      kcAdminClient: keycloakAdmin,
-      enableWorkspace: false
-    });
-    this.currentWorkspace = new CurrentWorkspace(
-      this.workspaceApi, this.everyoneGroupId, true, defaultWorkspaceId, k8sCrdNamespace);
-  }
 
   public watch = (options?: {rewatch?: boolean}) => {
-    const prefix = this.crd.getPrefix(this.currentWorkspace);
+    const prefix = this.crd.getPrefix();
     logger.info({
       component: logger.components.watcher,
       type: 'START',
@@ -87,7 +74,6 @@ export default class Watcher<T> {
             object.spec,
             {
               kcAdminClient: this.keycloakAdmin,
-              workspaceApi: this.workspaceApi,
               defaultNamespace: this.k8sCrdNamespace,
               everyoneGroupId: this.everyoneGroupId
             }

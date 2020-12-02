@@ -26,9 +26,6 @@ type Dataset {
   volumeSize: Float
   enableUploadServer: Boolean
   uploadServerLink: String
-
-  # workspace
-  workspaceId: String
 }
 
 """order"""
@@ -69,24 +66,18 @@ type DatasetConnection {
 
 input DatasetWhereUniqueInput {
   id: ID!
-  # workspace
-  workspaceId: String
 }
 
 input DatasetWhereInput {
   id: ID
   name_contains: String
   displayName_contains: String
-  # workspace
-  workspaceId: String
 }
 
 """group relation"""
 input DatasetGroupWhereUniqueInput {
   id: ID!
   writable: Boolean
-  # workspace
-  workspaceId: String
 }
 
 input DatasetGroupCreateManyInput {
@@ -150,9 +141,6 @@ input DatasetCreateInput {
   volumeSize: Float
   enableUploadServer: Boolean
   uploadServerLink: String
-
-  # workspace
-  workspaceId: String
 }
 
 input DatasetUpdateInput {

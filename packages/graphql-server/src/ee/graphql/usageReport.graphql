@@ -28,6 +28,4 @@ type UsageReportConnection {
 
 input UsageReportWhereInput {
   id_contains: String
-  # workspace
-  workspaceId: String
 }

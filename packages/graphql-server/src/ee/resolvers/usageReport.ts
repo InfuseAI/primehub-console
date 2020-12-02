@@ -57,11 +57,11 @@ const listQuery = async (context: Context, where: any, order: any) => {
 };
 
 export const query = async (root, args, context: Context) => {
-  const usageReports = await listQuery(context, args && omit(args.where, 'workspaceId'), args && args.orderBy);
+  const usageReports = await listQuery(context, args && args.where, args && args.orderBy);
   return paginate(usageReports, extractPagination(args));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
-  const usageReports = await listQuery(context, args && omit(args.where, 'workspaceId'), args && args.orderBy);
+  const usageReports = await listQuery(context, args && args.where, args && args.orderBy);
   return toRelay(usageReports, extractPagination(args));
 };
