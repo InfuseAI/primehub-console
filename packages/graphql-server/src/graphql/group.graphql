@@ -85,6 +85,10 @@ input InstancePlaceHolder {
   set: [String]
 }
 
+input GroupAdminPlaceHolder {
+  set: [String]
+}
+
 """Mutation input"""
 input GroupCreateInput {
   name: String!
@@ -113,7 +117,7 @@ input GroupCreateInput {
   enabledDeployment: Boolean
   jobDefaultActiveDeadlineSeconds: Int
   # group admin
-  admins: [String]
+  admins: GroupAdminPlaceHolder
 }
 
 input GroupUpdateInput {
@@ -143,7 +147,7 @@ input GroupUpdateInput {
   enabledDeployment: Boolean
   jobDefaultActiveDeadlineSeconds: Int
   # group admin
-  admins: [String]
+  admins: GroupAdminPlaceHolder
 }
 
 """Relation input"""
