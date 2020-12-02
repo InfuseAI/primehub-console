@@ -22,7 +22,6 @@ export interface SchemaType {
     serialize?: any,
     deserialize?: any
     rename?: string
-    multivalued?: boolean
   };
 }
 
@@ -79,7 +78,13 @@ export class Attributes {
       }
 
       const fieldName = (this.schema[key] && this.schema[key].rename) || key;
-      result[fieldName] = (this.schema[key] && this.schema[key].multivalued) ? [...value] : [value];
+      if (fieldName === 'admins') {
+        if (typeof(value) === 'object' && value.set) {
+          result[fieldName] = [...value.set];
+        }
+      } else {
+        result[fieldName] = [value];
+      }
       return result;
     }, {});
 
@@ -108,11 +113,7 @@ export class Attributes {
       const typeTransform = transforms[value.type];
       const customTransform = value.deserialize;
       const transform = customTransform || typeTransform || noop;
-      if (value.multivalued) {
-        result[key] = keycloakAttr[fieldName].map(v => transform(v))
-      } else {
-        result[key] = transform(keycloakAttr[fieldName][0]);
-      }
+      result[key] = transform(keycloakAttr[fieldName][0]);
       return result;
     }, {});
 

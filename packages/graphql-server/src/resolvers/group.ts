@@ -46,7 +46,7 @@ const attrSchema = {
   enabledDeployment: {type: FieldType.boolean, rename: 'enabled-deployment'},
   jobDefaultActiveDeadlineSeconds: {type: FieldType.integer, rename: 'job-default-active-deadline-seconds'},
   // group admin
-  admins: {type: FieldType.string, multivalued: true}
+  admins: {type: FieldType.string}
 };
 
 const groupAttrs = Object.keys(attrSchema);
