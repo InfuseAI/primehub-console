@@ -23,10 +23,8 @@ export default class RelationGroupUsersTable extends PureComponent {
 
   componentDidMount () {
     const { rootValue } = this.props;
-    debugger;
     const org_admins = get(rootValue, ['group', '0', 'admins'], "");
-    const admins = org_admins ? org_admins : [];
-
+    const admins = org_admins ? org_admins.split(',') : [];
     this.setState({admins});
   }
 
@@ -163,7 +161,7 @@ export default class RelationGroupUsersTable extends PureComponent {
         }
         <Table
           dataSource={showValues}
-          columns={[...columnsRender, {title: 'Group Admin', render: this.renderGroupAdminCheckbox}]}
+          columns={[...columnsRender, {title: intl.formatMessage({id: 'group.admin'}), render: this.renderGroupAdminCheckbox}]}
           style={{marginBottom: 16}}
         />
         {

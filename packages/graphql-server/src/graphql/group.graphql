@@ -32,7 +32,7 @@ type Group {
   enabledDeployment: Boolean
   jobDefaultActiveDeadlineSeconds: Int
   # group admin
-  admins: [String]
+  admins: String
 }
 
 """order"""
@@ -85,9 +85,6 @@ input InstancePlaceHolder {
   set: [String]
 }
 
-input GroupAdminPlaceHolder {
-  set: [String]
-}
 
 """Mutation input"""
 input GroupCreateInput {
@@ -117,7 +114,7 @@ input GroupCreateInput {
   enabledDeployment: Boolean
   jobDefaultActiveDeadlineSeconds: Int
   # group admin
-  admins: GroupAdminPlaceHolder
+  admins: String
 }
 
 input GroupUpdateInput {
@@ -147,7 +144,7 @@ input GroupUpdateInput {
   enabledDeployment: Boolean
   jobDefaultActiveDeadlineSeconds: Int
   # group admin
-  admins: GroupAdminPlaceHolder
+  admins: String
 }
 
 """Relation input"""
