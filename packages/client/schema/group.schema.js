@@ -79,6 +79,7 @@ export default () => (
               projectQuotaCpu
               projectQuotaGpu
               sharedVolumeCapacity
+              admins
             }
           }
           pageInfo {
@@ -210,7 +211,7 @@ export default () => (
           </Col>
         </Row>
       </Block>
-      <array keyName="admins"><string /></array>
+      <string keyName="admins" title="Admins"/>
       <Block title="${users}">
         <relation keyName="users"
           packageName='../src/cms-components/customize-relation-group-users-table'
