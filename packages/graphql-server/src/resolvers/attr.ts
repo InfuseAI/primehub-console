@@ -111,7 +111,12 @@ export class Attributes {
       const typeTransform = transforms[value.type];
       const customTransform = value.deserialize;
       const transform = customTransform || typeTransform || noop;
-      result[key] = transform(keycloakAttr[fieldName][0]);
+      // admins transform
+      if ( fieldName === 'admins' ) {
+        result[key] = keycloakAttr[fieldName].join(',');
+      } else {
+        result[key] = transform(keycloakAttr[fieldName][0]);
+      }
       return result;
     }, {});
 

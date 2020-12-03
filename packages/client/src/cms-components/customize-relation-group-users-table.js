@@ -40,13 +40,23 @@ export default class RelationGroupUsersTable extends PureComponent {
 
   handleOk = (queue, originData) => {
     let {onChange, refId, value = []} = this.props;
+
     // $FlowFixMe
     const currentIds = value.map(v => v.id);
     const idsShouldCreate = difference(queue, currentIds);
     const idsShouldRemove = difference(currentIds, queue);
     const createActions = idsShouldCreate.map(id => ({refId, type: "connect", value: originData.find(data => data.id === id)}));
     const delActions = idsShouldRemove.map(id => ({refId, type: "disconnect", value: originData.find(data => data.id === id)}));
-    onChange([...createActions, ...delActions]);
+    [...createActions, ...delActions].forEach(action => {
+      this.removeAdmin(action.value.username);
+    });
+    const removeAdminAction = {
+      refId: refId.remove(1).child('admins'),
+      type: 'update',
+      value: this.state.admins.toString()
+    };
+
+    onChange([...createActions, ...delActions, removeAdminAction]);
     this.handleCancel();
   }
 
@@ -77,8 +87,7 @@ export default class RelationGroupUsersTable extends PureComponent {
     } else {
       this.removeAdmin(value);
     }
-    console.log(this.state.admins);
-    onChange(parentRefId.child('admins'), 'update', this.state.admins.toString(), {});
+    onChange(parentRefId.child('admins'), 'update', this.state.admins.toString());
   }
 
   removeAdmin = (value) => {

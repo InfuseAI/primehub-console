@@ -183,6 +183,7 @@ export const update = async (root, args, context: Context) => {
   if (payload.enabledSharedVolume) {
     data.homeSymlink = true;
   }
+
   attrs.mergeWithData(data);
 
   // validate if a group has sharedVolumeCapacity = null + enabledSharedVolume, it should raise an error.
