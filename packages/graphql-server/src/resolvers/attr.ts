@@ -79,9 +79,7 @@ export class Attributes {
 
       const fieldName = (this.schema[key] && this.schema[key].rename) || key;
       if (fieldName === 'admins') {
-        if (typeof(value) === 'object' && value.set) {
-          result[fieldName] = [...value.set];
-        }
+        result[fieldName] = value.split(',');
       } else {
         result[fieldName] = [value];
       }

@@ -197,14 +197,14 @@ export const extractPagination = (args: any): Pagination => {
   return pick(args, ['last', 'first', 'before', 'after', 'page']);
 };
 
-export const getFromAttr = (key: string, attributes: Record<string, any>, defaultValue: any, type: any = v => v) => {
-  const value = attributes && attributes[key] && attributes[key][0];
-  return isUndefined(value) ? defaultValue : type(value);
-};
-
 export const getMultivaluedFromAttr = (key: string, attributes: Record<string, any>, defaultValue: any, type: any = v => v) => {
   const values = attributes && attributes[key] || defaultValue;
   return values.map(v => type(v));
+};
+
+export const getFromAttr = (key: string, attributes: Record<string, any>, defaultValue: any, type: any = v => v) => {
+  const value = attributes && attributes[key] && attributes[key][0];
+  return isUndefined(value) ? defaultValue : type(value);
 };
 
 export const parseFromAttr = (key: string, attributes: Record<string, any>, type: any = v => v) => {
