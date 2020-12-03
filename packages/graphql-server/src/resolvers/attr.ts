@@ -78,11 +78,7 @@ export class Attributes {
       }
 
       const fieldName = (this.schema[key] && this.schema[key].rename) || key;
-      if (fieldName === 'admins') {
-        result[fieldName] = value.split(',');
-      } else {
-        result[fieldName] = [value];
-      }
+      result[fieldName] = (fieldName === 'admins') ? value.split(',') : [value];
       return result;
     }, {});
 
@@ -112,11 +108,8 @@ export class Attributes {
       const customTransform = value.deserialize;
       const transform = customTransform || typeTransform || noop;
       // admins transform
-      if ( fieldName === 'admins' ) {
-        result[key] = keycloakAttr[fieldName].join(',');
-      } else {
-        result[key] = transform(keycloakAttr[fieldName][0]);
-      }
+      result[key] = (fieldName === 'admins') ?
+        keycloakAttr[fieldName].join(',') : transform(keycloakAttr[fieldName][0]);
       return result;
     }, {});
 
