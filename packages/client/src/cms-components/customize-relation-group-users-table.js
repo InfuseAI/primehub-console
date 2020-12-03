@@ -14,17 +14,20 @@ import pluralize from 'pluralize';
 export default class RelationGroupUsersTable extends PureComponent {
   constructor(props) {
     super(props);
-    this.admins = [];
-    if (props.rootValue &&
-      props.rootValue.group &&
-      props.rootValue.group[0] &&
-      props.rootValue.group[0].admins) {
-      this.admins = props.rootValue.group[0].admins;
-    }
     this.isOnComposition = false;
     this.state = {
       modalVisible: false,
+      admins: []
     };
+  }
+
+  componentDidMount () {
+    const { rootValue } = this.props;
+    debugger;
+    const org_admins = get(rootValue, ['group', '0', 'admins'], "");
+    const admins = org_admins ? org_admins : [];
+
+    this.setState({admins});
   }
 
   static defaultProps = {
@@ -76,27 +79,31 @@ export default class RelationGroupUsersTable extends PureComponent {
     } else {
       this.removeAdmin(value);
     }
-    console.log(this.admins);
-    onChange(parentRefId.child('admins'), 'update', this.admins);
-    this.setState({updated: new Date()});
+    console.log(this.state.admins);
+    onChange(parentRefId.child('admins'), 'update', this.state.admins.toString(), {});
   }
 
   removeAdmin = (value) => {
-    const index = this.admins.indexOf(value);
+    const { admins } = this.state;
+    const index = admins.indexOf(value);
     if (index !== -1) {
-      this.admins.splice(index, 1);
+      admins.splice(index, 1);
     }
+    this.setState({admins});
   };
 
   addAdmin = (value) => {
-    const index = this.admins.indexOf(value);
+    const { admins } = this.state;
+    const index = admins.indexOf(value);
     if (index === -1) {
-      this.admins.push(value);
+      admins.push(value);
     }
+    this.setState({admins});
   }
 
   renderGroupAdminCheckbox = (value, record) => {
-    return <Checkbox checked={this.admins.includes(record.username)}
+    const { admins } = this.state;
+    return <Checkbox checked={admins.includes(record.username)}
       onChange={(e) => { this.onGroupAdminChange(e.target.checked, record.username); }} />;
   }
 
