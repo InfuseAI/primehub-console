@@ -17,6 +17,7 @@ export const mapping = (item: Item<ImageSpec>) => {
     url: item.spec.url,
     urlForGpu: item.spec.urlForGpu,
     useImagePullSecret: item.spec.pullSecret,
+    groupName: item.spec.groupName,
     spec: item.spec,
   };
 };

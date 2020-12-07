@@ -18,7 +18,7 @@ type Group {
   projectQuotaMemory: Float
   users: [User]
   instanceTypes: [InstanceType]
-  images: [Image]
+  images(includeInternal: Boolean, internalOnly: Boolean): [Image]
   datasets: [Dataset]
   resourceStatus: ResourceStatus
   # for relation with dataset
