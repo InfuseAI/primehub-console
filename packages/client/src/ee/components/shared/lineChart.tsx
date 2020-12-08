@@ -39,6 +39,7 @@ class LineChart extends React.Component<Props> {
             },
             type: 'time',
             time: {
+              tooltipFormat: 'YYYY/MM/DD HH:mm:ss',
               unit: 'minute',
               displayFormats: {
                 minute: 'HH:mm'
