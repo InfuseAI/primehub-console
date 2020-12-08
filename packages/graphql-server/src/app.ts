@@ -29,6 +29,7 @@ import basicAuth from 'basic-auth';
 import koaMount from 'koa-mount';
 import { OidcTokenVerifier } from './oidc/oidcTokenVerifier';
 import cors from '@koa/cors';
+import { PodLogs } from './utils/podLogs';
 
 // cache
 import {
@@ -220,6 +221,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   const apiTokenCache = new ApiTokenCache({
     oidcClient
   });
+
+  const podLogs = new PodLogs({
+    namespace: config.k8sCrdNamespace
+  });
+
   // ann
   const annCtrl = new AnnCtrl({
     createKcAdminClient,
@@ -547,6 +553,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       const role = (roles.indexOf('realm-admin') >= 0) ? Role.ADMIN : Role.USER;
       ctx.role = role;
       ctx.userId = tokenPayload.sub;
+      ctx.username = tokenPayload.preferred_username;
 
       return next();
     }
@@ -578,6 +585,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   };
 
   mountAnn(rootRouter, annCtrl);
+
+  // Notebook Log
+  rootRouter.get(podLogs.getRoute(), authenticateMiddleware, podLogs.streamPodLogs);
 
   // health check
   rootRouter.get('/health', async ctx => {

@@ -1,5 +1,5 @@
 import * as chai from 'chai';
-import { escapeToPrimehubLabel } from '../src/utils/escapism';
+import { escapeToPrimehubLabel, escapePodName } from '../src/utils/escapism';
 
 const expect = chai.expect;
 
@@ -14,3 +14,14 @@ describe('escapeToPrimehubLabel', () => {
       .to.be.equals('escaped-abcd');
   });
 });
+
+
+describe('escapeToPodName', () => {
+  it('should be the same with a normal username', () => {
+    expect(escapePodName('foobarbar')).to.be.equals('foobarbar');
+  });
+
+  it('should be escape special chars in a username', () => {
+    expect(escapePodName('foobarbar@infuseai.io')).to.be.equals('foobarbar-40infuseai-2eio');
+  });
+})
