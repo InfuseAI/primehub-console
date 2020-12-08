@@ -79,6 +79,7 @@ export default () => (
               projectQuotaCpu
               projectQuotaGpu
               sharedVolumeCapacity
+              admins
             }
           }
           pageInfo {
@@ -210,9 +211,12 @@ export default () => (
           </Col>
         </Row>
       </Block>
-      <Block title="${users}">
+      <Condition match={() => false} defaultMode="hidden">
+        <string keyName="admins"/>
+      </Condition>
+      <Block title="${members}">
         <relation keyName="users"
-          packageName='../src/cms-components/customize-relation-table'
+          packageName='../src/cms-components/customize-relation-group-users-table'
           relation={{
             to: 'user',
             type: 'toMany'

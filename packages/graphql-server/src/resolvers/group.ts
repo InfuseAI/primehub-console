@@ -42,7 +42,9 @@ const attrSchema = {
   homeSymlink: {type: FieldType.boolean, rename: 'home-symlink'},
   launchGroupOnly: {type: FieldType.boolean, rename: 'launch-group-only'},
   enabledDeployment: {type: FieldType.boolean, rename: 'enabled-deployment'},
-  jobDefaultActiveDeadlineSeconds: {type: FieldType.integer, rename: 'job-default-active-deadline-seconds'}
+  jobDefaultActiveDeadlineSeconds: {type: FieldType.integer, rename: 'job-default-active-deadline-seconds'},
+  // group admin
+  admins: {type: FieldType.string}
 };
 
 const groupAttrs = Object.keys(attrSchema);
@@ -181,6 +183,7 @@ export const update = async (root, args, context: Context) => {
   if (payload.enabledSharedVolume) {
     data.homeSymlink = true;
   }
+
   attrs.mergeWithData(data);
 
   // validate if a group has sharedVolumeCapacity = null + enabledSharedVolume, it should raise an error.

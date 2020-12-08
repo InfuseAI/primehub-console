@@ -78,7 +78,7 @@ export class Attributes {
       }
 
       const fieldName = (this.schema[key] && this.schema[key].rename) || key;
-      result[fieldName] = [value];
+      result[fieldName] = (fieldName === 'admins') ? value.split(',') : [value];
       return result;
     }, {});
 
@@ -107,7 +107,9 @@ export class Attributes {
       const typeTransform = transforms[value.type];
       const customTransform = value.deserialize;
       const transform = customTransform || typeTransform || noop;
-      result[key] = transform(keycloakAttr[fieldName][0]);
+      // admins transform
+      result[key] = (fieldName === 'admins') ?
+        keycloakAttr[fieldName].join(',') : transform(keycloakAttr[fieldName][0]);
       return result;
     }, {});
 
