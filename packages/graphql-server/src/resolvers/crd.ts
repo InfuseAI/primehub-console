@@ -140,7 +140,6 @@ export class Crd<SpecType> {
           })
         );
         // filter out
-        console.log('Query images groups');
         return groupsWithRole.filter(v => v);
       }
     };
@@ -266,7 +265,6 @@ export class Crd<SpecType> {
   }
 
   private queryByGroup = async (parent, args, context: Context) => {
-    console.log('Query by group: ', this.resourceName, args);
     const groupId = parent.id;
 
     let resourceRoles = await this.listGroupResourceRoles(context.kcAdminClient, groupId);
@@ -482,12 +480,17 @@ export class Crd<SpecType> {
       resourceRoles.filter(role => isNil(role.rolePrefix));
   }
 
-  private async queryResourcesByRoles(resourceRoles: ResourceRole[], context: Context, args?: {includeInternal: Boolean, internalOnly: Boolean}) {
+  private async queryResourcesByRoles(
+    resourceRoles: ResourceRole[],
+    context: Context,
+    args?: {
+      includeInternal: boolean,
+      internalOnly: boolean
+  }) {
     // map the resource roles to resources
     // todo: make this logic better
 
     let rows = await Promise.all(resourceRoles.map(role => {
-      console.log(`role: ${role}`)
       const onError = () => {
         logger.error({
           type: 'FAIL_QUERY_RESOURCE_FROM_K8S_API',
@@ -509,9 +512,9 @@ export class Crd<SpecType> {
           }).catch(onError);
       }
       if (this.resourceName === 'image') {
-        return context.getImage(role.resourceName).then((image) => {
+        return context.getImage(role.resourceName).then(image => {
           const {includeInternal = true, internalOnly = false} = args;
-          const isInternal:Boolean = image.spec && image.spec.groupName && image.spec.groupName.length > 0;
+          const isInternal: boolean = image.spec && image.spec.groupName && image.spec.groupName.length > 0;
 
           if (!includeInternal && isInternal) {
             return null;
