@@ -173,7 +173,7 @@ export const createConfig = (): Config => {
     enableGrafana: getEnvBoolean('PRIMEHUB_FEATURE_GRAFANA', false),
     enableUsageReport: getEnvBoolean('PRIMEHUB_FEATURE_USAGE', false),
     enableLicenseCheck: getEnvBoolean('PRIMEHUB_FEATURE_LICENSE', false),
-    enableModelDeployment: getEnvBoolean('PRIMEHUB_FEATURE_MODEL_DEPLOYMENT', false),
+    enableModelDeployment: getEnvBoolean('PRIMEHUB_FEATURE_MODEL_DEPLOYMENT', true),
     enableLogPersistence: getEnvBoolean('PRIMEHUB_FEATURE_LOG_PERSISTENCE', false),
     enablePhfs: getEnvBoolean('PRIMEHUB_FEATURE_PHFS', false),
     enableJobArtifact: getEnvBoolean('PRIMEHUB_FEATURE_JOB_ARTIFACT', false),

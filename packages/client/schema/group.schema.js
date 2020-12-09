@@ -214,7 +214,7 @@ export default () => (
       <Condition match={() => false} defaultMode="hidden">
         <string keyName="admins"/>
       </Condition>
-      <Block title="${users}">
+      <Block title="${members}">
         <relation keyName="users"
           packageName='../src/cms-components/customize-relation-group-users-table'
           relation={{

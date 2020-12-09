@@ -81,7 +81,7 @@ class Main extends React.Component {
         title: 'Models',
         subPath: 'model-deployment',
         icon: iconModels,
-        stage: 'alpha',
+        stage: 'beta',
         style: {
           width: 'auto',
           height: 16,

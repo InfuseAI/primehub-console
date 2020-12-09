@@ -291,6 +291,7 @@ exports.dict = {
     licensedTo: 'Licensed To',
     defaultUserVolumeCapacity: 'Default User Volume Capacity',
     users: 'Users',
+    members: 'Members',
     basicInfo: 'Basic Info',
     username: 'Username',
     email: 'Email',
