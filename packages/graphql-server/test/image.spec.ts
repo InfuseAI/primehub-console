@@ -79,6 +79,7 @@ describe('image graphql', function() {
         type: 'both',
         displayName: data.name,
         pullSecret: null,
+        groupName: null
       },
       groups: []
     });
@@ -104,7 +105,7 @@ describe('image graphql', function() {
       spec: {
         type: 'both',
         displayName: data.name,
-        pullSecret: null
+        pullSecret: null,
       },
       groups: []
     });
@@ -134,7 +135,8 @@ describe('image graphql', function() {
         ...pick(data, ['displayName', 'description', 'url']),
         pullSecret: null,
         type: 'both',
-        urlForGpu: data.url
+        urlForGpu: data.url,
+        groupName: null
       },
       type: 'both',
       urlForGpu: data.url,
@@ -188,7 +190,8 @@ describe('image graphql', function() {
         ...pick(data, ['displayName', 'description', 'url']),
         type: 'both',
         urlForGpu: data.url,
-        pullSecret: null
+        pullSecret: null,
+        groupName: null
       },
       type: 'both',
       urlForGpu: data.url,
