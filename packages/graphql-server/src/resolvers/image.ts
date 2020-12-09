@@ -141,7 +141,8 @@ export const createMapping = (data: any) => {
       type: imageType,
       url,
       urlForGpu,
-      pullSecret: isNil(data.useImagePullSecret) ? null : data.useImagePullSecret
+      pullSecret: isNil(data.useImagePullSecret) ? null : data.useImagePullSecret,
+      groupName: isNil(data.groupName) ? null : data.groupName
     }
   };
 };
@@ -192,7 +193,8 @@ export const updateMapping = (data: any) => {
       type: data.type,
       url: data.url,
       urlForGpu: data.urlForGpu,
-      pullSecret: isNull(data.useImagePullSecret) ? null : data.useImagePullSecret
+      pullSecret: isNull(data.useImagePullSecret) ? null : data.useImagePullSecret,
+      groupName: isNil(data.groupName) ? null : data.groupName
     }
   };
 };
