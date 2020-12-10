@@ -2,7 +2,7 @@ import { kubeConfig, client as kubeClient } from '../crdClient/crdClientImpl';
 import { ParameterizedContext } from 'koa';
 import { Stream } from 'stream';
 import * as logger from '../logger';
-import { escapePodName } from './escapism';
+import { escapePodName } from '../utils/escapism';
 
 export class PodLogs {
 

@@ -29,7 +29,7 @@ import basicAuth from 'basic-auth';
 import koaMount from 'koa-mount';
 import { OidcTokenVerifier } from './oidc/oidcTokenVerifier';
 import cors from '@koa/cors';
-import { PodLogs } from './utils/podLogs';
+import { PodLogs } from './controllers/logCtrl';
 
 // cache
 import {
