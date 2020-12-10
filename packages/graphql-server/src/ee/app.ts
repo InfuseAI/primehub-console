@@ -41,6 +41,7 @@ import cors from '@koa/cors';
 import { JobLogCtrl } from './controllers/jobLogCtrl';
 import { PhJobCacheList } from './crdClient/phJobCacheList';
 import JobArtifactCleaner from './utils/jobArtifactCleaner';
+import { PodLogs } from '../controllers/logCtrl';
 
 // cache
 import {
@@ -306,6 +307,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     crdClient,
     appPrefix: config.appPrefix,
     persistLog,
+  });
+
+  const podLogs = new PodLogs({
+    namespace: config.k8sCrdNamespace
   });
 
   // job artifact cleaner
@@ -665,6 +670,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       // check if user is admin
       [ctx.role, ctx.kcAdminClient] = await getUserRoleAndKcAdminClient(apiToken, tokenPayload);
       ctx.userId = tokenPayload.sub;
+      ctx.username = tokenPayload.preferred_username;
       return next();
     }
   };
@@ -733,6 +739,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   };
 
   mountAnn(rootRouter, annCtrl);
+
+  // Notebook Log
+  rootRouter.get(podLogs.getRoute(), authenticateMiddleware, podLogs.streamPodLogs);
 
   // Log Ctrl
   rootRouter.get(logCtrl.getRoute(),
