@@ -442,7 +442,7 @@ export const update = async (root, args, context: Context) => {
       name: 'predictor1',
       replicas: isUndefined(data.replicas) ? predictor.replicas : data.replicas ,
       modelImage: data.modelImage || predictor.modelImage,
-      modelURI: data.modelURI || predictor.modelURI,
+      modelURI: isNil(data.modelURI) ? predictor.modelURI : data.modelURI ,
       instanceType: data.instanceType || predictor.instanceType,
       imagePullSecret: isNull(data.imagePullSecret) ? null : data.imagePullSecret || predictor.imagePullSecret,
       metadata: mergedMetadata,
