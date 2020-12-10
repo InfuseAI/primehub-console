@@ -9,6 +9,7 @@ type Image {
   type: String
   url: String
   urlForGpu: String
+  groupName: String
   global: Boolean
   spec: JSON
   useImagePullSecret: String
@@ -58,6 +59,7 @@ input ImageCreateInput {
   type: String
   url: String
   urlForGpu: String
+  groupName: String
   global: Boolean
   useImagePullSecret: String
   groups: GroupCreateManyInput
@@ -70,6 +72,7 @@ input ImageUpdateInput {
   type: String
   url: String
   urlForGpu: String
+  groupName: String
   global: Boolean
   useImagePullSecret: String
   groups: GroupUpdateManyInput

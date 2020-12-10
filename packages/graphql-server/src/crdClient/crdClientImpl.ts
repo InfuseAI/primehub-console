@@ -62,6 +62,7 @@ export interface ImageSpec {
   pullSecret?: string;
   type?: ImageType;
   urlForGpu?: string;
+  groupName?: string;
 }
 
 export interface DatasetSpec {

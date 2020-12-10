@@ -2,7 +2,7 @@ import { Context } from './interface';
 import { toRelay, paginate, extractPagination, filter } from './utils';
 import CustomResource, { Item } from '../crdClient/customResource';
 import pluralize from 'pluralize';
-import { isEmpty, omit, mapValues, find, get, isNil, unionBy } from 'lodash';
+import { isEmpty, omit, mapValues, remove, find, get, isNil, unionBy } from 'lodash';
 import KeycloakAdminClient from 'keycloak-admin';
 import { ApolloError } from 'apollo-server';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
@@ -269,7 +269,7 @@ export class Crd<SpecType> {
 
     let resourceRoles = await this.listGroupResourceRoles(context.kcAdminClient, groupId);
     if (!parent.effectiveGroup) {
-      return this.queryResourcesByRoles(resourceRoles, context);
+      return this.queryResourcesByRoles(resourceRoles, context, args);
     }
 
     // Effective Roles, we need to merge resource in this group and the everyone group.
@@ -277,7 +277,7 @@ export class Crd<SpecType> {
 
     if (this.resourceName !== 'dataset')  {
       resourceRoles = unionBy(resourceRoles, resourceRolesEveryone, resourceRole => resourceRole.originalName);
-      return this.queryResourcesByRoles(resourceRoles, context);
+      return this.queryResourcesByRoles(resourceRoles, context, args);
     }
 
     // For datasets in effectiveGroups, we need to merge datasets with non-launch-group datasets
@@ -480,7 +480,13 @@ export class Crd<SpecType> {
       resourceRoles.filter(role => isNil(role.rolePrefix));
   }
 
-  private async queryResourcesByRoles(resourceRoles: ResourceRole[], context: Context) {
+  private async queryResourcesByRoles(
+    resourceRoles: ResourceRole[],
+    context: Context,
+    args?: {
+      includeInternal: boolean,
+      internalOnly: boolean
+  }) {
     // map the resource roles to resources
     // todo: make this logic better
 
@@ -506,7 +512,19 @@ export class Crd<SpecType> {
           }).catch(onError);
       }
       if (this.resourceName === 'image') {
-        return context.getImage(role.resourceName).catch(onError);
+        return context.getImage(role.resourceName).then(image => {
+          const {includeInternal = true, internalOnly = false} = args;
+          const isInternal: boolean = image.spec && image.spec.groupName && image.spec.groupName.length > 0;
+
+          if (!includeInternal && isInternal) {
+            return null;
+          }
+          if (internalOnly && !isInternal) {
+            return null;
+          }
+
+          return {...image};
+        }).catch(onError);
       }
       if (this.resourceName === 'instanceType') {
         return context.getInstanceType(role.resourceName).catch(onError);
