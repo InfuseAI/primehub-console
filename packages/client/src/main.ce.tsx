@@ -10,6 +10,7 @@ import { createGraphqlClient } from 'utils/graphqlClient';
 
 // Icons
 import iconJupyterHub from 'images/icon-jupyterhub.svg'
+import iconJobs from 'images/icon-jobs.svg'
 
 // Components
 import Jupyterhub from 'containers/jupyterhubPage';
@@ -107,6 +108,18 @@ class Main extends React.Component {
           marginTop: '-2px'
         }
       },
+      {
+        title: 'Images',
+        subPath: 'images',
+        icon: iconJobs,
+        style: {
+          width: 'auto',
+          height: 17,
+          marginLeft: '1px',
+          marginRight: '-1px',
+          marginTop: '-3px',
+        }
+      }
     ]
 
     return (

@@ -10,10 +10,11 @@ import { fakeData, schema } from './fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
 
 // Icons
-import iconJupyterHub from 'images/icon-jupyterhub.svg'
-import iconJobs from 'images/icon-jobs.svg'
-import iconSchedule from 'images/icon-schedule.svg'
-import iconModels from 'images/icon-models.svg'
+import iconJupyterHub from 'images/icon-jupyterhub.svg';
+import iconJobs from 'images/icon-jobs.svg';
+import iconSchedule from 'images/icon-schedule.svg';
+import iconModels from 'images/icon-models.svg';
+import iconImages from 'images/icon-images.png';
 
 // Components
 import Jupyterhub from 'containers/jupyterhubPage';
@@ -28,6 +29,9 @@ import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
+import ImageDetailContainer from 'ee/containers/jobDetail';
+import ImageCreatePage from 'containers/imageCreatePage';
+import ImageListContainer from 'containers/imageList';
 
 const client = createGraphqlClient({
   fakeData,
@@ -92,6 +96,21 @@ class Main extends React.Component {
       });
     }
 
+    sidebarItems.push(
+      {
+        title: 'Images',
+        subPath: 'images',
+        icon: iconImages,
+        style: {
+          width: 'auto',
+          height: 17,
+          marginLeft: '1px',
+          marginRight: '-1px',
+          marginTop: '-3px',
+        }
+      }
+    );
+
     return (
       <BrowserRouter>
         <ApolloProvider client={client}>
@@ -100,6 +119,19 @@ class Main extends React.Component {
             <Route path={`${appPrefix}g/:groupName/hub`} exact>
               <Jupyterhub />
             </Route>
+
+            {/* Group Images management*/}
+            <Route path={`${appPrefix}g/:groupName/images`} exact>
+              <ListContainer Com={ImageListContainer} />
+            </Route>
+            <Route path={`${appPrefix}g/:groupName/images/create`} exact>
+              <ImageCreatePage />
+            </Route>
+            <Route
+              path={`${appPrefix}g/:groupName/images/:imageId`}
+              exact
+              component={JobDetailContainer}
+            />
 
             {/* Job Submission */}
             <Route path={`${appPrefix}g/:groupName/job`} exact>
