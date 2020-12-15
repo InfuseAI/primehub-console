@@ -9,6 +9,7 @@ import views from 'koa-views';
 import serve from 'koa-static';
 import Router from 'koa-router';
 import morgan from 'koa-morgan';
+import proxies from 'koa-proxies';
 import * as GraphQLJSON from 'graphql-type-json';
 import { makeExecutableSchema, mergeSchemas } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
@@ -575,7 +576,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   // cors
   app.use(cors({
-    allowHeaders: ['content-type', 'authorization', 'x-primehub-use-cache', 'x-primehub-job']
+    allowHeaders: ['content-type', 'authorization', 'x-primehub-use-cache', 'x-primehub-job', 'Content-Length', 'Upload-Length', 'Tus-Resumable', 'Upload-Metadata', 'Upload-Offset', 'Upload-Defer-Length', 'X-Forwarded-Host', 'X-Forwarded-Proto']
   }));
 
   // setup
@@ -802,6 +803,14 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         ctx.set('Content-type', mimetype);
       }
     );
+
+    // shared space proxy to tusd
+    app.use(proxies(`${staticPath}tus`, {
+      target: "http://primehub-shared-space-tusd:1080/files/",
+      changeOrigin: true,
+      logs: true,
+      rewrite: path => path.replace(`${staticPath}tus`, '').replace('/files/', ''),
+    }));
   }
 
   app.use(rootRouter.routes());
