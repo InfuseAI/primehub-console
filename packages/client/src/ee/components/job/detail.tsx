@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 import {get} from 'lodash';
 import styled from 'styled-components';
 import moment, { Moment } from 'moment';
-import Log from './log';
+import Log from 'components/share/log';
 import {getActionByPhase, Phase} from 'ee/components/job/phase';
 import Title from 'ee/components/job/title';
 import Message from 'components/share/message';
@@ -261,8 +261,8 @@ export default class Detail extends React.Component<Props> {
               disabled={job.phase === Phase.Pending || !job.logEndpoint}
             >
               <Log
-                endpoint={job.logEndpoint}
-                refetchJob={() => refetchPhJob({where: {id: job.id}})}
+                endpoint={job.endpoint}
+                enableLogPersistence={(window as any).enableLogPersistence || false}
               />
             </TabPane>
           </Tabs>

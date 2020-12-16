@@ -54,6 +54,7 @@ class JupyterhubContainer extends React.Component<Props> {
             >
               <Log
                 endpoint='/api/logs/jupyterhub'
+                retryAfterTemintated={true}
               />
             </Tabs.TabPane>
           </Tabs>
