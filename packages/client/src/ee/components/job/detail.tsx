@@ -261,7 +261,7 @@ export default class Detail extends React.Component<Props> {
               disabled={job.phase === Phase.Pending || !job.logEndpoint}
             >
               <Log
-                endpoint={job.endpoint}
+                endpoint={job.logEndpoint}
                 enableLogPersistence={(window as any).enableLogPersistence || false}
               />
             </TabPane>
