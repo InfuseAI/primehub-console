@@ -13,7 +13,8 @@ import * as logger from '../../logger';
 const proxy = HttpProxy.createProxyServer({
   headers: {
     'X-Forwarded-Host': 'hub.jackpan1.aws.primehub.io/api/tus',
-    'X-Forwarded-Proto': 'https'
+    'X-Forwarded-Proto': 'https',
+    'Access-Control-Allow-Origin': '*'
   }
 });
 const route = pathMatch({
