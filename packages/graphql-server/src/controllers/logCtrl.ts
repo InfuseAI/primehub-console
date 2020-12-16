@@ -23,7 +23,11 @@ export class PodLogs {
     }
 
     public streamPodLogs = async (ctx: ParameterizedContext) => {
-        const {follow=true, tailLines, container} = ctx.query;
+        const {
+          follow = true,
+          tailLines,
+          container
+        } = ctx.query;
         const podName = 'jupyter-' + escapePodName(ctx.username);
 
         let tail = 1000;
