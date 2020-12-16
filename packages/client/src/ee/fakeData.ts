@@ -21,11 +21,11 @@ export const fakeData = {
         name: 'IT1',
         displayName: 'group1 im',
       }],
-      resourceStatus: {        
-        cpuUsage: 0,        
-        gpuUsage: 0,        
-        memUsage: 0      
-      },      
+      resourceStatus: {
+        cpuUsage: 0,
+        gpuUsage: 0,
+        memUsage: 0
+      },
       datasets: [],
       jobDefaultActiveDeadlineSeconds: 86400,
     }, {
@@ -102,6 +102,7 @@ export const fakeData = {
       cpuLimit: 0.5,
       memoryLimit: 4,
     },
+    logEndpoint: 'http://localhost:3002/api/logs/namespaces/hub/phjobs/job-202012160950-qt0xdz?follow=true',
     artifact: {
       prefix: 'groups/group1/jobArtifacts/it1',
       items: [
