@@ -132,7 +132,7 @@ export default class Logs extends React.Component<Props, State> {
     // Fetch the log
     while (true) {
       try {
-        res = await fetch(`${endpoint}?tailLines=${tailLines}`, {
+        res = await fetch(`${endpoint}?tailLines=${tailLines}&follow=true`, {
           signal,
           method: 'GET',
           headers: {

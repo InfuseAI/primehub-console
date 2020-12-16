@@ -1,13 +1,13 @@
-import { kubeConfig, client as kubeClient } from '../crdClient/crdClientImpl';
+import { client as kubeClient } from '../crdClient/crdClientImpl';
 import { ParameterizedContext } from 'koa';
 import { Stream } from 'stream';
 import * as logger from '../logger';
 import { escapePodName } from '../utils/escapism';
+import { getStream as getK8SLogStream } from '../utils/k8sLog';
 
 export class PodLogs {
 
     private namespace: string;
-    private kubeClient: any;
 
     constructor({
         namespace
@@ -15,44 +15,29 @@ export class PodLogs {
         namespace: string
     }) {
         this.namespace = namespace || ' default';
-        this.kubeClient = kubeClient;
     }
 
-    public getRoute = () => {
+    public getJupyterHubRoute = () => {
         return '/logs/jupyterhub';
     }
 
-    public streamPodLogs = async (ctx: ParameterizedContext) => {
+    public streamJupyterHubLogs = async (ctx: ParameterizedContext) => {
         const {
-          follow = true,
+          follow,
           tailLines,
           container
         } = ctx.query;
         const podName = 'jupyter-' + escapePodName(ctx.username);
-
-        let tail = 1000;
-        if (tailLines) {
-            tail = parseInt(tailLines, 10);
-        }
-
-        const stream: Stream = await this.kubeClient.api.v1
-            .namespaces(this.namespace).pods(podName).log.getByteStream({
-                qs: {
-                    container: container || 'notebook',
-                    tailLines: tail,
-                    follow
-                }
-            });
-
+        const stream = getK8SLogStream(this.namespace, podName, {container: container || 'notebook', follow, tailLines});
         stream.on('error', err => {
-            logger.error({
-                component: logger.components.internal,
-                type: 'K8S_STREAM_LOG',
-                message: err.message
-            });
-            ctx.res.end();
+          logger.error({
+            component: logger.components.internal,
+            type: 'K8S_STREAM_LOG',
+            message: err.message
+          });
+
+          ctx.res.end();
         });
         ctx.body = stream;
     }
-
 }
