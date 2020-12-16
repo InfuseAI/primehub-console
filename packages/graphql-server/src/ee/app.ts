@@ -43,6 +43,7 @@ import { JobLogCtrl } from './controllers/jobLogCtrl';
 import { PhJobCacheList } from './crdClient/phJobCacheList';
 import JobArtifactCleaner from './utils/jobArtifactCleaner';
 import { PodLogs } from '../controllers/logCtrl';
+import { TusdProxy } from './tusdProxy/tusdProxy';
 
 // cache
 import {
@@ -805,7 +806,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     );
 
     // shared space proxy to tusd
-    app.use(proxies(`${staticPath}tus`, {
+    app.use(TusdProxy(`${staticPath}tus`, {
       target: 'http://primehub-shared-space-tusd:1080/files/',
       changeOrigin: true,
       logs: true,
