@@ -1,4 +1,3 @@
-import { client as kubeClient } from '../crdClient/crdClientImpl';
 import { ParameterizedContext } from 'koa';
 import { Stream } from 'stream';
 import * as logger from '../logger';
@@ -28,7 +27,11 @@ export class PodLogs {
           container
         } = ctx.query;
         const podName = 'jupyter-' + escapePodName(ctx.username);
-        const stream = getK8SLogStream(this.namespace, podName, {container: container || 'notebook', follow, tailLines});
+        const stream = getK8SLogStream(this.namespace, podName, {
+          container: container || 'notebook',
+          follow,
+          tailLines
+        });
         stream.on('error', err => {
           logger.error({
             component: logger.components.internal,
