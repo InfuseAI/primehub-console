@@ -806,10 +806,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
     // shared space proxy to tusd
     app.use(proxies(`${staticPath}tus`, {
-      target: "http://primehub-shared-space-tusd:1080/files/",
+      target: 'http://primehub-shared-space-tusd:1080/files/',
       changeOrigin: true,
       logs: true,
-      rewrite: path => path.replace(`${staticPath}tus`, '').replace('/files/', ''),
+      rewrite: rewritePath => rewritePath.replace(`${staticPath}tus`, '').replace('/files/', ''),
     }));
   }
 
