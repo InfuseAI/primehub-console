@@ -27,7 +27,7 @@ class JupyterhubContainer extends React.Component<Props> {
           <a href={`${basename}`}><Icon type="home" /></a>
           }
         </Breadcrumb.Item>
-        <Breadcrumb.Item key="notebook">Notebook</Breadcrumb.Item>
+        <Breadcrumb.Item key="notebook">Notebooks</Breadcrumb.Item>
       </Breadcrumb>
     );
   }
@@ -39,11 +39,11 @@ class JupyterhubContainer extends React.Component<Props> {
       <>
         <PageTitle
           breadcrumb={this.renderBreadCrumb()}
-          title={"Notebook"}
+          title={"Notebooks"}
         />
         <PageBody style={{flex: '1 1 0%'}}>
           <Tabs style={{height: '100%'}}>
-            <Tabs.TabPane key="information" tab="Information">
+            <Tabs.TabPane key="information" tab="Notebooks">
               <div style={{height: 'calc(100vh - 310px)'}}>
                 <IFrame src={`/hub/primehub/home?group=${groupContext.name}`}/>
               </div>

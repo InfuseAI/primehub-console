@@ -23,7 +23,7 @@ export class PodLogs {
     }
 
     public streamPodLogs = async (ctx: ParameterizedContext) => {
-        const {tailLines, container} = ctx.query;
+        const {follow=true, tailLines, container} = ctx.query;
         const podName = 'jupyter-' + escapePodName(ctx.username);
 
         let tail = 1000;
@@ -35,7 +35,8 @@ export class PodLogs {
             .namespaces(this.namespace).pods(podName).log.getByteStream({
                 qs: {
                     container: container || 'notebook',
-                    tailLines: tail
+                    tailLines: tail,
+                    follow
                 }
             });
 
