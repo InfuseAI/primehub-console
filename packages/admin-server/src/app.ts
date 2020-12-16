@@ -190,6 +190,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   rootRouter.get('/js/*', serveStatic);
   rootRouter.get('/font/*', serveStatic);
   rootRouter.get('/css/*', serveStatic);
+  rootRouter.get('/html/*', serveStatic);
 
   // ctrl
   mountOidc(rootRouter, oidcCtrl);
