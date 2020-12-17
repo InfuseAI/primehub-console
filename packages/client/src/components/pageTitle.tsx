@@ -3,7 +3,7 @@ import React from 'react';
 type Props = {
   breadcrumb: React.ReactNode;
   title: React.ReactNode;
-  style?: Object;
+  style?: React.CSSProperties;
 };
 
 export default class PageTitle extends React.Component<Props> {
@@ -25,7 +25,9 @@ export default class PageTitle extends React.Component<Props> {
         }}>
           {breadcrumb}
         </div>
-        <h2>{title}</h2>
+        {
+          title ?  <h2>{title}</h2> : <></>
+        }
       </div>
     )
   }
