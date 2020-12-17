@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 import {get} from 'lodash';
 import styled from 'styled-components';
 import moment, { Moment } from 'moment';
-import Log from './log';
+import Log from 'components/share/log';
 import {getActionByPhase, Phase} from 'ee/components/job/phase';
 import Title from 'ee/components/job/title';
 import Message from 'components/share/message';
@@ -157,6 +157,21 @@ export default class Detail extends React.Component<Props> {
     const startTime = job.startTime ? moment(job.startTime) : '';
     const finishTime = job.finishTime ? moment(job.finishTime) : '';
     const action = getActionByPhase(job.phase);
+    const allowPersistLog = () => {
+      let enableLogPersistence = (window as any).enableLogPersistence || false;
+      if (!enableLogPersistence) {
+        return false;
+      }
+      switch (job.phase) {
+        case 'Succeeded':
+        case 'Failed':
+        case 'Cancelled':
+          return true;
+        default:
+          return false;
+      }
+    }
+
     return (
       <>
         <PageTitle
@@ -262,7 +277,7 @@ export default class Detail extends React.Component<Props> {
             >
               <Log
                 endpoint={job.logEndpoint}
-                refetchJob={() => refetchPhJob({where: {id: job.id}})}
+                allowPersistLog={allowPersistLog}
               />
             </TabPane>
           </Tabs>
