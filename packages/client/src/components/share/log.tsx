@@ -8,7 +8,7 @@ import moment from 'moment';
 
 type Props = {
   endpoint: string;
-  enableLogPersistence?: boolean;
+  allowPersistLog?: Function;
   rows?: number;
   style?: React.CSSProperties;
   retryAfterTermintated?: boolean;
@@ -161,7 +161,10 @@ export default class Logs extends React.Component<Props, State> {
         });
 
         if (res.status >= 400) {
-          if (this.props.enableLogPersistence && this.state.loaded == false) {
+          let allowPerist = this.props.allowPersistLog?
+            this.props.allowPersistLog() :
+            false;
+          if (allowPerist && this.state.loaded == false) {
             this.setState({fromPersist: true});
             res = await fetch(`${endpoint}?tailLines=${tailLines}&persist=true`, {
               signal,
