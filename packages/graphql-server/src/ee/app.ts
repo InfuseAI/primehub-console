@@ -577,7 +577,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   // cors
   app.use(cors({
-    allowHeaders: ['content-type', 'authorization', 'x-primehub-use-cache', 'x-primehub-job', 'Content-Length', 'Upload-Length', 'Tus-Resumable', 'Upload-Metadata', 'Upload-Offset', 'Upload-Defer-Length', 'X-Forwarded-Host', 'X-Forwarded-Proto']
+    allowHeaders: ['content-type', 'authorization', 'x-primehub-use-cache', 'x-primehub-job', 'Content-Length', 'Upload-Length', 'Tus-Resumable', 'Upload-Metadata', 'Upload-Offset', 'Upload-Defer-Length']
   }));
 
   // setup
@@ -806,11 +806,14 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     );
 
     // shared space proxy to tusd
-    app.use(TusdProxy(`${staticPath}tus`, {
-      target: 'http://primehub-shared-space-tusd:1080/files/',
+    const tusProxyPath = `${staticPath}tus`;
+    app.use(TusdProxy(tusProxyPath, {
+      target: config.sharedSpaceTusdEndpoint,
       changeOrigin: true,
       logs: true,
-      rewrite: rewritePath => rewritePath.replace(`${staticPath}tus`, '').replace('/files/', ''),
+      graphqlHost: config.graphqlHost,
+      tusProxyPath,
+      rewrite: rewritePath => rewritePath.replace(tusProxyPath, '').replace('/files/', ''),
     }));
   }
 

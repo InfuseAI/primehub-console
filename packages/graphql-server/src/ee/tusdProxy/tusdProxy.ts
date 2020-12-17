@@ -9,13 +9,6 @@ import * as logger from '../../logger';
 /**
  * Constants
  */
-
-const proxy = HttpProxy.createProxyServer({
-  headers: {
-    'X-Forwarded-Host': 'hub.jackpan1.aws.primehub.io/api/tus',
-    'X-Forwarded-Proto': 'https'
-  }
-});
 const route = pathMatch({
   // path-to-regexp options
   sensitive: false,
@@ -29,6 +22,25 @@ let eventRegistered = false;
  * Koa Http Proxy Middleware
  */
 export const TusdProxy = (path, options) => (ctx, next) => {
+  let forwardedHost = '';
+  let forwardedProto = '';
+  if (options.graphqlHost.startsWith('http://')) {
+    forwardedHost = options.graphqlHost.replace('http://', '');
+    forwardedProto = 'http';
+  } else if (options.graphqlHost.startsWith('https://')) {
+    forwardedHost = options.graphqlHost.replace('https://', '');
+    forwardedProto = 'https';
+  } else {
+    throw new Error(`${options.graphqlHost} should start with http|https`);
+  }
+
+  const proxy = HttpProxy.createProxyServer({
+    headers: {
+      'X-Forwarded-Host': forwardedHost + options.tusProxyPath,
+      'X-Forwarded-Proto': forwardedProto
+    }
+  });
+
   // create a match function
   const match = route(path);
   if (!match(ctx.path)) {

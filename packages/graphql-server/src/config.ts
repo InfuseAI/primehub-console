@@ -79,6 +79,9 @@ export interface Config {
   enableLogPersistence: boolean;
 
   usageReportAPIHost: string;
+
+  // shared space
+  sharedSpaceTusdEndpoint: string;
 }
 
 const defaultConfigs = {
@@ -110,7 +113,8 @@ const defaultConfigs = {
   graphqlHost: 'http://localhost:3001',
   enableStore: false,
   enableLogPersistence: false,
-  usageReportAPIHost: 'http://localhost:5000'
+  usageReportAPIHost: 'http://localhost:5000',
+  sharedSpaceTusdEndpoint: 'http://localhost:1080/files/'
 };
 
 const prodConfigs = {
@@ -193,6 +197,7 @@ export const createConfig = (): Config => {
     storeBucket: process.env.PRIMEHUB_STORE_BUCKET,
     storeEndpoint: process.env.PRIMEHUB_STORE_ENDPOINT,
     usageReportAPIHost: process.env.PRIMEHUB_USAGE_REPORT_API_HOST,
+    sharedSpaceTusdEndpoint: process.env.PRIMEHUB_SHARED_SPACE_TUSD_ENDPOINT,
     // Feature flags
     enableDatasetUpload: getEnvBoolean('PRIMEHUB_FEATURE_DATASET_UPLOAD', false),
     enableStore: getEnvBoolean('PRIMEHUB_FEATURE_STORE', false),
