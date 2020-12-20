@@ -5,6 +5,12 @@
 # import Dataset from "dataset.graphql"
 # import ResourceStatus from "resourceStatus.graphql"
 
+enum QueryImageMode {
+  SYSTEM_ONLY
+  GROUP_ONLY
+  ALL
+}
+
 type Group {
   id: ID!
   name: String!
@@ -18,7 +24,7 @@ type Group {
   projectQuotaMemory: Float
   users: [User]
   instanceTypes: [InstanceType]
-  images(includeInternal: Boolean, internalOnly: Boolean): [Image]
+  images(mode: QueryImageMode): [Image]
   datasets: [Dataset]
   resourceStatus: ResourceStatus
   # for relation with dataset

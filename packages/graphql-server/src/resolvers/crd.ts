@@ -16,6 +16,12 @@ import { keycloakMaxCount } from './constant';
 // utils
 const config = createConfig();
 
+enum QueryImageMode {
+  SYSTEM_ONLY = 'SYSTEM_ONLY',
+  GROUP_ONLY = 'GROUP_ONLY',
+  ALL = 'ALL'
+}
+
 export class Crd<SpecType> {
   private cache: CrdCache<SpecType>;
   private customResourceMethod: string;
@@ -484,8 +490,7 @@ export class Crd<SpecType> {
     resourceRoles: ResourceRole[],
     context: Context,
     args?: {
-      includeInternal: boolean,
-      internalOnly: boolean
+      mode: QueryImageMode
   }) {
     // map the resource roles to resources
     // todo: make this logic better
@@ -513,13 +518,13 @@ export class Crd<SpecType> {
       }
       if (this.resourceName === 'image') {
         return context.getImage(role.resourceName).then(image => {
-          const {includeInternal = true, internalOnly = false} = args;
-          const isInternal: boolean = image.spec && image.spec.groupName && image.spec.groupName.length > 0;
+          const {mode = QueryImageMode.ALL} = args;
+          const isGroupImage: boolean = image.spec && image.spec.groupName && image.spec.groupName.length > 0;
 
-          if (!includeInternal && isInternal) {
+          if (mode === QueryImageMode.SYSTEM_ONLY && isGroupImage) {
             return null;
           }
-          if (internalOnly && !isInternal) {
+          if (mode === QueryImageMode.GROUP_ONLY && !isGroupImage) {
             return null;
           }
 
