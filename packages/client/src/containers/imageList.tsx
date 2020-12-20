@@ -5,45 +5,23 @@ import {compose} from 'recompose';
 import {withRouter} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
-import JobList from 'components/images/list';
+import ImageList from 'components/images/list';
 import {errorHandler} from 'utils/errorHandler';
 import {Group} from 'ee/components/shared/groupFilter';
 import {appPrefix} from 'utils/env';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
 
-export const PhJobFragment = gql`
-  fragment PhJobInfo on PhJob {
+export const ImageFragment = gql`
+  fragment ImageInfo on Image{
     id
     displayName
-    cancel
-    command
-    groupId
-    groupName
-    schedule
-    image
-    instanceType {
-      id
-      name
-      displayName
-      cpuLimit
-      memoryLimit
-      gpuLimit
-    }
-    userId
-    userName
-    phase
-    reason
-    message
-    createTime
-    startTime
-    finishTime
-    logEndpoint
+    name
  }
 `
 
-export const GET_PH_JOB_CONNECTION = gql`
-  query phJobsConnection($where: PhJobWhereInput, $page: Int, $orderBy: PhJobOrderByInput) {
-    phJobsConnection(where: $where, page: $page, orderBy: $orderBy) {
+export const GET_IMAGE_CONNECTION = gql`
+  query imageConnection($where: ImageWhereInput, $page: Int, $orderBy: ImageOrderByInput) {
+    imageConnection(where: $where, page: $page, orderBy: $orderBy) {
       pageInfo {
         totalPage
         currentPage
@@ -51,74 +29,30 @@ export const GET_PH_JOB_CONNECTION = gql`
       edges {
         cursor
         node {
-          ...PhJobInfo
+          ...ImageInfo
         }
       }
     }
   }
-  ${PhJobFragment}
-`;
-
-export const RERUN_JOB = gql`
-  mutation rerunPhJob($where: PhJobWhereUniqueInput!) {
-    rerunPhJob(where: $where) {
-      ...PhJobInfo
-    }
-  }
-  ${PhJobFragment}
-`;
-
-export const CANCEL_JOB = gql`
-  mutation cancelPhJob($where: PhJobWhereUniqueInput!) {
-    cancelPhJob(where: $where) {
-      id
-    }
-  }
+  ${ImageFragment}
 `;
 
 type Props = {
-  getPhJobConnection?: any;
+  getImageConnection?: any;
   groups: Array<Group>;
-  rerunPhJob: any;
-  cancelPhJob: any;
-  rerunPhJobResult: any;
-  cancelPhJobResult: any;
 } & RouteComponentProps & GroupContextComponentProps;
 
-class JobListContainer extends React.Component<Props> {
-  jobsRefetch = (payload) => {
-    const payloadWithStringWhere = {...payload};
-    if (payloadWithStringWhere.where)
-      payloadWithStringWhere.where = JSON.stringify(payload.where);
-    if (payloadWithStringWhere.orderBy)
-      payloadWithStringWhere.orderBy = JSON.stringify(payload.orderBy || {});
-
-    const {history, getPhJobConnection} = this.props;
-    const search = queryString.stringify(payloadWithStringWhere);
-    if (history.location.search === `?${search}`) {
-      getPhJobConnection.refetch(payload);
-    } else {
-      history.replace({
-        pathname: `job`,
-        search
-      });
-    }
-  }
+class ImageListContainer extends React.Component<Props> {
 
   render() {
-    const {groupContext, getPhJobConnection, rerunPhJob, rerunPhJobResult,cancelPhJobResult, cancelPhJob, groups } = this.props;
+    const {groupContext, getImageConnection, groups } = this.props;
     return (
-      <JobList
+      <ImageList
         groupContext={groupContext}
-        jobsLoading={getPhJobConnection.loading}
-        jobsError={getPhJobConnection.error}
-        jobsConnection={getPhJobConnection.phJobsConnection || {pageInfo: {}, edges: []}}
-        jobsVariables={getPhJobConnection.variables}
-        jobsRefetch={this.jobsRefetch}
-        rerunPhJob={rerunPhJob}
-        rerunPhJobResult={rerunPhJobResult}
-        cancelPhJobResult={cancelPhJobResult}
-        cancelPhJob={cancelPhJob}
+        jobsLoading={getImageConnection.loading}
+        jobsError={getImageConnection.error}
+        jobsConnection={getImageConnection.imageConnection || {pageInfo: {}, edges: []}}
+        jobsVariables={getImageConnection.variables}
         groups={groups}
       />
     );
@@ -127,14 +61,11 @@ class JobListContainer extends React.Component<Props> {
 
 export default compose(
   withRouter,
-  graphql(GET_PH_JOB_CONNECTION, {
+  graphql(GET_IMAGE_CONNECTION, {
     options: (props: Props) => {
       const params = queryString.parse(props.location.search.replace(/^\?/, ''));
       const {groupContext} = props;
       const where = JSON.parse(params.where as string || '{}');
-      if (groupContext) {
-        where.groupId_in = [groupContext.id];
-      }
 
       return {
         variables: {
@@ -145,26 +76,6 @@ export default compose(
         fetchPolicy: 'cache-and-network'
       }
     },
-    name: 'getPhJobConnection'
-  }),
-  graphql(RERUN_JOB, {
-    options: (props: Props) => ({
-      refetchQueries: [{
-        query: GET_PH_JOB_CONNECTION,
-        variables: props.getPhJobConnection.variables,
-      }],
-      onError: errorHandler
-    }),
-    name: 'rerunPhJob'
-  }),
-  graphql(CANCEL_JOB, {
-    options: (props: Props) => ({
-      refetchQueries: [{
-        query: GET_PH_JOB_CONNECTION,
-        variables: props.getPhJobConnection.variables
-      }],
-      onError: errorHandler
-    }),
-    name: 'cancelPhJob'
+    name: 'getImageConnection'
   })
-)(JobListContainer)
+)(ImageListContainer)

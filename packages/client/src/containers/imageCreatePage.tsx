@@ -27,9 +27,9 @@ export const GET_MY_GROUPS = gql`
   ${GroupFragment}
 `
 
-export const CREATE_JOB = gql`
-  mutation createPhJob($data: PhJobCreateInput!) {
-    createPhJob(data: $data) {
+export const CREATE_IMAGE = gql`
+  mutation createImage($data: ImageCreateInput!) {
+    createImage(data: $data) {
       id
     }
   }
@@ -41,7 +41,7 @@ const compareByAlphabetical = (prev, next) => {
   return 0;
 }
 
-const sortItems = (items) => {
+export const sortItems = (items) => {
   const copiedItems = items.slice();
   copiedItems
     .sort((prev, next) => {
@@ -54,8 +54,8 @@ const sortItems = (items) => {
 
 type Props = RouteComponentProps & GroupContextComponentProps & {
   getGroups: any;
-  createPhJob: any;
-  createPhJobResult: any;
+  createImage: any;
+  createImageResult: any;
   defaultValue?: object;
 }
 type State = {
@@ -75,8 +75,8 @@ class ImageCreatePage extends React.Component<Props, State> {
   }
 
   onSubmit = (payload) => {
-    const {createPhJob} = this.props;
-    createPhJob({
+    const {createImage} = this.props;
+    createImage({
       variables: {
         data: payload
       }
@@ -85,7 +85,7 @@ class ImageCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {groupContext, getGroups, createPhJobResult, defaultValue} = this.props;
+    const {groupContext, getGroups, createImageResult, defaultValue} = this.props;
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const jobDefaultActiveDeadlineSeconds = (window as any).jobDefaultActiveDeadlineSeconds;
     const allGroups = get(getGroups, 'me.groups', []);
@@ -144,9 +144,8 @@ class ImageCreatePage extends React.Component<Props, State> {
               groups={sortItems(groups)}
               instanceTypes={sortItems(instanceTypes)}
               images={sortItems(images)}
-              defaultActiveDeadlineSeconds={jobActiveDeadlineSeconds}
               onSubmit={this.onSubmit}
-              loading={createPhJobResult.loading}
+              loading={createImageResult.loading}
             />
           )}
 
@@ -162,17 +161,17 @@ export default compose(
   graphql(GET_MY_GROUPS, {
     name: 'getGroups'
   }),
-  graphql(CREATE_JOB, {
+  graphql(CREATE_IMAGE, {
     options: (props: Props) => ({
       onCompleted: () => {
         props.history.push({
-          pathname: `../job`,
+          pathname: `../images`,
           search: queryString.stringify({page: 1})
         });
       },
       onError: errorHandler
     }),
-    name: 'createPhJob'
+    name: 'createImage'
   }),
   Com => props => {
     const {defaultValue}: {defaultValue?: string} = queryString.parse(props.location.search.replace(/^\?/, ''));

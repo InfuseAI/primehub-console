@@ -29,7 +29,7 @@ import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
-import ImageDetailContainer from 'ee/containers/jobDetail';
+import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
 
@@ -128,9 +128,9 @@ class Main extends React.Component {
               <ImageCreatePage />
             </Route>
             <Route
-              path={`${appPrefix}g/:groupName/images/:imageId`}
+              path={`${appPrefix}g/:groupName/images/:imageId/edit`}
               exact
-              component={JobDetailContainer}
+              component={ImageEditPage}
             />
 
             {/* Job Submission */}

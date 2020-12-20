@@ -30,7 +30,7 @@ const renderImageName = (text, record) => (
         prevPathname: location.pathname,
         prevSearch: location.search,
       },
-      pathname: `images/${record.id}`
+      pathname: `images/${record.id}/edit`
     }} >
       {text}
     </Link>

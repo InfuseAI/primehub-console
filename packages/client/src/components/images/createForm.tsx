@@ -77,13 +77,11 @@ class ImageCreateForm extends React.Component<Props, State> {
     const {initialValue} = this.props;
     if (!initialValue) {
       this.autoSelectFirstGroup();
-      this.autoSelectFirstInstanceType();
     }
   }
 
   componentDidUpdate() {
     this.autoSelectFirstGroup();
-    this.autoSelectFirstInstanceType();
   }
 
   autoSelectFirstGroup = () => {
@@ -95,23 +93,12 @@ class ImageCreateForm extends React.Component<Props, State> {
     }
   }
 
-  autoSelectFirstInstanceType = () => {
-    const {instanceTypes, form} = this.props;
-    const currentInstanceType = form.getFieldValue('instanceType');
-    const validInstanceType = instanceTypes.some(instanceType => instanceType.id === currentInstanceType);
-    if ((!form.getFieldValue('instanceType') || !validInstanceType) && instanceTypes.length) {
-      form.setFieldsValue({instanceType: instanceTypes[0].id});
-    }
-  }
 
   submit = (e) => {
     const {form, onSubmit} = this.props;
     e.preventDefault();
     form.validateFields(async (err, values: FormValue) => {
       if (err) return;
-      if (!values.metadata) values.metadata = {}
-      values.endpointAccessType = values.privateAccess ? 'private' : 'public';
-      delete values.privateAccess;
       onSubmit(values);
     });
   }
