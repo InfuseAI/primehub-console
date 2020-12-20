@@ -1,17 +1,17 @@
 import * as React from 'react';
-import {Modal} from 'antd';
 import gql from 'graphql-tag';
+import queryString from 'querystring';
+import {get} from 'lodash';
+import {Modal} from 'antd';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
-import {get} from 'lodash';
 import {withRouter, Link} from 'react-router-dom';
-import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
-import ScheduleList from 'ee/components/schedule/list';
-import {errorHandler} from 'ee/components/job/errorHandler';
-import {Group} from 'ee/components/shared/groupFilter';
-import withPath, { PathComponentProps } from '../components/job/withPath';
 import {GroupContextComponentProps} from 'context/group';
+import {errorHandler} from 'utils/errorHandler';
+import ScheduleList from 'ee/components/schedule/list';
+import {Group} from 'ee/components/shared/groupFilter';
+import withPath, { PathComponentProps } from 'ee/components/job/withPath';
 
 export const PhScheduleFragment = gql`
   fragment PhScheduleInfo on PhSchedule {

@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {RouteComponentProps} from 'react-router-dom';
 import {compose} from 'recompose';
-import {errorHandler} from 'ee/components/job/errorHandler';
+import {errorHandler} from 'utils/errorHandler';
 import DeploymentDetail from 'ee/components/modelDeployment/detail';
 import {PhDeploymentFragment} from 'ee/components/modelDeployment/common';
 import {get} from 'lodash';

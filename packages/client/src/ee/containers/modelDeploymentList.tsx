@@ -13,7 +13,7 @@ import PageBody from 'components/pageBody';
 import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';
 import Filter from 'ee/components/shared/filter';
 import {Group} from 'ee/components/shared/groupFilter';
-import {errorHandler} from '../components/job/errorHandler';
+import {errorHandler} from 'utils/errorHandler';
 import DeploymentCard from 'ee/components/modelDeployment/card';
 import { PhDeploymentFragment, DeploymentConnection } from 'ee/components/modelDeployment/common';
 import InfuseButton from 'components/infuseButton';

@@ -6,7 +6,7 @@ import {compose} from 'recompose';
 import {get, unionBy, isEqual, pick} from 'lodash';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
-import {errorHandler} from 'ee/components/job/errorHandler';
+import {errorHandler} from 'utils/errorHandler';
 import DeploymentCreateForm from 'ee/components/modelDeployment/createForm';
 import PageTitle from 'components/pageTitle';
 import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';

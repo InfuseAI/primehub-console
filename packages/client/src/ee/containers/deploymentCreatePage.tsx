@@ -7,7 +7,7 @@ import {get, unionBy} from 'lodash';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
-import {errorHandler} from 'ee/components/job/errorHandler';
+import {errorHandler} from 'utils/errorHandler';
 import DeploymentCreateForm from 'ee/components/modelDeployment/createForm';
 import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';
 import {GroupFragment} from 'containers/list';

@@ -6,7 +6,7 @@ import {withRouter} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import JobList from 'ee/components/job/list';
-import {errorHandler} from 'ee/components/job/errorHandler';
+import {errorHandler} from 'utils/errorHandler';
 import {Group} from 'ee/components/shared/groupFilter';
 import {appPrefix} from 'utils/env';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
