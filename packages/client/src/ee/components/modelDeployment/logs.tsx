@@ -22,16 +22,6 @@ export default class ModelDeploymentLogs extends React.Component<Props, State> {
     };
   }
 
-  shouldRetryAfterFetched = async () => {
-    // only retry when the pod is still running
-    const {podName} = this.state;
-    const {refetchPhDeployment} = this.props;
-    const {data} = await refetchPhDeployment();
-    const pod = get(data, 'phDeployment.pods', [])
-      .find(pod => pod.name === podName);
-    return pod.phase === Phase.Running;
-  }
-
   render() {
     const {podName} = this.state;
     const {pods = []} = this.props;
@@ -43,11 +33,10 @@ export default class ModelDeploymentLogs extends React.Component<Props, State> {
           {pods.map(pod => (
             <Select.Option key={pod.name} value={pod.name}>{pod.name}</Select.Option>
           ))}
-        </Select> 
+        </Select>
         <Logs
           style={{marginTop: 16}}
           endpoint={selectedPod.logEndpoint}
-          shouldRetryAfterFetched={this.shouldRetryAfterFetched}
         />
       </>
     );

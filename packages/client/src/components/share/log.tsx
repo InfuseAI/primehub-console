@@ -8,10 +8,10 @@ import moment from 'moment';
 
 type Props = {
   endpoint: string;
-  enableLogPersistence?: boolean;
+  allowPersistLog?: Function;
   rows?: number;
-  style?: object;
-  shouldRetryAfterFetched?: Function;
+  style?: React.CSSProperties;
+  retryAfterTermintated?: boolean;
 }
 
 type State = {
@@ -20,6 +20,7 @@ type State = {
   autoScroll: boolean;
   tailLines?: number;
   loading: boolean;
+  loaded: boolean;
   downloading: boolean;
   fromPersist: boolean;
 }
@@ -49,6 +50,7 @@ export default class Logs extends React.Component<Props, State> {
   listRef: React.RefObject<any>;
   outerRef: React.RefObject<any>;
   controller: AbortController;
+  unmounted: boolean;
 
   constructor(props) {
     super(props);
@@ -58,6 +60,7 @@ export default class Logs extends React.Component<Props, State> {
       autoScroll: true,
       tailLines: INITIAL_LENGTH,
       loading: true,
+      loaded: false,
       downloading: false,
       topmost: false,
       fromPersist: false,
@@ -67,20 +70,14 @@ export default class Logs extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.fetchLog();
+    this.refetch();
     this.scrollToBottom();
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.endpoint !== this.props.endpoint) {
-      this.setState({
-        log: [],
-        loading: true,
-        autoScroll: true,
-        tailLines: INITIAL_LENGTH
-      }, () => {
-        this.fetchLog();
-      });
+      this.setState({log:[], loaded:false})
+      this.refetch();
     }
 
     const restartAutoScroll = !prevState.autoScroll && this.state.autoScroll;
@@ -92,12 +89,17 @@ export default class Logs extends React.Component<Props, State> {
     }
   }
 
+  componentWillUnmount() {
+    if (this.controller) this.controller.abort();
+    this.unmounted = true;
+  }
+
   scrollToBottom = () => {
     if (!this.listRef.current) return;
     this.listRef.current.scrollToItem(this.outerRef.current.scrollHeight - this.outerRef.current.clientHeight)
   }
 
-  showNewLog = (chunk: string) => {
+  appendNewLog = (chunk: string) => {
     const newLog = chunk.split(/[\n\r]+/);
     if (!newLog[newLog.length - 1]) newLog.pop();
     this.setState((prevState: any) => {
@@ -114,11 +116,29 @@ export default class Logs extends React.Component<Props, State> {
     });
   }
 
+  refetch() {
+    this.setState({
+      loading: true,
+      tailLines: INITIAL_LENGTH
+    });
+
+    this.fetchLog().then(() => {
+      if (this.unmounted) {
+        return;
+      }
+      // schedule next fetch if
+      if (!this.state.loaded || this.props.retryAfterTermintated) {
+        setTimeout(()=> {
+          this.refetch();
+        }, 5000);
+      }
+    });
+  }
+
   fetchLog = async () => {
     const token = window.localStorage.getItem('canner.accessToken');
-    const {endpoint, shouldRetryAfterFetched = () => {}} = this.props;
+    const {endpoint} = this.props;
     const {tailLines} = this.state;
-    const that = this;
     if (this.controller) this.controller.abort();
     const controller = new AbortController();
     this.controller = controller
@@ -141,7 +161,10 @@ export default class Logs extends React.Component<Props, State> {
         });
 
         if (res.status >= 400) {
-          if (this.props.enableLogPersistence) {
+          let allowPerist = this.props.allowPersistLog?
+            this.props.allowPersistLog() :
+            false;
+          if (allowPerist && this.state.loaded == false) {
             this.setState({fromPersist: true});
             res = await fetch(`${endpoint}?tailLines=${tailLines}&persist=true`, {
               signal,
@@ -153,10 +176,12 @@ export default class Logs extends React.Component<Props, State> {
           } else {
             const content = await res.json();
             const reason = get(content, 'message', 'of internal error');
-            that.setState(() => ({
-              log: [`Error: cannot get log due to ${reason}`],
-              loading: false
-            }));
+            if (this.state.loaded == false) {
+              this.setState(() => ({
+                log: [`Error: cannot get log due to ${reason}`],
+                loading: false
+              }));
+            }
             return;
           }
         }
@@ -169,9 +194,11 @@ export default class Logs extends React.Component<Props, State> {
           return;
         }
         console.log(err);
-        that.setState(() => ({
-          log: [`Error: cannot fetch the log`]
-        }));
+        if (this.state.loaded == false) {
+          this.setState(() => ({
+            log: [`Error: cannot fetch the log`]
+          }));
+        }
 
         retryCount++;
         if (retryCount === 5) {
@@ -184,23 +211,20 @@ export default class Logs extends React.Component<Props, State> {
     }
 
     // Keep reading the trunk
-    that.setState({log: []});
+    this.setState({log: []});
     const reader = res.body.getReader();
-
-    function readChunk() {
-      return reader.read().then(appendChunks);
+    try {
+      while (true) {
+        let result = await reader.read();
+        if (result.done) {
+          break;
+        }
+        const chunk = new TextDecoder().decode(result.value.buffer);
+        this.appendNewLog(chunk);
+      }
+    } finally {
+      this.setState({loaded: true});
     }
-
-    function appendChunks(result) {
-      if (result.done)
-        return 'done';
-      const chunk = new TextDecoder().decode(result.value.buffer);
-      that.showNewLog(chunk);
-
-      return readChunk();
-    }
-
-    readChunk();
   }
 
   onScroll = ({
