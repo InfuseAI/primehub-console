@@ -5,7 +5,7 @@ import {Link, withRouter} from 'react-router-dom';
 import {startCase, get} from 'lodash';
 import styled from 'styled-components';
 import moment from 'moment';
-import ImageBreadcrumb from './breadcrumb';
+import ImageBreadcrumb from 'components/images/breadcrumb';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';

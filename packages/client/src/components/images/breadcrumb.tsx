@@ -36,7 +36,7 @@ class ImageBreadcrumb extends React.Component<Props> {
       </Breadcrumb.Item>)
     } else if (match.url.endsWith('images/create')) {
       breadcrumbItems.push(<Breadcrumb.Item key="create">
-        New Schedule
+        New Image
       </Breadcrumb.Item>)
     }
 
