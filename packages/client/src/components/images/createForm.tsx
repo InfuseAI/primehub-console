@@ -1,38 +1,31 @@
 import * as React from 'react';
-import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon} from 'antd';
+import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon, InputNumber, Switch} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
-import {get, startCase} from 'lodash';
-import RecurrenceInput, {RecurrenceType, recurrenceValidator} from 'ee/components/schedule/recurrence';
-import Message from 'components/share/message';
-import styled from 'styled-components';
+import {get, snakeCase, debounce} from 'lodash';
+import DynamicFields from 'components/share/dynamicFields';
+import EnvFields from 'components/share/envFields';
+import InfuseButton from 'components/infuseButton';
+import ImagePullSecret from 'components/share/ImagePullSecret';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 
 const { Option } = Select;
 
 type Props = FormComponentProps & {
-  showResources: boolean;
+  groupContext: any;
   refetchGroup: Function;
-  groupContext?: any;
   groups: Array<Record<string, any>>;
-  onSelectGroup: Function;
+  onSelectGroup?: Function;
   selectedGroup: string;
   instanceTypes: Array<Record<string, any>>;
-  images: Array<Record<string, any>>;
-  defaultActiveDeadlineSeconds: number;
   onSubmit: Function;
   onCancel?: Function;
   loading: boolean;
   initialValue?: any;
-  type?: 'schedule' | 'job';
-  timezone?: {
-    name: string;
-    offset: number;
-  },
-  submitText?: string;
+  type?: 'edit' | 'create';
 };
 
 type State = {
-  recurrenceError: string;
+  revealEnv: boolean;
 }
 
 const radioStyle = {
@@ -56,54 +49,28 @@ const radioGroupStyle = {
 
 type FormValue = {
   groupId: string;
-  instanceType: string;
-  image: string;
   displayName: string;
-  command: string;
-  recurrence: {
-    cron: string;
-    type: RecurrenceType;
-  };
-  activeDeadlineSeconds: number;
+  name: string;
+  id: string;
+  type: string;
+  useImagePullSecret: string;
+  description: string;
+  url: string;
+  urlForGpu: string;
 };
-
-const transformImages = (images, instanceType) => {
-  const gpuInstance = Boolean(instanceType && instanceType.gpuLimit);
-  return images.map(image => {
-    return {
-      ...image,
-      __disabled: !gpuInstance && (image.type || '').toLowerCase() === 'gpu'
-    };
-  });
-}
-
-const getImageType = (image) => {
-  const imageType = (image.type || '').toLowerCase();
-  switch (imageType) {
-    case 'gpu':
-      return 'GPU';
-    case 'cpu':
-      return 'CPU';
-    case 'both':
-      return 'Universal'
-    default:
-      return 'Unknown';
-  }
-}
 
 const dashOrNumber = value => value === null ? '-' : value;
 
-const commandPlaceHolder = `echo "Start training"
-python /project/group-a/train.py \\
-  --dataset /datasets/dataset-a/train.txt \\
-  --output /workingdir/output \\
-  --parameter_1 value_1 \\
-  --parameter_2 value_2
-`;
+const autoGenId = (name: string) => {
+  const normalizedNAme = name.replace(/[\W_]/g, '-').toLowerCase();
+  const randomString = Math.random().toString(36).substring(7).substring(0, 5);
+  return `${normalizedNAme}-${randomString}`;
+}
 
-class CreateForm extends React.Component<Props, State> {
+class ImageCreateForm extends React.Component<Props, State> {
   state = {
-    recurrenceError: ''
+    recurrenceError: '',
+    revealEnv: false
   };
 
   componentDidMount() {
@@ -111,21 +78,19 @@ class CreateForm extends React.Component<Props, State> {
     if (!initialValue) {
       this.autoSelectFirstGroup();
       this.autoSelectFirstInstanceType();
-      this.autoSelectFirstImage();
     }
   }
 
   componentDidUpdate() {
     this.autoSelectFirstGroup();
     this.autoSelectFirstInstanceType();
-    this.autoSelectFirstImage();
   }
 
   autoSelectFirstGroup = () => {
     const {onSelectGroup, selectedGroup, groups, form} = this.props;
     if (!selectedGroup && groups.length) {
       const id = get(groups[0], 'id', null);
-      onSelectGroup(id);
+      onSelectGroup && onSelectGroup(id);
       form.setFieldsValue({groupId: id});
     }
   }
@@ -139,31 +104,14 @@ class CreateForm extends React.Component<Props, State> {
     }
   }
 
-  autoSelectFirstImage = () => {
-    const {images, instanceTypes, form} = this.props;
-    const instanceTypeId = form.getFieldValue('instanceType');
-    const imageId = form.getFieldValue('image');
-    const instanceType = instanceTypes.find(it => it.id === instanceTypeId);
-    const transformedImages = transformImages(images, instanceType);
-    const availableImages = transformedImages.filter(image => !image.__disabled);
-    if (imageId && availableImages.some(image => image.id === imageId)) return;
-    if (availableImages.length) form.setFieldsValue({image: availableImages[0].id});
-  }
-
   submit = (e) => {
     const {form, onSubmit} = this.props;
     e.preventDefault();
-
-    const recurrence = form.getFieldValue('recurrence');
-    if (recurrence && recurrence.type !== 'inactive' && !recurrence.cron) {
-      return this.setState({
-        recurrenceError: 'Please input cron expression!'
-      });
-    }
-
     form.validateFields(async (err, values: FormValue) => {
       if (err) return;
-
+      if (!values.metadata) values.metadata = {}
+      values.endpointAccessType = values.privateAccess ? 'private' : 'public';
+      delete values.privateAccess;
       onSubmit(values);
     });
   }
@@ -175,10 +123,11 @@ class CreateForm extends React.Component<Props, State> {
     onCancel(values);
   }
 
-  stringifyZone(zone, offset): string {
-    const ensure2Digits = num => (num > 9 ? `${num}` : `0${num}`);
-
-    return `${offset}${zone.offset < 0 ? '-' : '+'}${ensure2Digits(Math.floor(Math.abs(zone.offset)))}:${ensure2Digits(Math.abs((zone.offset % 1) * 60))}, ${zone.name}`;
+  toggleEnvVisibilty = () => {
+    const revealEnv = !this.state.revealEnv;
+    this.setState({
+      revealEnv
+    });
   }
 
   renderLabel = (defaultLabel: string, invalid: boolean, message: any) => {
@@ -190,230 +139,138 @@ class CreateForm extends React.Component<Props, State> {
     return label;
   }
 
+  handleNameChange = debounce(() => {
+    const {form} = this.props;
+    const values = form.getFieldsValue();
+    form.validateFields(['displayName'], (err, values) => {
+      if (err) return form.setFieldsValue({ id: '' });
+      const name = autoGenId(values.displayName);
+      form.setFieldsValue({ name });
+    });
+
+  }, 400)
+
   render() {
     const {
-      showResources,
-      refetchGroup,
       groupContext,
+      refetchGroup,
       groups,
       onSelectGroup,
-      instanceTypes,
-      images,
       loading,
       form,
-      type,
       initialValue,
-      timezone,
-      onCancel,
-      submitText,
       selectedGroup,
-      defaultActiveDeadlineSeconds
     } = this.props;
-    const {
-      recurrenceError
-    } = this.state;
-    const instanceType = instanceTypes.find(instanceType => instanceType.id === form.getFieldValue('instanceType'));
     const {
       groupId,
       groupName,
-      instanceTypeId,
-      instanceTypeName,
-      image,
+      name,
       displayName,
-      command,
-      recurrence = {},
-      invalid,
-      message,
-      activeDeadlineSeconds,
+      id,
+      type,
+      url,
+      urlForGpu,
+      useImagePullSecret,
+      description,
     } = initialValue || {};
-    let recurrenceLabel = `Recurrence Options`;
-    if (timezone) {
-      recurrenceLabel += `(${this.stringifyZone(timezone, 'GMT')})`;
-    }
-
-    const invalidInitialGroup = groupId && !form.getFieldValue('groupId') && !groups.find(group => group.id === groupId);
+    const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
     const groupLabel = this.renderLabel(
       'Group',
       invalidInitialGroup,
       <span>The group <b>{groupName}</b> was deleted.</span>
     )
-
-    const invalidInitialInstanceType = !invalidInitialGroup &&
-      instanceTypeId && !form.getFieldValue('instanceType') &&
-      !instanceTypes.find(it => it.id === instanceTypeId);
-
-    const instanceTypeLabel = this.renderLabel(
-      'InstanceTypes',
-      invalidInitialInstanceType,
-      <span>The instance type <b>{instanceTypeName}</b> was deleted.</span>
-    )
-
-    const invalidInitialImage = !invalidInitialGroup &&
-      image && !form.getFieldValue('image') &&
-      !images.find(it => it.id === image);
-    const imageLabel = this.renderLabel(
-      'Images',
-      invalidInitialImage,
-      <span>The image <b>{image}</b> was deleted.</span>
-    )
     return (
       <Form onSubmit={this.submit}>
-        <Row gutter={16}>
-          <Col xs={24} sm={16} lg={16}>
+        <Row>
+          <Col>
             <Card loading={loading} style={{overflow: 'auto'}}>
-              <h3>Environment Settings</h3>
-              <Divider />
-              {
-                groups.length ? (
-                  <Form.Item label={groupLabel} style={ groupContext ? { display: 'none' } : {} }>
-                    {form.getFieldDecorator('groupId', {
-                      initialValue: invalidInitialGroup ? '' : groupId,
-                      rules: [{ required: true, message: 'Please select a group!' }],
-                    })(
-                      <Select placeholder="Please select a group" onChange={id => onSelectGroup(id)}>
-                        {groups.map(group => (
-                          <Option key={group.id} value={group.id}>
-                            {group.displayName || group.name}
-                          </Option>
-                        ))}
-                      </Select>,
-                    )}
-                  </Form.Item>
-                ) : (
-                  <Form.Item>
-                    <Card>
-                      No group is configured for you to launch a server. Please contact admin.
-                    </Card>
-                  </Form.Item>
-                )
-              }
-
-              <Form.Item label={instanceTypeLabel}>
-                {form.getFieldDecorator('instanceType', {
-                  initialValue: instanceTypeId,
-                  rules: [{ required: true, message: 'Please select a instance type!' }],
-                })(
-                  instanceTypes.length ? (
-                    <Radio.Group style={radioGroupStyle} onChange={this.autoSelectFirstImage}>
-                      {instanceTypes.map(instanceType => (
-                        <Radio style={radioStyle} value={instanceType.id} key={instanceType.id}>
-                          <div style={radioContentStyle}>
-                            <h4>
-                              {instanceType.displayName || instanceType.name}
-                              <Tooltip
-                                title={`CPU: ${dashOrNumber(instanceType.cpuLimit)} / Memory: ${dashOrNumber(instanceType.memoryLimit)} G / GPU: ${dashOrNumber(instanceType.gpuLimit)}`}
-                              >
-                                <Icon
-                                  type="info-circle"
-                                  theme="filled"
-                                  style={{marginLeft: 8}}
-                                />
-                              </Tooltip>
-                            </h4>
-                            {instanceType.description}
-                          </div>
-                        </Radio>
-                      ))}
-                    </Radio.Group>
-                  ) : (
-                    <Card>
-                      No instance in this group.
-                    </Card>
-                  )
-                )}
-              </Form.Item>
-
-              <Form.Item label={imageLabel}>
-                {form.getFieldDecorator('image', {
-                  initialValue: image,
-                  rules: [{ required: true, message: 'Please select a image!' }],
-                })(
-                  images.length ? (
-                    <Radio.Group style={radioGroupStyle}>
-                      {transformImages(images, instanceType).map(image => (
-                        <Radio key={image.id} style={radioStyle} value={image.id} disabled={image.__disabled}>
-                          <div style={radioContentStyle}>
-                            <h4>{image.displayName || image.name} ({getImageType(image)})</h4>
-                            {image.description}
-                          </div>
-                        </Radio>
-                      ))}
-                    </Radio.Group>
-                  ) : (
-                    <Card>
-                      No image in this group.
-                    </Card>
-                  )
-                )}
-              </Form.Item>
-
-            </Card>
-            <Card>
-              <h3>{startCase(type || 'job')} Details</h3>
-              <Divider />
-              <Form.Item label={`${startCase(type || 'job')} name`}>
+              <Form.Item label={`Display name`} style={{marginBottom: '8px'}}>
                 {form.getFieldDecorator('displayName', {
                   initialValue: displayName,
                   rules: [
-                    { whitespace: true, required: true, message: 'Please input a name!' },
+                    {
+                      whitespace: true,
+                      required: true,
+                      message: 'Please input a name!'
+                    },
+                    {
+                      pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*/,
+                      message: `alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`
+                    }
                   ],
+                })(
+                  <Input disabled={type === 'edit'} onChange={this.handleNameChange} />
+                )}
+              </Form.Item>
+              <Form.Item label={`Image name`}>
+                {form.getFieldDecorator('name', {
+                  initialValue: name
+                })(
+                  <Input disabled />
+                )}
+              </Form.Item>
+              <Form.Item label="Description">
+                {form.getFieldDecorator('description', {
+                  initialValue: description
                 })(
                   <Input />
                 )}
               </Form.Item>
-              <Form.Item label={(
-                <span>
-                  Command&nbsp;
-                  <Tooltip title={(
-                    <React.Fragment>
-                      <h4 style={{color: 'white'}}>Information</h4>
-                      <div>{`Commands allow multiline. The working directory is located at '/home/jovyan'. The group volume is mounted at '/home/jovyan/<group>' and datasets are mounted at '/home/jovyan/datasets/<dataset>'.`}</div>
-                    </React.Fragment>
-                  )}>
-                    <Icon type="question-circle-o" />
-                  </Tooltip>
-                </span>
-              )} >
-                {form.getFieldDecorator('command', {
-                  initialValue: command,
-                  rules: [{ required: true, message: 'Please input commands!' }],
+              <Form.Item label="Type">
+                {form.getFieldDecorator('type', {
+                  initialValue: type,
+                  rules: [
+                    {
+                      required: true,
+                      message: 'Please select a type.'
+                    }
+                  ]
                 })(
-                  <Input.TextArea
-                    placeholder={commandPlaceHolder}
-                    rows={10}
-                  />
+                  <Select style={{width: '200px'}}>
+                    <Select.Option key='cpu' value='cpu'>cpu</Select.Option>
+                    <Select.Option key='gpu' value='gpu'>gpu</Select.Option>
+                    <Select.Option key='both' value='both'>universal</Select.Option>
+                  </Select>
+                )}
+              </Form.Item>
+              <Form.Item label="Container image url">
+                {form.getFieldDecorator('url', {
+                  initialValue: url
+                })(
+                  <Input />
+                )}
+              </Form.Item>
+
+              <Form.Item label={`Image Pull Secret`}>
+                {form.getFieldDecorator('useImagePullSecret', {
+                  initialValue: useImagePullSecret,
+                })(
+                  <ImagePullSecret />
                 )}
               </Form.Item>
             </Card>
             <Form.Item style={{textAlign: 'right', marginTop: 12}}>
               {
-                <Button
-                  type="primary" htmlType="submit"
-                  style={{width: "100%"}}
-                >
-                  {submitText || 'Submit'}
-                </Button>
-              }
-              {
-                onCancel && <Button onClick={this.cancel} style={{width: "100%"}}>
-                  Cancel
-                </Button>
+                type === 'edit' ? (
+                  <>
+                    <InfuseButton
+                      type="primary"
+                      htmlType="submit"
+                      style={{marginRight: 16, width: '100%'}}
+                    >
+                      Confirm
+                    </InfuseButton>
+                    <InfuseButton onClick={this.cancel} style={{width: "100%"}}>
+                      Cancel
+                    </InfuseButton>
+                  </>
+                ) : (
+                  <InfuseButton type="primary" htmlType="submit" style={{width: "100%"}}>
+                    Create
+                  </InfuseButton>
+                )
               }
             </Form.Item>
-          </Col>
-          <Col xs="24" sm="8" lg="8">
-            {
-              showResources ? (
-                <ResourceMonitor
-                  groupContext={groupContext}
-                  refetchGroup={refetchGroup}
-                  selectedGroup={selectedGroup}
-                  showDataset={true}
-                />
-              ) : (
-                <></>
-              )
-            }
           </Col>
         </Row>
       </Form>
@@ -422,4 +279,4 @@ class CreateForm extends React.Component<Props, State> {
 }
 
 
-export default Form.create<Props>()(CreateForm);
+export default Form.create<Props>()(ImageCreateForm);

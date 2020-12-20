@@ -5,10 +5,10 @@ import {Query} from 'react-apollo';
 import {FormattedMessage} from 'react-intl';
 
 type Props = {
-  onChange: (value: string) => void;
-  value: string;
-  title: React.ReactNode;
-  disabled: boolean
+  onChange?: (value: string) => void;
+  value?: string;
+  title?: React.ReactNode;
+  disabled?: boolean
 }
 type State = {
   checked: boolean

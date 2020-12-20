@@ -20,7 +20,6 @@ export const GET_MY_GROUPS = gql`
       id
       groups {
         ...GroupInfo
-        instanceTypes { id name displayName description spec global gpuLimit memoryLimit cpuLimit }
         images { id name displayName description spec global type }
       }
     }
@@ -111,7 +110,7 @@ class ImageCreatePage extends React.Component<Props, State> {
       <React.Fragment>
         <PageTitle
           breadcrumb={<ImageBreadcrumb />}
-          title={"New Job"}
+          title={"New Image"}
         />
         <div style={{
           margin: '16px',
