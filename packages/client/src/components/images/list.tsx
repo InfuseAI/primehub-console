@@ -119,7 +119,7 @@ class ImageList extends React.Component<Props> {
         ...imagesVariables,
         where: {
           ...imagesVariables.where,
-          displayName_contains: queryString
+          name_or_type_or_displayName_or_description: queryString
         }
       }
     }
@@ -213,7 +213,7 @@ class ImageList extends React.Component<Props> {
               <Col>
                 <FilterPlugins style={{marginRight: '10px'}}>
                   <Search
-                    placeholder={`Search Image name`}
+                    placeholder={`Search Image`}
                     onSearch={this.searchHandler}
                   />
                 </FilterPlugins>

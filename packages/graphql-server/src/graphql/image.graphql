@@ -53,8 +53,7 @@ input ImageWhereUniqueInput {
 
 input ImageWhereInput {
   id: ID
-  name_contains: String
-  displayName_contains: String
+  name_or_type_or_displayName_or_description: String
   groupName_contains: String
 }
 
