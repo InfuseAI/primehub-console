@@ -14,21 +14,40 @@ import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import {sortItems, GET_MY_GROUPS} from 'containers/imageCreatePage';
 
 export const GET_IMAGE = gql`
-  query image($where: imageWhereUniqueInput!) {
+  query image($where: ImageWhereUniqueInput!) {
     image(where: $where) {
       id
       displayName
+      description
       name
       url
       urlForGpu
       groupName
+      type
+      useImagePullSecret
+    }
+  }
+`;
+
+export const UPDATE_IMAGE= gql`
+  mutation updateImage($data: ImageUpdateInput!, $where: ImageWhereUniqueInput!) {
+    updateImage(where: $where, data: $data) {
+      id
+      name
+      displayName
+      description
+      type
+      url
+      urlForGpu
+      groupName
+      useImagePullSecret
     }
   }
 `;
 
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 
-type Props = RouteComponentProps<{imageId: string}> & {
+type Props = GroupContextComponentProps & RouteComponentProps<{imageId: string}> & {
   getGroups: any;
   updateImage: any;
   updateImageResult: any;
@@ -38,35 +57,32 @@ type State = {
   selectedGroup: string | null;
 }
 
-class ImageCreatePage extends React.Component<Props, State> {
+class ImageEditPage extends React.Component<Props, State> {
+
   onSubmit = (payload) => {
-    const {updateImage} = this.props;
+    const { updateImage, getImage } = this.props;
+    const { image } = getImage;
+    payload.id = image.id;
     updateImage({
       variables: {
-        where: {id: payload.id},
-        data: pick(payload, ['displayName', 'url', 'useImagePullSecret', 'urlForGpu', 'description'])
+        where: {id: image.id},
+        data: pick(payload, ['displayName', 'url', 'useImagePullSecret', 'urlForGpu', 'description', 'groupName'])
       }
     });
   }
 
   onCancel = values => {
     const {history, getImage} = this.props;
-    //const initialValue = {
-      //id: get(getPhDeployment, 'phDeployment.id'),
-      //instanceType: get(getPhDeployment, 'phDeployment.instanceType.id'),
-      //modelImage: get(getPhDeployment, 'phDeployment.modelImage'),
-      //imagePullSecret: get(getPhDeployment, 'phDeployment.imagePullSecret'),
-      //modelURI: get(getPhDeployment, 'phDeployment.modelURI'),
-      //replicas: get(getPhDeployment, 'phDeployment.replicas'),
-      //groupId: get(getPhDeployment, 'phDeployment.groupId'),
-      //name: get(getPhDeployment, 'phDeployment.name'),
-      //env: get(getPhDeployment, 'phDeployment.env'),
-      //metadata: get(getPhDeployment, 'phDeployment.metadata'),
-      //description: get(getPhDeployment, 'phDeployment.description'),
-      //updateMessage: get(getPhDeployment, 'phDeployment.updateMessage'),
-    //}
-    //if (isEqual(values, initialValue))
-      //return history.goBack();
+    const initialValue = {
+      id: get(getImage, 'image.id'),
+      name: get(getImage, 'image.name'),
+      url: get(getImage, 'image.url'),
+      type: get(getImage, 'image.type'),
+      description: get(getImage, 'image.description'),
+      useImagePullSecret: get(getImage, 'image.useImagePullSecret')
+    }
+    if (isEqual(values, initialValue))
+      return history.goBack();
 
     Modal.confirm({
       title: 'Do you want to discard the changes?',
@@ -84,7 +100,8 @@ class ImageCreatePage extends React.Component<Props, State> {
   }
 
   render() {
-    const {getGroups, getImage, history, groupContext, refetchGroup} = this.props;
+    const {getGroups, getImage, history, groupContext} = this.props;
+    console.log('gorupContext', groupContext);
     if (getImage.loading) return null;
     if (getImage.error) {
       return getMessage(getImage.error)
@@ -97,15 +114,10 @@ class ImageCreatePage extends React.Component<Props, State> {
     const selectedGroup = getImage.image.groupName;
     const group = groups
       .find(group => group.name === selectedGroup);
-    //const instanceTypes = unionBy(
-      //get(group, 'instanceTypes', []),
-      //get(everyoneGroup, 'instanceTypes', []),
-      //'id'
-    //);
     return (
       <React.Fragment>
         <PageTitle
-          title={`Update Deployment`}
+          title={`Update Image`}
           breadcrumb={<ImageBreadcrumb />}
         />
         <div style={{margin: '16px'}}>
@@ -115,13 +127,10 @@ class ImageCreatePage extends React.Component<Props, State> {
               ...(getImage.image || {})
             }}
             selectedGroup={selectedGroup}
-            groups={sortItems(groups)}
             groupContext={groupContext}
-            //refetchGroup={getGroups.refetch}
-            //instanceTypes={sortItems(instanceTypes)}
             onSubmit={this.onSubmit}
             onCancel={this.onCancel}
-            //loading={getGroups.loading || updatePhDeploymentResult.loading}
+            formType={'edit'}
           />
         </div>
       </React.Fragment>
@@ -146,25 +155,24 @@ export default compose(
     }),
     name: 'getImage'
   }),
-  //graphql(UPDATE_DEPLOYMENT, {
-    //options: (props: Props) => ({
-      //onCompleted: (data: any) => {
-        //const {history} = props;
-        //history.push(`../../model-deployment`);
-        //notification.success({
-          //duration: 10,
-          //placement: 'bottomRight',
-          //message: 'Success!',
-          //description: (
-            //<>
-              //Your update has begun deploying.
-              //Click <a onClick={() => history.push(`model-deployment/${data.updatePhDeployment.id}`)}>here</a> to view.
-            //</>
-          //)
-        //});
-      //},
-      //onError: errorHandler
-    //}),
-    //name: 'updatePhDeployment'
-  //})
-)(ImageCreatePage)
+  graphql(UPDATE_IMAGE, {
+    options: (props: Props) => ({
+      onCompleted: (data: any) => {
+        const {history} = props;
+        history.push(`../../images`);
+        notification.success({
+          duration: 10,
+          placement: 'bottomRight',
+          message: 'Success!',
+          description: (
+            <>
+              Image {data.updateImage.name} updated.
+            </>
+          )
+        });
+      },
+      onError: errorHandler
+    }),
+    name: 'updateImage'
+  })
+)(ImageEditPage)

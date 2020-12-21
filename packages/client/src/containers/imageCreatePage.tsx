@@ -3,7 +3,7 @@ import {Card, Skeleton, Row, Col} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
-import {get, unionBy} from 'lodash';
+import {get, unionBy, isEmpty} from 'lodash';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
@@ -75,7 +75,12 @@ class ImageCreatePage extends React.Component<Props, State> {
   }
 
   onSubmit = (payload) => {
-    const {createImage} = this.props;
+    const {createImage, groupContext} = this.props;
+    const groupConnector = {
+      connect: [{id: groupContext.id}]
+    };
+    payload.groupName = groupContext.name;
+    payload.groups = groupConnector
     createImage({
       variables: {
         data: payload
@@ -87,7 +92,6 @@ class ImageCreatePage extends React.Component<Props, State> {
     const {selectedGroup} = this.state;
     const {groupContext, getGroups, createImageResult, defaultValue} = this.props;
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
-    const jobDefaultActiveDeadlineSeconds = (window as any).jobDefaultActiveDeadlineSeconds;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups
       .filter(group => group.id !== everyoneGroupId)
@@ -95,17 +99,6 @@ class ImageCreatePage extends React.Component<Props, State> {
     const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
     const group = groups
       .find(group => group.id === selectedGroup);
-    const instanceTypes = unionBy(
-      get(group, 'instanceTypes', []),
-      get(everyoneGroup, 'instanceTypes', []),
-      'id'
-    );
-    const images = unionBy(
-      get(group, 'images', []),
-      get(everyoneGroup, 'images', []),
-      'id'
-    );
-    const jobActiveDeadlineSeconds = get(group, 'jobDefaultActiveDeadlineSeconds', null) || jobDefaultActiveDeadlineSeconds;
     return (
       <React.Fragment>
         <PageTitle
@@ -142,8 +135,6 @@ class ImageCreatePage extends React.Component<Props, State> {
               selectedGroup={selectedGroup}
               onSelectGroup={this.onChangeGroup}
               groups={sortItems(groups)}
-              instanceTypes={sortItems(instanceTypes)}
-              images={sortItems(images)}
               onSubmit={this.onSubmit}
               loading={createImageResult.loading}
             />

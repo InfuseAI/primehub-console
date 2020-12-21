@@ -98,6 +98,11 @@ class ImageList extends React.Component<Props> {
     history.push(`images/create`);
   }
 
+  editGroupImage = (id) => {
+    const {history} = this.props;
+    history.push(`images/${id}/edit`);
+  }
+
   searchHandler = (queryString) => {
     const {groupContext, imagesVariables, imagesRefetch} = this.props;
     if (queryString && queryString.length > 0) {
@@ -128,12 +133,11 @@ class ImageList extends React.Component<Props> {
 
   render() {
     const {groupContext, groups, imagesConnection, imagesLoading, imagesVariables } = this.props;
-    console.log(imagesConnection);
     const {currentId} = this.state;
     const renderAction = (id, record) => {
       return (
         <Button.Group>
-          <Button onClick={() => {return undefined;}}>
+          <Button onClick={() => {this.editGroupImage(id)}}>
             Edit
           </Button>
           <Button onClick={() => {return undefined;}}>remove</Button>
@@ -144,7 +148,7 @@ class ImageList extends React.Component<Props> {
       title: 'Name',
       dataIndex: 'name',
       sorter: true,
-      render: text => startCase(text)
+      render: text => text
     }, {
       title: 'Display Name',
       dataIndex: 'displayName',
@@ -158,7 +162,15 @@ class ImageList extends React.Component<Props> {
       title: 'type',
       sorter: true,
       dataIndex: 'type',
-      render: text => text
+      render: (value) => {
+        if (!value) {
+          return '-';
+        }
+        if (value === 'both') {
+          return 'universal';
+        }
+        return value;
+      }
     }, {
       title: 'Actions',
       dataIndex: 'id',

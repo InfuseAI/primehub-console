@@ -141,7 +141,7 @@ export const createMapping = (data: any) => {
       type: imageType,
       url,
       urlForGpu,
-      pullSecret: isNil(data.useImagePullSecret) ? null : data.useImagePullSecret,
+      pullSecret: isNil(data.useImagePullSecret) ? '' : data.useImagePullSecret,
       groupName: isNil(data.groupName) ? null : data.groupName
     }
   };

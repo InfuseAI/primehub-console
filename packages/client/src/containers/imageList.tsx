@@ -15,7 +15,9 @@ export const ImageFragment = gql`
   fragment ImageInfo on Image{
     id
     displayName
+    description
     name
+    type
  }
 `
 

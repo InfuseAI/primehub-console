@@ -14,14 +14,13 @@ type Props = FormComponentProps & {
   groupContext: any;
   refetchGroup: Function;
   groups: Array<Record<string, any>>;
-  onSelectGroup?: Function;
   selectedGroup: string;
   instanceTypes: Array<Record<string, any>>;
   onSubmit: Function;
   onCancel?: Function;
   loading: boolean;
   initialValue?: any;
-  type?: 'edit' | 'create';
+  formType?: 'edit' | 'create';
 };
 
 type State = {
@@ -75,24 +74,7 @@ class ImageCreateForm extends React.Component<Props, State> {
 
   componentDidMount() {
     const {initialValue} = this.props;
-    if (!initialValue) {
-      this.autoSelectFirstGroup();
-    }
   }
-
-  componentDidUpdate() {
-    this.autoSelectFirstGroup();
-  }
-
-  autoSelectFirstGroup = () => {
-    const {onSelectGroup, selectedGroup, groups, form} = this.props;
-    if (!selectedGroup && groups.length) {
-      const id = get(groups[0], 'id', null);
-      onSelectGroup && onSelectGroup(id);
-      form.setFieldsValue({groupId: id});
-    }
-  }
-
 
   submit = (e) => {
     const {form, onSubmit} = this.props;
@@ -142,11 +124,11 @@ class ImageCreateForm extends React.Component<Props, State> {
       groupContext,
       refetchGroup,
       groups,
-      onSelectGroup,
       loading,
       form,
       initialValue,
       selectedGroup,
+      formType
     } = this.props;
     const {
       groupId,
@@ -160,12 +142,6 @@ class ImageCreateForm extends React.Component<Props, State> {
       useImagePullSecret,
       description,
     } = initialValue || {};
-    const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
-    const groupLabel = this.renderLabel(
-      'Group',
-      invalidInitialGroup,
-      <span>The group <b>{groupName}</b> was deleted.</span>
-    )
     return (
       <Form onSubmit={this.submit}>
         <Row>
@@ -186,7 +162,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                     }
                   ],
                 })(
-                  <Input disabled={type === 'edit'} onChange={this.handleNameChange} />
+                  <Input disabled={formType === 'edit'} onChange={this.handleNameChange} />
                 )}
               </Form.Item>
               <Form.Item label={`Image name`}>
@@ -238,7 +214,7 @@ class ImageCreateForm extends React.Component<Props, State> {
             </Card>
             <Form.Item style={{textAlign: 'right', marginTop: 12}}>
               {
-                type === 'edit' ? (
+                formType === 'edit' ? (
                   <>
                     <InfuseButton
                       type="primary"
