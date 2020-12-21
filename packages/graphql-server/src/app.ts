@@ -682,7 +682,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     };
 
     const tusProxyPath = `${staticPath}tus`;
-    rootRouter.all(`${tusProxyPath}(/?.*)`, authenticateMiddleware, checkTusPermission, TusdProxy(tusProxyPath, {
+    rootRouter.all(`/tus(/?.*)`, authenticateMiddleware, checkTusPermission, TusdProxy(tusProxyPath, {
       target: config.sharedSpaceTusdEndpoint,
       changeOrigin: true,
       logs: true,
