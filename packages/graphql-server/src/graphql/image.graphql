@@ -1,6 +1,12 @@
 # import PageInfo from "common.graphql"
 # import Group, GroupCreateManyInput, GroupUpdateManyInput from "group.graphql"
 
+enum QueryImageMode {
+  SYSTEM_ONLY
+  GROUP_ONLY
+  ALL
+}
+
 type Image {
   id: ID!
   name: String!

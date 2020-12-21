@@ -1,15 +1,9 @@
 # import PageInfo from "common.graphql"
 # import User, UserCreateManyInput, UserUpdateManyInput from "user.graphql"
 # import InstanceType from "instanceType.graphql"
-# import Image from "image.graphql"
+# import Image, QueryImageMode from "image.graphql"
 # import Dataset from "dataset.graphql"
 # import ResourceStatus from "resourceStatus.graphql"
-
-enum QueryImageMode {
-  SYSTEM_ONLY
-  GROUP_ONLY
-  ALL
-}
 
 type Group {
   id: ID!

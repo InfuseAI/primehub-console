@@ -1,8 +1,8 @@
 # import System, SystemUpdateInput from "./system.graphql"
 # import User, UsersOrderBy, UserMultiEmailResponse, UserConnection, UserWhereInput, UserWhereUniqueInput, UserCreateInput, UserUpdateInput, UserActionResponse from "./user.graphql"
-# import Group, GroupOrderByInput, GroupConnection, GroupWhereInput, GroupWhereUniqueInput, GroupCreateInput, GroupUpdateInput from "./group.graphql"
+# import  Group, GroupOrderByInput, GroupConnection, GroupWhereInput, GroupWhereUniqueInput, GroupCreateInput, GroupUpdateInput from "./group.graphql"
 # import InstanceType, InstanceTypeOrderByInput, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput, InstanceTypeCreateInput, InstanceTypeUpdateInput from "./instanceType.graphql"
-# import Image, ImageOrderByInput, ImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput from "./image.graphql"
+# import QueryImageMode, Image, ImageOrderByInput, ImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput from "./image.graphql"
 # import Announcement, AnnouncementConnection, AnnouncementWhereInput, AnnouncementWhereUniqueInput, AnnouncementCreateInput, AnnouncementUpdateInput from "./announcement.graphql"
 # import Dataset, DatasetOrderByInput, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretOrderByInput, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
@@ -87,6 +87,7 @@ type Query {
     last: Int
   ): [Image]!
   imagesConnection(
+    mode: QueryImageMode
     where: ImageWhereInput
     page: Int
     orderBy: ImageOrderByInput

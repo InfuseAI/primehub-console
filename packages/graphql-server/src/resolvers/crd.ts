@@ -231,9 +231,20 @@ export class Crd<SpecType> {
    */
 
   private listQuery =
-    async (customResource: CustomResource<SpecType>, where: any, order: any) => {
+    async (customResource: CustomResource<SpecType>, where: any, order: any, mode?: QueryImageMode) => {
     const rows = await customResource.list();
     let mappedRows = rows.map(row => this.propMapping(row));
+    if (this.customResourceMethod === 'images') {
+        if (mode === QueryImageMode.SYSTEM_ONLY) {
+          mappedRows = mappedRows.filter((row) => {
+            return isEmpty(row.groupName);
+          })
+        } else if (mode === QueryImageMode.GROUP_ONLY) {
+          mappedRows = mappedRows.filter((row) => {
+            return !isEmpty(row.groupName);
+          })
+        }
+    }
     mappedRows = filter(mappedRows, where, order);
     return mappedRows;
   }
@@ -252,8 +263,9 @@ export class Crd<SpecType> {
 
   private connectionQuery = async (root, args, context: Context) => {
     const customResource = context.crdClient[this.customResourceMethod];
+    const {mode = QueryImageMode.ALL} = args;
     const where = this.parseWhere(args.where);
-    const rows = await this.listQuery(customResource, where, args && args.orderBy);
+    const rows = await this.listQuery(customResource, where, args && args.orderBy, mode);
 
     return toRelay(rows, extractPagination(args));
   }
