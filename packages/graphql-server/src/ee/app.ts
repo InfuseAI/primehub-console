@@ -43,7 +43,7 @@ import { JobLogCtrl } from './controllers/jobLogCtrl';
 import { PhJobCacheList } from './crdClient/phJobCacheList';
 import JobArtifactCleaner from './utils/jobArtifactCleaner';
 import { PodLogs } from '../controllers/logCtrl';
-import { TusdProxy } from '../utils/tusdProxy';
+import { MountSharedSpaceHandler } from '../controllers/sharedSpaceCtrl';
 
 // cache
 import {
@@ -805,60 +805,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       }
     );
 
-    // shared space proxy to tusd
-    const checkTusPermission = async (ctx: Koa.ParameterizedContext, next: any) => {
-      // if method is POST
-      // validate user permissions ctx.headers["upload-metadata"]
-      // validate header 'Upload-Metadata' should contains dirpath
-      // dirpath is a group path matching the pattern: groups/${group}/upload
-      if (ctx.request.method === 'POST') {
-        const uploadMetadata = ctx.headers['upload-metadata'];
-        if (!uploadMetadata) {
-          throw Boom.badRequest('upload-metadata header not found');
-        }
-
-        // get dirpath from header
-        const regex = new RegExp('dirpath ([^,]+),?');
-        const result = regex.exec(uploadMetadata);
-        if (!result) {
-          throw Boom.badRequest('dirpath not found in the upload-metadata header');
-        }
-        const dirPath = Buffer.from(result[1], 'base64').toString();
-
-        const isGroupBelongUser = async (userId, groupName): Promise<boolean> => {
-          const groups = await ctx.kcAdminClient.users.listGroups({
-            id: userId
-          });
-          const groupNames = groups.map(g => g.name);
-          if (groupNames.indexOf(groupName) >= 0) { return true; }
-          return false;
-        };
-
-        const uploadGroup = new RegExp('groups/(.+)/upload').exec(dirPath);
-        if (!uploadGroup) {
-          throw Boom.badRequest('there is no group name in the dirpath');
-        }
-
-        const userHasGroup = await isGroupBelongUser(ctx.userId, uploadGroup[1]) === true;
-        if (userHasGroup) {
-          return next();
-        }
-
-        throw Boom.forbidden('request not authorized');
-      } else {
-        return next();
-      }
-    };
-
+    // SharedSpace: add tusProxy when store-enable
     const tusProxyPath = `${staticPath}tus`;
-    rootRouter.all(`${tusProxyPath}(/?.*)`, authenticateMiddleware, checkTusPermission, TusdProxy(tusProxyPath, {
-      target: config.sharedSpaceTusdEndpoint,
-      changeOrigin: true,
-      logs: true,
-      graphqlHost: config.graphqlHost,
-      tusProxyPath,
-      rewrite: rewritePath => rewritePath.replace(tusProxyPath, '').replace('/files/', ''),
-    }));
+    MountSharedSpaceHandler(rootRouter, config, tusProxyPath, authenticateMiddleware);
   }
 
   app.use(rootRouter.routes());

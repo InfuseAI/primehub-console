@@ -5,6 +5,9 @@ import { URL } from 'url';
 import HttpProxy = require('http-proxy');
 import pathMatch = require('path-match');
 import * as logger from '../logger';
+import Boom from 'boom';
+import Koa, {Context} from 'koa';
+import Router = require('koa-router');
 
 /**
  * Constants
@@ -20,6 +23,7 @@ let eventRegistered = false;
 
 /**
  * Koa Http Proxy Middleware
+ * from https://github.com/vagusX/koa-proxies/blob/master/index.js
  */
 export const TusdProxy = (path, options) => (ctx, next) => {
   let forwardedHost = '';
@@ -109,3 +113,63 @@ function debug(ctx, target) {
     newPath: new URL(ctx.req.url, target)
   });
 }
+
+// shared space proxy to tusd
+export const sharedSpaceValidator = async (ctx: Koa.ParameterizedContext, next: any) => {
+  // if method is POST
+  // validate user permissions ctx.headers["upload-metadata"]
+  // validate header 'Upload-Metadata' should contains dirpath
+  // dirpath is a group path matching the pattern: groups/${group}/upload
+  if (ctx.request.method === 'POST') {
+    const uploadMetadata = ctx.headers['upload-metadata'];
+    if (!uploadMetadata) {
+      throw Boom.badRequest('upload-metadata header not found');
+    }
+
+    // get dirpath from header
+    const regex = new RegExp('dirpath ([^,]+),?');
+    const result = regex.exec(uploadMetadata);
+    if (!result) {
+      throw Boom.badRequest('dirpath not found in the upload-metadata header');
+    }
+    const dirPath = Buffer.from(result[1], 'base64').toString();
+
+    const isGroupBelongUser = async (userId, groupName): Promise<boolean> => {
+      const groups = await ctx.kcAdminClient.users.listGroups({
+        id: userId
+      });
+      const groupNames = groups.map(g => g.name);
+      if (groupNames.indexOf(groupName) >= 0) { return true; }
+      return false;
+    };
+
+    const uploadGroup = new RegExp('groups/(.+)/upload').exec(dirPath);
+    if (!uploadGroup) {
+      throw Boom.badRequest('there is no group name in the dirpath');
+    }
+
+    const userHasGroup = await isGroupBelongUser(ctx.userId, uploadGroup[1]) === true;
+    if (userHasGroup) {
+      return next();
+    }
+
+    throw Boom.forbidden('request not authorized');
+  } else {
+    return next();
+  }
+};
+
+const createProxy = (config, tusProxyPath) => {
+  return TusdProxy(tusProxyPath, {
+    target: config.sharedSpaceTusdEndpoint,
+    changeOrigin: true,
+    logs: true,
+    graphqlHost: config.graphqlHost,
+    tusProxyPath,
+    rewrite: rewritePath => rewritePath.replace(tusProxyPath, '').replace('/files/', ''),
+  });
+};
+
+export const MountSharedSpaceHandler = (router: Router, config, tusProxyPath: string, authenticateMiddleware) => {
+  router.all(`${tusProxyPath}(/?.*)`, authenticateMiddleware, sharedSpaceValidator, createProxy(config, tusProxyPath));
+};
