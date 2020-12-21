@@ -5,6 +5,7 @@ import { URL } from 'url';
 import HttpProxy = require('http-proxy');
 import pathMatch = require('path-match');
 import * as logger from '../../logger';
+import Boom from 'boom';
 
 /**
  * Constants
@@ -22,6 +23,10 @@ let eventRegistered = false;
  * Koa Http Proxy Middleware
  */
 export const TusdProxy = (path, options) => (ctx, next) => {
+  
+  console.log('tusd-proxy');
+  console.log(ctx.valid);
+  console.log('tusd-proxy');
   let forwardedHost = '';
   let forwardedProto = '';
   if (options.graphqlHost.startsWith('http://')) {
@@ -34,6 +39,8 @@ export const TusdProxy = (path, options) => (ctx, next) => {
     throw new Error(`${options.graphqlHost} should start with http|https`);
   }
 
+  // TODO remove hardcode
+  forwardedHost = '127.0.0.1:3001';
   const proxy = HttpProxy.createProxyServer({
     headers: {
       'X-Forwarded-Host': forwardedHost + options.tusProxyPath,

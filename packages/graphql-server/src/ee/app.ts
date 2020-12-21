@@ -806,9 +806,60 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     );
 
     // shared space proxy to tusd
+    const checkTusPermission = async (ctx: Koa.ParameterizedContext, next: any) => {
+      console.log('tusd-checkTusPermission');
+      ctx.valid = false;
+      if (!ctx.url.includes(`${staticPath}tus`)){
+        return next();
+      }
+      await authenticateMiddleware(ctx, next);
+
+      // validate user permissions ctx.headers["upload-metadata"]
+
+      // validate header 'Upload-Metadata' should contains dirpath 
+      // dirpath is a group path matching the pattern: groups/${group}/upload
+      const uploadMetadata = ctx.headers['upload-metadata'];
+      console.log(uploadMetadata);
+      if (!uploadMetadata) {
+        throw Boom.badRequest('upload-metadata header not found');
+      }
+
+      // get dirpath from header
+      const regex = new RegExp('dirpath ([^,]+),?');
+      const result = regex.exec(uploadMetadata);
+      if (!result) {
+        throw Boom.badRequest('dirpath not found in the upload-metadata header');
+      }
+      const dirPath = Buffer.from(result[1], 'base64').toString();
+
+      const isGroupBelongUser = async (userId, groupName): Promise<boolean> => {
+        const groups = await ctx.kcAdminClient.users.listGroups({
+          id: userId
+        });
+        const groupNames = groups.map(g => g.name);
+        if (groupNames.indexOf(groupName) >= 0) { return true; }
+        return false;
+      };
+
+      const uploadGroup = new RegExp('groups/(.+)/upload').exec(dirPath);
+      if (!uploadGroup) {
+        throw Boom.badRequest('there is no group name in the dirpath');
+      }
+
+      const userHasGroup = await isGroupBelongUser(ctx.userId, uploadGroup[1]) === true;
+      if (userHasGroup) {
+        ctx.valid = true;
+        console.log("TTTT");
+        console.log(ctx.valid);
+        return next();
+      }
+      console.log('Booooooooooooom');
+      throw Boom.forbidden('request not authorized');
+    };
+
     const tusProxyPath = `${staticPath}tus`;
-    app.use(TusdProxy(tusProxyPath, {
-      target: config.sharedSpaceTusdEndpoint,
+    app.use(checkTusPermission).use(TusdProxy(tusProxyPath, {
+      target: 'http://0.0.0.0:1080/files/',
       changeOrigin: true,
       logs: true,
       graphqlHost: config.graphqlHost,
