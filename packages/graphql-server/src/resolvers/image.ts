@@ -193,8 +193,8 @@ export const updateMapping = (data: any) => {
       displayName: data.displayName,
       description: data.description,
       type: data.type,
-      url: url,
-      urlForGpu: urlForGpu,
+      url,
+      urlForGpu,
       pullSecret: isNull(data.useImagePullSecret) ? null : data.useImagePullSecret,
       groupName: isNil(data.groupName) ? null : data.groupName
     }
