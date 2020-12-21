@@ -48,7 +48,7 @@ const renderTimeIfValid = time => {
 
 
 
-type JobsConnection = {
+type ImagesConnection = {
   pageInfo: {
     hasNextPage: boolean;
     hasPreviousPage: boolean;
@@ -63,53 +63,29 @@ type JobsConnection = {
 
 type Props = RouteComponentProps & GroupContextComponentProps & {
   groups: Array<any>;
-  jobsLoading: boolean;
-  jobsError: any;
-  jobsConnection: JobsConnection;
-  jobsVariables: any;
-  jobsRefetch: Function;
-  rerunPhJob: Function;
-  cancelPhJob: Function;
-  rerunPhJobResult: any;
-  cancelPhJobResult: any;
+  imagesLoading: boolean;
+  imagesError: any;
+  imagesConnection: ImagesConnection;
+  imagesVariables: any;
+  imagesRefetch: Function;
 };
 
-class JobList extends React.Component<Props> {
+class ImageList extends React.Component<Props> {
   state = {
     currentId: null
   };
 
   handleCancel = (id: string) => {
-    const {jobsConnection, cancelPhJob} = this.props;
-    const job = jobsConnection.edges.find(edge => edge.node.id === id).node;
+    const {imagesConnection} = this.props;
+    const image = imagesConnection.edges.find(edge => edge.node.id === id).node;
     this.setState({currentId: id});
     confirm({
       title: `Cancel`,
-      content: `Do you want to cancel '${job.displayName || job.name}'?`,
+      content: `Do you want to cancel '${image.displayName || image.name}'?`,
       iconType: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
-        return cancelPhJob({variables: {where: {id}}});
-      },
-      onCancel() {
-        console.log('Cancel');
-      },
-    });
-  }
-
-  handleRerun = (id: string) => {
-    const {jobsConnection, rerunPhJob} = this.props;
-    const job = jobsConnection.edges.find(edge => edge.node.id === id).node;
-    this.setState({currentId: id});
-    confirm({
-      title: `Rerun`,
-      content: `Do you want to rerun '${job.displayName || job.name}'?`,
-      iconType: 'info-circle',
-      okText: 'Yes',
-      cancelText: 'No',
-      onOk() {
-        return rerunPhJob({variables: {where: {id}}});
       },
       onCancel() {
         console.log('Cancel');
@@ -122,73 +98,36 @@ class JobList extends React.Component<Props> {
     history.push(`images/create`);
   }
 
-  changeFilter = ({
-    selectedGroups,
-    submittedByMe
-  }: {
-    selectedGroups: Array<string>;
-    submittedByMe: boolean;
-  }) => {
-    const {groupContext, jobsVariables, jobsRefetch} = this.props;
-    const newVariables = {
-      ...jobsVariables,
-      where: {
-        ...jobsVariables.where,
-        mine: submittedByMe,
-      }
-    };
-
-    if (!groupContext) {
-      newVariables.where.groupId_in = selectedGroups;
-    }
-
-    jobsRefetch(newVariables);
-  }
-
   searchHandler = (queryString) => {
-    const {groupContext, jobsVariables, jobsRefetch} = this.props;
+    const {groupContext, imagesVariables, imagesRefetch} = this.props;
     if (queryString && queryString.length > 0) {
       const newVariables = {
-        ...jobsVariables,
+        ...imagesVariables,
         where: {
-          ...jobsVariables.where,
+          ...imagesVariables.where,
           displayName_contains: queryString
         }
       }
     }
-    jobsRefetch(newVariables);
+    //jobsRefetch(newVariables);
   }
 
 
   handleTableChange = (pagination, _filters, sorter) => {
-    const {jobsVariables, jobsRefetch} = this.props;
+    const {imagesVariables, imagesRefetch} = this.props;
     const orderBy: any = {}
     if (sorter.field) {
       orderBy[sorter.field] = get(sorter, 'order') === 'ascend' ? 'asc' : 'desc'
     }
-    jobsRefetch({
-      ...jobsVariables,
-      page: pagination.current,
-      orderBy
-    });
-  }
-
-  cloneJob = (record) => {
-    const {groupContext, history} = this.props;
-    let data: any = {
-      displayName: record.displayName,
-      groupId: !groupContext ? record.groupId : groupContext.id,
-      groupName: !groupContext ? record.groupName : groupContext.name,
-      instanceTypeId: get(record, 'instanceType.id'),
-      instanceTypeName: get(record, 'instanceType.displayName') || get(record, 'instanceType.name'),
-      image: record.image,
-      command: record.command,
-    }
-    history.push(`job/create?defaultValue=${encodeURIComponent(JSON.stringify(data))}`)
+    //jobsRefetch({
+      //...jobsVariables,
+      //page: pagination.current,
+      //orderBy
+    //});
   }
 
   render() {
-    const {groupContext, groups, jobsConnection, jobsLoading, jobsVariables, cancelPhJobResult, rerunPhJobResult} = this.props;
+    const {groupContext, groups, imagesConnection, imagesLoading, imagesVariables } = this.props;
     const {currentId} = this.state;
     const renderAction = (id, record) => {
       return (
@@ -245,13 +184,13 @@ class JobList extends React.Component<Props> {
             </InfuseButton>
           </div>
           <Table
-            loading={jobsLoading}
-            dataSource={jobsConnection.edges.map(edge => edge.node)}
+            loading={imagesLoading}
+            dataSource={imagesConnection.edges.map(edge => edge.node)}
             columns={columns}
             rowKey="id"
             pagination={{
-              current: get(jobsConnection, 'pageInfo.currentPage', 0),
-              total: get(jobsConnection, 'pageInfo.totalPage', 0) * 10,
+              current: get(imagesConnection, 'pageInfo.currentPage', 0),
+              total: get(imagesConnection, 'pageInfo.totalPage', 0) * 10,
             }}
             onChange={this.handleTableChange}
           />
@@ -261,4 +200,4 @@ class JobList extends React.Component<Props> {
   }
 }
 
-export default withRouter(JobList);
+export default withRouter(ImageList);

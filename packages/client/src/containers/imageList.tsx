@@ -19,9 +19,9 @@ export const ImageFragment = gql`
  }
 `
 
-export const GET_IMAGE_CONNECTION = gql`
-  query imageConnection($where: ImageWhereInput, $page: Int, $orderBy: ImageOrderByInput) {
-    imageConnection(where: $where, page: $page, orderBy: $orderBy) {
+export const GET_IMAGES_CONNECTION = gql`
+  query imagesConnection($where: ImageWhereInput, $page: Int, $orderBy: ImageOrderByInput) {
+    imagesConnection(where: $where, page: $page, orderBy: $orderBy) {
       pageInfo {
         totalPage
         currentPage
@@ -38,21 +38,21 @@ export const GET_IMAGE_CONNECTION = gql`
 `;
 
 type Props = {
-  getImageConnection?: any;
+  getImagesConnection?: any;
   groups: Array<Group>;
 } & RouteComponentProps & GroupContextComponentProps;
 
 class ImageListContainer extends React.Component<Props> {
 
   render() {
-    const {groupContext, getImageConnection, groups } = this.props;
+    const {groupContext, getImagesConnection, groups } = this.props;
     return (
       <ImageList
         groupContext={groupContext}
-        jobsLoading={getImageConnection.loading}
-        jobsError={getImageConnection.error}
-        jobsConnection={getImageConnection.imageConnection || {pageInfo: {}, edges: []}}
-        jobsVariables={getImageConnection.variables}
+        imagesLoading={getImagesConnection.loading}
+        imagesError={getImagesConnection.error}
+        imagesConnection={getImagesConnection.imageConnection || {pageInfo: {}, edges: []}}
+        imagesVariables={getImagesConnection.variables}
         groups={groups}
       />
     );
@@ -61,7 +61,7 @@ class ImageListContainer extends React.Component<Props> {
 
 export default compose(
   withRouter,
-  graphql(GET_IMAGE_CONNECTION, {
+  graphql(GET_IMAGES_CONNECTION, {
     options: (props: Props) => {
       const params = queryString.parse(props.location.search.replace(/^\?/, ''));
       const {groupContext} = props;
@@ -76,6 +76,6 @@ export default compose(
         fetchPolicy: 'cache-and-network'
       }
     },
-    name: 'getImageConnection'
+    name: 'getImagesConnection'
   })
 )(ImageListContainer)
