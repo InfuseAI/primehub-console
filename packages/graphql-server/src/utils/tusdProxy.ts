@@ -4,7 +4,7 @@
 import { URL } from 'url';
 import HttpProxy = require('http-proxy');
 import pathMatch = require('path-match');
-import * as logger from '../../logger';
+import * as logger from '../logger';
 
 /**
  * Constants

@@ -67,6 +67,7 @@ import { Role } from './resolvers/interface';
 import Token from './oidc/token';
 import ApiTokenCache from './oidc/apiTokenCache';
 import { createMinioClient } from './utils/minioClient';
+import { TusdProxy } from './utils/tusdProxy';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -451,7 +452,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   // cors
   app.use(cors({
-    allowHeaders: ['content-type', 'authorization', 'x-primehub-use-cache', 'x-primehub-job']
+    allowHeaders: ['content-type', 'authorization', 'x-primehub-use-cache', 'x-primehub-job', 'Content-Length', 'Upload-Length', 'Tus-Resumable', 'Upload-Metadata', 'Upload-Offset', 'Upload-Defer-Length']
   }));
 
   // setup
@@ -634,6 +635,61 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         ctx.set('Content-type', mimetype);
       }
     );
+
+    // shared space proxy to tusd
+    const checkTusPermission = async (ctx: Koa.ParameterizedContext, next: any) => {
+      // if method is POST
+      // validate user permissions ctx.headers["upload-metadata"]
+      // validate header 'Upload-Metadata' should contains dirpath
+      // dirpath is a group path matching the pattern: groups/${group}/upload
+      if (ctx.request.method === 'POST') {
+        const uploadMetadata = ctx.headers['upload-metadata'];
+        if (!uploadMetadata) {
+          throw Boom.badRequest('upload-metadata header not found');
+        }
+
+        // get dirpath from header
+        const regex = new RegExp('dirpath ([^,]+),?');
+        const result = regex.exec(uploadMetadata);
+        if (!result) {
+          throw Boom.badRequest('dirpath not found in the upload-metadata header');
+        }
+        const dirPath = Buffer.from(result[1], 'base64').toString();
+
+        const isGroupBelongUser = async (userId, groupName): Promise<boolean> => {
+          const groups = await ctx.kcAdminClient.users.listGroups({
+            id: userId
+          });
+          const groupNames = groups.map(g => g.name);
+          if (groupNames.indexOf(groupName) >= 0) { return true; }
+          return false;
+        };
+
+        const uploadGroup = new RegExp('groups/(.+)/upload').exec(dirPath);
+        if (!uploadGroup) {
+          throw Boom.badRequest('there is no group name in the dirpath');
+        }
+
+        const userHasGroup = await isGroupBelongUser(ctx.userId, uploadGroup[1]) === true;
+        if (userHasGroup) {
+          return next();
+        }
+
+        throw Boom.forbidden('request not authorized');
+      } else {
+        return next();
+      }
+    };
+
+    const tusProxyPath = `${staticPath}tus`;
+    rootRouter.all(`${tusProxyPath}(/?.*)`, authenticateMiddleware, checkTusPermission, TusdProxy(tusProxyPath, {
+      target: config.sharedSpaceTusdEndpoint,
+      changeOrigin: true,
+      logs: true,
+      graphqlHost: config.graphqlHost,
+      tusProxyPath,
+      rewrite: rewritePath => rewritePath.replace(tusProxyPath, '').replace('/files/', ''),
+    }));
   }
 
   app.use(rootRouter.routes());
