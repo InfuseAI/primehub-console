@@ -51,7 +51,7 @@ class ImageListContainer extends React.Component<Props> {
         groupContext={groupContext}
         imagesLoading={getImagesConnection.loading}
         imagesError={getImagesConnection.error}
-        imagesConnection={getImagesConnection.imageConnection || {pageInfo: {}, edges: []}}
+        imagesConnection={getImagesConnection.imagesConnection || {pageInfo: {}, edges: []}}
         imagesVariables={getImagesConnection.variables}
         groups={groups}
       />
@@ -66,7 +66,9 @@ export default compose(
       const params = queryString.parse(props.location.search.replace(/^\?/, ''));
       const {groupContext} = props;
       const where = JSON.parse(params.where as string || '{}');
-
+      if (groupContext) {
+        where.groupName_contains = groupContext.name;
+      }
       return {
         variables: {
           where,

@@ -128,6 +128,7 @@ class ImageList extends React.Component<Props> {
 
   render() {
     const {groupContext, groups, imagesConnection, imagesLoading, imagesVariables } = this.props;
+    console.log(imagesConnection);
     const {currentId} = this.state;
     const renderAction = (id, record) => {
       return (
