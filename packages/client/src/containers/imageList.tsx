@@ -1,5 +1,6 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
+import {get} from 'lodash';
 import {notification} from 'antd';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -10,7 +11,8 @@ import ImageList from 'components/images/list';
 import {errorHandler} from 'utils/errorHandler';
 import {Group} from 'ee/components/shared/groupFilter';
 import {appPrefix} from 'utils/env';
-import { withGroupContext, GroupContextComponentProps } from 'context/group';
+import {withGroupContext, GroupContextComponentProps } from 'context/group';
+import {withUserContext, UserContextComponentProps } from 'context/user';
 
 export const ImageFragment = gql`
   fragment ImageInfo on Image{
@@ -57,9 +59,11 @@ type Props = {
   getImagesConnection?: any;
   deleteImage?: any;
   groups: Array<Group>;
-} & RouteComponentProps & GroupContextComponentProps;
+} & RouteComponentProps & GroupContextComponentProps & UserContextComponentProps;
 
 class ImageListContainer extends React.Component<Props> {
+  componentDidMount = () =>{
+  }
 
   removeImage = async (id) => {
     const {deleteImage} = this.props;
@@ -83,7 +87,10 @@ class ImageListContainer extends React.Component<Props> {
   }
 
   render() {
-    const {groupContext, getImagesConnection, groups } = this.props;
+    const {history, groupContext, userContext, getImagesConnection, groups } = this.props;
+    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
+      history.push(`../home`);
+    }
     return (
       <ImageList
         groupContext={groupContext}
@@ -101,6 +108,7 @@ class ImageListContainer extends React.Component<Props> {
 
 export default compose(
   withRouter,
+  withUserContext,
   withGroupContext,
   graphql(GET_IMAGES_CONNECTION, {
     options: (props: Props) => {

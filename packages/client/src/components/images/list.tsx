@@ -11,6 +11,7 @@ import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
+import { UserContextComponentProps } from 'context/user';
 import {FilterRow, FilterPlugins, ButtonCol} from 'root/cms-toolbar/filter';
 
 const Search = Input.Search;
@@ -62,7 +63,7 @@ type ImagesConnection = {
   }>
 }
 
-type Props = RouteComponentProps & GroupContextComponentProps & {
+type Props = RouteComponentProps & GroupContextComponentProps & UserContextComponentProps & {
   groups: Array<any>;
   imagesLoading: boolean;
   imagesError: any;
@@ -126,7 +127,7 @@ class ImageList extends React.Component<Props> {
   }
 
   handleTableChange = (pagination, _filters, sorter) => {
-    const {imagesVariables, refetchImages} = this.props;
+    const {imagesVariables, refetchImages, history, groupContext, userContext} = this.props;
     const orderBy: any = {}
     if (sorter.field) {
       orderBy[sorter.field] = get(sorter, 'order') === 'ascend' ? 'asc' : 'desc'
@@ -140,7 +141,8 @@ class ImageList extends React.Component<Props> {
 
 
   render() {
-    const {groupContext, groups, imagesConnection, imagesLoading, removeImage, imagesVariables } = this.props;
+    const { groupContext, groups, imagesConnection, imagesLoading, removeImage, imagesVariables } = this.props;
+
     const {currentId} = this.state;
     const renderAction = (id, record) => {
       return (

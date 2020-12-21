@@ -7,6 +7,9 @@ import styled from 'styled-components';
 import iconHome from 'images/icon-home.svg'
 import {get} from 'lodash'
 import { MainPageSidebarItem } from 'containers/mainPage';
+import {compose} from 'recompose';
+import { withGroupContext, GroupContextComponentProps } from 'context/group';
+import { withUserContext, UserContextComponentProps } from 'context/user';
 
 const Icon = styled.img`
   width: 25px;
@@ -33,7 +36,7 @@ const Badge = styled.span`
   }
 `;
 
-type Props = RouteComponentProps & {
+type Props = UserContextComponentProps & GroupContextComponentProps & RouteComponentProps & {
   sidebarItems: MainPageSidebarItem[]
 };
 
@@ -50,7 +53,7 @@ class Sidebar extends React.Component<Props> {
   }
 
   render() {
-    const {sidebarItems, history, match} = this.props;
+    const { history, match, groupContext, userContext} = this.props;
     const pathKeyList = ['home', 'hub', 'job', 'schedule', 'model-deployment', 'images'];
     let key = '';
     pathKeyList.forEach((val) => {
@@ -59,6 +62,13 @@ class Sidebar extends React.Component<Props> {
       }
     });
     const group = get(match, 'params.groupName', '');
+
+    const sidebarItems = this.props.sidebarItems.filter(item => {
+      if (item.groupAdminOnly) {
+        return get(userContext, 'isCurrentGroupAdmin', false);
+      }
+      return true;
+    });
 
     return (
       <Layout.Sider style={{position: 'fixed', height: '100%'}}>
@@ -74,15 +84,17 @@ class Sidebar extends React.Component<Props> {
           </Menu.Item>
 
           {group &&
-            sidebarItems ? sidebarItems.map(item => (
-              <Menu.Item key={item.subPath} style={{paddingLeft: 26}}>
-                <Link to={`${appPrefix}g/${group}/${item.subPath}`}>
-                  <Icon src={item.icon} style={item.style}/>
-                  <Title>{item.title}</Title>
-                  {this.renderStageBadge(item)}
-                </Link>
-              </Menu.Item>
-            )) : []
+            sidebarItems ? sidebarItems.map(item => {
+              return (
+                <Menu.Item key={item.subPath} style={{paddingLeft: 26}}>
+                  <Link to={`${appPrefix}g/${group}/${item.subPath}`}>
+                    <Icon src={item.icon} style={item.style}/>
+                    <Title>{item.title}</Title>
+                    {this.renderStageBadge(item)}
+                  </Link>
+                </Menu.Item>
+              )
+            }) : []
           }
         </Menu>
       </Layout.Sider>
@@ -90,4 +102,8 @@ class Sidebar extends React.Component<Props> {
   }
 }
 
-export default withRouter(Sidebar);
+export default compose(
+  withRouter,
+  withGroupContext,
+  withUserContext
+)(Sidebar);

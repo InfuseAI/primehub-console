@@ -18,6 +18,7 @@ export type GroupSelectorProps = {
     id: string;
     name: string;
     displayName: string;
+    admins: string;
   }>
   onSelectGroup: Function;
 } & RouteComponentProps;
