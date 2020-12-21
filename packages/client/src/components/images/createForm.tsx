@@ -1,12 +1,23 @@
 import * as React from 'react';
-import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon, InputNumber, Switch} from 'antd';
+import {Checkbox, Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon, InputNumber, Switch} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
-import {get, snakeCase, debounce} from 'lodash';
+import {get, snakeCase, debounce, isEmpty} from 'lodash';
 import DynamicFields from 'components/share/dynamicFields';
 import EnvFields from 'components/share/envFields';
 import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
+
+enum FormType {
+  Edit = 'edit',
+  Create = 'create'
+}
+
+enum ImageType {
+  CPU = 'cpu',
+  GPU = 'gpu',
+  ALL = 'both'
+}
 
 const { Option } = Select;
 
@@ -20,11 +31,12 @@ type Props = FormComponentProps & {
   onCancel?: Function;
   loading: boolean;
   initialValue?: any;
-  formType?: 'edit' | 'create';
+  formType?: FormType;
 };
 
 type State = {
-  revealEnv: boolean;
+  showGpuUrl: boolean
+  imageType: ImageType
 }
 
 const radioStyle = {
@@ -67,13 +79,16 @@ const autoGenId = (name: string) => {
 }
 
 class ImageCreateForm extends React.Component<Props, State> {
-  state = {
-    recurrenceError: '',
-    revealEnv: false
-  };
+  constructor (props) {
+    super(props);
+    const {formType, initialValue} = props;
+    this.state = {
+      showGpuUrl: formType === FormType.Edit && (!isEmpty(initialValue.urlForGpu) && initialValue.url !== initialValue.urlForGpu),
+      imageType: (initialValue && initialValue.type) || ImageType.ALL
+    }
+  }
 
   componentDidMount() {
-    const {initialValue} = this.props;
   }
 
   submit = (e) => {
@@ -92,11 +107,8 @@ class ImageCreateForm extends React.Component<Props, State> {
     onCancel(values);
   }
 
-  toggleEnvVisibilty = () => {
-    const revealEnv = !this.state.revealEnv;
-    this.setState({
-      revealEnv
-    });
+  handleGpuVisible = (e) => {
+    this.setState({showGpuUrl: e.target.checked});
   }
 
   renderLabel = (defaultLabel: string, invalid: boolean, message: any) => {
@@ -106,6 +118,13 @@ class ImageCreateForm extends React.Component<Props, State> {
         {defaultLabel} <span style={{color: 'red'}}>({message})</span>
       </span>
     return label;
+  }
+
+  handleTypeChange = (value) => {
+    const {form} = this.props;
+    const type = value;
+    this.setState({imageType: type});
+    form.setFieldsValue({ type });
   }
 
   handleNameChange = debounce(() => {
@@ -138,10 +157,10 @@ class ImageCreateForm extends React.Component<Props, State> {
       id,
       type,
       url,
-      urlForGpu,
       useImagePullSecret,
       description,
     } = initialValue || {};
+    let urlForGpu = formType !== FormType.Edit || !this.state.showGpuUrl || (initialValue.url == initialValue.urlForGpu) ? null : initialValue.urlForGpu;
     return (
       <Form onSubmit={this.submit}>
         <Row>
@@ -162,7 +181,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                     }
                   ],
                 })(
-                  <Input disabled={formType === 'edit'} onChange={this.handleNameChange} />
+                  <Input disabled={formType === FormType.Edit} onChange={this.handleNameChange} />
                 )}
               </Form.Item>
               <Form.Item label={`Image name`}>
@@ -181,7 +200,7 @@ class ImageCreateForm extends React.Component<Props, State> {
               </Form.Item>
               <Form.Item label="Type">
                 {form.getFieldDecorator('type', {
-                  initialValue: type,
+                  initialValue: type || ImageType.ALL,
                   rules: [
                     {
                       required: true,
@@ -189,28 +208,49 @@ class ImageCreateForm extends React.Component<Props, State> {
                     }
                   ]
                 })(
-                  <Select style={{width: '200px'}}>
+                  <Select style={{width: '200px'}} onChange={this.handleTypeChange}>
                     <Select.Option key='cpu' value='cpu'>cpu</Select.Option>
                     <Select.Option key='gpu' value='gpu'>gpu</Select.Option>
                     <Select.Option key='both' value='both'>universal</Select.Option>
                   </Select>
                 )}
               </Form.Item>
-              <Form.Item label="Container image url">
-                {form.getFieldDecorator('url', {
-                  initialValue: url
-                })(
-                  <Input />
-                )}
-              </Form.Item>
-
-              <Form.Item label={`Image Pull Secret`}>
-                {form.getFieldDecorator('useImagePullSecret', {
-                  initialValue: useImagePullSecret,
-                })(
-                  <ImagePullSecret />
-                )}
-              </Form.Item>
+              <Row gutter={24}>
+                <Col span={12}>
+                  <Form.Item label="Container image url" style={{marginBottom: '12px'}}>
+                    {form.getFieldDecorator('url', {
+                      initialValue: url
+                    })(
+                      <Input />
+                    )}
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label={`Image Pull Secret`}>
+                    {form.getFieldDecorator('useImagePullSecret', {
+                      initialValue: useImagePullSecret,
+                    })(
+                      <ImagePullSecret />
+                    )}
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={24} style={{display: (this.state.imageType === ImageType.ALL) ? 'block' : 'none'}}>
+                <Col span={12}>
+                  <Form.Item style={{marginBottom: '0'}}>
+                    <Checkbox style={{color: '#000000D9'}} checked={this.state.showGpuUrl} onChange={this.handleGpuVisible}>
+                      Specific container image url for GPU
+                    </Checkbox>
+                  </Form.Item>
+                  <Form.Item>
+                    {form.getFieldDecorator('urlForGpu', {
+                      initialValue: urlForGpu
+                    })(
+                      <Input disabled={!this.state.showGpuUrl}/>
+                    )}
+                  </Form.Item>
+                </Col>
+              </Row>
             </Card>
             <Form.Item style={{textAlign: 'right', marginTop: 12}}>
               {

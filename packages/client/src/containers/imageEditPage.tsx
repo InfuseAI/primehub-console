@@ -47,13 +47,13 @@ type State = {
 class ImageEditPage extends React.Component<Props, State> {
 
   onSubmit = (payload) => {
-    const { updateImage, getImage } = this.props;
+    const { updateImage, getImage, groupContext } = this.props;
     const { image } = getImage;
-    payload.id = image.id;
+    payload.groupName = groupContext.name;
     updateImage({
       variables: {
         where: {id: image.id},
-        data: pick(payload, ['displayName', 'url', 'useImagePullSecret', 'urlForGpu', 'description', 'groupName'])
+        data: pick(payload, ['displayName', 'type', 'url', 'useImagePullSecret', 'urlForGpu', 'description', 'groupName'])
       }
     });
   }

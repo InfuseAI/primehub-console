@@ -109,7 +109,7 @@ class ImageList extends React.Component<Props> {
   }
 
   searchHandler = (queryString) => {
-    const {groupContext, imagesVariables, refetchImage} = this.props;
+    const {groupContext, imagesVariables, refetchImages} = this.props;
     if (queryString && queryString.length > 0) {
       const newVariables = {
         ...imagesVariables,
@@ -119,7 +119,7 @@ class ImageList extends React.Component<Props> {
         }
       }
     }
-    //jobsRefetch(newVariables);
+    refetchImages(newVariables);
   }
 
   render() {
@@ -128,16 +128,18 @@ class ImageList extends React.Component<Props> {
     const renderAction = (id, record) => {
       return (
         <Button.Group>
-          <Button onClick={() => {this.editGroupImage(id)}}>
-            Edit
+          <Button size={'small'} onClick={() => {this.editGroupImage(id)}}>
+            <Icon type="edit" />
           </Button>
-          <Button onClick={() => {this.removeGroupImage(id)}}>remove</Button>
+          <Button size={'small'} onClick={() => {this.removeGroupImage(id)}}>
+            <Icon type="delete" />
+          </Button>
         </Button.Group>
       )
     }
     const columns = [{
-      title: 'Name',
-      dataIndex: 'name',
+      title: 'ID',
+      dataIndex: 'id',
       sorter: true,
       render: text => text
     }, {
@@ -148,7 +150,7 @@ class ImageList extends React.Component<Props> {
     }, {
       title: 'Description',
       sorter: true,
-      dataIndex: 'discription'
+      dataIndex: 'description'
     }, {
       title: 'type',
       sorter: true,

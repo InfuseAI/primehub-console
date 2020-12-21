@@ -3,7 +3,7 @@ import { Item } from '../crdClient/customResource';
 import { ImageSpec, ImageType } from '../crdClient/crdClientImpl';
 import { mutateRelation } from './utils';
 import { Crd } from './crd';
-import { isUndefined, isNil, isNull, get, omit } from 'lodash';
+import { isEmpty, isUndefined, isNil, isNull, get, omit } from 'lodash';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 import { ResourceNamePrefix } from './resourceRole';
 
@@ -166,11 +166,11 @@ const customUpdate = async ({
   } else {
     // just changing attribute
     // if not updated, use original values
-    url = isUndefined(spec.url) ? row.spec.url : spec.url;
+    url = isEmpty(spec.url) ? row.spec.url : spec.url;
     // if not `both` type, override urlForGpu with url
     urlForGpu = (row.spec.type !== ImageType.both) ?
       url
-      : isUndefined(spec.urlForGpu) ? row.spec.urlForGpu : spec.urlForGpu;
+      : isEmpty(spec.urlForGpu) ? row.spec.urlForGpu : spec.urlForGpu;
   }
 
   spec.url = url;
@@ -183,6 +183,8 @@ const customUpdate = async ({
 };
 
 export const updateMapping = (data: any) => {
+  const imageType = data.type || ImageType.both;
+  const {url, urlForGpu} = defineUrlAndUrlForGpu(data.url, data.urlForGpu, imageType);
   return {
     metadata: {
       name: data.name
@@ -191,8 +193,8 @@ export const updateMapping = (data: any) => {
       displayName: data.displayName,
       description: data.description,
       type: data.type,
-      url: data.url,
-      urlForGpu: data.urlForGpu,
+      url: url,
+      urlForGpu: urlForGpu,
       pullSecret: isNull(data.useImagePullSecret) ? null : data.useImagePullSecret,
       groupName: isNil(data.groupName) ? null : data.groupName
     }
