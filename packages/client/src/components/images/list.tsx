@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, Tooltip, Table as AntTable, Icon, Modal} from 'antd';
+import {Col, Button, Input, Tooltip, Table as AntTable, Icon, Modal} from 'antd';
 import {RouteComponentProps} from 'react-router';
 import {Link, withRouter} from 'react-router-dom';
 import {startCase, get} from 'lodash';
@@ -11,6 +11,9 @@ import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
+import {FilterRow, FilterPlugins, ButtonCol} from 'root/cms-toolbar/filter';
+
+const Search = Input.Search;
 
 const {confirm} = Modal;
 const Table = styled(AntTable as any)`
@@ -122,6 +125,20 @@ class ImageList extends React.Component<Props> {
     refetchImages(newVariables);
   }
 
+  handleTableChange = (pagination, _filters, sorter) => {
+    const {imagesVariables, refetchImages} = this.props;
+    const orderBy: any = {}
+    if (sorter.field) {
+      orderBy[sorter.field] = get(sorter, 'order') === 'ascend' ? 'asc' : 'desc'
+    }
+    refetchImages({
+      ...imagesVariables,
+      page: pagination.current,
+      orderBy
+    });
+  }
+
+
   render() {
     const {groupContext, groups, imagesConnection, imagesLoading, removeImage, imagesVariables } = this.props;
     const {currentId} = this.state;
@@ -138,8 +155,8 @@ class ImageList extends React.Component<Props> {
       )
     }
     const columns = [{
-      title: 'ID',
-      dataIndex: 'id',
+      title: 'Name',
+      dataIndex: 'name',
       sorter: true,
       render: text => text
     }, {
@@ -179,16 +196,28 @@ class ImageList extends React.Component<Props> {
           title={"Images"}
         />
         <PageBody>
-          <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
-            <InfuseButton
-              icon="plus"
-              onClick={this.createGroupImage}
-              style={{marginRight: 16, width: 120}}
-              type="primary"
-            >
-              New Image
-            </InfuseButton>
-          </div>
+          <FilterRow align="bottom" style={{marginBottom: 16, marginTop: 16}}>
+            <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
+              <InfuseButton
+                icon="plus"
+                onClick={this.createGroupImage}
+                style={{marginRight: 16, width: 120}}
+                type="primary"
+              >
+                New Image
+              </InfuseButton>
+            </div>
+            <ButtonCol>
+              <Col>
+                <FilterPlugins style={{marginRight: '10px'}}>
+                  <Search
+                    placeholder={`Search Image name`}
+                    onSearch={this.searchHandler}
+                  />
+                </FilterPlugins>
+              </Col>
+            </ButtonCol>
+          </FilterRow>
           <Table
             loading={imagesLoading}
             dataSource={imagesConnection.edges.map(edge => edge.node)}

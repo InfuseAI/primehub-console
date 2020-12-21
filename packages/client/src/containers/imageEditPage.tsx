@@ -88,7 +88,6 @@ class ImageEditPage extends React.Component<Props, State> {
 
   render() {
     const {getGroups, getImage, history, groupContext} = this.props;
-    console.log('gorupContext', groupContext);
     if (getImage.loading) return null;
     if (getImage.error) {
       return getMessage(getImage.error)

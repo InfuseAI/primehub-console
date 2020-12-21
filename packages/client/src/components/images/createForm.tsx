@@ -128,7 +128,9 @@ class ImageCreateForm extends React.Component<Props, State> {
   }
 
   handleNameChange = debounce(() => {
-    const {form} = this.props;
+    const {form, formType} = this.props;
+    // Don't change name(id) in edit mode.
+    if (formType === FormType.Edit) return;
     const values = form.getFieldsValue();
     form.validateFields(['displayName'], (err, values) => {
       if (err) return form.setFieldsValue({ id: '' });
@@ -181,7 +183,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                     }
                   ],
                 })(
-                  <Input disabled={formType === FormType.Edit} onChange={this.handleNameChange} />
+                  <Input onChange={this.handleNameChange} />
                 )}
               </Form.Item>
               <Form.Item label={`Image name`}>
