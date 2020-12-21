@@ -34,7 +34,9 @@ export class Telemetry {
     });
 
     // iterate through the middlewares and collect the traits
-    const traits = {};
+    const traits = {
+      installation: this.anonymouseId,
+    };
     const middlewares = this.traitMiddlewares;
     const runNext = index => {
       if (index < middlewares.length) {
