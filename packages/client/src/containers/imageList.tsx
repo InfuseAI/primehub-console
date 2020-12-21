@@ -1,5 +1,6 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
+import {notification} from 'antd';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {withRouter} from 'react-router-dom';
@@ -16,8 +17,12 @@ export const ImageFragment = gql`
     id
     displayName
     description
+    url
+    urlForGpu
     name
     type
+    groupName
+    useImagePullSecret
  }
 `
 
@@ -39,12 +44,43 @@ export const GET_IMAGES_CONNECTION = gql`
   ${ImageFragment}
 `;
 
+export const DELETE_IMAGE = gql`
+  mutation deleteImage($where: ImageWhereUniqueInput!) {
+    deleteImage(where: $where) {
+      ...ImageInfo
+    }
+  }
+  ${ImageFragment}
+`;
+
 type Props = {
   getImagesConnection?: any;
+  deleteImage?: any;
   groups: Array<Group>;
 } & RouteComponentProps & GroupContextComponentProps;
 
 class ImageListContainer extends React.Component<Props> {
+
+  removeImage = async (id) => {
+    const {deleteImage} = this.props;
+    await deleteImage({
+      variables: {
+        where: {id}
+      }
+    })
+  }
+
+  refetchImages = async (payload) => {
+    const payloadWithStringWhere = {...payload};
+    if (payloadWithStringWhere.where)
+      payloadWithStringWhere.where = JSON.stringify(payload.where);
+    if (payloadWithStringWhere.orderBy)
+      payloadWithStringWhere.orderBy = JSON.stringify(payload.orderBy || {});
+
+    const {history, getImagesConnection} = this.props;
+    const search = queryString.stringify(payloadWithStringWhere);
+    await getImagesConnection.refetch(payload);
+  }
 
   render() {
     const {groupContext, getImagesConnection, groups } = this.props;
@@ -55,6 +91,8 @@ class ImageListContainer extends React.Component<Props> {
         imagesError={getImagesConnection.error}
         imagesConnection={getImagesConnection.imagesConnection || {pageInfo: {}, edges: []}}
         imagesVariables={getImagesConnection.variables}
+        removeImage={this.removeImage}
+        refetchImages={this.refetchImages}
         groups={groups}
       />
     );
@@ -63,6 +101,7 @@ class ImageListContainer extends React.Component<Props> {
 
 export default compose(
   withRouter,
+  withGroupContext,
   graphql(GET_IMAGES_CONNECTION, {
     options: (props: Props) => {
       const params = queryString.parse(props.location.search.replace(/^\?/, ''));
@@ -81,5 +120,19 @@ export default compose(
       }
     },
     name: 'getImagesConnection'
-  })
+  }),
+  graphql(DELETE_IMAGE, {
+    options: (props: Props) => ({
+      onCompleted: (data: any) => {
+        const {history} = props;
+        notification.success({
+          duration: 10,
+          placement: 'bottomRight',
+          message: `Image "${data.deleteImage.name}" has been deleted.`
+        })
+      },
+      onError: errorHandler
+    }),
+    name: 'deleteImage'
+  }),
 )(ImageListContainer)

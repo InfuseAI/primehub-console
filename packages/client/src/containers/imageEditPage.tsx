@@ -1,6 +1,6 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
-import {Icon, notification, Modal} from 'antd';
+import {Icon, notification, Modal, Row, Col, Skeleton, Card} from 'antd';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {get, unionBy, isEqual, pick} from 'lodash';
@@ -12,37 +12,24 @@ import PageTitle from 'components/pageTitle';
 import ImageBreadcrumb from 'components/images/breadcrumb';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import {sortItems, GET_MY_GROUPS} from 'containers/imageCreatePage';
+import {ImageFragment} from 'containers/imageList';
 
 export const GET_IMAGE = gql`
   query image($where: ImageWhereUniqueInput!) {
     image(where: $where) {
-      id
-      displayName
-      description
-      name
-      url
-      urlForGpu
-      groupName
-      type
-      useImagePullSecret
+      ...ImageInfo
     }
   }
+  ${ImageFragment}
 `;
 
 export const UPDATE_IMAGE= gql`
   mutation updateImage($data: ImageUpdateInput!, $where: ImageWhereUniqueInput!) {
     updateImage(where: $where, data: $data) {
-      id
-      name
-      displayName
-      description
-      type
-      url
-      urlForGpu
-      groupName
-      useImagePullSecret
+      ...ImageInfo
     }
   }
+  ${ImageFragment}
 `;
 
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
@@ -121,6 +108,17 @@ class ImageEditPage extends React.Component<Props, State> {
           breadcrumb={<ImageBreadcrumb />}
         />
         <div style={{margin: '16px'}}>
+          {getGroups.loading ? (
+            <Row>
+              <Col>
+                <Card>
+                  <Skeleton active />
+                  <Skeleton active />
+                  <Skeleton active />
+                </Card>
+              </Col>
+            </Row>
+          ) : (
           <ImageCreateForm
             type="edit"
             initialValue={{
@@ -131,7 +129,7 @@ class ImageEditPage extends React.Component<Props, State> {
             onSubmit={this.onSubmit}
             onCancel={this.onCancel}
             formType={'edit'}
-          />
+          />)}
         </div>
       </React.Fragment>
     );

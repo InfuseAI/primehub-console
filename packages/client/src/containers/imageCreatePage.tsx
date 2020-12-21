@@ -110,15 +110,8 @@ class ImageCreatePage extends React.Component<Props, State> {
         }}>
 
           {getGroups.loading ? (
-            <Row gutter={16}>
-              <Col xs={24} sm={8} lg={8}>
-                <Card>
-                  <Skeleton active />
-                  <Skeleton active />
-                  <Skeleton active />
-                </Card>
-              </Col>
-              <Col xs={24} sm={16} lg={16}>
+            <Row>
+              <Col>
                 <Card>
                   <Skeleton active />
                   <Skeleton active />

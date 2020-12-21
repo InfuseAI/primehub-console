@@ -46,8 +46,6 @@ const renderTimeIfValid = time => {
   return momentTime.isValid() ? momentTime.format('YYYY-MM-DD HH:mm:ss') : '-';
 }
 
-
-
 type ImagesConnection = {
   pageInfo: {
     hasNextPage: boolean;
@@ -67,7 +65,8 @@ type Props = RouteComponentProps & GroupContextComponentProps & {
   imagesError: any;
   imagesConnection: ImagesConnection;
   imagesVariables: any;
-  imagesRefetch: Function;
+  refetchImages?: Function;
+  removeImage: Function;
 };
 
 class ImageList extends React.Component<Props> {
@@ -76,7 +75,7 @@ class ImageList extends React.Component<Props> {
   };
 
   handleCancel = (id: string) => {
-    const {imagesConnection} = this.props;
+    const {imagesConnection, removeImage} = this.props;
     const image = imagesConnection.edges.find(edge => edge.node.id === id).node;
     this.setState({currentId: id});
     confirm({
@@ -103,8 +102,14 @@ class ImageList extends React.Component<Props> {
     history.push(`images/${id}/edit`);
   }
 
+  removeGroupImage = async (id) => {
+    const {removeImage, refetchImages, imagesVariables} = this.props;
+    await removeImage(id);
+    refetchImages(imagesVariables);
+  }
+
   searchHandler = (queryString) => {
-    const {groupContext, imagesVariables, imagesRefetch} = this.props;
+    const {groupContext, imagesVariables, refetchImage} = this.props;
     if (queryString && queryString.length > 0) {
       const newVariables = {
         ...imagesVariables,
@@ -117,22 +122,8 @@ class ImageList extends React.Component<Props> {
     //jobsRefetch(newVariables);
   }
 
-
-  handleTableChange = (pagination, _filters, sorter) => {
-    const {imagesVariables, imagesRefetch} = this.props;
-    const orderBy: any = {}
-    if (sorter.field) {
-      orderBy[sorter.field] = get(sorter, 'order') === 'ascend' ? 'asc' : 'desc'
-    }
-    //jobsRefetch({
-      //...jobsVariables,
-      //page: pagination.current,
-      //orderBy
-    //});
-  }
-
   render() {
-    const {groupContext, groups, imagesConnection, imagesLoading, imagesVariables } = this.props;
+    const {groupContext, groups, imagesConnection, imagesLoading, removeImage, imagesVariables } = this.props;
     const {currentId} = this.state;
     const renderAction = (id, record) => {
       return (
@@ -140,7 +131,7 @@ class ImageList extends React.Component<Props> {
           <Button onClick={() => {this.editGroupImage(id)}}>
             Edit
           </Button>
-          <Button onClick={() => {return undefined;}}>remove</Button>
+          <Button onClick={() => {this.removeGroupImage(id)}}>remove</Button>
         </Button.Group>
       )
     }
