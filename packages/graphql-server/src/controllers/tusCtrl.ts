@@ -4,7 +4,7 @@
 import { URL } from 'url';
 import HttpProxy = require('http-proxy');
 import pathMatch = require('path-match');
-import * as logger from '../../logger';
+import * as logger from '../logger';
 import Boom = require('boom');
 import Koa, {Context, Middleware} from 'koa';
 import Router = require('koa-router');
@@ -145,14 +145,12 @@ const checkTusPermission = async (ctx: Koa.ParameterizedContext, next: any) => {
     return false;
   };
 
-  const uploadGroup = new RegExp('groups/(?<group>.+)/upload').exec(dirPath);
+  const uploadGroup = new RegExp('groups/(.+)/upload').exec(dirPath);
   if (!uploadGroup) {
     throw Boom.badRequest('there is no group name in the dirpath');
   }
 
-  /* tslint:disable:no-string-literal */
-  const userHasGroup = await isGroupBelongUser(ctx.userId, uploadGroup.groups['group']) === true;
-  /* tslint:enable:no-string-literal */
+  const userHasGroup = await isGroupBelongUser(ctx.userId, uploadGroup[1]) === true;
   if (userHasGroup) {
     return next();
   }

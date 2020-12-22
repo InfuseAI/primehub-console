@@ -67,7 +67,7 @@ import { Role } from './resolvers/interface';
 import Token from './oidc/token';
 import ApiTokenCache from './oidc/apiTokenCache';
 import { createMinioClient } from './utils/minioClient';
-import { mountTusCtrl } from './ee/controllers/tusCtrl';
+import { mountTusCtrl } from './controllers/tusCtrl';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));

@@ -42,7 +42,7 @@ import { JobLogCtrl } from './controllers/jobLogCtrl';
 import { PhJobCacheList } from './crdClient/phJobCacheList';
 import JobArtifactCleaner from './utils/jobArtifactCleaner';
 import { PodLogs } from '../controllers/logCtrl';
-import { mountTusCtrl } from './controllers/tusCtrl';
+import { mountTusCtrl } from '../controllers/tusCtrl';
 
 // cache
 import {
