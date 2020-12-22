@@ -4,7 +4,6 @@ import { Context, Role } from '../resolvers/interface';
 import { get, find } from 'lodash';
 
 const getCurrentGroup = async (args, ctx) => {
-  console.log(args);
   const currentGroupName = get(args, 'data.groupName', null);
   const groups = await ctx.kcAdminClient.groups.find({max: 99999});
   const groupData = find(groups, ['name', currentGroupName]);
