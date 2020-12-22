@@ -588,7 +588,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   mountAnn(rootRouter, annCtrl);
 
   // Notebook Log
-  rootRouter.get(podLogs.getRoute(), authenticateMiddleware, podLogs.streamPodLogs);
+  rootRouter.get(podLogs.getJupyterHubRoute(), authenticateMiddleware, podLogs.streamJupyterHubLogs);
 
   // health check
   rootRouter.get('/health', async ctx => {
