@@ -72,7 +72,7 @@ import { createMinioClient } from './utils/minioClient';
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
 
 // A map of functions which return data for the schema.
-const resolvers = {
+export const resolvers = {
   Query: {
     system: system.query,
     me: user.me,
