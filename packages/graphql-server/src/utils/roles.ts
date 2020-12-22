@@ -1,5 +1,13 @@
 import { rule } from 'graphql-shield';
 import { Context, Role } from '../resolvers/interface';
+import { get, find } from 'lodash';
+
+const getCurrentGroup = async (args, ctx) => {
+  const currentGroupName = get(args, 'where.groupName_contains', null);
+  const groups = await ctx.kcAdminClient.groups.find({max: 99999});
+  const groupData = find(groups, ['name', currentGroupName]);
+  return await ctx.kcAdminClient.groups.findOne({id: get(groupData,'id', '')});
+};
 
 export const isAdmin = rule({ cache: 'contextual' })(
   async (parent, args, ctx: Context, info) => {
@@ -17,5 +25,15 @@ export const isUser = rule({ cache: 'contextual' })(
 export const isClient = rule({ cache: 'contextual' })(
   async (parent, args, ctx, info) => {
     return ctx.role === Role.CLIENT;
+  },
+);
+
+export const isGroupAdmin = rule({ cache: 'contextual' })(
+  async (parent, args, ctx, info) => {
+    const currentGroup = await getCurrentGroup(args, ctx);
+    const admins = get(currentGroup, 'attributes.admins', []);
+    const valid = admins.includes(ctx.username);
+    console.log('isGroupAdmin', valid)
+    return valid;
   },
 );

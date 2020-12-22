@@ -49,6 +49,7 @@ export class Crd<SpecType> {
   private generateName?: () => string;
   private rolePrefix?: string;
   private preCreateCheck?: (data: any) => Promise<any>;
+  private customResolver?: Function;
 
   constructor({
     customResourceMethod,
@@ -64,7 +65,8 @@ export class Crd<SpecType> {
     customUpdate,
     customParseWhere,
     generateName,
-    preCreateCheck
+    preCreateCheck,
+    customResolver
   }: {
     customResourceMethod: string,
     propMapping: (item: Item<SpecType>) => Record<string, any>,
@@ -90,6 +92,7 @@ export class Crd<SpecType> {
     customParseWhere?: (where: any) => any,
     generateName?: () => string,
     preCreateCheck?: (data: any) => Promise<any>,
+    customResolver?: Function,
   }) {
     this.customResourceMethod = customResourceMethod;
     this.propMapping = propMapping;
@@ -106,6 +109,7 @@ export class Crd<SpecType> {
     this.customParseWhere = customParseWhere;
     this.generateName = generateName;
     this.preCreateCheck = preCreateCheck;
+    this.customResolver = customResolver;
   }
 
   public setCache(cache: CrdCache<SpecType>) {
@@ -176,6 +180,8 @@ export class Crd<SpecType> {
       [`delete${typename}`]: this.destroy
     };
   }
+
+  public resolveInCustom = () => this.customResolver ? this.customResolver() : {};
 
   // tslint:disable-next-line:max-line-length
   public findInGroup = async (groupId: string, resource: string, kcAdminClient: KeycloakAdminClient) => {

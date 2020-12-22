@@ -1,5 +1,5 @@
 import { rule, shield, and, or, not } from 'graphql-shield';
-import { isAdmin, isClient, isUser } from '../../utils/roles';
+import { isAdmin, isGroupAdmin, isClient, isUser } from '../../utils/roles';
 
 export const permissions = shield({
   Query: {
@@ -35,6 +35,9 @@ export const permissions = shield({
     'deletePhDeployment': or(isAdmin, isUser),
     'stopPhDeployment': or(isAdmin, isUser),
     'deployPhDeployment': or(isAdmin, isUser),
+    'createGroupImage': isGroupAdmin,
+    'updateGroupImage': isGroupAdmin,
+    'destroyGroupImage': isGroupAdmin,
   },
 }, {
   allowExternalErrors: true
