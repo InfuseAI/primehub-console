@@ -47,8 +47,8 @@ export const GET_IMAGES_CONNECTION = gql`
 `;
 
 export const DELETE_IMAGE = gql`
-  mutation deleteGroupImage($where: ImageWhereUniqueInput!) {
-    deleteGroupImage(where: $where) {
+  mutation deleteGroupImage($data: GroupImageDeleteInput!, $where: ImageWhereUniqueInput!) {
+    deleteGroupImage(where: $where, data: $data) {
       ...ImageInfo
     }
   }
@@ -66,10 +66,11 @@ class ImageListContainer extends React.Component<Props> {
   }
 
   removeImage = async (id) => {
-    const {deleteImage} = this.props;
+    const {deleteImage, groupContext} = this.props;
     await deleteImage({
       variables: {
-        where: {id}
+        where: {id},
+        data: {groupName: groupContext.name}
       }
     })
   }
@@ -136,7 +137,7 @@ export default compose(
         notification.success({
           duration: 10,
           placement: 'bottomRight',
-          message: `Image "${data.deleteImage.name}" has been deleted.`
+          message: `Image "${data.deleteGroupImage.name}" has been deleted.`
         })
       },
       onError: errorHandler
