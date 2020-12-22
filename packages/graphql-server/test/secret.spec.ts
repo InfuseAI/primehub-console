@@ -244,6 +244,6 @@ describe('secret graphql', function() {
       where: {id: mutation.createImage.id}
     });
 
-    expect(queryOne.image.useImagePullSecret).to.be.eql('');
+    expect(queryOne.image.useImagePullSecret).to.be.null;
   });
 });

@@ -294,7 +294,8 @@ describe('image graphql', function() {
     const updateData = {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
-      url: faker.internet.url()
+      url: faker.internet.url(),
+      useImagePullSecret: 'image-pull-secret'
     };
     const mutation = await this.graphqlRequest(`
     mutation($where: ImageWhereUniqueInput!, $data: ImageUpdateInput!){
@@ -545,7 +546,7 @@ describe('image graphql', function() {
     expect(secondQueryOne.image).to.be.include({
       type: 'both',
       url: 'test2',
-      urlForGpu: null
+      urlForGpu: 'test2'
     });
 
     // change to gpu
