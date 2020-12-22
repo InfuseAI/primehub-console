@@ -68,7 +68,7 @@ import Token from './oidc/token';
 import ApiTokenCache from './oidc/apiTokenCache';
 import { createMinioClient } from './utils/minioClient';
 import { Telemetry } from './utils/telemetry';
-import { createDefaultTraitMiddleware } from './utils/telemetry_traits';
+import { createDefaultTraitMiddleware } from './utils/telemetryTraits';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
