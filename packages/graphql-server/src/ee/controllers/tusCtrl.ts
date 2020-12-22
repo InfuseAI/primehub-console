@@ -4,7 +4,10 @@
 import { URL } from 'url';
 import HttpProxy = require('http-proxy');
 import pathMatch = require('path-match');
-import * as logger from '../logger';
+import * as logger from '../../logger';
+import Boom = require('boom');
+import Koa, {Context, Middleware} from 'koa';
+import Router = require('koa-router');
 
 /**
  * Constants
@@ -20,6 +23,7 @@ let eventRegistered = false;
 
 /**
  * Koa Http Proxy Middleware
+ * from: https://github.com/vagusX/koa-proxies
  */
 export const TusdProxy = (path, options) => (ctx, next) => {
   let forwardedHost = '';
@@ -109,3 +113,60 @@ function debug(ctx, target) {
     newPath: new URL(ctx.req.url, target)
   });
 }
+
+const checkTusPermission = async (ctx: Koa.ParameterizedContext, next: any) => {
+  // only verify if method is POST
+  if (ctx.request.method !== 'POST') {
+    return next();
+  }
+
+  // validate user permissions ctx.headers["upload-metadata"]
+  // validate header 'Upload-Metadata' should contains dirpath
+  // dirpath is a group path matching the pattern: groups/${group}/upload
+  const uploadMetadata = ctx.headers['upload-metadata'];
+  if (!uploadMetadata) {
+    throw Boom.badRequest('upload-metadata header not found');
+  }
+
+  // get dirpath from header
+  const regex = new RegExp('dirpath ([^,]+),?');
+  const result = regex.exec(uploadMetadata);
+  if (!result) {
+    throw Boom.badRequest('dirpath not found in the upload-metadata header');
+  }
+  const dirPath = Buffer.from(result[1], 'base64').toString();
+
+  const isGroupBelongUser = async (userId, groupName): Promise<boolean> => {
+    const groups = await ctx.kcAdminClient.users.listGroups({
+      id: userId
+    });
+    const groupNames = groups.map(g => g.name);
+    if (groupNames.indexOf(groupName) >= 0) { return true; }
+    return false;
+  };
+
+  const uploadGroup = new RegExp('groups/(?<group>.+)/upload').exec(dirPath);
+  if (!uploadGroup) {
+    throw Boom.badRequest('there is no group name in the dirpath');
+  }
+
+  /* tslint:disable:no-string-literal */
+  const userHasGroup = await isGroupBelongUser(ctx.userId, uploadGroup.groups['group']) === true;
+  /* tslint:enable:no-string-literal */
+  if (userHasGroup) {
+    return next();
+  }
+
+  throw Boom.forbidden('request not authorized');
+};
+
+export const mountTusCtrl = (router: Router, tusProxyPath: string, config, authenticateMiddleware: Middleware) => {
+  router.all(`/tus(/?.*)`, authenticateMiddleware, checkTusPermission, TusdProxy(tusProxyPath, {
+    target: config.sharedSpaceTusdEndpoint,
+    changeOrigin: true,
+    logs: true,
+    graphqlHost: config.graphqlHost,
+    tusProxyPath,
+    rewrite: rewritePath => rewritePath.replace(tusProxyPath, '').replace('/files/', ''),
+  }));
+};
