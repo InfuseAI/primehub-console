@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon, InputNumber, Switch} from 'antd';
+import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon, InputNumber, Switch, AutoComplete} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import {get, snakeCase, debounce} from 'lodash';
 import DynamicFields from 'components/share/dynamicFields';
@@ -75,7 +75,8 @@ const autoGenId = (name: string) => {
 class DeploymentCreateForm extends React.Component<Props, State> {
   state = {
     recurrenceError: '',
-    revealEnv: false
+    revealEnv: false,
+    modelImageSearchText: ''
   };
 
   componentDidMount() {
@@ -155,6 +156,10 @@ class DeploymentCreateForm extends React.Component<Props, State> {
 
   }, 400)
 
+  handleSearch = modelImageSearchText => {
+    this.setState({modelImageSearchText});
+  }
+
   render() {
     const {
       groupContext,
@@ -184,7 +189,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       metadata,
       endpointAccessType,
     } = initialValue || {};
-    const { revealEnv } = this.state;
+    const { revealEnv, modelImageSearchText } = this.state;
     const showRevealBtn = !!(type === 'edit')
     const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
     const groupLabel = this.renderLabel(
@@ -209,6 +214,25 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       </span>
     );
 
+    const images = [
+      { url: 'infuseai/tensorflow2-prepackaged_rest:v0.4.2', docLink: 'https://docs.primehub.io/docs/model-deployment-prepackaged-server-tensorflow2'},
+    ];
+    const dataSource = images
+    .filter(image => image.url.indexOf(modelImageSearchText) > -1)
+    .map((image, i) => {
+      const url = image.url;
+      const index = url.indexOf(modelImageSearchText);
+      const name = <span>
+        {url.substr(0, index)}
+        <b>{url.substr(index, modelImageSearchText.length)}</b>
+        {url.substr(index + modelImageSearchText.length)}
+      </span>
+      return (
+        <Option value={url} key={url}>
+          {name} <a href={image.docLink} target='_blank' onClick={event => event.stopPropagation()}><Icon type='link' /></a>
+        </Option>
+      );
+    })
 
     return (
       <Form onSubmit={this.submit}>
@@ -267,7 +291,15 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                       ],
                       initialValue: modelImage
                     })(
-                      <Input />
+                      <AutoComplete
+                        dataSource={dataSource}
+                        showSearch
+                        value={modelImage}
+                        onSearch={this.handleSearch}
+                        showArrow={false}
+                        filterOption={false}
+                        optionLabelProp="value"
+                      />
                     )}
                   </Form.Item>
                 </Col>
