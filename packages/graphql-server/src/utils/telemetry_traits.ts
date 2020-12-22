@@ -37,7 +37,7 @@ export const createDefaultTraitMiddleware = (params: CreateDefaultTraitMiddlewar
     const groups = await groupCount(kcAdminClient);
     const dimensions = pickBy({
       primehubVersion: config.version,
-      installationMode: config.installationMode,
+      primehubMode: config.primehubMode,
     });
     Object.assign(traits, {
       ...dimensions,
