@@ -170,15 +170,15 @@ export const filter = (rows: any[], where?: any, order?: any, comparators?: Reco
         // Simple OR filter by multi fields.
         const fieldNames = field.split('_or_');
         const value = where[field].toLowerCase();
-        rows = rows.filter(row =>{
-          const hits = fieldNames.map((fieldName) => {
+        rows = rows.filter(row => {
+          const hits = fieldNames.map(fieldName => {
             const transformTypeField = (fieldName === 'type');
             let col = row[fieldName];
             if (transformTypeField && col === 'both') {
               col = 'universal';
             }
-            return col && col.includes && col.toLowerCase().includes(value)
-          })
+            return col && col.includes && col.toLowerCase().includes(value);
+          });
           return hits.includes(true);
         });
       }

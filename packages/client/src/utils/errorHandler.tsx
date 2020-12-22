@@ -21,6 +21,10 @@ export function errorHandler (e) {
       message = 'System Error';
       description = description || 'The quota exceeded';
       break;
+    case 'INTERNAL_SERVER_ERROR':
+      message = 'Something wrong... :(';
+      description = description || 'Server Error';
+      break;
   };
 
   notification.error({

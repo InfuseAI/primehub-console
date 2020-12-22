@@ -1,4 +1,5 @@
 import { rule } from 'graphql-shield';
+import Boom from 'boom';
 import { Context, Role } from '../resolvers/interface';
 import { get, find } from 'lodash';
 
@@ -6,7 +7,7 @@ const getCurrentGroup = async (args, ctx) => {
   const currentGroupName = get(args, 'data.groupName', null);
   const groups = await ctx.kcAdminClient.groups.find({max: 99999});
   const groupData = find(groups, ['name', currentGroupName]);
-  return await ctx.kcAdminClient.groups.findOne({id: get(groupData,'id', '')});
+  return ctx.kcAdminClient.groups.findOne({id: get(groupData, 'id', '')});
 };
 
 export const isAdmin = rule({ cache: 'contextual' })(
@@ -33,7 +34,6 @@ export const isGroupAdmin = rule({ cache: 'contextual' })(
     const currentGroup = await getCurrentGroup(args, ctx);
     const admins = get(currentGroup, 'attributes.admins', []);
     const valid = admins.includes(ctx.username);
-    console.log('isGroupAdmin', valid)
     return valid;
   },
 );

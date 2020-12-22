@@ -47,8 +47,8 @@ export const GET_IMAGES_CONNECTION = gql`
 `;
 
 export const DELETE_IMAGE = gql`
-  mutation deleteImage($where: ImageWhereUniqueInput!) {
-    deleteImage(where: $where) {
+  mutation deleteGroupImage($where: ImageWhereUniqueInput!) {
+    deleteGroupImage(where: $where) {
       ...ImageInfo
     }
   }

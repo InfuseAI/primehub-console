@@ -208,24 +208,24 @@ export const updateMapping = (data: any) => {
 };
 
 export const createGroupImage = async (root, args, context: Context) => {
-  return await this.crd.create(root, args, context);
-}
+  return this.crd.create(root, args, context);
+};
 
 export const updateGroupImage = async (root, args, context: Context) => {
-  return await this.crd.update(root, args, context);
-}
+  return this.crd.update(root, args, context);
+};
 
 export const destroyGroupImage = async (root, args, context: Context) => {
-  return await this.crd.destroy(root, args, context);
-}
+  return this.crd.destroy(root, args, context);
+};
 
-export const customResolver = (context) => {
+export const customResolver = context => {
   return {
     [`createGroupImage`]: createGroupImage.bind(context),
     [`updateGroupImage`]: updateGroupImage.bind(context),
     [`deleteGroupImage`]: destroyGroupImage.bind(context)
   };
-}
+};
 
 export const crd = new Crd<ImageSpec>({
   customResourceMethod: 'images',

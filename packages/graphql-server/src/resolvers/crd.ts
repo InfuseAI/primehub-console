@@ -49,7 +49,7 @@ export class Crd<SpecType> {
   private generateName?: () => string;
   private rolePrefix?: string;
   private preCreateCheck?: (data: any) => Promise<any>;
-  private customResolver?: Function;
+  private customResolver?: (context: any) => any;
 
   constructor({
     customResourceMethod,
@@ -92,7 +92,7 @@ export class Crd<SpecType> {
     customParseWhere?: (where: any) => any,
     generateName?: () => string,
     preCreateCheck?: (data: any) => Promise<any>,
-    customResolver?: Function,
+    customResolver?: (context: any) => any,
   }) {
     this.customResourceMethod = customResourceMethod;
     this.propMapping = propMapping;
@@ -244,13 +244,13 @@ export class Crd<SpecType> {
     let mappedRows = rows.map(row => this.propMapping(row));
     if (this.customResourceMethod === 'images') {
         if (mode === QueryImageMode.SYSTEM_ONLY) {
-          mappedRows = mappedRows.filter((row) => {
+          mappedRows = mappedRows.filter(row => {
             return isEmpty(row.groupName);
-          })
+          });
         } else if (mode === QueryImageMode.GROUP_ONLY) {
-          mappedRows = mappedRows.filter((row) => {
+          mappedRows = mappedRows.filter(row => {
             return !isEmpty(row.groupName);
-          })
+          });
         }
     }
     mappedRows = filter(mappedRows, where, order);
