@@ -201,7 +201,7 @@ export const updateMapping = (data: any) => {
       type: data.type,
       url,
       urlForGpu,
-      pullSecret: isNull(data.useImagePullSecret) ? null : data.useImagePullSecret,
+      pullSecret: isNull(data.useImagePullSecret) ? '' : data.useImagePullSecret,
       groupName: isNil(data.groupName) ? null : data.groupName
     }
   };

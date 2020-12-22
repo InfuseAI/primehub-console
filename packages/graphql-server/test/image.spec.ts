@@ -521,7 +521,7 @@ describe('image graphql', function() {
 
     expect(queryOne.image).to.be.include({
       type: 'both',
-      url: 'test2',
+      url: 'test',
       urlForGpu: 'test'
     });
 
