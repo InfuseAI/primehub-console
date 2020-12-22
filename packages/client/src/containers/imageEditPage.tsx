@@ -10,7 +10,8 @@ import {errorHandler} from 'utils/errorHandler';
 import ImageCreateForm from 'components/images/createForm';
 import PageTitle from 'components/pageTitle';
 import ImageBreadcrumb from 'components/images/breadcrumb';
-import { GroupContextComponentProps, withGroupContext } from 'context/group';
+import {withGroupContext, GroupContextComponentProps} from 'context/group';
+import {withUserContext, UserContextComponentProps } from 'context/user';
 import {sortItems, GET_MY_GROUPS} from 'containers/imageCreatePage';
 import {ImageFragment} from 'containers/imageList';
 
@@ -34,7 +35,7 @@ export const UPDATE_IMAGE= gql`
 
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 
-type Props = GroupContextComponentProps & RouteComponentProps<{imageId: string}> & {
+type Props = UserContextComponentProps & GroupContextComponentProps & RouteComponentProps<{imageId: string}> & {
   getGroups: any;
   updateImage: any;
   updateImageResult: any;
@@ -87,7 +88,11 @@ class ImageEditPage extends React.Component<Props, State> {
   }
 
   render() {
-    const {getGroups, getImage, history, groupContext} = this.props;
+    const {getGroups, getImage, history, groupContext, userContext} = this.props;
+    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
+      history.push(`../home`);
+    }
+
     if (getImage.loading) return null;
     if (getImage.error) {
       return getMessage(getImage.error)
@@ -138,6 +143,7 @@ class ImageEditPage extends React.Component<Props, State> {
 export default compose(
   withRouter,
   withGroupContext,
+  withUserContext,
   graphql(GET_MY_GROUPS, {
     name: 'getGroups'
   }),

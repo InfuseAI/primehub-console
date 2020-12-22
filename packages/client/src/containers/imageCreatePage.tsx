@@ -12,7 +12,8 @@ import ImageCreateForm from 'components/images/createForm';
 import ImageBreadcrumb from 'components/images/breadcrumb';
 import {GroupFragment} from 'containers/list';
 import PageTitle from 'components/pageTitle';
-import { withGroupContext, GroupContextComponentProps } from 'context/group';
+import {withGroupContext, GroupContextComponentProps} from 'context/group';
+import {withUserContext, UserContextComponentProps} from 'context/user';
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -53,7 +54,7 @@ export const sortItems = (items) => {
   return copiedItems;
 }
 
-type Props = RouteComponentProps & GroupContextComponentProps & {
+type Props = RouteComponentProps & GroupContextComponentProps & UserContextComponentProps & {
   getGroups: any;
   createImage: any;
   createImageResult: any;
@@ -91,7 +92,10 @@ class ImageCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {groupContext, getGroups, createImageResult, defaultValue} = this.props;
+    const {userContext, groupContext, history, getGroups, createImageResult, defaultValue} = this.props;
+    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
+      history.push(`../home`);
+    }
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups
@@ -143,6 +147,7 @@ class ImageCreatePage extends React.Component<Props, State> {
 export default compose(
   withRouter,
   withGroupContext,
+  withUserContext,
   graphql(GET_MY_GROUPS, {
     name: 'getGroups'
   }),

@@ -73,12 +73,12 @@ describe('image graphql', function() {
       type: 'both',
       url: null,
       urlForGpu: null,
-      useImagePullSecret: null,
+      useImagePullSecret: '',
       global: false,
       spec: {
         type: 'both',
         displayName: data.name,
-        pullSecret: null,
+        pullSecret: '',
         groupName: null
       },
       groups: []
@@ -100,12 +100,12 @@ describe('image graphql', function() {
       type: 'both',
       url: null,
       urlForGpu: null,
-      useImagePullSecret: null,
+      useImagePullSecret: '',
       global: false,
       spec: {
         type: 'both',
         displayName: data.name,
-        pullSecret: null,
+        pullSecret: '',
         groupName: null
       },
       groups: []
@@ -131,10 +131,10 @@ describe('image graphql', function() {
     expect(mutation.createImage).to.be.eql({
       id: data.name,
       groups: [],
-      useImagePullSecret: null,
+      useImagePullSecret: '',
       spec: {
         ...pick(data, ['displayName', 'description', 'url']),
-        pullSecret: null,
+        pullSecret: '',
         groupName: null,
         type: 'both',
         urlForGpu: data.url,
@@ -155,10 +155,10 @@ describe('image graphql', function() {
     expect(queryOne.image).to.be.eql({
       id: data.name,
       groups: [],
-      useImagePullSecret: null,
+      useImagePullSecret: '',
       spec: {
         ...pick(data, ['displayName', 'description', 'url']),
-        pullSecret: null,
+        pullSecret: '',
         type: 'both',
         groupName: null,
         urlForGpu: data.url
@@ -187,12 +187,12 @@ describe('image graphql', function() {
     expect(mutation.createImage).to.be.eql({
       id: data.name,
       groups: [],
-      useImagePullSecret: null,
+      useImagePullSecret: '',
       spec: {
         ...pick(data, ['displayName', 'description', 'url']),
         type: 'both',
         urlForGpu: data.url,
-        pullSecret: null,
+        pullSecret: '',
         groupName: null
       },
       type: 'both',
@@ -211,12 +211,12 @@ describe('image graphql', function() {
     expect(queryOne.image).to.be.eql({
       id: data.name,
       groups: [],
-      useImagePullSecret: null,
+      useImagePullSecret: '',
       spec: {
         ...pick(data, ['displayName', 'description', 'url']),
         type: 'both',
         urlForGpu: data.url,
-        pullSecret: null,
+        pullSecret: '',
         groupName: null
       },
       type: 'both',
