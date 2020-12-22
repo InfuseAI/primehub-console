@@ -367,13 +367,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       const useCache = ctx.headers['x-primehub-use-cache'];
       const isJobClient = ctx.headers['x-primehub-job'];
       const minioClient = mClient;
-      logger.info({payload: ctx});
 
       // if a token is brought in bearer
       // the request could come from jupyterHub or cms
       // jupyterHub would use sharedGraphqlSecretKey and cms will use accessToken from refresh_token grant flow
       if (authorization.indexOf('Bearer') >= 0) {
-        logger.info({payload: "Bearer auth"});
         let apiToken = authorization.replace('Bearer ', '');
 
         // if config.sharedGraphqlSecretKey is set and apiToken equals to it
@@ -410,7 +408,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
             tokenPayload = await oidcTokenVerifier.verify(apiToken);
           }
 
-          logger.info({intro: 'tokenPayload:app.ts:333:', payload: tokenPayload});
           userId = tokenPayload.sub;
           username = tokenPayload.preferred_username;
 
@@ -428,7 +425,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       } else if (config.keycloakGrantType === 'password'
           && authorization.indexOf('Basic') >= 0
       ) {
-        logger.info({payload: "Basic auth"});
         // basic auth and specified grant type to password
         // used for test
         const credentials = basicAuth(ctx.req);

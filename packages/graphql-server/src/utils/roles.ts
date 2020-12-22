@@ -3,7 +3,7 @@ import { Context, Role } from '../resolvers/interface';
 import { get, find } from 'lodash';
 
 const getCurrentGroup = async (args, ctx) => {
-  const currentGroupName = get(args, 'where.groupName_contains', null);
+  const currentGroupName = get(args, 'data.groupName', null);
   const groups = await ctx.kcAdminClient.groups.find({max: 99999});
   const groupData = find(groups, ['name', currentGroupName]);
   return await ctx.kcAdminClient.groups.findOne({id: get(groupData,'id', '')});

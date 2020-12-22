@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Card, Skeleton, Row, Col} from 'antd';
+import {Card, notification, Skeleton, Row, Col} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -28,9 +28,10 @@ export const GET_MY_GROUPS = gql`
 `
 
 export const CREATE_IMAGE = gql`
-  mutation createImage($data: ImageCreateInput!) {
-    createImage(data: $data) {
+  mutation createGroupImage($data: ImageCreateInput!) {
+    createGroupImage(data: $data) {
       id
+      name
     }
   }
 `
@@ -147,10 +148,20 @@ export default compose(
   }),
   graphql(CREATE_IMAGE, {
     options: (props: Props) => ({
-      onCompleted: () => {
+      onCompleted: (data: any) => {
         props.history.push({
           pathname: `../images`,
           search: queryString.stringify({page: 1})
+        });
+        notification.success({
+          duration: 10,
+          placement: 'bottomRight',
+          message: 'Success!',
+          description: (
+            <>
+              Image created: {data.createGroupImage.name}.
+            </>
+          )
         });
       },
       onError: errorHandler

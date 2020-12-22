@@ -37,7 +37,7 @@ export const permissions = shield({
     'deployPhDeployment': or(isAdmin, isUser),
     'createGroupImage': isGroupAdmin,
     'updateGroupImage': isGroupAdmin,
-    'destroyGroupImage': isGroupAdmin,
+    'deleteGroupImage': isGroupAdmin,
   },
 }, {
   allowExternalErrors: true

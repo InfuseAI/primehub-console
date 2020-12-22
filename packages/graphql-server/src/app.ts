@@ -289,13 +289,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       const useCache = ctx.headers['x-primehub-use-cache'];
       const isJobClient = ctx.headers['x-primehub-job'];
 
-      logger.info({payload: "context init"});
-
       // if a token is brought in bearer
       // the request could come from jupyterHub or cms
       // jupyterHub would use sharedGraphqlSecretKey and cms will use accessToken from refresh_token grant flow
       if (authorization.indexOf('Bearer') >= 0) {
-        logger.info({payload: "Bearer auth"});
         let apiToken = authorization.replace('Bearer ', '');
 
         // if config.sharedGraphqlSecretKey is set and apiToken equals to it

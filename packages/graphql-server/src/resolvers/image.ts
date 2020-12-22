@@ -2,10 +2,12 @@ import { Context } from './interface';
 import { Item } from '../crdClient/customResource';
 import { ImageSpec, ImageType } from '../crdClient/crdClientImpl';
 import { mutateRelation } from './utils';
+import { ApolloError } from 'apollo-server';
 import { Crd } from './crd';
 import { isEmpty, isUndefined, isNil, isNull, get, omit } from 'lodash';
 import { ResourceNamePrefix } from './resourceRole';
 import { createConfig } from '../config';
+import * as logger from '../logger';
 
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 
@@ -205,23 +207,23 @@ export const updateMapping = (data: any) => {
   };
 };
 
-export const createGroupImage = (root, args, context: Context) => {
-
+export const createGroupImage = async (root, args, context: Context) => {
+  return await this.crd.create(root, args, context);
 }
 
-export const updateGroupImage = (root, args, context: Context) => {
-
+export const updateGroupImage = async (root, args, context: Context) => {
+  return await this.crd.update(root, args, context);
 }
 
-export const destroyGroupImage = (root, args, context: Context) => {
-  
+export const destroyGroupImage = async (root, args, context: Context) => {
+  return await this.crd.destroy(root, args, context);
 }
 
-export const customResolver = () => {
+export const customResolver = (context) => {
   return {
-    [`createGroupImage`]: createGroupImage,
-    [`updateGroupImage`]: updateGroupImage,
-    [`deleteGroupImage`]: destroyGroupImage
+    [`createGroupImage`]: createGroupImage.bind(context),
+    [`updateGroupImage`]: updateGroupImage.bind(context),
+    [`deleteGroupImage`]: destroyGroupImage.bind(context)
   };
 }
 

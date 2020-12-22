@@ -181,7 +181,9 @@ export class Crd<SpecType> {
     };
   }
 
-  public resolveInCustom = () => this.customResolver ? this.customResolver() : {};
+  public resolveInCustom = () => {
+    return this.customResolver ? this.customResolver(this) : {};
+  }
 
   // tslint:disable-next-line:max-line-length
   public findInGroup = async (groupId: string, resource: string, kcAdminClient: KeycloakAdminClient) => {

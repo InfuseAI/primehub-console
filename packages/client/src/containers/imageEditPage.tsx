@@ -24,8 +24,8 @@ export const GET_IMAGE = gql`
 `;
 
 export const UPDATE_IMAGE= gql`
-  mutation updateImage($data: ImageUpdateInput!, $where: ImageWhereUniqueInput!) {
-    updateImage(where: $where, data: $data) {
+  mutation updateGroupImage($data: ImageUpdateInput!, $where: ImageWhereUniqueInput!) {
+    updateGroupImage(where: $where, data: $data) {
       ...ImageInfo
     }
   }
@@ -156,17 +156,17 @@ export default compose(
     options: (props: Props) => ({
       onCompleted: (data: any) => {
         const {history} = props;
-        history.push(`../../images`);
         notification.success({
           duration: 10,
           placement: 'bottomRight',
           message: 'Success!',
           description: (
             <>
-              Image {data.updateImage.name} updated.
+              Image {data.updateGroupImage.name} updated.
             </>
           )
         });
+        history.push(`../../images`);
       },
       onError: errorHandler
     }),
