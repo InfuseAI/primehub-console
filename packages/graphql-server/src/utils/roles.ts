@@ -1,5 +1,4 @@
 import { rule } from 'graphql-shield';
-import Boom from 'boom';
 import { Context, Role } from '../resolvers/interface';
 import { get, find } from 'lodash';
 
@@ -33,7 +32,6 @@ export const isGroupAdmin = rule({ cache: 'contextual' })(
   async (parent, args, ctx, info) => {
     const currentGroup = await getCurrentGroup(args, ctx);
     const admins = get(currentGroup, 'attributes.admins', []);
-    const valid = admins.includes(ctx.username);
-    return valid;
+    return admins.includes(ctx.username);
   },
 );

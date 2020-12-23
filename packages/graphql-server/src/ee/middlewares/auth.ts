@@ -1,6 +1,5 @@
 import { rule, shield, and, or, not } from 'graphql-shield';
 import { isAdmin, isGroupAdmin, isClient, isUser } from '../../utils/roles';
-import Boom from 'boom';
 
 export const permissions = shield({
   Query: {
