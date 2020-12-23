@@ -574,7 +574,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       const groups = await ctx.kcAdminClient.users.listGroups({
         id: userId
       });
-      const groupNames = groups.map(g => g.name);
+      const groupNames = groups.map(g => g.name.toLowerCase());
       if (groupNames.indexOf(groupName) >= 0) { return true; }
       return false;
     };
