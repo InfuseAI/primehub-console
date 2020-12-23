@@ -101,6 +101,14 @@ commands:
       tag:
         type: string
     steps:
+      - run:
+          name: "Set the segment write key"
+          command: |
+            if [[ -n "${SEGMENT_WRITE_KEY}" ]]; then
+              sed -i "s/const SEGMENT_WRITE_KEY.*/const SEGMENT_WRITE_KEY = \'${SEGMENT_WRITE_KEY}\';/g" \
+                packages/graphql-server/src/utils/telemetry.ts
+              echo "Segment write key replaced"
+            fi
       - docker/check
       # Build and push Primehub-console GraphQL EE image
       - docker/build:

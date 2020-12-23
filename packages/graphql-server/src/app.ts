@@ -67,6 +67,8 @@ import { Role } from './resolvers/interface';
 import Token from './oidc/token';
 import ApiTokenCache from './oidc/apiTokenCache';
 import { createMinioClient } from './utils/minioClient';
+import { Telemetry } from './utils/telemetry';
+import { createDefaultTraitMiddleware } from './utils/telemetryTraits';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -261,6 +263,19 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
   observer.observe();
 
+  // create telemetry
+  let telemetry;
+  if (config.enableTelemetry) {
+    telemetry = new Telemetry(config.keycloakClientSecret);
+    const middleware = createDefaultTraitMiddleware({
+      config,
+      createKcAdminClient,
+      getAccessToken: () => tokenSyncer.getAccessToken(),
+    });
+    telemetry.addTraitMiddleware(middleware);
+    telemetry.start();
+  }
+
   // apollo server
   const schema: any = makeExecutableSchema({
     typeDefs: typeDefs as any,
@@ -406,6 +421,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         k8sUploadServerSecret,
         namespace: config.k8sCrdNamespace,
         graphqlHost: config.graphqlHost,
+        telemetry,
       };
     },
     formatError: (error: any) => {

@@ -8,6 +8,7 @@ import K8sUploadServerSecret from '../k8sResource/k8sUploadServerSecret';
 import { JobLogCtrl } from '../ee/controllers/jobLogCtrl';
 import K8sGroupPvc from '../k8sResource/k8sGroupPvc';
 import { PhJobCacheList } from '../ee/crdClient/phJobCacheList';
+import { Telemetry } from '../utils/telemetry';
 
 export enum Role {
   CLIENT = 'CLIENT',
@@ -43,4 +44,5 @@ export interface Context {
   jobLogCtrl: JobLogCtrl;
   phJobCacheList: PhJobCacheList;
   usageReportAPIHost: string;
+  telemetry: Telemetry;
 }
