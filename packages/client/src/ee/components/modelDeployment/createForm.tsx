@@ -7,6 +7,7 @@ import EnvFields from 'components/share/envFields';
 import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
+import {PrePackagedServers} from 'ee/components/modelDeployment/prePackagedServers';
 
 const { Option } = Select;
 
@@ -214,21 +215,18 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       </span>
     );
 
-    const images = [
-      { url: 'infuseai/tensorflow2-prepackaged_rest:v0.4.2', docLink: 'https://docs.primehub.io/docs/model-deployment-prepackaged-server-tensorflow2'},
-    ];
-    const dataSource = images
-    .filter(image => image.url.indexOf(modelImageSearchText) > -1)
+    const dataSource = PrePackagedServers
+    .filter(image => image.title.indexOf(modelImageSearchText) > -1)
     .map((image, i) => {
-      const url = image.url;
-      const index = url.indexOf(modelImageSearchText);
+      const title = image.title;
+      const index = title.indexOf(modelImageSearchText);
       const name = <span>
-        {url.substr(0, index)}
-        <b>{url.substr(index, modelImageSearchText.length)}</b>
-        {url.substr(index + modelImageSearchText.length)}
+        {title.substr(0, index)}
+        <b>{title.substr(index, modelImageSearchText.length)}</b>
+        {title.substr(index + modelImageSearchText.length)}
       </span>
       return (
-        <Option value={url} key={url}>
+        <Option value={image.url} key={image.url}>
           {name} <a href={image.docLink} target='_blank' onClick={event => event.stopPropagation()}><Icon type='link' /></a>
         </Option>
       );
