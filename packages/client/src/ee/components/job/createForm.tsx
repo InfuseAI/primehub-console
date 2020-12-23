@@ -331,14 +331,27 @@ class CreateForm extends React.Component<Props, State> {
                 })(
                   images.length ? (
                     <Radio.Group style={radioGroupStyle}>
-                      {transformImages(images, instanceType).map(image => (
+                      {transformImages(images, instanceType).map(image => {
+                        const isGroupImage = image.spec.groupName && image.spec.groupName.length > 0;
+                        const label = (isGroupImage ? 'Group' : 'System') + ' / ' + getImageType(image);
+                        return (
                         <Radio key={image.id} style={radioStyle} value={image.id} disabled={image.__disabled}>
                           <div style={radioContentStyle}>
-                            <h4>{image.displayName || image.name} ({getImageType(image)})</h4>
+                            <h4>{image.displayName || image.name}
+                              <Tooltip
+                                title={`${label}`}
+                              >
+                                <Icon
+                                  type="info-circle"
+                                  theme="filled"
+                                  style={{marginLeft: 8}}
+                                />
+                              </Tooltip>
+                            </h4>
                             {image.description}
                           </div>
                         </Radio>
-                      ))}
+                      )})}
                     </Radio.Group>
                   ) : (
                     <Card>

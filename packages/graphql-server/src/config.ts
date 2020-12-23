@@ -3,6 +3,7 @@ import { pickBy, isEmpty } from 'lodash';
 export interface Config {
   env: string;
   locale: string;
+  version: string;
   keycloakApiBaseUrl: string;
   keycloakOidcBaseUrl: string;
   keycloakRealmName: string;
@@ -78,15 +79,20 @@ export interface Config {
   // log persistence
   enableLogPersistence: boolean;
 
+  // Usage report
   usageReportAPIHost: string;
 
   // shared space
   sharedSpaceTusdEndpoint: string;
+
+  // Telemetry
+  enableTelemetry: boolean;
 }
 
 const defaultConfigs = {
   env: 'development',
   locale: 'en',
+  version: 'LOCAL',
   keycloakApiBaseUrl: 'http://127.0.0.1:8080/auth',
   keycloakOidcBaseUrl: 'http://127.0.0.1:8080/auth',
   keycloakRealmName: 'master',
@@ -114,7 +120,8 @@ const defaultConfigs = {
   enableStore: false,
   enableLogPersistence: false,
   usageReportAPIHost: 'http://localhost:5000',
-  sharedSpaceTusdEndpoint: 'http://localhost:1080/files/'
+  sharedSpaceTusdEndpoint: 'http://localhost:1080/files/',
+  enableTelemetry: false,
 };
 
 const prodConfigs = {
@@ -159,6 +166,7 @@ function getEnvBoolean(key: string, defaultValue: boolean): boolean {
 export const createConfig = (): Config => {
   const envConfigs = pickBy({
     locale: process.env.CANNER_LOCALE,
+    version: process.env.PH_VERSION,
     keycloakApiBaseUrl: process.env.KC_API_BASEURL,
     keycloakOidcBaseUrl: process.env.KC_OIDC_BASEURL,
     keycloakRealmName: process.env.KC_REALM,
@@ -202,6 +210,7 @@ export const createConfig = (): Config => {
     enableDatasetUpload: getEnvBoolean('PRIMEHUB_FEATURE_DATASET_UPLOAD', false),
     enableStore: getEnvBoolean('PRIMEHUB_FEATURE_STORE', false),
     enableLogPersistence: getEnvBoolean('PRIMEHUB_FEATURE_LOG_PERSISTENCE', false),
+    enableTelemetry: getEnvBoolean('PRIMEHUB_FEATURE_TELEMETRY', false),
   });
 
   const env = process.env.NODE_ENV || 'development';

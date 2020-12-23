@@ -82,6 +82,8 @@ import Token from '../oidc/token';
 import ApiTokenCache from '../oidc/apiTokenCache';
 import PersistLog from '../utils/persistLog';
 import { createMinioClient } from '../utils/minioClient';
+import { Telemetry } from '../utils/telemetry';
+import { createDefaultTraitMiddleware } from '../utils/telemetryTraits';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, '../graphql/index.graphql')));
@@ -358,6 +360,19 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
   observer.observe();
 
+  // create telemetry
+  let telemetry;
+  if (config.enableTelemetry) {
+    telemetry = new Telemetry(config.keycloakClientSecret);
+    const middleware = createDefaultTraitMiddleware({
+      config,
+      createKcAdminClient,
+      getAccessToken: () => tokenSyncer.getAccessToken(),
+    });
+    telemetry.addTraitMiddleware(middleware);
+    telemetry.start();
+  }
+
   // Schema for CE version
   const ceSchema = makeExecutableSchema({
     typeDefs: typeDefs as any,
@@ -530,7 +545,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         graphqlHost: config.graphqlHost,
         jobLogCtrl: logCtrl,
         phJobCacheList,
-        usageReportAPIHost: config.usageReportAPIHost
+        usageReportAPIHost: config.usageReportAPIHost,
+        telemetry,
       };
     },
     formatError: (error: any) => {
@@ -742,7 +758,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   mountAnn(rootRouter, annCtrl);
 
   // Notebook Log
-  rootRouter.get(podLogs.getRoute(), authenticateMiddleware, podLogs.streamPodLogs);
+  rootRouter.get(podLogs.getJupyterHubRoute(), authenticateMiddleware, podLogs.streamJupyterHubLogs);
 
   // Log Ctrl
   rootRouter.get(logCtrl.getRoute(),
