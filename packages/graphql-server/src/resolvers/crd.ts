@@ -118,8 +118,8 @@ export class Crd<SpecType> {
     this.customParseWhere = customParseWhere;
     this.generateName = generateName;
     this.preCreateCheck = preCreateCheck;
-    this.customResolvers = customResolvers || (() => {});
-    this.customResolversInGroup = customResolversInGroup || (() => {});
+    this.customResolvers = customResolvers || (() => undefined);
+    this.customResolversInGroup = customResolversInGroup || (() => undefined);
   }
 
   public setCache(cache: CrdCache<SpecType>) {
