@@ -16,8 +16,8 @@ import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 
 const config = createConfig();
 
-const adminAuthorization = async ({data, context}: {data: any, context: any}) : Promise<void> => {
-  const username = context.username
+const adminAuthorization = async ({data, context}: {data: any, context: any}): Promise<void> => {
+  const username = context.username;
   if (data && data.groupName) {
     if (!(await isGroupAdmin(username, data.groupName, context))) {
       throw new ApolloError('Not authorise', NOT_AUTH_ERROR);
@@ -27,12 +27,12 @@ const adminAuthorization = async ({data, context}: {data: any, context: any}) : 
       throw new ApolloError('Not authorise', NOT_AUTH_ERROR);
     }
   }
-}
+};
 
-const beforeDelete = async ({data, context}: {data: any, context: any}) : Promise<any> => {
+const beforeDelete = async ({data, context}: {data: any, context: any}): Promise<any> => {
   const {spec} = data;
   await adminAuthorization({data: spec, context});
-}
+};
 
 export const mapping = (item: Item<ImageSpec>) => {
   return {
