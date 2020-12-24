@@ -1,17 +1,38 @@
 import { Context } from './interface';
 import { Item } from '../crdClient/customResource';
 import { ImageSpec, ImageType } from '../crdClient/crdClientImpl';
-import { mutateRelation } from './utils';
+import { mutateRelation, isGroupAdmin, isAdmin } from './utils';
 import { ApolloError } from 'apollo-server';
 import { Crd } from './crd';
 import { isEmpty, isUndefined, isNil, isNull, get, omit } from 'lodash';
 import { ResourceNamePrefix } from './resourceRole';
 import { createConfig } from '../config';
 import * as logger from '../logger';
+import { ErrorCodes } from '../errorCodes';
+
+const {EXCEED_QUOTA_ERROR, NOT_AUTH_ERROR} = ErrorCodes;
 
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 
 const config = createConfig();
+
+const adminAuthorization = async ({data, context}: {data: any, context: any}) : Promise<void> => {
+  const username = context.username
+  if (data && data.groupName) {
+    if (!(await isGroupAdmin(username, data.groupName, context))) {
+      throw new ApolloError('Not authorise', NOT_AUTH_ERROR);
+    }
+  } else {
+    if (!isAdmin(context)) {
+      throw new ApolloError('Not authorise', NOT_AUTH_ERROR);
+    }
+  }
+}
+
+const beforeDelete = async ({data, context}: {data: any, context: any}) : Promise<any> => {
+  const {spec} = data;
+  await adminAuthorization({data: spec, context});
+}
 
 export const mapping = (item: Item<ImageSpec>) => {
   return {
@@ -40,33 +61,34 @@ export const resolveType = {
 export const onCreate = async (
   {role, resource, data, context}:
   {role: RoleRepresentation, resource: any, data: any, context: Context}) => {
-  const everyoneGroupId = context.everyoneGroupId;
-  if (data && data.global) {
-    // assign role to everyone
-    await context.kcAdminClient.groups.addRealmRoleMappings({
-      id: everyoneGroupId,
-      roles: [{
-        id: role.id,
-        name: role.name
-      }]
-    });
-  }
+    const everyoneGroupId = context.everyoneGroupId;
+    // auth isGroupAdmin if data has groupName for group image
+    if (data && data.global) {
+      // assign role to everyone
+      await context.kcAdminClient.groups.addRealmRoleMappings({
+        id: everyoneGroupId,
+        roles: [{
+          id: role.id,
+          name: role.name
+        }]
+      });
+    }
 
-  if (data && data.groups) {
-    // add to group
-    await mutateRelation({
-      resource: data.groups,
-      connect: async where => {
-        await context.kcAdminClient.groups.addRealmRoleMappings({
-          id: where.id,
-          roles: [{
-            id: role.id,
-            name: role.name
-          }]
-        });
-      }
-    });
-  }
+    if (data && data.groups) {
+      // add to group
+      await mutateRelation({
+        resource: data.groups,
+        connect: async where => {
+          await context.kcAdminClient.groups.addRealmRoleMappings({
+            id: where.id,
+            roles: [{
+              id: role.id,
+              name: role.name
+            }]
+          });
+        }
+      });
+    }
 };
 
 export const onUpdate = async (
@@ -219,14 +241,6 @@ export const destroyGroupImage = async (root, args, context: Context) => {
   return this.crd.destroy(root, args, context);
 };
 
-export const customResolver = context => {
-  return {
-    [`createGroupImage`]: createGroupImage.bind(context),
-    [`updateGroupImage`]: updateGroupImage.bind(context),
-    [`deleteGroupImage`]: destroyGroupImage.bind(context)
-  };
-};
-
 export const crd = new Crd<ImageSpec>({
   customResourceMethod: 'images',
   propMapping: mapping,
@@ -236,7 +250,9 @@ export const crd = new Crd<ImageSpec>({
   createMapping,
   updateMapping,
   customUpdate,
+  beforeCreate: adminAuthorization,
+  beforeUpdate: adminAuthorization,
+  beforeDelete,
   onCreate,
   onUpdate,
-  customResolver
 });

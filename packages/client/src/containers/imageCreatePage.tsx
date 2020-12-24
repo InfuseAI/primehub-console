@@ -29,8 +29,8 @@ export const GET_MY_GROUPS = gql`
 `
 
 export const CREATE_IMAGE = gql`
-  mutation createGroupImage($data: ImageCreateInput!) {
-    createGroupImage(data: $data) {
+  mutation createImage($data: ImageCreateInput!) {
+    createImage(data: $data) {
       id
       name
     }
@@ -164,7 +164,7 @@ export default compose(
           message: 'Success!',
           description: (
             <>
-              Image created: {data.createGroupImage.name}.
+              Image created: {data.createImage.name}.
             </>
           )
         });

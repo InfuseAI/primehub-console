@@ -17,9 +17,10 @@ export const permissions = shield({
   Mutation: {
     '*': isAdmin,
     'revokeApiToken': or(isAdmin, isUser),
-    'createGroupImage': isGroupAdmin,
-    'updateGroupImage': isGroupAdmin,
-    'deleteGroupImage': isGroupAdmin,
+    // will check isAdmin or isGroupAdmin in image resolver
+    'createImage': or(isAdmin, isUser),
+    'updateImage': or(isAdmin, isUser),
+    'deleteImage': or(isAdmin, isUser),
   },
 }, {
   allowExternalErrors: true

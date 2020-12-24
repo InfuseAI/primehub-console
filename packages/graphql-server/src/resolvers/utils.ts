@@ -9,12 +9,13 @@ import {
   reduce,
   isArray,
   mapValues,
-  isNaN
+  isNaN,
+  find,
+  get
 } from 'lodash';
 import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
 import { EOL } from 'os';
-import { Context } from './interface';
-
+import { Context, Role } from './interface';
 const ITEMS_PER_PAGE = 10;
 
 export interface Pagination {
@@ -32,6 +33,20 @@ export const paginate = (rows: any[], pagination?: Pagination) => {
     return cursorPaginate(rows, pagination);
   }
 };
+
+export const isAdmin = (ctx: Context) : boolean => {
+  return ctx.role === Role.ADMIN;
+}
+
+export const isGroupAdmin = async (username: string, groupName: string, ctx: Context) : Promise<boolean> => {
+  const groups = await ctx.kcAdminClient.groups.find({max: 99999});
+  const groupData = find(groups, ['name', groupName]);
+  const group = await ctx.kcAdminClient.groups.findOne({id: get(groupData, 'id', '')});
+  console.log(group);
+  const admins = get(group, 'attributes.admins', []);
+  console.log(admins);
+  return admins.includes(username);
+}
 
 export const numberedPaginate = (rows: any[], pagination?: Pagination) => {
   const page = (!isUndefined(pagination) && !isUndefined(pagination.page)) ? pagination.page : 1;

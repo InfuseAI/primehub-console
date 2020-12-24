@@ -2,7 +2,7 @@ import { rule } from 'graphql-shield';
 import { Context, Role } from '../resolvers/interface';
 import { get, find } from 'lodash';
 
-const getCurrentGroup = async (args, ctx) => {
+export const getCurrentGroup = async (args, ctx) => {
   const currentGroupName = get(args, 'data.groupName', null);
   const groups = await ctx.kcAdminClient.groups.find({max: 99999});
   const groupData = find(groups, ['name', currentGroupName]);

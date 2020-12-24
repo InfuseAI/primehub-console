@@ -192,12 +192,6 @@ type Mutation {
   updateImage(data: ImageUpdateInput!, where: ImageWhereUniqueInput!): Image
   deleteImage(where: ImageWhereUniqueInput!): Image
 
-  """Group Image"""
-  createGroupImage(data: ImageCreateInput!): Image!
-  updateGroupImage(data: ImageUpdateInput!, where: ImageWhereUniqueInput!): Image
-  deleteGroupImage(data: GroupImageDeleteInput!, where: ImageWhereUniqueInput!): Image
-
-
   """Announcement"""
   createAnnouncement(data: AnnouncementCreateInput!): Announcement!
   updateAnnouncement(data: AnnouncementUpdateInput!, where: AnnouncementWhereUniqueInput!): Announcement

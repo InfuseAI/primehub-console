@@ -110,7 +110,6 @@ export const resolvers = {
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation(),
     ...ann.resolveInMutation(),
-    ...image.resolveInCustom(),
   },
   System: {
     smtp: system.querySmtp

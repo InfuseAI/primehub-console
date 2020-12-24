@@ -16,9 +16,9 @@ import { isUserAdmin } from '../../resolvers/user';
 import { SCHEDULE_LABEL } from './phSchedule';
 import { BucketItem } from 'minio';
 import JobArtifactCleaner from '../utils/jobArtifactCleaner';
+import { ErrorCodes } from '../../errorCodes';
 
-const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
-const NOT_AUTH_ERROR = 'NOT_AUTH';
+const {EXCEED_QUOTA_ERROR, NOT_AUTH_ERROR} = ErrorCodes;
 
 export interface PhJob {
   id: string;

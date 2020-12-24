@@ -25,6 +25,13 @@ export function errorHandler (e) {
       message = 'Something wrong... :(';
       description = description || 'Server Error';
       break;
+    case 'NOT_AUTH':
+      message = 'Forbidden :(';
+      description = description || 'You do not have permissions.';
+      break;
+    default:
+      message = 'Something wrong... :(';
+      description = description || 'Server Error';
   };
 
   notification.error({

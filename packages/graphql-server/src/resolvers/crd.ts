@@ -16,7 +16,7 @@ import { keycloakMaxCount } from './constant';
 // utils
 const config = createConfig();
 
-enum QueryImageMode {
+export enum QueryImageMode {
   SYSTEM_ONLY = 'SYSTEM_ONLY',
   GROUP_ONLY = 'GROUP_ONLY',
   ALL = 'ALL'
@@ -31,8 +31,11 @@ export class Crd<SpecType> {
   private resolveType?: Record<string, any>;
   private prefixName: string;
   private resourceName: string;
+  private beforeCreate?: (data: any) => Promise<any>;
   private onCreate?: (data: any) => Promise<any>;
+  private beforeUpdate?: (data: any) => Promise<any>;
   private onUpdate?: (data: any) => Promise<any>;
+  private beforeDelete?: (data: any) => Promise<any>;
   private onDelete?: (data: any) => Promise<any>;
   private customUpdate?: ({
     name, metadata, spec, customResource, context, getPrefix, data
@@ -59,6 +62,9 @@ export class Crd<SpecType> {
     resolveType,
     prefixName,
     resourceName,
+    beforeCreate,
+    beforeDelete,
+    beforeUpdate,
     onCreate,
     onUpdate,
     onDelete,
@@ -75,6 +81,9 @@ export class Crd<SpecType> {
     resolveType?: Record<string, any>,
     prefixName: string,
     resourceName: string,
+    beforeCreate?: (data: any) => Promise<any>,
+    beforeUpdate?: (data: any) => Promise<any>,
+    beforeDelete?: (data: any) => Promise<any>,
     onCreate?: (data: any) => Promise<any>,
     onUpdate?: (data: any) => Promise<any>,
     onDelete?: (data: any) => Promise<any>,
@@ -92,6 +101,8 @@ export class Crd<SpecType> {
     customParseWhere?: (where: any) => any,
     generateName?: () => string,
     preCreateCheck?: (data: any) => Promise<any>,
+    hasCustomResolver?: boolean,
+    hasCustomMutation?: boolean,
     customResolver?: (context: any) => any,
   }) {
     this.customResourceMethod = customResourceMethod;
@@ -101,6 +112,9 @@ export class Crd<SpecType> {
     this.resolveType = resolveType;
     this.prefixName = prefixName;
     this.resourceName = resourceName;
+    this.beforeCreate = beforeCreate;
+    this.beforeUpdate = beforeUpdate;
+    this.beforeDelete = beforeDelete;
     this.onCreate = onCreate;
     this.onUpdate = onUpdate;
     this.onDelete = onDelete;
@@ -202,6 +216,14 @@ export class Crd<SpecType> {
       everyoneGroupId: string,
       defaultNamespace: string
     }) => {
+
+    if (this.beforeCreate) {
+      try {
+        await this.beforeCreate({data, context});
+      } catch (err) {
+        throw err;
+      }
+    }
 
     if (this.preCreateCheck) {
       try {
@@ -357,6 +379,14 @@ export class Crd<SpecType> {
     const customResource = crdClient[this.customResourceMethod];
     const {metadata, spec} = this.createMapping(args.data, name);
 
+    if (this.beforeCreate) {
+      try {
+        await this.beforeCreate({data: args.data, context});
+      } catch (err) {
+        throw err;
+      }
+    }
+
     if (this.preCreateCheck) {
       try {
         await this.preCreateCheck({
@@ -413,6 +443,14 @@ export class Crd<SpecType> {
     const roleName = `${this.getPrefix()}${name}`;
     const role = await kcAdminClient.roles.findOneByName({name: roleName});
 
+    if (this.beforeUpdate) {
+      try {
+        await this.beforeUpdate({data: args.data, context});
+      } catch (err) {
+        throw err;
+      }
+    }
+
     // update crd on k8s
     const onUpdateGetPrefix = (customizePrefix?: string) => this.getPrefix(customizePrefix);
     const {metadata, spec} = this.updateMapping(args.data);
@@ -450,10 +488,18 @@ export class Crd<SpecType> {
     const onDestroyGetPrefix = (customizePrefix?: string) => this.getPrefix(customizePrefix);
     const customResource = crdClient[this.customResourceMethod];
     const roleName = `${this.getPrefix()}${name}`;
-    const role = await kcAdminClient.roles.delByName({name: roleName});
+    const crd = await customResource.get(name);
 
     // delete crd on k8s
-    const crd = await customResource.get(name);
+    if (this.beforeDelete) {
+      try {
+        await this.beforeDelete({data: crd, context});
+      } catch (err) {
+        throw err;
+      }
+    }
+
+    await kcAdminClient.roles.delByName({name: roleName});
     await customResource.del(name);
     if (this.onDelete) {
       await this.onDelete({name, context, resource: crd, getPrefix: onDestroyGetPrefix});
