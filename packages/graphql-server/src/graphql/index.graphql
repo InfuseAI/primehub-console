@@ -2,7 +2,7 @@
 # import User, UsersOrderBy, UserMultiEmailResponse, UserConnection, UserWhereInput, UserWhereUniqueInput, UserCreateInput, UserUpdateInput, UserActionResponse from "./user.graphql"
 # import  Group, GroupOrderByInput, GroupConnection, GroupWhereInput, GroupWhereUniqueInput, GroupCreateInput, GroupUpdateInput from "./group.graphql"
 # import InstanceType, InstanceTypeOrderByInput, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput, InstanceTypeCreateInput, InstanceTypeUpdateInput from "./instanceType.graphql"
-# import QueryImageMode, Image, ImageOrderByInput, ImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput, GroupImageDeleteInput from "./image.graphql"
+# import QueryImageMode, Image, ImageOrderByInput, ImageConnection, GroupImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput, GroupImageDeleteInput from "./image.graphql"
 # import Announcement, AnnouncementConnection, AnnouncementWhereInput, AnnouncementWhereUniqueInput, AnnouncementCreateInput, AnnouncementUpdateInput from "./announcement.graphql"
 # import Dataset, DatasetOrderByInput, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretOrderByInput, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
@@ -96,6 +96,26 @@ type Query {
     first: Int
     last: Int
   ): ImageConnection!
+
+  """GroupImage"""
+  groupImages(
+    where: ImageWhereInput
+    page: Int
+    orderBy: ImageOrderByInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [Image]!
+  groupImagesConnection(
+    where: ImageWhereInput
+    page: Int
+    orderBy: ImageOrderByInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): GroupImageConnection!
 
   """Announcement"""
   announcement(where: AnnouncementWhereUniqueInput!): Announcement

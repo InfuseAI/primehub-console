@@ -18,6 +18,12 @@ import { EOL } from 'os';
 import { Context, Role } from './interface';
 const ITEMS_PER_PAGE = 10;
 
+export enum QueryImageMode {
+  SYSTEM_ONLY = 'SYSTEM_ONLY',
+  GROUP_ONLY = 'GROUP_ONLY',
+  ALL = 'ALL'
+}
+
 export interface Pagination {
   page?: number;
   last?: number;

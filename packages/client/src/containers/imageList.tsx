@@ -29,8 +29,8 @@ export const ImageFragment = gql`
 `
 
 export const GET_IMAGES_CONNECTION = gql`
-  query imagesConnection($where: ImageWhereInput, $page: Int, $orderBy: ImageOrderByInput) {
-    imagesConnection(where: $where, page: $page, orderBy: $orderBy) {
+  query groupImagesConnection($where: ImageWhereInput, $page: Int, $orderBy: ImageOrderByInput) {
+    groupImagesConnection(where: $where, page: $page, orderBy: $orderBy) {
       pageInfo {
         totalPage
         currentPage
@@ -96,7 +96,7 @@ class ImageListContainer extends React.Component<Props> {
         groupContext={groupContext}
         imagesLoading={getImagesConnection.loading}
         imagesError={getImagesConnection.error}
-        imagesConnection={getImagesConnection.imagesConnection || {pageInfo: {}, edges: []}}
+        imagesConnection={getImagesConnection.groupImagesConnection || {pageInfo: {}, edges: []}}
         imagesVariables={getImagesConnection.variables}
         removeImage={this.removeImage}
         refetchImages={this.refetchImages}

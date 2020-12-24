@@ -19,6 +19,7 @@ type Group {
   users: [User]
   instanceTypes: [InstanceType]
   images(mode: QueryImageMode): [Image]
+  groupImages: [Image]
   datasets: [Dataset]
   resourceStatus: ResourceStatus
   # for relation with dataset

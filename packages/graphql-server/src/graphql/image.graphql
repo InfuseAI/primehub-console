@@ -47,6 +47,14 @@ type ImageConnection {
   edges: [ImageEdge]!
 }
 
+type GroupImageConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ImageEdge]!
+}
+
 input ImageWhereUniqueInput {
   id: ID!
 }

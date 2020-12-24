@@ -1,5 +1,5 @@
 import { Context } from './interface';
-import { toRelay, paginate, extractPagination, filter } from './utils';
+import { QueryImageMode, toRelay, paginate, extractPagination, filter } from './utils';
 import CustomResource, { Item } from '../crdClient/customResource';
 import pluralize from 'pluralize';
 import { isEmpty, omit, mapValues, remove, find, get, isNil, unionBy } from 'lodash';
@@ -15,12 +15,6 @@ import { keycloakMaxCount } from './constant';
 
 // utils
 const config = createConfig();
-
-export enum QueryImageMode {
-  SYSTEM_ONLY = 'SYSTEM_ONLY',
-  GROUP_ONLY = 'GROUP_ONLY',
-  ALL = 'ALL'
-}
 
 export class Crd<SpecType> {
   private cache: CrdCache<SpecType>;
@@ -52,7 +46,8 @@ export class Crd<SpecType> {
   private generateName?: () => string;
   private rolePrefix?: string;
   private preCreateCheck?: (data: any) => Promise<any>;
-  private customResolver?: (context: any) => any;
+  private customResolvers?: () => any;
+  private customResolversInGroup?: () => any;
 
   constructor({
     customResourceMethod,
@@ -72,7 +67,8 @@ export class Crd<SpecType> {
     customParseWhere,
     generateName,
     preCreateCheck,
-    customResolver
+    customResolvers,
+    customResolversInGroup
   }: {
     customResourceMethod: string,
     propMapping: (item: Item<SpecType>) => Record<string, any>,
@@ -101,9 +97,8 @@ export class Crd<SpecType> {
     customParseWhere?: (where: any) => any,
     generateName?: () => string,
     preCreateCheck?: (data: any) => Promise<any>,
-    hasCustomResolver?: boolean,
-    hasCustomMutation?: boolean,
-    customResolver?: (context: any) => any,
+    customResolvers?: () => any,
+    customResolversInGroup?: () => any,
   }) {
     this.customResourceMethod = customResourceMethod;
     this.propMapping = propMapping;
@@ -123,7 +118,8 @@ export class Crd<SpecType> {
     this.customParseWhere = customParseWhere;
     this.generateName = generateName;
     this.preCreateCheck = preCreateCheck;
-    this.customResolver = customResolver;
+    this.customResolvers = customResolvers || (() => { return {}; });
+    this.customResolversInGroup = customResolversInGroup || (() => { return {}; });
   }
 
   public setCache(cache: CrdCache<SpecType>) {
@@ -139,7 +135,8 @@ export class Crd<SpecType> {
     return {
       [this.resourceName]: this.queryOne,
       [pluralKey]: this.query,
-      [`${pluralKey}Connection`]: this.connectionQuery
+      [`${pluralKey}Connection`]: this.connectionQuery,
+      ...this.customResolvers()
     };
   }
 
@@ -182,7 +179,8 @@ export class Crd<SpecType> {
   public resolveInGroup = () => {
     const pluralKey = pluralize.plural(this.resourceName);
     return {
-      [pluralKey]: this.queryByGroup
+      [pluralKey]: this.queryByGroup,
+      ...this.customResolversInGroup()
     };
   }
 
@@ -193,10 +191,6 @@ export class Crd<SpecType> {
       [`update${typename}`]: this.update,
       [`delete${typename}`]: this.destroy
     };
-  }
-
-  public resolveInCustom = () => {
-    return this.customResolver ? this.customResolver(this) : {};
   }
 
   // tslint:disable-next-line:max-line-length

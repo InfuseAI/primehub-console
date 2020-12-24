@@ -1,10 +1,10 @@
 import { Context } from './interface';
 import { Item } from '../crdClient/customResource';
 import { ImageSpec, ImageType } from '../crdClient/crdClientImpl';
-import { mutateRelation, isGroupAdmin, isAdmin } from './utils';
+import { QueryImageMode, toRelay, extractPagination, mutateRelation, isGroupAdmin, isAdmin } from './utils';
 import { ApolloError } from 'apollo-server';
 import { Crd } from './crd';
-import { isEmpty, isUndefined, isNil, isNull, get, omit } from 'lodash';
+import { isEmpty, isUndefined, isNil, isNull, get, omit, unionBy } from 'lodash';
 import { ResourceNamePrefix } from './resourceRole';
 import { createConfig } from '../config';
 import * as logger from '../logger';
@@ -229,16 +229,45 @@ export const updateMapping = (data: any) => {
   };
 };
 
-export const createGroupImage = async (root, args, context: Context) => {
-  return this.crd.create(root, args, context);
+export const groupImages = async (parent, args, context: Context) => {
+  // TODO group image (GROUP_ONLY)
+  const groupId = parent.id;
+  args.mode = QueryImageMode.GROUP_ONLY; // Force the query mode to GROUP_ONLY
+
+  let resourceRoles = await this.crd.listGroupResourceRoles(context.kcAdminClient, groupId);
+  if (!parent.effectiveGroup) {
+    return this.crd.queryResourcesByRoles(resourceRoles, context, args);
+  }
+
+  // Effective Roles, we need to merge resource in this group and the everyone group.
+  const resourceRolesEveryone = this.crd.transfromResourceRoles(parent.realmRolesEveryone);
+
+  resourceRoles = unionBy(resourceRoles, resourceRolesEveryone, (resourceRole: any) => resourceRole.originalName);
+  return this.crd.queryResourcesByRoles(resourceRoles, context, args);
 };
 
-export const updateGroupImage = async (root, args, context: Context) => {
-  return this.crd.update(root, args, context);
+export const groupImagesConnection = async (root, args, context: Context) => {
+  const where = this.crd.parseWhere(args.where);
+  if (where.groupName_contains) {
+    await adminAuthorization({data: {groupName: where.groupName_contains}, context});
+  } else {
+    throw new ApolloError('Not authorise', NOT_AUTH_ERROR);
+  }
+  const customResource = context.crdClient[this.crd.customResourceMethod];
+  const rows = await this.crd.listQuery(customResource, where, args && args.orderBy, QueryImageMode.GROUP_ONLY);
+  return toRelay(rows, extractPagination(args));
 };
 
-export const destroyGroupImage = async (root, args, context: Context) => {
-  return this.crd.destroy(root, args, context);
+export const customResolvers = () => {
+  return {
+    [`groupImagesConnection`]: groupImagesConnection,
+  };
+};
+
+export const customResolversInGroup = () => {
+  return {
+    [`groupImages`]: groupImages,
+  };
 };
 
 export const crd = new Crd<ImageSpec>({
@@ -255,4 +284,5 @@ export const crd = new Crd<ImageSpec>({
   beforeDelete,
   onCreate,
   onUpdate,
+  customResolvers
 });
