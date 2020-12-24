@@ -82,6 +82,9 @@ export interface Config {
   // Usage report
   usageReportAPIHost: string;
 
+  // shared space
+  sharedSpaceTusdEndpoint: string;
+
   // Telemetry
   enableTelemetry: boolean;
 }
@@ -117,6 +120,7 @@ const defaultConfigs = {
   enableStore: false,
   enableLogPersistence: false,
   usageReportAPIHost: 'http://localhost:5000',
+  sharedSpaceTusdEndpoint: 'http://localhost:1080/files/',
   enableTelemetry: false,
 };
 
@@ -201,6 +205,7 @@ export const createConfig = (): Config => {
     storeBucket: process.env.PRIMEHUB_STORE_BUCKET,
     storeEndpoint: process.env.PRIMEHUB_STORE_ENDPOINT,
     usageReportAPIHost: process.env.PRIMEHUB_USAGE_REPORT_API_HOST,
+    sharedSpaceTusdEndpoint: process.env.PRIMEHUB_SHARED_SPACE_TUSD_ENDPOINT,
     // Feature flags
     enableDatasetUpload: getEnvBoolean('PRIMEHUB_FEATURE_DATASET_UPLOAD', false),
     enableStore: getEnvBoolean('PRIMEHUB_FEATURE_STORE', false),

@@ -42,6 +42,7 @@ import { JobLogCtrl } from './controllers/jobLogCtrl';
 import { PhJobCacheList } from './crdClient/phJobCacheList';
 import JobArtifactCleaner from './utils/jobArtifactCleaner';
 import { PodLogs } from '../controllers/logCtrl';
+import { mountTusCtrl } from '../controllers/tusCtrl';
 
 // cache
 import {
@@ -591,7 +592,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   // cors
   app.use(cors({
-    allowHeaders: ['content-type', 'authorization', 'x-primehub-use-cache', 'x-primehub-job']
+    allowHeaders: ['content-type', 'authorization', 'x-primehub-use-cache', 'x-primehub-job', 'Content-Length', 'Upload-Length', 'Tus-Resumable', 'Upload-Metadata', 'Upload-Offset', 'Upload-Defer-Length']
   }));
 
   // setup
@@ -818,6 +819,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         ctx.set('Content-type', mimetype);
       }
     );
+
+    // shared space proxy to tusd
+    const tusProxyPath = `${staticPath}tus`;
+    mountTusCtrl(rootRouter, tusProxyPath, config, authenticateMiddleware);
   }
 
   app.use(rootRouter.routes());
