@@ -1,5 +1,5 @@
 import { rule, shield, and, or, not } from 'graphql-shield';
-import { isAdmin, isClient, isUser, isGroupAdmin } from '../utils/roles';
+import { isAdmin, isClient, isUser } from '../utils/roles';
 
 export const permissions = shield({
   Query: {
@@ -10,14 +10,13 @@ export const permissions = shield({
     'group': or(isAdmin, isClient),
     'groups': or(isAdmin, isClient),
     'instanceType': or(isAdmin, isClient),
-    'image': or(isAdmin, isGroupAdmin, isUser, isClient),
-    'images': or(isAdmin, isGroupAdmin, isUser, isClient),
-    'imagesConnection': or(isAdmin, isGroupAdmin, isUser, isClient),
+    'image': or(isAdmin, isUser, isClient),
+    'images': or(isAdmin, isUser, isClient),
+    'imagesConnection': or(isAdmin, isUser, isClient),
   },
   Mutation: {
     '*': isAdmin,
     'revokeApiToken': or(isAdmin, isUser),
-    // will check isAdmin or isGroupAdmin in image resolver
     'createImage': or(isAdmin, isUser),
     'updateImage': or(isAdmin, isUser),
     'deleteImage': or(isAdmin, isUser),
