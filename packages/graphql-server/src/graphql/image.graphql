@@ -65,7 +65,7 @@ input GroupImageDeleteInput {
 
 input ImageWhereInput {
   id: ID
-  name_or_type_or_displayName_or_description: String
+  _or: [ImageWhereInput]
   name_contains: String
   displayName_contains: String
   groupName_contains: String

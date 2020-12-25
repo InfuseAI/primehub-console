@@ -185,21 +185,13 @@ export const filter = (rows: any[], where?: any, order?: any, comparators?: Reco
         const fieldName = field.replace('_eq', '');
         const value = where[field];
         rows = rows.filter(row => row[fieldName] && row[fieldName] === value);
-      } else if (field.indexOf('_or_') >= 0) {
+      } else if (field.indexOf('_or') >= 0) {
         // Simple OR filter by multi fields.
-        const fieldNames = field.split('_or_');
-        const value = where[field].toLowerCase();
-        rows = rows.filter(row => {
-          const hits = fieldNames.map(fieldName => {
-            const transformTypeField = (fieldName === 'type');
-            let col = row[fieldName];
-            if (transformTypeField && col === 'both') {
-              col = 'universal';
-            }
-            return col && col.includes && col.toLowerCase().includes(value);
-          });
-          return hits.includes(true);
+        const conditions = where[field];
+        const hits = conditions.map(condition => {
+          return filter(rows, condition);
         });
+        rows = hits.reduce((prev, next) => prev.concat(next));
       }
     });
   }

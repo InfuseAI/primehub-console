@@ -119,7 +119,12 @@ class ImageList extends React.Component<Props> {
         ...imagesVariables,
         where: {
           ...imagesVariables.where,
-          name_or_type_or_displayName_or_description: queryString
+          "_or": [
+            {name_contains: queryString},
+            {displayName_contains: queryString},
+            {description_contains: queryString},
+            {type: queryString}
+          ]
         }
       }
     }
