@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon, InputNumber, Switch} from 'antd';
+import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon, InputNumber, Switch, AutoComplete} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import {get, snakeCase, debounce} from 'lodash';
 import DynamicFields from 'components/share/dynamicFields';
@@ -7,6 +7,7 @@ import EnvFields from 'components/share/envFields';
 import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
+import {PrePackagedServers} from 'ee/components/modelDeployment/prePackagedServers';
 
 const { Option } = Select;
 
@@ -75,7 +76,8 @@ const autoGenId = (name: string) => {
 class DeploymentCreateForm extends React.Component<Props, State> {
   state = {
     recurrenceError: '',
-    revealEnv: false
+    revealEnv: false,
+    modelImageSearchText: ''
   };
 
   componentDidMount() {
@@ -155,6 +157,10 @@ class DeploymentCreateForm extends React.Component<Props, State> {
 
   }, 400)
 
+  handleSearch = modelImageSearchText => {
+    this.setState({modelImageSearchText});
+  }
+
   render() {
     const {
       groupContext,
@@ -184,7 +190,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       metadata,
       endpointAccessType,
     } = initialValue || {};
-    const { revealEnv } = this.state;
+    const { revealEnv, modelImageSearchText } = this.state;
     const showRevealBtn = !!(type === 'edit')
     const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
     const groupLabel = this.renderLabel(
@@ -209,6 +215,22 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       </span>
     );
 
+    const dataSource = PrePackagedServers
+    .filter(image => image.title.indexOf(modelImageSearchText) > -1)
+    .map((image, i) => {
+      const title = image.title;
+      const index = title.indexOf(modelImageSearchText);
+      const name = <span>
+        {title.substr(0, index)}
+        <b>{title.substr(index, modelImageSearchText.length)}</b>
+        {title.substr(index + modelImageSearchText.length)}
+      </span>
+      return (
+        <Option value={image.url} key={image.url}>
+          {name} <a href={image.docLink} target='_blank' onClick={event => event.stopPropagation()}><Icon type='link' /></a>
+        </Option>
+      );
+    })
 
     return (
       <Form onSubmit={this.submit}>
@@ -267,7 +289,15 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                       ],
                       initialValue: modelImage
                     })(
-                      <Input />
+                      <AutoComplete
+                        dataSource={dataSource}
+                        showSearch
+                        value={modelImage}
+                        onSearch={this.handleSearch}
+                        showArrow={false}
+                        filterOption={false}
+                        optionLabelProp="value"
+                      />
                     )}
                   </Form.Item>
                 </Col>
