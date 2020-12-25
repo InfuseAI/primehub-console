@@ -7,9 +7,13 @@ import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
 import { createGraphqlClient } from 'utils/graphqlClient';
+import ImageEditPage from 'containers/imageEditPage';
+import ImageCreatePage from 'containers/imageCreatePage';
+import ImageListContainer from 'containers/imageList';
 
 // Icons
 import iconJupyterHub from 'images/icon-jupyterhub.svg'
+import iconImages from 'images/icon-images.png';
 
 // Components
 import Jupyterhub from 'containers/jupyterhubPage';
@@ -107,6 +111,18 @@ class Main extends React.Component {
           marginTop: '-2px'
         }
       },
+      {
+        title: 'Images',
+        subPath: 'images',
+        icon: iconImages,
+        style: {
+          width: 'auto',
+          height: 17,
+          marginLeft: '1px',
+          marginRight: '-1px',
+          marginTop: '-3px',
+        }
+      }
     ]
 
     return (
@@ -117,6 +133,19 @@ class Main extends React.Component {
             <Route path={`${appPrefix}g/:groupName/hub`} exact>
               <Jupyterhub />
             </Route>
+
+            {/* Group Images management*/}
+            <Route path={`${appPrefix}g/:groupName/images`} exact>
+              <ListContainer Com={ImageListContainer} />
+            </Route>
+            <Route path={`${appPrefix}g/:groupName/images/create`} exact>
+              <ImageCreatePage />
+            </Route>
+            <Route
+              path={`${appPrefix}g/:groupName/images/:imageId/edit`}
+              exact
+              component={ImageEditPage}
+            />
           </MainPage>
         </ApolloProvider>
       </BrowserRouter>

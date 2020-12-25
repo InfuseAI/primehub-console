@@ -1,7 +1,7 @@
 # import PageInfo from "common.graphql"
 # import User, UserCreateManyInput, UserUpdateManyInput from "user.graphql"
 # import InstanceType from "instanceType.graphql"
-# import Image from "image.graphql"
+# import Image, QueryImageMode from "image.graphql"
 # import Dataset from "dataset.graphql"
 # import ResourceStatus from "resourceStatus.graphql"
 
@@ -18,7 +18,8 @@ type Group {
   projectQuotaMemory: Float
   users: [User]
   instanceTypes: [InstanceType]
-  images(includeInternal: Boolean, internalOnly: Boolean): [Image]
+  images(mode: QueryImageMode): [Image]
+  groupImages: [Image]
   datasets: [Dataset]
   resourceStatus: ResourceStatus
   # for relation with dataset

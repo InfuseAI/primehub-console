@@ -45,7 +45,7 @@ export default () => (
     }}
     graphql={
       `query($imagePage: Int, $imageOrderBy: ImageOrderByInput, $imageWhere: ImageWhereInput) {
-        image: imagesConnection(page: $imagePage, orderBy: $imageOrderBy, where: $imageWhere) {
+        image: imagesConnection(page: $imagePage, orderBy: $imageOrderBy, where: $imageWhere, mode: SYSTEM_ONLY) {
           edges {
             cursor
             node {

@@ -1,12 +1,12 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
-import {errorHandler} from '../components/job/errorHandler';
+import {errorHandler} from 'utils/errorHandler';
 import {get} from 'lodash';
 import {appPrefix} from 'utils/env';
 import { Button, Table, Alert } from 'antd';
 import styled from 'styled-components';
-import LineChart from '../components/shared/lineChart'
+import LineChart from 'ee/components/shared/lineChart';
 
 type Props = {
   jobId: string;

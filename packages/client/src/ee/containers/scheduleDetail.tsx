@@ -5,15 +5,15 @@ import {RouteComponentProps, withRouter} from 'react-router-dom';
 import {compose} from 'recompose';
 import {Button, Modal} from 'antd';
 import queryString from 'querystring';
-import ScheduleUpdateForm from '../components/job/createForm';
-import ScheduleBreadCrumb from '../components/schedule/breadcrumb';
-import Title from '../components/job/title';
-import {errorHandler} from '../components/job/errorHandler';
-import {PhScheduleFragment} from './scheduleList';
-import {GET_MY_GROUPS, GET_TIMEZONE, sortItems} from './scheduleCreatePage';
+import ScheduleUpdateForm from 'ee/components/job/createForm';
+import ScheduleBreadCrumb from 'ee/components/schedule/breadcrumb';
+import Title from 'ee/components/job/title';
+import {errorHandler} from 'utils/errorHandler';
+import {PhScheduleFragment} from 'ee/containers/scheduleList';
+import {GET_MY_GROUPS, GET_TIMEZONE, sortItems} from 'ee/containers/scheduleCreatePage';
 import {get, unionBy, isEqual} from 'lodash';
-import {appPrefix} from '../../utils/env';
-import PageTitle from '../../components/pageTitle';
+import {appPrefix} from 'utils/env';
+import PageTitle from 'components/pageTitle';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
 
 type Props = {

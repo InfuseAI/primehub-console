@@ -75,7 +75,7 @@ import { createDefaultTraitMiddleware } from './utils/telemetryTraits';
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
 
 // A map of functions which return data for the schema.
-const resolvers = {
+export const resolvers = {
   Query: {
     system: system.query,
     me: user.me,
@@ -112,7 +112,7 @@ const resolvers = {
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation(),
-    ...ann.resolveInMutation()
+    ...ann.resolveInMutation(),
   },
   System: {
     smtp: system.querySmtp

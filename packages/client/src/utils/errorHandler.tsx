@@ -21,6 +21,17 @@ export function errorHandler (e) {
       message = 'System Error';
       description = description || 'The quota exceeded';
       break;
+    case 'INTERNAL_SERVER_ERROR':
+      message = 'Something wrong... :(';
+      description = description || 'Server Error';
+      break;
+    case 'NOT_AUTH':
+      message = 'Forbidden :(';
+      description = description || 'You do not have permissions.';
+      break;
+    default:
+      message = 'Something wrong... :(';
+      description = description || 'Server Error';
   };
 
   notification.error({

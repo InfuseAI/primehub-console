@@ -1,18 +1,19 @@
 import * as React from 'react';
-import {Card, Skeleton, Row, Col} from 'antd';
+import {Card, notification, Skeleton, Row, Col} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
-import {get, unionBy} from 'lodash';
+import {get, unionBy, isEmpty} from 'lodash';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'utils/errorHandler';
-import JobCreateForm from 'ee/components/job/createForm';
-import JobBreadcrumb from 'ee/components/job/breadcrumb';
+import ImageCreateForm from 'components/images/createForm';
+import ImageBreadcrumb from 'components/images/breadcrumb';
 import {GroupFragment} from 'containers/list';
 import PageTitle from 'components/pageTitle';
-import { withGroupContext, GroupContextComponentProps } from 'context/group';
+import {withGroupContext, GroupContextComponentProps} from 'context/group';
+import {withUserContext, UserContextComponentProps} from 'context/user';
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -20,7 +21,6 @@ export const GET_MY_GROUPS = gql`
       id
       groups {
         ...GroupInfo
-        instanceTypes { id name displayName description spec global gpuLimit memoryLimit cpuLimit }
         images { id name displayName description spec global type }
       }
     }
@@ -28,10 +28,11 @@ export const GET_MY_GROUPS = gql`
   ${GroupFragment}
 `
 
-export const CREATE_JOB = gql`
-  mutation createPhJob($data: PhJobCreateInput!) {
-    createPhJob(data: $data) {
+export const CREATE_IMAGE = gql`
+  mutation createImage($data: ImageCreateInput!) {
+    createImage(data: $data) {
       id
+      name
     }
   }
 `
@@ -42,7 +43,7 @@ const compareByAlphabetical = (prev, next) => {
   return 0;
 }
 
-const sortItems = (items) => {
+export const sortItems = (items) => {
   const copiedItems = items.slice();
   copiedItems
     .sort((prev, next) => {
@@ -53,17 +54,17 @@ const sortItems = (items) => {
   return copiedItems;
 }
 
-type Props = RouteComponentProps & GroupContextComponentProps & {
+type Props = RouteComponentProps & GroupContextComponentProps & UserContextComponentProps & {
   getGroups: any;
-  createPhJob: any;
-  createPhJobResult: any;
+  createImage: any;
+  createImageResult: any;
   defaultValue?: object;
 }
 type State = {
   selectedGroup: string | null;
 }
 
-class JobCreatePage extends React.Component<Props, State> {
+class ImageCreatePage extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     this.state = {
@@ -76,8 +77,13 @@ class JobCreatePage extends React.Component<Props, State> {
   }
 
   onSubmit = (payload) => {
-    const {createPhJob} = this.props;
-    createPhJob({
+    const {createImage, groupContext} = this.props;
+    const groupConnector = {
+      connect: [{id: groupContext.id}]
+    };
+    payload.groupName = groupContext.name;
+    payload.groups = groupConnector
+    createImage({
       variables: {
         data: payload
       }
@@ -86,9 +92,11 @@ class JobCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {groupContext, getGroups, createPhJobResult, defaultValue} = this.props;
+    const {userContext, groupContext, history, getGroups, createImageResult, defaultValue} = this.props;
+    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
+      history.push(`../home`);
+    }
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
-    const jobDefaultActiveDeadlineSeconds = (window as any).jobDefaultActiveDeadlineSeconds;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups
       .filter(group => group.id !== everyoneGroupId)
@@ -96,37 +104,19 @@ class JobCreatePage extends React.Component<Props, State> {
     const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
     const group = groups
       .find(group => group.id === selectedGroup);
-    const instanceTypes = unionBy(
-      get(group, 'instanceTypes', []),
-      get(everyoneGroup, 'instanceTypes', []),
-      'id'
-    );
-    const images = unionBy(
-      get(group, 'images', []),
-      get(everyoneGroup, 'images', []),
-      'id'
-    );
-    const jobActiveDeadlineSeconds = get(group, 'jobDefaultActiveDeadlineSeconds', null) || jobDefaultActiveDeadlineSeconds;
     return (
       <React.Fragment>
         <PageTitle
-          breadcrumb={<JobBreadcrumb />}
-          title={"New Job"}
+          breadcrumb={<ImageBreadcrumb />}
+          title={"New Image"}
         />
         <div style={{
           margin: '16px',
         }}>
 
           {getGroups.loading ? (
-            <Row gutter={16}>
-              <Col xs={24} sm={8} lg={8}>
-                <Card>
-                  <Skeleton active />
-                  <Skeleton active />
-                  <Skeleton active />
-                </Card>
-              </Col>
-              <Col xs={24} sm={16} lg={16}>
+            <Row>
+              <Col>
                 <Card>
                   <Skeleton active />
                   <Skeleton active />
@@ -135,7 +125,7 @@ class JobCreatePage extends React.Component<Props, State> {
               </Col>
             </Row>
           ) : (
-            <JobCreateForm
+            <ImageCreateForm
               showResources={true}
               refetchGroup={getGroups.refetch}
               groupContext={groupContext}
@@ -143,11 +133,8 @@ class JobCreatePage extends React.Component<Props, State> {
               selectedGroup={selectedGroup}
               onSelectGroup={this.onChangeGroup}
               groups={sortItems(groups)}
-              instanceTypes={sortItems(instanceTypes)}
-              images={sortItems(images)}
-              defaultActiveDeadlineSeconds={jobActiveDeadlineSeconds}
               onSubmit={this.onSubmit}
-              loading={createPhJobResult.loading}
+              loading={createImageResult.loading}
             />
           )}
 
@@ -160,23 +147,34 @@ class JobCreatePage extends React.Component<Props, State> {
 export default compose(
   withRouter,
   withGroupContext,
+  withUserContext,
   graphql(GET_MY_GROUPS, {
     name: 'getGroups'
   }),
-  graphql(CREATE_JOB, {
+  graphql(CREATE_IMAGE, {
     options: (props: Props) => ({
-      onCompleted: () => {
+      onCompleted: (data: any) => {
         props.history.push({
-          pathname: `../job`,
+          pathname: `../images`,
           search: queryString.stringify({page: 1})
+        });
+        notification.success({
+          duration: 10,
+          placement: 'bottomRight',
+          message: 'Success!',
+          description: (
+            <>
+              Image created: {data.createImage.name}.
+            </>
+          )
         });
       },
       onError: errorHandler
     }),
-    name: 'createPhJob'
+    name: 'createImage'
   }),
   Com => props => {
     const {defaultValue}: {defaultValue?: string} = queryString.parse(props.location.search.replace(/^\?/, ''));
     return <Com {...props} defaultValue={defaultValue ? JSON.parse(defaultValue.replace(/\n/g, "\\n")) : undefined}  />
   }
-)(JobCreatePage)
+)(ImageCreatePage)

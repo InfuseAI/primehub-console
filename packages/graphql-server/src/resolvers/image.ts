@@ -1,11 +1,38 @@
 import { Context } from './interface';
 import { Item } from '../crdClient/customResource';
 import { ImageSpec, ImageType } from '../crdClient/crdClientImpl';
-import { mutateRelation } from './utils';
+import { QueryImageMode, toRelay, extractPagination, mutateRelation, isGroupAdmin, isAdmin } from './utils';
+import { ApolloError } from 'apollo-server';
 import { Crd } from './crd';
-import { isUndefined, isNil, isNull, get, omit } from 'lodash';
-import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
+import { isEmpty, isUndefined, isNil, isNull, get, omit, unionBy } from 'lodash';
 import { ResourceNamePrefix } from './resourceRole';
+import { createConfig } from '../config';
+import * as logger from '../logger';
+import { ErrorCodes } from '../errorCodes';
+
+const {EXCEED_QUOTA_ERROR, NOT_AUTH_ERROR} = ErrorCodes;
+
+import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
+
+const config = createConfig();
+
+const adminAuthorization = async ({data, context}: {data: any, context: any}): Promise<void> => {
+  const username = context.username;
+  if (data && data.groupName) {
+    if (!(await isGroupAdmin(username, data.groupName, context))) {
+      throw new ApolloError('Not authorise', NOT_AUTH_ERROR);
+    }
+  } else {
+    if (!isAdmin(context)) {
+      throw new ApolloError('Not authorise', NOT_AUTH_ERROR);
+    }
+  }
+};
+
+const beforeDelete = async ({data, context}: {data: any, context: any}): Promise<any> => {
+  const {spec} = data;
+  await adminAuthorization({data: spec, context});
+};
 
 export const mapping = (item: Item<ImageSpec>) => {
   return {
@@ -34,33 +61,34 @@ export const resolveType = {
 export const onCreate = async (
   {role, resource, data, context}:
   {role: RoleRepresentation, resource: any, data: any, context: Context}) => {
-  const everyoneGroupId = context.everyoneGroupId;
-  if (data && data.global) {
-    // assign role to everyone
-    await context.kcAdminClient.groups.addRealmRoleMappings({
-      id: everyoneGroupId,
-      roles: [{
-        id: role.id,
-        name: role.name
-      }]
-    });
-  }
+    const everyoneGroupId = context.everyoneGroupId;
+    // auth isGroupAdmin if data has groupName for group image
+    if (data && data.global) {
+      // assign role to everyone
+      await context.kcAdminClient.groups.addRealmRoleMappings({
+        id: everyoneGroupId,
+        roles: [{
+          id: role.id,
+          name: role.name
+        }]
+      });
+    }
 
-  if (data && data.groups) {
-    // add to group
-    await mutateRelation({
-      resource: data.groups,
-      connect: async where => {
-        await context.kcAdminClient.groups.addRealmRoleMappings({
-          id: where.id,
-          roles: [{
-            id: role.id,
-            name: role.name
-          }]
-        });
-      }
-    });
-  }
+    if (data && data.groups) {
+      // add to group
+      await mutateRelation({
+        resource: data.groups,
+        connect: async where => {
+          await context.kcAdminClient.groups.addRealmRoleMappings({
+            id: where.id,
+            roles: [{
+              id: role.id,
+              name: role.name
+            }]
+          });
+        }
+      });
+    }
 };
 
 export const onUpdate = async (
@@ -141,7 +169,7 @@ export const createMapping = (data: any) => {
       type: imageType,
       url,
       urlForGpu,
-      pullSecret: isNil(data.useImagePullSecret) ? null : data.useImagePullSecret,
+      pullSecret: isNil(data.useImagePullSecret) ? '' : data.useImagePullSecret,
       groupName: isNil(data.groupName) ? null : data.groupName
     }
   };
@@ -166,11 +194,11 @@ const customUpdate = async ({
   } else {
     // just changing attribute
     // if not updated, use original values
-    url = isUndefined(spec.url) ? row.spec.url : spec.url;
+    url = isEmpty(spec.url) ? row.spec.url : spec.url;
     // if not `both` type, override urlForGpu with url
     urlForGpu = (row.spec.type !== ImageType.both) ?
       url
-      : isUndefined(spec.urlForGpu) ? row.spec.urlForGpu : spec.urlForGpu;
+      : isEmpty(spec.urlForGpu) ? row.spec.urlForGpu : spec.urlForGpu;
   }
 
   spec.url = url;
@@ -183,6 +211,8 @@ const customUpdate = async ({
 };
 
 export const updateMapping = (data: any) => {
+  const imageType = data.type || ImageType.both;
+  const {url, urlForGpu} = defineUrlAndUrlForGpu(data.url, data.urlForGpu, imageType);
   return {
     metadata: {
       name: data.name
@@ -191,11 +221,52 @@ export const updateMapping = (data: any) => {
       displayName: data.displayName,
       description: data.description,
       type: data.type,
-      url: data.url,
-      urlForGpu: data.urlForGpu,
-      pullSecret: isNull(data.useImagePullSecret) ? null : data.useImagePullSecret,
+      url,
+      urlForGpu,
+      pullSecret: isNil(data.useImagePullSecret) ? null : data.useImagePullSecret,
       groupName: isNil(data.groupName) ? null : data.groupName
     }
+  };
+};
+
+export const groupImages = async (parent, args, context: Context) => {
+  // TODO group image (GROUP_ONLY)
+  const groupId = parent.id;
+  args.mode = QueryImageMode.GROUP_ONLY; // Force the query mode to GROUP_ONLY
+
+  let resourceRoles = await this.crd.listGroupResourceRoles(context.kcAdminClient, groupId);
+  if (!parent.effectiveGroup) {
+    return this.crd.queryResourcesByRoles(resourceRoles, context, args);
+  }
+
+  // Effective Roles, we need to merge resource in this group and the everyone group.
+  const resourceRolesEveryone = this.crd.transfromResourceRoles(parent.realmRolesEveryone);
+
+  resourceRoles = unionBy(resourceRoles, resourceRolesEveryone, (resourceRole: any) => resourceRole.originalName);
+  return this.crd.queryResourcesByRoles(resourceRoles, context, args);
+};
+
+export const groupImagesConnection = async (root, args, context: Context) => {
+  const where = this.crd.parseWhere(args.where);
+  if (where.groupName_contains) {
+    await adminAuthorization({data: {groupName: where.groupName_contains}, context});
+  } else {
+    throw new ApolloError('Not authorise', NOT_AUTH_ERROR);
+  }
+  const customResource = context.crdClient[this.crd.customResourceMethod];
+  const rows = await this.crd.listQuery(customResource, where, args && args.orderBy, QueryImageMode.GROUP_ONLY);
+  return toRelay(rows, extractPagination(args));
+};
+
+export const customResolvers = () => {
+  return {
+    [`groupImagesConnection`]: groupImagesConnection,
+  };
+};
+
+export const customResolversInGroup = () => {
+  return {
+    [`groupImages`]: groupImages,
   };
 };
 
@@ -208,6 +279,10 @@ export const crd = new Crd<ImageSpec>({
   createMapping,
   updateMapping,
   customUpdate,
+  beforeCreate: adminAuthorization,
+  beforeUpdate: adminAuthorization,
+  beforeDelete,
   onCreate,
-  onUpdate
+  onUpdate,
+  customResolvers
 });

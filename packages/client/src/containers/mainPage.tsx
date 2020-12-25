@@ -5,6 +5,7 @@ import Header from 'components/header';
 import GroupSelector from 'components/groupSelector';
 import Sidebar from 'components/main/sidebar';
 import styled from 'styled-components';
+import {has} from 'lodash';
 import { Redirect } from 'react-router';
 import {appPrefix} from 'utils/env';
 import gql from 'graphql-tag';
@@ -12,6 +13,7 @@ import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {withRouter} from 'react-router';
 import { GroupContextValue, GroupContext } from 'context/group';
+import { UserContextValue, UserContext } from 'context/user';
 import { Landing } from '../landing';
 import ApiTokenPage from 'containers/apiTokenPage';
 
@@ -20,6 +22,7 @@ export const GroupFragment = gql`
     id
     displayName
     name
+    admins
   }
 `;
 
@@ -27,6 +30,7 @@ export const GET_MY_GROUPS = gql`
   query me {
     me {
       id
+      username
       groups {
         ...GroupInfo
       }
@@ -40,6 +44,7 @@ export type MainPageSidebarItem = {
   icon: string;
   style?: any;
   stage?: string;
+  groupAdminOnly?: boolean;
 }
 
 export type MainPageProps = {
@@ -68,10 +73,19 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
     }
   }
 
+  checkUserIsGroupAdmin(currentGroup: GroupContextValue, currentUser: UserContextValue): boolean {
+    if (!currentUser) {
+      return false;
+    }
+    const adminList = has(currentGroup, 'admins') ? currentGroup.admins.split(','): [];
+    return adminList.includes(currentUser.username);
+  }
+
   getGroups(): {
     loading: boolean,
     error: any,
-    groups: Array<GroupContextValue>
+    groups: Array<GroupContextValue>,
+    me: UserContextValue
   } {
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const {getMyGroups} = this.props;
@@ -79,17 +93,20 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
     const groups = !loading && !error && me ?
       me.groups.filter(group => group.id !== everyoneGroupId) :
       undefined;
-    return {loading, error, groups};
+    return {loading, error, groups, me};
   }
 
   render() {
     const {sidebarItems, location, children} = this.props;
     const {currentGroupName} = this.state;
-    const {loading, error, groups} = this.getGroups();
-
+    const {loading, error, groups, me} = this.getGroups();
+    const currentUser = me;
     const currentGroup = groups ?
       groups.find(group => group.name === currentGroupName) :
       undefined;
+    if (currentUser) {
+      currentUser.isCurrentGroupAdmin = this.checkUserIsGroupAdmin(currentGroup, currentUser);
+    }
 
     let content;
 
@@ -147,6 +164,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
 
     return (
       <GroupContext.Provider value={currentGroup}>
+      <UserContext.Provider value={currentUser}>
         <Layout>
           <Switch>
             <Route path={`${appPrefix}g`} exact>
@@ -186,6 +204,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
             </Layout.Content>
           </Layout>
         </Layout>
+      </UserContext.Provider>
       </GroupContext.Provider>
     )
   }

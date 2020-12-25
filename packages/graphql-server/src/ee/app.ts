@@ -28,6 +28,7 @@ import * as phJob from './resolvers/phJob';
 import * as phSchedule from './resolvers/phSchedule';
 import * as phDeployment from './resolvers/phDeployment';
 import * as usageReport from './resolvers/usageReport';
+import { resolvers as ceResolvers } from '../app';
 import { crd as instanceType} from '../resolvers/instanceType';
 import { crd as dataset, regenerateUploadSecret} from '../resolvers/dataset';
 import { crd as image} from '../resolvers/image';
@@ -89,60 +90,6 @@ import { createDefaultTraitMiddleware } from '../utils/telemetryTraits';
 const typeDefs = gql(importSchema(path.resolve(__dirname, '../graphql/index.graphql')));
 // The EE GraphQL schema
 const typeDefsEE = gql(importSchema(path.resolve(__dirname, './graphql/ee.graphql')));
-
-// A map of functions which return data for the schema.
-const ceResolvers = {
-  Query: {
-    system: system.query,
-    me: user.me,
-    user: user.queryOne,
-    users: user.query,
-    usersConnection: user.connectionQuery,
-    group: group.queryOne,
-    groups: group.query,
-    groupsConnection: group.connectionQuery,
-    secret: secret.queryOne,
-    secrets: secret.query,
-    secretsConnection: secret.connectionQuery,
-    ...instanceType.resolvers(),
-    ...dataset.resolvers(),
-    ...image.resolvers(),
-    ...ann.resolvers()
-  },
-  Mutation: {
-    updateSystem: system.update,
-    createUser: user.create,
-    updateUser: user.update,
-    deleteUser: user.destroy,
-    revokeApiToken: user.revokeApiToken,
-    sendEmail: user.sendEmail,
-    sendMultiEmail: user.sendMultiEmail,
-    resetPassword: user.resetPassword,
-    createGroup: group.create,
-    updateGroup: group.update,
-    deleteGroup: group.destroy,
-    createSecret: secret.create,
-    updateSecret: secret.update,
-    deleteSecret: secret.destroy,
-    regenerateUploadServerSecret: regenerateUploadSecret,
-    ...instanceType.resolveInMutation(),
-    ...dataset.resolveInMutation(),
-    ...image.resolveInMutation(),
-    ...ann.resolveInMutation()
-  },
-  System: {
-    smtp: system.querySmtp
-  },
-  User: user.typeResolvers,
-  Group: group.typeResolvers,
-  ...instanceType.typeResolver(),
-  ...dataset.typeResolver(),
-  ...image.typeResolver(),
-  ...ann.typeResolver(),
-
-  // scalars
-  JSON: GraphQLJSON
-};
 
 const eeResolvers = {
   Query: {
@@ -476,6 +423,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
             apiToken = await apiTokenCache.getAccessToken(apiToken);
             tokenPayload = await oidcTokenVerifier.verify(apiToken);
           }
+
           userId = tokenPayload.sub;
           username = tokenPayload.preferred_username;
 

@@ -1,5 +1,5 @@
 import { Context } from './interface';
-import { toRelay, paginate, extractPagination, filter } from './utils';
+import { QueryImageMode, toRelay, paginate, extractPagination, filter } from './utils';
 import CustomResource, { Item } from '../crdClient/customResource';
 import pluralize from 'pluralize';
 import { isEmpty, omit, mapValues, remove, find, get, isNil, unionBy } from 'lodash';
@@ -25,8 +25,11 @@ export class Crd<SpecType> {
   private resolveType?: Record<string, any>;
   private prefixName: string;
   private resourceName: string;
+  private beforeCreate?: (data: any) => Promise<any>;
   private onCreate?: (data: any) => Promise<any>;
+  private beforeUpdate?: (data: any) => Promise<any>;
   private onUpdate?: (data: any) => Promise<any>;
+  private beforeDelete?: (data: any) => Promise<any>;
   private onDelete?: (data: any) => Promise<any>;
   private customUpdate?: ({
     name, metadata, spec, customResource, context, getPrefix, data
@@ -43,6 +46,8 @@ export class Crd<SpecType> {
   private generateName?: () => string;
   private rolePrefix?: string;
   private preCreateCheck?: (data: any) => Promise<any>;
+  private customResolvers?: () => any;
+  private customResolversInGroup?: () => any;
 
   constructor({
     customResourceMethod,
@@ -52,13 +57,18 @@ export class Crd<SpecType> {
     resolveType,
     prefixName,
     resourceName,
+    beforeCreate,
+    beforeDelete,
+    beforeUpdate,
     onCreate,
     onUpdate,
     onDelete,
     customUpdate,
     customParseWhere,
     generateName,
-    preCreateCheck
+    preCreateCheck,
+    customResolvers,
+    customResolversInGroup
   }: {
     customResourceMethod: string,
     propMapping: (item: Item<SpecType>) => Record<string, any>,
@@ -67,6 +77,9 @@ export class Crd<SpecType> {
     resolveType?: Record<string, any>,
     prefixName: string,
     resourceName: string,
+    beforeCreate?: (data: any) => Promise<any>,
+    beforeUpdate?: (data: any) => Promise<any>,
+    beforeDelete?: (data: any) => Promise<any>,
     onCreate?: (data: any) => Promise<any>,
     onUpdate?: (data: any) => Promise<any>,
     onDelete?: (data: any) => Promise<any>,
@@ -84,6 +97,8 @@ export class Crd<SpecType> {
     customParseWhere?: (where: any) => any,
     generateName?: () => string,
     preCreateCheck?: (data: any) => Promise<any>,
+    customResolvers?: () => any,
+    customResolversInGroup?: () => any,
   }) {
     this.customResourceMethod = customResourceMethod;
     this.propMapping = propMapping;
@@ -92,6 +107,9 @@ export class Crd<SpecType> {
     this.resolveType = resolveType;
     this.prefixName = prefixName;
     this.resourceName = resourceName;
+    this.beforeCreate = beforeCreate;
+    this.beforeUpdate = beforeUpdate;
+    this.beforeDelete = beforeDelete;
     this.onCreate = onCreate;
     this.onUpdate = onUpdate;
     this.onDelete = onDelete;
@@ -100,6 +118,8 @@ export class Crd<SpecType> {
     this.customParseWhere = customParseWhere;
     this.generateName = generateName;
     this.preCreateCheck = preCreateCheck;
+    this.customResolvers = customResolvers || (() => undefined);
+    this.customResolversInGroup = customResolversInGroup || (() => undefined);
   }
 
   public setCache(cache: CrdCache<SpecType>) {
@@ -115,7 +135,8 @@ export class Crd<SpecType> {
     return {
       [this.resourceName]: this.queryOne,
       [pluralKey]: this.query,
-      [`${pluralKey}Connection`]: this.connectionQuery
+      [`${pluralKey}Connection`]: this.connectionQuery,
+      ...this.customResolvers()
     };
   }
 
@@ -158,7 +179,8 @@ export class Crd<SpecType> {
   public resolveInGroup = () => {
     const pluralKey = pluralize.plural(this.resourceName);
     return {
-      [pluralKey]: this.queryByGroup
+      [pluralKey]: this.queryByGroup,
+      ...this.customResolversInGroup()
     };
   }
 
@@ -188,6 +210,14 @@ export class Crd<SpecType> {
       everyoneGroupId: string,
       defaultNamespace: string
     }) => {
+
+    if (this.beforeCreate) {
+      try {
+        await this.beforeCreate({data, context});
+      } catch (err) {
+        throw err;
+      }
+    }
 
     if (this.preCreateCheck) {
       try {
@@ -225,9 +255,20 @@ export class Crd<SpecType> {
    */
 
   private listQuery =
-    async (customResource: CustomResource<SpecType>, where: any, order: any) => {
+    async (customResource: CustomResource<SpecType>, where: any, order: any, mode?: QueryImageMode) => {
     const rows = await customResource.list();
     let mappedRows = rows.map(row => this.propMapping(row));
+    if (this.customResourceMethod === 'images') {
+        if (mode === QueryImageMode.SYSTEM_ONLY) {
+          mappedRows = mappedRows.filter(row => {
+            return isEmpty(row.groupName);
+          });
+        } else if (mode === QueryImageMode.GROUP_ONLY) {
+          mappedRows = mappedRows.filter(row => {
+            return !isEmpty(row.groupName);
+          });
+        }
+    }
     mappedRows = filter(mappedRows, where, order);
     return mappedRows;
   }
@@ -246,8 +287,9 @@ export class Crd<SpecType> {
 
   private connectionQuery = async (root, args, context: Context) => {
     const customResource = context.crdClient[this.customResourceMethod];
+    const {mode = QueryImageMode.ALL} = args;
     const where = this.parseWhere(args.where);
-    const rows = await this.listQuery(customResource, where, args && args.orderBy);
+    const rows = await this.listQuery(customResource, where, args && args.orderBy, mode);
 
     return toRelay(rows, extractPagination(args));
   }
@@ -331,6 +373,14 @@ export class Crd<SpecType> {
     const customResource = crdClient[this.customResourceMethod];
     const {metadata, spec} = this.createMapping(args.data, name);
 
+    if (this.beforeCreate) {
+      try {
+        await this.beforeCreate({data: args.data, context});
+      } catch (err) {
+        throw err;
+      }
+    }
+
     if (this.preCreateCheck) {
       try {
         await this.preCreateCheck({
@@ -387,6 +437,14 @@ export class Crd<SpecType> {
     const roleName = `${this.getPrefix()}${name}`;
     const role = await kcAdminClient.roles.findOneByName({name: roleName});
 
+    if (this.beforeUpdate) {
+      try {
+        await this.beforeUpdate({data: args.data, context});
+      } catch (err) {
+        throw err;
+      }
+    }
+
     // update crd on k8s
     const onUpdateGetPrefix = (customizePrefix?: string) => this.getPrefix(customizePrefix);
     const {metadata, spec} = this.updateMapping(args.data);
@@ -424,10 +482,18 @@ export class Crd<SpecType> {
     const onDestroyGetPrefix = (customizePrefix?: string) => this.getPrefix(customizePrefix);
     const customResource = crdClient[this.customResourceMethod];
     const roleName = `${this.getPrefix()}${name}`;
-    const role = await kcAdminClient.roles.delByName({name: roleName});
+    const crd = await customResource.get(name);
 
     // delete crd on k8s
-    const crd = await customResource.get(name);
+    if (this.beforeDelete) {
+      try {
+        await this.beforeDelete({data: crd, context});
+      } catch (err) {
+        throw err;
+      }
+    }
+
+    await kcAdminClient.roles.delByName({name: roleName});
     await customResource.del(name);
     if (this.onDelete) {
       await this.onDelete({name, context, resource: crd, getPrefix: onDestroyGetPrefix});
@@ -484,8 +550,7 @@ export class Crd<SpecType> {
     resourceRoles: ResourceRole[],
     context: Context,
     args?: {
-      includeInternal: boolean,
-      internalOnly: boolean
+      mode: QueryImageMode
   }) {
     // map the resource roles to resources
     // todo: make this logic better
@@ -513,13 +578,13 @@ export class Crd<SpecType> {
       }
       if (this.resourceName === 'image') {
         return context.getImage(role.resourceName).then(image => {
-          const {includeInternal = true, internalOnly = false} = args;
-          const isInternal: boolean = image.spec && image.spec.groupName && image.spec.groupName.length > 0;
+          const {mode = QueryImageMode.ALL} = args;
+          const isGroupImage: boolean = image.spec && image.spec.groupName && image.spec.groupName.length > 0;
 
-          if (!includeInternal && isInternal) {
+          if (mode === QueryImageMode.SYSTEM_ONLY && isGroupImage) {
             return null;
           }
-          if (internalOnly && !isInternal) {
+          if (mode === QueryImageMode.GROUP_ONLY && !isGroupImage) {
             return null;
           }
 

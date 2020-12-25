@@ -12,7 +12,7 @@ query ($groupWhere: GroupWhereInput, $everyoneGroupWhere: GroupWhereInput) {
     edges {
       cursor
       node {
-        images {
+        images(mode: SYSTEM_ONLY) {
           id
           displayName
           type

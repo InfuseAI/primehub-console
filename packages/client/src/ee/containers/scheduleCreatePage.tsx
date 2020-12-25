@@ -8,7 +8,7 @@ import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import ScheduleBreadCrumb from 'ee/components/schedule/breadcrumb';
-import {errorHandler} from 'ee/components/job/errorHandler';
+import {errorHandler} from 'utils/errorHandler';
 import ScheduleCreateForm from 'ee/components/job/createForm';
 import {GroupFragment} from 'containers/list';
 import PageTitle from 'components/pageTitle';

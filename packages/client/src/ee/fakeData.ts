@@ -17,9 +17,13 @@ export const fakeData = {
         displayName: 'group1 it'
       }],
       images: [{
-        id: 'g-it1',
-        name: 'IT1',
-        displayName: 'group1 im',
+        id: 'image-1',
+        name: 'image-test',
+        displayName: 'Group image test',
+        url: 'cpucpu',
+        type: 'cpu',
+        urlForGpu: null,
+        groupName: 'group1'
       }],
       resourceStatus: {        
         cpuUsage: 0,        
@@ -179,6 +183,14 @@ export const fakeData = {
   TypeError: unsupported operand type(s) for /: 'str' and 'str'TypeError: unsupported operand type(s) for /: 'str' and 'str'
 `
   }],
+  images: [{
+    id: 'test-xis1dx',
+    name: 'test',
+    displayName: 'Test image',
+    type: 'both',
+    url: 'jupyter/base-notebook'
+  }]
+  ,
   phSchedules: [{
     id: 'it1',
     name: 'IT1',
@@ -418,6 +430,7 @@ export const fakeData = {
 export const schema =  {
   me: {type: 'object'},
   secrets: {type: 'array', items: {type: 'object'}},
+  images: {type: 'array', items: {type: 'object'}},
   phJobs: {type: 'array', items: {type: 'object'}},
   phSchedules: {type: 'array', items: {type: 'object'}},
   phDeployments: {type: 'array', items: {type: 'object'}}

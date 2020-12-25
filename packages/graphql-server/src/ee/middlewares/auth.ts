@@ -9,6 +9,9 @@ export const permissions = shield({
     'user': or(isAdmin, isClient),
     'group': or(isAdmin, isClient),
     'groups': or(isAdmin, isClient),
+    'image': or(isAdmin, isUser, isClient),
+    'images': or(isAdmin, isUser, isClient),
+    'imagesConnection': or(isAdmin, isUser, isClient),
     'instanceType': or(isAdmin, isClient),
     'phJob': or(isAdmin, isUser),
     'phJobs': or(isAdmin, isUser),
@@ -35,6 +38,9 @@ export const permissions = shield({
     'deletePhDeployment': or(isAdmin, isUser),
     'stopPhDeployment': or(isAdmin, isUser),
     'deployPhDeployment': or(isAdmin, isUser),
+    'createImage': or(isAdmin, isUser),
+    'updateImage': or(isAdmin, isUser),
+    'deleteImage': or(isAdmin, isUser),
   },
 }, {
   allowExternalErrors: true

@@ -1,6 +1,12 @@
 # import PageInfo from "common.graphql"
 # import Group, GroupCreateManyInput, GroupUpdateManyInput from "group.graphql"
 
+enum QueryImageMode {
+  SYSTEM_ONLY
+  GROUP_ONLY
+  ALL
+}
+
 type Image {
   id: ID!
   name: String!
@@ -41,14 +47,30 @@ type ImageConnection {
   edges: [ImageEdge]!
 }
 
+type GroupImageConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ImageEdge]!
+}
+
 input ImageWhereUniqueInput {
   id: ID!
 }
 
+input GroupImageDeleteInput {
+  groupName: String
+}
+
 input ImageWhereInput {
   id: ID
+  _or: [ImageWhereInput]
   name_contains: String
   displayName_contains: String
+  groupName_contains: String
+  type_contains: String
+  description_contains: String
 }
 
 """Mutation input"""

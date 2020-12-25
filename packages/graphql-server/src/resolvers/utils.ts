@@ -9,13 +9,21 @@ import {
   reduce,
   isArray,
   mapValues,
-  isNaN
+  isNaN,
+  find,
+  get,
+  uniq
 } from 'lodash';
 import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
 import { EOL } from 'os';
-import { Context } from './interface';
-
+import { Context, Role } from './interface';
 const ITEMS_PER_PAGE = 10;
+
+export enum QueryImageMode {
+  SYSTEM_ONLY = 'SYSTEM_ONLY',
+  GROUP_ONLY = 'GROUP_ONLY',
+  ALL = 'ALL'
+}
 
 export interface Pagination {
   page?: number;
@@ -31,6 +39,18 @@ export const paginate = (rows: any[], pagination?: Pagination) => {
   } else {
     return cursorPaginate(rows, pagination);
   }
+};
+
+export const isAdmin = (ctx: Context): boolean => {
+  return ctx.role === Role.ADMIN;
+};
+
+export const isGroupAdmin = async (username: string, groupName: string, ctx: Context): Promise<boolean> => {
+  const groups = await ctx.kcAdminClient.groups.find({max: 99999});
+  const groupData = find(groups, ['name', groupName]);
+  const group = await ctx.kcAdminClient.groups.findOne({id: get(groupData, 'id', '')});
+  const admins = get(group, 'attributes.admins', []);
+  return admins.includes(username);
 };
 
 export const numberedPaginate = (rows: any[], pagination?: Pagination) => {
@@ -166,6 +186,15 @@ export const filter = (rows: any[], where?: any, order?: any, comparators?: Reco
         const fieldName = field.replace('_eq', '');
         const value = where[field];
         rows = rows.filter(row => row[fieldName] && row[fieldName] === value);
+      } else if (field.indexOf('_or') >= 0) {
+        // Simple OR filter by multi fields.
+        const conditions = where[field];
+        if (conditions && conditions.length > 1) {
+          const hits = conditions.map(condition => {
+            return filter(rows, condition);
+          });
+          rows = uniq(hits.reduce((prev, next) => prev.concat(next), []));
+        }
       }
     });
   }

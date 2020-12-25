@@ -1,5 +1,6 @@
 import { rule } from 'graphql-shield';
 import { Context, Role } from '../resolvers/interface';
+import { get, find } from 'lodash';
 
 export const isAdmin = rule({ cache: 'contextual' })(
   async (parent, args, ctx: Context, info) => {
