@@ -121,7 +121,6 @@ class ImageList extends React.Component<Props> {
         "_or": []
       }
     }
-    console.log(newVariables, queryString);
     if (queryString && queryString.length > 0) {
       newVariables = {
         ...imagesVariables,
@@ -136,7 +135,6 @@ class ImageList extends React.Component<Props> {
         }
       }
     }
-    console.log(newVariables);
     refetchImages(newVariables);
   }
 
