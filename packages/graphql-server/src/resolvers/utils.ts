@@ -11,7 +11,8 @@ import {
   mapValues,
   isNaN,
   find,
-  get
+  get,
+  uniq
 } from 'lodash';
 import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
 import { EOL } from 'os';
@@ -188,10 +189,12 @@ export const filter = (rows: any[], where?: any, order?: any, comparators?: Reco
       } else if (field.indexOf('_or') >= 0) {
         // Simple OR filter by multi fields.
         const conditions = where[field];
-        const hits = conditions.map(condition => {
-          return filter(rows, condition);
-        });
-        rows = hits.reduce((prev, next) => prev.concat(next));
+        if (conditions && conditions.length > 1) {
+          const hits = conditions.map(condition => {
+            return filter(rows, condition);
+          });
+          rows = uniq(hits.reduce((prev, next) => prev.concat(next), []));
+        }
       }
     });
   }

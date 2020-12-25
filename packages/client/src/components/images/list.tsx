@@ -114,8 +114,16 @@ class ImageList extends React.Component<Props> {
 
   searchHandler = (queryString) => {
     const {groupContext, imagesVariables, refetchImages} = this.props;
+    let newVariables = {
+      ...imagesVariables,
+      where: {
+        ...imagesVariables.where,
+        "_or": []
+      }
+    }
+    console.log(newVariables, queryString);
     if (queryString && queryString.length > 0) {
-      const newVariables = {
+      newVariables = {
         ...imagesVariables,
         where: {
           ...imagesVariables.where,
@@ -123,11 +131,12 @@ class ImageList extends React.Component<Props> {
             {name_contains: queryString},
             {displayName_contains: queryString},
             {description_contains: queryString},
-            {type: queryString}
+            {type_contains: queryString}
           ]
         }
       }
     }
+    console.log(newVariables);
     refetchImages(newVariables);
   }
 
