@@ -7,6 +7,7 @@ import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
 import { createGraphqlClient } from 'utils/graphqlClient';
+import ListContainer from 'containers/list';
 import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
