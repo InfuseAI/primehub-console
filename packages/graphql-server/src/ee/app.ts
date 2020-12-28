@@ -84,7 +84,7 @@ import ApiTokenCache from '../oidc/apiTokenCache';
 import PersistLog from '../utils/persistLog';
 import { createMinioClient } from '../utils/minioClient';
 import { Telemetry } from '../utils/telemetry';
-import { createDefaultTraitMiddleware } from '../utils/telemetryTraits';
+import { createDefaultTraitMiddleware, createEETraitMiddleware } from '../utils/telemetryTraits';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, '../graphql/index.graphql')));
@@ -316,7 +316,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       createKcAdminClient,
       getAccessToken: () => tokenSyncer.getAccessToken(),
     });
-    telemetry.addTraitMiddleware(middleware);
+    const eeMiddleware = createEETraitMiddleware({
+      config,
+      crdClient,
+    });
+    telemetry.addTraitMiddleware(middleware, eeMiddleware);
     telemetry.start();
   }
 
