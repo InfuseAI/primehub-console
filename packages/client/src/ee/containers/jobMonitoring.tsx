@@ -128,16 +128,18 @@ class JobMonitoringContainer extends React.Component<Props> {
       );
     });
     return (
-      <Tooltip title={'View the average usage within these most recent time frames.'}>
-        <Icon
-          type="info-circle"
-          theme="filled"
-          /*style={{marginLeft: 8}}*/
-        />
-      </Tooltip>
-      <Button.Group>
-        {buttons}
-      </Button.Group>
+      <div>
+        <Tooltip title={'View the average usage within these most recent time frames.'}>
+          <Icon
+            type="info-circle"
+            theme="filled"
+            /*style={{marginLeft: 8}}*/
+          />
+        </Tooltip>
+        <Button.Group>
+          {buttons}
+        </Button.Group>
+      </div>
     )
   }
 
