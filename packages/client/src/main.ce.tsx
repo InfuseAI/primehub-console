@@ -15,6 +15,7 @@ import ImageListContainer from 'containers/imageList';
 // Icons
 import iconJupyterHub from 'images/icon-jupyterhub.svg'
 import iconImages from 'images/icon-images.png';
+import iconShareFiles from 'images/icon-files.png';
 
 // Components
 import Jupyterhub from 'containers/jupyterhubPage';
@@ -117,6 +118,18 @@ class Main extends React.Component {
         subPath: 'images',
         icon: iconImages,
         groupAdminOnly: true,
+        style: {
+          width: 'auto',
+          height: 17,
+          marginLeft: '1px',
+          marginRight: '-1px',
+          marginTop: '-3px',
+        }
+      },
+      {
+        title: 'Share Files',
+        subPath: 'browse',
+        icon: iconShareFiles,
         style: {
           width: 'auto',
           height: 17,

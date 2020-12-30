@@ -15,6 +15,7 @@ import iconJobs from 'images/icon-jobs.svg';
 import iconSchedule from 'images/icon-schedule.svg';
 import iconModels from 'images/icon-models.svg';
 import iconImages from 'images/icon-images.png';
+import iconShareFiles from 'images/icon-files.png';
 
 // Components
 import Jupyterhub from 'containers/jupyterhubPage';
@@ -102,6 +103,18 @@ class Main extends React.Component {
         subPath: 'images',
         icon: iconImages,
         groupAdminOnly: true,
+        style: {
+          width: 'auto',
+          height: 17,
+          marginLeft: '1px',
+          marginRight: '-1px',
+          marginTop: '-3px',
+        }
+      },
+      {
+        title: 'Share Files',
+        subPath: 'browse',
+        icon: iconShareFiles,
         style: {
           width: 'auto',
           height: 17,
