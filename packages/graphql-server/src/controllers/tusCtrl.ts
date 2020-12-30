@@ -126,6 +126,7 @@ function debug(ctx, target) {
 }
 
 const checkTusPermission = async (ctx: Koa.ParameterizedContext, next: any) => {
+  logger.info({checkTusPermission: '1'});
   // only verify if method is POST
   if (ctx.request.method !== 'POST') {
     return next();
@@ -138,7 +139,7 @@ const checkTusPermission = async (ctx: Koa.ParameterizedContext, next: any) => {
   if (!uploadMetadata) {
     throw Boom.badRequest('upload-metadata header not found');
   }
-
+  logger.info({checkTusPermission: '2'});
   // get dirpath from header
   const regex = new RegExp('dirpath ([^,]+),?');
   const result = regex.exec(uploadMetadata);
@@ -151,10 +152,11 @@ const checkTusPermission = async (ctx: Koa.ParameterizedContext, next: any) => {
   if (!uploadGroup) {
     throw Boom.badRequest('there is no group name in the dirpath');
   }
-
+  logger.info({checkTusPermission: '3'});
   const groupName = uploadGroup[1];
   const userHasGroup = await isGroupBelongUser(ctx, ctx.userId, groupName) === true;
   if (userHasGroup) {
+    logger.info({checkTusPermission: '4'});
     return next();
   }
 
@@ -162,6 +164,7 @@ const checkTusPermission = async (ctx: Koa.ParameterizedContext, next: any) => {
 };
 
 export const mountTusCtrl = (router: Router, tusProxyPath: string, config, authenticateMiddleware: Middleware) => {
+  logger.info({message: 'mountTusCtrl', router, tusProxyPath, config});
   router.all(`/tus(/?.*)`, authenticateMiddleware, checkTusPermission, TusdProxy(tusProxyPath, {
     target: config.sharedSpaceTusdEndpoint,
     changeOrigin: true,
