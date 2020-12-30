@@ -27,6 +27,7 @@ let eventRegistered = false;
  * from: https://github.com/vagusX/koa-proxies
  */
 export const TusdProxy = (path, options) => (ctx, next) => {
+  logger.info({message: '1'});
   let forwardedHost = '';
   let forwardedProto = '';
   if (options.graphqlHost.startsWith('http://')) {
@@ -46,6 +47,11 @@ export const TusdProxy = (path, options) => (ctx, next) => {
     }
   });
 
+  logger.info({
+    'X-Forwarded-Host': forwardedHost + options.tusProxyPath,
+    'X-Forwarded-Proto': forwardedProto
+  });
+
   // create a match function
   const match = route(path);
   if (!match(ctx.path)) {
@@ -57,6 +63,8 @@ export const TusdProxy = (path, options) => (ctx, next) => {
     const params = match(ctx.path);
     opts = options.call(options, params);
   }
+  logger.info({message: '66'});
+  logger.info(opts);
   // object-rest-spread is still in stage-3
   // https://github.com/tc39/proposal-object-rest-spread
   const { logs, rewrite, events } = opts;
@@ -68,6 +76,7 @@ export const TusdProxy = (path, options) => (ctx, next) => {
       return prev;
     }, {});
 
+  logger.info({message: '79'});
   return new Promise((resolve, reject) => {
     ctx.req.oldPath = ctx.req.url;
 
@@ -95,6 +104,7 @@ export const TusdProxy = (path, options) => (ctx, next) => {
       resolve();
     });
 
+    logger.info({message: '107'});
     proxy.web(ctx.req, ctx.res, httpProxyOpts, e => {
       const status = {
         ECONNREFUSED: 503,
