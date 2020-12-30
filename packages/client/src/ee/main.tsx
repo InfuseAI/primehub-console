@@ -33,6 +33,7 @@ import DeploymentEditPage from 'ee/containers/deploymentEditPage';
 import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
+import ShareFilesUploader from 'components/sharefiles/uploader';
 
 const client = createGraphqlClient({
   fakeData,
@@ -132,6 +133,11 @@ class Main extends React.Component {
             {/* Jupyterhub */}
             <Route path={`${appPrefix}g/:groupName/hub`} exact>
               <Jupyterhub />
+            </Route>
+
+            {/* Share Files */}
+            <Route path={`${appPrefix}g/:groupName/browse`} exact>
+              <ShareFilesUploader />
             </Route>
 
             {/* Group Images management*/}
