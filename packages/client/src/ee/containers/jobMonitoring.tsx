@@ -4,7 +4,7 @@ import {graphql} from 'react-apollo';
 import {errorHandler} from 'utils/errorHandler';
 import {get} from 'lodash';
 import {appPrefix} from 'utils/env';
-import { Button, Table, Alert, Tooltip } from 'antd';
+import { Button, Table, Alert, Tooltip, Icon } from 'antd';
 import styled from 'styled-components';
 import LineChart from 'ee/components/shared/lineChart';
 
