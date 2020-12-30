@@ -4,7 +4,7 @@ import {graphql} from 'react-apollo';
 import {errorHandler} from 'utils/errorHandler';
 import {get} from 'lodash';
 import {appPrefix} from 'utils/env';
-import { Button, Table, Alert } from 'antd';
+import { Button, Table, Alert, Tooltip, Icon } from 'antd';
 import styled from 'styled-components';
 import LineChart from 'ee/components/shared/lineChart';
 
@@ -128,9 +128,18 @@ class JobMonitoringContainer extends React.Component<Props> {
       );
     });
     return (
-      <Button.Group>
-        {buttons}
-      </Button.Group>
+      <div>
+        <Tooltip title={'View the average usage within these most recent time frames.'}>
+          <Icon
+            type="info-circle"
+            theme="filled"
+            style={{marginRight: 8}}
+          />
+        </Tooltip>
+        <Button.Group>
+          {buttons}
+        </Button.Group>
+      </div>
     )
   }
 
