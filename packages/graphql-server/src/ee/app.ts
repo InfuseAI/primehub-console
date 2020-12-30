@@ -604,6 +604,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   // ctrl
   const authenticateMiddleware = async (ctx: Koa.ParameterizedContext, next: any) => {
+    logger.info({authenticateMiddleware: '1', url: ctx.url});
     const {authorization = ''}: {authorization: string} = ctx.header;
 
     if (authorization.indexOf('Bearer') < 0) {
@@ -611,8 +612,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     }
 
     let apiToken = authorization.replace('Bearer ', '');
-
+    logger.info({authenticateMiddleware: '2', url: ctx.url});
     if (!isEmpty(config.sharedGraphqlSecretKey) && config.sharedGraphqlSecretKey === apiToken) {
+      logger.info({authenticateMiddleware: 'pass', url: ctx.url});
       return next();
     } else {
       let tokenPayload;
@@ -632,7 +634,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         apiToken = await apiTokenCache.getAccessToken(apiToken);
         tokenPayload = await oidcTokenVerifier.verify(apiToken);
       }
-
+      logger.info({authenticateMiddleware: '3', url: ctx.url});
       // check if user is admin
       [ctx.role, ctx.kcAdminClient] = await getUserRoleAndKcAdminClient(apiToken, tokenPayload);
       ctx.userId = tokenPayload.sub;
