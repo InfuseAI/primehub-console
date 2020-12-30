@@ -8,6 +8,7 @@ import * as logger from '../logger';
 import Boom = require('boom');
 import Koa, {Context, Middleware} from 'koa';
 import Router = require('koa-router');
+import { isGroupBelongUser } from '../utils/groupCheck';
 
 /**
  * Constants
@@ -136,21 +137,13 @@ const checkTusPermission = async (ctx: Koa.ParameterizedContext, next: any) => {
   }
   const dirPath = Buffer.from(result[1], 'base64').toString();
 
-  const isGroupBelongUser = async (userId, groupName): Promise<boolean> => {
-    const groups = await ctx.kcAdminClient.users.listGroups({
-      id: userId
-    });
-    const groupNames = groups.map(g => g.name);
-    if (groupNames.indexOf(groupName) >= 0) { return true; }
-    return false;
-  };
-
   const uploadGroup = new RegExp('groups/(.+)/upload').exec(dirPath);
   if (!uploadGroup) {
     throw Boom.badRequest('there is no group name in the dirpath');
   }
 
-  const userHasGroup = await isGroupBelongUser(ctx.userId, uploadGroup[1]) === true;
+  const groupName = uploadGroup[1];
+  const userHasGroup = await isGroupBelongUser(ctx, ctx.userId, groupName) === true;
   if (userHasGroup) {
     return next();
   }
