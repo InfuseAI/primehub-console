@@ -3,6 +3,7 @@ import {Breadcrumb, Icon} from 'antd';
 import {withRouter, Link} from 'react-router-dom';
 import {RouteComponentProps} from 'react-router';
 import {appPrefix} from 'utils/env';
+import {compose} from 'recompose';
 
 type BreadcrumbItemSetup = {
   key: string,
@@ -23,9 +24,9 @@ const parseBreadcrumb = (match: any, basename: string, items: Array<BreadcrumbIt
   const result = [];
   if(items) {
     items.forEach((item) => {
-      const {matcher, title, link} = item;
+      const {key, matcher, title, link} = item;
       if(matcher && matcher.test(match.url)) {
-        result.push(<Breadcrumb.Item>
+        result.push(<Breadcrumb.Item key={key}>
           {
             !!link ? <Link to={`${basename}${link}`}>{title}</Link> : title
           }
@@ -33,16 +34,14 @@ const parseBreadcrumb = (match: any, basename: string, items: Array<BreadcrumbIt
       }
     });
   }
-  return result; 
+  return result;
 }
 
 class Breadcrumbs extends React.Component<Props> {
   render() {
     const { match, pathList } = this.props;
-    const params = match.params as any
-
+    const params = match.params as any;
     const basename = params.groupName ? `${appPrefix}g/${params.groupName}` : `${appPrefix}`;
-
     const breadcrumbItems = [
       <Breadcrumb.Item key="home">
         {
@@ -63,4 +62,4 @@ class Breadcrumbs extends React.Component<Props> {
   }
 }
 
-export default withRouter(Breadcrumbs);
+export default compose(withRouter)(Breadcrumbs);
