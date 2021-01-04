@@ -52,7 +52,6 @@ import Observer from './observer/observer';
 import Boom from 'boom';
 
 // graphql middlewares
-import readOnlyMiddleware from './middlewares/readonly';
 import { permissions as authMiddleware } from './middlewares/auth';
 import TokenSyncer from './oidc/syncer';
 import K8sSecret from './k8sResource/k8sSecret';
@@ -282,7 +281,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     typeDefs: typeDefs as any,
     resolvers
   });
-  const schemaWithMiddleware = applyMiddleware(schema, readOnlyMiddleware, authMiddleware);
+  const schemaWithMiddleware = applyMiddleware(schema, authMiddleware);
   const server = new ApolloServer({
     playground: config.graphqlPlayground,
     // if playground is enabled, so should introspection
@@ -291,7 +290,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     debug: true,
     schema: schemaWithMiddleware as any,
     context: async ({ ctx }: { ctx: Koa.Context }) => {
-      let readOnly = false;
       let userId: string;
       let username: string;
       let role: Role = Role.NOT_AUTH;
@@ -319,7 +317,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           kcAdminClient.setAccessToken(accessToken);
           getInstanceType = instCache.get;
           getImage = imageCache.get;
-          readOnly = true;
           username = userId = 'jupyterHub';
           role = Role.CLIENT;
         } else {
@@ -411,7 +408,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         getImage: getImage || memGetImage(crdClient),
         getDataset: memGetDataset(crdClient),
         k8sSecret,
-        readOnly,
         userId,
         username,
         role,
