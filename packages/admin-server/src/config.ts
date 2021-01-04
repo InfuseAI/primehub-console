@@ -31,6 +31,7 @@ export interface Config {
   appPrefix?: string;
 
   // standalone graphql endpoint
+  graphqlPrefix: string
   graphqlEndpoint: string;
   graphqlSvcEndpoint: string;
 
@@ -89,6 +90,7 @@ const defaultConfigs = {
   keycloakMaxFreeSockets: 10,
   keycloakRetries: 0,
   keycloakTimeout: 3000,
+  graphqlPrefix: '/',
   graphqlEndpoint: 'http://localhost:3001/graphql',
   graphqlSvcEndpoint: 'http://localhost:3001/graphql',
   enableUserPortal: false,
@@ -155,6 +157,7 @@ export const createConfig = (): Config => {
     keycloakRetries: process.env.KC_OIDC_RETRIES,
     keycloakTimeout: process.env.KC_OIDC_TIMEOUT ? parseInt(process.env.KC_OIDC_TIMEOUT, 10) : undefined,
     appPrefix: sanitizePath(process.env.APP_PREFIX),
+    graphqlPrefix: process.env.GRAPHQL_PREFIX,
     graphqlEndpoint: process.env.GRAPHQL_ENDPOINT,
     graphqlSvcEndpoint: process.env.GRAPHQL_SVC_ENDPOINT,
     enableUserPortal: process.env.PRIMEHUB_FEATURE_USER_PORTAL,

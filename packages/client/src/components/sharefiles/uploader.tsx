@@ -24,7 +24,7 @@ const breadcrumbs = [
 
 const ShareFilesUploader = (props: Props) => {
   const { accessToken, groupContext } = props;
-  const endpoint = 'https://hub.a.demo.primehub.io/api/tus';
+  const endpoint = `${(window as any).cmsHost}${(window as any).graphqlPrefix}/tus`;
   const dirpath = `groups/${groupContext.name}/upload`;
   const headers = {
     authorization: `Bearer ${accessToken}`

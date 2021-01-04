@@ -5,8 +5,10 @@ html
     include ./utils/head.pug
     script.
       window.APP_PREFIX = "#{staticPath}";
+      window.graphqlPrefix = "#{graphqlPrefix}";
       window.graphqlEndpoint = '#{graphqlEndpoint}';
       window.absGraphqlEndpoint = '#{cmsHost}#{graphqlEndpoint}';
+      window.cmsHost = "#{cmsHost}";
       window.username = "#{username}";
       window.thumbnail = "#{thumbnail}";
       window.isUserAdmin = #{isUserAdmin};
