@@ -84,7 +84,8 @@ import ApiTokenCache from '../oidc/apiTokenCache';
 import PersistLog from '../utils/persistLog';
 import { createMinioClient } from '../utils/minioClient';
 import { Telemetry } from '../utils/telemetry';
-import { createDefaultTraitMiddleware, createEETraitMiddleware } from '../utils/telemetryTraits';
+import { createDefaultTraitMiddleware } from '../utils/telemetryTraits';
+import { createEETraitMiddleware } from './utils/telemetryTraits';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, '../graphql/index.graphql')));
@@ -118,6 +119,7 @@ const eeResolvers = {
     createPhJob: phJob.create,
     rerunPhJob: phJob.rerun,
     cancelPhJob: phJob.cancel,
+    notifyPhJobEvent: phJob.notifyJobEvent,
     cleanupPhJobArtifact: phJob.artifactCleanUp,
     createPhSchedule: phSchedule.create,
     updatePhSchedule: phSchedule.update,
@@ -403,7 +405,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           kcAdminClient.setAccessToken(accessToken);
           getInstanceType = instCache.get;
           getImage = imageCache.get;
-          readOnly = true;
+          readOnly = false;
           username = userId = 'jupyterHub';
           role = Role.CLIENT;
         } else {

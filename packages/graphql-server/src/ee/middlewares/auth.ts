@@ -29,6 +29,7 @@ export const permissions = shield({
     'createPhJob': or(isAdmin, isUser),
     'rerunPhJob': or(isAdmin, isUser),
     'cancelPhJob': or(isAdmin, isUser),
+    'notifyPhJobEvent': or(isClient),
     'createPhSchedule': or(isAdmin, isUser),
     'updatePhSchedule': or(isAdmin, isUser),
     'deletePhSchedule': or(isAdmin, isUser),

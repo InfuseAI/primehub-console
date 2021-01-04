@@ -87,3 +87,8 @@ input PhJobCreateInput {
   command: String
   activeDeadlineSeconds: Int
 }
+
+input PhJobNotifyEventInput {
+  id: ID
+  type: String
+}
