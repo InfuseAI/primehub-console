@@ -440,8 +440,8 @@ export const notifyJobEvent = async (root, args, context: Context) => {
 
   if ([PhJobPhase.Succeeded, PhJobPhase.Failed, PhJobPhase.Cancelled, PhJobPhase.Unknown].includes(type)) {
     telemetry.track('Job Completed', {
-      'jobStatus': type,
-      'jobDuration': duration,
+      jobStatus: type,
+      jobDuration: duration,
     });
   }
   return 0;

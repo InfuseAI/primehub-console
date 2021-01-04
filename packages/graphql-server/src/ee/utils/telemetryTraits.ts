@@ -6,11 +6,11 @@ const licenseStatusString = async (config: Config): Promise<string> => {
   const status = config.licenseStatus.toLowerCase();
   return status;
 };
-  
+
 const modelDploymentCount = async (crdClient: CrdClient): Promise<number> => {
   return (await crdClient.phDeployments.list()).length;
 };
-  
+
 const scheduleCount = async (crdClient: CrdClient): Promise<number> => {
   return (await crdClient.phSchedules.list()).length;
 };
