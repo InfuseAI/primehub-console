@@ -2,7 +2,6 @@ import React from 'react';
 import { Icon, Modal, Card, Divider, Row, Col, Tabs, Input, Button, message} from 'antd';
 import { DeploymentInfo, Status, ClientResult } from './common';
 import PageTitle from 'components/pageTitle';
-import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';
 import InfuseButton from 'components/infuseButton';
 import { appPrefix } from 'utils/env';
 import {Link} from 'react-router-dom';
@@ -14,6 +13,7 @@ import EnvList from 'ee/components/modelDeployment/envList';
 import Message from 'components/share/message';
 import moment from 'moment';
 import ModelDeploymentClients from './client';
+import Breadcrumbs from 'components/share/breadcrumb';
 
 const {confirm} = Modal;
 
@@ -257,11 +257,25 @@ export default class Detail extends React.Component<Props, State> {
 
   render() {
     const {phDeployment, stopPhDeploymentResult, deletePhDeploymentResult, deployPhDeploymentResult, history} = this.props;
+    const breadcrumbs = [
+      {
+        key: 'list',
+        matcher: /\/model-deployment/,
+        title: 'Model Deployments',
+        link: '/model-deployment?page=1'
+      },
+      {
+        key: 'detail',
+        matcher: /\/model-deployment\/([\w-])+/,
+        title: `Deployment: ${phDeployment.name}`
+      }
+    ];
+
     return (
       <>
         <PageTitle
           title={`Deployment: ${phDeployment.name}`}
-          breadcrumb={<DeploymentBreadcrumb deploymentName={phDeployment.name} />}
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
         />
         <Card style={{margin: '16px 16px'}} loading={stopPhDeploymentResult.loading || deletePhDeploymentResult.loading || deployPhDeploymentResult.loading}>
           <div style={{marginBottom: 16, textAlign: 'right'}}>

@@ -10,7 +10,6 @@ import {RouteComponentProps} from 'react-router';
 import Pagination from 'components/share/pagination';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
-import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';
 import Filter from 'ee/components/shared/filter';
 import {Group} from 'ee/components/shared/groupFilter';
 import {errorHandler} from 'utils/errorHandler';
@@ -18,6 +17,16 @@ import DeploymentCard from 'ee/components/modelDeployment/card';
 import { PhDeploymentFragment, DeploymentConnection } from 'ee/components/modelDeployment/common';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
+import Breadcrumbs from 'components/share/breadcrumb';
+
+const breadcrumbs = [
+  {
+    key: 'list',
+    matcher: /\/model-deployment/,
+    title: 'Model Deployments',
+    link: '/model-deployment?page=1'
+  }
+];
 
 const PAGE_SIZE = 12;
 const Search = Input.Search
@@ -240,7 +249,7 @@ class DeploymentListContainer extends React.Component<Props, State> {
     return (
       <>
         <PageTitle
-          breadcrumb={<DeploymentBreadcrumb />}
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
           title={"Model Deployments"}
         />
         <PageBody>{pageBody}</PageBody>

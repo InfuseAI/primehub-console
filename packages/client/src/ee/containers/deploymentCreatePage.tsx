@@ -9,11 +9,26 @@ import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'utils/errorHandler';
 import DeploymentCreateForm from 'ee/components/modelDeployment/createForm';
-import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';
 import {GroupFragment} from 'containers/list';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
+import Breadcrumbs from 'components/share/breadcrumb';
+
+const breadcrumbs = [
+  {
+    key: 'list',
+    matcher: /\/model-deployment/,
+    title: 'Model Deployments',
+    link: '/model-deployment?page=1'
+  },
+  {
+    key: 'list',
+    matcher: /\/model-deployment\/create/,
+    title: 'Create Deployment'
+  }
+];
+
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -105,7 +120,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
     return (
       <React.Fragment>
         <PageTitle
-          breadcrumb={<DeploymentBreadcrumb />}
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
           title={"Create Deployment"}
         />
         <div style={{margin: '16px'}}>
