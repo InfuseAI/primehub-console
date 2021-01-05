@@ -5,7 +5,7 @@ import { PhJobPhase, PhJobSpec, PhJobStatus } from '../../crdClient/crdClientImp
 import CustomResource, { Item } from '../../crdClient/customResource';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
 import { orderBy, omit, get, isUndefined, isNil, isEmpty, intersection } from 'lodash';
-import * as moment from 'moment';
+import moment from 'moment';
 import { escapeToPrimehubLabel } from '../../utils/escapism';
 import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
@@ -425,5 +425,24 @@ export const artifactCleanUp = async (root, args, context: Context) => {
 
   const cleaner = new JobArtifactCleaner(minioClient, storeBucket);
   await cleaner.cleanUp();
+  return 0;
+};
+
+export const notifyJobEvent = async (root, args, context: Context) => {
+  const {id, type} = args.data;
+  const phJob = await context.crdClient.phJobs.get(id);
+  const {telemetry} = context;
+  let duration = 0;
+  if (phJob.status.startTime) {
+    const finishTime = phJob.status.finishTime ? phJob.status.finishTime : new Date().toISOString();
+    duration = moment.duration(moment(finishTime).diff(moment(phJob.status.startTime))).asSeconds();
+  }
+
+  if ([PhJobPhase.Succeeded, PhJobPhase.Failed, PhJobPhase.Cancelled, PhJobPhase.Unknown].includes(type)) {
+    telemetry.track('Job Completed', {
+      jobStatus: type,
+      jobDuration: duration,
+    });
+  }
   return 0;
 };

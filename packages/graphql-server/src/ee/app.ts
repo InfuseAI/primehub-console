@@ -66,7 +66,6 @@ import Observer from '../observer/observer';
 import Boom from 'boom';
 
 // graphql middlewares
-import readOnlyMiddleware from '../middlewares/readonly';
 // Basic Auth middleware
 import { permissions as authMiddleware } from './middlewares/auth';
 import TokenSyncer from '../oidc/syncer';
@@ -85,6 +84,7 @@ import PersistLog from '../utils/persistLog';
 import { createMinioClient } from '../utils/minioClient';
 import { Telemetry } from '../utils/telemetry';
 import { createDefaultTraitMiddleware } from '../utils/telemetryTraits';
+import { createEETraitMiddleware } from './utils/telemetryTraits';
 import { isGroupBelongUser } from '../utils/groupCheck';
 
 // The GraphQL schema
@@ -119,6 +119,7 @@ const eeResolvers = {
     createPhJob: phJob.create,
     rerunPhJob: phJob.rerun,
     cancelPhJob: phJob.cancel,
+    notifyPhJobEvent: phJob.notifyJobEvent,
     cleanupPhJobArtifact: phJob.artifactCleanUp,
     createPhSchedule: phSchedule.create,
     updatePhSchedule: phSchedule.update,
@@ -317,7 +318,11 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       createKcAdminClient,
       getAccessToken: () => tokenSyncer.getAccessToken(),
     });
-    telemetry.addTraitMiddleware(middleware);
+    const eeMiddleware = createEETraitMiddleware({
+      config,
+      crdClient,
+    });
+    telemetry.addTraitMiddleware(middleware, eeMiddleware);
     telemetry.start();
   }
 
@@ -362,7 +367,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     return [ role, kcAdminClient ];
   };
 
-  const schemaWithMiddleware = applyMiddleware(schema, readOnlyMiddleware, authMiddleware);
+  const schemaWithMiddleware = applyMiddleware(schema, authMiddleware);
   const server = new ApolloServer({
     playground: config.graphqlPlayground,
     // if playground is enabled, so should introspection
@@ -371,7 +376,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     debug: true,
     schema: schemaWithMiddleware as any,
     context: async ({ ctx }: { ctx: Koa.Context }) => {
-      let readOnly = false;
       let userId: string;
       let username: string;
       let role: Role = Role.NOT_AUTH;
@@ -400,7 +404,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           kcAdminClient.setAccessToken(accessToken);
           getInstanceType = instCache.get;
           getImage = imageCache.get;
-          readOnly = true;
           username = userId = 'jupyterHub';
           role = Role.CLIENT;
         } else {
@@ -480,7 +483,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         getImage: getImage || memGetImage(crdClient),
         getDataset: memGetDataset(crdClient),
         k8sSecret,
-        readOnly,
         userId,
         username,
         role,

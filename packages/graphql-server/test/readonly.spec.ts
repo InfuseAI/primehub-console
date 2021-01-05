@@ -55,21 +55,5 @@ describe('readonly graphql', function() {
     }`, null, `Bearer ${this.secret}`);
     expect(data.user.id).to.be.eql(this.currentUserId);
   });
-
-  it('should fail to mutate user', async () => {
-    const data = await this.graphqlRequestWithAuth(`
-    mutation($data: UserUpdateInput!) {
-      updateUser (where: {id: "${this.currentUserId}"}, data: $data) {
-        id
-        username
-        email
-      }
-    }`, {
-      data: {
-        email: faker.internet.email()
-      }
-    }, `Bearer ${this.secret}`);
-
-    expect(data[0].extensions.code).to.be.eql('MUTATION_IN_READONLY');
-  });
+  
 });
