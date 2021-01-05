@@ -13,7 +13,7 @@ export type GroupContextComponentProps = {
   groupContext: GroupContextValue
 }
 
-export  function withGroupContext(Com) {
+export function withGroupContext(Com) {
   return class ComWithGroupContext extends React.Component<any> {
     render() {
       return <GroupContext.Consumer>

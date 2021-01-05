@@ -7,6 +7,7 @@ import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
 import { createGraphqlClient } from 'utils/graphqlClient';
+import ListContainer from 'containers/list';
 import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
@@ -14,6 +15,7 @@ import ImageListContainer from 'containers/imageList';
 // Icons
 import iconJupyterHub from 'images/icon-jupyterhub.svg'
 import iconImages from 'images/icon-images.png';
+import iconShareFiles from 'images/icon-files.png';
 
 // Components
 import Jupyterhub from 'containers/jupyterhubPage';
@@ -115,6 +117,19 @@ class Main extends React.Component {
         title: 'Images',
         subPath: 'images',
         icon: iconImages,
+        groupAdminOnly: true,
+        style: {
+          width: 'auto',
+          height: 17,
+          marginLeft: '1px',
+          marginRight: '-1px',
+          marginTop: '-3px',
+        }
+      },
+      {
+        title: 'Share Files',
+        subPath: 'browse',
+        icon: iconShareFiles,
         style: {
           width: 'auto',
           height: 17,

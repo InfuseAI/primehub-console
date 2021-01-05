@@ -5,7 +5,7 @@ import Header from 'components/header';
 import GroupSelector from 'components/groupSelector';
 import Sidebar from 'components/main/sidebar';
 import styled from 'styled-components';
-import {has} from 'lodash';
+import {get} from 'lodash';
 import { Redirect } from 'react-router';
 import {appPrefix} from 'utils/env';
 import gql from 'graphql-tag';
@@ -77,7 +77,8 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
     if (!currentUser) {
       return false;
     }
-    const adminList = has(currentGroup, 'admins') ? currentGroup.admins.split(','): [];
+    const admins = get(currentGroup, 'admins', "");
+    const adminList = admins ? admins.split(',') : [];
     return adminList.includes(currentUser.username);
   }
 

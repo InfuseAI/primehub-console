@@ -69,6 +69,7 @@ import { createMinioClient } from './utils/minioClient';
 import { mountTusCtrl } from './controllers/tusCtrl';
 import { Telemetry } from './utils/telemetry';
 import { createDefaultTraitMiddleware } from './utils/telemetryTraits';
+import { isGroupBelongUser } from './utils/groupCheck';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -573,21 +574,12 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   };
 
   const checkUserGroup = async (ctx: Koa.ParameterizedContext, next: any) => {
-    const isGroupBelongUser = async (userId, groupName): Promise<boolean> => {
-      const groups = await ctx.kcAdminClient.users.listGroups({
-        id: userId
-      });
-      const groupNames = groups.map(g => g.name.toLowerCase());
-      if (groupNames.indexOf(groupName) >= 0) { return true; }
-      return false;
-    };
-
     let fileDownloadAPIPrefix = `${config.appPrefix || ''}/files/`;
     if (ctx.request.path.startsWith(fileDownloadAPIPrefix)) {
       fileDownloadAPIPrefix = fileDownloadAPIPrefix + 'groups/';
       const groupName = ctx.request.path.split(fileDownloadAPIPrefix).pop().split('/')[0];
       if (!ctx.request.path.startsWith(fileDownloadAPIPrefix) ||
-          await isGroupBelongUser(ctx.userId, groupName) === false) {
+          await isGroupBelongUser(ctx, ctx.userId, groupName) === false) {
         throw Boom.forbidden('request not authorized');
       } else {
         return next();
