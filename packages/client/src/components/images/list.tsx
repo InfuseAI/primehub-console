@@ -5,7 +5,6 @@ import {Link, withRouter} from 'react-router-dom';
 import {startCase, get} from 'lodash';
 import styled from 'styled-components';
 import moment from 'moment';
-import ImageBreadcrumb from 'components/images/breadcrumb';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
@@ -13,6 +12,16 @@ import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
 import { UserContextComponentProps } from 'context/user';
 import {FilterRow, FilterPlugins, ButtonCol} from 'root/cms-toolbar/filter';
+import Breadcrumbs from 'components/share/breadcrumb';
+const breadcrumbs = [
+  {
+    key: 'list',
+    matcher: /\/images/,
+    title: 'Images',
+    link: '/images?page=1'
+  }
+];
+
 
 const Search = Input.Search;
 
@@ -206,7 +215,7 @@ class ImageList extends React.Component<Props> {
     return (
       <>
         <PageTitle
-          breadcrumb={<ImageBreadcrumb />}
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
           title={"Images"}
         />
         <PageBody>

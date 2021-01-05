@@ -9,11 +9,24 @@ import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'utils/errorHandler';
 import ImageCreateForm from 'components/images/createForm';
-import ImageBreadcrumb from 'components/images/breadcrumb';
 import {GroupFragment} from 'containers/list';
 import PageTitle from 'components/pageTitle';
 import {withGroupContext, GroupContextComponentProps} from 'context/group';
 import {withUserContext, UserContextComponentProps} from 'context/user';
+import Breadcrumbs from 'components/share/breadcrumb';
+const breadcrumbs = [
+  {
+    key: 'list',
+    matcher: /\/images/,
+    title: 'Images',
+    link: '/images?page=1'
+  },
+  {
+    key: 'create',
+    matcher: /\/images\/create/,
+    title: 'New Images'
+  }
+];
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -107,7 +120,7 @@ class ImageCreatePage extends React.Component<Props, State> {
     return (
       <React.Fragment>
         <PageTitle
-          breadcrumb={<ImageBreadcrumb />}
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
           title={"New Image"}
         />
         <div style={{
