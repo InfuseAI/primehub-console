@@ -16,10 +16,6 @@ type Props = RouteComponentProps & {
   pathList?: Array<BreadcrumbItemSetup>;
 }
 
-/**
- * TODO: Implement general breadcrumb component for all.
- */
-
 const parseBreadcrumb = (match: any, basename: string, items: Array<BreadcrumbItemSetup>) => {
   const result = [];
   if(items) {

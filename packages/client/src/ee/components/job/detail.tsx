@@ -8,7 +8,6 @@ import Log from 'components/share/log';
 import {getActionByPhase, Phase} from 'ee/components/job/phase';
 import Title from 'ee/components/job/title';
 import Message from 'components/share/message';
-import JobBreadcrumb from 'ee/components/job/breadcrumb';
 import {History} from 'history';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
@@ -17,6 +16,7 @@ import InfuseButton from 'components/infuseButton';
 import Field from 'components/share/field';
 import JobArtifact from 'ee/containers/jobArtifact';
 import JobMonitoring from 'ee/containers/jobMonitoring';
+import Breadcrumbs from 'components/share/breadcrumb';
 
 const TabPane = Tabs.TabPane;
 
@@ -172,10 +172,24 @@ export default class Detail extends React.Component<Props> {
       }
     }
 
+    const breadcrumbs = [
+      {
+        key: 'list',
+        matcher: /\/job/,
+        title: 'Jobs',
+        link: '/job?page=1'
+      },
+      {
+        key: 'detail',
+        matcher: /\/job\/([\w-])+/,
+        title: `Job: ${job.displayName || job.name}`,
+      }
+    ];
+
     return (
       <>
         <PageTitle
-          breadcrumb={<JobBreadcrumb jobName={job.displayName || job.name} />}
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
           title={`Job: ${job.displayName || job.name}`}
         />
         <PageBody>
