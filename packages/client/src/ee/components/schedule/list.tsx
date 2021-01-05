@@ -8,12 +8,21 @@ import styled from 'styled-components';
 import Filter from '../shared/filter';
 import {Group} from '../shared/groupFilter';
 import Pagination from 'components/share/pagination';
-import ScheduleBreadCrumb from './breadcrumb';
 import {renderRecurrence} from './recurrence';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
+import Breadcrumbs from 'components/share/breadcrumb';
+
+const breadcrumbs = [
+  {
+    key: 'list',
+    matcher: /\/schedule/,
+    title: 'Schedule',
+    link: '/schedule?page=1'
+  }
+];
 
 const {confirm} = Modal;
 
@@ -211,7 +220,7 @@ class ScheduleList extends React.Component<Props> {
     return (
       <>
         <PageTitle
-          breadcrumb={<ScheduleBreadCrumb />}
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
           title={"Schedule"}
         />
         <PageBody>
