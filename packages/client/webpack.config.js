@@ -81,7 +81,7 @@ module.exports = {
         }
       }, {
         test: /\.css$/,
-        use: [devMode ? 'style-loader' : MiniCssExtractPlugin.loader, "css-loader"]
+        use: ['style-loader', "css-loader"]
       }, {
         test: /\.less$/,
         loader: 'ignore-loader'
