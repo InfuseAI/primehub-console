@@ -30,8 +30,6 @@ const ShareFilesUploader = (props: Props) => {
     authorization: `Bearer ${accessToken}`
   };
   const uppy = Uppy({
-    meta: { type: 'avatar' },
-    restrictions: { maxNumberOfFiles: 1 },
     autoProceed: true
   });
 
