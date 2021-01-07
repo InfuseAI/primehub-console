@@ -4,6 +4,11 @@ import {withRouter, Link} from 'react-router-dom';
 import {RouteComponentProps} from 'react-router';
 import {appPrefix} from 'utils/env';
 import {compose} from 'recompose';
+import styled from 'styled-components';
+
+const StyledBreadcrumb = styled(Breadcrumb)`
+  font-size: 14px;
+`;
 
 type BreadcrumbItemSetup = {
   key: string,
@@ -16,20 +21,19 @@ type Props = RouteComponentProps & {
   pathList?: Array<BreadcrumbItemSetup>;
 }
 
-/**
- * TODO: Implement general breadcrumb component for all.
- */
-
 const parseBreadcrumb = (match: any, basename: string, items: Array<BreadcrumbItemSetup>) => {
   const result = [];
   if(items) {
-    items.forEach((item) => {
+    items.forEach((item, index) => {
+      const last = index === items.length - 1;
       const {key, matcher, title, link} = item;
       if(matcher && matcher.test(match.url)) {
-        result.push(<Breadcrumb.Item key={key}>
-          {
-            !!link ? <Link to={`${basename}${link}`}>{title}</Link> : title
-          }
+        result.push(<Breadcrumb.Item  key={key}>
+          <span style={{fontWeight: (last) ? 500 : 'initial', color: (last) ? 'rgba(0, 0, 0, 0.65)' : null}}>
+            {
+              !!link ? <Link style={{color: (last) ? 'rgba(0, 0, 0, 0.65)' : null}} to={`${basename}${link}`}>{title}</Link> : title
+            }
+          </span>
         </Breadcrumb.Item>);
       }
     });
@@ -55,9 +59,9 @@ class Breadcrumbs extends React.Component<Props> {
     ];
 
     return (
-      <Breadcrumb style={{marginBottom: 8}}>
+      <StyledBreadcrumb>
         {breadcrumbItems}
-      </Breadcrumb>
+      </StyledBreadcrumb>
     );
   }
 }

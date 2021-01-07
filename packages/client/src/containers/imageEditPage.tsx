@@ -9,11 +9,11 @@ import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'utils/errorHandler';
 import ImageCreateForm from 'components/images/createForm';
 import PageTitle from 'components/pageTitle';
-import ImageBreadcrumb from 'components/images/breadcrumb';
 import {withGroupContext, GroupContextComponentProps} from 'context/group';
 import {withUserContext, UserContextComponentProps } from 'context/user';
 import {sortItems, GET_MY_GROUPS} from 'containers/imageCreatePage';
 import {ImageFragment} from 'containers/imageList';
+import Breadcrumbs from 'components/share/breadcrumb';
 
 export const GET_IMAGE = gql`
   query image($where: ImageWhereUniqueInput!) {
@@ -101,15 +101,28 @@ class ImageEditPage extends React.Component<Props, State> {
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []).filter(group => group.enabledDeployment || group.id === everyoneGroupId);
     const groups = allGroups.filter(group => group.id !== everyoneGroupId);
-    console.log(getImage);
-    const selectedGroup = getImage.image.groupName;
+    const image = getImage.image;
+    const selectedGroup = image.groupName;
     const group = groups
       .find(group => group.name === selectedGroup);
+    const breadcrumbs = [
+      {
+        key: 'list',
+        matcher: /\/images/,
+        title: 'Images',
+        link: '/images?page=1'
+      },
+      {
+        key: 'create',
+        matcher: /\/images\/([\w-])+\/edit/,
+        title: `Update Images: ${image.displayName}`
+      }
+    ];
     return (
       <React.Fragment>
         <PageTitle
           title={`Update Image`}
-          breadcrumb={<ImageBreadcrumb />}
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
         />
         <div style={{margin: '16px'}}>
           {getGroups.loading ? (
@@ -126,7 +139,7 @@ class ImageEditPage extends React.Component<Props, State> {
           <ImageCreateForm
             type="edit"
             initialValue={{
-              ...(getImage.image || {})
+              ...(image || {})
             }}
             selectedGroup={selectedGroup}
             groupContext={groupContext}

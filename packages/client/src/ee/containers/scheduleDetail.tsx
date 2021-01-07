@@ -6,7 +6,6 @@ import {compose} from 'recompose';
 import {Button, Modal} from 'antd';
 import queryString from 'querystring';
 import ScheduleUpdateForm from 'ee/components/job/createForm';
-import ScheduleBreadCrumb from 'ee/components/schedule/breadcrumb';
 import Title from 'ee/components/job/title';
 import {errorHandler} from 'utils/errorHandler';
 import {PhScheduleFragment} from 'ee/containers/scheduleList';
@@ -15,6 +14,7 @@ import {get, unionBy, isEqual} from 'lodash';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
+import Breadcrumbs from 'components/share/breadcrumb';
 
 type Props = {
   getGroups: any;
@@ -128,10 +128,25 @@ class ScheduleDetailContainer extends React.Component<Props> {
       get(everyoneGroup, 'images', []),
       'id'
     );
+
+    const breadcrumbs = [
+      {
+        key: 'list',
+        matcher: /\/schedule/,
+        title: 'Schedule',
+        link: '/schedule?page=1'
+      },
+      {
+        key: 'update',
+        matcher: /\/schedule\/([\w-])+/,
+        title: `Schedule: ${get(getPhSchedule, 'phSchedule.displayName')}`,
+      }
+    ];
+
     return (
       <React.Fragment>
         <PageTitle
-          breadcrumb={<ScheduleBreadCrumb scheduleName={get(getPhSchedule, 'phSchedule.displayName')} />}
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
           title={`Schedule: ${get(getPhSchedule, 'phSchedule.displayName')}`}
         />
         <div style={{margin: 16}}>

@@ -9,11 +9,11 @@ import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'utils/errorHandler';
 import DeploymentCreateForm from 'ee/components/modelDeployment/createForm';
 import PageTitle from 'components/pageTitle';
-import DeploymentBreadcrumb from 'ee/components/modelDeployment/breadcrumb';
 import {PhDeploymentFragment} from 'ee/components/modelDeployment/common';
 import {GET_PH_DEPLOYMENT, getMessage} from 'ee/containers/deploymentDetail';
 import {GET_MY_GROUPS} from './deploymentCreatePage';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
+import Breadcrumbs from 'components/share/breadcrumb';
 
 export const UPDATE_DEPLOYMENT = gql`
   mutation updatePhDeployment($where: PhDeploymentWhereUniqueInput!, $data: PhDeploymentUpdateInput!) {
@@ -41,8 +41,9 @@ export const sortItems = (items) => {
   return copiedItems;
 }
 
-type Props = RouteComponentProps<{deploymentId: string}> & {
+type Props = RouteComponentProps<{deploymentId: string}> & GroupContextComponentProps & {
   getGroups: any;
+  refetchGroup: any;
   updatePhDeployment: any;
   updatePhDeploymentResult: any;
   getPhDeployment: any;
@@ -97,7 +98,9 @@ class DeploymentCreatePage extends React.Component<Props, State> {
   }
 
   render() {
-    const {getGroups, updatePhDeploymentResult, history, getPhDeployment, groupContext, refetchGroup} = this.props;
+    const {getGroups, updatePhDeploymentResult, history, getPhDeployment, groupContext, refetchGroup, match} = this.props;
+    const {params} = match;
+
     if (getPhDeployment.loading) return null;
     if (getPhDeployment.error) {
       return getMessage(getPhDeployment.error)
@@ -115,11 +118,31 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       get(everyoneGroup, 'instanceTypes', []),
       'id'
     );
+    const breadcrumbs = [
+      {
+        key: 'list',
+        matcher: /\/model-deployment/,
+        title: 'Model Deployments',
+        link: '/model-deployment?page=1'
+      },
+      {
+        key: 'detail',
+        matcher: /\/model-deployment\/([\w-])+/,
+        title: `Deployment: ${get(getPhDeployment, 'phDeployment.name')}`,
+        link: `/model-deployment/${params.deploymentId}`
+      },
+      {
+        key: 'update',
+        matcher: /\/model-deployment\/([\w-])+\/edit/,
+        title: 'Update Deployment',
+      }
+    ];
+
     return (
       <React.Fragment>
         <PageTitle
           title={`Update Deployment`}
-          breadcrumb={<DeploymentBreadcrumb deploymentName={get(getPhDeployment, 'phDeployment.name')} />}
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
         />
         <div style={{margin: '16px'}}>
           <DeploymentCreateForm

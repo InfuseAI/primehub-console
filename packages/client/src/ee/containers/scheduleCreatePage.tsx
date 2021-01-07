@@ -7,12 +7,26 @@ import {get, unionBy} from 'lodash';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
-import ScheduleBreadCrumb from 'ee/components/schedule/breadcrumb';
 import {errorHandler} from 'utils/errorHandler';
 import ScheduleCreateForm from 'ee/components/job/createForm';
 import {GroupFragment} from 'containers/list';
 import PageTitle from 'components/pageTitle';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
+import Breadcrumbs from 'components/share/breadcrumb';
+
+const breadcrumbs = [
+  {
+    key: 'list',
+    matcher: /\/schedule/,
+    title: 'Schedule',
+    link: '/schedule?page=1'
+  },
+  {
+    key: 'create',
+    matcher: /\/schedule\/create/,
+    title: 'New Schedule',
+  }
+];
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -115,13 +129,13 @@ class ScheduleCreatePage extends React.Component<Props, State> {
       'id'
     );
 
-    const jobActiveDeadlineSeconds = get(group, 'jobDefaultActiveDeadlineSeconds', null) || jobDefaultActiveDeadlineSeconds;
+    const jobActiveDeadlineSeconds = get(group, 'jobDefaultActiveDeadlineSeconds', null) || (window as any).jobDefaultActiveDeadlineSeconds;
 
     return (
       <React.Fragment>
         <PageTitle
           title="New Schedule"
-          breadcrumb={<ScheduleBreadCrumb />}
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
         />
         <div style={{margin: 16}}>
           <ScheduleCreateForm

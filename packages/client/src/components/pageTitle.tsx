@@ -2,7 +2,7 @@ import React from 'react';
 
 type Props = {
   breadcrumb: React.ReactNode;
-  title: React.ReactNode;
+  title?: React.ReactNode;
   style?: React.CSSProperties;
 };
 
@@ -20,14 +20,7 @@ export default class PageTitle extends React.Component<Props> {
         padding: '16px 24px',
         ...style
       }}>
-        <div style={{
-          marginBottom: 24
-        }}>
-          {breadcrumb}
-        </div>
-        {
-          title ?  <h2>{title}</h2> : <></>
-        }
+        {breadcrumb}
       </div>
     )
   }

@@ -5,40 +5,30 @@ import IFrame from 'components/hub/iframe';
 import PageTitle from 'components/pageTitle';
 import Log from 'components/share/log';
 import PageBody from 'components/pageBody';
-import { Breadcrumb, Icon, Tabs } from 'antd';
+import Breadcrumbs from 'components/share/breadcrumb';
+import { Icon, Tabs } from 'antd';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { appPrefix } from 'utils/env';
 import { withRouter } from 'react-router';
 
 type Props = GroupContextComponentProps & RouteComponentProps;
 
-class JupyterhubContainer extends React.Component<Props> {
-  renderBreadCrumb () {
-    const { match } = this.props;
-    const params = match.params as any
-    const basename = params.groupName ? `${appPrefix}g/${params.groupName}` : `${appPrefix}`;
-
-    return (
-      <Breadcrumb style={{marginBottom: 8}}>
-        <Breadcrumb.Item key="home">
-          {
-          params.groupName ?
-          <Link to={`${basename}`}><Icon type="home" /></Link> :
-          <a href={`${basename}`}><Icon type="home" /></a>
-          }
-        </Breadcrumb.Item>
-        <Breadcrumb.Item key="notebook">Notebooks</Breadcrumb.Item>
-      </Breadcrumb>
-    );
+const breadcrumbs = [
+  {
+    key: 'hub',
+    matcher: /\/hub/,
+    title: 'Notebooks'
   }
+];
 
+class JupyterhubContainer extends React.Component<Props> {
   render() {
     const {groupContext} = this.props;
 
     return (
       <>
         <PageTitle
-          breadcrumb={this.renderBreadCrumb()}
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
           title={"Notebooks"}
         />
         <PageBody style={{flex: '1 1 0%'}}>

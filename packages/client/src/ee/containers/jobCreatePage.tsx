@@ -9,10 +9,25 @@ import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'utils/errorHandler';
 import JobCreateForm from 'ee/components/job/createForm';
-import JobBreadcrumb from 'ee/components/job/breadcrumb';
 import {GroupFragment} from 'containers/list';
 import PageTitle from 'components/pageTitle';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
+import Breadcrumbs from 'components/share/breadcrumb';
+
+const breadcrumbs = [
+  {
+    key: 'list',
+    matcher: /\/job/,
+    title: 'Jobs',
+    link: '/job?page=1'
+  },
+  {
+    key: 'create',
+    matcher: /\/job\/create/,
+    title: 'New Job',
+  }
+];
+
 
 export const GET_MY_GROUPS = gql`
   query me {
@@ -110,7 +125,7 @@ class JobCreatePage extends React.Component<Props, State> {
     return (
       <React.Fragment>
         <PageTitle
-          breadcrumb={<JobBreadcrumb />}
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
           title={"New Job"}
         />
         <div style={{

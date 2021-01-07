@@ -8,13 +8,22 @@ import Filter from '../shared/filter';
 import moment from 'moment';
 import {Group} from '../shared/groupFilter';
 import {computeDuration} from './detail';
-import JobBreadcrumb from './breadcrumb';
 import { Phase, getActionByPhase } from './phase';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
+import Breadcrumbs from 'components/share/breadcrumb';
+
+const breadcrumbs = [
+  {
+    key: 'list',
+    matcher: /\/job/,
+    title: 'Jobs',
+    link: '/job?page=1'
+  }
+];
 
 const {confirm} = Modal;
 const Table = styled(AntTable as any)`
@@ -327,7 +336,7 @@ class JobList extends React.Component<Props> {
     return (
       <>
         <PageTitle
-          breadcrumb={<JobBreadcrumb />}
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
           title={"Jobs"}
         />
         <PageBody>
