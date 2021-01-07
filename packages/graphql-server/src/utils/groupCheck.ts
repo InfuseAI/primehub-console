@@ -2,7 +2,8 @@ export const isGroupBelongUser = async (ctx: any, userId: string, groupName: str
     const groups = await ctx.kcAdminClient.users.listGroups({
       id: userId
     });
-    const groupNames = groups.map(g => g.name.toLowerCase());
+    groupName = groupName.toLowerCase().replace('_', '-');
+    const groupNames = groups.map(g => g.name.toLowerCase().replace('_', '-'));
     if (groupNames.indexOf(groupName) >= 0) { return true; }
     return false;
   };
