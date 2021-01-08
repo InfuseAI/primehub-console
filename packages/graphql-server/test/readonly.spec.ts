@@ -55,5 +55,5 @@ describe('readonly graphql', function() {
     }`, null, `Bearer ${this.secret}`);
     expect(data.user.id).to.be.eql(this.currentUserId);
   });
-  
+
 });
