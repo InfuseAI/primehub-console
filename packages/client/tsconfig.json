@@ -13,7 +13,8 @@
       "cms-components/*": ["./src/cms-components/*"],
       "styledShare/*": ["./src/styled_share/*"],
       "context/*": ["./src/context/*"],
-      "ee/*": ["./src/ee/*"]
+      "ee/*": ["./src/ee/*"],
+      "@types/*": ["./src/@types/*"]
     }
   },
   "exclude": ["dist", "build", "node_modules"]
