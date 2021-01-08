@@ -17,7 +17,7 @@ const breadcrumbs = [
   {
     key: 'browse',
     matcher: /\/browse/,
-    title: 'Share Files',
+    title: 'Shared Files',
     link: '/browse'
   }
 ];
@@ -54,12 +54,25 @@ const ShareFilesUploader = (props: Props) => {
       <PageBody>
         <div style={
           {
-            width: "70%",
+            width: 850,
             margin: "auto"
           }
-        }
-        >
+        }>
+          <div
+            style={
+              {
+                margin: "10px",
+                textAlign: "center"
+              }
+            }
+          >
+            <span>Upload files to your group's PrimeHub File System. Files uploaded in this group are shared at phfs/uploads.</span>
+          </div>
+          {/*
+           //@ts-ignore */}
           <Dashboard
+            inline={true}
+            width={850}
             uppy={uppy}
           />
         </div>

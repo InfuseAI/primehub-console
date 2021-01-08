@@ -127,7 +127,7 @@ class Main extends React.Component {
         }
       },
       {
-        title: 'Share Files',
+        title: 'Shared Files',
         subPath: 'browse',
         icon: iconShareFiles,
         style: {

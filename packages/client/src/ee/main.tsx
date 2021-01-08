@@ -113,7 +113,7 @@ class Main extends React.Component {
         }
       },
       {
-        title: 'Share Files',
+        title: 'Shared Files',
         subPath: 'browse',
         icon: iconShareFiles,
         style: {
@@ -135,7 +135,7 @@ class Main extends React.Component {
               <Jupyterhub />
             </Route>
 
-            {/* Share Files */}
+            {/* Shared Files */}
             <Route path={`${appPrefix}g/:groupName/browse`} exact>
               <ShareFilesUploader />
             </Route>
