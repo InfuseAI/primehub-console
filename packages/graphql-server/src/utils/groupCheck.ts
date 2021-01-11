@@ -3,7 +3,10 @@ export const isGroupBelongUser = async (ctx: any, userId: string, groupName: str
       id: userId
     });
     groupName = groupName.toLowerCase();
-    const groupNames = groups.map(g => g.name.toLowerCase());
+    const groupNames = groups.map(g => toGroupPath(g.name));
     if (groupNames.indexOf(groupName) >= 0) { return true; }
     return false;
   };
+
+export const toGroupPath = (groupName: string) =>
+  groupName.replace(/_/g, '-').toLowerCase();
