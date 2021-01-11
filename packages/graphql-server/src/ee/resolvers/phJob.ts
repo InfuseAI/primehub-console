@@ -17,6 +17,7 @@ import { SCHEDULE_LABEL } from './phSchedule';
 import { BucketItem } from 'minio';
 import JobArtifactCleaner from '../utils/jobArtifactCleaner';
 import { ErrorCodes } from '../../errorCodes';
+import { toGroupPath } from '../../utils/groupCheck';
 
 const {EXCEED_QUOTA_ERROR, NOT_AUTH_ERROR} = ErrorCodes;
 
@@ -190,7 +191,7 @@ export const typeResolvers = {
   async artifact(parent, args, context: Context) {
     const {minioClient, storeBucket} = context;
     const phjobID = parent.id;
-    const groupName = `${parent.groupName}`.toLowerCase();
+    const groupName = toGroupPath(parent.groupName);
     const prefix = `groups/${groupName}/jobArtifacts/${phjobID}`;
 
     return new Promise<any>((resolve, reject) => {
@@ -230,7 +231,7 @@ export const typeResolvers = {
   async monitoring(parent, args, context: Context) {
     const { minioClient, storeBucket } = context;
     const phjobID = parent.id;
-    const groupName = `${parent.groupName}`.toLowerCase();
+    const groupName = toGroupPath(parent.groupName);
     const objectName = `groups/${groupName}/jobArtifacts/${phjobID}/.metadata/monitoring`;
 
     return new Promise<any>((resolve, reject) => {

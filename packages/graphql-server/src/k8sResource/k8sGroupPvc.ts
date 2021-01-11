@@ -1,16 +1,14 @@
 import { client as kubeClient } from '../crdClient/crdClientImpl';
 import { get, isEmpty, isUndefined, isNull } from 'lodash';
 import { ApolloError } from 'apollo-server';
+import { toGroupPath } from '../utils/groupCheck';
 
 // utils
 const stringifyVolumeSize = (volumeSize: number) => `${volumeSize}Gi`;
 const parseVolumeSize = (volumeSizeFromK8s: string) => parseFloat(volumeSizeFromK8s.replace('Gi', ''));
 
-const escapeGroupName = (groupName: string) =>
-  groupName.replace(/_/g, '-').toLowerCase();
-
 export const getPvcName = (groupName: string) => {
-  return `project-${escapeGroupName(groupName)}`;
+  return `project-${toGroupPath(groupName)}`;
 };
 
 export default class K8sGroupPvc {
@@ -55,7 +53,7 @@ export default class K8sGroupPvc {
     volumeSize: number
   }) => {
     try {
-      const escapedGroupName = escapeGroupName(groupName);
+      const escapedGroupName = toGroupPath(groupName);
       const pvcName = getPvcName(groupName);
       const {body} = await this.resource.post({
         body: {
