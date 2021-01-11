@@ -23,6 +23,7 @@ import Boom from 'boom';
 import GroupRepresentation from 'keycloak-admin/lib/defs/groupRepresentation';
 import {createConfig} from '../config';
 import { transform } from './groupUtils';
+import { isGroupNameAvailable } from '../utils/groupCheck';
 
 const config = createConfig();
 
@@ -95,11 +96,9 @@ export const create = async (root, args, context: Context) => {
   }
 
   // check existing groups with the same name
-  groups.map(g => {
-    if (payload.name.toLowerCase() === g.name.toLowerCase()) {
-      throw new ApolloError('Group exists with same name', 'GROUP_CONFLICT_NAME');
-    }
-  });
+  if (!isGroupNameAvailable(payload.name, groups)) {
+    throw new ApolloError('Group exists with same name', 'GROUP_CONFLICT_NAME');
+  }
 
   let groupId: string;
   try {
