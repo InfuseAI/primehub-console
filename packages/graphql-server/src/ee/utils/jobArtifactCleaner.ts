@@ -2,6 +2,7 @@ import { Client as MinioClient, BucketItem} from 'minio';
 import * as logger from '../../logger';
 import { Stream } from 'stream';
 import getStream from 'get-stream';
+import { toGroupPath } from '../../utils/groupCheck';
 
 const CLEANUP_INTERVAL_SECONDS = 86400;
 
@@ -55,7 +56,7 @@ export default class JobArtifactCleaner {
   }
 
   private cleanArtifactsByGroup = async group => {
-    group = `${group}`.toLowerCase();
+    group = toGroupPath(group);
     const prefix = `groups/${group}/jobArtifacts/`;
     const promises = [];
     await new Promise<string[]> ((resolve, reject) => {
