@@ -14,10 +14,7 @@ resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/ee/index.schema.
 module.exports = {
   entry: {
     index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
-    landing: './src/landing.tsx',
     'main': devMode ? './src/ee/main.tsx' : ['./src/public-import.js', './src/ee/main.tsx'],
-    job: devMode ? './src/ee/job.tsx' : ['./src/public-import.js', './src/ee/job.tsx'],
-    'model-deployment': devMode ? './src/ee/modelDeployment.tsx' : ['./src/public-import.js', './src/ee/modelDeployment.tsx'],
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -34,15 +31,6 @@ module.exports = {
       rewrites: [
         { from: /^\/g/, to: '/main.html' },
         { from: /^\/app-prefix\/g/, to: '/main.html' },
-        { from: /^\/landing$/, to: '/landing.html' },
-        { from: /^\/app-prefix\/landing/, to: '/landing.html' },
-        { from: /^\/app-prefix\/job/, to: '/job.html' },
-        { from: /^\/job/, to: '/job.html' },
-        { from: /^\/app-prefix\/schedule/, to: '/job.html' },
-        { from: /^\/schedule/, to: '/job.html' },
-        { from: /^\/model-deployment/, to: '/model-deployment.html' },
-        { from: /^\/app-prefix\/model-deployment/, to: '/model-deployment.html' },
-
         { from: /./, to: '/index.html' }
       ]
     },
@@ -103,24 +91,9 @@ module.exports = {
       filename: 'index.html'
     }),
     new HtmlWebPackPlugin({
-      chunks: ['landing'],
-      template: 'docs/index.html',
-      filename: 'landing.html'
-    }),
-    new HtmlWebPackPlugin({
       chunks: ['main'],
       template: 'docs/index.html',
       filename: 'main.html'
-    }),
-    new HtmlWebPackPlugin({
-      chunks: ['job'],
-      template: 'docs/index.html',
-      filename: 'job.html'
-    }),
-    new HtmlWebPackPlugin({
-      chunks: ['model-deployment'],
-      template: 'docs/index.html',
-      filename: 'model-deployment.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({
