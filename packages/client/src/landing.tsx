@@ -49,7 +49,11 @@ const Empty = (props: {height: number, description?: string}) => (
   </Card>
 )
 
-export class Landing extends React.Component {
+type Props = {
+  includeHeader: boolean
+}
+
+export class Landing extends React.Component<Props> {
   render() {
     const { includeHeader } = this.props;
     const isUserAdmin = (window as any).isUserAdmin || false;
