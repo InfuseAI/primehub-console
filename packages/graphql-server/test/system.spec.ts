@@ -47,6 +47,8 @@ const systemFields = `
     startedAt
     expiredAt
     maxGroup
+    maxNode
+    maxModelDeploy
   }
 `;
 
@@ -87,7 +89,9 @@ describe('system graphql', function() {
           licensedTo: null,
           startedAt: null,
           expiredAt: null,
-          maxGroup: 999
+          maxGroup: 99999,
+          maxNode: 99999,
+          maxModelDeploy: 0,
         }
       }
     });
@@ -156,7 +160,9 @@ describe('system graphql', function() {
           licensedTo: null,
           startedAt: null,
           expiredAt: null,
-          maxGroup: 999
+          maxGroup: 99999,
+          maxNode: 99999,
+          maxModelDeploy: 0,
         },
         defaultUserVolumeCapacity: delta.defaultUserVolumeCapacity
       }
@@ -245,7 +251,9 @@ describe('system graphql', function() {
           licensedTo: null,
           startedAt: null,
           expiredAt: null,
-          maxGroup: 999
+          maxGroup: 99999,
+          maxNode: 99999,
+          maxModelDeploy: 0,
         },
         defaultUserVolumeCapacity: delta.defaultUserVolumeCapacity
       }
