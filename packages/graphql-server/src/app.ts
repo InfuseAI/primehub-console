@@ -115,7 +115,8 @@ export const resolvers = {
     ...ann.resolveInMutation(),
   },
   System: {
-    smtp: system.querySmtp
+    smtp: system.querySmtp,
+    license: system.queryLicense,
   },
   User: user.typeResolvers,
   Group: group.typeResolvers,
