@@ -137,13 +137,14 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   // dataset pvc
   const datasetPvc = new K8sDatasetPvc({
     namespace: config.k8sCrdNamespace,
-    primehubGroupSc: config.primehubGroupSc
+    primehubGroupSc: config.primehubGroupSc,
+    groupVolumeStorageClass: config.groupVolumeStorageClass,
   });
   // group pvc
   const groupPvc = new K8sGroupPvc({
     namespace: config.k8sCrdNamespace,
     primehubGroupSc: config.primehubGroupSc,
-    groupVolumeStorageClass: config.groupVolumeStorageClass
+    groupVolumeStorageClass: config.groupVolumeStorageClass,
   });
   // K8sUploadServerSecret
   const k8sUploadServerSecret = new K8sUploadServerSecret({

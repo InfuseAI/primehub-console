@@ -14,16 +14,20 @@ export default class K8sDatasetPvc {
   private namespace: string;
   private resource: any;
   private primehubGroupSc: string;
+  private groupVolumeStorageClass: string;
 
   constructor({
     namespace,
-    primehubGroupSc
+    primehubGroupSc,
+    groupVolumeStorageClass
   }: {
     namespace: string,
-    primehubGroupSc: string
+    primehubGroupSc: string,
+    groupVolumeStorageClass: string
   }) {
     this.namespace = namespace || 'default';
     this.primehubGroupSc = primehubGroupSc;
+    this.groupVolumeStorageClass = groupVolumeStorageClass || '';
     this.resource = kubeClient.api.v1.namespaces(this.namespace).persistentvolumeclaims;
   }
 
@@ -49,16 +53,30 @@ export default class K8sDatasetPvc {
   }) => {
     try {
       const pvcName = getPvcName(volumeName);
+      let annotations;
+      let selector;
+
+      if (!this.groupVolumeStorageClass) {
+        // Use groupVolume controller to provision shared volume
+        annotations = {
+          'primehub-group': pvcName,
+          'primehub-group-sc': this.primehubGroupSc
+        };
+        selector = {
+          matchLabels: {
+            'primehub-group': pvcName,
+            'primehub-namespace': this.namespace
+          }
+        };
+      }
+
       const {body} = await this.resource.post({
         body: {
           Kind: 'PersistentVolumeClaim',
           apiVersion: 'v1',
           metadata: {
             name: pvcName,
-            annotations: {
-              'primehub-group': pvcName,
-              'primehub-group-sc': this.primehubGroupSc
-            }
+            annotations,
           },
           spec: {
             accessModes: ['ReadWriteMany'],
@@ -68,13 +86,8 @@ export default class K8sDatasetPvc {
                 storage: stringifyVolumeSize(volumeSize)
               }
             },
-            selector: {
-              matchLabels: {
-                'primehub-group': pvcName,
-                'primehub-namespace': this.namespace
-              }
-            },
-            storageClassName: ''
+            selector,
+            storageClassName: this.groupVolumeStorageClass
           }
         }
       });
