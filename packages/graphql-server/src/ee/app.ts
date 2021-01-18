@@ -23,6 +23,7 @@ import * as license from './resolvers/license';
 import * as user from '../resolvers/user';
 import * as group from '../resolvers/group';
 import * as secret from '../resolvers/secret';
+import * as store from '../resolvers/store';
 import * as buildImage from './resolvers/buildImage';
 import * as buildImageJob from './resolvers/buildImageJob';
 import * as phJob from './resolvers/phJob';

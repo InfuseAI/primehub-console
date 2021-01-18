@@ -1,0 +1,15 @@
+type File {
+  name: String
+  prefix: String
+  size: Float
+  lastModified: String
+}
+
+input FileWhereInput {
+  groupName: String!
+  prefix: String!
+}
+
+input FileOptionInput {
+  limit: Int
+}

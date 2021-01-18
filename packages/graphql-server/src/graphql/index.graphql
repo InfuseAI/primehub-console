@@ -6,6 +6,7 @@
 # import Announcement, AnnouncementConnection, AnnouncementWhereInput, AnnouncementWhereUniqueInput, AnnouncementCreateInput, AnnouncementUpdateInput from "./announcement.graphql"
 # import Dataset, DatasetOrderByInput, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretOrderByInput, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
+# import File, FileWhereInput, FileOptionInput from "./store.graphql"
 
 scalar JSON
 
@@ -175,6 +176,12 @@ type Query {
     first: Int
     last: Int
   ): SecretConnection!
+
+  """PHFS"""
+  files(
+    where: FileWhereInput!
+    options: FileOptionInput
+  ): [File]!
 }
 
 type Mutation {
