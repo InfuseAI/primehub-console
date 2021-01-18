@@ -224,8 +224,9 @@ jobs:
           name: Running tslint & tsc dryrun tests for graphql
           command: |
             cd packages/graphql-server
-            npm install
-            npm run test:build
+            npm install yarn
+            yarn install
+            yarn run test:build
   graphql-unit-test:
     docker:
       - image: circleci/node:10
