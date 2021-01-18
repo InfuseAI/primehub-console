@@ -55,16 +55,30 @@ export default class K8sGroupPvc {
     try {
       const escapedGroupName = toGroupPath(groupName);
       const pvcName = getPvcName(groupName);
+      let annotations;
+      let selector;
+
+      if (!this.groupVolumeStorageClass) {
+        // Use groupVolume controller to provision shared volume
+        annotations = {
+          'primehub-group': escapedGroupName,
+          'primehub-group-sc': this.primehubGroupSc
+        };
+        selector = {
+          matchLabels: {
+            'primehub-group': escapedGroupName,
+            'primehub-namespace': this.namespace
+          }
+        };
+      }
+
       const {body} = await this.resource.post({
         body: {
           Kind: 'PersistentVolumeClaim',
           apiVersion: 'v1',
           metadata: {
             name: pvcName,
-            annotations: {
-              'primehub-group': escapedGroupName,
-              'primehub-group-sc': this.primehubGroupSc
-            }
+            annotations,
           },
           spec: {
             accessModes: ['ReadWriteMany'],
@@ -74,12 +88,7 @@ export default class K8sGroupPvc {
                 storage: stringifyVolumeSize(volumeSize)
               }
             },
-            selector: {
-              matchLabels: {
-                'primehub-group': escapedGroupName,
-                'primehub-namespace': this.namespace
-              }
-            },
+            selector,
             storageClassName: this.groupVolumeStorageClass
           }
         }

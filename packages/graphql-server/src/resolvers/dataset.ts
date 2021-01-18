@@ -21,7 +21,8 @@ const uploadServerList = ['pv', 'nfs', 'hostPath'];
 const config = createConfig();
 const datasetPvcQuery = new K8sDatasetPvc({
   namespace: config.k8sCrdNamespace,
-  primehubGroupSc: config.primehubGroupSc
+  primehubGroupSc: config.primehubGroupSc,
+  groupVolumeStorageClass: config.groupVolumeStorageClass,
 });
 
 // utils
