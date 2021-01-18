@@ -1,0 +1,16 @@
+type License {
+  licensedTo: String
+  licenseStatus: String
+  startedAt: String
+  expiredAt: String
+  maxGroup: Int
+  maxNode: Int
+  maxModelDeploy: Int
+  usage: Usage
+}
+
+type Usage {
+  maxGroup: Int
+  maxNode: Int
+  maxModelDeploy: Int
+}

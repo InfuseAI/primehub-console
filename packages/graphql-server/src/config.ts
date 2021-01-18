@@ -62,6 +62,8 @@ export interface Config {
 
   // license management stuffs
   maxGroup: number;
+  maxNode: number;
+  maxModelDeploy: number;
   licenseStatus: string;
   licensedTo?: string;
   startedAt?: string;
@@ -115,7 +117,9 @@ const defaultConfigs = {
   groupVolumeStorageClass: '',
   enableDatasetUpload: false,
   licenseStatus: 'invalid',
-  maxGroup: 999,
+  maxGroup: 99999,
+  maxNode: 99999,
+  maxModelDeploy: 0,
   graphqlHost: 'http://localhost:3001',
   enableStore: false,
   enableLogPersistence: false,
@@ -195,6 +199,8 @@ export const createConfig = (): Config => {
     groupVolumeStorageClass: process.env.PRIMEHUB_GROUP_VOLUME_STORAGE_CLASS,
     graphqlHost: process.env.GRAPHQL_HOST,
     maxGroup: process.env.MAX_GROUP,
+    maxNode: process.env.MAX_NODE,
+    maxModelDeploy: process.env.MAX_MODEL_DEPLOY,
     licensedTo: process.env.LICENSED_TO,
     startedAt: process.env.STARTED_AT,
     expiredAt: process.env.EXPIRED_AT,

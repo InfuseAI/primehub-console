@@ -21,7 +21,8 @@ export const permissions = shield({
     'phSchedulesConnection': or(isAdmin, isUser),
     'phDeployment': or(isAdmin, isUser),
     'phDeployments': or(isAdmin, isUser),
-    'phDeploymentsConnection': or(isAdmin, isUser)
+    'phDeploymentsConnection': or(isAdmin, isUser),
+    'license': or(isAdmin, isUser),
   },
   Mutation: {
     '*': isAdmin,

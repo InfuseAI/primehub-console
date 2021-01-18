@@ -19,6 +19,7 @@ import url from 'url';
 
 import CrdClient, { InstanceTypeSpec, ImageSpec, client as kubeClient, kubeConfig } from '../crdClient/crdClientImpl';
 import * as system from '../resolvers/system';
+import * as license from './resolvers/license';
 import * as user from '../resolvers/user';
 import * as group from '../resolvers/group';
 import * as secret from '../resolvers/secret';
@@ -111,6 +112,7 @@ const eeResolvers = {
     phDeploymentsConnection: phDeployment.connectionQuery,
     usageReports: usageReport.query,
     usageReportsConnection: usageReport.connectionQuery,
+    license: license.query,
   },
   Mutation: {
     createBuildImage: buildImage.create,
