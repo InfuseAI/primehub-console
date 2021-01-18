@@ -224,7 +224,6 @@ jobs:
           name: Running tslint & tsc dryrun tests for graphql
           command: |
             cd packages/graphql-server
-            npm install yarn
             yarn install
             yarn run test:build
   graphql-unit-test:
@@ -236,7 +235,6 @@ jobs:
           name: Unit tests
           command: |
             cd ~/project/packages/graphql-server
-            npm install yarn
             yarn install
             yarn test:unit
 
