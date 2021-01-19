@@ -217,15 +217,15 @@ jobs:
   # Tests
   graphql-lint:
     docker:
-      - image: circleci/node:lts
+      - image: circleci/node:10
     steps:
       - checkout
       - run:
           name: Running tslint & tsc dryrun tests for graphql
           command: |
             cd packages/graphql-server
-            npm install
-            npm run test:build
+            yarn install
+            yarn run test:build
   graphql-unit-test:
     docker:
       - image: circleci/node:10
@@ -235,7 +235,6 @@ jobs:
           name: Unit tests
           command: |
             cd ~/project/packages/graphql-server
-            npm install yarn
             yarn install
             yarn test:unit
 

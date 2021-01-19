@@ -5,6 +5,7 @@ import { createDefaultSystemSettings } from './constant';
 import { Context } from './interface';
 import { parseFromAttr, toAttr, parseDiskQuota, stringifyDiskQuota } from './utils';
 import { findTimezone } from '../utils/timezones';
+import * as license from '../ee/resolvers/license';
 import {createConfig} from '../config';
 
 const config = createConfig();
@@ -21,18 +22,10 @@ export const query = async (root, args, context: Context) => {
   const kcAdminClient: KcAdminClient = context.kcAdminClient;
   const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});
   const defaultSystemSettings = createDefaultSystemSettings(context.defaultUserVolumeCapacity);
-  const license = {
-    licensedTo: config.licensedTo,
-    licenseStatus: config.licenseStatus,
-    startedAt: config.startedAt,
-    expiredAt: config.expiredAt,
-    maxGroup: config.maxGroup
-  };
 
   if (isEmpty(attributes)) {
     return {
       ...defaultSystemSettings,
-      license,
       defaultUserVolumeCapacity: parseDiskQuota(defaultSystemSettings.defaultUserVolumeCapacity)
     };
   }
@@ -83,6 +76,8 @@ export const querySmtp = async (root, args, context: Context) => {
     username: smtpServer.user
   };
 };
+
+export const queryLicense = license.query;
 
 export const update = async (root, args, context) => {
   const defaultSystemSettings = createDefaultSystemSettings(context.defaultUserVolumeCapacity);

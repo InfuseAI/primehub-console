@@ -1,4 +1,5 @@
 # import CannerImage, CannerImageInput from "common.graphql"
+# import License from "../ee/graphql/license.graphql"
 
 type Org {
   name: String
@@ -8,14 +9,6 @@ type Org {
 type Timezone {
   name: String!
   offset: Float!
-}
-
-type License {
-  licensedTo: String
-  licenseStatus: String
-  startedAt: String
-  expiredAt: String
-  maxGroup: Int
 }
 
 type Smtp {

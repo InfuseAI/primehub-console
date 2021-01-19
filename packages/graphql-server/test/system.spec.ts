@@ -42,12 +42,6 @@ const systemFields = `
     password
   }
   defaultUserVolumeCapacity
-  license {
-    licensedTo
-    startedAt
-    expiredAt
-    maxGroup
-  }
 `;
 
 describe('system graphql', function() {
@@ -82,13 +76,7 @@ describe('system graphql', function() {
           username: null,
           password: null
         },
-        defaultUserVolumeCapacity: 20,
-        license: {
-          licensedTo: null,
-          startedAt: null,
-          expiredAt: null,
-          maxGroup: 999
-        }
+        defaultUserVolumeCapacity: 20
       }
     });
   });
@@ -151,12 +139,6 @@ describe('system graphql', function() {
           enableAuth: false,
           username: null,
           password: null
-        },
-        license: {
-          licensedTo: null,
-          startedAt: null,
-          expiredAt: null,
-          maxGroup: 999
         },
         defaultUserVolumeCapacity: delta.defaultUserVolumeCapacity
       }
@@ -240,12 +222,6 @@ describe('system graphql', function() {
           enableAuth: delta.smtp.enableAuth,
           username: delta.smtp.username,
           password: SECRET_VALUE
-        },
-        license: {
-          licensedTo: null,
-          startedAt: null,
-          expiredAt: null,
-          maxGroup: 999
         },
         defaultUserVolumeCapacity: delta.defaultUserVolumeCapacity
       }

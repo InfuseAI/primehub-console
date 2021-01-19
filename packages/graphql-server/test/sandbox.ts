@@ -19,6 +19,7 @@ const datasetCrd = loadCrd('dataset');
 const instanceTypeCrd = loadCrd('instance-type');
 const imageCrd = loadCrd('image');
 const phJobCrd = loadCrd('phJob');
+const phDeploymentCrd = loadCrd('phDeployment');
 
 const masterRealmCred = {
   username: 'keycloak',
@@ -113,6 +114,7 @@ export const createSandbox = async () => {
   await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: instanceTypeCrd });
   await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: imageCrd });
   await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phJobCrd });
+  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phDeploymentCrd });
 
   /**
    * Keycloak
@@ -271,6 +273,7 @@ export const destroySandbox = async () => {
     await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(instanceTypeCrd.metadata.name);
     await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(imageCrd.metadata.name);
     await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(phJobCrd.metadata.name);
+    await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(phDeploymentCrd.metadata.name);
   } catch (e) {
     // tslint:disable-next-line:no-console
     console.log(e);
