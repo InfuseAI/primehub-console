@@ -2,7 +2,7 @@ import { Context } from '../../resolvers/interface';
 import {
   toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, mergeVariables, getGroupIdsByUser
 } from '../../resolvers/utils';
-import { validateLicense } from './utils';
+import { validateLicense, validateModelDeployQuota } from './utils';
 import {
   PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, client as kubeClient
 } from '../../crdClient/crdClientImpl';
@@ -392,6 +392,7 @@ export const queryOne = async (root, args, context: Context) => {
 export const create = async (root, args, context: Context) => {
   const data: PhDeploymentMutationInput = args.data;
   validateLicense();
+  await validateModelDeployQuota(context);
   await validateQuota(context, data.groupId, data.instanceType);
   if (data.env && data.env.length > 0) {
     validateEnvVars(data.env);
