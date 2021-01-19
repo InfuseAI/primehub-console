@@ -95,6 +95,7 @@ const typeDefsEE = gql(importSchema(path.resolve(__dirname, './graphql/ee.graphq
 
 const eeResolvers = {
   Query: {
+    system: system.query,
     buildImage: buildImage.queryOne,
     buildImages: buildImage.query,
     buildImagesConnection: buildImage.connectionQuery,
@@ -134,6 +135,10 @@ const eeResolvers = {
     stopPhDeployment: phDeployment.stop,
     createPhDeploymentClient: phDeployment.createClient,
     deletePhDeploymentClient: phDeployment.destroyClient,
+  },
+  System: {
+    smtp: system.querySmtp,
+    license: system.queryLicense,
   },
   BuildImage: buildImage.typeResolvers,
   PhJob: phJob.typeResolvers,

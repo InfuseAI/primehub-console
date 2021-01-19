@@ -116,7 +116,7 @@ export const resolvers = {
   },
   System: {
     smtp: system.querySmtp,
-    license: system.queryLicense,
+    license: () => {},
   },
   User: user.typeResolvers,
   Group: group.typeResolvers,

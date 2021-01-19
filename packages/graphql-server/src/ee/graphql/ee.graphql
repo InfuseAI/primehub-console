@@ -1,3 +1,4 @@
+# import System from "../../graphql/system.graphql"
 # import License from "./license.graphql"
 # import BuildImageJob, BuildImageOrderByInput, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql"
 # import PhJob, PhJobOrderByInput, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput, PhJobCreateInput, PhJobCancelResponse, PhJobNotifyEventInput from "./phJob.graphql"
@@ -8,6 +9,8 @@
 scalar JSON
 
 type Query {
+  system: System
+
   """License"""
   license: License
 
