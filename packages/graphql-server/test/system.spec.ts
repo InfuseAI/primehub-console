@@ -42,14 +42,6 @@ const systemFields = `
     password
   }
   defaultUserVolumeCapacity
-  license {
-    licensedTo
-    startedAt
-    expiredAt
-    maxGroup
-    maxNode
-    maxModelDeploy
-  }
 `;
 
 describe('system graphql', function() {
@@ -84,15 +76,7 @@ describe('system graphql', function() {
           username: null,
           password: null
         },
-        defaultUserVolumeCapacity: 20,
-        license: {
-          licensedTo: null,
-          startedAt: null,
-          expiredAt: null,
-          maxGroup: 99999,
-          maxNode: 99999,
-          maxModelDeploy: 0,
-        }
+        defaultUserVolumeCapacity: 20
       }
     });
   });
@@ -155,14 +139,6 @@ describe('system graphql', function() {
           enableAuth: false,
           username: null,
           password: null
-        },
-        license: {
-          licensedTo: null,
-          startedAt: null,
-          expiredAt: null,
-          maxGroup: 99999,
-          maxNode: 99999,
-          maxModelDeploy: 0,
         },
         defaultUserVolumeCapacity: delta.defaultUserVolumeCapacity
       }
@@ -246,14 +222,6 @@ describe('system graphql', function() {
           enableAuth: delta.smtp.enableAuth,
           username: delta.smtp.username,
           password: SECRET_VALUE
-        },
-        license: {
-          licensedTo: null,
-          startedAt: null,
-          expiredAt: null,
-          maxGroup: 99999,
-          maxNode: 99999,
-          maxModelDeploy: 0,
         },
         defaultUserVolumeCapacity: delta.defaultUserVolumeCapacity
       }
