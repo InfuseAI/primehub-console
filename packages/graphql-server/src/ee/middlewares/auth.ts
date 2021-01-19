@@ -44,6 +44,7 @@ export const permissions = shield({
     'createImage': or(isAdmin, isUser),
     'updateImage': or(isAdmin, isUser),
     'deleteImage': or(isAdmin, isUser),
+    'deleteFiles': or(isAdmin, isUser),
   },
 }, {
   allowExternalErrors: true

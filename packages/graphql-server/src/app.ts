@@ -111,6 +111,7 @@ export const resolvers = {
     updateSecret: secret.update,
     deleteSecret: secret.destroy,
     regenerateUploadServerSecret: regenerateUploadSecret,
+    deleteFiles: store.destroy,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation(),

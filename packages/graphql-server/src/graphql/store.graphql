@@ -12,4 +12,5 @@ input FileWhereInput {
 
 input FileOptionInput {
   limit: Int
+  recursive: Boolean
 }
