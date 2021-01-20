@@ -9,7 +9,6 @@ const {NOT_AUTH_ERROR, INTERNAL_ERROR} = ErrorCodes;
 
 interface StoreFile {
   name?: string;
-  prefix?: string;
   size?: number;
   lastModified?: Date;
 }
@@ -26,9 +25,9 @@ const listQuery = async (context: Context, prefix: string, limit: number, recurs
     const stream = minioClient.listObjects(storeBucket, prefix, recursive);
     stream.on('data', obj => {
       if (limit === 0 || fetchedFiles.length < limit) {
+        const removedPrefixName = obj.name ? obj.name.replace(prefix, '') : obj.prefix.replace(prefix, '');
         fetchedFiles.push({
-          name: obj.name,
-          prefix: obj.prefix,
+          name: removedPrefixName,
           size: obj.size,
           lastModified: obj.lastModified,
         });
@@ -58,42 +57,9 @@ export const query = async (root, args, context: Context) => {
   if (args.options && args.options.limit) {
     limit = args.options.limit;
   }
-
-  const groupPath = toGroupPath(groupName);
-  const fullPrefix = `/groups/${groupPath}/${prefix}`;
-
-  let fetchedFiles: StoreFile[] = [];
-  try {
-    fetchedFiles = await listQuery(context, fullPrefix, limit, false);
-  } catch (err) {
-    logger.error({
-      component: logger.components.store,
-      type: 'STORE_LIST_OBJECTS',
-      stacktrace: err.stack,
-      message: err.message
-    });
-    throw new ApolloError('failed to list store objects', INTERNAL_ERROR);
-  }
-
-  return fetchedFiles;
-};
-
-export const destroy = async (root, args, context: Context) => {
-  const {minioClient, storeBucket, userId} = context;
-  const {groupName, prefix} = args.where;
-
-  const viewable = await canUserQueryFiles(context, userId, groupName);
-  if (!viewable) {
-    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
-  }
-
   let recursive = false;
   if (args.options && args.options.recursive) {
     recursive = args.options.recursive;
-  }
-  let limit = 0;
-  if (args.options && args.options.limit) {
-    limit = args.options.limit;
   }
 
   const groupPath = toGroupPath(groupName);
@@ -111,16 +77,56 @@ export const destroy = async (root, args, context: Context) => {
     });
     throw new ApolloError('failed to list store objects', INTERNAL_ERROR);
   }
+
+  return {
+    items: fetchedFiles,
+    phfsPrefix: prefix,
+    prefix: fullPrefix.substring(1),
+  };
+};
+
+export const destroy = async (root, args, context: Context) => {
+  const {minioClient, storeBucket, userId} = context;
+  const {groupName, prefix} = args.where;
+
+  const viewable = await canUserQueryFiles(context, userId, groupName);
+  if (!viewable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
+
+  let recursive = false;
+  if (args.options && args.options.recursive) {
+    recursive = args.options.recursive;
+  }
+
+  const groupPath = toGroupPath(groupName);
+  const fullPrefix = `/groups/${groupPath}/${prefix}`;
+
+  let fetchedFiles: StoreFile[] = [];
+  try {
+    fetchedFiles = await listQuery(context, fullPrefix, 0, recursive);
+  } catch (err) {
+    logger.error({
+      component: logger.components.store,
+      type: 'STORE_LIST_OBJECTS',
+      stacktrace: err.stack,
+      message: err.message
+    });
+    throw new ApolloError('failed to list store objects', INTERNAL_ERROR);
+  }
   const removeObjNames = [];
   for (const element of fetchedFiles) {
-    if (element.name) {
-      removeObjNames.push(element.name);
+    if (recursive) {
+      removeObjNames.push(`${fullPrefix}${element.name}`);
+    } else if (recursive === false && element.name === '') {
+      // Element name is without prefix, therefore, if it's exactly match, it will be an empty string
+      removeObjNames.push(`${fullPrefix}`);
     }
   }
 
   try {
     await minioClient.removeObjects(storeBucket, removeObjNames);
-    return 0;
+    return removeObjNames.length;
   } catch (err) {
     logger.error({
       component: logger.components.store,
