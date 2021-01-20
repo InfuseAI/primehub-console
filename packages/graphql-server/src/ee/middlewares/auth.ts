@@ -23,6 +23,7 @@ export const permissions = shield({
     'phDeployments': or(isAdmin, isUser),
     'phDeploymentsConnection': or(isAdmin, isUser),
     'license': or(isAdmin, isUser),
+    'files': or(isAdmin, isUser),
   },
   Mutation: {
     '*': isAdmin,
@@ -43,6 +44,7 @@ export const permissions = shield({
     'createImage': or(isAdmin, isUser),
     'updateImage': or(isAdmin, isUser),
     'deleteImage': or(isAdmin, isUser),
+    'deleteFiles': or(isAdmin, isUser),
   },
 }, {
   allowExternalErrors: true

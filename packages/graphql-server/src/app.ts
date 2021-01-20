@@ -19,6 +19,7 @@ import * as system from './resolvers/system';
 import * as user from './resolvers/user';
 import * as group from './resolvers/group';
 import * as secret from './resolvers/secret';
+import * as store from './resolvers/store';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset, regenerateUploadSecret} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
@@ -88,6 +89,7 @@ export const resolvers = {
     secret: secret.queryOne,
     secrets: secret.query,
     secretsConnection: secret.connectionQuery,
+    files: store.query,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),
@@ -109,6 +111,7 @@ export const resolvers = {
     updateSecret: secret.update,
     deleteSecret: secret.destroy,
     regenerateUploadServerSecret: regenerateUploadSecret,
+    deleteFiles: store.destroy,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation(),
@@ -278,6 +281,14 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     telemetry.start();
   }
 
+  // create phfs
+  let minioClient;
+  let storeBucket;
+  if (config.enableStore) {
+    storeBucket = config.storeBucket;
+    minioClient = createMinioClient(config.storeEndpoint, config.storeAccessKey, config.storeSecretKey);
+  }
+
   // apollo server
   const schema: any = makeExecutableSchema({
     typeDefs: typeDefs as any,
@@ -421,6 +432,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         namespace: config.k8sCrdNamespace,
         graphqlHost: config.graphqlHost,
         telemetry,
+        minioClient,
+        storeBucket,
       };
     },
     formatError: (error: any) => {
@@ -601,16 +614,13 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
 
   if (config.enableStore) {
-    // create minio client
-    const storeBucket = config.storeBucket;
-    const mClient = createMinioClient(config.storeEndpoint, config.storeAccessKey, config.storeSecretKey);
     // phfs file download api
     rootRouter.get('/files/(.*)', authenticateMiddleware, checkUserGroup,
       async ctx => {
         const objectPath = decodeURIComponent(ctx.request.path.split('/groups').pop());
         let req;
         try {
-          req = await mClient.getObject(storeBucket, `groups${objectPath}`);
+          req = await minioClient.getObject(storeBucket, `groups${objectPath}`);
         } catch (error) {
           if (error.code === 'NoSuchKey') {
             return ctx.status = 404;

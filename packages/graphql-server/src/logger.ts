@@ -28,6 +28,7 @@ export enum components {
   usageReport = 'UsageReport',
   resourceStatus = 'ResourceStatus',
   telemetry = 'Telemetry',
+  store = 'Store',
 }
 
 export const log = (levelType: level = level.info, payload?: any) => {
