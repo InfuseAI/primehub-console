@@ -1,4 +1,4 @@
-import { pickBy, isEmpty } from 'lodash';
+import { pickBy, isEmpty, toInteger } from 'lodash';
 
 export interface Config {
   env: string;
@@ -200,7 +200,7 @@ export const createConfig = (): Config => {
     graphqlHost: process.env.GRAPHQL_HOST,
     maxGroup: process.env.MAX_GROUP,
     maxNode: process.env.MAX_NODE,
-    maxModelDeploy: process.env.MAX_MODEL_DEPLOY,
+    maxModelDeploy: toInteger(process.env.MAX_MODEL_DEPLOY),
     licensedTo: process.env.LICENSED_TO,
     startedAt: process.env.STARTED_AT,
     expiredAt: process.env.EXPIRED_AT,
