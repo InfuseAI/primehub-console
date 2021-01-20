@@ -21,6 +21,11 @@ export const validateLicense = () => {
 };
 
 export const validateModelDeployQuota = async (context: Context) => {
+  // -1 = unlimited
+  if (config.maxModelDeploy === -1) {
+    return;
+  }
+
   const {crdClient} = context;
   const deploys = await crdClient.phDeployments.list();
   if (deploys.length >= Math.ceil(1.1 * config.maxModelDeploy)) {
