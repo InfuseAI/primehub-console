@@ -44,9 +44,28 @@ const listQuery = async (context: Context, prefix: string, limit: number, recurs
   return listObjects;
 };
 
+const generatePrefixForQuery = (groupName: string, phfsPrefix: string, recursive: boolean) => {
+  if (!phfsPrefix.startsWith('/')) {
+    phfsPrefix = '/'  + phfsPrefix;
+  }
+  if (recursive === false) {
+    if (!phfsPrefix.endsWith('/')) {
+      phfsPrefix = phfsPrefix + '/';
+    }
+  }
+
+  const groupPath = toGroupPath(groupName);
+  const fullPrefix = `/groups/${groupPath}${phfsPrefix}`;
+
+  return {
+    fullPrefix,
+    phfsPrefix
+  };
+};
+
 export const query = async (root, args, context: Context) => {
   const {userId} = context;
-  const {groupName, prefix} = args.where;
+  const {groupName, phfsPrefix} = args.where;
 
   const viewable = await canUserQueryFiles(context, userId, groupName);
   if (!viewable) {
@@ -62,12 +81,11 @@ export const query = async (root, args, context: Context) => {
     recursive = args.options.recursive;
   }
 
-  const groupPath = toGroupPath(groupName);
-  const fullPrefix = `/groups/${groupPath}/${prefix}`;
+  const modifiedPrefixes = generatePrefixForQuery(groupName, phfsPrefix, recursive);
 
   let fetchedFiles: StoreFile[] = [];
   try {
-    fetchedFiles = await listQuery(context, fullPrefix, limit, recursive);
+    fetchedFiles = await listQuery(context, modifiedPrefixes.fullPrefix, limit, recursive);
   } catch (err) {
     logger.error({
       component: logger.components.store,
@@ -80,14 +98,14 @@ export const query = async (root, args, context: Context) => {
 
   return {
     items: fetchedFiles,
-    phfsPrefix: prefix,
-    prefix: fullPrefix.substring(1),
+    phfsPrefix: modifiedPrefixes.phfsPrefix,
+    prefix: modifiedPrefixes.fullPrefix.substring(1),
   };
 };
 
 export const destroy = async (root, args, context: Context) => {
   const {minioClient, storeBucket, userId} = context;
-  const {groupName, prefix} = args.where;
+  const {groupName, phfsPrefix} = args.where;
 
   const viewable = await canUserQueryFiles(context, userId, groupName);
   if (!viewable) {
@@ -100,7 +118,7 @@ export const destroy = async (root, args, context: Context) => {
   }
 
   const groupPath = toGroupPath(groupName);
-  const fullPrefix = `/groups/${groupPath}/${prefix}`;
+  const fullPrefix = `/groups/${groupPath}/${phfsPrefix}`;
 
   let fetchedFiles: StoreFile[] = [];
   try {

@@ -12,7 +12,7 @@ type StoreFileList {
 
 input StoreFileWhereInput {
   groupName: String!
-  prefix: String!
+  phfsPrefix: String!
 }
 
 input StoreFileListOptionInput {
