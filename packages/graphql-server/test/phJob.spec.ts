@@ -43,9 +43,7 @@ declare module 'mocha' {
   }
 }
 
-describe.skip('phJob graphql', function() {
-  // XXX: Skip and make integration test happy. Should fix it in the future.
-
+describe('phJob graphql', function() {
   before(async () => {
     // setup lambdas
     this.graphqlRequest = (global as any).graphqlRequest;
