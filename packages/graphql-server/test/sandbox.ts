@@ -137,6 +137,10 @@ export const createSandbox = async () => {
     await client.auth(masterRealmCred);
   };
 
+  (global as any).addUserToGroup = async (groupId, id) => {
+    await client.users.addToGroup({groupId, id})
+  }
+
   await (global as any).authKcAdmin();
   // create new realm
   const realmId = faker.internet.userName().toLowerCase();
@@ -160,9 +164,19 @@ export const createSandbox = async () => {
     name: groupName
   });
 
+  const testGroupName = 'test';
+  await client.groups.create({
+    realm: realmId,
+    name: testGroupName
+  });
+
   // find the group
   const groups = await client.groups.find({realm: realmId, search: groupName});
   const group = groups[0];
+
+  // find test group
+  const testGroups = await client.groups.find({realm: realmId, search: testGroupName});
+  const testGroup = testGroups[0];
 
   // create admin user
   const username = faker.internet.userName().toLowerCase();
@@ -183,7 +197,12 @@ export const createSandbox = async () => {
 
   // assignAdmin
   const users = await client.users.find({realm: realmId, username});
-  await assignAdmin(client, realmId, users[0].id);
+  const user = users[0];
+  await assignAdmin(client, realmId, user.id);
+
+  // assign user to test group
+  (global as any).addUserToGroup(testGroup.id, user.id);
+
 
   // create new client
   const authClientId = faker.internet.userName();
@@ -264,6 +283,7 @@ export const createSandbox = async () => {
   process.env.KC_REALM = realmId;
   process.env.KC_EVERYONE_GROUP_ID = group.id;
   process.env.KC_USERNAME = username;
+  process.env.TEST_USER_ID = user.id;
   process.env.KC_PWD = password;
   process.env.SHARED_GRAPHQL_SECRET_KEY = 'secret';
   process.env.KC_CLIENT_ID = authClient.clientId;

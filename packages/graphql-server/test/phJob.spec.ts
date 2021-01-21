@@ -57,7 +57,9 @@ describe('phJob graphql', function() {
           name: faker.internet.userName().toLowerCase()
         }
       });
-      return data.createGroup;
+      const group = data.createGroup;
+      await (global as any).addUserToGroup(group.id, process.env.TEST_USER_ID);
+      return group;
     };
     await (global as any).authKcAdmin();
   });
