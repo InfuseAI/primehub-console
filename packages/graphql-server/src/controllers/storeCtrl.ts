@@ -5,12 +5,16 @@ import mime from 'mime';
 
 import * as logger from '../logger';
 
-export const mountStoreCtrl = (router: Router, authenticateMiddleware: Middleware, checkUserGroup: Middleware, minioClient: Client, storeBucket: string) => {
+export const mountStoreCtrl = (router: Router,
+                               authenticateMiddleware: Middleware,
+                               checkUserGroup: Middleware,
+                               minioClient: Client,
+                               storeBucket: string) => {
   router.get('/files/(.*)', authenticateMiddleware, checkUserGroup,
     async ctx => {
       const objectPath = decodeURIComponent(ctx.request.path.split('/groups').pop());
       let download = false;
-      if ('download' in ctx.request.query && ctx.request.query['download'] === '1') {
+      if ('download' in ctx.request.query && ctx.request.query.download === '1') {
         download = true;
       }
       let req;
