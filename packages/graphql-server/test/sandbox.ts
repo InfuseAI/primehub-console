@@ -9,6 +9,7 @@ import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
 import CrdClient from '../src/crdClient/crdClientImpl';
+import { createMinioClient } from '../src/utils/minioClient';
 const crdClient = new CrdClient();
 (global as any).crdClient = crdClient;
 
@@ -27,6 +28,13 @@ const masterRealmCred = {
   grantType: 'password',
   clientId: 'admin-cli'
 };
+
+console.log('Creating minio bucket for test');
+const mClient = createMinioClient('http://127.0.0.1:9000', 'minioadmin', 'minioadmin');
+mClient.makeBucket('test', '', function(err) {
+  if (err) return console.log('Error creating bucket.', err)
+  console.log('Bucket created successfully.')
+})
 
 const inCluster = (process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT);
 

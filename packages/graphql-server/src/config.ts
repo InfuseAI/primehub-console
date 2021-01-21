@@ -126,6 +126,10 @@ const defaultConfigs = {
   usageReportAPIHost: 'http://localhost:5000',
   sharedSpaceTusdEndpoint: 'http://localhost:1080/files/',
   enableTelemetry: false,
+  storeAccessKey: 'minioadmin',
+  storeSecretKey: 'minioadmin',
+  storeBucket: 'test',
+  storeEndpoint: 'http://127.0.0.1:9000',
 };
 
 const prodConfigs = {

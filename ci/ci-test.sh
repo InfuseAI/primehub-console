@@ -58,6 +58,14 @@ setup_k3d() {
   done
 }
 
+setup_minio() {
+  echo "┌────────────────────┐"
+  echo "│ Setup MinIO        │"
+  echo "└────────────────────┘"
+  mkdir -p minio_data
+  docker run -d --rm -p 9000:9000 -v `pwd`/minio_data:/data minio/minio server /data
+}
+
 setup_keycloak() {
   echo "┌────────────────────┐"
   echo "│ Run local keycloak │"
@@ -85,4 +93,5 @@ run_test() {
 wait_for_docker
 setup_k3d
 setup_keycloak
+setup_minio
 run_test
