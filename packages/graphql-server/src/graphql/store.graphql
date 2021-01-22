@@ -1,16 +1,25 @@
-type File {
+type StoreFile {
   name: String
-  prefix: String
-  size: Float
+  size: Int
   lastModified: String
 }
 
-input FileWhereInput {
-  groupName: String!
-  prefix: String!
+type StoreFileList {
+  items: [StoreFile]
+  phfsPrefix: String
+  prefix: String
 }
 
-input FileOptionInput {
+input StoreFileWhereInput {
+  groupName: String!
+  phfsPrefix: String!
+}
+
+input StoreFileListOptionInput {
   limit: Int
+  recursive: Boolean
+}
+
+input StoreFileDeleteOptionInput {
   recursive: Boolean
 }

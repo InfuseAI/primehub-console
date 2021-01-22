@@ -9,9 +9,8 @@ const {NOT_AUTH_ERROR, INTERNAL_ERROR} = ErrorCodes;
 
 interface StoreFile {
   name?: string;
-  prefix?: string;
   size?: number;
-  lastModified?: Date;
+  lastModified?: string;
 }
 
 const canUserQueryFiles = async (context: Context, userId: string, groupName: string): Promise<boolean> => {
@@ -26,11 +25,11 @@ const listQuery = async (context: Context, prefix: string, limit: number, recurs
     const stream = minioClient.listObjects(storeBucket, prefix, recursive);
     stream.on('data', obj => {
       if (limit === 0 || fetchedFiles.length < limit) {
+        const removedPrefixName = obj.name ? obj.name.replace(prefix, '') : obj.prefix.replace(prefix, '');
         fetchedFiles.push({
-          name: obj.name,
-          prefix: obj.prefix,
+          name: removedPrefixName,
           size: obj.size,
-          lastModified: obj.lastModified,
+          lastModified: obj.lastModified ? obj.lastModified.toISOString() : null,
         });
       }
     });
@@ -45,9 +44,28 @@ const listQuery = async (context: Context, prefix: string, limit: number, recurs
   return listObjects;
 };
 
+const generatePrefixForQuery = (groupName: string, phfsPrefix: string, recursive: boolean) => {
+  if (!phfsPrefix.startsWith('/')) {
+    phfsPrefix = '/'  + phfsPrefix;
+  }
+  if (recursive === false) {
+    if (!phfsPrefix.endsWith('/')) {
+      phfsPrefix = phfsPrefix + '/';
+    }
+  }
+
+  const groupPath = toGroupPath(groupName);
+  const fullPrefix = `/groups/${groupPath}${phfsPrefix}`;
+
+  return {
+    fullPrefix,
+    phfsPrefix
+  };
+};
+
 export const query = async (root, args, context: Context) => {
   const {userId} = context;
-  const {groupName, prefix} = args.where;
+  const {groupName, phfsPrefix} = args.where;
 
   const viewable = await canUserQueryFiles(context, userId, groupName);
   if (!viewable) {
@@ -58,13 +76,16 @@ export const query = async (root, args, context: Context) => {
   if (args.options && args.options.limit) {
     limit = args.options.limit;
   }
+  let recursive = false;
+  if (args.options && args.options.recursive) {
+    recursive = args.options.recursive;
+  }
 
-  const groupPath = toGroupPath(groupName);
-  const fullPrefix = `/groups/${groupPath}/${prefix}`;
+  const modifiedPrefixes = generatePrefixForQuery(groupName, phfsPrefix, recursive);
 
   let fetchedFiles: StoreFile[] = [];
   try {
-    fetchedFiles = await listQuery(context, fullPrefix, limit, false);
+    fetchedFiles = await listQuery(context, modifiedPrefixes.fullPrefix, limit, recursive);
   } catch (err) {
     logger.error({
       component: logger.components.store,
@@ -75,12 +96,16 @@ export const query = async (root, args, context: Context) => {
     throw new ApolloError('failed to list store objects', INTERNAL_ERROR);
   }
 
-  return fetchedFiles;
+  return {
+    items: fetchedFiles,
+    phfsPrefix: modifiedPrefixes.phfsPrefix,
+    prefix: modifiedPrefixes.fullPrefix.substring(1),
+  };
 };
 
 export const destroy = async (root, args, context: Context) => {
   const {minioClient, storeBucket, userId} = context;
-  const {groupName, prefix} = args.where;
+  const {groupName, phfsPrefix} = args.where;
 
   const viewable = await canUserQueryFiles(context, userId, groupName);
   if (!viewable) {
@@ -91,17 +116,13 @@ export const destroy = async (root, args, context: Context) => {
   if (args.options && args.options.recursive) {
     recursive = args.options.recursive;
   }
-  let limit = 0;
-  if (args.options && args.options.limit) {
-    limit = args.options.limit;
-  }
 
   const groupPath = toGroupPath(groupName);
-  const fullPrefix = `/groups/${groupPath}/${prefix}`;
+  const fullPrefix = `/groups/${groupPath}/${phfsPrefix}`;
 
   let fetchedFiles: StoreFile[] = [];
   try {
-    fetchedFiles = await listQuery(context, fullPrefix, limit, recursive);
+    fetchedFiles = await listQuery(context, fullPrefix, 0, recursive);
   } catch (err) {
     logger.error({
       component: logger.components.store,
@@ -113,14 +134,17 @@ export const destroy = async (root, args, context: Context) => {
   }
   const removeObjNames = [];
   for (const element of fetchedFiles) {
-    if (element.name) {
-      removeObjNames.push(element.name);
+    if (recursive) {
+      removeObjNames.push(`${fullPrefix}${element.name}`);
+    } else if (recursive === false && element.name === '') {
+      // Element name is without prefix, therefore, if it's exactly match, it will be an empty string
+      removeObjNames.push(`${fullPrefix}`);
     }
   }
 
   try {
     await minioClient.removeObjects(storeBucket, removeObjNames);
-    return 0;
+    return removeObjNames.length;
   } catch (err) {
     logger.error({
       component: logger.components.store,

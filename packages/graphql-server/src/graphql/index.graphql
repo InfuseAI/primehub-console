@@ -6,7 +6,7 @@
 # import Announcement, AnnouncementConnection, AnnouncementWhereInput, AnnouncementWhereUniqueInput, AnnouncementCreateInput, AnnouncementUpdateInput from "./announcement.graphql"
 # import Dataset, DatasetOrderByInput, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretOrderByInput, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
-# import File, FileWhereInput, FileOptionInput from "./store.graphql"
+# import StoreFileList, StoreFileWhereInput, StoreFileListOptionInput, StoreFileDeleteOptionInput from "./store.graphql"
 
 scalar JSON
 
@@ -179,9 +179,9 @@ type Query {
 
   """STORE"""
   files(
-    where: FileWhereInput!
-    options: FileOptionInput
-  ): [File]!
+    where: StoreFileWhereInput!
+    options: StoreFileListOptionInput
+  ): StoreFileList!
 }
 
 type Mutation {
@@ -231,5 +231,5 @@ type Mutation {
   deleteDataset(where: DatasetWhereUniqueInput!): Dataset
 
   """STORE"""
-  deleteFiles(where: FileWhereInput!, options: FileOptionInput): Int
+  deleteFiles(where: StoreFileWhereInput!, options: StoreFileDeleteOptionInput): Int
 }
