@@ -10,7 +10,7 @@ const {NOT_AUTH_ERROR, INTERNAL_ERROR} = ErrorCodes;
 interface StoreFile {
   name?: string;
   size?: number;
-  lastModified?: Date;
+  lastModified?: string;
 }
 
 const canUserQueryFiles = async (context: Context, userId: string, groupName: string): Promise<boolean> => {
@@ -29,7 +29,7 @@ const listQuery = async (context: Context, prefix: string, limit: number, recurs
         fetchedFiles.push({
           name: removedPrefixName,
           size: obj.size,
-          lastModified: obj.lastModified,
+          lastModified: obj.lastModified ? obj.lastModified.toISOString() : null,
         });
       }
     });
