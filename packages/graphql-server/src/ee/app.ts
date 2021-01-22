@@ -14,7 +14,6 @@ import { makeExecutableSchema, mergeSchemas } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
 import { keycloakMaxCount } from '../resolvers/constant';
 import request from 'request';
-import mime from 'mime';
 import url from 'url';
 
 import CrdClient, { InstanceTypeSpec, ImageSpec, client as kubeClient, kubeConfig } from '../crdClient/crdClientImpl';
@@ -46,6 +45,7 @@ import { PhJobCacheList } from './crdClient/phJobCacheList';
 import JobArtifactCleaner from './utils/jobArtifactCleaner';
 import { PodLogs } from '../controllers/logCtrl';
 import { mountTusCtrl } from '../controllers/tusCtrl';
+import { mountStoreCtrl } from '../controllers/storeCtrl';
 
 // cache
 import {
@@ -735,42 +735,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     config.usageReportAPIHost, '/report/monthly/details', authenticateMiddleware, checkIsAdmin);
 
   if (config.enableStore) {
-    // phfs file download api
-    rootRouter.get('/files/(.*)', authenticateMiddleware, checkUserGroup,
-      async ctx => {
-        const objectPath = decodeURIComponent(ctx.request.path.split('/groups').pop());
-        let req;
-        try {
-          req = await mClient.getObject(storeBucket, `groups${objectPath}`);
-        } catch (error) {
-          if (error.code === 'NoSuchKey') {
-            return ctx.status = 404;
-          } else {
-            logger.error({
-              component: logger.components.internal,
-              type: 'MINIO_GET_OBJECT_ERROR',
-              code: error.code,
-              message: error.message
-            });
-            ctx.res.end();
-          }
-        }
-
-        req.on('error', err => {
-          logger.error({
-            component: logger.components.internal,
-            type: 'MINIO_GET_OBJECT_ERROR',
-            message: err.message
-          });
-          ctx.res.end();
-        });
-
-        ctx.body = req;
-
-        const mimetype = mime.getType(objectPath);
-        ctx.set('Content-type', mimetype);
-      }
-    );
+    // store file download api
+    mountStoreCtrl(rootRouter, authenticateMiddleware, checkUserGroup, mClient, storeBucket);
 
     // shared space proxy to tusd
     const tusProxyPath = `${staticPath}tus`;
