@@ -20,6 +20,28 @@ type Image {
   spec: JSON
   useImagePullSecret: String
   groups: [Group]
+  isReady: Boolean
+  imageSpec: ImageSpec
+  jobStatus: JobStatus
+}
+
+type ImageSpec {
+  baseImage: String
+  pullSecret: String
+  packages: ImageSpecPackages
+  cancel: Boolean
+  updateTime: String
+}
+
+type ImageSpecPackages {
+  apt: [String]
+  pip: [String]
+  conda: [String]
+}
+
+type JobStatus {
+  image: String
+  phase: String
 }
 
 """order"""
@@ -85,6 +107,7 @@ input ImageCreateInput {
   global: Boolean
   useImagePullSecret: String
   groups: GroupCreateManyInput
+  imageSpec: ImageSpecUpdateInput
 }
 
 input ImageUpdateInput {
@@ -98,4 +121,18 @@ input ImageUpdateInput {
   global: Boolean
   useImagePullSecret: String
   groups: GroupUpdateManyInput
+  imageSpec: ImageSpecUpdateInput
+}
+
+input ImageSpecUpdateInput {
+  baseImage: String
+  pullSecret: String
+  packages: ImageSpecPackagesInput
+  cancel: Boolean
+}
+
+input ImageSpecPackagesInput {
+  apt: [String]
+  pip: [String]
+  conda: [String]
 }

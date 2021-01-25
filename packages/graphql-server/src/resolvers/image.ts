@@ -10,7 +10,7 @@ import { createConfig } from '../config';
 import * as logger from '../logger';
 import { ErrorCodes } from '../errorCodes';
 
-const {EXCEED_QUOTA_ERROR, NOT_AUTH_ERROR} = ErrorCodes;
+const {EXCEED_QUOTA_ERROR, NOT_AUTH_ERROR, INTERNAL_ERROR} = ErrorCodes;
 
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 
@@ -46,6 +46,9 @@ export const mapping = (item: Item<ImageSpec>) => {
     useImagePullSecret: item.spec.pullSecret,
     groupName: item.spec.groupName,
     spec: item.spec,
+    isReady: item.spec.url ? true : false,
+    imageSpec: item.spec.imageSpec,
+    jobStatus: item.status ? item.status.jobCondition : null,
   };
 };
 
@@ -170,7 +173,8 @@ export const createMapping = (data: any) => {
       url,
       urlForGpu,
       pullSecret: isNil(data.useImagePullSecret) ? '' : data.useImagePullSecret,
-      groupName: isNil(data.groupName) ? null : data.groupName
+      groupName: isNil(data.groupName) ? null : data.groupName,
+      imageSpec: isNil(data.imageSpec) ? null : data.imageSpec
     }
   };
 };
@@ -224,7 +228,8 @@ export const updateMapping = (data: any) => {
       url,
       urlForGpu,
       pullSecret: isNil(data.useImagePullSecret) ? null : data.useImagePullSecret,
-      groupName: isNil(data.groupName) ? null : data.groupName
+      groupName: isNil(data.groupName) ? null : data.groupName,
+      imageSpec: isNil(data.imageSpec) ? null : data.imageSpec
     }
   };
 };
@@ -258,6 +263,28 @@ export const groupImagesConnection = async (root, args, context: Context) => {
   return toRelay(rows, extractPagination(args));
 };
 
+export const cancelImageBuild = async (root, args, context: Context) => {
+  const name = args.where.id;
+  const customResource = context.crdClient[this.crd.customResourceMethod];
+  try {
+    const item = await customResource.get(name);
+    item.spec.imageSpec.cancel = true;
+    customResource.patch(name, {
+      spec: item.spec
+    });
+    return this.mapping(item);
+  } catch (err) {
+    logger.error({
+      component: logger.components.image,
+      type: 'IMAGE_UPDATE',
+      stacktrace: err.stack,
+      message: err.message
+    });
+    throw new ApolloError('failed to cancel image build', INTERNAL_ERROR);
+    return null;
+  }
+};
+
 export const customResolvers = () => {
   return {
     [`groupImagesConnection`]: groupImagesConnection,
@@ -267,6 +294,12 @@ export const customResolvers = () => {
 export const customResolversInGroup = () => {
   return {
     [`groupImages`]: groupImages,
+  };
+};
+
+export const customResolversInMutation = () => {
+  return {
+    [`cancelImageBuild`]: cancelImageBuild,
   };
 };
 
@@ -284,5 +317,6 @@ export const crd = new Crd<ImageSpec>({
   beforeDelete,
   onCreate,
   onUpdate,
-  customResolvers
+  customResolvers,
+  customResolversInMutation
 });

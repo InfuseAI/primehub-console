@@ -48,6 +48,7 @@ export class Crd<SpecType> {
   private preCreateCheck?: (data: any) => Promise<any>;
   private customResolvers?: () => any;
   private customResolversInGroup?: () => any;
+  private customResolversInMutation?: () => any;
 
   constructor({
     customResourceMethod,
@@ -68,7 +69,8 @@ export class Crd<SpecType> {
     generateName,
     preCreateCheck,
     customResolvers,
-    customResolversInGroup
+    customResolversInGroup,
+    customResolversInMutation
   }: {
     customResourceMethod: string,
     propMapping: (item: Item<SpecType>) => Record<string, any>,
@@ -99,6 +101,7 @@ export class Crd<SpecType> {
     preCreateCheck?: (data: any) => Promise<any>,
     customResolvers?: () => any,
     customResolversInGroup?: () => any,
+    customResolversInMutation?: () => any,
   }) {
     this.customResourceMethod = customResourceMethod;
     this.propMapping = propMapping;
@@ -120,6 +123,7 @@ export class Crd<SpecType> {
     this.preCreateCheck = preCreateCheck;
     this.customResolvers = customResolvers || (() => undefined);
     this.customResolversInGroup = customResolversInGroup || (() => undefined);
+    this.customResolversInMutation = customResolversInMutation || (() => undefined);
   }
 
   public setCache(cache: CrdCache<SpecType>) {
@@ -189,7 +193,8 @@ export class Crd<SpecType> {
     return {
       [`create${typename}`]: this.create,
       [`update${typename}`]: this.update,
-      [`delete${typename}`]: this.destroy
+      [`delete${typename}`]: this.destroy,
+      ...this.customResolversInMutation()
     };
   }
 
