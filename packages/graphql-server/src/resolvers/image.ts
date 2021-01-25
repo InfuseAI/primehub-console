@@ -5,6 +5,7 @@ import { QueryImageMode, toRelay, extractPagination, mutateRelation, isGroupAdmi
 import { ApolloError } from 'apollo-server';
 import { Crd } from './crd';
 import { isEmpty, isUndefined, isNil, isNull, get, omit, unionBy } from 'lodash';
+import moment = require('moment');
 import { ResourceNamePrefix } from './resourceRole';
 import { createConfig } from '../config';
 import * as logger from '../logger';
@@ -263,6 +264,29 @@ export const groupImagesConnection = async (root, args, context: Context) => {
   return toRelay(rows, extractPagination(args));
 };
 
+export const rebuildImage = async (root, args, context: Context) => {
+  const name = args.where.id;
+  const customResource = context.crdClient[this.crd.customResourceMethod];
+  try {
+    const item = await customResource.get(name);
+    item.spec.imageSpec.cancel = false;
+    item.spec.imageSpec.updateTime = moment.utc().toISOString();
+    customResource.patch(name, {
+      spec: item.spec
+    });
+    return this.mapping(item);
+  } catch (err) {
+    logger.error({
+      component: logger.components.image,
+      type: 'IMAGE_UPDATE',
+      stacktrace: err.stack,
+      message: err.message
+    });
+    throw new ApolloError('failed to rebuild image', INTERNAL_ERROR);
+    return null;
+  }
+};
+
 export const cancelImageBuild = async (root, args, context: Context) => {
   const name = args.where.id;
   const customResource = context.crdClient[this.crd.customResourceMethod];
@@ -299,6 +323,7 @@ export const customResolversInGroup = () => {
 
 export const customResolversInMutation = () => {
   return {
+    [`rebuildImage`]: rebuildImage,
     [`cancelImageBuild`]: cancelImageBuild,
   };
 };
