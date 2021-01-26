@@ -29,6 +29,21 @@ const fields = `
     quotaGpu
   }`;
 
+const customImageFields = `
+  id
+  name
+  isReady
+  imageSpec {
+    baseImage
+    pullSecret
+    packages {
+      apt
+      pip
+      conda
+    }
+    cancel
+  }`;
+
 declare module 'mocha' {
   // tslint:disable-next-line:interface-name
   interface ISuiteCallbackContext {
@@ -713,5 +728,65 @@ describe('image graphql', function() {
     });
 
     expect(data.image).to.be.null;
+  });
+
+  it('create a custom image with only name', async () => {
+    const data = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      imageSpec: {
+        baseImage: 'jupyter/base-notebook:foo',
+        packages: {
+          apt: ['curl'],
+          pip: []
+        }
+      }
+    };
+    const mutation = await this.graphqlRequest(`
+    mutation($data: ImageCreateInput!){
+      createImage (data: $data) { ${customImageFields} }
+    }`, {
+      data
+    });
+
+    expect(mutation.createImage).to.be.eql({
+      id: data.name,
+      name: data.name,
+      isReady: false,
+      imageSpec: {
+        baseImage: data.imageSpec.baseImage,
+        packages: {
+          apt: ['curl'],
+          pip: [],
+          conda: []
+        },
+        cancel: false,
+        pullSecret: null
+      }
+    });
+
+    // get one
+    const queryOne = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${customImageFields} }
+    }`, {
+      where: {id: data.name}
+    });
+
+    expect(queryOne.image).to.be.eql({
+      id: data.name,
+      name: data.name,
+      isReady: false,
+      imageSpec: {
+        baseImage: data.imageSpec.baseImage,
+        packages: {
+          apt: ['curl'],
+          pip: [],
+          conda: []
+        },
+        cancel: false,
+        pullSecret: null
+      }
+    });
+    this.currentImage = queryOne.image;
   });
 });
