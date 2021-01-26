@@ -39,8 +39,7 @@ const imageSpecMapping = (imageSpec: ImageCrdImageSpec) => {
   const packages = { apt: [], pip: [], conda: [] };
 
   if (imageSpec.packages) {
-    const keys = Object.keys(packages);
-    keys.forEach(k => {
+    Object.keys(packages).forEach(k => {
       if (k in imageSpec.packages && imageSpec.packages[k]) {
         packages[k] = imageSpec.packages[k];
       }
@@ -49,7 +48,7 @@ const imageSpecMapping = (imageSpec: ImageCrdImageSpec) => {
   }
 
   return imageSpec;
-}
+};
 
 export const mapping = (item: Item<ImageSpec>) => {
   return {

@@ -92,7 +92,7 @@ export interface ImageCrdImageSpec {
   cancel?: boolean;
 }
 
-export type ImageCrdImageSpecPackages = {
+export interface ImageCrdImageSpecPackages {
   apt?: string[];
   pip?: string[];
   conda?: string[];
