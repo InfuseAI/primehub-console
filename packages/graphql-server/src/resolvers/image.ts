@@ -1,10 +1,10 @@
 import { Context } from './interface';
 import { Item } from '../crdClient/customResource';
-import { ImageSpec, ImageType } from '../crdClient/crdClientImpl';
+import { ImageSpec, ImageType, ImageCrdImageSpec } from '../crdClient/crdClientImpl';
 import { QueryImageMode, toRelay, extractPagination, mutateRelation, isGroupAdmin, isAdmin } from './utils';
 import { ApolloError } from 'apollo-server';
 import { Crd } from './crd';
-import { isEmpty, isUndefined, isNil, isNull, get, omit, unionBy } from 'lodash';
+import { isEmpty, isUndefined, isNil, isNull, get, omit, unionBy, keys } from 'lodash';
 import moment = require('moment');
 import { ResourceNamePrefix } from './resourceRole';
 import { createConfig } from '../config';
@@ -35,6 +35,22 @@ const beforeDelete = async ({data, context}: {data: any, context: any}): Promise
   await adminAuthorization({data: spec, context});
 };
 
+const imageSpecMapping = (imageSpec: ImageCrdImageSpec) => {
+  const packages = { apt: [], pip: [], conda: [] };
+
+  if (imageSpec.packages) {
+    const keys = Object.keys(packages);
+    keys.forEach(k => {
+      if (k in imageSpec.packages && imageSpec.packages[k]) {
+        packages[k] = imageSpec.packages[k];
+      }
+    });
+    imageSpec.packages = packages;
+  }
+
+  return imageSpec;
+}
+
 export const mapping = (item: Item<ImageSpec>) => {
   return {
     id: item.metadata.name,
@@ -48,7 +64,7 @@ export const mapping = (item: Item<ImageSpec>) => {
     groupName: item.spec.groupName,
     spec: item.spec,
     isReady: item.spec.url ? true : false,
-    imageSpec: item.spec.imageSpec,
+    imageSpec: item.spec.imageSpec ? imageSpecMapping(item.spec.imageSpec) : null,
     jobStatus: item.status ? item.status.jobCondition : null,
   };
 };

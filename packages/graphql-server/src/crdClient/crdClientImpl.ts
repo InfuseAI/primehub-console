@@ -86,14 +86,16 @@ export interface AnnouncementSpec {
 export interface ImageCrdImageSpec {
   baseImage?: string;
   pullSecret?: string;
-  packages?: {
-    apt?: string[];
-    pip?: string[];
-    conda?: string[];
-  };
+  packages?: ImageCrdImageSpecPackages;
   // iso8601
   updateTime?: string;
   cancel?: boolean;
+}
+
+export type ImageCrdImageSpecPackages = {
+  apt?: string[];
+  pip?: string[];
+  conda?: string[];
 }
 
 export interface ImageSpecSpec {
