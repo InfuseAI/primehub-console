@@ -121,7 +121,6 @@ input ImageUpdateInput {
   global: Boolean
   useImagePullSecret: String
   groups: GroupUpdateManyInput
-  imageSpec: ImageSpecUpdateInput
 }
 
 input ImageSpecUpdateInput {

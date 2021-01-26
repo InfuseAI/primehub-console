@@ -218,7 +218,7 @@ type Mutation {
   createImage(data: ImageCreateInput!): Image!
   updateImage(data: ImageUpdateInput!, where: ImageWhereUniqueInput!): Image
   deleteImage(where: ImageWhereUniqueInput!): Image
-  rebuildImage(where: ImageWhereUniqueInput!): Image
+  rebuildImage(data: ImageSpecUpdateInput!, where: ImageWhereUniqueInput!): Image
   cancelImageBuild(where: ImageWhereUniqueInput!): Image
 
   """Announcement"""

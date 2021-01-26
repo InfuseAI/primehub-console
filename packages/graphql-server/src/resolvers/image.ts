@@ -282,9 +282,15 @@ export const groupImagesConnection = async (root, args, context: Context) => {
 
 export const rebuildImage = async (root, args, context: Context) => {
   const name = args.where.id;
+  const imageSpec = args.data;
   const customResource = context.crdClient[this.crd.customResourceMethod];
   try {
     const item = await customResource.get(name);
+    if (item.spec.imageSpec === null) {
+      throw new Error(`image '${name}' is not a custom build image`);
+    }
+
+    item.spec.imageSpec = imageSpec;
     item.spec.imageSpec.cancel = false;
     item.spec.imageSpec.updateTime = moment.utc().toISOString();
     customResource.patch(name, {
@@ -308,6 +314,10 @@ export const cancelImageBuild = async (root, args, context: Context) => {
   const customResource = context.crdClient[this.crd.customResourceMethod];
   try {
     const item = await customResource.get(name);
+    if (item.spec.imageSpec === null) {
+      throw new Error(`image '${name}' is not a custom build image`);
+    }
+
     item.spec.imageSpec.cancel = true;
     customResource.patch(name, {
       spec: item.spec
