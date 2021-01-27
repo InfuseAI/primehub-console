@@ -108,6 +108,27 @@ export const onCreate = async (
         }
       });
     }
+
+    if (resource.spec && resource.spec.imageSpec) {
+      const name = resource.metadata.name;
+      resource.spec.imageSpec.cancel = false;
+      resource.spec.imageSpec.updateTime = moment.utc().toISOString();
+
+      try {
+        const customResource = context.crdClient[this.crd.customResourceMethod];
+        customResource.patch(name, {
+          spec: resource.spec
+        });
+      } catch (err) {
+        logger.error({
+          component: logger.components.image,
+          type: 'IMAGE_CREATE',
+          stacktrace: err.stack,
+          message: err.message
+        });
+        throw new ApolloError('failed to create custom image', INTERNAL_ERROR);
+      }
+    }
 };
 
 export const onUpdate = async (
