@@ -34,7 +34,7 @@ import DeploymentEditPage from 'ee/containers/deploymentEditPage';
 import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
-import ShareFilesUploader from 'components/sharefiles/uploader';
+import ShareFilesPage from 'components/sharefiles/shareFilesPage';
 
 const client = createGraphqlClient({
   fakeData,
@@ -139,7 +139,7 @@ class Main extends React.Component {
 
             {/* Shared Files */}
             <Route path={`${appPrefix}g/:groupName/browse`} exact>
-              <ShareFilesUploader />
+              <ShareFilesPage />
             </Route>
 
             {/* Group Images management*/}
