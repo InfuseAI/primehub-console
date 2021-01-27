@@ -789,12 +789,10 @@ describe('image graphql', function() {
 
   it('rebuild a custom image', async () => {
     const data = {
-      imageSpec: {
-        baseImage: 'jupyter/base-notebook:foo',
-        packages: {
-          apt: ['curl', 'vim'],
-          pip: ['flask']
-        }
+      baseImage: 'jupyter/base-notebook:foo',
+      packages: {
+        apt: ['curl', 'vim'],
+        pip: ['flask']
       }
     };
     const where = {
