@@ -424,7 +424,21 @@ export const fakeData = {
       'hello': 123,
       'new': 'fdsafdsafdsafdsafdsafdsafdsagdsags'
     }
-  }]
+  }],
+  license: {
+    "startedAt": "2018-07-21T08:19:43Z",
+    "expiredAt": "2021-07-21T08:19:43Z",
+    "maxGroup": 50,
+    "maxNode": 10,
+    "maxModelDeploy": -1,
+    "licensedTo": "InfuseAI",
+    "licenseStatus": "expired",
+    "usage": {
+      "maxGroup": 51,
+      "maxNode": 10,
+      "maxModelDeploy": 0
+    }
+  }
 };
 
 export const schema =  {
@@ -433,5 +447,6 @@ export const schema =  {
   images: {type: 'array', items: {type: 'object'}},
   phJobs: {type: 'array', items: {type: 'object'}},
   phSchedules: {type: 'array', items: {type: 'object'}},
-  phDeployments: {type: 'array', items: {type: 'object'}}
+  phDeployments: {type: 'array', items: {type: 'object'}},
+  license: {type: 'object'}
 };

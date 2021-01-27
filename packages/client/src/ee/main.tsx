@@ -8,6 +8,7 @@ import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
 import { fakeData, schema } from './fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
+import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
 
 // Icons
 import iconJupyterHub from 'images/icon-jupyterhub.svg';
@@ -129,7 +130,8 @@ class Main extends React.Component {
     return (
       <BrowserRouter>
         <ApolloProvider client={client}>
-          <MainPage sidebarItems={sidebarItems}>
+          <MainPage sidebarItems={sidebarItems} notification={<LicenseWarningBanner/>}>
+
             {/* Jupyterhub */}
             <Route path={`${appPrefix}g/:groupName/hub`} exact>
               <Jupyterhub />
