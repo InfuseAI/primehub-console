@@ -25,11 +25,11 @@ export const fakeData = {
         urlForGpu: null,
         groupName: 'group1'
       }],
-      resourceStatus: {        
-        cpuUsage: 0,        
-        gpuUsage: 0,        
-        memUsage: 0      
-      },      
+      resourceStatus: {
+        cpuUsage: 0,
+        gpuUsage: 0,
+        memUsage: 0
+      },
       datasets: [],
       jobDefaultActiveDeadlineSeconds: 86400,
     }, {
@@ -424,7 +424,38 @@ export const fakeData = {
       'hello': 123,
       'new': 'fdsafdsafdsafdsafdsafdsafdsagdsags'
     }
-  }]
+  }],
+  files: {
+    prefix: 'groups/phusers/is/fake/path',
+    phfsPrefix: '/is/fake/path',
+    items: [
+      {
+        "name": "test.png",
+        "size": 162,
+        "lastModified": "2020-11-09T10:07:07.143Z",
+      },
+      {
+        "name": "test.jpg",
+        "size": 162,
+        "lastModified": "2020-11-09T10:07:07.143Z",
+      },
+      {
+        "name": "test.txt",
+        "size": 162,
+        "lastModified": "2020-11-09T10:07:07.143Z",
+      },
+      {
+        "name": "test.ipynb",
+        "size": 162,
+        "lastModified": "2020-11-09T10:07:07.143Z",
+      },
+      {
+        "name": "test/",
+        "size": 0,
+        "lastModified": null,
+      },
+    ],
+  }
 };
 
 export const schema =  {
@@ -433,5 +464,6 @@ export const schema =  {
   images: {type: 'array', items: {type: 'object'}},
   phJobs: {type: 'array', items: {type: 'object'}},
   phSchedules: {type: 'array', items: {type: 'object'}},
-  phDeployments: {type: 'array', items: {type: 'object'}}
+  phDeployments: {type: 'array', items: {type: 'object'}},
+  files: {type: 'object'}
 };
