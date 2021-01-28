@@ -215,6 +215,7 @@ class Browser extends React.Component<Props, State> {
             return <><Icon style={iconStyle} type="file" />{name}</>;
           }
         },
+        sorter: (left, right) => left.name.localeCompare(right.name),
       },
       {
         title: 'Size',
@@ -224,7 +225,12 @@ class Browser extends React.Component<Props, State> {
         width: 120,
         render: (size, record) => {
           return !record.name.endsWith('/') ? humanFileSize(size, true, 1) : undefined;
-        }
+        },
+        sorter: (left, right) => {
+          let leftSize = left.size || 0;
+          let rightSize = right.size || 0;
+          return leftSize - rightSize;
+        },
       },
       {
         title: 'Last Modified',
@@ -234,6 +240,11 @@ class Browser extends React.Component<Props, State> {
         width: 200,
         render: (lastModified, record) => {
           return !record.name.endsWith('/') ? moment(lastModified).format('YYYY-MM-DD HH:mm:ss') : undefined;
+        },
+        sorter: (left, right) => {
+          let leftTime = Date.parse(left.lastModified) || 0;
+          let rightTime = Date.parse(right.lastModified) || 0;
+          return leftTime - rightTime;
         },
       },
       {
@@ -259,7 +270,7 @@ class Browser extends React.Component<Props, State> {
       pageSizeOptions: ['10', '25', '50', '100']
     };
 
-    return <Table dataSource={dataSource} columns={columns} pagination={pagination}/>
+    return <Table style={{paddingTop: 8}}dataSource={dataSource} columns={columns} pagination={pagination}/>
 
   }
 }
