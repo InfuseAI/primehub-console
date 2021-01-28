@@ -7,6 +7,8 @@ import { withAccessToken} from 'components/helpers/withAccessToken';
 import { GroupContextComponentProps, withGroupContext} from 'context/group';
 import {withRouter} from 'react-router-dom';
 import Browser from './browser';
+import { appPrefix } from 'utils/env';
+import { RouteComponentProps } from 'react-router';
 
 const breadcrumbs = [
   {
@@ -18,7 +20,7 @@ const breadcrumbs = [
 ];
 
 
-interface Props extends GroupContextComponentProps {
+interface Props extends GroupContextComponentProps, RouteComponentProps {
 
 }
 
@@ -27,18 +29,20 @@ interface State {
 }
 
 class ShareFilesPage extends React.Component<Props, State> {
-
-  state = {
-    path: '/'
-  }
-
   onPathChanged (newPath) {
-    this.setState({path: newPath});
+    // this.setState({path: newPath});
+    const {history, groupContext} = this.props;
+    history.push(`${appPrefix}g/${groupContext.name}/browse${newPath}` )
   }
 
   render () {
-    const {groupContext} =this.props;
-    const {path} = this.state;
+    const {groupContext, match} =this.props;
+    let path:string = (match.params as any).phfsPrefix || '';
+
+    if (! path.startsWith('/')) {
+      path = '/' + path;
+    }
+
     return <div>
       <PageTitle
         breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}

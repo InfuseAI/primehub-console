@@ -136,7 +136,10 @@ class Main extends React.Component {
             </Route>
 
             {/* Shared Files */}
-            <Route path={`${appPrefix}g/:groupName/browse`} exact>
+            {/* <Route path={`${appPrefix}g/:groupName/browse`}>
+              <ShareFilesPage />
+            </Route> */}
+            <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
               <ShareFilesPage />
             </Route>
 

@@ -4,14 +4,22 @@ import {graphql} from 'react-apollo';
 import {errorHandler} from 'utils/errorHandler';
 import {get} from 'lodash';
 import {appPrefix} from 'utils/env';
-import { Table, Alert } from 'antd';
+import { Table, Alert, Breadcrumb, Icon, Input, Skeleton } from 'antd';
+import { RouteComponentProps, withRouter } from 'react-router';
+import {compose} from 'recompose';
+import moment from 'moment';
+import { ColumnProps } from 'antd/lib/table';
 
-type Props = {
+interface Props extends RouteComponentProps {
   path: string;
   groupName: string;
   onPathChanged?: Function;
   data?: any;
 };
+
+interface State {
+  editPath: boolean;
+}
 
 export const GET_FILES = gql`
   query files($where: StoreFileWhereInput!) {
@@ -62,25 +70,97 @@ const getDownloadUrl = (prefix, name) => {
   return `${appPrefix}files/${prefix}/${name}?`
 }
 
-class Browser extends React.Component<Props> {
+class Browser extends React.Component<Props, State> {
 
-  public handleFolderClick = (folder) => {
+  state = {
+    editPath: false
+  };
+  pathInput = undefined;
+
+  private handleFolderClick = (folder) => {
     const {
       path: path,
       onPathChanged
     } = this.props;
-    const targetPath = path + folder;
+    const targetPath = path.endsWith('/') ? `${path}${folder}` : `${path}/${folder}`;
     if (onPathChanged) {
       onPathChanged(targetPath);
     }
   }
 
+  private handlePathChange = (targetPath) => {
+    const {
+      onPathChanged
+    } = this.props;
+
+    if (onPathChanged) {
+      onPathChanged(targetPath);
+    }
+  }
+
+  private splitPath(): string[] {
+    let {path} = this.props;
+    if (path.startsWith('/')) {
+      path = path.substring(1,path.length);
+    }
+    if (path.endsWith('/')) {
+      path = path.substring(0,path.length-1);
+    }
+
+    return path.length > 0 ? path.split('/') : [];
+  }
+
   public render = () => {
-    return <div style={{minHeight: 480}}>{this.renderContent()}</div>;
+    return <div>
+      <div style={{marginLeft: 15, display: this.state.editPath ? 'none' : 'block'}}>{this.renderPathBreadcrumb()}</div>
+      <div style={{marginLeft: 15, display: this.state.editPath ? 'block' : 'none'}}>{this.renderPathInput()}</div>
+      {this.renderContent()}
+    </div>
+  }
+
+  private renderPathBreadcrumb() {
+    let pathComponents = this.splitPath();
+    let items = [];
+    let currentPath = '/';
+
+
+    items.push(<Breadcrumb.Item><a onClick={()=>{this.handlePathChange('/')}}><Icon type="database"  style={{fontSize: '12pt'}}/></a></Breadcrumb.Item>);
+    for (const component of pathComponents) {
+      currentPath += `${component}/`;
+      let targetPath = currentPath;
+      items.push(<Breadcrumb.Item><a onClick={()=>{this.handlePathChange(targetPath)}}>{component}</a></Breadcrumb.Item>);
+    }
+
+    items.push(
+      <Breadcrumb.Item>
+        <a onClick={() => {
+          this.setState({editPath: true}, () => {
+            this.pathInput.focus();
+          });
+        }}
+        >
+            <Icon type="folder-add" theme='filled' style={{fontSize: '14pt', position: 'relative', top: 2}}/>
+      </a></Breadcrumb.Item>);
+    return <Breadcrumb>{items}</Breadcrumb>
+  }
+
+  private renderPathInput() {
+    const {path} = this.props;
+    return <Input
+      prefix={<Icon type="database" style={{fontSize: '12pt'}}/>}
+      onPressEnter={(e) => {
+        let targetPath = (e.target as any).value;
+        this.handlePathChange(targetPath);
+        this.setState({editPath:false});
+      }}
+      onFocus={(e) => {e.target.value = path.endsWith('/') ? path : path + '/'}}
+      onBlur={() => {this.setState({editPath: false})}}
+      ref={(input) => {this.pathInput = input}}
+    />
   }
 
   private renderContent = () => {
-    const {data, path} = this.props;
+    const {data} = this.props;
 
     if (!isPhfsEnabled()) {
       return <Alert
@@ -100,42 +180,58 @@ class Browser extends React.Component<Props> {
     }
 
     if (data.loading) {
-      return 'Loading...';
+      return <Skeleton active />
     }
 
-    const columns = [
+    const columns: ColumnProps<any>[] = [
       {
-        title: 'File',
+        title: 'Name',
         dataIndex: 'name',
         key: 'name',
+        render: (text, record, index)=> {
+          const iconStyle = {fontSize: '12pt', paddingRight: 16}
+          if (text.endsWith('/')) {
+            return <><Icon style={iconStyle} type="folder" /><a style={{color: "rgba(0, 0, 0, 0.65)"}}onClick={() => this.handleFolderClick(text)}>{text}</a></>;
+          } else {
+            return <><Icon style={iconStyle} type="file" />{text}</>;
+          }
+        },
       },
       {
         title: 'Size',
         dataIndex: 'size',
         key: 'size',
+        align: 'right',
+        width: 120,
+        render: (text, record, index) => {
+          return !record.name.endsWith('/') ? humanFileSize(text, true, 1) : undefined;
+        }
+      },
+      {
+        title: 'Last Modified',
+        dataIndex: 'lastModified',
+        key: 'lastModified',
+        align: 'right',
+        width: 200,
+        render: (text, record, index) => {
+          return !record.name.endsWith('/') ? moment(text.lastModified).format('YYYY-MM-DD HH:mm:ss') : undefined;
+        },
+      },
+      {
+        title: '',
+        key: 'action',
+        align: 'right',
+        width: 30,
+        render: () => {
+          return <Icon type="home" style={{fontSize: '12pt'}}/>;
+        },
       },
     ];
     let dataSource = [];
 
     if (data.files && data.files && data.files.items) {
       const prefix = data.files.prefix;
-      dataSource = data.files.items.map(item =>
-        {
-          const itemName: String = item.name || '';
-          let nameCell;
-
-          if (itemName.endsWith('/')) {
-            nameCell = <a onClick={() => this.handleFolderClick(itemName)}>{item.name}</a>;
-          } else {
-            nameCell = itemName;
-          }
-
-          return {
-            name: nameCell,
-            size: humanFileSize(item.size, true, 1),
-          }
-        }
-      );
+      dataSource = data.files.items;
     }
 
     const pagination = {
@@ -145,14 +241,14 @@ class Browser extends React.Component<Props> {
       pageSizeOptions: ['10', '25', '50', '100']
     };
 
-    return <div>
-      <div>{`Path: ${path}`}</div>
-      <Table dataSource={dataSource} columns={columns} pagination={pagination}/>
-    </div>
+    return <Table dataSource={dataSource} columns={columns} pagination={pagination}/>
+
   }
 }
 
-export default graphql(GET_FILES, {
+export default compose(
+  withRouter,
+  graphql(GET_FILES, {
   options: (props: Props) => ({
     variables: {
       where: {
@@ -165,4 +261,4 @@ export default graphql(GET_FILES, {
     skip: !isPhfsEnabled(),
     })
   })
-(Browser);
+)(Browser);
