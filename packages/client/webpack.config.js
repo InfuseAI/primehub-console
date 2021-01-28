@@ -13,7 +13,7 @@ resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/ee/index.schema.
 
 module.exports = {
   entry: {
-    index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
+    index: devMode ? './src/ee/index.tsx' : ['./src/public-import.js', './src/ee/index.tsx'],
     'main': devMode ? './src/ee/main.tsx' : ['./src/public-import.js', './src/ee/main.tsx'],
   },
   output: {

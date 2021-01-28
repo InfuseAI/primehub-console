@@ -88,8 +88,6 @@ class LicenseWarningBanner extends React.Component<Props, State> {
 export default graphql(GET_LICENSE, {
   options: (props: Props) => ({
     fetchPolicy: 'cache-and-network',
-    pollInterval: 10 * 60 * 1000,
-    onError: errorHandler,
     })
   })
 (LicenseWarningBanner);
