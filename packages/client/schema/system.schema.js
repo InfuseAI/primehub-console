@@ -1,5 +1,5 @@
 /** @jsx builder */
-import builder, {Block, Condition} from 'canner-script';
+import builder, {Block, Condition, Row, Col} from 'canner-script';
 import Tag from 'antd'
 import moment from 'moment';
 import 'moment-timezone';
@@ -11,12 +11,28 @@ const emailValidator = (value, cb) => {
 };
 
 export default () => (
-  <object keyName="system" title="${system}" >
+  <object keyName="system" title="${system}">
     <Block title="${primehubLicense}" hidden={!window.enableLicenseCheck}>
       <object keyName="license">
-        <string keyName="licenseStatus" title="${licenseStatus}" packageName="../src/cms-components/customize-string-license-status"/>
-        <dateTime keyName="expiredAt" title="${expirationDate}" format={(text) => moment(text).format('YYYY/MM/DD HH:mm')} packageName="../src/cms-components/customize-string-readonly"/>
-        <string keyName="licensedTo" title="${licensedTo}" packageName="../src/cms-components/customize-string-readonly"/>
+        <Row type="flex">
+          <Col sm={5} xs={24}>
+            <string keyName="licenseStatus" title="${licenseStatus}" packageName="../src/cms-components/customize-string-license-status"/>
+            <dateTime keyName="expiredAt" title="${expirationDate}" format={(text) => moment(text).format('YYYY/MM/DD HH:mm')} packageName="../src/cms-components/customize-string-readonly"/>
+            <string keyName="licensedTo" title="${licensedTo}" packageName="../src/cms-components/customize-string-readonly"/>
+          </Col>
+          <Col sm={5} xs={24}>
+            <string keyName="maxNode" title="Utilized Nodes" packageName="../src/cms-components/customize-string-license-usage"/>
+          </Col>
+          <Col sm={5} xs={24} hidden={!window.enableModelDeployment}>
+            <string keyName="maxModelDeploy" title="Deployed Models" packageName="../src/cms-components/customize-string-license-usage"/>
+          </Col>
+        </Row>
+        <string keyName="maxGroup" hidden={true} />
+        <object keyName="usage" hidden={true}>
+          <string keyName="maxGroup" />
+          <string keyName="maxNode" />
+          <string keyName="maxModelDeploy" />
+        </object>
       </object>
     </Block>
     <Block title="${systemSettings}">
