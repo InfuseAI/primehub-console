@@ -70,6 +70,10 @@ const getDownloadUrl = (prefix, name) => {
   return `${appPrefix}files/${prefix}/${name}?`
 }
 
+const IconMore = () => {
+  return <svg style={{width: 16, fontSize: '16pt'}} xmlns="http://www.w3.org/2000/svg"   viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+}
+
 class Browser extends React.Component<Props, State> {
 
   state = {
@@ -95,6 +99,15 @@ class Browser extends React.Component<Props, State> {
 
     if (onPathChanged) {
       onPathChanged(targetPath);
+    }
+  }
+
+  private handleRefetch = () => {
+    const {data} = this.props;
+    const {refetch} = data;
+
+    if (refetch) {
+      refetch();
     }
   }
 
@@ -124,12 +137,18 @@ class Browser extends React.Component<Props, State> {
     let currentPath = '/';
 
 
-    items.push(<Breadcrumb.Item><a onClick={()=>{this.handlePathChange('/')}}><Icon type="database"  style={{fontSize: '12pt'}}/></a></Breadcrumb.Item>);
-    for (const component of pathComponents) {
+    items.push(<Breadcrumb.Item>
+      <a onClick={()=>{pathComponents.length==0 ? this.handleRefetch() : this.handlePathChange('/')}}><Icon type="database"  style={{fontSize: '12pt'}}/></a>
+    </Breadcrumb.Item>);
+
+    pathComponents.forEach((component, i) => {
       currentPath += `${component}/`;
       let targetPath = currentPath;
-      items.push(<Breadcrumb.Item><a onClick={()=>{this.handlePathChange(targetPath)}}>{component}</a></Breadcrumb.Item>);
-    }
+      let handleOnClick = i == pathComponents.length - 1 ?
+        () => {this.handleRefetch()} :
+        () => {this.handlePathChange(targetPath)};
+      items.push(<Breadcrumb.Item><a onClick={handleOnClick}>{component}</a></Breadcrumb.Item>);
+    });
 
     items.push(
       <Breadcrumb.Item>
@@ -188,12 +207,12 @@ class Browser extends React.Component<Props, State> {
         title: 'Name',
         dataIndex: 'name',
         key: 'name',
-        render: (text, record, index)=> {
+        render: (name, record, index)=> {
           const iconStyle = {fontSize: '12pt', paddingRight: 16}
-          if (text.endsWith('/')) {
-            return <><Icon style={iconStyle} type="folder" /><a style={{color: "rgba(0, 0, 0, 0.65)"}}onClick={() => this.handleFolderClick(text)}>{text}</a></>;
+          if (name.endsWith('/')) {
+            return <><Icon style={iconStyle} type="folder" /><a style={{color: "rgba(0, 0, 0, 0.65)"}}onClick={() => this.handleFolderClick(name)}>{name}</a></>;
           } else {
-            return <><Icon style={iconStyle} type="file" />{text}</>;
+            return <><Icon style={iconStyle} type="file" />{name}</>;
           }
         },
       },
@@ -203,8 +222,8 @@ class Browser extends React.Component<Props, State> {
         key: 'size',
         align: 'right',
         width: 120,
-        render: (text, record, index) => {
-          return !record.name.endsWith('/') ? humanFileSize(text, true, 1) : undefined;
+        render: (size, record) => {
+          return !record.name.endsWith('/') ? humanFileSize(size, true, 1) : undefined;
         }
       },
       {
@@ -213,8 +232,8 @@ class Browser extends React.Component<Props, State> {
         key: 'lastModified',
         align: 'right',
         width: 200,
-        render: (text, record, index) => {
-          return !record.name.endsWith('/') ? moment(text.lastModified).format('YYYY-MM-DD HH:mm:ss') : undefined;
+        render: (lastModified, record) => {
+          return !record.name.endsWith('/') ? moment(lastModified).format('YYYY-MM-DD HH:mm:ss') : undefined;
         },
       },
       {
@@ -223,14 +242,13 @@ class Browser extends React.Component<Props, State> {
         align: 'right',
         width: 30,
         render: () => {
-          return <Icon type="home" style={{fontSize: '12pt'}}/>;
+          return <IconMore />;
         },
       },
     ];
     let dataSource = [];
 
     if (data.files && data.files && data.files.items) {
-      const prefix = data.files.prefix;
       dataSource = data.files.items;
     }
 

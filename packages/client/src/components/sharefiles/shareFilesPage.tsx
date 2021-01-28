@@ -24,13 +24,9 @@ interface Props extends GroupContextComponentProps, RouteComponentProps {
 
 }
 
-interface State {
-  path: string
-}
+class ShareFilesPage extends React.Component<Props> {
 
-class ShareFilesPage extends React.Component<Props, State> {
   onPathChanged (newPath) {
-    // this.setState({path: newPath});
     const {history, groupContext} = this.props;
     history.push(`${appPrefix}g/${groupContext.name}/browse${newPath}` )
   }
