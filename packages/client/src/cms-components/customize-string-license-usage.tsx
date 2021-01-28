@@ -10,8 +10,8 @@ export default class LicenseUsage extends React.Component {
     if (rootValue.system &&
       rootValue.system.license &&
       rootValue.system.license.usage &&
-      rootValue.system.license[keyName] &&
-      rootValue.system.license.usage[keyName]) {
+      rootValue.system.license[keyName] !== null &&
+      rootValue.system.license.usage[keyName] !== null) {
 
       const license = rootValue.system.license;
       const limit = license[keyName] === -1 ? '∞' : license[keyName];
