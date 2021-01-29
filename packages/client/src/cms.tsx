@@ -68,6 +68,7 @@ export interface State {
 @injectIntl
 export default class CMSPage extends React.Component<Props, State> {
   schema = null;
+  notification = null;
 
   state = {
     prepare: false,
@@ -81,6 +82,7 @@ export default class CMSPage extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     this.schema = this.process(props.schema);
+    this.notification = props.notification;
   }
 
   process = (schema) => {
@@ -358,6 +360,7 @@ export default class CMSPage extends React.Component<Props, State> {
             {this.renderMenu()}
           </Sider>
           <Content style={{marginLeft: 200}}>
+            {this.notification}
             <Canner
               schema={this.schema}
               goTo={router.goTo}

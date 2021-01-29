@@ -36,7 +36,7 @@ function parseJSON(response) {
   return response.json();
 }
 
-const tokenSyncWorker = new BackgroundTokenSyncer({
+export const tokenSyncWorker = new BackgroundTokenSyncer({
   appPrefix: (window as any).APP_PREFIX,
   refreshTokenExp: (window as any).refreshTokenExp,
   accessTokenExp: (window as any).accessTokenExp,

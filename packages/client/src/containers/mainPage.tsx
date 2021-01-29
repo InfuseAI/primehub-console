@@ -49,6 +49,7 @@ export type MainPageSidebarItem = {
 
 export type MainPageProps = {
   sidebarItems: MainPageSidebarItem[];
+  notification?: React.ReactNode;
   children?: React.ReactNode;
   getMyGroups: any;
 } & RouteComponentProps;
@@ -98,7 +99,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
   }
 
   render() {
-    const {sidebarItems, location, children} = this.props;
+    const {sidebarItems, notification, location, children} = this.props;
     const {currentGroupName} = this.state;
     const {loading, error, groups, me} = this.getGroups();
     const currentUser = me;
@@ -201,6 +202,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
               <Sidebar sidebarItems={sidebarItems}/>
             </Route>
             <Layout.Content style={{marginLeft: 200,  minHeight: 'calc(100vh - 64px)'}}>
+              {notification}
               {content}
             </Layout.Content>
           </Layout>
