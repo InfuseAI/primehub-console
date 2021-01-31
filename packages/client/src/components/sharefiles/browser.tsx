@@ -4,11 +4,13 @@ import {graphql} from 'react-apollo';
 import {errorHandler} from 'utils/errorHandler';
 import {get} from 'lodash';
 import {appPrefix} from 'utils/env';
-import { Table, Alert, Breadcrumb, Icon, Input, Skeleton, Menu, Dropdown, Modal, notification, Form } from 'antd';
+import { Table, Alert, Breadcrumb, Icon, Input, Skeleton, Menu, Dropdown, Modal, notification, Form, Button } from 'antd';
 import { RouteComponentProps, withRouter } from 'react-router';
 import {compose} from 'recompose';
 import moment from 'moment';
 import { ColumnProps } from 'antd/lib/table';
+import Uploader from './uploader';
+import InfuseButton from 'components/infuseButton';
 
 interface Props extends RouteComponentProps {
   path: string;
@@ -25,7 +27,8 @@ interface ItemType {
 }
 
 interface State {
-  editPath: boolean;
+  editing: boolean;
+  uploading: boolean;
   itemCopyUri?: ItemType;
 }
 
@@ -85,7 +88,8 @@ const IconMore = () => {
 class Browser extends React.Component<Props, State> {
 
   state: State = {
-    editPath: false,
+    editing: false,
+    uploading: false,
   };
 
   refInputPath = undefined;
@@ -191,11 +195,28 @@ class Browser extends React.Component<Props, State> {
   }
 
   public render = () => {
+    if (!isPhfsEnabled()) {
+      return <Alert
+      message='Warning'
+      description='PHFS is not enabled. Please tell your administrator to enable it.'
+      type='warning'
+      showIcon
+      />;
+    }
+
     return <div>
-      <div style={{marginLeft: 15, display: this.state.editPath ? 'none' : 'block'}}>{this.renderPathBreadcrumb()}</div>
-      <div style={{marginLeft: 15, display: this.state.editPath ? 'block' : 'none'}}>{this.renderPathInput()}</div>
+      <div style={{display: 'flex'}}>
+        <div style={{flex: '1', marginLeft: 15, display: this.state.editing ? 'none' : 'block'}}>{this.renderPathBreadcrumb()}</div>
+        <div style={{flex: '1', marginLeft: 15, display: this.state.editing ? 'block' : 'none'}}>{this.renderPathInput()}</div>
+        <InfuseButton icon="upload" type="primary" style={{marginLeft: 16}}onClick={()=>{
+          this.setState({uploading: true})}
+          }>Upload
+        </InfuseButton>
+      </div>
+
       {this.renderContent()}
       {this.renderCopyUriModal()}
+      {this.renderUploadModal()}
     </div>
   }
 
@@ -229,7 +250,7 @@ class Browser extends React.Component<Props, State> {
       } else if(i == pathComponents.length - 1 ) {
         // the last one: edit path
         const editPath = () => {
-          this.setState({editPath: true}, () => {
+          this.setState({editing: true}, () => {
             this.refInputPath.focus();
           });
         }
@@ -253,10 +274,10 @@ class Browser extends React.Component<Props, State> {
       onPressEnter={(e) => {
         let targetPath = (e.target as any).value;
         this.handlePathChange(targetPath);
-        this.setState({editPath:false});
+        this.setState({editing:false});
       }}
       onFocus={(e) => {e.target.value = this.normalizedPath()}}
-      onBlur={() => {this.setState({editPath: false})}}
+      onBlur={() => {this.setState({editing: false})}}
       ref={(input) => {this.refInputPath = input}}
     />
   }
@@ -330,17 +351,29 @@ class Browser extends React.Component<Props, State> {
     </Modal>
   }
 
-  private renderContent = () => {
+  private renderUploadModal = () => {
     const {data} = this.props;
 
-    if (!isPhfsEnabled()) {
-      return <Alert
-      message='Warning'
-      description='PHFS is not enabled. Please tell your administrator to enable it.'
-      type='warning'
-      showIcon
-      />;
+    if (!data || !data.files || !data.files.prefix) {
+      return null;
     }
+
+    return <Modal
+      title="Upload"
+      visible={this.state.uploading}
+      footer={[
+        <Button type="primary" onClick={() => {
+          this.setState({uploading: false});
+        }}>OK</Button>
+      ]}
+      onCancel={()=>{this.setState({uploading: false})}}
+    >
+      <Uploader dirPath={data.files.prefix} />
+    </Modal>
+  }
+
+  private renderContent = () => {
+    const {data} = this.props;
 
     if (!data.files) {
       return null;
