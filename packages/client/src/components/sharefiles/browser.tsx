@@ -4,7 +4,7 @@ import {graphql} from 'react-apollo';
 import {errorHandler} from 'utils/errorHandler';
 import {get} from 'lodash';
 import {appPrefix} from 'utils/env';
-import { Table, Alert, Breadcrumb, Icon, Input, Skeleton } from 'antd';
+import { Table, Alert, Breadcrumb, Icon, Input, Skeleton, Menu, Dropdown, Modal, notification } from 'antd';
 import { RouteComponentProps, withRouter } from 'react-router';
 import {compose} from 'recompose';
 import moment from 'moment';
@@ -15,13 +15,14 @@ interface Props extends RouteComponentProps {
   groupName: string;
   onPathChanged?: Function;
   data?: any;
+  deleteFiles: Function;
 };
 
 interface State {
   editPath: boolean;
 }
 
-export const GET_FILES = gql`
+const GET_FILES = gql`
   query files($where: StoreFileWhereInput!) {
     files (where: $where) {
       prefix
@@ -34,6 +35,14 @@ export const GET_FILES = gql`
     }
   }
 `;
+
+const DELETE_FILES= gql`
+  mutation deleteFiles($where: StoreFileWhereInput!, $options: StoreFileDeleteOptionInput)  {
+    deleteFiles(where:$where, options:$options)
+  }
+`
+
+
 
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 const isPhfsEnabled = (): boolean => {
@@ -62,14 +71,6 @@ const humanFileSize = (bytes, si=false, dp=1) => {
   return bytes.toFixed(dp) + ' ' + units[u];
 };
 
-const getViewContentUrl = (prefix, name) => {
-  return `${appPrefix}files/${prefix}/${name}`
-}
-
-const getDownloadUrl = (prefix, name) => {
-  return `${appPrefix}files/${prefix}/${name}?`
-}
-
 const IconMore = () => {
   return <svg style={{width: 16, fontSize: '16pt'}} xmlns="http://www.w3.org/2000/svg"   viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
 }
@@ -82,11 +83,8 @@ class Browser extends React.Component<Props, State> {
   pathInput = undefined;
 
   private handleFolderClick = (folder) => {
-    const {
-      path: path,
-      onPathChanged
-    } = this.props;
-    const targetPath = path.endsWith('/') ? `${path}${folder}` : `${path}/${folder}`;
+    const {onPathChanged} = this.props;
+    const targetPath = `${this.normalizedPath()}${folder}`;
     if (onPathChanged) {
       onPathChanged(targetPath);
     }
@@ -111,16 +109,72 @@ class Browser extends React.Component<Props, State> {
     }
   }
 
-  private splitPath(): string[] {
+  private handleCopyPhfsUri = (item) => {
+  }
+
+  private handleDelete = (item) => {
+    const {groupName, deleteFiles} = this.props;
+    const isFolder = item.name.endsWith('/') ? true : false;
+    const phfsPrefix = (this.normalizedPath() + item.name).substring(1);
+    const variables = {
+      where: {
+        groupName,
+        phfsPrefix
+      },
+      options: {
+        recursive: isFolder
+      }
+    };
+
+    Modal.confirm({
+      title: `Are you sure to delete '${item.name}'?`,
+      onOk: () => {
+        deleteFiles({variables})
+        .then((result) => {
+          const {data} = result || {} ;
+          const deletedConut = (data && data.deleteFiles) || 0;
+
+          const message = isFolder ?
+            `${deletedConut} Files deleted` :
+            `${item.name} deleted`;
+          notification.success({
+            message,
+            duration: 10,
+            placement: 'bottomRight'
+          });
+        });
+      }
+    });
+  }
+
+  /**
+   * Normalize the path to the format '/this/is/a/path/
+   * 1. Always have leading slash
+   * 2. Always have tailing slash
+   */
+  private normalizedPath() {
     let {path} = this.props;
-    if (path.startsWith('/')) {
-      path = path.substring(1,path.length);
-    }
-    if (path.endsWith('/')) {
-      path = path.substring(0,path.length-1);
+
+    if (!path) {
+      return '/'
     }
 
-    return path.length > 0 ? path.split('/') : [];
+    if (!path.startsWith('/')) {
+      path = '/' + path;
+    }
+
+    if (!path.endsWith('/')) {
+      path = path + '/'
+    }
+
+    return path;
+  }
+
+  private getFilePath(filename) {
+    const {data} = this.props;
+    const {files} = data || {};
+    const {prefix} = files || {};
+    return `${appPrefix}files/${prefix}/${filename}`
   }
 
   public render = () => {
@@ -132,39 +186,54 @@ class Browser extends React.Component<Props, State> {
   }
 
   private renderPathBreadcrumb() {
-    let pathComponents = this.splitPath();
+    const currentPath = this.normalizedPath();
+    let pathComponents = currentPath.split('/');
+
     let items = [];
-    let currentPath = '/';
-
-
-    items.push(<Breadcrumb.Item>
-      <a onClick={()=>{pathComponents.length==0 ? this.handleRefetch() : this.handlePathChange('/')}}><Icon type="database"  style={{fontSize: '12pt'}}/></a>
-    </Breadcrumb.Item>);
+    let tmpPath = '';
 
     pathComponents.forEach((component, i) => {
-      currentPath += `${component}/`;
-      let targetPath = currentPath;
-      let handleOnClick = i == pathComponents.length - 1 ?
-        () => {this.handleRefetch()} :
-        () => {this.handlePathChange(targetPath)};
-      items.push(<Breadcrumb.Item><a onClick={handleOnClick}>{component}</a></Breadcrumb.Item>);
-    });
+      tmpPath += `${component}/`;
+      let targetPath = tmpPath;
+      const changePath = () => {
+        if (targetPath === currentPath) {
+          this.handleRefetch()
+        } else {
+          this.handlePathChange(targetPath)
+        }
+      };
 
-    items.push(
-      <Breadcrumb.Item>
-        <a onClick={() => {
+
+      if (i == 0) {
+        // the root: change to root path
+        items.push(<Breadcrumb.Item>
+          <a onClick={changePath}><Icon type="database"  style={{fontSize: '12pt'}}/></a>
+        </Breadcrumb.Item>);
+      } else if(i < pathComponents.length - 1 ) {
+        // the inermediate path components: change path
+        items.push(<Breadcrumb.Item><a onClick={changePath}>{component}</a></Breadcrumb.Item>);
+      } else if(i == pathComponents.length - 1 ) {
+        // the last one: edit path
+        const editPath = () => {
           this.setState({editPath: true}, () => {
             this.pathInput.focus();
           });
-        }}
-        >
-            <Icon type="folder-add" theme='filled' style={{fontSize: '14pt', position: 'relative', top: 2}}/>
-      </a></Breadcrumb.Item>);
+        }
+
+        items.push(
+          <Breadcrumb.Item>
+            <a onClick={editPath}><Icon type="folder-add" theme='filled' style={{fontSize: '14pt', position: 'relative', top: 2}}/></a>
+          </Breadcrumb.Item>);
+      } else {
+        // should not reach here
+      }
+    });
+
     return <Breadcrumb>{items}</Breadcrumb>
   }
 
   private renderPathInput() {
-    const {path} = this.props;
+
     return <Input
       prefix={<Icon type="database" style={{fontSize: '12pt'}}/>}
       onPressEnter={(e) => {
@@ -172,10 +241,46 @@ class Browser extends React.Component<Props, State> {
         this.handlePathChange(targetPath);
         this.setState({editPath:false});
       }}
-      onFocus={(e) => {e.target.value = path.endsWith('/') ? path : path + '/'}}
+      onFocus={(e) => {e.target.value = this.normalizedPath()}}
       onBlur={() => {this.setState({editPath: false})}}
       ref={(input) => {this.pathInput = input}}
     />
+  }
+
+  private renderItemAction = (item) => {
+    const menuItems = [];
+    const menuItemView = <Menu.Item key="view"><a target='_blank' href={`${this.getFilePath(item.name)}`}>View file</a></Menu.Item>;
+    const menuItemDownload = <Menu.Item key="download"><a href={`${this.getFilePath(item.name)}?download=1`}>Download file</a></Menu.Item>;
+    const menuItemCopyUri = <Menu.Item key="Copy Uri">Copy PHFS URI</Menu.Item>;
+    const menuItemDelete = <Menu.Item key="delete"><a onClick={()=>{this.handleDelete(item)}}>Delete</a></Menu.Item>;
+
+
+    if (item.name.endsWith("/")) {
+      // folder
+    } else if (item.name.endsWith("txt") ||
+        item.name.endsWith("png") ||
+        item.name.endsWith("jpg"))
+    {
+      // viewable file
+      menuItems.push(menuItemView);
+      menuItems.push(menuItemDownload);
+    } else {
+      // other format file
+      menuItems.push(menuItemDownload);
+    }
+
+    menuItems.push(menuItemCopyUri);
+    menuItems.push(<Menu.Divider />);
+    menuItems.push(menuItemDelete);
+
+    return <Dropdown
+            overlay={<Menu>{menuItems}</Menu>}
+          >
+            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+              <IconMore/>
+            </a>
+          </Dropdown>
+    return
   }
 
   private renderContent = () => {
@@ -252,8 +357,8 @@ class Browser extends React.Component<Props, State> {
         key: 'action',
         align: 'right',
         width: 30,
-        render: () => {
-          return <IconMore />;
+        render: (_, record) => {
+          return this.renderItemAction(record);
         },
       },
     ];
@@ -278,16 +383,33 @@ class Browser extends React.Component<Props, State> {
 export default compose(
   withRouter,
   graphql(GET_FILES, {
-  options: (props: Props) => ({
-    variables: {
-      where: {
-        phfsPrefix: props.path,
-        groupName: props.groupName,
-      }
-    },
-    fetchPolicy: 'network-only',
-    onError: errorHandler,
-    skip: !isPhfsEnabled(),
-    })
-  })
+    options: (props: Props) => ({
+      variables: {
+        where: {
+          phfsPrefix: props.path,
+          groupName: props.groupName,
+        }
+      },
+      fetchPolicy: 'network-only',
+      onError: errorHandler,
+      skip: !isPhfsEnabled(),
+      })
+  }),
+  graphql(DELETE_FILES, {
+    options: (props: Props) => ({
+      onError: errorHandler,
+      refetchQueries: [
+        {
+          query: GET_FILES,
+          variables: {
+            where: {
+              phfsPrefix: props.path,
+              groupName: props.groupName,
+            }
+          },
+        }
+      ]
+    }),
+    name: "deleteFiles"
+  }),
 )(Browser);
