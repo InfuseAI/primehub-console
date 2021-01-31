@@ -4,7 +4,7 @@ import {graphql} from 'react-apollo';
 import {errorHandler} from 'utils/errorHandler';
 import {get} from 'lodash';
 import {appPrefix} from 'utils/env';
-import { Table, Alert, Breadcrumb, Icon, Input, Skeleton, Menu, Dropdown, Modal, notification } from 'antd';
+import { Table, Alert, Breadcrumb, Icon, Input, Skeleton, Menu, Dropdown, Modal, notification, Form } from 'antd';
 import { RouteComponentProps, withRouter } from 'react-router';
 import {compose} from 'recompose';
 import moment from 'moment';
@@ -18,8 +18,15 @@ interface Props extends RouteComponentProps {
   deleteFiles: Function;
 };
 
+interface ItemType {
+  name: string;
+  size: number;
+  lastModified?: string;
+}
+
 interface State {
   editPath: boolean;
+  itemCopyUri?: ItemType;
 }
 
 const GET_FILES = gql`
@@ -77,10 +84,12 @@ const IconMore = () => {
 
 class Browser extends React.Component<Props, State> {
 
-  state = {
-    editPath: false
+  state: State = {
+    editPath: false,
   };
-  pathInput = undefined;
+
+  refInputPath = undefined;
+  refInputPhfsUri = undefined;
 
   private handleFolderClick = (folder) => {
     const {onPathChanged} = this.props;
@@ -177,11 +186,16 @@ class Browser extends React.Component<Props, State> {
     return `${appPrefix}files/${prefix}/${filename}`
   }
 
+  private getPhfsUri(name) {
+    return `phfs://${this.normalizedPath()}` + name
+  }
+
   public render = () => {
     return <div>
       <div style={{marginLeft: 15, display: this.state.editPath ? 'none' : 'block'}}>{this.renderPathBreadcrumb()}</div>
       <div style={{marginLeft: 15, display: this.state.editPath ? 'block' : 'none'}}>{this.renderPathInput()}</div>
       {this.renderContent()}
+      {this.renderCopyUriModal()}
     </div>
   }
 
@@ -216,7 +230,7 @@ class Browser extends React.Component<Props, State> {
         // the last one: edit path
         const editPath = () => {
           this.setState({editPath: true}, () => {
-            this.pathInput.focus();
+            this.refInputPath.focus();
           });
         }
 
@@ -243,7 +257,7 @@ class Browser extends React.Component<Props, State> {
       }}
       onFocus={(e) => {e.target.value = this.normalizedPath()}}
       onBlur={() => {this.setState({editPath: false})}}
-      ref={(input) => {this.pathInput = input}}
+      ref={(input) => {this.refInputPath = input}}
     />
   }
 
@@ -251,9 +265,8 @@ class Browser extends React.Component<Props, State> {
     const menuItems = [];
     const menuItemView = <Menu.Item key="view"><a target='_blank' href={`${this.getFilePath(item.name)}`}>View file</a></Menu.Item>;
     const menuItemDownload = <Menu.Item key="download"><a href={`${this.getFilePath(item.name)}?download=1`}>Download file</a></Menu.Item>;
-    const menuItemCopyUri = <Menu.Item key="Copy Uri">Copy PHFS URI</Menu.Item>;
+    const menuItemCopyUri = <Menu.Item key="Copy Uri"><a onClick={() => {this.setState({itemCopyUri: item})}}>Copy PHFS URI</a></Menu.Item>;
     const menuItemDelete = <Menu.Item key="delete"><a onClick={()=>{this.handleDelete(item)}}>Delete</a></Menu.Item>;
-
 
     if (item.name.endsWith("/")) {
       // folder
@@ -281,6 +294,40 @@ class Browser extends React.Component<Props, State> {
             </a>
           </Dropdown>
     return
+  }
+
+  private renderCopyUriModal = () => {
+    const {itemCopyUri} = this.state;
+    if (!itemCopyUri) {
+      return <></>;
+    }
+
+    const uri = this.getPhfsUri(itemCopyUri.name);
+
+    return <Modal
+      title="Copy PHFS URI"
+      okText='Copy'
+      visible={true}
+      onOk={() => {
+        const input = this.refInputPhfsUri;
+        input.select();
+        document.execCommand('copy');
+        notification.success({
+          message: "Copied to clipboard",
+          placement: 'bottomRight'
+        });
+        this.setState({itemCopyUri: undefined});
+      }}
+      onCancel= {() => {
+        this.setState({itemCopyUri: undefined});
+      }}
+    >
+      <Form layout="vertical">
+        <Form.Item label="URI:">
+          <Input value={uri} ref={(input)=>{this.refInputPhfsUri = input}}/>
+        </Form.Item>
+      </Form>
+    </Modal>
   }
 
   private renderContent = () => {
