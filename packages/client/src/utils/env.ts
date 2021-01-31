@@ -5,3 +5,7 @@ function getAppPrefix() {
 }
 
 export const appPrefix = getAppPrefix();
+
+export function getAccessToken() {
+  return window.localStorage.getItem('canner.accessToken');
+}

@@ -3,7 +3,6 @@ import { compose } from 'recompose';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import Breadcrumbs from 'components/share/breadcrumb';
-import { withAccessToken} from 'components/helpers/withAccessToken';
 import { GroupContextComponentProps, withGroupContext} from 'context/group';
 import {withRouter} from 'react-router-dom';
 import Browser from './browser';
@@ -56,7 +55,6 @@ class ShareFilesPage extends React.Component<Props> {
 }
 
 export default compose(
-  withAccessToken,
   withGroupContext,
   withRouter
 )(ShareFilesPage);
