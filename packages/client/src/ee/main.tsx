@@ -6,7 +6,7 @@ import {BrowserRouter, Route} from 'react-router-dom';
 import {BackgroundTokenSyncer} from '../workers/backgroundTokenSyncer';
 import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
-import { fakeData, schema } from './fakeData';
+import { fakeData, schema } from '../fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
 import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
 
@@ -21,6 +21,7 @@ import iconShareFiles from 'images/icon-files.png';
 // Components
 import Jupyterhub from 'containers/jupyterhubPage';
 import ListContainer from 'containers/list';
+import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
 import JobDetailContainer from 'ee/containers/jobDetail';
 import JobCreatePage from 'ee/containers/jobCreatePage';
 import JobListContainer from 'ee/containers/jobList';
@@ -34,7 +35,7 @@ import DeploymentEditPage from 'ee/containers/deploymentEditPage';
 import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
-import ShareFilesPage from 'components/sharefiles/shareFilesPage';
+
 
 const client = createGraphqlClient({
   fakeData,
@@ -80,10 +81,6 @@ class Main extends React.Component {
           marginTop: '-5px',
         }
       },
-    ] ;
-
-    if ((window as any).enableModelDeployment) {
-      sidebarItems.push(
       {
         title: 'Models',
         subPath: 'model-deployment',
@@ -96,9 +93,22 @@ class Main extends React.Component {
           marginRight: '-2px',
           marginTop: '-5px',
         }
-      });
-    }
+      },
+      {
+        title: 'Shared Files',
+        subPath: 'browse',
+        icon: iconShareFiles,
+        style: {
+          width: 'auto',
+          height: 17,
+          marginLeft: '1px',
+          marginRight: '-1px',
+          marginTop: '-3px',
+        }
+      },
+    ];
 
+    // Group Admin Only
     sidebarItems.push(
       {
         title: 'Images',
@@ -113,18 +123,6 @@ class Main extends React.Component {
           marginTop: '-3px',
         }
       },
-      {
-        title: 'Shared Files',
-        subPath: 'browse',
-        icon: iconShareFiles,
-        style: {
-          width: 'auto',
-          height: 17,
-          marginLeft: '1px',
-          marginRight: '-1px',
-          marginTop: '-3px',
-        }
-      }
     );
 
     return (
@@ -138,11 +136,8 @@ class Main extends React.Component {
             </Route>
 
             {/* Shared Files */}
-            {/* <Route path={`${appPrefix}g/:groupName/browse`}>
-              <ShareFilesPage />
-            </Route> */}
             <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
-              <ShareFilesPage />
+              <SharedFilesPage />
             </Route>
 
             {/* Group Images management*/}

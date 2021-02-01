@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {ApolloProvider} from 'react-apollo';
-import { fakeData, schema as fakeDataSchema } from './fakeData';
+import { fakeData, schema as fakeDataSchema } from '../fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 import {IntlProvider, addLocaleData} from 'react-intl';

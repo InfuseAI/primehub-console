@@ -6,11 +6,10 @@ import {BrowserRouter, Route} from 'react-router-dom';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
+import { fakeData, schema } from './fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
-import ListContainer from 'containers/list';
-import ImageEditPage from 'containers/imageEditPage';
-import ImageCreatePage from 'containers/imageCreatePage';
-import ImageListContainer from 'containers/imageList';
+
+
 
 // Icons
 import iconJupyterHub from 'images/icon-jupyterhub.svg'
@@ -19,84 +18,18 @@ import iconShareFiles from 'images/icon-files.png';
 
 // Components
 import Jupyterhub from 'containers/jupyterhubPage';
+import ListContainer from 'containers/list';
+import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
 
-const fakeData = {
-  me: {
-    apiTokenCount: 1,
-    groups: [{
-      id: 'groupId1',
-      name: 'group1',
-      displayName: 'c-Group 1',
-      instanceTypes: [{
-        id: 'g-it1',
-        name: 'IT1',
-        displayName: 'group1 it'
-      }],
-      images: [{
-        id: 'g-it1',
-        name: 'IT1',
-        displayName: 'group1 im',
-      }]
-    }, {
-      id: 'groupId2',
-      name: 'group2',
-      displayName: 'Group 2',
-      instanceTypes: [{
-        id: 'ggit1',
-        name: 'IT1',
-        displayName: 'group2 it'
-      }],
-      images: [{
-        id: 'ggit2',
-        name: 'IT1',
-        displayName: 'group2 im',
-      }]
-    }, {
-      id: 'everyone',
-      name: 'everyone',
-      displayName: 'Group DisplayName',
-      instanceTypes: [{
-        id: 'everyone-it',
-        name: 'it',
-        displayName: 'gpu0',
-        gpuLimit: 0,
-        cpuLimit: 0.5,
-        memoryLimit: 4,
-      }, {
-        id: 'everyone-it2',
-        name: 'it',
-        displayName: 'gpu1',
-        gpuLimit: 1
-      }],
-      images: [{
-        id: 'everyone-image',
-        name: 'b-cpu',
-        displayName: 'b-cpu',
-        type: 'cpu'
-      }, {
-        id: 'everyone-image2',
-        name: 'a-gpu',
-        displayName: 'a-gpu',
-        type: 'gpu'
-      }, {
-        id: 'everyone-image3',
-        name: 'c-img',
-        displayName: 'c-img',
-        type: 'both'
-      }]
-    }]
-  },
-};
+import ImageEditPage from 'containers/imageEditPage';
+import ImageCreatePage from 'containers/imageCreatePage';
+import ImageListContainer from 'containers/imageList';
 
-const schema = {
-  me: {type: 'object'},
-};
 
 const client = createGraphqlClient({
   fakeData,
   schema
 });
-
 
 class Main extends React.Component {
   render() {
@@ -114,6 +47,22 @@ class Main extends React.Component {
         }
       },
       {
+        title: 'Shared Files',
+        subPath: 'browse',
+        icon: iconShareFiles,
+        style: {
+          width: 'auto',
+          height: 17,
+          marginLeft: '1px',
+          marginRight: '-1px',
+          marginTop: '-3px',
+        }
+      },
+    ];
+
+    // Group Admin Only
+    sidebarItems.push(
+      {
         title: 'Images',
         subPath: 'images',
         icon: iconImages,
@@ -126,19 +75,7 @@ class Main extends React.Component {
           marginTop: '-3px',
         }
       },
-      {
-        title: 'Shared Files',
-        subPath: 'browse',
-        icon: iconShareFiles,
-        style: {
-          width: 'auto',
-          height: 17,
-          marginLeft: '1px',
-          marginRight: '-1px',
-          marginTop: '-3px',
-        }
-      }
-    ]
+    );
 
     return (
       <BrowserRouter>
@@ -147,6 +84,11 @@ class Main extends React.Component {
             {/* Jupyterhub */}
             <Route path={`${appPrefix}g/:groupName/hub`} exact>
               <Jupyterhub />
+            </Route>
+
+            {/* Shared Files */}
+            <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
+              <SharedFilesPage />
             </Route>
 
             {/* Group Images management*/}

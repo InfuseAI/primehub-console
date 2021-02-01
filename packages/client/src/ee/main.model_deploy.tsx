@@ -6,18 +6,21 @@ import {BrowserRouter, Route} from 'react-router-dom';
 import {BackgroundTokenSyncer} from '../workers/backgroundTokenSyncer';
 import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
-import { fakeData, schema } from './fakeData';
+import { fakeData, schema } from '../fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
 
 // Icons
 import iconModels from 'images/icon-models.svg'
+import iconShareFiles from 'images/icon-files.png';
 
 // Components
 import ListContainer from 'containers/list';
+import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
 import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
+
 
 const client = createGraphqlClient({
   fakeData,
@@ -40,12 +43,28 @@ class Main extends React.Component {
           marginTop: '-5px',
         }
       },
-    ]
+      {
+        title: 'Shared Files',
+        subPath: 'browse',
+        icon: iconShareFiles,
+        style: {
+          width: 'auto',
+          height: 17,
+          marginLeft: '1px',
+          marginRight: '-1px',
+          marginTop: '-3px',
+        }
+      },
+    ];
 
     return (
       <BrowserRouter>
         <ApolloProvider client={client}>
           <MainPage sidebarItems={sidebarItems}>
+            {/* Shared Files */}
+            <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
+              <SharedFilesPage />
+            </Route>
             {/* Model Deployment */}
             <Route path={`${appPrefix}g/:groupName/model-deployment`} exact>
               <ListContainer Com={ModelDeploymentListContainer} />

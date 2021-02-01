@@ -9,7 +9,7 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import {compose} from 'recompose';
 import moment from 'moment';
 import { ColumnProps } from 'antd/lib/table';
-import Uploader from './uploader';
+import Uploader from '../../components/sharedFiles/uploader';
 import InfuseButton from 'components/infuseButton';
 
 interface Props extends RouteComponentProps {
