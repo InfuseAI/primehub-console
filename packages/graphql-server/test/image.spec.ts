@@ -29,6 +29,20 @@ const fields = `
     quotaGpu
   }`;
 
+const customImageFields = `
+  id
+  name
+  imageSpec {
+    baseImage
+    pullSecret
+    packages {
+      apt
+      pip
+      conda
+    }
+    cancel
+  }`;
+
 declare module 'mocha' {
   // tslint:disable-next-line:interface-name
   interface ISuiteCallbackContext {
@@ -79,7 +93,8 @@ describe('image graphql', function() {
         type: 'both',
         displayName: data.name,
         pullSecret: '',
-        groupName: null
+        groupName: null,
+        imageSpec: null
       },
       groups: []
     });
@@ -106,7 +121,8 @@ describe('image graphql', function() {
         type: 'both',
         displayName: data.name,
         pullSecret: '',
-        groupName: null
+        groupName: null,
+        imageSpec: null
       },
       groups: []
     });
@@ -136,6 +152,7 @@ describe('image graphql', function() {
         ...pick(data, ['displayName', 'description', 'url']),
         pullSecret: '',
         groupName: null,
+        imageSpec: null,
         type: 'both',
         urlForGpu: data.url,
       },
@@ -161,6 +178,7 @@ describe('image graphql', function() {
         pullSecret: '',
         type: 'both',
         groupName: null,
+        imageSpec: null,
         urlForGpu: data.url
       },
       type: 'both',
@@ -193,7 +211,8 @@ describe('image graphql', function() {
         type: 'both',
         urlForGpu: data.url,
         pullSecret: '',
-        groupName: null
+        groupName: null,
+        imageSpec: null
       },
       type: 'both',
       urlForGpu: data.url,
@@ -217,7 +236,8 @@ describe('image graphql', function() {
         type: 'both',
         urlForGpu: data.url,
         pullSecret: '',
-        groupName: null
+        groupName: null,
+        imageSpec: null
       },
       type: 'both',
       urlForGpu: data.url,
@@ -691,6 +711,193 @@ describe('image graphql', function() {
   });
 
   it('should delete image', async () => {
+    const mutation = await this.graphqlRequest(`
+    mutation($where: ImageWhereUniqueInput!){
+      deleteImage (where: $where) { id }
+    }`, {
+      where: {id: this.currentImage.id}
+    });
+
+    // query
+    const data = await this.graphqlRequest(`
+    query ($where: ImageWhereUniqueInput!) {
+      image (where: $where) { ${fields} }
+    }`, {
+      where: {id: this.currentImage.id}
+    });
+
+    expect(data.image).to.be.null;
+  });
+
+  it('create a custom image', async () => {
+    const data = {
+      name: faker.internet.userName().toLowerCase().replace(/_/g, '-'),
+      imageSpec: {
+        baseImage: 'jupyter/base-notebook:foo',
+        packages: {
+          apt: ['curl'],
+          pip: []
+        }
+      }
+    };
+    const mutation = await this.graphqlRequest(`
+    mutation($data: ImageCreateInput!){
+      createImage (data: $data) { ${customImageFields} }
+    }`, {
+      data
+    });
+
+    expect(mutation.createImage).to.be.eql({
+      id: data.name,
+      name: data.name,
+      imageSpec: {
+        baseImage: data.imageSpec.baseImage,
+        packages: {
+          apt: ['curl'],
+          pip: [],
+          conda: []
+        },
+        cancel: false,
+        pullSecret: null
+      }
+    });
+
+    // get one
+    const queryOne = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${customImageFields} }
+    }`, {
+      where: {id: data.name}
+    });
+
+    expect(queryOne.image).to.be.eql({
+      id: data.name,
+      name: data.name,
+      imageSpec: {
+        baseImage: data.imageSpec.baseImage,
+        packages: {
+          apt: ['curl'],
+          pip: [],
+          conda: []
+        },
+        cancel: false,
+        pullSecret: null
+      }
+    });
+    this.currentImage = queryOne.image;
+  });
+
+  it('rebuild a custom image', async () => {
+    const data = {
+      baseImage: 'jupyter/base-notebook:foo',
+      packages: {
+        apt: ['curl', 'vim'],
+        pip: ['flask']
+      }
+    };
+    const where = {
+      id: this.currentImage.name
+    };
+    const mutation = await this.graphqlRequest(`
+    mutation($data: ImageSpecUpdateInput!, $where: ImageWhereUniqueInput!){
+      rebuildImage (data: $data, where: $where) { ${customImageFields} }
+    }`, {
+      data,
+      where
+    });
+
+    expect(mutation.rebuildImage).to.be.eql({
+      id: this.currentImage.id,
+      name: this.currentImage.name,
+      imageSpec: {
+        baseImage: this.currentImage.imageSpec.baseImage,
+        packages: {
+          apt: ['curl', 'vim'],
+          pip: ['flask'],
+          conda: []
+        },
+        cancel: false,
+        pullSecret: null
+      }
+    });
+
+    // get one
+    const queryOne = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${customImageFields} }
+    }`, {
+      where: {id: this.currentImage.id}
+    });
+
+    expect(queryOne.image).to.be.eql({
+      id: this.currentImage.id,
+      name: this.currentImage.name,
+      imageSpec: {
+        baseImage: this.currentImage.imageSpec.baseImage,
+        packages: {
+          apt: ['curl', 'vim'],
+          pip: ['flask'],
+          conda: []
+        },
+        cancel: false,
+        pullSecret: null
+      }
+    });
+    this.currentImage = queryOne.image;
+  });
+
+  it('cancel a custom image', async () => {
+    const where = {
+      id: this.currentImage.name
+    };
+    const mutation = await this.graphqlRequest(`
+    mutation($where: ImageWhereUniqueInput!){
+      cancelImageBuild (where: $where) { ${customImageFields} }
+    }`, {
+      where
+    });
+
+    expect(mutation.cancelImageBuild).to.be.eql({
+      id: this.currentImage.id,
+      name: this.currentImage.name,
+      imageSpec: {
+        baseImage: this.currentImage.imageSpec.baseImage,
+        packages: {
+          apt: ['curl', 'vim'],
+          pip: ['flask'],
+          conda: []
+        },
+        cancel: true,
+        pullSecret: null
+      }
+    });
+
+    // get one
+    const queryOne = await this.graphqlRequest(`
+    query($where: ImageWhereUniqueInput!){
+      image (where: $where) { ${customImageFields} }
+    }`, {
+      where: {id: this.currentImage.id}
+    });
+
+    expect(queryOne.image).to.be.eql({
+      id: this.currentImage.id,
+      name: this.currentImage.name,
+      imageSpec: {
+        baseImage: this.currentImage.imageSpec.baseImage,
+        packages: {
+          apt: ['curl', 'vim'],
+          pip: ['flask'],
+          conda: []
+        },
+        cancel: true,
+        pullSecret: null
+      }
+    });
+    this.currentImage = queryOne.image;
+  });
+
+  it('should delete custom image', async () => {
     const mutation = await this.graphqlRequest(`
     mutation($where: ImageWhereUniqueInput!){
       deleteImage (where: $where) { id }

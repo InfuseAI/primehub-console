@@ -63,6 +63,7 @@ export interface ImageSpec {
   type?: ImageType;
   urlForGpu?: string;
   groupName?: string;
+  imageSpec?: ImageCrdImageSpec;
 }
 
 export interface DatasetSpec {
@@ -80,6 +81,21 @@ export interface AnnouncementSpec {
   expiryDate: number;
   sendEmail: boolean;
   status: string; // published, draft
+}
+
+export interface ImageCrdImageSpec {
+  baseImage?: string;
+  pullSecret?: string;
+  packages?: ImageCrdImageSpecPackages;
+  // iso8601
+  updateTime?: string;
+  cancel?: boolean;
+}
+
+export interface ImageCrdImageSpecPackages {
+  apt?: string[];
+  pip?: string[];
+  conda?: string[];
 }
 
 export interface ImageSpecSpec {

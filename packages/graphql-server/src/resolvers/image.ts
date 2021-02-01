@@ -1,16 +1,17 @@
 import { Context } from './interface';
 import { Item } from '../crdClient/customResource';
-import { ImageSpec, ImageType } from '../crdClient/crdClientImpl';
+import { ImageSpec, ImageType, ImageCrdImageSpec } from '../crdClient/crdClientImpl';
 import { QueryImageMode, toRelay, extractPagination, mutateRelation, isGroupAdmin, isAdmin } from './utils';
 import { ApolloError } from 'apollo-server';
 import { Crd } from './crd';
-import { isEmpty, isUndefined, isNil, isNull, get, omit, unionBy } from 'lodash';
+import { isEmpty, isUndefined, isNil, isNull, get, omit, unionBy, keys } from 'lodash';
+import moment = require('moment');
 import { ResourceNamePrefix } from './resourceRole';
 import { createConfig } from '../config';
 import * as logger from '../logger';
 import { ErrorCodes } from '../errorCodes';
 
-const {EXCEED_QUOTA_ERROR, NOT_AUTH_ERROR} = ErrorCodes;
+const {EXCEED_QUOTA_ERROR, NOT_AUTH_ERROR, INTERNAL_ERROR} = ErrorCodes;
 
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 
@@ -34,6 +35,21 @@ const beforeDelete = async ({data, context}: {data: any, context: any}): Promise
   await adminAuthorization({data: spec, context});
 };
 
+const imageSpecMapping = (imageSpec: ImageCrdImageSpec) => {
+  const packages = { apt: [], pip: [], conda: [] };
+
+  if (imageSpec.packages) {
+    Object.keys(packages).forEach(k => {
+      if (k in imageSpec.packages && imageSpec.packages[k]) {
+        packages[k] = imageSpec.packages[k];
+      }
+    });
+    imageSpec.packages = packages;
+  }
+
+  return imageSpec;
+};
+
 export const mapping = (item: Item<ImageSpec>) => {
   return {
     id: item.metadata.name,
@@ -46,6 +62,9 @@ export const mapping = (item: Item<ImageSpec>) => {
     useImagePullSecret: item.spec.pullSecret,
     groupName: item.spec.groupName,
     spec: item.spec,
+    isReady: item.spec.url ? true : false,
+    imageSpec: item.spec.imageSpec ? imageSpecMapping(item.spec.imageSpec) : null,
+    jobStatus: item.status ? item.status.jobCondition : null,
   };
 };
 
@@ -88,6 +107,27 @@ export const onCreate = async (
           });
         }
       });
+    }
+
+    if (resource.spec && resource.spec.imageSpec) {
+      const name = resource.metadata.name;
+      resource.spec.imageSpec.cancel = false;
+      resource.spec.imageSpec.updateTime = moment.utc().toISOString();
+
+      try {
+        const customResource = context.crdClient[this.crd.customResourceMethod];
+        customResource.patch(name, {
+          spec: resource.spec
+        });
+      } catch (err) {
+        logger.error({
+          component: logger.components.image,
+          type: 'IMAGE_CREATE',
+          stacktrace: err.stack,
+          message: err.message
+        });
+        throw new ApolloError('failed to create custom image', INTERNAL_ERROR);
+      }
     }
 };
 
@@ -170,7 +210,8 @@ export const createMapping = (data: any) => {
       url,
       urlForGpu,
       pullSecret: isNil(data.useImagePullSecret) ? '' : data.useImagePullSecret,
-      groupName: isNil(data.groupName) ? null : data.groupName
+      groupName: isNil(data.groupName) ? null : data.groupName,
+      imageSpec: isNil(data.imageSpec) ? null : data.imageSpec
     }
   };
 };
@@ -224,7 +265,8 @@ export const updateMapping = (data: any) => {
       url,
       urlForGpu,
       pullSecret: isNil(data.useImagePullSecret) ? null : data.useImagePullSecret,
-      groupName: isNil(data.groupName) ? null : data.groupName
+      groupName: isNil(data.groupName) ? null : data.groupName,
+      imageSpec: isNil(data.imageSpec) ? null : data.imageSpec
     }
   };
 };
@@ -258,6 +300,61 @@ export const groupImagesConnection = async (root, args, context: Context) => {
   return toRelay(rows, extractPagination(args));
 };
 
+export const rebuildImage = async (root, args, context: Context) => {
+  const name = args.where.id;
+  const imageSpec = args.data;
+  const customResource = context.crdClient[this.crd.customResourceMethod];
+  try {
+    const item = await customResource.get(name);
+    if (item.spec.imageSpec === null) {
+      throw new Error(`image '${name}' is not a custom build image`);
+    }
+
+    item.spec.imageSpec = imageSpec;
+    item.spec.imageSpec.cancel = false;
+    item.spec.imageSpec.updateTime = moment.utc().toISOString();
+    customResource.patch(name, {
+      spec: item.spec
+    });
+    return this.mapping(item);
+  } catch (err) {
+    logger.error({
+      component: logger.components.image,
+      type: 'IMAGE_UPDATE',
+      stacktrace: err.stack,
+      message: err.message
+    });
+    throw new ApolloError('failed to rebuild image', INTERNAL_ERROR);
+    return null;
+  }
+};
+
+export const cancelImageBuild = async (root, args, context: Context) => {
+  const name = args.where.id;
+  const customResource = context.crdClient[this.crd.customResourceMethod];
+  try {
+    const item = await customResource.get(name);
+    if (item.spec.imageSpec === null) {
+      throw new Error(`image '${name}' is not a custom build image`);
+    }
+
+    item.spec.imageSpec.cancel = true;
+    customResource.patch(name, {
+      spec: item.spec
+    });
+    return this.mapping(item);
+  } catch (err) {
+    logger.error({
+      component: logger.components.image,
+      type: 'IMAGE_UPDATE',
+      stacktrace: err.stack,
+      message: err.message
+    });
+    throw new ApolloError('failed to cancel image build', INTERNAL_ERROR);
+    return null;
+  }
+};
+
 export const customResolvers = () => {
   return {
     [`groupImagesConnection`]: groupImagesConnection,
@@ -267,6 +364,13 @@ export const customResolvers = () => {
 export const customResolversInGroup = () => {
   return {
     [`groupImages`]: groupImages,
+  };
+};
+
+export const customResolversInMutation = () => {
+  return {
+    [`rebuildImage`]: rebuildImage,
+    [`cancelImageBuild`]: cancelImageBuild,
   };
 };
 
@@ -284,5 +388,6 @@ export const crd = new Crd<ImageSpec>({
   beforeDelete,
   onCreate,
   onUpdate,
-  customResolvers
+  customResolvers,
+  customResolversInMutation
 });
