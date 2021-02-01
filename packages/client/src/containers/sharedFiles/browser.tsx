@@ -187,7 +187,7 @@ class Browser extends React.Component<Props, State> {
     const {data} = this.props;
     const {files} = data || {};
     const {prefix} = files || {};
-    return `${appPrefix}files/${prefix}/${filename}`
+    return `${appPrefix}files/${prefix}${filename}`
   }
 
   private getPhfsUri(name) {
@@ -338,11 +338,9 @@ class Browser extends React.Component<Props, State> {
           placement: 'bottomRight'
         });
         this.setState({itemCopyUri: undefined});
-        this.handleRefetch();
       }}
       onCancel= {() => {
         this.setState({itemCopyUri: undefined});
-        this.handleRefetch();
       }}
     >
       <Form layout="vertical">
@@ -366,9 +364,13 @@ class Browser extends React.Component<Props, State> {
       footer={[
         <Button type="primary" onClick={() => {
           this.setState({uploading: false});
+          this.handleRefetch();
         }}>OK</Button>
       ]}
-      onCancel={()=>{this.setState({uploading: false})}}
+      onCancel={()=>{
+        this.setState({uploading: false});
+        this.handleRefetch();
+      }}
     >
       <Uploader dirPath={data.files.prefix} />
     </Modal>
