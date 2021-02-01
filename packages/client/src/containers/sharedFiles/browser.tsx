@@ -187,7 +187,7 @@ class Browser extends React.Component<Props, State> {
     const {data} = this.props;
     const {files} = data || {};
     const {prefix} = files || {};
-    return `${appPrefix}files/${prefix}/${filename}`
+    return `${appPrefix}files/${prefix}${filename}`
   }
 
   private getPhfsUri(name) {
