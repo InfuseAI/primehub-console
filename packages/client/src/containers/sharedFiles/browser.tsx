@@ -338,9 +338,11 @@ class Browser extends React.Component<Props, State> {
           placement: 'bottomRight'
         });
         this.setState({itemCopyUri: undefined});
+        this.handleRefetch();
       }}
       onCancel= {() => {
         this.setState({itemCopyUri: undefined});
+        this.handleRefetch();
       }}
     >
       <Form layout="vertical">
