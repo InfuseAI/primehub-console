@@ -73,6 +73,7 @@ type Props = RouteComponentProps & GroupContextComponentProps & UserContextCompo
   createImageResult: any;
   defaultValue?: object;
 }
+
 type State = {
   selectedGroup: string | null;
 }
@@ -106,9 +107,9 @@ class ImageCreatePage extends React.Component<Props, State> {
   render() {
     const {selectedGroup} = this.state;
     const {userContext, groupContext, history, getGroups, createImageResult, defaultValue} = this.props;
-    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
-      history.push(`../home`);
-    }
+    //if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
+      //history.push(`../home`);
+    //}
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups

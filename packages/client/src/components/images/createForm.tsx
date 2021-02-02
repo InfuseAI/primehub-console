@@ -19,6 +19,11 @@ enum ImageType {
   ALL = 'both'
 }
 
+enum BuildType {
+  EXIST = 'exist',
+  CUSTOM = 'custom'
+}
+
 const { Option } = Select;
 
 type Props = FormComponentProps & {
@@ -37,6 +42,7 @@ type Props = FormComponentProps & {
 type State = {
   showGpuUrl: boolean
   imageType: ImageType
+  buildType: BuildType
 }
 
 const radioStyle = {
@@ -70,28 +76,29 @@ type FormValue = {
   urlForGpu: string;
 };
 
+
 const dashOrNumber = value => value === null ? '-' : value;
 
 const autoGenId = (name: string) => {
   const normalizedNAme = name.replace(/[\W_]/g, '-').toLowerCase();
   const randomString = Math.random().toString(36).substring(7).substring(0, 5);
   return `${normalizedNAme}-${randomString}`;
-}
+};
 
 class ImageCreateForm extends React.Component<Props, State> {
-  constructor (props) {
+  constructor(props) {
     super(props);
     const {formType, initialValue} = props;
     this.state = {
-      showGpuUrl: formType === FormType.Edit && (!isEmpty(initialValue.urlForGpu) && initialValue.url !== initialValue.urlForGpu),
-      imageType: (initialValue && initialValue.type) || ImageType.ALL
-    }
+      showGpuUrl: formType === FormType.Edit
+        && (!isEmpty(initialValue.urlForGpu)
+        && initialValue.url !== initialValue.urlForGpu),
+      imageType: (initialValue && initialValue.type) || ImageType.ALL,
+      buildType: BuildType.EXIST
+    };
   }
 
-  componentDidMount() {
-  }
-
-  submit = (e) => {
+  public submit = e => {
     const {form, onSubmit} = this.props;
     e.preventDefault();
     form.validateFields(async (err, values: FormValue) => {
@@ -118,6 +125,12 @@ class ImageCreateForm extends React.Component<Props, State> {
         {defaultLabel} <span style={{color: 'red'}}>({message})</span>
       </span>
     return label;
+  }
+
+  handleBuildingType = e => {
+    this.setState({
+      buildType: e.target.value,
+    });
   }
 
   handleTypeChange = (value) => {
@@ -199,6 +212,17 @@ class ImageCreateForm extends React.Component<Props, State> {
                 })(
                   <Input />
                 )}
+              </Form.Item>
+              <Divider/>
+              <Form.Item>
+                <Radio.Group onChange={this.handleBuildingType} value={this.state.buildType}>
+                  <Radio value={BuildType.EXIST}>
+                    Use existing one
+                  </Radio>
+                  <Radio value={BuildType.CUSTOM}>
+                    Build Custom Image
+                  </Radio>
+                </Radio.Group>
               </Form.Item>
               <Form.Item label="Type">
                 {form.getFieldDecorator('type', {
