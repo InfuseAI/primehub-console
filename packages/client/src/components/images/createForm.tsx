@@ -8,6 +8,8 @@ import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 
+const { TextArea } = Input;
+
 enum FormType {
   Edit = 'edit',
   Create = 'create'
@@ -224,59 +226,132 @@ class ImageCreateForm extends React.Component<Props, State> {
                   </Radio>
                 </Radio.Group>
               </Form.Item>
-              <Form.Item label="Type">
-                {form.getFieldDecorator('type', {
-                  initialValue: type || ImageType.ALL,
-                  rules: [
-                    {
-                      required: true,
-                      message: 'Please select a type.'
-                    }
-                  ]
-                })(
-                  <Select style={{width: '200px'}} onChange={this.handleTypeChange}>
-                    <Select.Option key='cpu' value='cpu'>cpu</Select.Option>
-                    <Select.Option key='gpu' value='gpu'>gpu</Select.Option>
-                    <Select.Option key='both' value='both'>universal</Select.Option>
-                  </Select>
-                )}
-              </Form.Item>
-              <Row gutter={24}>
-                <Col span={12}>
-                  <Form.Item label="Container image url" style={{marginBottom: '12px'}}>
-                    {form.getFieldDecorator('url', {
-                      initialValue: url
-                    })(
-                      <Input />
-                    )}
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label={`Image Pull Secret`}>
-                    {form.getFieldDecorator('useImagePullSecret', {
-                      initialValue: useImagePullSecret,
-                    })(
-                      <ImagePullSecret />
-                    )}
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={24} style={{display: (this.state.imageType === ImageType.ALL) ? 'block' : 'none'}}>
-                <Col span={12}>
-                  <Form.Item style={{marginBottom: '0'}}>
-                    <Checkbox style={{color: '#000000D9'}} checked={this.state.showGpuUrl} onChange={this.handleGpuVisible}>
-                      Specific container image url for GPU
-                    </Checkbox>
-                  </Form.Item>
-                  <Form.Item>
-                    {form.getFieldDecorator('urlForGpu', {
-                      initialValue: urlForGpu
-                    })(
-                      <Input disabled={!this.state.showGpuUrl}/>
-                    )}
-                  </Form.Item>
-                </Col>
-              </Row>
+              {
+                this.state.buildType === BuildType.CUSTOM ? (
+                  <>
+                    <Form.Item label="Type">
+                      {form.getFieldDecorator('type', {
+                        initialValue: type || ImageType.ALL,
+                        rules: [
+                          {
+                            required: true,
+                            message: 'Please select a type.'
+                          }
+                        ]
+                      })(
+                        <Select style={{width: '200px'}} onChange={this.handleTypeChange}>
+                          <Select.Option key='cpu' value='cpu'>cpu</Select.Option>
+                          <Select.Option key='gpu' value='gpu'>gpu</Select.Option>
+                          <Select.Option key='both' value='both'>universal</Select.Option>
+                        </Select>
+                      )}
+                    </Form.Item>
+                    <Row gutter={24}>
+                      <Col span={12}>
+                        <Form.Item label="Base image url" style={{marginBottom: '12px'}}>
+                          {form.getFieldDecorator('url', {
+                            initialValue: url,
+                            rules: [
+                              {
+                                required: true,
+                                message: 'Please give a base image url'
+                              }
+                            ]
+                          })(
+                            <Input />
+                          )}
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item label={`Image Pull Secret`}>
+                          {form.getFieldDecorator('useImagePullSecret', {
+                            initialValue: useImagePullSecret,
+                          })(
+                            <ImagePullSecret />
+                          )}
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Form.Item label="Packages">
+                      <Card>
+                        <Row gutter={24}>
+                          <Col span={8}>
+                            <Form.Item label={`APT`} style={{marginBottom: '10px'}}>
+                              <TextArea rows={4}/>
+                            </Form.Item>
+                          </Col>
+                          <Col span={8}>
+                            <Form.Item label={`Conda`} style={{marginBottom: '10px'}}>
+                              <TextArea rows={4}/>
+                            </Form.Item>
+                          </Col>
+                          <Col span={8}>
+                            <Form.Item label={`pip`} style={{marginBottom: '10px'}}>
+                              <TextArea rows={4}/>
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                      </Card>
+                    </Form.Item>
+                  </>
+                ) : (
+                  <>
+                    <Form.Item label="Type">
+                      {form.getFieldDecorator('type', {
+                        initialValue: type || ImageType.ALL,
+                        rules: [
+                          {
+                            required: true,
+                            message: 'Please select a type.'
+                          }
+                        ]
+                      })(
+                        <Select style={{width: '200px'}} onChange={this.handleTypeChange}>
+                          <Select.Option key='cpu' value='cpu'>cpu</Select.Option>
+                          <Select.Option key='gpu' value='gpu'>gpu</Select.Option>
+                          <Select.Option key='both' value='both'>universal</Select.Option>
+                        </Select>
+                      )}
+                    </Form.Item>
+                    <Row gutter={24}>
+                      <Col span={12}>
+                        <Form.Item label="Container image url" style={{marginBottom: '12px'}}>
+                          {form.getFieldDecorator('url', {
+                            initialValue: url
+                          })(
+                            <Input />
+                          )}
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item label={`Image Pull Secret`}>
+                          {form.getFieldDecorator('useImagePullSecret', {
+                            initialValue: useImagePullSecret,
+                          })(
+                            <ImagePullSecret />
+                          )}
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row gutter={24} style={{display: (this.state.imageType === ImageType.ALL) ? 'block' : 'none'}}>
+                      <Col span={12}>
+                        <Form.Item style={{marginBottom: '0'}}>
+                          <Checkbox style={{color: '#000000D9'}} checked={this.state.showGpuUrl} onChange={this.handleGpuVisible}>
+                            Specific container image url for GPU
+                          </Checkbox>
+                        </Form.Item>
+                        <Form.Item>
+                          {form.getFieldDecorator('urlForGpu', {
+                            initialValue: urlForGpu
+                          })(
+                            <Input disabled={!this.state.showGpuUrl}/>
+                          )}
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  </>
+                )
+              }
             </Card>
             <Form.Item style={{textAlign: 'right', marginTop: 12}}>
               {
