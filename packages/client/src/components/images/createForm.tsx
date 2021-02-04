@@ -55,7 +55,7 @@ type State = {
   imageType: ImageType
   buildType: BuildType
   buildModalVisible: boolean
-}
+};
 
 const radioStyle = {
   display: 'block',
@@ -86,6 +86,11 @@ type FormValue = {
   description: string;
   url: string;
   urlForGpu: string;
+  baseImage: string;
+  pullSecret: string;
+  apt: string;
+  pip: string;
+  conda: string;
 };
 
 const dashOrNumber = value => value === null ? '-' : value;
@@ -184,13 +189,13 @@ class ImageCreateForm extends React.Component<Props, State> {
     this.setState({buildModalVisible: false});
   }
 
-  renderBuildCustomImageForm = (form, formType, url, useImagePullSecret) => {
-    const debugFlag = true;
+  renderBuildCustomImageForm = (form, formType, imageSpec = {}, packages = {}) => {
+    const debugFlag = false;
     if (debugFlag || formType === FormType.Edit) {
       return (
         <StyledFormItem label={<span>Container image url :  {this.renderBuildingLink()}</span>} style={{marginBottom: '12px'}}>
-          {form.getFieldDecorator('url', {
-            initialValue: url
+          {form.getFieldDecorator('baseImage', {
+            initialValue: imageSpec.baseImage
           })(
             <Input disabled />
           )}
@@ -202,8 +207,8 @@ class ImageCreateForm extends React.Component<Props, State> {
           <Row gutter={24}>
             <Col span={12}>
               <Form.Item label='Base image url' style={{marginBottom: '12px'}}>
-                {form.getFieldDecorator('url', {
-                  initialValue: url,
+                {form.getFieldDecorator('imageSpec.baseImage', {
+                  initialValue: imageSpec.baseImage,
                   rules: [
                     {
                       required: true,
@@ -217,8 +222,8 @@ class ImageCreateForm extends React.Component<Props, State> {
             </Col>
             <Col span={12}>
               <Form.Item label={`Image Pull Secret`}>
-                {form.getFieldDecorator('useImagePullSecret', {
-                  initialValue: useImagePullSecret,
+                {form.getFieldDecorator('imageSpec.pullSecret', {
+                  initialValue: imageSpec.pullSecret,
                 })(
                   <ImagePullSecret />
                 )}
@@ -230,17 +235,29 @@ class ImageCreateForm extends React.Component<Props, State> {
               <Row gutter={24}>
                 <Col span={8}>
                   <Form.Item label={`APT`} style={{marginBottom: '10px'}}>
-                    <TextArea rows={4}/>
+                    {form.getFieldDecorator('imageSpec.packages.apt', {
+                      initialValue: packages.apt,
+                    })(
+                      <TextArea rows={4}/>
+                    )}
                   </Form.Item>
                 </Col>
                 <Col span={8}>
                   <Form.Item label={`Conda`} style={{marginBottom: '10px'}}>
-                    <TextArea rows={4}/>
+                    {form.getFieldDecorator('imageSpec.packages.conda', {
+                      initialValue: packages.conda,
+                    })(
+                      <TextArea rows={4}/>
+                    )}
                   </Form.Item>
                 </Col>
                 <Col span={8}>
                   <Form.Item label={`pip`} style={{marginBottom: '10px'}}>
-                    <TextArea rows={4}/>
+                    {form.getFieldDecorator('imageSpec.packages.pip', {
+                      initialValue: packages.pip,
+                    })(
+                      <TextArea rows={4}/>
+                    )}
                   </Form.Item>
                 </Col>
               </Row>
@@ -272,8 +289,10 @@ class ImageCreateForm extends React.Component<Props, State> {
       url,
       useImagePullSecret,
       description,
+      imageSpec,
     } = initialValue || {};
     let urlForGpu = formType !== FormType.Edit || !this.state.showGpuUrl || (initialValue.url == initialValue.urlForGpu) ? null : initialValue.urlForGpu;
+    const { packages } = imageSpec || {};
     return (
       <Form onSubmit={this.submit}>
         <Row>
@@ -342,7 +361,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                         </Select>
                       )}
                     </Form.Item>
-                    { this.renderBuildCustomImageForm(form, formType, url, useImagePullSecret) }
+                    { this.renderBuildCustomImageForm(form, formType, imageSpec, packages) }
                   </>
                 ) : (
                   <>
@@ -429,75 +448,77 @@ class ImageCreateForm extends React.Component<Props, State> {
             </Form.Item>
           </Col>
         </Row>
-        <Modal
-          width="calc(100% - 128px)"
-          style={{marginLeft: '64px'}}
-          footer={null}
-          visible={this.state.buildModalVisible}
-          onCancel={this.hideBuildingModal}>
-          <div>
-            <Tabs defaultActiveKey="details">
-              <TabPane tab="Build Details" key="details">
-                <Row gutter={24}>
-                  <Col span={12}>
-                    <Form.Item label='Base image url' style={{marginBottom: '12px'}}>
-                      {form.getFieldDecorator('url', {
-                        initialValue: url,
-                        rules: [
-                          {
-                            required: true,
-                            message: 'Please give a base image url'
-                          }
-                        ]
-                      })(
-                        <Input disabled />
-                      )}
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <Form.Item label={`Image Pull Secret`}>
-                      {form.getFieldDecorator('useImagePullSecret', {
-                        initialValue: useImagePullSecret,
-                      })(
-                        <ImagePullSecret disabled />
-                      )}
-                    </Form.Item>
-                  </Col>
-                </Row>
-                <Form.Item label='Status' style={{marginBottom: '12px'}}>
-                  <Input disabled />
-                </Form.Item>
-                <Form.Item label='Packages'>
-                  <Card>
-                    <Row gutter={24}>
-                      <Col span={8}>
-                        <Form.Item label={`APT`} style={{marginBottom: '10px'}}>
-                          <TextArea disabled rows={4}/>
-                        </Form.Item>
-                      </Col>
-                      <Col span={8}>
-                        <Form.Item label={`Conda`} style={{marginBottom: '10px'}}>
-                          <TextArea disabled rows={4}/>
-                        </Form.Item>
-                      </Col>
-                      <Col span={8}>
-                        <Form.Item label={`pip`} style={{marginBottom: '10px'}}>
-                          <TextArea disabled rows={4}/>
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                  </Card>
-                </Form.Item>
-              </TabPane>
-              <TabPane tab="Log" key="log">
-                <Log
-                  endpoint={""}
-                />
-              </TabPane>
-            </Tabs>
+        {
+          formType === FormType.Edit ? (
+          <Modal
+            width="calc(100% - 128px)"
+            style={{marginLeft: '64px'}}
+            footer={null}
+            visible={this.state.buildModalVisible}
+            onCancel={this.hideBuildingModal}>
+            <div>
+              <Tabs defaultActiveKey="details">
+                <TabPane tab="Build Details" key="details">
+                  <Row gutter={24}>
+                    <Col span={12}>
+                      <Form.Item label='Base image url' style={{marginBottom: '12px'}}>
+                        {form.getFieldDecorator('url', {
+                          initialValue: url,
+                          rules: [
+                            {
+                              required: true,
+                              message: 'Please give a base image url'
+                            }
+                          ]
+                        })(
+                          <Input disabled />
+                        )}
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item label={`Image Pull Secret`}>
+                        {form.getFieldDecorator('useImagePullSecret', {
+                          initialValue: useImagePullSecret,
+                        })(
+                          <ImagePullSecret disabled />
+                        )}
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  <Form.Item label='Status' style={{marginBottom: '12px'}}>
+                    <Input disabled />
+                  </Form.Item>
+                  <Form.Item label='Packages'>
+                    <Card>
+                      <Row gutter={24}>
+                        <Col span={8}>
+                          <Form.Item label={`APT`} style={{marginBottom: '10px'}}>
+                            <TextArea disabled rows={4}/>
+                          </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                          <Form.Item label={`Conda`} style={{marginBottom: '10px'}}>
+                            <TextArea disabled rows={4}/>
+                          </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                          <Form.Item label={`pip`} style={{marginBottom: '10px'}}>
+                            <TextArea disabled rows={4}/>
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    </Card>
+                  </Form.Item>
+                </TabPane>
+                <TabPane tab="Log" key="log">
+                  <Log
+                    endpoint={""}
+                  />
+                </TabPane>
+              </Tabs>
 
-          </div>
-        </Modal>
+            </div>
+          </Modal>) : (<></>)}
       </Form>
     )
   }

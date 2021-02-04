@@ -26,7 +26,7 @@ export const ImageFragment = gql`
     groupName
     useImagePullSecret
  }
-`
+`;
 
 export const GET_IMAGES_CONNECTION = gql`
   query groupImagesConnection($where: ImageWhereInput, $page: Int, $orderBy: ImageOrderByInput) {
