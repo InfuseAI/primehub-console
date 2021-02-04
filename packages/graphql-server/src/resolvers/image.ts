@@ -4,7 +4,7 @@ import { ImageSpec, ImageType, ImageCrdImageSpec } from '../crdClient/crdClientI
 import { QueryImageMode, toRelay, extractPagination, mutateRelation, isGroupAdmin, isAdmin } from './utils';
 import { ApolloError } from 'apollo-server';
 import { Crd } from './crd';
-import { isEmpty, isUndefined, isNil, isNull, get, omit, unionBy, keys } from 'lodash';
+import { isEmpty, isUndefined, isNil, isNull, get, omit, unionBy, keys, merge } from 'lodash';
 import moment = require('moment');
 import { ResourceNamePrefix } from './resourceRole';
 import { createConfig } from '../config';
@@ -199,7 +199,7 @@ export const createMapping = (data: any) => {
   const imageType = data.type || ImageType.both;
   const {url, urlForGpu} = defineUrlAndUrlForGpu(data.url, data.urlForGpu, imageType);
 
-  return {
+  const result = {
     metadata: {
       name: data.name
     },
@@ -211,9 +211,13 @@ export const createMapping = (data: any) => {
       urlForGpu,
       pullSecret: isNil(data.useImagePullSecret) ? '' : data.useImagePullSecret,
       groupName: isNil(data.groupName) ? null : data.groupName,
-      imageSpec: isNil(data.imageSpec) ? null : data.imageSpec
     }
   };
+  if (!isNil(data.imageSpec)) {
+    merge(result.spec, { imageSpec: data.imageSpec});
+  }
+
+  return result;
 };
 
 const customUpdate = async ({
@@ -254,7 +258,8 @@ const customUpdate = async ({
 export const updateMapping = (data: any) => {
   const imageType = data.type || ImageType.both;
   const {url, urlForGpu} = defineUrlAndUrlForGpu(data.url, data.urlForGpu, imageType);
-  return {
+
+  const result = {
     metadata: {
       name: data.name
     },
@@ -266,9 +271,13 @@ export const updateMapping = (data: any) => {
       urlForGpu,
       pullSecret: isNil(data.useImagePullSecret) ? null : data.useImagePullSecret,
       groupName: isNil(data.groupName) ? null : data.groupName,
-      imageSpec: isNil(data.imageSpec) ? null : data.imageSpec
     }
   };
+  if (!isNil(data.imageSpec)) {
+    merge(result.spec, { imageSpec: data.imageSpec});
+  }
+
+  return result;
 };
 
 export const groupImages = async (parent, args, context: Context) => {
