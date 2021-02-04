@@ -8,9 +8,16 @@ import Log from 'components/share/log';
 import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
+import styled from 'styled-components';
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;
+
+const StyledFormItem = styled(Form.Item)`
+  > .ant-form-item-label label:after {
+    content: "";
+  }
+`;
 
 enum FormType {
   Edit = 'edit',
@@ -90,6 +97,7 @@ const autoGenId = (name: string) => {
 };
 
 class ImageCreateForm extends React.Component<Props, State> {
+
   constructor(props) {
     super(props);
     const {formType, initialValue} = props;
@@ -103,7 +111,7 @@ class ImageCreateForm extends React.Component<Props, State> {
     };
   }
 
-  public submit = e => {
+  submit = e => {
     const {form, onSubmit} = this.props;
     e.preventDefault();
     form.validateFields(async (err, values: FormValue) => {
@@ -119,16 +127,17 @@ class ImageCreateForm extends React.Component<Props, State> {
     onCancel(values);
   }
 
-  handleGpuVisible = (e) => {
+  handleGpuVisible = e => {
     this.setState({showGpuUrl: e.target.checked});
   }
 
   renderLabel = (defaultLabel: string, invalid: boolean, message: any) => {
     let label = <span>{defaultLabel}</span>;
-    if (invalid)
-      label = <span>
+    if (invalid) {
+      label = (<span>
         {defaultLabel} <span style={{color: 'red'}}>({message})</span>
-      </span>
+      </span>);
+    }
     return label;
   }
 
@@ -138,7 +147,7 @@ class ImageCreateForm extends React.Component<Props, State> {
     });
   }
 
-  handleTypeChange = (value) => {
+  handleTypeChange = value => {
     const {form} = this.props;
     const type = value;
     this.setState({imageType: type});
@@ -148,24 +157,26 @@ class ImageCreateForm extends React.Component<Props, State> {
   handleNameChange = debounce(() => {
     const {form, formType} = this.props;
     // Don't change name(id) in edit mode.
-    if (formType === FormType.Edit) return;
-    const values = form.getFieldsValue();
-    form.validateFields(['displayName'], (err, values) => {
-      if (err) return form.setFieldsValue({ id: '' });
-      const name = autoGenId(values.displayName);
+    if (formType === FormType.Edit) {
+      return;
+    }
+    form.validateFields(['displayName'], (err, val) => {
+      if (err) {
+        return form.setFieldsValue({ id: '' });
+      }
+      const name = autoGenId(val.displayName);
       form.setFieldsValue({ name });
     });
 
-  }, 400)
+  }, 400);
 
   renderBuildingLink = () => {
     return (
       <a onClick={() => this.showBuildingModal()}>Image building in progress...</a>
-    )
+    );
   }
 
   showBuildingModal = () => {
-    console.log('111');
     this.setState({buildModalVisible: true});
   }
 
@@ -177,13 +188,13 @@ class ImageCreateForm extends React.Component<Props, State> {
     const debugFlag = true;
     if (debugFlag || formType === FormType.Edit) {
       return (
-        <Form.Item label={<span>Container image url {this.renderBuildingLink()}</span>} style={{marginBottom: '12px'}}>
+        <StyledFormItem label={<span>Container image url :  {this.renderBuildingLink()}</span>} style={{marginBottom: '12px'}}>
           {form.getFieldDecorator('url', {
             initialValue: url
           })(
             <Input disabled />
           )}
-        </Form.Item>
+        </StyledFormItem>
       );
     } else {
       return (

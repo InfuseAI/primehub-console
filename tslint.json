@@ -9,6 +9,9 @@
         "named-imports-order": "any"
       }
     ],
+    "member-access": false,
+    "member-ordering": false,
+    "curly": false,
     "quotemark": [true, "single"],
     "no-implicit-dependencies": [true, "dev"],
     "no-submodule-imports": false,
