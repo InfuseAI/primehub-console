@@ -88,6 +88,8 @@ type FormValue = {
   urlForGpu: string;
   baseImage: string;
   pullSecret: string;
+  logEndpoint: string;
+  jobStatus: any;
   apt: string;
   pip: string;
   conda: string;
@@ -111,7 +113,7 @@ class ImageCreateForm extends React.Component<Props, State> {
         && (!isEmpty(initialValue.urlForGpu)
         && initialValue.url !== initialValue.urlForGpu),
       imageType: (initialValue && initialValue.type) || ImageType.ALL,
-      buildType: BuildType.EXIST,
+      buildType: (initialValue && initialValue.imageSpec) ? BuildType.CUSTOM : BuildType.EXIST,
       buildModalVisible: false
     };
   }
@@ -175,10 +177,13 @@ class ImageCreateForm extends React.Component<Props, State> {
 
   }, 400);
 
-  renderBuildingLink = () => {
-    return (
-      <a onClick={() => this.showBuildingModal()}>Image building in progress...</a>
-    );
+  renderBuildingLink = (isReady = false) => {
+    if (!isReady) {
+      return (
+        <a onClick={() => this.showBuildingModal()}>Image building in progress...</a>
+      );
+    }
+    return;
   }
 
   showBuildingModal = () => {
@@ -189,13 +194,13 @@ class ImageCreateForm extends React.Component<Props, State> {
     this.setState({buildModalVisible: false});
   }
 
-  renderBuildCustomImageForm = (form, formType, imageSpec = {}, packages = {}) => {
+  renderBuildCustomImageForm = (form, formType, url, isReady, imageSpec = {}, packages = {}) => {
     const debugFlag = false;
     if (debugFlag || formType === FormType.Edit) {
       return (
-        <StyledFormItem label={<span>Container image url :  {this.renderBuildingLink()}</span>} style={{marginBottom: '12px'}}>
-          {form.getFieldDecorator('baseImage', {
-            initialValue: imageSpec.baseImage
+        <StyledFormItem label={<span>Container image url :  {this.renderBuildingLink(isReady)}</span>} style={{marginBottom: '12px'}}>
+          {form.getFieldDecorator('url', {
+            initialValue: url
           })(
             <Input disabled />
           )}
@@ -290,6 +295,9 @@ class ImageCreateForm extends React.Component<Props, State> {
       useImagePullSecret,
       description,
       imageSpec,
+      isReady,
+      jobStatus,
+      logEndpoint
     } = initialValue || {};
     let urlForGpu = formType !== FormType.Edit || !this.state.showGpuUrl || (initialValue.url == initialValue.urlForGpu) ? null : initialValue.urlForGpu;
     const { packages } = imageSpec || {};
@@ -361,7 +369,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                         </Select>
                       )}
                     </Form.Item>
-                    { this.renderBuildCustomImageForm(form, formType, imageSpec, packages) }
+                    { this.renderBuildCustomImageForm(form, formType, url, isReady, imageSpec, packages) }
                   </>
                 ) : (
                   <>
@@ -449,7 +457,7 @@ class ImageCreateForm extends React.Component<Props, State> {
           </Col>
         </Row>
         {
-          formType === FormType.Edit ? (
+          formType === FormType.Edit && imageSpec ? (
           <Modal
             width="calc(100% - 128px)"
             style={{marginLeft: '64px'}}
@@ -462,48 +470,34 @@ class ImageCreateForm extends React.Component<Props, State> {
                   <Row gutter={24}>
                     <Col span={12}>
                       <Form.Item label='Base image url' style={{marginBottom: '12px'}}>
-                        {form.getFieldDecorator('url', {
-                          initialValue: url,
-                          rules: [
-                            {
-                              required: true,
-                              message: 'Please give a base image url'
-                            }
-                          ]
-                        })(
-                          <Input disabled />
-                        )}
+                        <Input disabled value={get(imageSpec, 'baseImage', '')} />
                       </Form.Item>
                     </Col>
                     <Col span={12}>
                       <Form.Item label={`Image Pull Secret`}>
-                        {form.getFieldDecorator('useImagePullSecret', {
-                          initialValue: useImagePullSecret,
-                        })(
-                          <ImagePullSecret disabled />
-                        )}
+                        <ImagePullSecret disabled value={get(imageSpec, 'pullSecret', '')} />
                       </Form.Item>
                     </Col>
                   </Row>
                   <Form.Item label='Status' style={{marginBottom: '12px'}}>
-                    <Input disabled />
+                    <Input disabled value={get(jobStatus, 'phase', 'Unknow')} />
                   </Form.Item>
                   <Form.Item label='Packages'>
                     <Card>
                       <Row gutter={24}>
                         <Col span={8}>
                           <Form.Item label={`APT`} style={{marginBottom: '10px'}}>
-                            <TextArea disabled rows={4}/>
+                            <TextArea disabled rows={4} value={get(packages, 'apt', []).join('\n')}/>
                           </Form.Item>
                         </Col>
                         <Col span={8}>
                           <Form.Item label={`Conda`} style={{marginBottom: '10px'}}>
-                            <TextArea disabled rows={4}/>
+                            <TextArea disabled rows={4} value={get(packages, 'conda', []).join('\n')}/>
                           </Form.Item>
                         </Col>
                         <Col span={8}>
                           <Form.Item label={`pip`} style={{marginBottom: '10px'}}>
-                            <TextArea disabled rows={4}/>
+                            <TextArea disabled rows={4} value={get(packages, 'pip', []).join('\n')}/>
                           </Form.Item>
                         </Col>
                       </Row>
@@ -512,7 +506,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                 </TabPane>
                 <TabPane tab="Log" key="log">
                   <Log
-                    endpoint={""}
+                    endpoint={logEndpoint}
                   />
                 </TabPane>
               </Tabs>

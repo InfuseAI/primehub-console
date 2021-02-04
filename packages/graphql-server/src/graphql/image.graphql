@@ -21,6 +21,7 @@ type Image {
   useImagePullSecret: String
   groups: [Group]
   isReady: Boolean
+  logEndpoint: String
   imageSpec: ImageSpec
   jobStatus: JobStatus
 }

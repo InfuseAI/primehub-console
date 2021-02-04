@@ -25,6 +25,20 @@ export const ImageFragment = gql`
     type
     groupName
     useImagePullSecret
+    logEndpoint
+    isReady
+    jobStatus {
+      phase
+    }
+    imageSpec {
+      baseImage
+      pullSecret
+      packages {
+        apt
+        conda
+        pip
+      }
+    }
  }
 `;
 
