@@ -11,6 +11,7 @@ export const fakeData = {
       id: 'groupId1',
       name: 'group1',
       displayName: 'c-Group 1',
+      enabledDeployment: true,
       instanceTypes: [{
         id: 'g-it1',
         name: 'IT1',
