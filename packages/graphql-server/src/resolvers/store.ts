@@ -55,7 +55,7 @@ const generatePrefixForQuery = (groupName: string, phfsPrefix: string, recursive
   }
 
   const groupPath = toGroupPath(groupName);
-  const fullPrefix = `/groups/${groupPath}${phfsPrefix}`;
+  const fullPrefix = `groups/${groupPath}${phfsPrefix}`;
 
   return {
     fullPrefix,
@@ -99,7 +99,7 @@ export const query = async (root, args, context: Context) => {
   return {
     items: fetchedFiles,
     phfsPrefix: modifiedPrefixes.phfsPrefix,
-    prefix: modifiedPrefixes.fullPrefix.substring(1),
+    prefix: modifiedPrefixes.fullPrefix,
   };
 };
 
@@ -118,7 +118,7 @@ export const destroy = async (root, args, context: Context) => {
   }
 
   const groupPath = toGroupPath(groupName);
-  const fullPrefix = `/groups/${groupPath}/${phfsPrefix}`;
+  const fullPrefix = `groups/${groupPath}/${phfsPrefix}`;
 
   let fetchedFiles: StoreFile[] = [];
   try {
