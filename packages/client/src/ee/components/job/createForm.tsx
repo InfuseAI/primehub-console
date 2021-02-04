@@ -73,7 +73,7 @@ const transformImages = (images, instanceType) => {
   return images.map(image => {
     return {
       ...image,
-      __disabled: !gpuInstance && (image.type || '').toLowerCase() === 'gpu'
+      __disabled: !image.isReady || (!gpuInstance && (image.type || '').toLowerCase() === 'gpu')
     };
   });
 }
@@ -333,7 +333,7 @@ class CreateForm extends React.Component<Props, State> {
                     <Radio.Group style={radioGroupStyle}>
                       {transformImages(images, instanceType).map(image => {
                         const isGroupImage = image && image.spec && image.spec.groupName && image.spec.groupName.length > 0;
-                        const label = (isGroupImage ? 'Group' : 'System') + ' / ' + getImageType(image);
+                        const label = (isGroupImage ? 'Group' : 'System') + ' / ' + getImageType(image) + (image.isReady ? '' : ' (Not Ready)');
                         return (
                         <Radio key={image.id} style={radioStyle} value={image.id} disabled={image.__disabled}>
                           <div style={radioContentStyle}>
