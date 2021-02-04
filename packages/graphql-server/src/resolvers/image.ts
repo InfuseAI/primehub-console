@@ -112,7 +112,7 @@ export const onCreate = async (
     if (resource.spec && resource.spec.imageSpec) {
       const name = resource.metadata.name;
       resource.spec.imageSpec.cancel = false;
-      resource.spec.imageSpec.updateTime = moment.utc().toISOString();
+      resource.spec.imageSpec.updateTime = moment.utc().milliseconds(0).toISOString();
 
       try {
         const customResource = context.crdClient[this.crd.customResourceMethod];
@@ -321,7 +321,7 @@ export const rebuildImage = async (root, args, context: Context) => {
 
     item.spec.imageSpec = imageSpec;
     item.spec.imageSpec.cancel = false;
-    item.spec.imageSpec.updateTime = moment.utc().toISOString();
+    item.spec.imageSpec.updateTime = moment.utc().milliseconds(0).toISOString();
     customResource.patch(name, {
       spec: item.spec
     });
