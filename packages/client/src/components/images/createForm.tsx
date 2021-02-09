@@ -44,6 +44,8 @@ type Props = FormComponentProps & {
   selectedGroup: string;
   instanceTypes: Array<Record<string, any>>;
   onSubmit: Function;
+  onRebuild: Function;
+  onCancelBuild: Function;
   onCancel?: Function;
   loading: boolean;
   initialValue?: any;
@@ -127,6 +129,25 @@ class ImageCreateForm extends React.Component<Props, State> {
     });
   }
 
+  rebuild = e => {
+    const {form, onRebuild} = this.props;
+    e.preventDefault();
+    form.validateFields(async (err, values: FormValue) => {
+      if (err) return;
+      onRebuild(values);
+      this.hideBuildingModal();
+    });
+  }
+
+  cancelBuild = () => {
+    const {form, onCancelBuild} = this.props;
+    if (!onCancelBuild) return;
+    const values = form.getFieldsValue();
+    onCancelBuild(values, () => {
+      this.hideBuildingModal();
+    });
+  }
+
   cancel = () => {
     const {form, onCancel} = this.props;
     if (!onCancel) return;
@@ -177,13 +198,31 @@ class ImageCreateForm extends React.Component<Props, State> {
 
   }, 400);
 
-  renderBuildingLink = (isReady = false) => {
-    if (!isReady) {
-      return (
-        <a onClick={() => this.showBuildingModal()}>Image building in progress...</a>
-      );
+  renderBuildingLink = (isReady = false, jobStatus = '') => {
+    let msg = 'Image building in progess...';
+    if (isReady && jobStatus === 'Succeeded') {
+      msg = 'View build details';
+    } else if (jobStatus === 'Failed') {
+      msg = 'Image build failed';
+    } else if (jobStatus === 'Canceled') {
+      msg = 'Image build canceled';
     }
-    return;
+    return (<a onClick={() => this.showBuildingModal()}>{msg}</a>);
+  }
+
+  buildModalEditable = (isReady, jobStatus) => {
+    const phase = get(jobStatus, 'phase', '');
+    let result = false;
+    switch (phase) {
+      case 'Succeeded':
+      case 'Failed':
+      case 'Cancelled':
+        result = true;
+        break;
+      default:
+        result = false;
+    }
+    return result;
   }
 
   showBuildingModal = () => {
@@ -194,11 +233,12 @@ class ImageCreateForm extends React.Component<Props, State> {
     this.setState({buildModalVisible: false});
   }
 
-  renderBuildCustomImageForm = (form, formType, url, isReady, imageSpec = {}, packages = {}) => {
-    const debugFlag = false;
-    if (debugFlag || formType === FormType.Edit) {
+  renderBuildCustomImageForm = (form, formType, url, isReady, jobStatus, imageSpec = {}, packages = {}) => {
+    if (formType === FormType.Edit) {
       return (
-        <StyledFormItem label={<span>Container image url :  {this.renderBuildingLink(isReady)}</span>} style={{marginBottom: '12px'}}>
+        <StyledFormItem
+          label={<span>Container image url : {this.renderBuildingLink(isReady, get(jobStatus, 'phase', ''))}</span>}
+          style={{marginBottom: '12px'}}>
           {form.getFieldDecorator('url', {
             initialValue: url
           })(
@@ -301,6 +341,7 @@ class ImageCreateForm extends React.Component<Props, State> {
     } = initialValue || {};
     let urlForGpu = formType !== FormType.Edit || !this.state.showGpuUrl || (initialValue.url == initialValue.urlForGpu) ? null : initialValue.urlForGpu;
     const { packages } = imageSpec || {};
+    const imageReady = this.buildModalEditable(isReady, jobStatus);
     return (
       <Form onSubmit={this.submit}>
         <Row>
@@ -369,7 +410,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                         </Select>
                       )}
                     </Form.Item>
-                    { this.renderBuildCustomImageForm(form, formType, url, isReady, imageSpec, packages) }
+                    { this.renderBuildCustomImageForm(form, formType, url, isReady, jobStatus, imageSpec, packages) }
                   </>
                 ) : (
                   <>
@@ -470,12 +511,26 @@ class ImageCreateForm extends React.Component<Props, State> {
                   <Row gutter={24}>
                     <Col span={12}>
                       <Form.Item label='Base image url' style={{marginBottom: '12px'}}>
-                        <Input disabled value={get(imageSpec, 'baseImage', '')} />
+                        {form.getFieldDecorator('imageSpec.baseImage', {
+                          initialValue: get(imageSpec, 'baseImage', ''),
+                          rules: [
+                            {
+                              required: true,
+                              message: 'Please give a base image url'
+                            }
+                          ]
+                        })(
+                          <Input disabled={!imageReady} />
+                        )}
                       </Form.Item>
                     </Col>
                     <Col span={12}>
                       <Form.Item label={`Image Pull Secret`}>
-                        <ImagePullSecret disabled value={get(imageSpec, 'pullSecret', '')} />
+                        {form.getFieldDecorator('imageSpec.pullSecret', {
+                          initialValue: get(imageSpec, 'pullSecret', ''),
+                        })(
+                          <ImagePullSecret disabled={!imageReady} />
+                        )}
                       </Form.Item>
                     </Col>
                   </Row>
@@ -487,17 +542,29 @@ class ImageCreateForm extends React.Component<Props, State> {
                       <Row gutter={24}>
                         <Col span={8}>
                           <Form.Item label={`APT`} style={{marginBottom: '10px'}}>
-                            <TextArea disabled rows={4} value={get(packages, 'apt', []).join('\n')}/>
+                            {form.getFieldDecorator('imageSpec.packages.apt', {
+                              initialValue: get(packages, 'apt', []).join('\n'),
+                            })(
+                              <TextArea disabled={!imageReady} rows={4}/>
+                            )}
                           </Form.Item>
                         </Col>
                         <Col span={8}>
                           <Form.Item label={`Conda`} style={{marginBottom: '10px'}}>
-                            <TextArea disabled rows={4} value={get(packages, 'conda', []).join('\n')}/>
+                            {form.getFieldDecorator('imageSpec.packages.conda', {
+                              initialValue: get(packages, 'conda', []).join('\n'),
+                            })(
+                              <TextArea disabled={!imageReady} rows={4}/>
+                            )}
                           </Form.Item>
                         </Col>
                         <Col span={8}>
                           <Form.Item label={`pip`} style={{marginBottom: '10px'}}>
-                            <TextArea disabled rows={4} value={get(packages, 'pip', []).join('\n')}/>
+                            {form.getFieldDecorator('imageSpec.packages.pip', {
+                              initialValue: get(packages, 'pip', []).join('\n'),
+                            })(
+                              <TextArea disabled={!imageReady} rows={4}/>
+                            )}
                           </Form.Item>
                         </Col>
                       </Row>
@@ -510,7 +577,29 @@ class ImageCreateForm extends React.Component<Props, State> {
                   />
                 </TabPane>
               </Tabs>
-
+              <Form.Item style={{textAlign: 'right', marginTop: 12}}>
+                {
+                  imageReady ? (
+                    <>
+                      <InfuseButton type='primary' onClick={this.rebuild} style={{marginRight: '5px'}}>
+                        Rebuild
+                      </InfuseButton>
+                      <InfuseButton onClick={this.hideBuildingModal}>
+                        Close
+                      </InfuseButton>
+                    </>
+                  ) : (
+                    <>
+                      <InfuseButton type="primary" onClick={this.hideBuildingModal} style={{marginRight: '5px'}}>
+                        Close
+                      </InfuseButton>
+                      <InfuseButton>
+                        Cancel Build
+                      </InfuseButton>
+                    </>
+                  )
+                }
+              </Form.Item>
             </div>
           </Modal>) : (<></>)}
       </Form>
