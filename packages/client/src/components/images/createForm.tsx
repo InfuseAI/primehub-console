@@ -143,7 +143,7 @@ class ImageCreateForm extends React.Component<Props, State> {
     const {form, onCancelBuild} = this.props;
     if (!onCancelBuild) return;
     const values = form.getFieldsValue();
-    onCancelBuild(values, () => {
+    onCancelBuild(() => {
       this.hideBuildingModal();
     });
   }
@@ -204,8 +204,8 @@ class ImageCreateForm extends React.Component<Props, State> {
       msg = 'View build details';
     } else if (jobStatus === 'Failed') {
       msg = 'Image build failed';
-    } else if (jobStatus === 'Canceled') {
-      msg = 'Image build canceled';
+    } else if (jobStatus === 'Cancelled') {
+      msg = 'Image build cancelled';
     }
     return (<a onClick={() => this.showBuildingModal()}>{msg}</a>);
   }
@@ -593,7 +593,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                       <InfuseButton type="primary" onClick={this.hideBuildingModal} style={{marginRight: '5px'}}>
                         Close
                       </InfuseButton>
-                      <InfuseButton>
+                      <InfuseButton onClick={this.cancelBuild}>
                         Cancel Build
                       </InfuseButton>
                     </>
