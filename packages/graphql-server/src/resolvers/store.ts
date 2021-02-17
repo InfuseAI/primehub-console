@@ -22,7 +22,7 @@ const listQuery = async (context: Context, prefix: string, limit: number, recurs
 
   const listObjects = new Promise<StoreFile[]>((resolve, reject) => {
     const fetchedFiles: StoreFile[] = [];
-    const stream = minioClient.listObjects(storeBucket, prefix, recursive);
+    const stream = minioClient.listObjectsV2(storeBucket, prefix, recursive);
     stream.on('data', obj => {
       if (limit === 0 || fetchedFiles.length < limit) {
         const removedPrefixName = obj.name ? obj.name.replace(prefix, '') : obj.prefix.replace(prefix, '');
