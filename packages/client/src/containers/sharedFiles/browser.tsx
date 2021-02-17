@@ -107,6 +107,24 @@ class Browser extends React.Component<Props, State> {
     const {
       onPathChanged
     } = this.props;
+    let errorMessage = '';
+
+    targetPath = this.normalizedPath(targetPath);
+
+    if (targetPath.includes("//")) {
+      errorMessage = 'Path contains consecutive slashes.'
+    } else if (targetPath.length > 1000 ) {
+      errorMessage = 'Path too long. (length > 1000)'
+    }
+
+    if (errorMessage) {
+      notification.error({
+        message: errorMessage,
+        duration: 10,
+        placement: 'bottomRight'
+      });
+      return;
+    }
 
     if (onPathChanged) {
       onPathChanged(targetPath);
@@ -120,9 +138,6 @@ class Browser extends React.Component<Props, State> {
     if (refetch) {
       refetch();
     }
-  }
-
-  private handleCopyPhfsUri = (item) => {
   }
 
   private handleDelete = (item) => {
@@ -165,9 +180,7 @@ class Browser extends React.Component<Props, State> {
    * 1. Always have leading slash
    * 2. Always have tailing slash
    */
-  private normalizedPath() {
-    let {path} = this.props;
-
+  private normalizedPath(path = this.props.path) {
     if (!path) {
       return '/'
     }
@@ -204,9 +217,14 @@ class Browser extends React.Component<Props, State> {
       />;
     }
 
+    const styleOverflowX = {
+      overflowX: "auto",
+      whiteSpace: "nowrap",
+    };
+
     return <div>
       <div style={{display: 'flex'}}>
-        <div style={{flex: '1', marginLeft: 15, display: this.state.editing ? 'none' : 'block'}}>{this.renderPathBreadcrumb()}</div>
+        <div style={{flex: '1', marginLeft: 15, display: this.state.editing ? 'none' : 'block', ...styleOverflowX}}>{this.renderPathBreadcrumb()}</div>
         <div style={{flex: '1', marginLeft: 15, display: this.state.editing ? 'block' : 'none'}}>{this.renderPathInput()}</div>
         <InfuseButton icon="upload" type="primary" style={{marginLeft: 16}}onClick={()=>{
           this.setState({uploading: true})}
