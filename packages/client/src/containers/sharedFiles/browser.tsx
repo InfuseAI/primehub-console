@@ -9,8 +9,10 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import {compose} from 'recompose';
 import moment from 'moment';
 import { ColumnProps } from 'antd/lib/table';
-import Uploader from '../../components/sharedFiles/uploader';
+import Uploader from 'components/sharedFiles/uploader';
 import InfuseButton from 'components/infuseButton';
+import iconShareFiles from 'images/icon-files-gray.svg';
+import iconMore from 'images/icon-more.svg';
 
 interface Props extends RouteComponentProps {
   path: string;
@@ -80,10 +82,6 @@ const humanFileSize = (bytes, si=false, dp=1) => {
 
   return bytes.toFixed(dp) + ' ' + units[u];
 };
-
-const IconMore = () => {
-  return <svg style={{width: 16, fontSize: '16pt'}} xmlns="http://www.w3.org/2000/svg"   viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-}
 
 class Browser extends React.Component<Props, State> {
 
@@ -260,7 +258,7 @@ class Browser extends React.Component<Props, State> {
       if (i == 0) {
         // the root: change to root path
         items.push(<Breadcrumb.Item>
-          <a onClick={changePath}><Icon type="database"  style={{fontSize: '12pt'}}/></a>
+          <a onClick={changePath}><img src={iconShareFiles} style={{width:16, height:16, position:"relative", top:-1}}/></a>
         </Breadcrumb.Item>);
       } else if(i < pathComponents.length - 1 ) {
         // the inermediate path components: change path
@@ -329,7 +327,8 @@ class Browser extends React.Component<Props, State> {
             overlay={<Menu>{menuItems}</Menu>}
           >
             <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-              <IconMore/>
+              {/* <IconMore/> */}
+              <img src={iconMore} style={{width:16, height:16}}/>
             </a>
           </Dropdown>
     return

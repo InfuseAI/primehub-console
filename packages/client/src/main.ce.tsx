@@ -14,7 +14,7 @@ import { createGraphqlClient } from 'utils/graphqlClient';
 // Icons
 import iconJupyterHub from 'images/icon-jupyterhub.svg'
 import iconImages from 'images/icon-images.png';
-import iconShareFiles from 'images/icon-files.png';
+import iconShareFiles from 'images/icon-files.svg';
 
 // Components
 import Jupyterhub from 'containers/jupyterhubPage';
