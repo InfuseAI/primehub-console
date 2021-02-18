@@ -16,7 +16,7 @@ import iconJobs from 'images/icon-jobs.svg';
 import iconSchedule from 'images/icon-schedule.svg';
 import iconModels from 'images/icon-models.svg';
 import iconImages from 'images/icon-images.png';
-import iconShareFiles from 'images/icon-files.png';
+import iconShareFiles from 'images/icon-files.svg';
 
 // Components
 import Jupyterhub from 'containers/jupyterhubPage';
