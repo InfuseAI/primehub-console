@@ -286,7 +286,7 @@ class Browser extends React.Component<Props, State> {
   private renderPathInput() {
 
     return <Input
-      prefix={<Icon type="database" style={{fontSize: '12pt'}}/>}
+      prefix={<img src={iconShareFiles} style={{width:16, height:16}}/>}
       onPressEnter={(e) => {
         let targetPath = (e.target as any).value;
         this.handlePathChange(targetPath);
