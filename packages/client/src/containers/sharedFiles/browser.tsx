@@ -9,8 +9,10 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import {compose} from 'recompose';
 import moment from 'moment';
 import { ColumnProps } from 'antd/lib/table';
-import Uploader from '../../components/sharedFiles/uploader';
+import Uploader from 'components/sharedFiles/uploader';
 import InfuseButton from 'components/infuseButton';
+import iconShareFiles from 'images/icon-files-gray.svg';
+import iconMore from 'images/icon-more.svg';
 
 interface Props extends RouteComponentProps {
   path: string;
@@ -81,10 +83,6 @@ const humanFileSize = (bytes, si=false, dp=1) => {
   return bytes.toFixed(dp) + ' ' + units[u];
 };
 
-const IconMore = () => {
-  return <svg style={{width: 16, fontSize: '16pt'}} xmlns="http://www.w3.org/2000/svg"   viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-}
-
 class Browser extends React.Component<Props, State> {
 
   state: State = {
@@ -107,6 +105,24 @@ class Browser extends React.Component<Props, State> {
     const {
       onPathChanged
     } = this.props;
+    let errorMessage = '';
+
+    targetPath = this.normalizedPath(targetPath);
+
+    if (targetPath.includes("//")) {
+      errorMessage = 'Path contains consecutive slashes.'
+    } else if (targetPath.length > 1000 ) {
+      errorMessage = 'Path too long. (length > 1000)'
+    }
+
+    if (errorMessage) {
+      notification.error({
+        message: errorMessage,
+        duration: 10,
+        placement: 'bottomRight'
+      });
+      return;
+    }
 
     if (onPathChanged) {
       onPathChanged(targetPath);
@@ -120,9 +136,6 @@ class Browser extends React.Component<Props, State> {
     if (refetch) {
       refetch();
     }
-  }
-
-  private handleCopyPhfsUri = (item) => {
   }
 
   private handleDelete = (item) => {
@@ -165,9 +178,7 @@ class Browser extends React.Component<Props, State> {
    * 1. Always have leading slash
    * 2. Always have tailing slash
    */
-  private normalizedPath() {
-    let {path} = this.props;
-
+  private normalizedPath(path = this.props.path) {
     if (!path) {
       return '/'
     }
@@ -204,9 +215,14 @@ class Browser extends React.Component<Props, State> {
       />;
     }
 
+    const styleOverflowX = {
+      overflowX: "auto",
+      whiteSpace: "nowrap",
+    };
+
     return <div>
       <div style={{display: 'flex'}}>
-        <div style={{flex: '1', marginLeft: 15, display: this.state.editing ? 'none' : 'block'}}>{this.renderPathBreadcrumb()}</div>
+        <div style={{flex: '1', marginLeft: 15, display: this.state.editing ? 'none' : 'block', ...styleOverflowX}}>{this.renderPathBreadcrumb()}</div>
         <div style={{flex: '1', marginLeft: 15, display: this.state.editing ? 'block' : 'none'}}>{this.renderPathInput()}</div>
         <InfuseButton icon="upload" type="primary" style={{marginLeft: 16}}onClick={()=>{
           this.setState({uploading: true})}
@@ -242,7 +258,7 @@ class Browser extends React.Component<Props, State> {
       if (i == 0) {
         // the root: change to root path
         items.push(<Breadcrumb.Item>
-          <a onClick={changePath}><Icon type="database"  style={{fontSize: '12pt'}}/></a>
+          <a onClick={changePath}><img src={iconShareFiles} style={{width:16, height:16, position:"relative", top:-1}}/></a>
         </Breadcrumb.Item>);
       } else if(i < pathComponents.length - 1 ) {
         // the inermediate path components: change path
@@ -270,7 +286,7 @@ class Browser extends React.Component<Props, State> {
   private renderPathInput() {
 
     return <Input
-      prefix={<Icon type="database" style={{fontSize: '12pt'}}/>}
+      prefix={<img src={iconShareFiles} style={{width:16, height:16}}/>}
       onPressEnter={(e) => {
         let targetPath = (e.target as any).value;
         this.handlePathChange(targetPath);
@@ -311,7 +327,8 @@ class Browser extends React.Component<Props, State> {
             overlay={<Menu>{menuItems}</Menu>}
           >
             <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-              <IconMore/>
+              {/* <IconMore/> */}
+              <img src={iconMore} style={{width:16, height:16}}/>
             </a>
           </Dropdown>
     return

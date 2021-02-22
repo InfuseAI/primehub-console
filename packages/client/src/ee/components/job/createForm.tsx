@@ -55,6 +55,10 @@ const radioGroupStyle = {
   border: '1px solid #e8e8e8',
 }
 
+const withDisabledStyle = {
+  color: 'rgba(0, 0, 0, 0.25)'
+};
+
 type FormValue = {
   groupId: string;
   instanceType: string;
@@ -73,7 +77,7 @@ const transformImages = (images, instanceType) => {
   return images.map(image => {
     return {
       ...image,
-      __disabled: !gpuInstance && (image.type || '').toLowerCase() === 'gpu'
+      __disabled: !image.isReady || (!gpuInstance && (image.type || '').toLowerCase() === 'gpu')
     };
   });
 }
@@ -333,11 +337,12 @@ class CreateForm extends React.Component<Props, State> {
                     <Radio.Group style={radioGroupStyle}>
                       {transformImages(images, instanceType).map(image => {
                         const isGroupImage = image && image.spec && image.spec.groupName && image.spec.groupName.length > 0;
-                        const label = (isGroupImage ? 'Group' : 'System') + ' / ' + getImageType(image);
+                        const label = (image.isReady ? '' : '(Not Ready) ') + (isGroupImage ? 'Group' : 'System') + ' / ' + getImageType(image);
+                        const h4Style = image.__disabled ? withDisabledStyle : {};
                         return (
                         <Radio key={image.id} style={radioStyle} value={image.id} disabled={image.__disabled}>
                           <div style={radioContentStyle}>
-                            <h4>{image.displayName || image.name}
+                            <h4 style={h4Style}>{image.displayName || image.name}
                               <Tooltip
                                 title={`${label}`}
                               >

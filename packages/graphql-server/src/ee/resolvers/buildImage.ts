@@ -114,7 +114,7 @@ export const create = async (root, args, context: Context) => {
       conda: isNil(get(data, 'packages.conda')) ? undefined : parsePackageField(get(data, 'packages.conda'))
     },
     // iso8601
-    updateTime: moment.utc().toISOString()
+    updateTime: moment.utc().milliseconds(0).toISOString()
   };
 
   const created = await imageSpecClient.create({
@@ -159,7 +159,7 @@ export const update = async (root, args, context: Context) => {
       pip: updatePackageField(get(data, 'packages.pip')),
       conda: updatePackageField(get(data, 'packages.conda'))
     },
-    updateTime: moment.utc().toISOString()
+    updateTime: moment.utc().milliseconds(0).toISOString()
   };
 
   const updated = await imageSpecClient.patch(id, {

@@ -11,7 +11,7 @@ import { createGraphqlClient } from 'utils/graphqlClient';
 
 // Icons
 import iconModels from 'images/icon-models.svg'
-import iconShareFiles from 'images/icon-files.png';
+import iconShareFiles from 'images/icon-files.svg';
 
 // Components
 import ListContainer from 'containers/list';
