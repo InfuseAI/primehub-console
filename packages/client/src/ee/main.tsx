@@ -114,7 +114,7 @@ class Main extends React.Component {
         title: 'Images',
         subPath: 'images',
         icon: iconImages,
-        groupAdminOnly: false,
+        groupAdminOnly: true,
         style: {
           width: 'auto',
           height: 17,
