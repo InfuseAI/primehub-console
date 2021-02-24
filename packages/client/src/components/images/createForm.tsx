@@ -381,7 +381,10 @@ class ImageCreateForm extends React.Component<Props, State> {
               </Form.Item>
               <Divider/>
               <Form.Item>
-                <Radio.Group onChange={this.handleBuildingType} value={this.state.buildType}>
+                <Radio.Group
+                  disabled={formType === FormType.Edit}
+                  onChange={this.handleBuildingType}
+                  value={this.state.buildType}>
                   <Radio value={BuildType.EXIST}>
                     Use existing one
                   </Radio>
