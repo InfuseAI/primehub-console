@@ -7,7 +7,6 @@ module.exports = {
     'react-dom': "ReactDOM",
     'antd': 'antd',
     'lodash': '_',
-    'firebase': 'firebase',
     'immutable': 'Immutable',
     'styled-components': 'styled',
     'canner-slate-editor': 'CannerSlateEditor',
