@@ -1,5 +1,4 @@
 import React from 'react';
-import firebase from 'firebase';
 import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlClient';
 import {ImgurStorage} from '@canner/storage';
 import {FormattedMessage} from 'react-intl';
