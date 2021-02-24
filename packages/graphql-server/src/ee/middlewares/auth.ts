@@ -12,6 +12,7 @@ export const permissions = shield({
     'image': or(isAdmin, isUser, isClient),
     'images': or(isAdmin, isUser, isClient),
     'imagesConnection': or(isAdmin, isUser, isClient),
+    'groupImagesConnection': or(isAdmin, isUser, isClient),
     'instanceType': or(isAdmin, isClient),
     'phJob': or(isAdmin, isUser),
     'phJobs': or(isAdmin, isUser),

@@ -13,6 +13,7 @@ export const permissions = shield({
     'image': or(isAdmin, isUser, isClient),
     'images': or(isAdmin, isUser, isClient),
     'imagesConnection': or(isAdmin, isUser, isClient),
+    'groupImagesConnection': or(isAdmin, isUser, isClient),
     'files': or(isAdmin, isUser),
   },
   Mutation: {
