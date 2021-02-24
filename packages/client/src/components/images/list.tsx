@@ -181,7 +181,14 @@ class ImageList extends React.Component<Props> {
       title: 'Name',
       dataIndex: 'name',
       sorter: true,
-      render: text => text
+      render: (text, record) => {
+        const {isReady} = record;
+        let result = `${text}`;
+        if (!isReady) {
+          result = <span>{result} <Icon type='warning' title="Image is not ready." /></span>
+        }
+        return result;
+      }
     }, {
       title: 'Display Name',
       dataIndex: 'displayName',
