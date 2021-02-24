@@ -15,8 +15,6 @@ import {sortItems, GET_MY_GROUPS} from 'containers/imageCreatePage';
 import {ImageFragment} from 'containers/imageList';
 import Breadcrumbs from 'components/share/breadcrumb';
 
-const REFETCH_INTERVAL = 30000;
-
 export const GET_IMAGE = gql`
   query image($where: ImageWhereUniqueInput!) {
     image(where: $where) {
@@ -56,7 +54,6 @@ export const CANCEL_IMAGE = gql`
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 
 type Props = UserContextComponentProps & GroupContextComponentProps & RouteComponentProps<{imageId: string}> & {
-  getGroups: any;
   updateImage: any;
   rebuildImage: any;
   cancelImageBuild: any;
@@ -83,26 +80,6 @@ class ImageEditPage extends React.Component<Props, State> {
     });
   }
 
-  componentDidMount() {
-    this.timer = setInterval(() => this.refetchImage(), REFETCH_INTERVAL);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.timer);
-    this.timer = null;
-  }
-
-  refetchImage = async () => {
-    const { getImage } = this.props;
-    const { image } = getImage;
-    const { jobStatus } = image;
-    if (!image.isReady || jobStatus.phase === 'Running' ||  jobStatus.phase === 'Pending') {
-      console.log('Image not ready, Polling Image build status..');
-      await getImage.refetch();
-      this.setState({});
-    }
-  }
-
   onRebuild = payload => {
     const { rebuildImage, getImage, groupContext } = this.props;
     const { image } = getImage;
@@ -112,7 +89,6 @@ class ImageEditPage extends React.Component<Props, State> {
     imageSpec.packages.apt = (apt && apt.length > 0) ? apt.split('\n') : null;
     imageSpec.packages.pip = (pip && pip.length > 0) ? pip.split('\n') : null;
     imageSpec.packages.conda = (conda && conda.length > 0) ? conda.split('\n') : null;
-    console.log('imageSpec', imageSpec);
     rebuildImage({
       variables: {
         where: {id: image.id},
@@ -175,23 +151,18 @@ class ImageEditPage extends React.Component<Props, State> {
   }
 
   render() {
-    const {getGroups, getImage, history, groupContext, userContext} = this.props;
+    const {getImage, history, groupContext, userContext} = this.props;
     if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
       history.push(`../home`);
     }
 
-    if (getImage.loading) return null;
+    if (!getImage.image) return null;
     if (getImage.error) {
       return getMessage(getImage.error)
     };
 
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
-    const allGroups = get(getGroups, 'me.groups', []).filter(group => group.enabledDeployment || group.id === everyoneGroupId);
-    const groups = allGroups.filter(group => group.id !== everyoneGroupId);
     const image = getImage.image;
     const selectedGroup = image.groupName;
-    const group = groups
-      .find(group => group.name === selectedGroup);
     const breadcrumbs = [
       {
         key: 'list',
@@ -212,17 +183,6 @@ class ImageEditPage extends React.Component<Props, State> {
           breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
         />
         <div style={{margin: '16px'}}>
-          {getGroups.loading ? (
-            <Row>
-              <Col>
-                <Card>
-                  <Skeleton active />
-                  <Skeleton active />
-                  <Skeleton active />
-                </Card>
-              </Col>
-            </Row>
-          ) : (
           <ImageCreateForm
             type="edit"
             initialValue={{
@@ -235,7 +195,7 @@ class ImageEditPage extends React.Component<Props, State> {
             onCancel={this.onCancel}
             onCancelBuild={this.onCancelBuild}
             formType={'edit'}
-          />)}
+          />
         </div>
       </React.Fragment>
     );
@@ -246,9 +206,6 @@ export default compose(
   withRouter,
   withGroupContext,
   withUserContext,
-  graphql(GET_MY_GROUPS, {
-    name: 'getGroups'
-  }),
   graphql(GET_IMAGE, {
     options: (props: Props) => ({
       variables: {
@@ -256,7 +213,8 @@ export default compose(
           id: props.match.params.imageId
         }
       },
-      fetchPolicy: 'cache-and-network'
+      fetchPolicy: 'cache-and-network',
+      pollInterval: 5000
     }),
     name: 'getImage'
   }),
@@ -294,7 +252,6 @@ export default compose(
             </>
           )
         });
-        history.go(0);
       },
       onError: errorHandler
     }),
@@ -314,7 +271,6 @@ export default compose(
             </>
           )
         });
-        history.go(0);
       },
       onError: errorHandler
     }),

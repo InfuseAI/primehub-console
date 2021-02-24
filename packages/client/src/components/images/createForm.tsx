@@ -341,6 +341,8 @@ class ImageCreateForm extends React.Component<Props, State> {
     } = initialValue || {};
     let urlForGpu = formType !== FormType.Edit || !this.state.showGpuUrl || (initialValue.url == initialValue.urlForGpu) ? null : initialValue.urlForGpu;
     const { packages } = imageSpec || {};
+    const { buildModalVisible } = this.state;
+    console.log('buildModalVisible', buildModalVisible);
     const imageReady = this.buildModalEditable(isReady, jobStatus);
     return (
       <Form onSubmit={this.submit}>
