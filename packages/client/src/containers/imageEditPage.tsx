@@ -109,9 +109,10 @@ class ImageEditPage extends React.Component<Props, State> {
     const {imageSpec} = payload;
     const { packages } = imageSpec;
     const {apt, pip, conda} = packages;
-    imageSpec.packages.apt = apt && apt.split('\n');
-    imageSpec.packages.pip = pip && pip.split('\n');
-    imageSpec.packages.conda = conda && conda.split('\n');
+    imageSpec.packages.apt = (apt && apt.length > 0) ? apt.split('\n') : null;
+    imageSpec.packages.pip = (pip && pip.length > 0) ? pip.split('\n') : null;
+    imageSpec.packages.conda = (conda && conda.length > 0) ? conda.split('\n') : null;
+    console.log('imageSpec', imageSpec);
     rebuildImage({
       variables: {
         where: {id: image.id},
