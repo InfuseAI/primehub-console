@@ -270,7 +270,7 @@ export default compose(
             </>
           )
         });
-        history.push(`../../images`);
+        history.go(0);
       },
       onError: errorHandler
     }),
@@ -290,7 +290,7 @@ export default compose(
             </>
           )
         });
-        history.push(`../../images`);
+        history.go(0);
       },
       onError: errorHandler
     }),

@@ -21,6 +21,8 @@ export const permissions = shield({
     'revokeApiToken': or(isAdmin, isUser),
     'createImage': or(isAdmin, isUser),
     'updateImage': or(isAdmin, isUser),
+    'rebuildImage': or(isAdmin, isUser),
+    'cancelImageBuild': or(isAdmin, isUser),
     'deleteImage': or(isAdmin, isUser),
     'deleteFiles': or(isAdmin, isUser),
   },
