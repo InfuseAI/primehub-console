@@ -130,6 +130,8 @@ describe('group graphql', function() {
     expect(group.attributes['shared-volume-capacity'][0]).to.be.equals('200G');
     expect(group.attributes['home-symlink'][0]).to.be.equals('true');
     expect(group.attributes['launch-group-only'][0]).to.be.equals('true');
+
+    this.currentGroup = data.createGroup;
   });
 
   it('should list groups', async () => {
