@@ -341,6 +341,7 @@ export const query = async (root, args, context: Context) => {
     const pageGroups = paginate(groupQuery.groups, extractPagination(args));
     fetchedAndPagedGroups = await Promise.all(
       pageGroups.map(group => context.kcAdminClient.groups.findOne({id: group.id})));
+    fetchedAndPagedGroups = fetchedAndPagedGroups.map(transform);
   } else {
     // map already, just paginate
     fetchedAndPagedGroups = paginate(groupQuery.groups, extractPagination(args)).map(transform);
