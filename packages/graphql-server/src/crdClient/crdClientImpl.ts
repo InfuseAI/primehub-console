@@ -64,6 +64,7 @@ export interface ImageSpec {
   urlForGpu?: string;
   groupName?: string;
   imageSpec?: ImageCrdImageSpec;
+  logEndpoint?: string;
 }
 
 export interface DatasetSpec {

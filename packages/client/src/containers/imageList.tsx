@@ -25,8 +25,22 @@ export const ImageFragment = gql`
     type
     groupName
     useImagePullSecret
+    logEndpoint
+    isReady
+    jobStatus {
+      phase
+    }
+    imageSpec {
+      baseImage
+      pullSecret
+      packages {
+        apt
+        conda
+        pip
+      }
+    }
  }
-`
+`;
 
 export const GET_IMAGES_CONNECTION = gql`
   query groupImagesConnection($where: ImageWhereInput, $page: Int, $orderBy: ImageOrderByInput) {
@@ -88,9 +102,9 @@ class ImageListContainer extends React.Component<Props> {
 
   render() {
     const {history, groupContext, userContext, getImagesConnection, groups } = this.props;
-    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
-      history.push(`../home`);
-    }
+    //if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
+      //history.push(`../home`);
+    //}
     return (
       <ImageList
         groupContext={groupContext}

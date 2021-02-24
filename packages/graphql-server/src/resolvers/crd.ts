@@ -20,7 +20,7 @@ export class Crd<SpecType> {
   private cache: CrdCache<SpecType>;
   private customResourceMethod: string;
   private propMapping: (item: Item<SpecType>) => Record<string, any>;
-  private createMapping: (data: any, name: string) => any;
+  private createMapping: (data: any, name: string, context: Context) => any;
   private updateMapping: (data: any) => any;
   private resolveType?: Record<string, any>;
   private prefixName: string;
@@ -74,7 +74,7 @@ export class Crd<SpecType> {
   }: {
     customResourceMethod: string,
     propMapping: (item: Item<SpecType>) => Record<string, any>,
-    createMapping: (data: any, name: string) => any,
+    createMapping: (data: any, name: string, context: Context) => any,
     updateMapping: (data: any) => any,
     resolveType?: Record<string, any>,
     prefixName: string,
@@ -376,7 +376,7 @@ export class Crd<SpecType> {
     const name = (this.generateName) ? this.generateName() : get(args, 'data.name');
     const {kcAdminClient, crdClient} = context;
     const customResource = crdClient[this.customResourceMethod];
-    const {metadata, spec} = this.createMapping(args.data, name);
+    const {metadata, spec} = this.createMapping(args.data, name, context);
 
     if (this.beforeCreate) {
       try {

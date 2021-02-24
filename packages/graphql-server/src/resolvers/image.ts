@@ -64,6 +64,7 @@ export const mapping = (item: Item<ImageSpec>) => {
     spec: item.spec,
     isReady: item.spec.url ? true : false,
     imageSpec: item.spec.imageSpec ? imageSpecMapping(item.spec.imageSpec) : null,
+    logEndpoint: item.spec.logEndpoint,
     jobStatus: item.status ? item.status.jobCondition : null,
   };
 };
@@ -195,7 +196,7 @@ const defineUrlAndUrlForGpu = (urlInRequest: string, urlForGpuInRequest: string,
   return {url, urlForGpu};
 };
 
-export const createMapping = (data: any) => {
+export const createMapping = (data: any, name, context) => {
   const imageType = data.type || ImageType.both;
   const {url, urlForGpu} = defineUrlAndUrlForGpu(data.url, data.urlForGpu, imageType);
 
@@ -214,7 +215,10 @@ export const createMapping = (data: any) => {
     }
   };
   if (!isNil(data.imageSpec)) {
-    merge(result.spec, { imageSpec: data.imageSpec});
+    merge(result.spec, {
+      logEndpoint: `${context.graphqlHost}${context.jobLogCtrl.getEndpoint(context.namespace, data.name)}`,
+      imageSpec: data.imageSpec
+    });
   }
 
   return result;

@@ -6,11 +6,11 @@ import {compose} from 'recompose';
 import {get, unionBy, isEmpty} from 'lodash';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
-import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'utils/errorHandler';
 import ImageCreateForm from 'components/images/createForm';
 import {GroupFragment} from 'containers/list';
 import PageTitle from 'components/pageTitle';
+import {withRouter} from 'react-router-dom';
 import {withGroupContext, GroupContextComponentProps} from 'context/group';
 import {withUserContext, UserContextComponentProps} from 'context/user';
 import Breadcrumbs from 'components/share/breadcrumb';
@@ -34,12 +34,20 @@ export const GET_MY_GROUPS = gql`
       id
       groups {
         ...GroupInfo
-        images { id name displayName description spec global type }
+        images {
+          id
+          name
+          displayName
+          description
+          spec
+          global
+          type
+        }
       }
     }
   }
   ${GroupFragment}
-`
+`;
 
 export const CREATE_IMAGE = gql`
   mutation createImage($data: ImageCreateInput!) {
@@ -48,7 +56,7 @@ export const CREATE_IMAGE = gql`
       name
     }
   }
-`
+`;
 
 const compareByAlphabetical = (prev, next) => {
   if(prev < next) return -1;
@@ -73,6 +81,7 @@ type Props = RouteComponentProps & GroupContextComponentProps & UserContextCompo
   createImageResult: any;
   defaultValue?: object;
 }
+
 type State = {
   selectedGroup: string | null;
 }
@@ -95,7 +104,14 @@ class ImageCreatePage extends React.Component<Props, State> {
       connect: [{id: groupContext.id}]
     };
     payload.groupName = groupContext.name;
-    payload.groups = groupConnector
+    payload.groups = groupConnector;
+    if (payload.imageSpec) {
+      const { packages } = payload.imageSpec;
+      const {apt, pip, conda} = packages
+      payload.imageSpec.packages.apt = apt && apt.split('\n');
+      payload.imageSpec.packages.pip = pip && pip.split('\n');
+      payload.imageSpec.packages.conda = conda && conda.split('\n');
+    }
     createImage({
       variables: {
         data: payload
