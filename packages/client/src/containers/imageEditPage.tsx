@@ -15,6 +15,8 @@ import {sortItems, GET_MY_GROUPS} from 'containers/imageCreatePage';
 import {ImageFragment} from 'containers/imageList';
 import Breadcrumbs from 'components/share/breadcrumb';
 
+const REFETCH_INTERVAL = 30000;
+
 export const GET_IMAGE = gql`
   query image($where: ImageWhereUniqueInput!) {
     image(where: $where) {
@@ -67,6 +69,7 @@ type State = {
 }
 
 class ImageEditPage extends React.Component<Props, State> {
+  timer = null;
 
   onSubmit = (payload) => {
     const { updateImage, getImage, groupContext } = this.props;
@@ -80,7 +83,27 @@ class ImageEditPage extends React.Component<Props, State> {
     });
   }
 
-  onRebuild = (payload) => {
+  componentDidMount() {
+    this.timer = setInterval(() => this.refetchImage(), REFETCH_INTERVAL);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
+    this.timer = null;
+  }
+
+  refetchImage = async () => {
+    const { getImage } = this.props;
+    const { image } = getImage;
+    const { jobStatus } = image;
+    if (!image.isReady || jobStatus.phase === 'Running' ||  jobStatus.phase === 'Pending') {
+      console.log('Image not ready, Polling Image build status..');
+      await getImage.refetch();
+      this.setState({});
+    }
+  }
+
+  onRebuild = payload => {
     const { rebuildImage, getImage, groupContext } = this.props;
     const { image } = getImage;
     const {imageSpec} = payload;
