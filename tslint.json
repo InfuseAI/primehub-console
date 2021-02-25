@@ -11,6 +11,7 @@
     ],
     "member-access": false,
     "member-ordering": false,
+    "max-line-length": [true, 240],
     "curly": false,
     "quotemark": [true, "single"],
     "no-implicit-dependencies": [true, "dev"],
