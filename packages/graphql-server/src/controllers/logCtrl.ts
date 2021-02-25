@@ -7,17 +7,21 @@ import CrdClientImpl, { client as kubeClient } from '../crdClient/crdClientImpl'
 export class PodLogs {
 
   private namespace: string;
+  private appPrefix: string;
   private crdClient: CrdClientImpl;
 
   constructor({
     namespace,
-    crdClient
+    crdClient,
+    appPrefix
   }: {
     namespace: string,
-    crdClient?: CrdClientImpl
+    crdClient?: CrdClientImpl,
+    appPrefix?: string
   }) {
-    this.namespace = namespace || ' default';
+    this.namespace = namespace || 'default';
     this.crdClient = crdClient || new CrdClientImpl({ namespace });
+    this.appPrefix = appPrefix || '/';
   }
 
   public jupyterHubRoute = '/logs/jupyterhub';
@@ -45,6 +49,10 @@ export class PodLogs {
       ctx.res.end();
     });
     ctx.body = stream;
+  }
+
+  public getImageSpecJobEndpoint = (imageId: string) => {
+    return `${this.appPrefix || ''}logs/images/${imageId}/job`;
   }
 
   public streamImageSpecJobLogs = async (ctx: ParameterizedContext) => {

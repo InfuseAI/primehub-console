@@ -273,6 +273,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   const podLogs = new PodLogs({
     namespace: config.k8sCrdNamespace,
     crdClient,
+    appPrefix: config.appPrefix,
   });
 
   // job artifact cleaner
@@ -505,6 +506,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         appPrefix: config.appPrefix,
         graphqlHost: config.graphqlHost,
         jobLogCtrl: logCtrl,
+        podLogs,
         phJobCacheList,
         usageReportAPIHost: config.usageReportAPIHost,
         telemetry,

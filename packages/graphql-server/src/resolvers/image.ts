@@ -50,7 +50,7 @@ const imageSpecMapping = (imageSpec: ImageCrdImageSpec) => {
   return imageSpec;
 };
 
-export const mapping = (item: Item<ImageSpec>) => {
+export const mapping = (item: Item<ImageSpec>, context: Context) => {
   return {
     id: item.metadata.name,
     name: item.metadata.name,
@@ -64,7 +64,7 @@ export const mapping = (item: Item<ImageSpec>) => {
     spec: item.spec,
     isReady: item.spec.url ? true : false,
     imageSpec: item.spec.imageSpec ? imageSpecMapping(item.spec.imageSpec) : null,
-    logEndpoint: item.spec.logEndpoint,
+    logEndpoint: `${context.graphqlHost}${context.podLogs.getImageSpecJobEndpoint(item.metadata.name)}`,
     jobStatus: item.status ? item.status.jobCondition : null,
   };
 };
@@ -216,7 +216,6 @@ export const createMapping = (data: any, name, context) => {
   };
   if (!isNil(data.imageSpec)) {
     merge(result.spec, {
-      logEndpoint: `${context.graphqlHost}${context.jobLogCtrl.getEndpoint(context.namespace, data.name)}`,
       imageSpec: data.imageSpec
     });
   }
@@ -309,7 +308,7 @@ export const groupImagesConnection = async (root, args, context: Context) => {
     throw new ApolloError('Not authorise', NOT_AUTH_ERROR);
   }
   const customResource = context.crdClient[this.crd.customResourceMethod];
-  const rows = await this.crd.listQuery(customResource, where, args && args.orderBy, QueryImageMode.GROUP_ONLY);
+  const rows = await this.crd.listQuery(customResource, where, args && args.orderBy, context, QueryImageMode.GROUP_ONLY);
   return toRelay(rows, extractPagination(args));
 };
 

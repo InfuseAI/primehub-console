@@ -231,7 +231,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   const podLogs = new PodLogs({
     namespace: config.k8sCrdNamespace,
-    crdClient
+    crdClient,
+    appPrefix: config.appPrefix
   });
 
   // ann
@@ -432,10 +433,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         k8sUploadServerSecret,
         namespace: config.k8sCrdNamespace,
         graphqlHost: config.graphqlHost,
-        jobLogCtrl: {
-          getEndpoint: () => ''
-        },
         telemetry,
+        podLogs,
         minioClient,
         storeBucket,
       };
