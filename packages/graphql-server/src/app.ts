@@ -230,7 +230,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
 
   const podLogs = new PodLogs({
-    namespace: config.k8sCrdNamespace
+    namespace: config.k8sCrdNamespace,
+    crdClient
   });
 
   // ann
@@ -609,7 +610,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   mountAnn(rootRouter, annCtrl);
 
   // Notebook Log
-  rootRouter.get(podLogs.getJupyterHubRoute(), authenticateMiddleware, podLogs.streamJupyterHubLogs);
+  rootRouter.get(podLogs.jupyterHubRoute, authenticateMiddleware, podLogs.streamJupyterHubLogs);
+
+  // ImageSpecJob Log
+  rootRouter.get(podLogs.imageSpecJobRoute, authenticateMiddleware, podLogs.streamImageSpecJobLogs);
 
   // health check
   rootRouter.get('/health', async ctx => {
