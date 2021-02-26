@@ -45,7 +45,7 @@ export const isAdmin = (ctx: Context): boolean => {
   return ctx.role === Role.ADMIN;
 };
 
-export const isGroupAdmin = async (username: string, groupName: string, ctx: Context): Promise<boolean> => {
+export const isGroupAdmin = async (username: string, groupName: string, ctx: any): Promise<boolean> => {
   const groups = await ctx.kcAdminClient.groups.find({max: 99999});
   const groupData = find(groups, ['name', groupName]);
   const group = await ctx.kcAdminClient.groups.findOne({id: get(groupData, 'id', '')});

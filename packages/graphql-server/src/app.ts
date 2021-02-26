@@ -53,6 +53,7 @@ import Boom from 'boom';
 
 // graphql middlewares
 import { permissions as authMiddleware } from './middlewares/auth';
+import groupAdminMiddleware from './middlewares/isGroupAdmin';
 import TokenSyncer from './oidc/syncer';
 import K8sSecret from './k8sResource/k8sSecret';
 import K8sDatasetPvc from './k8sResource/k8sDatasetPvc';
@@ -612,7 +613,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   rootRouter.get(podLogs.jupyterHubRoute, authenticateMiddleware, podLogs.streamJupyterHubLogs);
 
   // ImageSpecJob Log
-  rootRouter.get(podLogs.imageSpecJobRoute, authenticateMiddleware, podLogs.streamImageSpecJobLogs);
+  rootRouter.get(podLogs.imageSpecJobRoute, authenticateMiddleware, groupAdminMiddleware, podLogs.streamImageSpecJobLogs);
 
   // health check
   rootRouter.get('/health', async ctx => {
