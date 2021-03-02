@@ -130,6 +130,8 @@ describe('group graphql', function() {
     expect(group.attributes['shared-volume-capacity'][0]).to.be.equals('200G');
     expect(group.attributes['home-symlink'][0]).to.be.equals('true');
     expect(group.attributes['launch-group-only'][0]).to.be.equals('true');
+
+    this.currentGroup = data.createGroup;
   });
 
   it('should list groups', async () => {
@@ -200,6 +202,25 @@ describe('group graphql', function() {
     });
 
     expect(middleData.groups.length).to.be.equals(1);
+  });
+
+  it('should list groups with where contains name and check quotas', async () => {
+    const data = await this.graphqlRequest(`
+    query ($where: GroupWhereInput!) {
+      groups (where: $where) { ${groupFields} }
+    }`, {
+      where: {name_contains: this.currentGroup.name}
+    });
+
+    expect(data.groups.length).to.be.equals(1);
+
+    const group = data.groups[0];
+    expect(group.quotaCpu).to.be.equals(10.5);
+    expect(group.quotaGpu).to.be.equals(10);
+    expect(group.quotaMemory).to.be.equals(1.5);
+    expect(group.projectQuotaCpu).to.be.equals(1.5);
+    expect(group.projectQuotaGpu).to.be.equals(10);
+    expect(group.projectQuotaMemory).to.be.equals(0.5);
   });
 
   it('should get a group', async () => {
