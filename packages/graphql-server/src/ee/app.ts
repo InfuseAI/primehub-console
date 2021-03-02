@@ -70,7 +70,7 @@ import Boom from 'boom';
 // graphql middlewares
 // Basic Auth middleware
 import { permissions as authMiddleware } from './middlewares/auth';
-import groupAdminMiddleware from '../middlewares/isGroupAdmin';
+import groupAdminMiddleware from '../middlewares/groupAdmin';
 import TokenSyncer from '../oidc/syncer';
 import K8sSecret from '../k8sResource/k8sSecret';
 import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
