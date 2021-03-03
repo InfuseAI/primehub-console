@@ -99,6 +99,8 @@ type FormValue = {
   conda: string;
 };
 
+const packagesPlaceHolder = `one package per line. e.g. \npackage1\npackage2\n`;
+
 const dashOrNumber = value => value === null ? '-' : value;
 
 const autoGenId = (name: string) => {
@@ -122,11 +124,36 @@ class ImageCreateForm extends React.Component<Props, State> {
     };
   }
 
+  validatePackagesFilled = (form) => {
+    const aptValue = form.getFieldValue('imageSpec.packages.apt');
+    const pipValue = form.getFieldValue('imageSpec.packages.pip');
+    const condaValue = form.getFieldValue('imageSpec.packages.conda');
+    if (!aptValue && !pipValue && !condaValue) {
+      form.setFields({
+        "imageSpec.packages.apt": {
+          errors: [new Error('You must input at least one package.')],
+        },
+        "imageSpec.packages.pip": {
+          errors: [new Error('')],
+        },
+        "imageSpec.packages.conda": {
+          errors: [new Error('')],
+        }
+      })
+      return false;
+    }
+    return true;
+  }
+
   submit = e => {
     const {form, onSubmit} = this.props;
     e.preventDefault();
+    let validPackagesfilled = true;
+    if (this.state.buildType === BuildType.CUSTOM) {
+      validPackagesfilled = this.validatePackagesFilled(form);
+    }
     form.validateFields(async (err, values: FormValue) => {
-      if (err) return;
+      if (err || !validPackagesfilled) return;
       onSubmit(values);
     });
   }
@@ -134,8 +161,12 @@ class ImageCreateForm extends React.Component<Props, State> {
   rebuild = e => {
     const {form, onRebuild} = this.props;
     e.preventDefault();
+    let validPackagesfilled = true;
+    if (this.state.buildType === BuildType.CUSTOM) {
+      validPackagesfilled = this.validatePackagesFilled(form);
+    }
     form.validateFields(async (err, values: FormValue) => {
-      if (err) return;
+      if (err || !validPackagesfilled) return;
       onRebuild(values);
       this.hideBuildingModal();
     });
@@ -277,7 +308,7 @@ class ImageCreateForm extends React.Component<Props, State> {
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item label='Packages'>
+          <Form.Item label='Package(s)' required={true}>
             <Card>
               <Row gutter={24}>
                 <Col span={8}>
@@ -285,7 +316,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                     {form.getFieldDecorator('imageSpec.packages.apt', {
                       initialValue: packages.apt,
                     })(
-                      <TextArea rows={4}/>
+                      <TextArea rows={4} placeholder={packagesPlaceHolder}/>
                     )}
                   </Form.Item>
                 </Col>
@@ -294,7 +325,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                     {form.getFieldDecorator('imageSpec.packages.conda', {
                       initialValue: packages.conda,
                     })(
-                      <TextArea rows={4}/>
+                      <TextArea rows={4} placeholder={packagesPlaceHolder}/>
                     )}
                   </Form.Item>
                 </Col>
@@ -303,7 +334,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                     {form.getFieldDecorator('imageSpec.packages.pip', {
                       initialValue: packages.pip,
                     })(
-                      <TextArea rows={4}/>
+                      <TextArea rows={4} placeholder={packagesPlaceHolder}/>
                     )}
                   </Form.Item>
                 </Col>
@@ -551,7 +582,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                   <Form.Item label='Status' style={{marginBottom: '12px'}}>
                     <Input disabled value={get(jobStatus, 'phase', 'Unknow')} />
                   </Form.Item>
-                  <Form.Item label='Packages'>
+                  <Form.Item label='Package(s)' required={true}>
                     <Card>
                       <Row gutter={24}>
                         <Col span={8}>
@@ -559,7 +590,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                             {form.getFieldDecorator('imageSpec.packages.apt', {
                               initialValue: get(packages, 'apt', []).join('\n'),
                             })(
-                              <TextArea disabled={!imageReady} rows={4}/>
+                              <TextArea disabled={!imageReady} rows={4} placeholder={packagesPlaceHolder}/>
                             )}
                           </Form.Item>
                         </Col>
@@ -568,7 +599,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                             {form.getFieldDecorator('imageSpec.packages.conda', {
                               initialValue: get(packages, 'conda', []).join('\n'),
                             })(
-                              <TextArea disabled={!imageReady} rows={4}/>
+                              <TextArea disabled={!imageReady} rows={4} placeholder={packagesPlaceHolder}/>
                             )}
                           </Form.Item>
                         </Col>
@@ -577,7 +608,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                             {form.getFieldDecorator('imageSpec.packages.pip', {
                               initialValue: get(packages, 'pip', []).join('\n'),
                             })(
-                              <TextArea disabled={!imageReady} rows={4}/>
+                              <TextArea disabled={!imageReady} rows={4} placeholder={packagesPlaceHolder}/>
                             )}
                           </Form.Item>
                         </Col>
