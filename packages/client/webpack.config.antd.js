@@ -20,6 +20,14 @@ module.exports = {
   resolveLoader: {
     moduleExtensions: ['-loader']
   },
+  performance: {
+    hints: false
+  },
+  optimization: {
+    removeAvailableModules: false,
+    removeEmptyChunks: false,
+    splitChunks: false,
+  },
   plugins: [
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output

@@ -25,6 +25,9 @@ module.exports = {
   mode: devMode ? 'development' : 'production',
   externals,
   resolve,
+  performance: {
+    hints: false
+  },
   devServer: {
     port: "8090",
     contentBase: path.join(__dirname, 'dist'),
