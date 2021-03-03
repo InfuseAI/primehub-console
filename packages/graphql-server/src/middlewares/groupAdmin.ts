@@ -1,4 +1,4 @@
-import Koa, {Context} from 'koa';
+import * as Koa from 'koa';
 import { isGroupAdmin } from '../resolvers/utils';
 import Boom from 'boom';
 import { createConfig } from '../config';

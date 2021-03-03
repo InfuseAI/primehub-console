@@ -8,6 +8,7 @@ const path = require('path');
 const webpack = require('webpack');
 const devMode = process.env.NODE_ENV !== 'production';
 const CompressionPlugin = require('compression-webpack-plugin');
+const { ESBuildPlugin } = require('esbuild-loader');
 
 resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/ee/index.schema.js');
 
@@ -40,18 +41,10 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: 'ts-loader',
+        loader: 'esbuild-loader',
         options: {
-          transpileOnly: true,
-          compilerOptions: {
-            module: 'es2015'
-          },
-          getCustomTransformers: () => ({
-            before: [tsImportPluginFactory({
-              libraryName: 'antd',
-              style: true,
-            })]
-          }),
+          loader: 'tsx',
+          target: 'es2015'
         }
       },
       {
@@ -85,6 +78,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new ESBuildPlugin(),
     new HtmlWebPackPlugin({
       chunks: ['index'],
       template: 'docs/index.html',

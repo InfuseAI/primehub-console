@@ -1,5 +1,6 @@
 const path = require('path');
 const {externals, resolve} = require('./webpack.settings');
+const { ESBuildPlugin } = require('esbuild-loader');
 const {theme} = require('./package.json');
 // plugins
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -24,19 +25,18 @@ module.exports = {
       // Options similar to the same options in webpackOptions.output
       // both options are optional
       filename: 'antd.css'
-    })
+    }),
+    new ESBuildPlugin()
   ],
   module: {
     rules: [
       // .ts, .tsx
       {
         test: /\.tsx?$/,
-        loader: 'ts-loader',
+        loader: 'esbuild-loader',
         options: {
-          transpileOnly: true,
-          compilerOptions: {
-            module: 'es2015'
-          }
+          loader: 'tsx',
+          target: 'es2015'
         }
       },
       {

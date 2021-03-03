@@ -89,7 +89,6 @@ const getCreateTimeAndFinishTime = (startTime, finishTime, phase: Phase) => {
 }
 
 const renderTiming = (createTime, record) => {
-  const createTime = record.createTime;
   const startTime = record.startTime;
   const finishTime = record.finishTime;
   const duration = computeDuration(moment(startTime), moment(finishTime || new Date().toISOString()));

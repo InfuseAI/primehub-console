@@ -66,6 +66,7 @@
     "cross-env": "^5.1.3",
     "css-loader": "^0.28.11",
     "enzyme": "^2.4.1",
+    "esbuild-loader": "^2.9.2",
     "eslint": "^4.18.2",
     "eslint-plugin-react": "^6.2.0",
     "file-loader": "^1.1.11",
