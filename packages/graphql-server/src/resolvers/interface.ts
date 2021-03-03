@@ -6,6 +6,7 @@ import { Item } from '../crdClient/customResource';
 import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
 import K8sUploadServerSecret from '../k8sResource/k8sUploadServerSecret';
 import { JobLogCtrl } from '../ee/controllers/jobLogCtrl';
+import { PodLogs } from '../controllers/logCtrl';
 import K8sGroupPvc from '../k8sResource/k8sGroupPvc';
 import { PhJobCacheList } from '../ee/crdClient/phJobCacheList';
 import { Telemetry } from '../utils/telemetry';
@@ -42,6 +43,7 @@ export interface Context {
   appPrefix: string;
   graphqlHost: string;
   jobLogCtrl: JobLogCtrl;
+  podLogs: PodLogs;
   phJobCacheList: PhJobCacheList;
   usageReportAPIHost: string;
   telemetry: Telemetry;

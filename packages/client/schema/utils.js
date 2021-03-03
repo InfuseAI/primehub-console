@@ -496,7 +496,7 @@ exports.dict = {
     'buildImage.useImagePullSecret': 'Use Image PullSecret',
     'buildImage.packages': 'Package(s)',
     'buildImage.msg.pleaseCheckSetup': 'Image registry not found. Please set up your image registry using Image Builder.',
-    'buildImage.msg.regsitrySetupLink': imageBuilderLink,
+    'buildImage.msg.registrySetupLink': imageBuilderLink,
     'buildImage.apt': 'APT',
     'buildImage.pip': 'Pip',
     'buildImage.conda': 'Conda',

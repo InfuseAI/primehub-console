@@ -19,7 +19,7 @@ const config = createConfig();
 export class Crd<SpecType> {
   private cache: CrdCache<SpecType>;
   private customResourceMethod: string;
-  private propMapping: (item: Item<SpecType>) => Record<string, any>;
+  private propMapping: (item: Item<SpecType>, context?: Context) => Record<string, any>;
   private createMapping: (data: any, name: string, context: Context) => any;
   private updateMapping: (data: any) => any;
   private resolveType?: Record<string, any>;
@@ -73,7 +73,7 @@ export class Crd<SpecType> {
     customResolversInMutation
   }: {
     customResourceMethod: string,
-    propMapping: (item: Item<SpecType>) => Record<string, any>,
+    propMapping: (item: Item<SpecType>, context?: Context) => Record<string, any>,
     createMapping: (data: any, name: string, context: Context) => any,
     updateMapping: (data: any) => any,
     resolveType?: Record<string, any>,
@@ -260,9 +260,9 @@ export class Crd<SpecType> {
    */
 
   private listQuery =
-    async (customResource: CustomResource<SpecType>, where: any, order: any, mode?: QueryImageMode) => {
+    async (customResource: CustomResource<SpecType>, where: any, order: any, context: Context, mode?: QueryImageMode) => {
     const rows = await customResource.list();
-    let mappedRows = rows.map(row => this.propMapping(row));
+    let mappedRows = rows.map(row => this.propMapping(row, context));
     if (this.customResourceMethod === 'images') {
         if (mode === QueryImageMode.SYSTEM_ONLY) {
           mappedRows = mappedRows.filter(row => {
@@ -285,7 +285,7 @@ export class Crd<SpecType> {
   private query = async (root, args, context: Context) => {
     const customResource = context.crdClient[this.customResourceMethod];
     const where = this.parseWhere(args.where);
-    const rows = await this.listQuery(customResource, where, args && args.orderBy);
+    const rows = await this.listQuery(customResource, where, args && args.orderBy, context);
 
     return paginate(rows, extractPagination(args));
   }
@@ -294,7 +294,7 @@ export class Crd<SpecType> {
     const customResource = context.crdClient[this.customResourceMethod];
     const {mode = QueryImageMode.ALL} = args;
     const where = this.parseWhere(args.where);
-    const rows = await this.listQuery(customResource, where, args && args.orderBy, mode);
+    const rows = await this.listQuery(customResource, where, args && args.orderBy, context, mode);
 
     return toRelay(rows, extractPagination(args));
   }
@@ -304,7 +304,7 @@ export class Crd<SpecType> {
     const customResource = context.crdClient[this.customResourceMethod];
     try {
       const row = await customResource.get(id);
-      return this.propMapping(row);
+      return this.propMapping(row, context);
     } catch (e) {
       // if http 404 error
       return null;
@@ -432,7 +432,7 @@ export class Crd<SpecType> {
       id: res.metadata.name
     });
 
-    return this.propMapping(res);
+    return this.propMapping(res, context);
   }
 
   private update = async (root, args, context: Context) => {
@@ -478,7 +478,7 @@ export class Crd<SpecType> {
       username: context.username,
       id: res.metadata.name
     });
-    return this.propMapping(res);
+    return this.propMapping(res, context);
   }
 
   private destroy = async (root, args, context: Context) => {
@@ -515,7 +515,7 @@ export class Crd<SpecType> {
       username: context.username,
       id: name
     });
-    return this.propMapping(crd);
+    return this.propMapping(crd, context);
   }
 
   // tslint:disable-next-line:max-line-length
@@ -603,7 +603,7 @@ export class Crd<SpecType> {
     }));
     rows = rows
     .filter(row => row !== null)  // filter out the failed resource
-    .map(row => this.propMapping(row));
+    .map(row => this.propMapping(row, context));
     return rows;
   }
 }

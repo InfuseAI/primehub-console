@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {
-  Checkbox, Button, Radio, Select, Form, Card, Divider, Tabs,
+  Checkbox, Button, Radio, Select, Form, Card, Divider, Tabs, Alert,
   Row, Col, Input, Modal, Tooltip, Icon, InputNumber, Switch} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import {get, snakeCase, debounce, isEmpty} from 'lodash';
@@ -18,6 +18,8 @@ const StyledFormItem = styled(Form.Item)`
     content: "";
   }
 `;
+
+const DISABLE_BUILD_IMAGE = !(window as any).customImageSetup;
 
 enum FormType {
   Edit = 'edit',
@@ -381,6 +383,14 @@ class ImageCreateForm extends React.Component<Props, State> {
                 )}
               </Form.Item>
               <Divider/>
+              {(DISABLE_BUILD_IMAGE) ? (
+                <Alert
+                  message='Warning'
+                  description={<span>Image registry not found. Please set up your image registry using Image Builder. <a href='https://docs.primehub.io/docs/next/getting_started/configure-image-builder' target='_blank'>More Info.</a></span>}
+                  type='warning'
+                  showIcon
+                />
+              ) : (<></>)}
               <Form.Item>
                 <Radio.Group
                   disabled={formType === FormType.Edit}
@@ -389,7 +399,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                   <Radio value={BuildType.EXIST}>
                     Use existing one
                   </Radio>
-                  <Radio value={BuildType.CUSTOM}>
+                  <Radio value={BuildType.CUSTOM} disabled={DISABLE_BUILD_IMAGE}>
                     Build Custom Image
                   </Radio>
                 </Radio.Group>

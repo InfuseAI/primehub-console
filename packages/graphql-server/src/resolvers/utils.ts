@@ -14,6 +14,7 @@ import {
   get,
   uniq
 } from 'lodash';
+import KcAdminClient from 'keycloak-admin';
 import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
 import { EOL } from 'os';
 import { Context, Role } from './interface';
@@ -45,10 +46,10 @@ export const isAdmin = (ctx: Context): boolean => {
   return ctx.role === Role.ADMIN;
 };
 
-export const isGroupAdmin = async (username: string, groupName: string, ctx: Context): Promise<boolean> => {
-  const groups = await ctx.kcAdminClient.groups.find({max: 99999});
+export const isGroupAdmin = async (username: string, groupName: string, kcAdminClient: KcAdminClient): Promise<boolean> => {
+  const groups = await kcAdminClient.groups.find({max: 99999});
   const groupData = find(groups, ['name', groupName]);
-  const group = await ctx.kcAdminClient.groups.findOne({id: get(groupData, 'id', '')});
+  const group = await kcAdminClient.groups.findOne({id: get(groupData, 'id', '')});
   const admins = get(group, 'attributes.admins', []);
   return admins.includes(username);
 };

@@ -12,17 +12,12 @@ import morgan from 'koa-morgan';
 import * as GraphQLJSON from 'graphql-type-json';
 import { makeExecutableSchema, mergeSchemas } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
-import { keycloakMaxCount } from '../resolvers/constant';
 import request from 'request';
 import url from 'url';
 
 import CrdClient, { InstanceTypeSpec, ImageSpec, client as kubeClient, kubeConfig } from '../crdClient/crdClientImpl';
 import * as system from '../resolvers/system';
 import * as license from './resolvers/license';
-import * as user from '../resolvers/user';
-import * as group from '../resolvers/group';
-import * as secret from '../resolvers/secret';
-import * as store from '../resolvers/store';
 import * as buildImage from './resolvers/buildImage';
 import * as buildImageJob from './resolvers/buildImageJob';
 import * as phJob from './resolvers/phJob';
@@ -31,9 +26,7 @@ import * as phDeployment from './resolvers/phDeployment';
 import * as usageReport from './resolvers/usageReport';
 import { resolvers as ceResolvers } from '../app';
 import { crd as instanceType} from '../resolvers/instanceType';
-import { crd as dataset, regenerateUploadSecret} from '../resolvers/dataset';
 import { crd as image} from '../resolvers/image';
-import { crd as ann} from '../resolvers/announcement';
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import { ErrorCodes } from '../errorCodes';
 import basicAuth from 'basic-auth';
@@ -70,6 +63,7 @@ import Boom from 'boom';
 // graphql middlewares
 // Basic Auth middleware
 import { permissions as authMiddleware } from './middlewares/auth';
+import groupAdminMiddleware from '../middlewares/groupAdmin';
 import TokenSyncer from '../oidc/syncer';
 import K8sSecret from '../k8sResource/k8sSecret';
 import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
@@ -271,7 +265,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
 
   const podLogs = new PodLogs({
-    namespace: config.k8sCrdNamespace
+    namespace: config.k8sCrdNamespace,
+    crdClient,
+    appPrefix: config.appPrefix,
   });
 
   // job artifact cleaner
@@ -391,7 +387,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       let getInstanceType: (name: string) => Promise<Item<InstanceTypeSpec>>;
       let getImage: (name: string) => Promise<Item<ImageSpec>>;
 
-      let kcAdminClient;
+      let kcAdminClient: KcAdminClient;
       const keycloakClientId = config.keycloakClientId;
       const {authorization = ''}: {authorization: string} = ctx.header;
       const useCache = ctx.headers['x-primehub-use-cache'];
@@ -504,6 +500,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         appPrefix: config.appPrefix,
         graphqlHost: config.graphqlHost,
         jobLogCtrl: logCtrl,
+        podLogs,
         phJobCacheList,
         usageReportAPIHost: config.usageReportAPIHost,
         telemetry,
@@ -710,7 +707,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   mountAnn(rootRouter, annCtrl);
 
   // Notebook Log
-  rootRouter.get(podLogs.getJupyterHubRoute(), authenticateMiddleware, podLogs.streamJupyterHubLogs);
+  rootRouter.get(podLogs.jupyterHubRoute, authenticateMiddleware, podLogs.streamJupyterHubLogs);
+
+  // ImageSpecJob Log
+  rootRouter.get(podLogs.imageSpecJobRoute, authenticateMiddleware, groupAdminMiddleware, podLogs.streamImageSpecJobLogs);
 
   // Log Ctrl
   rootRouter.get(logCtrl.getRoute(),

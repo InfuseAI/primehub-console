@@ -53,6 +53,7 @@ import Boom from 'boom';
 
 // graphql middlewares
 import { permissions as authMiddleware } from './middlewares/auth';
+import groupAdminMiddleware from './middlewares/groupAdmin';
 import TokenSyncer from './oidc/syncer';
 import K8sSecret from './k8sResource/k8sSecret';
 import K8sDatasetPvc from './k8sResource/k8sDatasetPvc';
@@ -230,7 +231,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   });
 
   const podLogs = new PodLogs({
-    namespace: config.k8sCrdNamespace
+    namespace: config.k8sCrdNamespace,
+    crdClient,
+    appPrefix: config.appPrefix
   });
 
   // ann
@@ -431,10 +434,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         k8sUploadServerSecret,
         namespace: config.k8sCrdNamespace,
         graphqlHost: config.graphqlHost,
-        jobLogCtrl: {
-          getEndpoint: () => ''
-        },
         telemetry,
+        podLogs,
         minioClient,
         storeBucket,
       };
@@ -609,7 +610,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   mountAnn(rootRouter, annCtrl);
 
   // Notebook Log
-  rootRouter.get(podLogs.getJupyterHubRoute(), authenticateMiddleware, podLogs.streamJupyterHubLogs);
+  rootRouter.get(podLogs.jupyterHubRoute, authenticateMiddleware, podLogs.streamJupyterHubLogs);
+
+  // ImageSpecJob Log
+  rootRouter.get(podLogs.imageSpecJobRoute, authenticateMiddleware, groupAdminMiddleware, podLogs.streamImageSpecJobLogs);
 
   // health check
   rootRouter.get('/health', async ctx => {
