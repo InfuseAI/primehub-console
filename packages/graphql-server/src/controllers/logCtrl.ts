@@ -21,7 +21,7 @@ export class PodLogs {
   }) {
     this.namespace = namespace || 'default';
     this.crdClient = crdClient || new CrdClientImpl({ namespace });
-    this.appPrefix = appPrefix || '/';
+    this.appPrefix = appPrefix || '';
   }
 
   public jupyterHubRoute = '/logs/jupyterhub';
@@ -52,7 +52,7 @@ export class PodLogs {
   }
 
   public getImageSpecJobEndpoint = (imageId: string) => {
-    return `${this.appPrefix || ''}logs/images/${imageId}/job`;
+    return `${this.appPrefix || ''}/logs/images/${imageId}/job`;
   }
 
   public streamImageSpecJobLogs = async (ctx: ParameterizedContext) => {
