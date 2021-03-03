@@ -37,6 +37,11 @@ module.exports = {
     },
     https: false
   },
+  optimization: {
+    removeAvailableModules: false,
+    removeEmptyChunks: false,
+    splitChunks: false,
+  },
   module: {
     rules: [
       {
