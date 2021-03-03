@@ -252,6 +252,7 @@ export default compose(
             </>
           )
         });
+        history.go(0);
       },
       onError: errorHandler
     }),

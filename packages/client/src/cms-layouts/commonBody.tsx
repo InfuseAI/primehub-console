@@ -129,7 +129,7 @@ export default class CommonBody extends React.Component<Props> {
 
     let customImageAlert = undefined;
     if (key === 'buildImage' && DISABLE_BUILD_IMAGE === true) {
-      let desc = <span>{intl.formatMessage({id: 'buildImage.msg.pleaseCheckSetup'})} <a href={intl.formatMessage({id: 'buildImage.msg.regsitrySetupLink'})} target="_blank">More Info</a></span>;
+      let desc = <span>{intl.formatMessage({id: 'buildImage.msg.pleaseCheckSetup'})} <a href={intl.formatMessage({id: 'buildImage.msg.registrySetupLink'})} target="_blank">More Info</a></span>;
       customImageAlert = <Alert
           message="Warning"
           description={desc}
