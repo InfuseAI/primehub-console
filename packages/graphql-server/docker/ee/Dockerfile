@@ -1,4 +1,4 @@
-FROM node:carbon-slim AS build
+FROM node:dubnium-slim AS build
 
 # create app directory
 WORKDIR /usr/src/app
@@ -16,7 +16,7 @@ RUN cd packages/graphql-server \
   && rm -rf server/src
 
 # Run
-FROM node:carbon-slim
+FROM node:dubnium-slim
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app /usr/src/app
 ENV NODE_ENV production
