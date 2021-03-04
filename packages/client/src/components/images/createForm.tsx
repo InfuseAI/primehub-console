@@ -417,7 +417,7 @@ class ImageCreateForm extends React.Component<Props, State> {
               {(DISABLE_BUILD_IMAGE) ? (
                 <Alert
                   message='Warning'
-                  description={<span>Image registry not found. Please set up your image registry using Image Builder. <a href='https://docs.primehub.io/docs/next/getting_started/configure-image-builder' target='_blank'>More Info.</a></span>}
+                  description={<span>Image registry not found. Please set up your image registry using Image Builder. <a href='https://docs.primehub.io/docs/getting_started/configure-image-builder' target='_blank'>More Info.</a></span>}
                   type='warning'
                   showIcon
                 />

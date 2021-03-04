@@ -114,7 +114,7 @@ class CopyableText extends React.Component {
             tooltipVisible: false
           });
         }, 1000)
-        
+
       }
     } catch(err) {
       this.setState({
@@ -272,7 +272,7 @@ exports.parseToStepDot5 = function(value) {
 }
 
 const instanceTypeLink = "https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-feature";
-const imageBuilderLink = "https://docs.primehub.io/docs/tasks/dockerhub-registry#set-up-dockerhub-registry";
+const imageBuilderLink = "https://docs.primehub.io/docs/getting_started/configure-image-builder";
 
 exports.dict = {
   en: {
@@ -339,7 +339,7 @@ exports.dict = {
     memoryRequest: 'Memory Request',
     'instanceType.request.text.title': 'Overcommitting (advanced feature)',
     'instanceType.request.text.description': `
-      If you want to overcommit computing resources, you can use this feature. 
+      If you want to overcommit computing resources, you can use this feature.
       <a href="${instanceTypeLink}">More Info</a>
     `,
     // dataset
@@ -373,7 +373,7 @@ exports.dict = {
     nfsPath: 'NFS Path',
     hostPath: 'Host Path',
     pvProvisioning: 'Provisioning',
-    
+
     // userfederation
     userFederations: 'User Federations',
     basicInformation: 'Basic Information',
@@ -591,7 +591,7 @@ exports.dict = {
     memoryRequest: 'Memory Request',
     'instanceType.request.text.title': 'Overcommitting (advanced feature)',
     'instanceType.request.text.description': `
-      If you want to overcommit computing resources, you can use this feature. 
+      If you want to overcommit computing resources, you can use this feature.
       <a href="${instanceTypeLink}">More Info</a>
     `,
     // dataset
