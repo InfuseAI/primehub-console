@@ -9,6 +9,8 @@ import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 import styled from 'styled-components';
+import BuildCustomImageForm from './buildCustomImageForm';
+import BaseImageRow from './baseImageRow';
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;
@@ -42,6 +44,25 @@ enum BuildType {
 
 const { Option } = Select;
 
+interface FormValue {
+  groupId: string;
+  displayName: string;
+  name: string;
+  id: string;
+  type: string;
+  useImagePullSecret: string;
+  description: string;
+  url: string;
+  urlForGpu: string;
+  baseImage: string;
+  pullSecret: string;
+  logEndpoint: string;
+  jobStatus: any;
+  apt: string;
+  pip: string;
+  conda: string;
+}
+
 type Props = FormComponentProps & {
   refetchGroup: Function;
   instanceTypes: Array<Record<string, any>>;
@@ -55,13 +76,13 @@ type Props = FormComponentProps & {
   formType?: FormType;
 };
 
-type State = {
-  showGpuUrl: boolean
-  imageType: ImageType
-  buildType: BuildType
-  buildModalVisible: boolean
-  searchText: string
-};
+interface State {
+  showGpuUrl: boolean;
+  imageType: ImageType;
+  buildType: BuildType;
+  buildModalVisible: boolean;
+  searchText: string;
+}
 
 const radioStyle = {
   display: 'block',
@@ -80,25 +101,6 @@ const radioGroupStyle = {
   maxHeight: '30vh',
   overflow: 'auto',
   border: '1px solid #e8e8e8',
-};
-
-type FormValue = {
-  groupId: string;
-  displayName: string;
-  name: string;
-  id: string;
-  type: string;
-  useImagePullSecret: string;
-  description: string;
-  url: string;
-  urlForGpu: string;
-  baseImage: string;
-  pullSecret: string;
-  logEndpoint: string;
-  jobStatus: any;
-  apt: string;
-  pip: string;
-  conda: string;
 };
 
 const packagesPlaceHolder = `one package per line. e.g. \npackage1\npackage2\n`;
@@ -321,7 +323,11 @@ class ImageCreateForm extends React.Component<Props, State> {
     return dataSource;
   }
 
-  renderBuildCustomImageForm = (form, formType, url, isReady, jobStatus, imageSpec: any = {}, packages = {}) => {
+  renderBuildCustomImageForm = () => {
+    // form, formType, url, isReady, jobStatus, imageSpec: any = {}, packages = {}
+    const { form, formType, initialValue, availableImages} = this.props;
+    const { url, isReady, jobStatus, imageSpec } = initialValue || {};
+    const { packages } = imageSpec || {};
     if (formType === FormType.Edit) {
       return (
         <StyledFormItem
@@ -336,73 +342,12 @@ class ImageCreateForm extends React.Component<Props, State> {
       );
     } else {
       return (
-        <>
-          <Row gutter={24}>
-            <Col span={12}>
-              <Form.Item label='Base image url' style={{marginBottom: '12px'}}>
-                {form.getFieldDecorator('imageSpec.baseImage', {
-                  initialValue: imageSpec.baseImage,
-                  rules: [
-                    {
-                      required: true,
-                      message: 'Please give a base image url'
-                    }
-                  ]
-                })(
-                  <AutoComplete
-                    dataSource={this.getImagesSuggestion()}
-                    value={imageSpec.baseImage}
-                    onSearch={this.handleSearchImage}
-                    optionLabelProp="value"
-                    onSelect={this.handleImageSuggestionSelected}
-                  />
-                )}
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label={`Image Pull Secret`}>
-                {form.getFieldDecorator('imageSpec.pullSecret', {
-                  initialValue: imageSpec.pullSecret,
-                })(
-                  <ImagePullSecret />
-                )}
-              </Form.Item>
-            </Col>
-          </Row>
-          <Form.Item label='Package(s)' required={true}>
-            <Card>
-              <Row gutter={24}>
-                <Col span={8}>
-                  <Form.Item label={`APT`} style={{marginBottom: '10px'}}>
-                    {form.getFieldDecorator('imageSpec.packages.apt', {
-                      initialValue: packages.apt,
-                    })(
-                      <TextArea rows={4} placeholder={packagesPlaceHolder}/>
-                    )}
-                  </Form.Item>
-                </Col>
-                <Col span={8}>
-                  <Form.Item label={`Conda`} style={{marginBottom: '10px'}}>
-                    {form.getFieldDecorator('imageSpec.packages.conda', {
-                      initialValue: packages.conda,
-                    })(
-                      <TextArea rows={4} placeholder={packagesPlaceHolder}/>
-                    )}
-                  </Form.Item>
-                </Col>
-                <Col span={8}>
-                  <Form.Item label={`pip`} style={{marginBottom: '10px'}}>
-                    {form.getFieldDecorator('imageSpec.packages.pip', {
-                      initialValue: packages.pip,
-                    })(
-                      <TextArea rows={4} placeholder={packagesPlaceHolder}/>
-                    )}
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Card>
-          </Form.Item>
-        </>
+       <BuildCustomImageForm
+         form={form}
+         imageSpec={imageSpec}
+         packages={packages}
+         availableImages={availableImages}
+       />
       );
     }
   }
@@ -414,6 +359,7 @@ class ImageCreateForm extends React.Component<Props, State> {
       form,
       initialValue,
       formType,
+      availableImages
     } = this.props;
     const {
       groupId,
@@ -430,7 +376,7 @@ class ImageCreateForm extends React.Component<Props, State> {
       jobStatus,
       logEndpoint
     } = initialValue || {};
-    let urlForGpu = formType !== FormType.Edit || !this.state.showGpuUrl || (initialValue.url == initialValue.urlForGpu) ? null : initialValue.urlForGpu;
+    const urlForGpu = formType !== FormType.Edit || !this.state.showGpuUrl || (initialValue.url === initialValue.urlForGpu) ? null : initialValue.urlForGpu;
     const { packages } = imageSpec || {};
     const { buildModalVisible } = this.state;
     const imageReady = this.buildModalEditable(isReady, jobStatus);
@@ -513,7 +459,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                         </Select>
                       )}
                     </Form.Item>
-                    { this.renderBuildCustomImageForm(form, formType, url, isReady, jobStatus, imageSpec, packages) }
+                    { this.renderBuildCustomImageForm() }
                   </>
                 ) : (
                   <>
@@ -611,40 +557,12 @@ class ImageCreateForm extends React.Component<Props, State> {
             <div>
               <Tabs defaultActiveKey='details'>
                 <TabPane tab='Build Details' key='details'>
-                  <Row gutter={24}>
-                    <Col span={12}>
-                      <Form.Item label='Base image url' style={{marginBottom: '12px'}}>
-                        {form.getFieldDecorator('imageSpec.baseImage', {
-                          initialValue: get(imageSpec, 'baseImage', ''),
-                          rules: [
-                            {
-                              required: true,
-                              message: 'Please give a base image url'
-                            }
-                          ]
-                        })(
-                          <AutoComplete
-                            style={{ width: '100%' }}
-                            dataSource={this.getImagesSuggestion()}
-                            value={imageSpec.baseImage}
-                            onSearch={this.handleSearchImage}
-                            optionLabelProp='value'
-                            onSelect={this.handleImageSuggestionSelected}
-                            disabled={!imageReady}
-                          />
-                        )}
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item label={`Image Pull Secret`}>
-                        {form.getFieldDecorator('imageSpec.pullSecret', {
-                          initialValue: get(imageSpec, 'pullSecret', ''),
-                        })(
-                          <ImagePullSecret disabled={!imageReady} />
-                        )}
-                      </Form.Item>
-                    </Col>
-                  </Row>
+                  <BaseImageRow
+                    form={form}
+                    imageSpec={imageSpec}
+                    disabled={!isReady}
+                    availableImages={availableImages}
+                  />
                   <Form.Item label='Status' style={{marginBottom: '12px'}}>
                     <Input disabled value={get(jobStatus, 'phase', 'Unknow')} />
                   </Form.Item>
