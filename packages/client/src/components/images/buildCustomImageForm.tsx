@@ -52,10 +52,6 @@ export default class BuildCustomImageForm extends React.Component<Props> {
   }
 
   render() {
-    const {
-      form,
-      packages
-    } = this.props;
     return (
       <>
         <BaseImageRow {...this.props} />

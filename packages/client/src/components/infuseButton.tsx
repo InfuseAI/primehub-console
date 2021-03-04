@@ -13,5 +13,5 @@ export default function InfuseButton(props: ButtonProps) {
       }}
       {...rest}
     />
-  )
+  );
 }

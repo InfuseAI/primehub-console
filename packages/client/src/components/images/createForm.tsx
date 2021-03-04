@@ -15,9 +15,6 @@ import BaseImageRow from './baseImageRow';
 const { TextArea } = Input;
 const { TabPane } = Tabs;
 
-const urlDict: { [key: string]: string; } = {};
-const secretDict: { [key: string]: string; } = {};
-
 const StyledFormItem = styled(Form.Item)`
   > .ant-form-item-label label:after {
     content: "";
@@ -129,7 +126,7 @@ class ImageCreateForm extends React.Component<Props, State> {
     };
   }
 
-  validatePackagesFilled = (form) => {
+  validatePackagesFilled(form) {
     const aptValue = form.getFieldValue('imageSpec.packages.apt');
     const pipValue = form.getFieldValue('imageSpec.packages.pip');
     const condaValue = form.getFieldValue('imageSpec.packages.conda');
@@ -271,58 +268,6 @@ class ImageCreateForm extends React.Component<Props, State> {
     this.setState({buildModalVisible: false});
   }
 
-  handleSearchImage = searchText => {
-    this.setState({searchText});
-  }
-
-  handleImageSuggestionSelected = value => {
-    const secret = secretDict[value];
-    const {form} = this.props;
-    form.setFieldsValue({'imageSpec.pullSecret': secret});
-  }
-
-  getImagesSuggestion = () => {
-    const availableImages = this.props.availableImages ? this.props.availableImages.filter(image => image.isReady) : [];
-    const { searchText } = this.state;
-    const dataSource = uniq(sortBy(flatMap(availableImages, image => {
-      const {displayName, type, url, urlForGpu, groupName, useImagePullSecret} = image;
-      const scopeType = groupName ? 'Group' : 'System';
-      if (type === 'both' && url !== urlForGpu) {
-        urlDict[`${displayName} (${scopeType} / CPU)`] = url;
-        urlDict[`${displayName} (${scopeType} / GPU)`] = urlForGpu;
-        secretDict[url] = useImagePullSecret;
-        secretDict[urlForGpu] = useImagePullSecret;
-        return [
-          `${displayName} (${scopeType} / CPU)`,
-          `${displayName} (${scopeType} / GPU)`
-        ];
-      } else if (type === 'gpu') {
-        urlDict[`${displayName} (${scopeType} / GPU)`] = url;
-        secretDict[url] = useImagePullSecret;
-        return `${displayName} (${scopeType} / GPU)`;
-      } else {
-        urlDict[`${displayName} (${scopeType} / CPU)`] = url;
-        secretDict[url] = useImagePullSecret;
-        return `${displayName} (${scopeType} / CPU)`;
-      }
-    })))
-    .filter(text => text.indexOf(searchText) > -1)
-    .map((text, i) => {
-      const index = text.indexOf(searchText);
-      const name = <span>
-        {text.substr(0, index)}
-        <b>{text.substr(index, searchText.length)}</b>
-        {text.substr(index + searchText.length)}
-      </span>;
-      return (
-        <Option value={urlDict[text]} key={urlDict[text]}>
-          {name}
-        </Option>
-      );
-    });
-    return dataSource;
-  }
-
   renderBuildCustomImageForm = () => {
     // form, formType, url, isReady, jobStatus, imageSpec: any = {}, packages = {}
     const { form, formType, initialValue, availableImages} = this.props;
@@ -439,47 +384,27 @@ class ImageCreateForm extends React.Component<Props, State> {
                   </Radio>
                 </Radio.Group>
               </Form.Item>
+              <Form.Item label='Type'>
+                {form.getFieldDecorator('type', {
+                  initialValue: type || ImageType.ALL,
+                  rules: [
+                    {
+                      required: true,
+                      message: 'Please select a type.'
+                    }
+                  ]
+                })(
+                  <Select style={{width: '200px'}} onChange={this.handleTypeChange}>
+                    <Option key='cpu' value='cpu'>cpu</Option>
+                    <Option key='gpu' value='gpu'>gpu</Option>
+                    <Option key='both' value='both'>universal</Option>
+                  </Select>
+                )}
+              </Form.Item>
               {
-                this.state.buildType === BuildType.CUSTOM ? (
+                this.state.buildType === BuildType.CUSTOM ? this.renderBuildCustomImageForm()
+                  : (
                   <>
-                    <Form.Item label='Type'>
-                      {form.getFieldDecorator('type', {
-                        initialValue: type || ImageType.ALL,
-                        rules: [
-                          {
-                            required: true,
-                            message: 'Please select a type.'
-                          }
-                        ]
-                      })(
-                        <Select style={{width: '200px'}} onChange={this.handleTypeChange}>
-                          <Option key='cpu' value='cpu'>cpu</Option>
-                          <Option key='gpu' value='gpu'>gpu</Option>
-                          <Option key='both' value='both'>universal</Option>
-                        </Select>
-                      )}
-                    </Form.Item>
-                    { this.renderBuildCustomImageForm() }
-                  </>
-                ) : (
-                  <>
-                    <Form.Item label='Type'>
-                      {form.getFieldDecorator('type', {
-                        initialValue: type || ImageType.ALL,
-                        rules: [
-                          {
-                            required: true,
-                            message: 'Please select a type.'
-                          }
-                        ]
-                      })(
-                        <Select style={{width: '200px'}} onChange={this.handleTypeChange}>
-                          <Option key='cpu' value='cpu'>cpu</Option>
-                          <Option key='gpu' value='gpu'>gpu</Option>
-                          <Option key='both' value='both'>universal</Option>
-                        </Select>
-                      )}
-                    </Form.Item>
                     <Row gutter={24}>
                       <Col span={12}>
                         <Form.Item label='Container image url' style={{marginBottom: '12px'}}>
@@ -632,9 +557,8 @@ class ImageCreateForm extends React.Component<Props, State> {
             </div>
           </Modal>) : (<></>)}
       </Form>
-    )
+    );
   }
 }
-
 
 export default Form.create<Props>()(ImageCreateForm);
