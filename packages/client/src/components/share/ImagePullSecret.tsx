@@ -21,6 +21,13 @@ export default class ImagePullSecret extends React.Component<Props, State> {
       checked: Boolean(props.value)
     };
   }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.value !== prevProps.value) {
+      this.setState({checked: Boolean(this.props.value)});
+    }
+  }
+
   handleCheck = (e: any) => {
     const {onChange} = this.props;
     const checked = e.target.checked;

@@ -13,7 +13,8 @@ import styled from 'styled-components';
 const { TextArea } = Input;
 const { TabPane } = Tabs;
 
-const url_dict: { [key: string]: string; } = {};
+const urlDict: { [key: string]: string; } = {};
+const secretDict: { [key: string]: string; } = {};
 
 const StyledFormItem = styled(Form.Item)`
   > .ant-form-item-label label:after {
@@ -56,11 +57,11 @@ type Props = FormComponentProps & {
 
 type State = {
   showGpuUrl: boolean
-  baseImage: string
   imageType: ImageType
   buildType: BuildType
   buildModalVisible: boolean
   searchText: string
+  secret: string
 };
 
 const radioStyle = {
@@ -124,7 +125,7 @@ class ImageCreateForm extends React.Component<Props, State> {
       buildType: (initialValue && initialValue.imageSpec) ? BuildType.CUSTOM : BuildType.EXIST,
       buildModalVisible: false,
       searchText: '',
-      baseImage: ''
+      secret: ''
     };
   }
 
@@ -274,24 +275,34 @@ class ImageCreateForm extends React.Component<Props, State> {
     this.setState({searchText});
   }
 
+  handleImageSuggestionSelected = value => {
+    const secret = secretDict[value];
+    console.log(1111, secret);
+    this.setState({secret});
+  }
+
   getImagesSuggestion = () => {
-    const { availableImages } = this.props;
+    const availableImages = this.props.availableImages.filter(image => image.isReady);
     const { searchText } = this.state;
     const dataSource = uniq(sortBy(flatMap(availableImages, image => {
-      const {displayName, type, url, urlForGpu, groupName} = image;
+      const {displayName, type, url, urlForGpu, groupName, useImagePullSecret} = image;
       const scopeType = groupName ? 'Group' : 'System';
       if (type === 'both' && url !== urlForGpu) {
-        url_dict[`${displayName} (${scopeType} / CPU)`] = url;
-        url_dict[`${displayName} (${scopeType} / GPU)`] = urlForGpu;
+        urlDict[`${displayName} (${scopeType} / CPU)`] = url;
+        urlDict[`${displayName} (${scopeType} / GPU)`] = urlForGpu;
+        secretDict[url] = useImagePullSecret;
+        secretDict[urlForGpu] = useImagePullSecret;
         return [
           `${displayName} (${scopeType} / CPU)`,
           `${displayName} (${scopeType} / GPU)`
         ];
       } else if (type === 'gpu') {
-        url_dict[`${displayName} (${scopeType} / GPU)`] = url;
+        urlDict[`${displayName} (${scopeType} / GPU)`] = url;
+        secretDict[url] = useImagePullSecret;
         return `${displayName} (${scopeType} / GPU)`;
       } else {
-        url_dict[`${displayName} (${scopeType} / CPU)`] = url;
+        urlDict[`${displayName} (${scopeType} / CPU)`] = url;
+        secretDict[url] = useImagePullSecret;
         return `${displayName} (${scopeType} / CPU)`;
       }
     })))
@@ -304,7 +315,7 @@ class ImageCreateForm extends React.Component<Props, State> {
         {text.substr(index + searchText.length)}
       </span>;
       return (
-        <Option value={url_dict[text]} key={url_dict[text]}>
+        <Option value={urlDict[text]} key={urlDict[text]}>
           {name}
         </Option>
       );
@@ -312,7 +323,8 @@ class ImageCreateForm extends React.Component<Props, State> {
     return dataSource;
   }
 
-  renderBuildCustomImageForm = (form, formType, url, isReady, jobStatus, imageSpec = {}, packages = {}) => {
+  renderBuildCustomImageForm = (form, formType, url, isReady, jobStatus, imageSpec: any = {}, packages = {}) => {
+    const {secret} = this.state;
     if (formType === FormType.Edit) {
       return (
         <StyledFormItem
@@ -345,6 +357,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                     value={imageSpec.baseImage}
                     onSearch={this.handleSearchImage}
                     optionLabelProp="value"
+                    onSelect={this.handleImageSuggestionSelected}
                   />
                 )}
               </Form.Item>
@@ -352,9 +365,9 @@ class ImageCreateForm extends React.Component<Props, State> {
             <Col span={12}>
               <Form.Item label={`Image Pull Secret`}>
                 {form.getFieldDecorator('imageSpec.pullSecret', {
-                  initialValue: imageSpec.pullSecret,
+                  initialValue: secret || imageSpec.pullSecret,
                 })(
-                  <ImagePullSecret />
+                  <ImagePullSecret value={secret}/>
                 )}
               </Form.Item>
             </Col>
@@ -422,7 +435,7 @@ class ImageCreateForm extends React.Component<Props, State> {
     } = initialValue || {};
     let urlForGpu = formType !== FormType.Edit || !this.state.showGpuUrl || (initialValue.url == initialValue.urlForGpu) ? null : initialValue.urlForGpu;
     const { packages } = imageSpec || {};
-    const { buildModalVisible } = this.state;
+    const { buildModalVisible, secret } = this.state;
     const imageReady = this.buildModalEditable(isReady, jobStatus);
     return (
       <Form onSubmit={this.submit}>
@@ -619,6 +632,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                             value={imageSpec.baseImage}
                             onSearch={this.handleSearchImage}
                             optionLabelProp='value'
+                            onSelect={this.handleImageSuggestionSelected}
                             disabled={!imageReady}
                           />
                         )}
@@ -629,7 +643,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                         {form.getFieldDecorator('imageSpec.pullSecret', {
                           initialValue: get(imageSpec, 'pullSecret', ''),
                         })(
-                          <ImagePullSecret disabled={!imageReady} />
+                          <ImagePullSecret disabled={!imageReady} value={secret} />
                         )}
                       </Form.Item>
                     </Col>

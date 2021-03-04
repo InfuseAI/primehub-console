@@ -41,8 +41,10 @@ export const GET_MY_GROUPS = gql`
           displayName
           description
           groupName
+          isReady
           url
           urlForGpu
+          useImagePullSecret
           spec
           global
           type
