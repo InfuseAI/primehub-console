@@ -36,25 +36,25 @@ class LicenseWarningBanner extends React.Component<Props, State> {
 
   expired = (
     <Alert
-      message="Your license has expired. Please contact your sales team to extend your license."
-      description=" "
-      type="warning"
+      message='Your license has expired. Please contact your sales team to extend your license.'
+      description=' '
+      type='warning'
       showIcon />
   );
 
   reachedNodeLimit = (
     <Alert
-      message="Your are using more nodes than your license allows. Please contact your system administrator."
-      description=" "
-      type="warning"
+      message='Your are using more nodes than your license allows. Please contact your system administrator.'
+      description=' '
+      type='warning'
       showIcon />
   );
 
   reachedModelDeployLimit = (
     <Alert
-      message="Please contact your system administrator for assistance to upgrade your license to run more models."
-      description=" "
-      type="warning"
+      message='Please contact your system administrator for assistance to upgrade your license to run more models.'
+      description=' '
+      type='warning'
       showIcon />
   );
 
@@ -66,7 +66,7 @@ class LicenseWarningBanner extends React.Component<Props, State> {
       const license = data.license;
       const usage = data.license.usage;
 
-      if (license.licenseStatus === "expired") {
+      if (license.licenseStatus === 'expired') {
         alerts.push(this.expired);
       }
       if (license.maxNode !== -1 && usage.maxNode > license.maxNode) {
@@ -76,7 +76,7 @@ class LicenseWarningBanner extends React.Component<Props, State> {
         alerts.push(this.reachedModelDeployLimit);
       }
     }
-    
+
     return (
       <>
         { ...alerts }

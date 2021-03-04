@@ -59,11 +59,12 @@ type Props = UserContextComponentProps & GroupContextComponentProps & RouteCompo
   cancelImageBuild: any;
   updateImageResult: any;
   getImage: any;
-}
+  getGroups: any;
+};
 
 type State = {
   selectedGroup: string | null;
-}
+};
 
 class ImageEditPage extends React.Component<Props, State> {
   timer = null;
@@ -151,7 +152,7 @@ class ImageEditPage extends React.Component<Props, State> {
   }
 
   render() {
-    const {getImage, history, groupContext, userContext} = this.props;
+    const {getImage, history, groupContext, userContext, getGroups} = this.props;
     if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
       history.push(`../home`);
     }
@@ -160,6 +161,16 @@ class ImageEditPage extends React.Component<Props, State> {
     if (getImage.error) {
       return getMessage(getImage.error)
     };
+
+    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+    const allGroups = get(getGroups, 'me.groups', []);
+    const groups = allGroups
+      .filter(group => group.id !== everyoneGroupId)
+      .filter(group => !groupContext || groupContext.id === group.id );
+    const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
+    const group = groups
+      .find(group => group.id === groupContext.id);
+    const availableImages = get(group, 'images');
 
     const image = getImage.image;
     const selectedGroup = image.groupName;
@@ -184,16 +195,15 @@ class ImageEditPage extends React.Component<Props, State> {
         />
         <div style={{margin: '16px'}}>
           <ImageCreateForm
-            type="edit"
+            type='edit'
             initialValue={{
               ...(image || {})
             }}
-            selectedGroup={selectedGroup}
-            groupContext={groupContext}
             onSubmit={this.onSubmit}
             onRebuild={this.onRebuild}
             onCancel={this.onCancel}
             onCancelBuild={this.onCancelBuild}
+            availableImages={availableImages}
             formType={'edit'}
           />
         </div>
@@ -206,6 +216,9 @@ export default compose(
   withRouter,
   withGroupContext,
   withUserContext,
+  graphql(GET_MY_GROUPS, {
+    name: 'getGroups'
+  }),
   graphql(GET_IMAGE, {
     options: (props: Props) => ({
       variables: {

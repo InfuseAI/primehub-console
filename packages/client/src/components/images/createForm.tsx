@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {
   Checkbox, Button, Radio, Select, Form, Card, Divider, Tabs, Alert,
-  Row, Col, Input, Modal, Tooltip, Icon, InputNumber, Switch} from 'antd';
+  Row, Col, Input, Modal, Tooltip, Icon, InputNumber, Switch, AutoComplete} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
-import {get, snakeCase, debounce, isEmpty} from 'lodash';
+import {flatMap, uniq, get, snakeCase, debounce, isEmpty, sortBy} from 'lodash';
 import Log from 'components/share/log';
 import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
@@ -12,6 +12,8 @@ import styled from 'styled-components';
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;
+
+const url_dict: { [key: string]: string; } = {};
 
 const StyledFormItem = styled(Form.Item)`
   > .ant-form-item-label label:after {
@@ -40,11 +42,9 @@ enum BuildType {
 const { Option } = Select;
 
 type Props = FormComponentProps & {
-  groupContext: any;
   refetchGroup: Function;
-  groups: Array<Record<string, any>>;
-  selectedGroup: string;
   instanceTypes: Array<Record<string, any>>;
+  availableImages: any[];
   onSubmit: Function;
   onRebuild: Function;
   onCancelBuild: Function;
@@ -56,9 +56,11 @@ type Props = FormComponentProps & {
 
 type State = {
   showGpuUrl: boolean
+  baseImage: string
   imageType: ImageType
   buildType: BuildType
   buildModalVisible: boolean
+  searchText: string
 };
 
 const radioStyle = {
@@ -120,7 +122,9 @@ class ImageCreateForm extends React.Component<Props, State> {
         && initialValue.url !== initialValue.urlForGpu),
       imageType: (initialValue && initialValue.type) || ImageType.ALL,
       buildType: (initialValue && initialValue.imageSpec) ? BuildType.CUSTOM : BuildType.EXIST,
-      buildModalVisible: false
+      buildModalVisible: false,
+      searchText: '',
+      baseImage: ''
     };
   }
 
@@ -130,16 +134,16 @@ class ImageCreateForm extends React.Component<Props, State> {
     const condaValue = form.getFieldValue('imageSpec.packages.conda');
     if (!aptValue && !pipValue && !condaValue) {
       form.setFields({
-        "imageSpec.packages.apt": {
+        'imageSpec.packages.apt': {
           errors: [new Error('You must input at least one package.')],
         },
-        "imageSpec.packages.pip": {
+        'imageSpec.packages.pip': {
           errors: [new Error('')],
         },
-        "imageSpec.packages.conda": {
+        'imageSpec.packages.conda': {
           errors: [new Error('')],
         }
-      })
+      });
       return false;
     }
     return true;
@@ -266,6 +270,48 @@ class ImageCreateForm extends React.Component<Props, State> {
     this.setState({buildModalVisible: false});
   }
 
+  handleSearchImage = searchText => {
+    this.setState({searchText});
+  }
+
+  getImagesSuggestion = () => {
+    const { availableImages } = this.props;
+    const { searchText } = this.state;
+    const dataSource = uniq(sortBy(flatMap(availableImages, image => {
+      const {displayName, type, url, urlForGpu, groupName} = image;
+      const scopeType = groupName ? 'Group' : 'System';
+      if (type === 'both' && url !== urlForGpu) {
+        url_dict[`${displayName} (${scopeType} / CPU)`] = url;
+        url_dict[`${displayName} (${scopeType} / GPU)`] = urlForGpu;
+        return [
+          `${displayName} (${scopeType} / CPU)`,
+          `${displayName} (${scopeType} / GPU)`
+        ];
+      } else if (type === 'gpu') {
+        url_dict[`${displayName} (${scopeType} / GPU)`] = url;
+        return `${displayName} (${scopeType} / GPU)`;
+      } else {
+        url_dict[`${displayName} (${scopeType} / CPU)`] = url;
+        return `${displayName} (${scopeType} / CPU)`;
+      }
+    })))
+    .filter(text => text.indexOf(searchText) > -1)
+    .map((text, i) => {
+      const index = text.indexOf(searchText);
+      const name = <span>
+        {text.substr(0, index)}
+        <b>{text.substr(index, searchText.length)}</b>
+        {text.substr(index + searchText.length)}
+      </span>;
+      return (
+        <Option value={url_dict[text]} key={url_dict[text]}>
+          {name}
+        </Option>
+      );
+    });
+    return dataSource;
+  }
+
   renderBuildCustomImageForm = (form, formType, url, isReady, jobStatus, imageSpec = {}, packages = {}) => {
     if (formType === FormType.Edit) {
       return (
@@ -294,7 +340,12 @@ class ImageCreateForm extends React.Component<Props, State> {
                     }
                   ]
                 })(
-                  <Input />
+                  <AutoComplete
+                    dataSource={this.getImagesSuggestion()}
+                    value={imageSpec.baseImage}
+                    onSearch={this.handleSearchImage}
+                    optionLabelProp="value"
+                  />
                 )}
               </Form.Item>
             </Col>
@@ -348,14 +399,11 @@ class ImageCreateForm extends React.Component<Props, State> {
 
   render() {
     const {
-      groupContext,
       refetchGroup,
-      groups,
       loading,
       form,
       initialValue,
-      selectedGroup,
-      formType
+      formType,
     } = this.props;
     const {
       groupId,
@@ -523,18 +571,18 @@ class ImageCreateForm extends React.Component<Props, State> {
                 formType === FormType.Edit ? (
                   <>
                     <InfuseButton
-                      type="primary"
-                      htmlType="submit"
+                      type='primary'
+                      htmlType='submit'
                       style={{marginRight: 16, width: '100%'}}
                     >
                       Confirm
                     </InfuseButton>
-                    <InfuseButton onClick={this.cancel} style={{width: "100%"}}>
+                    <InfuseButton onClick={this.cancel} style={{width: '100%'}}>
                       Cancel
                     </InfuseButton>
                   </>
                 ) : (
-                  <InfuseButton type="primary" htmlType="submit" style={{width: "100%"}}>
+                  <InfuseButton type='primary' htmlType='submit' style={{width: '100%'}}>
                     Create
                   </InfuseButton>
                 )
@@ -545,14 +593,14 @@ class ImageCreateForm extends React.Component<Props, State> {
         {
           formType === FormType.Edit && imageSpec ? (
           <Modal
-            width="calc(100% - 128px)"
+            width='calc(100% - 128px)'
             style={{marginLeft: '64px'}}
             footer={null}
             visible={this.state.buildModalVisible}
             onCancel={this.hideBuildingModal}>
             <div>
-              <Tabs defaultActiveKey="details">
-                <TabPane tab="Build Details" key="details">
+              <Tabs defaultActiveKey='details'>
+                <TabPane tab='Build Details' key='details'>
                   <Row gutter={24}>
                     <Col span={12}>
                       <Form.Item label='Base image url' style={{marginBottom: '12px'}}>
@@ -565,7 +613,14 @@ class ImageCreateForm extends React.Component<Props, State> {
                             }
                           ]
                         })(
-                          <Input disabled={!imageReady} />
+                          <AutoComplete
+                            style={{ width: '100%' }}
+                            dataSource={this.getImagesSuggestion()}
+                            value={imageSpec.baseImage}
+                            onSearch={this.handleSearchImage}
+                            optionLabelProp='value'
+                            disabled={!imageReady}
+                          />
                         )}
                       </Form.Item>
                     </Col>

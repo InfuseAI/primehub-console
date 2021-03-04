@@ -14,6 +14,7 @@ import {withRouter} from 'react-router-dom';
 import {withGroupContext, GroupContextComponentProps} from 'context/group';
 import {withUserContext, UserContextComponentProps} from 'context/user';
 import Breadcrumbs from 'components/share/breadcrumb';
+
 const breadcrumbs = [
   {
     key: 'list',
@@ -39,6 +40,9 @@ export const GET_MY_GROUPS = gql`
           name
           displayName
           description
+          groupName
+          url
+          urlForGpu
           spec
           global
           type
@@ -62,7 +66,7 @@ const compareByAlphabetical = (prev, next) => {
   if(prev < next) return -1;
   if(prev > next) return 1;
   return 0;
-}
+};
 
 export const sortItems = (items) => {
   const copiedItems = items.slice();
@@ -73,30 +77,20 @@ export const sortItems = (items) => {
       return compareByAlphabetical(prevName, nextName);
     });
   return copiedItems;
-}
+};
 
 type Props = RouteComponentProps & GroupContextComponentProps & UserContextComponentProps & {
   getGroups: any;
   createImage: any;
   createImageResult: any;
   defaultValue?: object;
-}
+};
 
 type State = {
   selectedGroup: string | null;
-}
+};
 
 class ImageCreatePage extends React.Component<Props, State> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedGroup: get(props, 'defaultValue.groupId') || null
-    }
-  }
-
-  onChangeGroup = (id: string) => {
-    this.setState({selectedGroup: id});
-  }
 
   onSubmit = (payload) => {
     const {createImage, groupContext} = this.props;
@@ -120,7 +114,6 @@ class ImageCreatePage extends React.Component<Props, State> {
   }
 
   render() {
-    const {selectedGroup} = this.state;
     const {userContext, groupContext, history, getGroups, createImageResult, defaultValue} = this.props;
     if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
       history.push(`../home`);
@@ -132,7 +125,8 @@ class ImageCreatePage extends React.Component<Props, State> {
       .filter(group => !groupContext || groupContext.id === group.id );
     const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
     const group = groups
-      .find(group => group.id === selectedGroup);
+      .find(group => group.id === groupContext.id);
+    const availableImages = get(group, 'images');
     return (
       <React.Fragment>
         <PageTitle
@@ -157,11 +151,8 @@ class ImageCreatePage extends React.Component<Props, State> {
             <ImageCreateForm
               showResources={true}
               refetchGroup={getGroups.refetch}
-              groupContext={groupContext}
               initialValue={defaultValue}
-              selectedGroup={selectedGroup}
-              onSelectGroup={this.onChangeGroup}
-              groups={sortItems(groups)}
+              availableImages={availableImages}
               onSubmit={this.onSubmit}
               loading={createImageResult.loading}
             />
