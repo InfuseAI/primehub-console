@@ -28,12 +28,6 @@ enum FormType {
   Create = 'create'
 }
 
-enum ImageType {
-  CPU = 'cpu',
-  GPU = 'gpu',
-  ALL = 'both'
-}
-
 enum BuildType {
   EXIST = 'exist',
   CUSTOM = 'custom'

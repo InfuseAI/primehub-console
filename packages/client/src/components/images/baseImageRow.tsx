@@ -46,7 +46,7 @@ export default class BaseImageRow extends React.Component<Props, State> {
     const dataSource = uniq(sortBy(flatMap(availableImages, image => {
       const {displayName, type, url, urlForGpu, groupName, useImagePullSecret} = image;
       const scopeType = groupName ? 'Group' : 'System';
-      if (type === 'both' && url !== urlForGpu) {
+      if (type === ImageType.ALL && url !== urlForGpu) {
         this.urlDict[`${displayName} (${scopeType} / CPU)`] = url;
         this.urlDict[`${displayName} (${scopeType} / GPU)`] = urlForGpu;
         this.secretDict[url] = useImagePullSecret;
@@ -55,7 +55,7 @@ export default class BaseImageRow extends React.Component<Props, State> {
           `${displayName} (${scopeType} / CPU)`,
           `${displayName} (${scopeType} / GPU)`
         ];
-      } else if (type === 'gpu') {
+      } else if (type === ImageType.CPU) {
         this.urlDict[`${displayName} (${scopeType} / GPU)`] = url;
         this.secretDict[url] = useImagePullSecret;
         return `${displayName} (${scopeType} / GPU)`;
