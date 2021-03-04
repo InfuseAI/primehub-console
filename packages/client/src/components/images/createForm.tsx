@@ -61,7 +61,6 @@ type State = {
   buildType: BuildType
   buildModalVisible: boolean
   searchText: string
-  secret: string
 };
 
 const radioStyle = {
@@ -125,7 +124,6 @@ class ImageCreateForm extends React.Component<Props, State> {
       buildType: (initialValue && initialValue.imageSpec) ? BuildType.CUSTOM : BuildType.EXIST,
       buildModalVisible: false,
       searchText: '',
-      secret: ''
     };
   }
 
@@ -277,12 +275,12 @@ class ImageCreateForm extends React.Component<Props, State> {
 
   handleImageSuggestionSelected = value => {
     const secret = secretDict[value];
-    console.log(1111, secret);
-    this.setState({secret});
+    const {form} = this.props;
+    form.setFieldsValue({'imageSpec.pullSecret': secret});
   }
 
   getImagesSuggestion = () => {
-    const availableImages = this.props.availableImages.filter(image => image.isReady);
+    const availableImages = this.props.availableImages ? this.props.availableImages.filter(image => image.isReady) : [];
     const { searchText } = this.state;
     const dataSource = uniq(sortBy(flatMap(availableImages, image => {
       const {displayName, type, url, urlForGpu, groupName, useImagePullSecret} = image;
@@ -324,7 +322,6 @@ class ImageCreateForm extends React.Component<Props, State> {
   }
 
   renderBuildCustomImageForm = (form, formType, url, isReady, jobStatus, imageSpec: any = {}, packages = {}) => {
-    const {secret} = this.state;
     if (formType === FormType.Edit) {
       return (
         <StyledFormItem
@@ -365,9 +362,9 @@ class ImageCreateForm extends React.Component<Props, State> {
             <Col span={12}>
               <Form.Item label={`Image Pull Secret`}>
                 {form.getFieldDecorator('imageSpec.pullSecret', {
-                  initialValue: secret || imageSpec.pullSecret,
+                  initialValue: imageSpec.pullSecret,
                 })(
-                  <ImagePullSecret value={secret}/>
+                  <ImagePullSecret />
                 )}
               </Form.Item>
             </Col>
@@ -435,7 +432,7 @@ class ImageCreateForm extends React.Component<Props, State> {
     } = initialValue || {};
     let urlForGpu = formType !== FormType.Edit || !this.state.showGpuUrl || (initialValue.url == initialValue.urlForGpu) ? null : initialValue.urlForGpu;
     const { packages } = imageSpec || {};
-    const { buildModalVisible, secret } = this.state;
+    const { buildModalVisible } = this.state;
     const imageReady = this.buildModalEditable(isReady, jobStatus);
     return (
       <Form onSubmit={this.submit}>
@@ -643,7 +640,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                         {form.getFieldDecorator('imageSpec.pullSecret', {
                           initialValue: get(imageSpec, 'pullSecret', ''),
                         })(
-                          <ImagePullSecret disabled={!imageReady} value={secret} />
+                          <ImagePullSecret disabled={!imageReady} />
                         )}
                       </Form.Item>
                     </Col>
