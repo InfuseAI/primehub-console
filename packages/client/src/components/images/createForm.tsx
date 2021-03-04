@@ -105,9 +105,9 @@ const packagesPlaceHolder = `one package per line. e.g. \npackage1\npackage2\n`;
 const dashOrNumber = value => value === null ? '-' : value;
 
 const autoGenId = (name: string) => {
-  const normalizedNAme = name.replace(/[\W_]/g, '-').toLowerCase();
+  const normalizedName = name.replace(/[\W_]/g, '-').toLowerCase();
   const randomString = Math.random().toString(36).substring(7).substring(0, 5);
-  return `${normalizedNAme}-${randomString}`;
+  return `${normalizedName.substring(0, 57)}-${randomString}`;
 };
 
 class ImageCreateForm extends React.Component<Props, State> {
