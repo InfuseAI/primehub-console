@@ -53,7 +53,7 @@ class Main extends React.Component {
         style: {
           width: 'auto',
           height: 17,
-          marginLeft: '1px',
+          marginLeft: '3px',
           marginRight: '-1px',
           marginTop: '-3px',
         }
