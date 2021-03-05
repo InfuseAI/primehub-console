@@ -14,6 +14,7 @@ import {withRouter} from 'react-router-dom';
 import {withGroupContext, GroupContextComponentProps} from 'context/group';
 import {withUserContext, UserContextComponentProps} from 'context/user';
 import Breadcrumbs from 'components/share/breadcrumb';
+
 const breadcrumbs = [
   {
     key: 'list',
@@ -39,6 +40,11 @@ export const GET_MY_GROUPS = gql`
           name
           displayName
           description
+          groupName
+          isReady
+          url
+          urlForGpu
+          useImagePullSecret
           spec
           global
           type
@@ -59,12 +65,12 @@ export const CREATE_IMAGE = gql`
 `;
 
 const compareByAlphabetical = (prev, next) => {
-  if(prev < next) return -1;
-  if(prev > next) return 1;
+  if (prev < next) return -1;
+  if (prev > next) return 1;
   return 0;
-}
+};
 
-export const sortItems = (items) => {
+export const sortItems = items => {
   const copiedItems = items.slice();
   copiedItems
     .sort((prev, next) => {
@@ -73,32 +79,22 @@ export const sortItems = (items) => {
       return compareByAlphabetical(prevName, nextName);
     });
   return copiedItems;
-}
+};
 
-type Props = RouteComponentProps & GroupContextComponentProps & UserContextComponentProps & {
+interface Props extends RouteComponentProps, GroupContextComponentProps, UserContextComponentProps {
   getGroups: any;
   createImage: any;
   createImageResult: any;
   defaultValue?: object;
 }
 
-type State = {
+interface State {
   selectedGroup: string | null;
 }
 
 class ImageCreatePage extends React.Component<Props, State> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedGroup: get(props, 'defaultValue.groupId') || null
-    }
-  }
 
-  onChangeGroup = (id: string) => {
-    this.setState({selectedGroup: id});
-  }
-
-  onSubmit = (payload) => {
+  onSubmit = payload => {
     const {createImage, groupContext} = this.props;
     const groupConnector = {
       connect: [{id: groupContext.id}]
@@ -107,7 +103,7 @@ class ImageCreatePage extends React.Component<Props, State> {
     payload.groups = groupConnector;
     if (payload.imageSpec) {
       const { packages } = payload.imageSpec;
-      const {apt, pip, conda} = packages
+      const {apt, pip, conda} = packages;
       payload.imageSpec.packages.apt = apt && apt.split('\n');
       payload.imageSpec.packages.pip = pip && pip.split('\n');
       payload.imageSpec.packages.conda = conda && conda.split('\n');
@@ -120,24 +116,24 @@ class ImageCreatePage extends React.Component<Props, State> {
   }
 
   render() {
-    const {selectedGroup} = this.state;
     const {userContext, groupContext, history, getGroups, createImageResult, defaultValue} = this.props;
-    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
+    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
       history.push(`../home`);
     }
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups
-      .filter(group => group.id !== everyoneGroupId)
-      .filter(group => !groupContext || groupContext.id === group.id );
-    const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
+      .filter(record => record.id !== everyoneGroupId)
+      .filter(record => !groupContext || groupContext.id === record.id);
+    const everyoneGroup = allGroups.find(record => record.id === everyoneGroupId);
     const group = groups
-      .find(group => group.id === selectedGroup);
+      .find(record => record.id === groupContext.id);
+    const availableImages = unionBy(get(group, 'images'), get(everyoneGroup, 'images'));
     return (
       <React.Fragment>
         <PageTitle
           breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-          title={"New Image"}
+          title={'New Image'}
         />
         <div style={{
           margin: '16px',
@@ -157,11 +153,8 @@ class ImageCreatePage extends React.Component<Props, State> {
             <ImageCreateForm
               showResources={true}
               refetchGroup={getGroups.refetch}
-              groupContext={groupContext}
               initialValue={defaultValue}
-              selectedGroup={selectedGroup}
-              onSelectGroup={this.onChangeGroup}
-              groups={sortItems(groups)}
+              availableImages={availableImages}
               onSubmit={this.onSubmit}
               loading={createImageResult.loading}
             />
@@ -204,6 +197,6 @@ export default compose(
   }),
   Com => props => {
     const {defaultValue}: {defaultValue?: string} = queryString.parse(props.location.search.replace(/^\?/, ''));
-    return <Com {...props} defaultValue={defaultValue ? JSON.parse(defaultValue.replace(/\n/g, "\\n")) : undefined}  />
+    return <Com {...props} defaultValue={defaultValue ? JSON.parse(defaultValue.replace(/\n/g, '\\n')) : undefined}  />;
   }
-)(ImageCreatePage)
+)(ImageCreatePage);

@@ -27,6 +27,8 @@ export const ImageFragment = gql`
     useImagePullSecret
     logEndpoint
     isReady
+    spec
+    global
     jobStatus {
       phase
     }

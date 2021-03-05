@@ -6,12 +6,11 @@ import GroupSelector from 'components/groupSelector';
 import Sidebar from 'components/main/sidebar';
 import styled from 'styled-components';
 import {get} from 'lodash';
-import { Redirect } from 'react-router';
+import { Redirect, withRouter } from 'react-router';
 import {appPrefix} from 'utils/env';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
-import {withRouter} from 'react-router';
 import { GroupContextValue, GroupContext } from 'context/group';
 import { UserContextValue, UserContext } from 'context/user';
 import { Landing } from '../landing';
@@ -37,8 +36,9 @@ export const GET_MY_GROUPS = gql`
     }
   }
   ${GroupFragment}
-`
-export type MainPageSidebarItem = {
+`;
+
+export interface MainPageSidebarItem {
   title: string;
   subPath: string;
   icon: string;
@@ -54,19 +54,19 @@ export type MainPageProps = {
   getMyGroups: any;
 } & RouteComponentProps;
 
-export type MainPageState = {
+export interface MainPageState {
   currentGroupName: string;
-};
+}
 
 export class MainPage extends React.Component<MainPageProps, MainPageState> {
   state = {
     currentGroupName: localStorage.getItem('currentGroupName') || ''
-  }
+  };
 
-  onSelectGroup = (groupName) => {
+  onSelectGroup = groupName => {
     const {currentGroupName} = this.state;
 
-    if ( currentGroupName !== groupName) {
+    if (currentGroupName !== groupName) {
       this.setState({
         currentGroupName: groupName
       });

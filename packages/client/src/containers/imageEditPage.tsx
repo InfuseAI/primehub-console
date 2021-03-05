@@ -40,7 +40,7 @@ export const REBUILD_IMAGE = gql`
     }
   }
   ${ImageFragment}
-`
+`;
 
 export const CANCEL_IMAGE = gql`
   mutation cancelImageBuild($where: ImageWhereUniqueInput!) {
@@ -49,26 +49,27 @@ export const CANCEL_IMAGE = gql`
     }
   }
   ${ImageFragment}
-`
+`;
 
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 
-type Props = UserContextComponentProps & GroupContextComponentProps & RouteComponentProps<{imageId: string}> & {
+interface Props extends UserContextComponentProps, GroupContextComponentProps, RouteComponentProps<{imageId: string}> {
   updateImage: any;
   rebuildImage: any;
   cancelImageBuild: any;
   updateImageResult: any;
   getImage: any;
+  getGroups: any;
 }
 
-type State = {
+interface State {
   selectedGroup: string | null;
 }
 
 class ImageEditPage extends React.Component<Props, State> {
   timer = null;
 
-  onSubmit = (payload) => {
+  onSubmit = payload => {
     const { updateImage, getImage, groupContext } = this.props;
     const { image } = getImage;
     payload.groupName = groupContext.name;
@@ -97,7 +98,7 @@ class ImageEditPage extends React.Component<Props, State> {
     });
   }
 
-  onCancelBuild = (callback = () => {}) => {
+  onCancelBuild = (callback = () => undefined) => {
     const { cancelImageBuild, getImage, groupContext } = this.props;
     const { image } = getImage;
     Modal.confirm({
@@ -151,15 +152,26 @@ class ImageEditPage extends React.Component<Props, State> {
   }
 
   render() {
-    const {getImage, history, groupContext, userContext} = this.props;
-    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
+    const {getImage, history, groupContext, userContext, getGroups} = this.props;
+    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
       history.push(`../home`);
     }
 
     if (!getImage.image) return null;
+
     if (getImage.error) {
-      return getMessage(getImage.error)
-    };
+      return getMessage(getImage.error);
+    }
+
+    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+    const allGroups = get(getGroups, 'me.groups', []);
+    const groups = allGroups
+      .filter(record => record.id !== everyoneGroupId)
+      .filter(record => !groupContext || groupContext.id === record.id);
+    const everyoneGroup = allGroups.find(record => record.id === everyoneGroupId);
+    const group = groups
+      .find(record => record.id === groupContext.id);
+    const availableImages = unionBy(get(group, 'images'), get(everyoneGroup, 'images'));
 
     const image = getImage.image;
     const selectedGroup = image.groupName;
@@ -184,16 +196,15 @@ class ImageEditPage extends React.Component<Props, State> {
         />
         <div style={{margin: '16px'}}>
           <ImageCreateForm
-            type="edit"
+            type='edit'
             initialValue={{
               ...(image || {})
             }}
-            selectedGroup={selectedGroup}
-            groupContext={groupContext}
             onSubmit={this.onSubmit}
             onRebuild={this.onRebuild}
             onCancel={this.onCancel}
             onCancelBuild={this.onCancelBuild}
+            availableImages={availableImages}
             formType={'edit'}
           />
         </div>
@@ -206,6 +217,9 @@ export default compose(
   withRouter,
   withGroupContext,
   withUserContext,
+  graphql(GET_MY_GROUPS, {
+    name: 'getGroups'
+  }),
   graphql(GET_IMAGE, {
     options: (props: Props) => ({
       variables: {
