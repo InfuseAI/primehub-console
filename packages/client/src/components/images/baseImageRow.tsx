@@ -49,7 +49,7 @@ export default class BaseImageRow extends React.Component<Props, State> {
       const scopeType = groupName ? 'Group' : 'System';
       if (type === ImageType.ALL && url !== urlForGpu) {
         this.urlDict[`${displayName} (${scopeType} / CPU)`] = url;
-        this.urlDict[`${displayName} (${scopeType} / GPU)`] = urlForGpu;
+        this.urlDict[`${displayName} (${scopeType} / GPU)`] = urlForGpu || url;
         this.secretDict[url] = useImagePullSecret;
         this.secretDict[urlForGpu] = useImagePullSecret;
         return [

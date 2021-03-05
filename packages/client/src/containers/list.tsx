@@ -9,6 +9,7 @@ import {RouteComponentProps} from 'react-router-dom';
 import withPath, { PathComponentProps } from 'ee/components/job/withPath';
 import {appPrefix} from 'utils/env';
 import {withGroupContext, GroupContextComponentProps, GroupContext} from 'context/group';
+import {ImageFragment} from 'containers/imageList';
 
 export const GroupFragment = gql`
   fragment GroupInfo on Group {
@@ -37,11 +38,25 @@ export const GET_MY_GROUPS = gql`
       id
       groups {
         ...GroupInfo
+        images {
+          id
+          name
+          displayName
+          description
+          groupName
+          isReady
+          url
+          urlForGpu
+          useImagePullSecret
+          spec
+          global
+          type
+        }
       }
     }
   }
   ${GroupFragment}
-`
+`;
 
 type Props = {
   getMyGroups: any;

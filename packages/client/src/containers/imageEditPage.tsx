@@ -153,24 +153,25 @@ class ImageEditPage extends React.Component<Props, State> {
 
   render() {
     const {getImage, history, groupContext, userContext, getGroups} = this.props;
-    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
+    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
       history.push(`../home`);
     }
 
     if (!getImage.image) return null;
+
     if (getImage.error) {
-      return getMessage(getImage.error)
-    };
+      return getMessage(getImage.error);
+    }
 
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups
-      .filter(group => group.id !== everyoneGroupId)
-      .filter(group => !groupContext || groupContext.id === group.id );
-    const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
+      .filter(record => record.id !== everyoneGroupId)
+      .filter(record => !groupContext || groupContext.id === record.id);
+    const everyoneGroup = allGroups.find(record => record.id === everyoneGroupId);
     const group = groups
-      .find(group => group.id === groupContext.id);
-    const availableImages = get(group, 'images');
+      .find(record => record.id === groupContext.id);
+    const availableImages = unionBy(get(group, 'images'), get(everyoneGroup, 'images'));
 
     const image = getImage.image;
     const selectedGroup = image.groupName;
