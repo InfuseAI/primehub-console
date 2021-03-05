@@ -81,12 +81,12 @@ export const sortItems = items => {
   return copiedItems;
 };
 
-type Props = RouteComponentProps & GroupContextComponentProps & UserContextComponentProps & {
+interface Props extends RouteComponentProps, GroupContextComponentProps, UserContextComponentProps {
   getGroups: any;
   createImage: any;
   createImageResult: any;
   defaultValue?: object;
-};
+}
 
 interface State {
   selectedGroup: string | null;
@@ -197,6 +197,6 @@ export default compose(
   }),
   Com => props => {
     const {defaultValue}: {defaultValue?: string} = queryString.parse(props.location.search.replace(/^\?/, ''));
-    return <Com {...props} defaultValue={defaultValue ? JSON.parse(defaultValue.replace(/\n/g, "\\n")) : undefined}  />
+    return <Com {...props} defaultValue={defaultValue ? JSON.parse(defaultValue.replace(/\n/g, '\\n')) : undefined}  />;
   }
-)(ImageCreatePage)
+)(ImageCreatePage);

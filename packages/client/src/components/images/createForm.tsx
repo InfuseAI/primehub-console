@@ -56,13 +56,13 @@ interface FormValue {
 }
 
 type Props = FormComponentProps & {
-  refetchGroup: Function;
+  refetchGroup: () => void;
   instanceTypes: Array<Record<string, any>>;
   availableImages: any[];
-  onSubmit: Function;
-  onRebuild: Function;
-  onCancelBuild: Function;
-  onCancel?: Function;
+  onSubmit: () => void;
+  onRebuild: () => void;
+  onCancelBuild: () => void;
+  onCancel?: () => void;
   loading: boolean;
   initialValue?: any;
   formType?: FormType;

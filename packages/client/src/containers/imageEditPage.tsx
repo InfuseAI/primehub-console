@@ -40,7 +40,7 @@ export const REBUILD_IMAGE = gql`
     }
   }
   ${ImageFragment}
-`
+`;
 
 export const CANCEL_IMAGE = gql`
   mutation cancelImageBuild($where: ImageWhereUniqueInput!) {
@@ -49,27 +49,27 @@ export const CANCEL_IMAGE = gql`
     }
   }
   ${ImageFragment}
-`
+`;
 
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 
-type Props = UserContextComponentProps & GroupContextComponentProps & RouteComponentProps<{imageId: string}> & {
+interface Props extends UserContextComponentProps, GroupContextComponentProps, RouteComponentProps<{imageId: string}> {
   updateImage: any;
   rebuildImage: any;
   cancelImageBuild: any;
   updateImageResult: any;
   getImage: any;
   getGroups: any;
-};
+}
 
-type State = {
+interface State {
   selectedGroup: string | null;
-};
+}
 
 class ImageEditPage extends React.Component<Props, State> {
   timer = null;
 
-  onSubmit = (payload) => {
+  onSubmit = payload => {
     const { updateImage, getImage, groupContext } = this.props;
     const { image } = getImage;
     payload.groupName = groupContext.name;
@@ -98,7 +98,7 @@ class ImageEditPage extends React.Component<Props, State> {
     });
   }
 
-  onCancelBuild = (callback = () => {}) => {
+  onCancelBuild = (callback = () => undefined) => {
     const { cancelImageBuild, getImage, groupContext } = this.props;
     const { image } = getImage;
     Modal.confirm({

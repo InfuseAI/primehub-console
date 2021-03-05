@@ -35,7 +35,7 @@ export default class BaseImageRow extends React.Component<Props, State> {
   }
 
   onSelect = (value: string) => {
-    const secret = this.secretDict[value];
+    const secret = get(this.secretDict, value, '');
     const {form} = this.props;
     form.setFieldsValue({'imageSpec.pullSecret': secret});
   }
