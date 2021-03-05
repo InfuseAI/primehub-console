@@ -11,6 +11,7 @@ import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 import styled from 'styled-components';
 import BuildCustomImageForm from './buildCustomImageForm';
 import BaseImageRow from './baseImageRow';
+import ImageType from 'constant/ImageType';
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;

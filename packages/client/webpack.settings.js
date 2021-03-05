@@ -25,6 +25,7 @@ module.exports = {
       'cms-components': path.resolve(__dirname, 'src/cms-components'),
       context: path.resolve(__dirname, 'src/context'),
       ee: path.resolve(__dirname, 'src/ee'),
+      constant: path.resolve(__dirname, 'src/constant'),
       root: path.resolve(__dirname, 'src'),
       schema: path.resolve(__dirname, 'schema')
     }

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Row, Col, Form, AutoComplete, Select } from 'antd';
 import ImagePullSecret from 'components/share/ImagePullSecret';
+import ImageType from 'constant/ImageType';
 import { uniq, sortBy, flatMap, get } from 'lodash';
 const {Option} = Select;
 

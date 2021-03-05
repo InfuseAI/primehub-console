@@ -33,7 +33,7 @@ export const GET_MY_GROUPS = gql`
   query me {
     me {
       id
-      groups {
+      effectiveGroups {
         ...GroupInfo
         images {
           id

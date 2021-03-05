@@ -14,7 +14,8 @@
       "styledShare/*": ["./src/styled_share/*"],
       "context/*": ["./src/context/*"],
       "ee/*": ["./src/ee/*"],
-      "@types/*": ["./src/@types/*"]
+      "constant/*": ["./constant/types/*"],
+      "@types/*": ["./src/@types/*"],
     }
   },
   "exclude": ["dist", "build", "node_modules"]
