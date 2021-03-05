@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Row, Col, Form, AutoComplete, Select } from 'antd';
 import ImagePullSecret from 'components/share/ImagePullSecret';
 import ImageType from 'constant/ImageType';
-import { uniq, sortBy, flatMap, get } from 'lodash';
+import { uniq, sortBy, flatMap, get, defaultTo } from 'lodash';
 const {Option} = Select;
 
 interface Props {
@@ -35,7 +35,7 @@ export default class BaseImageRow extends React.Component<Props, State> {
   }
 
   onSelect = (value: string) => {
-    const secret = get(this.secretDict, value, '');
+    const secret = defaultTo(get(this.secretDict, value), '');
     const {form} = this.props;
     form.setFieldsValue({'imageSpec.pullSecret': secret});
   }
