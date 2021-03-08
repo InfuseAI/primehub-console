@@ -103,10 +103,11 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       key: 'refreshWarning'
     });
   }
-})
+});
+
+/* tslint:disable:no-console */
 tokenSyncWorker.run().catch(console.error);
 
-// render
 ReactDOM.render(
   <Main />
 , document.getElementById('root'));
