@@ -4,11 +4,10 @@ import {Link} from 'react-router-dom';
 import {appPrefix} from 'utils/env';
 import { withRouter, RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
-import iconHome from 'images/icon-home.svg'
-import {get} from 'lodash'
+import iconHome from 'images/icon-home.svg';
+import {get} from 'lodash';
 import { MainPageSidebarItem } from 'containers/mainPage';
 import {compose} from 'recompose';
-import { withGroupContext, GroupContextComponentProps } from 'context/group';
 import { withUserContext, UserContextComponentProps } from 'context/user';
 
 const Icon = styled.img`
@@ -36,27 +35,27 @@ const Badge = styled.span`
   }
 `;
 
-type Props = UserContextComponentProps & GroupContextComponentProps & RouteComponentProps & {
+type Props = UserContextComponentProps & RouteComponentProps & {
   sidebarItems: MainPageSidebarItem[]
 };
 
 class Sidebar extends React.Component<Props> {
   renderStageBadge(item: MainPageSidebarItem) {
 
-    if (item.stage === 'beta' ) {
-      return <Badge>beta</Badge>
-    } else if (item.stage === 'alpha' ) {
-      return <Badge>alpha</Badge>
+    if (item.stage === 'beta') {
+      return <Badge>beta</Badge>;
+    } else if (item.stage === 'alpha') {
+      return <Badge>alpha</Badge>;
     } else {
-      return <></>
+      return <></>;
     }
   }
 
   render() {
-    const { history, match, groupContext, userContext} = this.props;
+    const { history, match, userContext} = this.props;
     const pathKeyList = ['home', 'hub', 'job', 'schedule', 'model-deployment', 'browse', 'images'];
     let key = '';
-    pathKeyList.forEach((val) => {
+    pathKeyList.forEach(val => {
       if (history.location.pathname.split('/').includes(val)) {
         key = val;
       }
@@ -73,10 +72,10 @@ class Sidebar extends React.Component<Props> {
     return (
       <Layout.Sider style={{position: 'fixed', height: '100%'}}>
         <Menu
-          theme="dark"
+          theme='dark'
           selectedKeys={[key]}
         >
-          <Menu.Item key="home" style={{marginTop: 0, paddingLeft: 26}}>
+          <Menu.Item key='home' style={{marginTop: 0, paddingLeft: 26}}>
             <Link to={group ? `${appPrefix}g/${group}/home` : `${appPrefix}g`}>
               <Icon src={iconHome} style={{width: 'auto', height: 16, marginTop: '-4px'}}/>
               <Title>Home</Title>
@@ -93,7 +92,7 @@ class Sidebar extends React.Component<Props> {
                     {this.renderStageBadge(item)}
                   </Link>
                 </Menu.Item>
-              )
+              );
             }) : []
           }
         </Menu>
@@ -104,6 +103,5 @@ class Sidebar extends React.Component<Props> {
 
 export default compose(
   withRouter,
-  withGroupContext,
   withUserContext
 )(Sidebar);
