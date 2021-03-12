@@ -155,21 +155,21 @@ export default class Logs extends React.Component<Props, State> {
           signal,
           method: 'GET',
           headers: {
-            Authorization: 'Bearer ' + token
+            Authorization: `Bearer ${token}`
           },
         });
 
         if (res.status >= 400) {
-          const allowPerist = this.props.allowPersistLog ?
+          const allowPersist = this.props.allowPersistLog ?
             this.props.allowPersistLog() :
             false;
-          if (allowPerist && this.state.loaded === false) {
+          if (allowPersist && this.state.loaded === false) {
             this.setState({fromPersist: true});
             res = await fetch(`${endpoint}?tailLines=${tailLines}&persist=true`, {
               signal,
               method: 'GET',
               headers: {
-                Authorization: 'Bearer ' + token
+                Authorization: `Bearer ${token}`
               },
             });
           } else {
@@ -261,7 +261,7 @@ export default class Logs extends React.Component<Props, State> {
     fetch(url, {
       method: 'GET',
       headers: {
-        Authorization: 'Bearer ' + token
+        Authorization: `Bearer ${token}`
       },
     }).then(res => res.blob())
     .then(blob => {
@@ -344,7 +344,7 @@ export default class Logs extends React.Component<Props, State> {
 
 function handleLong(log: string) {
   if (log.length > 200) {
-    return log.slice(0, 30) + ` ...Download to see more... ` + log.slice(-30);
+    return `${log.slice(0, 30)} ...Download to see more... ${log.slice(-30)}`;
   }
   return log;
 }
