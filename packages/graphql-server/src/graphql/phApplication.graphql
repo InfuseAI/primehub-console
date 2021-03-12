@@ -1,0 +1,90 @@
+# import PageInfo from "common.graphql"
+# import InstanceType from "instanceType.graphql"
+
+type Pod {
+  name: String
+  phase: String
+  logEndpoint: String
+}
+
+type EnvVar {
+  name: String
+  value: String
+}
+
+type DefaultEnvVar {
+  name: String
+  description: String
+  defaultValue: String
+  optional: Boolean
+}
+
+type PhApplication {
+  id: ID!
+  displayName: String
+  appName: String
+  appDefaultEnv: [DefaultEnvVar]
+  groupName: String
+  instanceType: InstanceType
+  scope: String
+  appUrl: String
+  internalAppUrl: String
+  svcEndpoints: [String]
+  stop: Boolean
+  env: [EnvVar]
+  status: String
+  message: String
+  pods: [Pod]
+}
+
+"""An edge in a connection."""
+type PhApplicationEdge {
+  """The item at the end of the edge."""
+  node: PhApplication!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type PhApplicationConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [PhApplicationEdge]!
+}
+
+input PhApplicationWhereUniqueInput {
+  id: ID!
+}
+
+input PhApplicationWhereInput {
+  id: ID
+  app_name_contains: String
+}
+
+
+"""Mutation input"""
+input PhApplicationCreateInput {
+  id: ID!
+  displayName: String
+  appName: String
+  appDefaultEnv: JSON
+  groupName: String
+  instanceType: InstanceType
+  scope: String
+  appUrl: String
+  internalAppUrl: String
+  env: JSON
+}
+
+input PhApplicationUpdateInput {
+  displayName: String
+  appDefaultEnv: JSON
+  instanceType: InstanceType
+  scope: String
+  appUrl: String
+  internalAppUrl: String
+  env: JSON
+}
+

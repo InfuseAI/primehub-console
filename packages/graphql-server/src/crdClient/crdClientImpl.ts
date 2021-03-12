@@ -246,6 +246,26 @@ export interface PhDeploymentEndPoint {
     token: string;
   }>;
 }
+
+// PhApplication
+export interface PhApplicationSpec {
+  displayName: string;
+  groupName: string;
+  instanceType: string;
+  scope: string;
+  stop: boolean;
+  podTemplate: any;
+  svcTemplate: any;
+  httpPort: number;
+}
+
+export interface PhApplicationStatus {
+  // TODO: should be enum
+  phase: string;
+  message: string;
+  serviceName: string;
+}
+
 /**
  * CRD
  */
@@ -271,6 +291,7 @@ export default class CrdClientImpl {
   public phJobs: CustomResource<PhJobSpec, PhJobStatus>;
   public phSchedules: CustomResource<PhScheduleSpec, PhScheduleStatus>;
   public phDeployments: CustomResource<PhDeploymentSpec, PhDeploymentStatus>;
+  public phApplications: CustomResource<PhApplicationSpec, PhApplicationStatus>;
   private namespace: string;
 
   constructor(args?: CrdArgs) {
@@ -321,6 +342,12 @@ export default class CrdClientImpl {
       client,
       watch,
       loadCrd('phDeployment'),
+      this.namespace
+    );
+    this.phApplications = new CustomResource<PhApplicationSpec, PhApplicationStatus>(
+      client,
+      watch,
+      loadCrd('phApplication'),
       this.namespace
     );
     this.announcements = new CustomResource<AnnouncementSpec>(

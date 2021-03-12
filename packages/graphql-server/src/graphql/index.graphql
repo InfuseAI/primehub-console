@@ -7,6 +7,7 @@
 # import Dataset, DatasetOrderByInput, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretOrderByInput, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
 # import StoreFileList, StoreFileWhereInput, StoreFileListOptionInput, StoreFileDeleteOptionInput from "./store.graphql"
+# import PhApplication, PhApplicationWhereInput, PhApplicationWhereUniqueInput from "./phApplication.graphql"
 
 scalar JSON
 
@@ -182,6 +183,16 @@ type Query {
     where: StoreFileWhereInput!
     options: StoreFileListOptionInput
   ): StoreFileList!
+
+  """PhApplication"""
+  phApplication(where: PhApplicationWhereUniqueInput!): PhApplication
+  phApplications(
+    where: PhApplicationWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [PhApplication]!
 }
 
 type Mutation {

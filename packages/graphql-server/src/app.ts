@@ -19,6 +19,7 @@ import * as user from './resolvers/user';
 import * as group from './resolvers/group';
 import * as secret from './resolvers/secret';
 import * as store from './resolvers/store';
+import * as phApplication from './resolvers/phApplication';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset, regenerateUploadSecret} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
@@ -91,6 +92,8 @@ export const resolvers = {
     secrets: secret.query,
     secretsConnection: secret.connectionQuery,
     files: store.query,
+    phApplication: phApplication.queryOne,
+    phApplications: phApplication.query,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),
@@ -127,6 +130,7 @@ export const resolvers = {
   ...dataset.typeResolver(),
   ...image.typeResolver(),
   ...ann.typeResolver(),
+  PhApplication: phApplication.typeResolvers,
 
   // scalars
   JSON: GraphQLJSON
