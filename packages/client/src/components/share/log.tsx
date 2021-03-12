@@ -1,3 +1,4 @@
+/* tslint:disable:no-console */
 import * as React from 'react';
 import {FixedSizeList as List} from 'react-window';
 import {Button, Icon} from 'antd';
@@ -6,16 +7,16 @@ import downloadjs from 'downloadjs';
 import styled from 'styled-components';
 import moment from 'moment';
 
-type Props = {
+interface Props {
   endpoint: string;
-  allowPersistLog?: Function;
+  allowPersistLog?: () => void;
   rows?: number;
   style?: React.CSSProperties;
   retryAfterTermintated?: boolean;
 }
 
-type State = {
-  log: Array<string>;
+interface State {
+  log: string[];
   topmost: boolean;
   autoScroll: boolean;
   tailLines?: number;
@@ -76,15 +77,14 @@ export default class Logs extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.endpoint !== this.props.endpoint) {
-      this.setState({log:[], loaded:false})
+      this.setState({log: [], loaded: false});
       this.refetch();
     }
 
     const restartAutoScroll = !prevState.autoScroll && this.state.autoScroll;
     // scroll log box to bottom
     if (((this.state.log[this.state.log.length - 1] !== prevState.log[prevState.log.length - 1] && this.state.autoScroll) || restartAutoScroll)) {
-      //https://github.com/ant-design/ant-design/issues/10527
-      // @ts-ignore
+      // https://github.com/ant-design/ant-design/issues/10527
       this.scrollToBottom();
     }
   }
@@ -96,7 +96,7 @@ export default class Logs extends React.Component<Props, State> {
 
   scrollToBottom = () => {
     if (!this.listRef.current) return;
-    this.listRef.current.scrollToItem(this.outerRef.current.scrollHeight - this.outerRef.current.clientHeight)
+    this.listRef.current.scrollToItem(this.outerRef.current.scrollHeight - this.outerRef.current.clientHeight);
   }
 
   appendNewLog = (chunk: string) => {
@@ -108,7 +108,7 @@ export default class Logs extends React.Component<Props, State> {
       prevState.log;
       return {
         log: [...log, ...newLog],
-      }
+      };
     }, () => {
       if (!this.state.autoScroll && this.state.log.length >= 2000) {
         this.listRef.current.scrollTo(this.outerRef.current.scrollTop - newLog.length * LINE_HEIGHT);
@@ -128,7 +128,7 @@ export default class Logs extends React.Component<Props, State> {
       }
       // schedule next fetch if
       if (!this.state.loaded || this.props.retryAfterTermintated) {
-        setTimeout(()=> {
+        setTimeout(() => {
           this.refetch();
         }, 5000);
       }
@@ -141,10 +141,9 @@ export default class Logs extends React.Component<Props, State> {
     const {tailLines} = this.state;
     if (this.controller) this.controller.abort();
     const controller = new AbortController();
-    this.controller = controller
+    this.controller = controller;
     const signal = controller.signal;
     if (!endpoint) return;
-
 
     let retryCount = 0;
     let res: Response;
@@ -156,27 +155,27 @@ export default class Logs extends React.Component<Props, State> {
           signal,
           method: 'GET',
           headers: {
-            'Authorization': 'Bearer ' + token
+            Authorization: `Bearer ${token}`
           },
         });
 
         if (res.status >= 400) {
-          let allowPerist = this.props.allowPersistLog?
+          const allowPersist = this.props.allowPersistLog ?
             this.props.allowPersistLog() :
             false;
-          if (allowPerist && this.state.loaded == false) {
+          if (allowPersist && this.state.loaded === false) {
             this.setState({fromPersist: true});
             res = await fetch(`${endpoint}?tailLines=${tailLines}&persist=true`, {
               signal,
               method: 'GET',
               headers: {
-                'Authorization': 'Bearer ' + token
+                Authorization: `Bearer ${token}`
               },
             });
           } else {
             const content = await res.json();
             const reason = get(content, 'message', 'of internal error');
-            if (this.state.loaded == false) {
+            if (this.state.loaded === false) {
               this.setState(() => ({
                 log: [`Error: cannot get log due to ${reason}`],
                 loading: false
@@ -187,14 +186,14 @@ export default class Logs extends React.Component<Props, State> {
         }
         this.setState({
           loading: false
-        })
+        });
         break;
       } catch (err) {
         if (err.message === 'The user aborted a request.') {
           return;
         }
         console.log(err);
-        if (this.state.loaded == false) {
+        if (this.state.loaded === false) {
           this.setState(() => ({
             log: [`Error: cannot fetch the log`]
           }));
@@ -215,13 +214,15 @@ export default class Logs extends React.Component<Props, State> {
     const reader = res.body.getReader();
     try {
       while (true) {
-        let result = await reader.read();
+        const result = await reader.read();
         if (result.done) {
           break;
         }
         const chunk = new TextDecoder().decode(result.value.buffer);
         this.appendNewLog(chunk);
       }
+    } catch (e) {
+      this.refetch(); // refetch log if error in response.
     } finally {
       this.setState({loaded: true});
     }
@@ -260,16 +261,17 @@ export default class Logs extends React.Component<Props, State> {
     fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer ' + token
+        Authorization: `Bearer ${token}`
       },
     }).then(res => res.blob())
     .then(blob => {
       return downloadjs(
         blob, `${moment(new Date().toISOString()).format('YYYY-MM-DD-HH-mm-ss')}.log`, 'text/plain');
     })
+    // @ts-ignore
     .finally(() => {
       this.setState({downloading: false});
-    })
+    });
   }
 
   render() {
@@ -279,7 +281,7 @@ export default class Logs extends React.Component<Props, State> {
     hints.push('Please download the log to view more than 2000 lines.');
 
     let listItems = log;
-    if (listItems.length == 0) {
+    if (listItems.length === 0) {
       listItems = loading ? ['loading...'] : ['(no data)'];
     }
     const listStyle = {
@@ -312,9 +314,9 @@ export default class Logs extends React.Component<Props, State> {
       </div>
       <div style={{position: 'relative', marginTop: 48, ...style}}>
         <Hint>
-          {hints.map((hint) => (
-            <div style={{display: "flex"}}>
-              <Icon type="info-circle" theme="twoTone" style={{marginTop: 4}}/><div style={{marginLeft: 4, flex: "0 0 100%"}}>{hint}</div>
+          {hints.map(hint => (
+            <div style={{display: 'flex'}}>
+              <Icon type='info-circle' theme='twoTone' style={{marginTop: 4}}/><div style={{marginLeft: 4, flex: '0 0 100%'}}>{hint}</div>
             </div>))
           }
         </Hint>
@@ -328,8 +330,8 @@ export default class Logs extends React.Component<Props, State> {
           itemCount={listItems.length}
           itemSize={LINE_HEIGHT}
         >
-          {({index, style}) => <div key={index} style={{
-            ...style,
+          {({index, val}) => <div key={index} style={{
+            ...val,
             padding: '0px 12px',
             overflow: 'visible',
             whiteSpace: 'nowrap'
@@ -342,7 +344,7 @@ export default class Logs extends React.Component<Props, State> {
 
 function handleLong(log: string) {
   if (log.length > 200) {
-    return log.slice(0, 30) + ` ...Download to see more... ` + log.slice(-30);
+    return `${log.slice(0, 30)} ...Download to see more... ${log.slice(-30)}`;
   }
   return log;
 }
