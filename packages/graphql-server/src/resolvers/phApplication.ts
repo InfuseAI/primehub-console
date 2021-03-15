@@ -15,6 +15,9 @@ import * as logger from '../logger';
 import { keycloakMaxCount } from './constant';
 import { isUserAdmin } from './user';
 import md5 = require('apache-md5');
+import {createConfig} from '../config';
+
+const config = createConfig();
 
 interface EnvVar {
   name: string;
@@ -44,24 +47,54 @@ export interface PhApplication {
   message: string;
 }
 
-export const transform = async (item: Item<PhApplicationSpec>, kcAdminClient: KeycloakAdminClient): Promise<PhApplication> => {
+export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatus>, kcAdminClient: KeycloakAdminClient): Promise<PhApplication> => {
+  const podSpec = item.spec && item.spec.podTemplate && item.spec.podTemplate.spec;
+  const svcSpec = item.spec && item.spec.svcTemplate && item.spec.svcTemplate.spec;
+  // TODO: check if podSpec and svcSpec exists
+
+  let appName = null;
+  let appDefaultEnv = null;
+  let svcEndpoints = [];
+  let internalAppUrl = null;
+  let env = null;
+
+  const svcName = item.status && item.status.serviceName;
+  if (svcName && svcSpec.ports && svcSpec.ports.length > 0) {
+    svcEndpoints = svcSpec.ports.map(p => `${svcName}:${p.port}`);
+  }
+
+  if (svcName && item.spec.httpPort) {
+    internalAppUrl = `http://${svcName}:${item.spec.httpPort}/console/apps/${item.metadata.name}`;
+  }
+
+  if (podSpec.containers && podSpec.containers.length > 0) {
+    env = podSpec.containers[0].env;
+  }
+
+  const templateString = item.metadata && item.metadata.annotations['phapplication.primehub.io/template'];
+  if (templateString) {
+    const template = JSON.parse(templateString.trim());
+    appName = template.metadata.name;
+    appDefaultEnv = template.spec.defaultEnvs;
+  }
+
   return {
     id: item.metadata.name,
     displayName: item.spec.displayName,
-    appName: 'noAppName',
-    appDefaultEnv: [],
+    appName: appName,
+    appDefaultEnv: appDefaultEnv,
     groupName: item.spec.groupName,
     instanceType: item.spec.instanceType,
     scope: item.spec.scope,
-    appUrl: 'noAppUrl',
-    internalAppUrl: 'noInternalAppUrl',
-    svcEndpoints: [],
+    appUrl: `${config.graphqlHost}/console/apps/${item.metadata.name}`,
+    internalAppUrl: internalAppUrl,
+    svcEndpoints: svcEndpoints,
     stop: item.spec.stop,
-    env: [],
-    status: 'noStatus',
-    message: 'noMessage',
-  }
-}
+    env: env,
+    status: item.status ? item.status.phase : null,
+    message: item.status ? item.status.message : null,
+  };
+};
 
 export const typeResolvers = {
   async instanceType(parent, args, context: Context) {
@@ -95,21 +128,14 @@ const listQuery = async (client: CustomResource<PhApplicationSpec, PhApplication
   if (where && where.id) {
     const phApplication = await client.get(where.id);
     const transformed = await transform(phApplication, kcAdminClient);
-    //const viewable = await canUserView(currentUserId, transformed, context);
-    //if (!viewable) {
-    //  throw new ApolloError('user not auth', NOT_AUTH_ERROR);
-    //}
     return [transformed];
   }
 
   const phApplications = await client.list();
-  let transformedPhApplications = await Promise.all(
+  const transformedPhApplications = await Promise.all(
     phApplications.map(item => transform(item, kcAdminClient)));
 
-  // sort by updateTime
-  //transformedPhApplications = orderBy(transformedPhApplications, 'lastUpdatedTime', 'desc');
-  //return filter(transformedPhApplications, omit(where, 'mine'));
-  return transformedPhApplications;
+  return filter(transformedPhApplications, where);
 };
 
 export const query = async (root, args, context: Context) => {
@@ -132,10 +158,5 @@ export const queryOne = async (root, args, context: Context) => {
   const phApplication = await crdClient.phApplications.get(id);
   const transformed =
     await transform(phApplication, context.kcAdminClient);
-  //const viewable = await canUserView(currentUserId, transformed, context);
-  //if (!viewable) {
-  //  throw new ApolloError('user not auth', NOT_AUTH_ERROR);
-  //}
   return transformed;
 };
-

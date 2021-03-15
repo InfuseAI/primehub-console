@@ -60,7 +60,7 @@ input PhApplicationWhereUniqueInput {
 
 input PhApplicationWhereInput {
   id: ID
-  app_name_contains: String
+  appName_contains: String
 }
 
 
