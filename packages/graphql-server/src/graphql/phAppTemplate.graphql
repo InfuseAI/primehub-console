@@ -1,0 +1,69 @@
+# import PageInfo from "common.graphql"
+
+type DefaultEnvVar {
+  name: String
+  description: String
+  defaultValue: String
+  optional: Boolean
+}
+
+type PhAppTemplate {
+  id: ID!
+  name: String
+  description: String
+  version: String
+  docLink: String
+  icon: String
+  defaultEnvs: [DefaultEnvVar]
+  template: JSON
+}
+
+"""An edge in a connection."""
+type PhAppTemplateEdge {
+  """The item at the end of the edge."""
+  node: PhAppTemplate!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type PhAppTemplateConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [PhAppTemplateEdge]!
+}
+
+input PhAppTemplateWhereUniqueInput {
+  id: ID!
+}
+
+input PhAppTemplateWhereInput {
+  id: ID
+  name_contains: String
+}
+
+
+"""Mutation input"""
+input PhAppTemplateCreateInput {
+  id: ID!
+  name: String
+  description: String
+  version: String
+  docLink: String
+  icon: String
+  defaultEnvs: [DefaultEnvVar]
+  template: JSON
+}
+
+input PhAppTemplateUpdateInput {
+  name: String
+  description: String
+  version: String
+  docLink: String
+  icon: String
+  defaultEnvs: [DefaultEnvVar]
+  template: JSON
+}
+

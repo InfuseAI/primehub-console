@@ -266,6 +266,27 @@ export interface PhApplicationStatus {
   serviceName: string;
 }
 
+export interface PhAppTemplateSpec {
+  name: string;
+  description: string;
+  version: string;
+  docLink: string;
+  icon: string;
+  defaultEnvs: Array<{
+    name: string;
+    description: string;
+    defaultValue: string;
+    optional: boolean;
+  }>;
+  template: {
+    spec: {
+      podTemplate: any;
+      svcTemplate: any;
+      httpPort: number;
+    }
+  };
+}
+
 /**
  * CRD
  */
@@ -292,6 +313,7 @@ export default class CrdClientImpl {
   public phSchedules: CustomResource<PhScheduleSpec, PhScheduleStatus>;
   public phDeployments: CustomResource<PhDeploymentSpec, PhDeploymentStatus>;
   public phApplications: CustomResource<PhApplicationSpec, PhApplicationStatus>;
+  public phAppTemplates: CustomResource<PhAppTemplateSpec>;
   private namespace: string;
 
   constructor(args?: CrdArgs) {
@@ -348,6 +370,12 @@ export default class CrdClientImpl {
       client,
       watch,
       loadCrd('phApplication'),
+      this.namespace
+    );
+    this.phAppTemplates = new CustomResource<PhAppTemplateSpec>(
+      client,
+      watch,
+      loadCrd('phAppTemplate'),
       this.namespace
     );
     this.announcements = new CustomResource<AnnouncementSpec>(

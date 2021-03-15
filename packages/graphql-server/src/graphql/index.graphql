@@ -8,6 +8,7 @@
 # import Secret, SecretOrderByInput, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
 # import StoreFileList, StoreFileWhereInput, StoreFileListOptionInput, StoreFileDeleteOptionInput from "./store.graphql"
 # import PhApplication, PhApplicationWhereInput, PhApplicationWhereUniqueInput from "./phApplication.graphql"
+# import PhAppTemplate, PhAppTemplateWhereInput, PhAppTemplateWhereUniqueInput from "./phAppTemplate.graphql"
 
 scalar JSON
 
@@ -193,6 +194,16 @@ type Query {
     first: Int
     last: Int
   ): [PhApplication]!
+
+  phAppTemplate(where: PhAppTemplateWhereUniqueInput!): PhAppTemplate
+  phAppTemplates(
+    where: PhAppTemplateWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [PhAppTemplate]!
+
 }
 
 type Mutation {

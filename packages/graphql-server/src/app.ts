@@ -20,6 +20,7 @@ import * as group from './resolvers/group';
 import * as secret from './resolvers/secret';
 import * as store from './resolvers/store';
 import * as phApplication from './resolvers/phApplication';
+import * as phAppTemplate from './resolvers/phAppTemplate';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset, regenerateUploadSecret} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
@@ -94,6 +95,8 @@ export const resolvers = {
     files: store.query,
     phApplication: phApplication.queryOne,
     phApplications: phApplication.query,
+    phAppTemplate: phAppTemplate.queryOne,
+    phAppTemplates: phAppTemplate.query,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),
