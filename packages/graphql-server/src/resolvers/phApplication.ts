@@ -70,8 +70,10 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
   const svcSpec = item.spec && item.spec.svcTemplate && item.spec.svcTemplate.spec;
   // TODO: check if podSpec and svcSpec exists
 
-  let appName = null;
-  let appDefaultEnv = null;
+  const appTemplate = getAppTemplateFromAnnotations(item);
+  const appName = appTemplate.metadata.name;
+  const appDefaultEnv = appTemplate.spec.defaultEnvs;
+
   let svcEndpoints = [];
   let internalAppUrl = null;
   let env = null;
@@ -87,13 +89,6 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
 
   if (podSpec.containers && podSpec.containers.length > 0) {
     env = podSpec.containers[0].env;
-  }
-
-  const templateString = item.metadata && item.metadata.annotations[ANNOTATIONS_TEMPLATE_NAME];
-  if (templateString) {
-    const template = JSON.parse(templateString.trim());
-    appName = template.metadata.name;
-    appDefaultEnv = template.spec.defaultEnvs;
   }
 
   return {
@@ -182,7 +177,7 @@ const getAppTemplateFromAnnotations = (item: Item<PhApplicationSpec, PhApplicati
     return JSON.parse(templateString.trim());
   }
   throw new ApolloError(`No template in PhApplication '${item.metadata.name}'`, APP_TEMPLATE_NOT_FOUND);
-}
+};
 
 const patchAppTemplateData = (item: Item<PhApplicationSpec, PhApplicationStatus>, data: Partial<PhApplicationMutationInput>) => {
   const dataString = item.metadata && item.metadata.annotations && item.metadata.annotations[ANNOTATIONS_TEMPLATE_DATA_NAME];
@@ -192,7 +187,7 @@ const patchAppTemplateData = (item: Item<PhApplicationSpec, PhApplicationStatus>
     return JSON.stringify(templateData);
   }
   throw new ApolloError(`No template data in PhApplication '${item.metadata.name}'`, APP_TEMPLATE_DATA_NOT_FOUND);
-}
+};
 
 const createApplication = async (context: Context, data: PhApplicationMutationInput) => {
   const {crdClient} = context;
@@ -226,8 +221,8 @@ const createApplication = async (context: Context, data: PhApplicationMutationIn
     groupName: data.groupName,
     instanceType: data.instanceType,
     scope: data.scope,
-    podTemplate: podTemplate,
-    svcTemplate: svcTemplate,
+    podTemplate,
+    svcTemplate,
     httpPort,
   };
   return crdClient.phApplications.create(metadata, spec);
@@ -284,4 +279,28 @@ export const destroy = async (root, args, context: Context) => {
 
   await context.crdClient.phApplications.del(id);
   return {id};
+};
+
+const toggleApplication = async (isStop: boolean, args, context: Context) => {
+  const {crdClient, userId} = context;
+  const {id} = args.where;
+  const item = await crdClient.phApplications.get(args.where.id);
+  const mutable = await isUserInGroup(userId, item.spec.groupName, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
+
+  const spec = item.spec;
+  spec.stop = isStop;
+
+  const updated = await context.crdClient.phApplications.patch(args.where.id, {spec});
+  return transform(updated, context.kcAdminClient);
+};
+
+export const start = async (root, args, context: Context) => {
+  return toggleApplication(false, args, context);
+};
+
+export const stop = async (root, args, context: Context) => {
+  return toggleApplication(true, args, context);
 };
