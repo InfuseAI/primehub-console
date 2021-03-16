@@ -119,6 +119,11 @@ export const resolvers = {
     deleteSecret: secret.destroy,
     regenerateUploadServerSecret: regenerateUploadSecret,
     deleteFiles: store.destroy,
+    createPhApplication: phApplication.create,
+    updatePhApplication: phApplication.update,
+    deletePhApplication: phApplication.destroy,
+    //startPhApplication: phApplication.start,
+    //stopPhApplication: phApplication.stop,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation(),
@@ -133,7 +138,6 @@ export const resolvers = {
   ...dataset.typeResolver(),
   ...image.typeResolver(),
   ...ann.typeResolver(),
-  PhApplication: phApplication.typeResolvers,
 
   // scalars
   JSON: GraphQLJSON

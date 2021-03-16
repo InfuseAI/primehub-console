@@ -248,11 +248,26 @@ export interface PhDeploymentEndPoint {
 }
 
 // PhApplication
+export enum PhApplicationScope {
+  Public = 'public',
+  PrimeHub = 'primehub',
+  Group = 'group',
+}
+
+export enum PhApplicationPhase {
+  Starting = 'Starting',
+  Ready = 'Ready',
+  Updating = 'Updating',
+  Stopping = 'Stopping',
+  Stopped = 'Stopped',
+  Error = 'Error',
+}
+
 export interface PhApplicationSpec {
   displayName: string;
   groupName: string;
   instanceType: string;
-  scope: string;
+  scope: PhApplicationScope;
   stop: boolean;
   podTemplate: any;
   svcTemplate: any;
@@ -260,8 +275,7 @@ export interface PhApplicationSpec {
 }
 
 export interface PhApplicationStatus {
-  // TODO: should be enum
-  phase: string;
+  phase: PhApplicationPhase;
   message: string;
   serviceName: string;
 }

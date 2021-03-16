@@ -1,5 +1,4 @@
 # import PageInfo from "common.graphql"
-# import InstanceType from "instanceType.graphql"
 
 type Pod {
   name: String
@@ -25,7 +24,7 @@ type PhApplication {
   appName: String
   appDefaultEnv: [DefaultEnvVar]
   groupName: String
-  instanceType: InstanceType
+  instanceType: String
   scope: String
   appUrl: String
   internalAppUrl: String
@@ -66,25 +65,18 @@ input PhApplicationWhereInput {
 
 """Mutation input"""
 input PhApplicationCreateInput {
+  templateId: String
   id: ID!
-  displayName: String
-  appName: String
-  appDefaultEnv: JSON
+  name: String
   groupName: String
-  instanceType: InstanceType
-  scope: String
-  appUrl: String
-  internalAppUrl: String
   env: JSON
+  instanceType: String
+  scope: String
 }
 
 input PhApplicationUpdateInput {
-  displayName: String
-  appDefaultEnv: JSON
-  instanceType: InstanceType
-  scope: String
-  appUrl: String
-  internalAppUrl: String
   env: JSON
+  instanceType: String
+  scope: String
 }
 

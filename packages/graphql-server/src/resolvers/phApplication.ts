@@ -3,10 +3,10 @@ import {
   toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, mergeVariables, getGroupIdsByUser
 } from './utils';
 import {
-  PhApplicationSpec, PhApplicationStatus, client as kubeClient
+  PhApplicationSpec, PhApplicationStatus, PhApplicationScope, PhApplicationPhase, client as kubeClient
 } from '../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../crdClient/customResource';
-import { orderBy, omit, get, isUndefined, isNil, isEmpty, isNull, capitalize, intersection } from 'lodash';
+import { orderBy, omit, get, isUndefined, isNil, isEmpty, isNull, capitalize, intersection, find } from 'lodash';
 import * as moment from 'moment';
 import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
@@ -19,6 +19,13 @@ import {createConfig} from '../config';
 
 const config = createConfig();
 
+const ANNOTATIONS_TEMPLATE_NAME = 'phapplication.primehub.io/template';
+const ANNOTATIONS_TEMPLATE_DATA_NAME = 'phapplication.primehub.io/template-data';
+
+const APP_TEMPLATE_NOT_FOUND = 'APP_TEMPLATE_NOT_FOUND';
+const APP_TEMPLATE_DATA_NOT_FOUND = 'APP_TEMPLATE_DATA_NOT_FOUND';
+const NOT_AUTH_ERROR = 'NOT_AUTH';
+
 interface EnvVar {
   name: string;
   value: string;
@@ -26,7 +33,9 @@ interface EnvVar {
 
 interface DefaultEnvVar {
   name: string;
-  value: string;
+  description: string;
+  defaultValue: string;
+  optional: boolean;
 }
 
 export interface PhApplication {
@@ -36,15 +45,24 @@ export interface PhApplication {
   appDefaultEnv: DefaultEnvVar[];
   groupName: string;
   instanceType: string;
-  scope: string;
+  scope: PhApplicationScope;
   appUrl: string;
   internalAppUrl: string;
   svcEndpoints: string[];
   stop: boolean;
   env: EnvVar[];
-  // TODO: status should be enum
-  status: string;
+  status: PhApplicationPhase;
   message: string;
+}
+
+export interface PhApplicationMutationInput {
+  templateId: string;
+  id: string;
+  name: string;
+  groupName: string;
+  env: EnvVar[];
+  instanceType: string;
+  scope: PhApplicationScope;
 }
 
 export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatus>, kcAdminClient: KeycloakAdminClient): Promise<PhApplication> => {
@@ -71,7 +89,7 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
     env = podSpec.containers[0].env;
   }
 
-  const templateString = item.metadata && item.metadata.annotations['phapplication.primehub.io/template'];
+  const templateString = item.metadata && item.metadata.annotations[ANNOTATIONS_TEMPLATE_NAME];
   if (templateString) {
     const template = JSON.parse(templateString.trim());
     appName = template.metadata.name;
@@ -91,35 +109,24 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
     svcEndpoints,
     stop: item.spec.stop,
     env,
-    status: item.status ? item.status.phase : null,
+    status: item.status ? item.status.phase : PhApplicationPhase.Error,
     message: item.status ? item.status.message : null,
   };
 };
 
-export const typeResolvers = {
-  async instanceType(parent, args, context: Context) {
-    const instanceTypeId = parent.instanceType;
-    if (!instanceTypeId) {
-      return null;
-    }
-
-    try {
-      const instanceType = await context.getInstanceType(instanceTypeId);
-      return mapping(instanceType);
-    } catch (error) {
-      logger.info({
-        component: logger.components.phApplication,
-        type: 'RESOURCE_NOT_FOUND',
-        id: parent.id,
-        instanceTypeId
-      });
-      return {
-        id: `${instanceTypeId}-not-found`,
-        name: instanceTypeId,
-        tolerations: []
-      };
-    }
-  },
+const isUserInGroup = async (userId: string, groupName: string, context: Context): Promise<boolean> => {
+  const groups = await context.kcAdminClient.groups.find({max: keycloakMaxCount});
+  const groupData = find(groups, ['name', groupName]);
+  if (!groupData) {
+    // false if group not found
+    return false;
+  }
+  const members = await context.kcAdminClient.groups.listMembers({
+    id: get(groupData, 'id', ''),
+    max: keycloakMaxCount
+  });
+  const memberIds = members.map(user => user.id);
+  return (memberIds.indexOf(userId) >= 0);
 };
 
 // tslint:disable-next-line:max-line-length
@@ -128,6 +135,10 @@ const listQuery = async (client: CustomResource<PhApplicationSpec, PhApplication
   if (where && where.id) {
     const phApplication = await client.get(where.id);
     const transformed = await transform(phApplication, kcAdminClient);
+    const viewable = await isUserInGroup(currentUserId, transformed.groupName, context);
+    if (!viewable) {
+      throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+    }
     return [transformed];
   }
 
@@ -158,5 +169,119 @@ export const queryOne = async (root, args, context: Context) => {
   const phApplication = await crdClient.phApplications.get(id);
   const transformed =
     await transform(phApplication, context.kcAdminClient);
+  const viewable = await isUserInGroup(currentUserId, transformed.groupName, context);
+  if (!viewable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
   return transformed;
+};
+
+const getAppTemplateFromAnnotations = (item: Item<PhApplicationSpec, PhApplicationStatus>) => {
+  const templateString = item.metadata && item.metadata.annotations && item.metadata.annotations[ANNOTATIONS_TEMPLATE_NAME];
+  if (templateString) {
+    return JSON.parse(templateString.trim());
+  }
+  throw new ApolloError(`No template in PhApplication '${item.metadata.name}'`, APP_TEMPLATE_NOT_FOUND);
+}
+
+const patchAppTemplateData = (item: Item<PhApplicationSpec, PhApplicationStatus>, data: Partial<PhApplicationMutationInput>) => {
+  const dataString = item.metadata && item.metadata.annotations && item.metadata.annotations[ANNOTATIONS_TEMPLATE_DATA_NAME];
+  if (dataString) {
+    const templateData = JSON.parse(dataString.trim());
+    Object.keys(data).forEach(k => { templateData[k] = data[k]; });
+    return JSON.stringify(templateData);
+  }
+  throw new ApolloError(`No template data in PhApplication '${item.metadata.name}'`, APP_TEMPLATE_DATA_NOT_FOUND);
+}
+
+const createApplication = async (context: Context, data: PhApplicationMutationInput) => {
+  const {crdClient} = context;
+
+  const appTemplate = await crdClient.phAppTemplates.get(data.templateId);
+
+  const metadata = {
+    name: data.id.toLowerCase(),
+    annotations: {
+      [ANNOTATIONS_TEMPLATE_NAME]: JSON.stringify(appTemplate),
+      [ANNOTATIONS_TEMPLATE_DATA_NAME]: JSON.stringify(data),
+    }
+  };
+
+  const podTemplate = appTemplate.spec.template.spec && appTemplate.spec.template.spec.podTemplate;
+  const svcTemplate = appTemplate.spec.template.spec && appTemplate.spec.template.spec.svcTemplate;
+  let httpPort = null;
+
+  // Append env to pod template
+  if (podTemplate.spec.containers && podTemplate.spec.containers.length > 0) {
+    podTemplate.spec.containers[0].env = podTemplate.spec.containers[0].env.concat(data.env);
+  }
+
+  if (appTemplate.spec.template.spec && appTemplate.spec.template.spec.httpPort) {
+    httpPort = appTemplate.spec.template.spec.httpPort;
+  }
+
+  const spec = {
+    stop: false,
+    displayName: data.name,
+    groupName: data.groupName,
+    instanceType: data.instanceType,
+    scope: data.scope,
+    podTemplate: podTemplate,
+    svcTemplate: svcTemplate,
+    httpPort,
+  };
+  return crdClient.phApplications.create(metadata, spec);
+};
+
+export const create = async (root, args, context: Context) => {
+  const data: PhApplicationMutationInput = args.data;
+  // TODO: validate data.env
+  const mutable = await isUserInGroup(context.userId, data.groupName, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
+  const phApplication = await createApplication(context, data);
+  return transform(phApplication, context.kcAdminClient);
+};
+
+export const update = async (root, args, context: Context) => {
+  const {crdClient, userId} = context;
+  const data: Partial<PhApplicationMutationInput> = args.data;
+  // TODO: validate data.env
+  const item = await crdClient.phApplications.get(args.where.id);
+  const mutable = await isUserInGroup(userId, item.spec.groupName, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
+  const appTemplate = getAppTemplateFromAnnotations(item);
+  const metadata = item.metadata;
+
+  if (metadata && metadata.annotations) {
+    metadata.annotations[ANNOTATIONS_TEMPLATE_DATA_NAME] = patchAppTemplateData(item, data);
+  }
+
+  const spec = item.spec;
+  spec.instanceType = data.instanceType;
+  spec.scope = data.scope;
+
+  // Append env to pod template
+  if (spec.podTemplate.spec.containers && spec.podTemplate.spec.containers.length > 0) {
+    spec.podTemplate.spec.containers[0].env = appTemplate.spec.template.spec.podTemplate.spec.containers[0].env.concat(data.env);
+  }
+
+  const updated = await context.crdClient.phApplications.patch(args.where.id, {metadata, spec});
+  return transform(updated, context.kcAdminClient);
+};
+
+export const destroy = async (root, args, context: Context) => {
+  const {crdClient, userId} = context;
+  const {id} = args.where;
+  const phApplication = await crdClient.phApplications.get(id);
+  const mutable = await isUserInGroup(userId, phApplication.spec.groupName, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
+
+  await context.crdClient.phApplications.del(id);
+  return {id};
 };
