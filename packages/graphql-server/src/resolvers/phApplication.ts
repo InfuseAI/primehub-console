@@ -65,6 +65,33 @@ export interface PhApplicationMutationInput {
   scope: PhApplicationScope;
 }
 
+const labelStringify = (labels: Record<string, string>) => {
+  return Object.keys(labels).map(labelKey => {
+    const labelValue = labels[labelKey];
+    return `${labelKey}=${labelValue}`;
+  }).join(',');
+};
+
+export const typeResolvers = {
+  async pods(parent, args, context: Context) {
+    const labelSelector = labelStringify({
+      'app': 'primehub-app',
+      'primehub.io/phapplication': `app-${parent.id}`,
+    });
+    const {body: {items}} = await kubeClient.api.v1.namespaces(context.crdNamespace).pods.get({
+      qs: {labelSelector}
+    });
+    return (items || []).map(item => {
+      const podName = get(item, 'metadata.name');
+      return {
+        name: podName,
+        logEndpoint:
+          `${context.graphqlHost}${context.podLogs.getPhApplicationPodEndpoint(podName)}`,
+      };
+    });
+  },
+};
+
 export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatus>, kcAdminClient: KeycloakAdminClient): Promise<PhApplication> => {
   const podSpec = item.spec && item.spec.podTemplate && item.spec.podTemplate.spec;
   const svcSpec = item.spec && item.spec.svcTemplate && item.spec.svcTemplate.spec;

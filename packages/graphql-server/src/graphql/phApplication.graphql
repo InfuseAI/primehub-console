@@ -2,7 +2,6 @@
 
 type Pod {
   name: String
-  phase: String
   logEndpoint: String
 }
 

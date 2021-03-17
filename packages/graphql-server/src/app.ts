@@ -138,6 +138,7 @@ export const resolvers = {
   ...dataset.typeResolver(),
   ...image.typeResolver(),
   ...ann.typeResolver(),
+  PhApplication: phApplication.typeResolvers,
 
   // scalars
   JSON: GraphQLJSON
@@ -625,6 +626,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   // ImageSpecJob Log
   rootRouter.get(podLogs.imageSpecJobRoute, authenticateMiddleware, groupAdminMiddleware, podLogs.streamImageSpecJobLogs);
+
+  // PhApplication Pod Log
+  rootRouter.get(podLogs.phApplicationPodRoute, authenticateMiddleware, podLogs.streamPhApplicationPodLogs);
 
   // health check
   rootRouter.get('/health', async ctx => {
