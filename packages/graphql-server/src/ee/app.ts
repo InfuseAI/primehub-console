@@ -530,6 +530,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       // print error message and stacktrace
       logger.error({
         code: errorCode,
+        error,
+        extensions,
+        exception,
         stacktrace: get(exception, 'stacktrace', []).join('\n'),
         httpAgent: httpAgent.getCurrentStatus(),
         httpsAgent: httpsAgent.getCurrentStatus()
