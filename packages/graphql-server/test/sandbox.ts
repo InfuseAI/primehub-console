@@ -132,18 +132,19 @@ export const createSandbox = async () => {
   });
   (global as any).kcAdminClient = client;
 
+  const realmId = faker.internet.userName().toLowerCase();
+
   // authorize with username/passowrd
   (global as any).authKcAdmin = async () => {
     await client.auth(masterRealmCred);
   };
 
   (global as any).addUserToGroup = async (groupId, id) => {
-    await client.users.addToGroup({groupId, id})
-  }
+    await client.users.addToGroup({groupId, id, realm: realmId});
+  };
 
   await (global as any).authKcAdmin();
   // create new realm
-  const realmId = faker.internet.userName().toLowerCase();
   await client.realms.create({
     id: realmId,
     realm: realmId,
