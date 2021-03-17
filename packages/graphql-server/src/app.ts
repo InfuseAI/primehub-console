@@ -604,6 +604,19 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   };
 
   const checkUserGroup = async (ctx: Koa.ParameterizedContext, next: any) => {
+    const canUserView = async (userId, groupId): Promise<boolean> => {
+      const groups = await ctx.kcAdminClient.users.listGroups({
+        id: userId
+      });
+      const groupIds = groups.map(u => u.id);
+      if (groupIds.indexOf(groupId) >= 0) { return true; }
+      return false;
+    };
+
+    if (ctx.request.path.match(`${config.appPrefix || ''}/logs/pods/[^/]+`)) {
+      return next();
+    }
+
     let fileDownloadAPIPrefix = `${config.appPrefix || ''}/files/`;
     if (ctx.request.path.startsWith(fileDownloadAPIPrefix)) {
       fileDownloadAPIPrefix = fileDownloadAPIPrefix + 'groups/';

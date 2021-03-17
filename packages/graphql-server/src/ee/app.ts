@@ -666,6 +666,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       return false;
     };
 
+    if (ctx.request.path.match(`${config.appPrefix || ''}/logs/pods/[^/]+`)) {
+      return next();
+    }
+
     let fileDownloadAPIPrefix = `${config.appPrefix || ''}/files/`;
     if (ctx.request.path.startsWith(fileDownloadAPIPrefix)) {
       fileDownloadAPIPrefix = fileDownloadAPIPrefix + 'groups/';
