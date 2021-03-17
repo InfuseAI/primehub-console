@@ -75,76 +75,6 @@ describe('phJob graphql', function() {
     expect(data.phJobs.length >= 0).to.be.true;
   });
 
-  it('create phJob to insert artifacts', async () => {
-    const group = await this.createGroup();
-    const instanceTypeId = faker.internet.userName().toLowerCase().replace(/_/g, '-');
-    const imageId = faker.internet.userName().toLowerCase().replace(/_/g, '-');
-    // create instanceType
-    await this.graphqlRequest(`
-    mutation($data: InstanceTypeCreateInput!){
-      createInstanceType (data: $data) { id }
-    }`, {
-      data: {
-        name: instanceTypeId,
-        cpuLimit: 2,
-        memoryLimit: 2,
-        cpuRequest: 2,
-        memoryRequest: 2,
-        groups: {
-          connect: [{id: group.id}]
-        }
-      }
-    });
-    // create image
-    await this.graphqlRequest(`
-    mutation($data: ImageCreateInput!){
-      createImage (data: $data) { id }
-    }`, {
-      data: {
-        name: imageId,
-        groups: {
-          connect: [{id: group.id}]
-        }
-      }
-    });
-
-    const data = {
-      displayName: 'job name',
-      groupId: group.id,
-      instanceType: instanceTypeId,
-      image: imageId,
-      command: `mkdir -p artifacts;date > artifacts/date.txt;date`
-    };
-
-    const mutation = await this.graphqlRequest(`
-    mutation($data: PhJobCreateInput!){
-      createPhJob (data: $data) { ${fields} }
-    }`, {
-      data
-    });
-
-    const expectedResult = {
-      ...data,
-      instanceType: {
-        id: instanceTypeId
-      }
-    };
-
-    expect(mutation.createPhJob).to.be.deep.include(expectedResult);
-    await BPromise.delay(1000);
-
-    // get one
-    const queryOne = await this.graphqlRequest(`
-    query($where: PhJobWhereUniqueInput!){
-      phJob (where: $where) { ${fields} }
-    }`, {
-      where: {id: mutation.createPhJob.id}
-    });
-
-    expect(queryOne.phJob).to.be.deep.include(expectedResult);
-    expect(queryOne.phJob.id).to.exist;
-  });
-
   it('create phJob', async () => {
     const group = await this.createGroup();
     const instanceTypeId = faker.internet.userName().toLowerCase().replace(/_/g, '-');
@@ -211,6 +141,88 @@ describe('phJob graphql', function() {
 
     expect(queryOne.phJob).to.be.deep.include(expectedResult);
     expect(queryOne.phJob.id).to.exist;
+  });
+
+  it('create phJob to insert artifacts', async () => {
+    const group = await this.createGroup();
+    const instanceTypeId = faker.internet.userName().toLowerCase().replace(/_/g, '-');
+    const imageId = faker.internet.userName().toLowerCase().replace(/_/g, '-');
+    // create instanceType
+    await this.graphqlRequest(`
+    mutation($data: InstanceTypeCreateInput!){
+      createInstanceType (data: $data) { id }
+    }`, {
+      data: {
+        name: instanceTypeId,
+        cpuLimit: 2,
+        memoryLimit: 2,
+        cpuRequest: 2,
+        memoryRequest: 2,
+        groups: {
+          connect: [{id: group.id}]
+        }
+      }
+    });
+    // create image
+    await this.graphqlRequest(`
+    mutation($data: ImageCreateInput!){
+      createImage (data: $data) { id }
+    }`, {
+      data: {
+        name: imageId,
+        groups: {
+          connect: [{id: group.id}]
+        }
+      }
+    });
+
+    const data = {
+      displayName: 'job name',
+      groupId: group.id,
+      instanceType: instanceTypeId,
+      image: imageId,
+      command: `mkdir -p artifacts;date > artifacts/date.txt;date`
+    };
+
+    const mutation = await this.graphqlRequest(`
+    mutation($data: PhJobCreateInput!){
+      createPhJob (data: $data) { ${fields} }
+    }`, {
+      data
+    });
+
+    const expectedResult = {
+      ...data,
+      instanceType: {
+        id: instanceTypeId
+      }
+    };
+
+    expect(mutation.createPhJob).to.be.deep.include(expectedResult);
+    await BPromise.delay(1000);
+
+    // get one
+    const queryOne = await this.graphqlRequest(`
+    query($where: PhJobWhereUniqueInput!){
+      phJob (where: $where) {
+        id
+        artifact {
+          prefix
+          items {
+            name
+            size
+            lastModified
+          }
+        }
+      }
+    }`, {
+      where: {id: mutation.createPhJob.id}
+    });
+
+    expect(queryOne.phJob.id).to.exist;
+    expect(queryOne.phJob.artifact.prefix).to.be.eq(`groups/${group.name}/jobArtifacts/${mutation.createPhJob.id}`);
+    console.log(queryOne.phJob.artifact, 224);
+    expect(queryOne.phJob.artifact.items.length).to.be.eq(1);
   });
 
   it('should query large amount of phJob within acceptable time', async () => {
