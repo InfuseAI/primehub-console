@@ -289,6 +289,7 @@ export const createSandbox = async () => {
   process.env.SHARED_GRAPHQL_SECRET_KEY = 'secret';
   process.env.KC_CLIENT_ID = authClient.clientId;
   process.env.KC_CLIENT_SECRET = clientSecret.value;
+  process.env.PRIMEHUB_FEATURE_STORE = 'true'; // enable store for test job artifacts
 };
 
 export const destroySandbox = async () => {
