@@ -628,7 +628,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   rootRouter.get(podLogs.imageSpecJobRoute, authenticateMiddleware, groupAdminMiddleware, podLogs.streamImageSpecJobLogs);
 
   // PhApplication Pod Log
-  rootRouter.get(podLogs.phApplicationPodRoute, authenticateMiddleware, podLogs.streamPhApplicationPodLogs);
+  rootRouter.get(podLogs.phApplicationPodRoute, authenticateMiddleware, checkUserGroup, podLogs.streamPhApplicationPodLogs);
 
   // health check
   rootRouter.get('/health', async ctx => {
