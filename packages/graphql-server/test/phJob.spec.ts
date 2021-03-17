@@ -206,6 +206,7 @@ describe('phJob graphql', function() {
     query($where: PhJobWhereUniqueInput!){
       phJob (where: $where) {
         id
+        phase
         artifact {
           prefix
           items {
@@ -220,9 +221,7 @@ describe('phJob graphql', function() {
     });
 
     expect(queryOne.phJob.id).to.exist;
-    expect(queryOne.phJob.artifact.prefix).to.be.eq(`groups/${group.name}/jobArtifacts/${mutation.createPhJob.id}`);
-    console.log(queryOne.phJob.artifact, 224);
-    expect(queryOne.phJob.artifact.items.length).to.be.eq(1);
+    expect(queryOne.phJob.artifact.prefix).to.be.eq(`groups/${group.name.toLowerCase().replace(/_/g, '-')}/jobArtifacts/${mutation.createPhJob.id}`);
   });
 
   it('should query large amount of phJob within acceptable time', async () => {
