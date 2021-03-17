@@ -6,7 +6,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.2.2
   creationTimestamp: null
-  name: phapplications.primehub.io
+  name: phapplicationspecs.primehub.io
 spec:
   additionalPrinterColumns:
   - JSONPath: .spec.groupName
@@ -22,10 +22,10 @@ spec:
     type: string
   group: primehub.io
   names:
-    kind: PhApplication
-    listKind: PhApplicationList
-    plural: phapplications
-    singular: phapplication
+    kind: PhApplicationSpec
+    listKind: PhApplicationSpecList
+    plural: phapplicationspecs
+    singular: phapplicationspec
   scope: ""
   subresources:
     status: {}
