@@ -102,7 +102,7 @@ export default class PersistLog {
   private async listObjects(prefix) {
     return new Promise<BucketItem[]>((resolve, reject) => {
         const list: BucketItem[] = [];
-        const stream = this.minioClient.listObjects(this.bucket, prefix, true);
+        const stream = this.minioClient.listObjectsV2(this.bucket, prefix, true);
         stream.on('data', (obj: BucketItem) => {
             list.push(obj);
         });
