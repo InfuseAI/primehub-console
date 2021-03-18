@@ -39,7 +39,7 @@ export default class JobArtifactCleaner {
     const prefix = `groups/`;
     const groups = [];
     return new Promise<string[]> ((resolve, reject) => {
-      const stream = this.minioClient.listObjects(this.bucket, prefix, false);
+      const stream = this.minioClient.listObjectsV2(this.bucket, prefix, false);
       stream.on('data', (obj: BucketItem) => {
         if (obj.prefix) {
           const group = obj.prefix.split('/')[1];
@@ -60,7 +60,7 @@ export default class JobArtifactCleaner {
     const prefix = `groups/${group}/jobArtifacts/`;
     const promises = [];
     await new Promise<string[]> ((resolve, reject) => {
-      const stream = this.minioClient.listObjects(this.bucket, prefix, false);
+      const stream = this.minioClient.listObjectsV2(this.bucket, prefix, false);
       stream.on('data', async (obj: BucketItem) => {
         if (obj.prefix) {
           const job = obj.prefix.split('/')[3];
@@ -97,7 +97,7 @@ export default class JobArtifactCleaner {
       logger.info({type: 'JOB_ARTIFACT_CLEAN_JOB_START', job});
       try {
         await new Promise<string[]> ((resolve, reject) => {
-          const stream = this.minioClient.listObjects(this.bucket, jobObj.prefix, true);
+          const stream = this.minioClient.listObjectsV2(this.bucket, jobObj.prefix, true);
           stream.on('data', async (obj: BucketItem) => {
             objs.push(obj.name);
           });
