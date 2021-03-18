@@ -176,7 +176,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     logs: true,
     rewrite: path => path.replace(staticPath, '/')
   }));
-  rootRouter.all('${staticPath}apps/abc/public-scope/(.*)', proxies('${staticPath}apps/abc/public-scope', {
+  rootRouter.all(`/apps/abc/public-scope/(.*)`, proxies(`${config.appPrefix}/apps/abc/public-scope`, {
     target: 'http://primehub-mlflow:5000',
     changeOrigin: true,
     logs: true,
