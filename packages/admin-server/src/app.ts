@@ -12,6 +12,10 @@ import Agent, { HttpsAgent } from 'agentkeepalive';
 import koaMount from 'koa-mount';
 import yaml from 'js-yaml';
 import fs from 'fs';
+import NodeCache from 'node-cache'
+import { v4 as uuidv4 } from 'uuid';
+import { gql, GraphQLClient } from 'graphql-request'
+import Boom from 'boom';
 
 // controller
 import { OidcCtrl, mount as mountOidc } from './oidc';
@@ -54,6 +58,12 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     token_endpoint: `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/token`,
     userinfo_endpoint: `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/userinfo`,
     jwks_uri: `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/certs`,
+  });
+
+  const graphqlClient = new GraphQLClient(config.graphqlSvcEndpoint, {
+    headers: {
+      authorization: `Bearer ${config.sharedGraphqlSecretKey}`,
+    }
   });
 
   const oidcClient = new issuer.Client({
@@ -113,6 +123,8 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
       adminPortalLink: config.appPrefix ? `${config.appPrefix}/cms` : '/cms',
       logoutLink: config.appPrefix ? `${config.appPrefix}/oidc/logout` : '/oidc/logout',
     });
+
+    ctx.graphqlClient = graphqlClient;
     return next();
   });
 
@@ -182,6 +194,87 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     logs: true,
     rewrite: path => path.replace('/public-scope', '/')
   }));
+
+  const sessionTokenCacheExpireTime = 30;
+  const sessionTokenCacheStore = new NodeCache({stdTTL: sessionTokenCacheExpireTime});
+  const checkSessionToken = async (ctx: Koa.ParameterizedContext, next: any) => {
+    const sessionToken = ctx.cookies.get('phapplication-session-id') || '';
+    const sessionTokenCached = sessionTokenCacheStore.get(sessionToken);
+    if (sessionToken) {
+      if (sessionTokenCached) {
+        return next();
+      }
+      ctx.resetSessionToken = true;
+    }
+    console.log('Token: ', ctx.cookies.get('phapplication-session-id'));
+    return oidcCtrl.loggedIn(ctx, next);
+  };
+
+  const updateSessionToken = async (ctx: Koa.ParameterizedContext, next: any) => {
+    let sessionToken = ctx.cookies.get('phapplication-session-id');
+    if (!sessionToken || ctx.resetSessionToken) {
+      // Generate session token
+      sessionToken = uuidv4();
+      console.log('Generate token');
+      console.log(sessionToken);
+      ctx.cookies.set('phapplication-session-id', sessionToken, {path: `${config.appPrefix}/apps/abc`});
+    }
+    console.log('Update Token: ', sessionToken)
+    sessionTokenCacheStore.set(sessionToken, true, sessionTokenCacheExpireTime);
+
+    return next();
+  };
+
+  rootRouter.all(`/apps/abc/primehub-scope/(.*)`, checkSessionToken, updateSessionToken, proxies(`${config.appPrefix}/apps/abc/primehub-scope`, {
+    target: 'http://mlflow.jackpan1.aws.primehub.io',
+    changeOrigin: true,
+    logs: true,
+    rewrite: path => path.replace('/primehub-scope', '/')
+  }));
+
+  const checkUserGroup = async (ctx: Koa.ParameterizedContext, next: any) => {
+    const {userId} = oidcCtrl.getUserFromContext(ctx);
+    const variables = {
+      id: userId,
+    }
+    const query = gql`
+    query ($id: ID!) {
+      user(where: {id: $id}) {
+        id
+        username
+        groups {name}
+      }
+    }
+    `
+    const data = await ctx.graphqlClient.request(query, variables);
+
+    for (const group of data.user.groups) {
+      console.log(group.name);
+      if (group.name === 'phusers') {
+        return next();
+      }
+    }
+
+    throw Boom.forbidden('request not authorized');
+  };
+
+  rootRouter.all(`/apps/:appID/group-scope/(.*)`, checkSessionToken, checkUserGroup, updateSessionToken, proxies(`${config.appPrefix}/apps/abc/group-scope`, {
+    target: 'http://mlflow.jackpan1.aws.primehub.io',
+    changeOrigin: true,
+    logs: true,
+    rewrite: path => path.replace('/group-scope', '/')
+  }));
+
+  // const phApplicationProxyHandler = async (ctx: Koa.ParameterizedContext, next: any) => {
+  //   const appID = ctx.params.appID;
+  //   const scope = 'group';
+  //   const service = 'app-mlflow-xyzab.hub.svc.cluster.local:5000';
+
+    
+  //   const result = await checkSessionToken(ctx, next);
+  // };
+  // rootRouter.all(`/apps/:appID/(.*)`, phApplicationProxyHandler);
+
 
   // redirect
   const home = '/g';

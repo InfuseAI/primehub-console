@@ -34,6 +34,7 @@ export interface Config {
   graphqlPrefix: string
   graphqlEndpoint: string;
   graphqlSvcEndpoint: string;
+  sharedGraphqlSecretKey: string;
 
   // user portal
   enableUserPortal: boolean;
@@ -93,6 +94,7 @@ const defaultConfigs = {
   graphqlPrefix: '/',
   graphqlEndpoint: 'http://localhost:3001/graphql',
   graphqlSvcEndpoint: 'http://localhost:3001/graphql',
+  sharedGraphqlSecretKey: '',
   enableUserPortal: false,
   portalConfigPath: resolve(__dirname, '../etc/portal-config.yaml'),
   homeConfigPath: resolve(__dirname, '../etc/home-config.yaml'),
@@ -160,6 +162,7 @@ export const createConfig = (): Config => {
     graphqlPrefix: process.env.GRAPHQL_PREFIX,
     graphqlEndpoint: process.env.GRAPHQL_ENDPOINT,
     graphqlSvcEndpoint: process.env.GRAPHQL_SVC_ENDPOINT,
+    sharedGraphqlSecretKey: process.env.SHARED_GRAPHQL_SECRET_KEY,
     enableUserPortal: process.env.PRIMEHUB_FEATURE_USER_PORTAL,
     portalConfigPath: process.env.PORTAL_CONFIG_PATH,
     homeConfigPath: process.env.HOME_CONFIG_PATH,

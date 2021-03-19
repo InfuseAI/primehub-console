@@ -1,4 +1,4 @@
-import { Context } from 'koa';
+import Koa, { Context } from 'koa';
 import Boom from 'boom';
 import Router from 'koa-router';
 import gravatar from 'gravatar';
@@ -65,7 +65,7 @@ export class OidcCtrl {
       returnPath;
   }
 
-  public ensureAdmin = async (ctx: Context, next: any) => {
+  public ensureAdmin = async (ctx: Koa.ParameterizedContext, next: any) => {
     try {
       if (!ctx.cookies.get('accessToken') || !ctx.cookies.get('refreshToken')) {
         throw Boom.forbidden('require token', {code: ERRORS.FORCE_LOGIN});
@@ -122,7 +122,7 @@ export class OidcCtrl {
     }
   }
 
-  public loggedIn = async (ctx: Context, next: any) => {
+  public loggedIn = async (ctx: Koa.ParameterizedContext, next: any) => {
     try {
       if (!ctx.cookies.get('accessToken') || !ctx.cookies.get('refreshToken')) {
         throw Boom.forbidden('require token', {code: ERRORS.FORCE_LOGIN});
@@ -360,13 +360,13 @@ export class OidcCtrl {
     return encodeURIComponent(url.pathname + url.search);
   }
 
-  private createNonceFromSecret = (ctx: Context) => {
+  private createNonceFromSecret = (ctx: Koa.ParameterizedContext) => {
     const secret = ctx.cookies.get(NONCE_COOKIE, {signed: true});
     const hash = createHash('sha256').update(secret).digest('hex');
     return hash;
   }
 
-  private saveNonceSecret = (ctx: Context) => {
+  private saveNonceSecret = (ctx: Koa.ParameterizedContext) => {
     const secret = UUID.v1();
     const secureRequest = ctx.request.secure;
     ctx.cookies.set(NONCE_COOKIE, secret, {signed: true, secure: secureRequest});
