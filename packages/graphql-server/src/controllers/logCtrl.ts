@@ -26,6 +26,7 @@ export class PodLogs {
 
   public jupyterHubRoute = '/logs/jupyterhub';
   public imageSpecJobRoute = '/logs/images/:imageId/job';
+  public phApplicationPodRoute = '/logs/pods/:podName';
 
   public streamJupyterHubLogs = async (ctx: ParameterizedContext) => {
     const {
@@ -60,6 +61,27 @@ export class PodLogs {
     const imageId = ctx.params.imageId;
     const imageSpecJob = await this.crdClient.imageSpecJobs.get(imageId);
     const podName = imageSpecJob.status.podName;
+    const stream = getK8SLogStream(this.namespace, podName, {follow, tailLines});
+
+    stream.on('error', err => {
+      logger.error({
+        component: logger.components.internal,
+        type: 'K8S_STREAM_LOG',
+        message: err.message
+      });
+
+      ctx.res.end();
+    });
+    ctx.body = stream;
+  }
+
+  public getPhApplicationPodEndpoint = (podName: string) => {
+    return `${this.appPrefix || ''}/logs/pods/${podName}`;
+  }
+
+  public streamPhApplicationPodLogs = async (ctx: ParameterizedContext) => {
+    const {follow, tailLines} = ctx.query;
+    const podName = ctx.params.podName;
     const stream = getK8SLogStream(this.namespace, podName, {follow, tailLines});
 
     stream.on('error', err => {

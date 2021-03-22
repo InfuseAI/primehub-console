@@ -19,6 +19,8 @@ import * as user from './resolvers/user';
 import * as group from './resolvers/group';
 import * as secret from './resolvers/secret';
 import * as store from './resolvers/store';
+import * as phApplication from './resolvers/phApplication';
+import * as phAppTemplate from './resolvers/phAppTemplate';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset, regenerateUploadSecret} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
@@ -91,6 +93,10 @@ export const resolvers = {
     secrets: secret.query,
     secretsConnection: secret.connectionQuery,
     files: store.query,
+    phApplication: phApplication.queryOne,
+    phApplications: phApplication.query,
+    phAppTemplate: phAppTemplate.queryOne,
+    phAppTemplates: phAppTemplate.query,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),
@@ -113,6 +119,11 @@ export const resolvers = {
     deleteSecret: secret.destroy,
     regenerateUploadServerSecret: regenerateUploadSecret,
     deleteFiles: store.destroy,
+    createPhApplication: phApplication.create,
+    updatePhApplication: phApplication.update,
+    deletePhApplication: phApplication.destroy,
+    startPhApplication: phApplication.start,
+    stopPhApplication: phApplication.stop,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation(),
@@ -127,6 +138,7 @@ export const resolvers = {
   ...dataset.typeResolver(),
   ...image.typeResolver(),
   ...ann.typeResolver(),
+  PhApplication: phApplication.typeResolvers,
 
   // scalars
   JSON: GraphQLJSON
@@ -595,6 +607,19 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   };
 
   const checkUserGroup = async (ctx: Koa.ParameterizedContext, next: any) => {
+    const canUserView = async (userId, groupId): Promise<boolean> => {
+      const groups = await ctx.kcAdminClient.users.listGroups({
+        id: userId
+      });
+      const groupIds = groups.map(u => u.id);
+      if (groupIds.indexOf(groupId) >= 0) { return true; }
+      return false;
+    };
+
+    if (ctx.request.path.match(`${config.appPrefix || ''}/logs/pods/[^/]+`)) {
+      return next();
+    }
+
     let fileDownloadAPIPrefix = `${config.appPrefix || ''}/files/`;
     if (ctx.request.path.startsWith(fileDownloadAPIPrefix)) {
       fileDownloadAPIPrefix = fileDownloadAPIPrefix + 'groups/';
@@ -617,6 +642,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   // ImageSpecJob Log
   rootRouter.get(podLogs.imageSpecJobRoute, authenticateMiddleware, groupAdminMiddleware, podLogs.streamImageSpecJobLogs);
+
+  // PhApplication Pod Log
+  rootRouter.get(podLogs.phApplicationPodRoute, authenticateMiddleware, checkUserGroup, podLogs.streamPhApplicationPodLogs);
 
   // health check
   rootRouter.get('/health', async ctx => {

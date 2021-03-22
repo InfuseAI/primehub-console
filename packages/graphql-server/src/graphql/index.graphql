@@ -7,6 +7,8 @@
 # import Dataset, DatasetOrderByInput, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretOrderByInput, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
 # import StoreFileList, StoreFileWhereInput, StoreFileListOptionInput, StoreFileDeleteOptionInput from "./store.graphql"
+# import PhApplication, PhApplicationWhereInput, PhApplicationWhereUniqueInput, PhApplicationCreateInput, PhApplicationUpdateInput from "./phApplication.graphql"
+# import PhAppTemplate, PhAppTemplateWhereInput, PhAppTemplateWhereUniqueInput from "./phAppTemplate.graphql"
 
 scalar JSON
 
@@ -182,6 +184,26 @@ type Query {
     where: StoreFileWhereInput!
     options: StoreFileListOptionInput
   ): StoreFileList!
+
+  """PhApplication"""
+  phApplication(where: PhApplicationWhereUniqueInput!): PhApplication
+  phApplications(
+    where: PhApplicationWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [PhApplication]!
+
+  phAppTemplate(where: PhAppTemplateWhereUniqueInput!): PhAppTemplate
+  phAppTemplates(
+    where: PhAppTemplateWhereInput
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [PhAppTemplate]!
+
 }
 
 type Mutation {
@@ -234,4 +256,11 @@ type Mutation {
 
   """STORE"""
   deleteFiles(where: StoreFileWhereInput!, options: StoreFileDeleteOptionInput): Int
+
+  """PhApplication"""
+  createPhApplication(data: PhApplicationCreateInput!): PhApplication!
+  updatePhApplication(data: PhApplicationUpdateInput!, where: PhApplicationWhereUniqueInput!): PhApplication
+  deletePhApplication(where: PhApplicationWhereUniqueInput!): PhApplication
+  startPhApplication(where: PhApplicationWhereUniqueInput!): PhApplication
+  stopPhApplication(where: PhApplicationWhereUniqueInput!): PhApplication
 }

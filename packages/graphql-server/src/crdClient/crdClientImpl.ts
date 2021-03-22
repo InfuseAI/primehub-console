@@ -246,6 +246,61 @@ export interface PhDeploymentEndPoint {
     token: string;
   }>;
 }
+
+// PhApplication
+export enum PhApplicationScope {
+  Public = 'public',
+  PrimeHub = 'primehub',
+  Group = 'group',
+}
+
+export enum PhApplicationPhase {
+  Starting = 'Starting',
+  Ready = 'Ready',
+  Updating = 'Updating',
+  Stopping = 'Stopping',
+  Stopped = 'Stopped',
+  Error = 'Error',
+}
+
+export interface PhApplicationSpec {
+  displayName: string;
+  groupName: string;
+  instanceType: string;
+  scope: PhApplicationScope;
+  stop: boolean;
+  podTemplate: any;
+  svcTemplate: any;
+  httpPort: number;
+}
+
+export interface PhApplicationStatus {
+  phase: PhApplicationPhase;
+  message: string;
+  serviceName: string;
+}
+
+export interface PhAppTemplateSpec {
+  name: string;
+  description: string;
+  version: string;
+  docLink: string;
+  icon: string;
+  defaultEnvs: Array<{
+    name: string;
+    description: string;
+    defaultValue: string;
+    optional: boolean;
+  }>;
+  template: {
+    spec: {
+      podTemplate: any;
+      svcTemplate: any;
+      httpPort: number;
+    }
+  };
+}
+
 /**
  * CRD
  */
@@ -271,6 +326,8 @@ export default class CrdClientImpl {
   public phJobs: CustomResource<PhJobSpec, PhJobStatus>;
   public phSchedules: CustomResource<PhScheduleSpec, PhScheduleStatus>;
   public phDeployments: CustomResource<PhDeploymentSpec, PhDeploymentStatus>;
+  public phApplications: CustomResource<PhApplicationSpec, PhApplicationStatus>;
+  public phAppTemplates: CustomResource<PhAppTemplateSpec>;
   private namespace: string;
 
   constructor(args?: CrdArgs) {
@@ -321,6 +378,18 @@ export default class CrdClientImpl {
       client,
       watch,
       loadCrd('phDeployment'),
+      this.namespace
+    );
+    this.phApplications = new CustomResource<PhApplicationSpec, PhApplicationStatus>(
+      client,
+      watch,
+      loadCrd('phApplication'),
+      this.namespace
+    );
+    this.phAppTemplates = new CustomResource<PhAppTemplateSpec>(
+      client,
+      watch,
+      loadCrd('phAppTemplate'),
       this.namespace
     );
     this.announcements = new CustomResource<AnnouncementSpec>(

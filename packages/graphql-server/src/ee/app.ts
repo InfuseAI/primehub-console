@@ -670,6 +670,10 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       return false;
     };
 
+    if (ctx.request.path.match(`${config.appPrefix || ''}/logs/pods/[^/]+`)) {
+      return next();
+    }
+
     let fileDownloadAPIPrefix = `${config.appPrefix || ''}/files/`;
     if (ctx.request.path.startsWith(fileDownloadAPIPrefix)) {
       fileDownloadAPIPrefix = fileDownloadAPIPrefix + 'groups/';
@@ -726,6 +730,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   rootRouter.get(logCtrl.getPhDeploymentRoute(),
                  authenticateMiddleware, checkUserGroup,
                  logCtrl.streamPhDeploymentLogs);
+
+  // PhApplication Pod Log
+  rootRouter.get(podLogs.phApplicationPodRoute, authenticateMiddleware, checkUserGroup, podLogs.streamPhApplicationPodLogs);
 
   // health check
   rootRouter.get('/health', async ctx => {

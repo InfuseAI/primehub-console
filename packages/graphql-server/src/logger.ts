@@ -24,6 +24,7 @@ export enum components {
   buildImage = 'BuildImage',
   phJob = 'PhJob',
   phDeployment = 'PhDeployment',
+  phApplication = 'PhApplication',
   internal = 'Internal',
   usageReport = 'UsageReport',
   resourceStatus = 'ResourceStatus',

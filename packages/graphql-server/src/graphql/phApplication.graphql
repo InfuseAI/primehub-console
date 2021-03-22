@@ -1,0 +1,81 @@
+# import PageInfo from "common.graphql"
+
+type Pod {
+  name: String
+  logEndpoint: String
+}
+
+type EnvVar {
+  name: String
+  value: String
+}
+
+type DefaultEnvVar {
+  name: String
+  description: String
+  defaultValue: String
+  optional: Boolean
+}
+
+type PhApplication {
+  id: ID!
+  displayName: String
+  appName: String
+  appDefaultEnv: [DefaultEnvVar]
+  groupName: String
+  instanceType: String
+  scope: String
+  appUrl: String
+  internalAppUrl: String
+  svcEndpoints: [String]
+  stop: Boolean
+  env: [EnvVar]
+  status: String
+  message: String
+  pods: [Pod]
+}
+
+"""An edge in a connection."""
+type PhApplicationEdge {
+  """The item at the end of the edge."""
+  node: PhApplication!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type PhApplicationConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [PhApplicationEdge]!
+}
+
+input PhApplicationWhereUniqueInput {
+  id: ID!
+}
+
+input PhApplicationWhereInput {
+  id: ID
+  appName_contains: String
+}
+
+
+"""Mutation input"""
+input PhApplicationCreateInput {
+  templateId: String
+  id: ID!
+  name: String
+  groupName: String
+  env: JSON
+  instanceType: String
+  scope: String
+}
+
+input PhApplicationUpdateInput {
+  env: JSON
+  instanceType: String
+  scope: String
+}
+
