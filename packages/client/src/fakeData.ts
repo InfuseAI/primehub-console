@@ -220,10 +220,10 @@ export const fakeData = {
   }],
   phDeployments: [{
     id: 'd0',
-    name: 'd0',
+    name: 'My MLFlow',
     description: 'd0',
     schedule: 'd0',
-    status: 'Failed',
+    status: 'Error',
     creationTIme: '2019-10-04T14:48:00.000Z',
     lastUpdatedTime: '2019-10-04T14:48:00.000Z',
     message: `batch1
@@ -289,10 +289,10 @@ export const fakeData = {
     }]
   }, {
     id: 'd1',
-    name: 'd1',
+    name: 'My MLFlow 2',
     description: 'd1',
     schedule: 'd1',
-    status: 'Deployed',
+    status: 'Ready',
     creationTIme: '2019-10-04T14:48:00.000Z',
     lastUpdatedTime: '2019-10-04T14:48:00.000Z',
     message: `batch1
@@ -326,9 +326,9 @@ export const fakeData = {
     }
   }, {
     id: 'id2',
-    name: 'd2',
+    name: 'MATLAB Test',
     description: 'd2',
-    status: 'Deploying',
+    status: 'Ready',
     creationTIme: '2019-10-04T14:48:00.000Z',
     lastUpdatedTime: '2019-10-04T14:48:00.000Z',
     message: `batch1
@@ -361,7 +361,7 @@ export const fakeData = {
     }
   }, {
     id: 'id2-stopping',
-    name: 'd2',
+    name: 'CATLAB',
     description: 'd2',
     status: 'Stopping',
     creationTIme: '2019-10-04T14:48:00.000Z',
@@ -396,7 +396,7 @@ export const fakeData = {
     }
   }, {
     id: 'id3',
-    name: 'd3',
+    name: 'Our gitlab',
     description: 'd3',
     status: 'Stopped',
     creationTIme: '2019-10-04T14:48:00.000Z',
@@ -425,7 +425,39 @@ export const fakeData = {
       'hello': 123,
       'new': 'fdsafdsafdsafdsafdsafdsafdsagdsags'
     }
-  }],
+  }, {
+    id: 'id4',
+    name: 'My app',
+    description: 'd3',
+    status: 'Starting',
+    creationTIme: '2019-10-04T14:48:00.000Z',
+    lastUpdatedTime: '2019-10-04T14:48:00.000Z',
+    message: `batch1 ffsdafn fdksoanfkosafdns kofdsnaiofdnsnfsodnfidosanfdisoafidsfndsio
+    batch2
+    batch3
+    batch4
+    `,
+    groupId: 'groupId1',
+    groupName: 'Group1',
+    endpoint: 'https://endpoint/mode-deployment/example/test/1',
+    modelImage: 'imageurl',
+    pods: [],
+    availableReplicas: 3,
+    replicas: 4,
+    instanceType: {
+      id: 'everyone-it',
+      name: 'it',
+      displayName: 'gpu0',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
+    },
+    metadata: {
+      'hello': 123,
+      'new': 'fdsafdsafdsafdsafdsafdsafdsagdsags'
+    }
+  }
+  ],
   license: {
     "startedAt": "2018-07-21T08:19:43Z",
     "expiredAt": "2021-07-21T08:19:43Z",
@@ -433,7 +465,7 @@ export const fakeData = {
     "maxNode": 10,
     "maxModelDeploy": -1,
     "licensedTo": "InfuseAI",
-    "licenseStatus": "expired",
+    "licenseStatus": "unexpired",
     "usage": {
       "maxGroup": 51,
       "maxNode": 10,

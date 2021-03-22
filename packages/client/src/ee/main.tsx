@@ -27,6 +27,7 @@ import DeploymentEditPage from 'ee/containers/deploymentEditPage';
 import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
+import AppListContainer from 'containers/appList';
 
 const client = createGraphqlClient({
   fakeData,
@@ -109,10 +110,15 @@ class Main extends React.Component {
             >
               <DeploymentEditPage />
             </Route>
+
+            {/* Apps */}
+            <Route path={`${appPrefix}g/:groupName/apps`} exact>
+              <ListContainer Com={AppListContainer} />
+            </Route>
           </MainPage>
         </ApolloProvider>
       </BrowserRouter>
-    )
+    );
   }
 }
 
