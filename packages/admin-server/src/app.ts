@@ -188,18 +188,13 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     logs: true,
     rewrite: path => path.replace(staticPath, '/')
   }));
-  rootRouter.all(`/apps/abc/public-scope/(.*)`, proxies(`${config.appPrefix}/apps/abc/public-scope`, {
-    target: 'http://primehub-mlflow:5000',
-    changeOrigin: true,
-    logs: true,
-    rewrite: path => path.replace('/public-scope', '/')
-  }));
 
   const sessionTokenCacheExpireTime = 30;
   const sessionTokenCacheStore = new NodeCache({stdTTL: sessionTokenCacheExpireTime});
   const checkSessionToken = async (ctx: Koa.ParameterizedContext, next: any) => {
     const sessionToken = ctx.cookies.get('phapplication-session-id') || '';
     const sessionTokenCached = sessionTokenCacheStore.get(sessionToken);
+    const scope = ctx.params.scope || '';
     if (sessionToken) {
       if (sessionTokenCached) {
         return next();
@@ -207,7 +202,12 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
       ctx.resetSessionToken = true;
     }
     console.log('Token: ', ctx.cookies.get('phapplication-session-id'));
-    return oidcCtrl.loggedIn(ctx, next);
+    return oidcCtrl.loggedIn(ctx, () => {
+      if (scope === 'group') {
+        return checkUserGroup(ctx, next);
+      }
+      return next();
+    });
   };
 
   const updateSessionToken = async (ctx: Koa.ParameterizedContext, next: any) => {
@@ -224,13 +224,6 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
 
     return next();
   };
-
-  rootRouter.all(`/apps/abc/primehub-scope/(.*)`, checkSessionToken, updateSessionToken, proxies(`${config.appPrefix}/apps/abc/primehub-scope`, {
-    target: 'http://mlflow.jackpan1.aws.primehub.io',
-    changeOrigin: true,
-    logs: true,
-    rewrite: path => path.replace('/primehub-scope', '/')
-  }));
 
   const checkUserGroup = async (ctx: Koa.ParameterizedContext, next: any) => {
     const {userId} = oidcCtrl.getUserFromContext(ctx);
@@ -258,23 +251,38 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     throw Boom.forbidden('request not authorized');
   };
 
-  rootRouter.all(`/apps/:appID/group-scope/(.*)`, checkSessionToken, checkUserGroup, updateSessionToken, proxies(`${config.appPrefix}/apps/abc/group-scope`, {
-    target: 'http://mlflow.jackpan1.aws.primehub.io',
-    changeOrigin: true,
-    logs: true,
-    rewrite: path => path.replace('/group-scope', '/')
-  }));
+  const phApplicationProxyHandler = async (ctx: Koa.ParameterizedContext, next: any) => {
+    const appID = ctx.params.appID;
+    const scope = 'public';
+    // const service = 'app-mlflow-xyzab.hub.svc.cluster.local:5000';
+    const service = 'localhost:5000';
+    ctx.params.scope = scope;
+    ctx.params.service = service;
 
-  // const phApplicationProxyHandler = async (ctx: Koa.ParameterizedContext, next: any) => {
-  //   const appID = ctx.params.appID;
-  //   const scope = 'group';
-  //   const service = 'app-mlflow-xyzab.hub.svc.cluster.local:5000';
 
-    
-  //   const result = await checkSessionToken(ctx, next);
-  // };
-  // rootRouter.all(`/apps/:appID/(.*)`, phApplicationProxyHandler);
-
+    switch (scope) {
+      // case 'group':
+      // case 'primehub':
+      //   await checkUserGroup(ctx, next);
+      //   await updateSessionToken(ctx, next);
+      //   await proxies(`${config.appPrefix}/apps/${appID}`, {
+      //     target: `http://${service}`,
+      //     changeOrigin: true,
+      //     logs: true,
+      //   })(ctx, next);
+      //   break;
+      case 'public':
+        await proxies(`${config.appPrefix}/apps/${appID}`, {
+          target: `http://${service}`,
+          changeOrigin: true,
+          logs: true,
+        })(ctx, next);
+        break;
+      default:
+        throw Boom.badRequest('bad request');
+    }
+  };
+  rootRouter.all(`/apps/:appID/(.*)`, phApplicationProxyHandler);
 
   // redirect
   const home = '/g';
