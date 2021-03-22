@@ -460,6 +460,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
         role = Role.ADMIN;
 
         // use password grant type if specified, or basic auth provided
+        kcAdminClient = createKcAdminClient();
         await kcAdminClient.auth({
           username: credentials.name,
           password: credentials.pass,
@@ -529,6 +530,9 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       // print error message and stacktrace
       logger.error({
         code: errorCode,
+        error,
+        extensions,
+        exception,
         stacktrace: get(exception, 'stacktrace', []).join('\n'),
         httpAgent: httpAgent.getCurrentStatus(),
         httpsAgent: httpsAgent.getCurrentStatus()

@@ -12,7 +12,7 @@ const expect = chai.expect;
 
 import { createSandbox, destroySandbox } from './sandbox';
 // import app
-import { createApp } from '../src/app';
+import { createApp } from '../src/ee/app';
 
 before(async () => {
   // setup testing realm and related env

@@ -6,6 +6,7 @@ import { Crd } from './crd';
 import { isUndefined, isNil, values, isEmpty, get, omit, isArray } from 'lodash';
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
 import Boom from 'boom';
+import { ApolloError } from 'apollo-server';
 import { ErrorCodes } from '../errorCodes';
 import { isNull } from 'util';
 import { ResourceNamePrefix } from './resourceRole';
@@ -39,30 +40,22 @@ const validateAndMapTolerations = (tolerations: Array<{operator: string, effect?
     const value = isEmpty(toleration.value) ? emptyValue : toleration.value;
 
     if (!OperatorValues[toleration.operator]) {
-      throw Boom.badRequest(`operator should be one of [${values(OperatorValues)}], but got ${toleration.operator}`, {
-        code: ErrorCodes.REQUEST_BODY_INVALID
-      });
+      throw new ApolloError(`operator should be one of [${values(OperatorValues)}], but got ${toleration.operator}`, ErrorCodes.REQUEST_BODY_INVALID);
     }
 
     // If the operator is Exists, key optional & value should not be specified
     if (toleration.operator === OperatorValues.Exists && value) {
-      throw Boom.badRequest('If the operator is Exists, value should not be specified', {
-        code: ErrorCodes.REQUEST_BODY_INVALID
-      });
+      throw new ApolloError('If the operator is Exists, value should not be specified', ErrorCodes.REQUEST_BODY_INVALID);
     }
 
     // If the operator is Equal, key, value are required
     if (toleration.operator === OperatorValues.Equal && (!key || !value)) {
-      throw Boom.badRequest('If the operator is Equal, key, value are required', {
-        code: ErrorCodes.REQUEST_BODY_INVALID
-      });
+      throw new ApolloError('If the operator is Equal, key, value are required', ErrorCodes.REQUEST_BODY_INVALID);
     }
 
     // validate and convert effect
     if (EffectValues.indexOf(toleration.effect) < 0) {
-      throw Boom.badRequest(`effect should be one of [${EffectValues.join()}], but got ${toleration.effect}`, {
-        code: ErrorCodes.REQUEST_BODY_INVALID
-      });
+      throw new ApolloError(`effect should be one of [${EffectValues.join()}], but got ${toleration.effect}`, ErrorCodes.REQUEST_BODY_INVALID);
     }
 
     const effect = (toleration.effect === EffectNone) ? emptyValue : toleration.effect;
