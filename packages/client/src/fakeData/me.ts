@@ -1,6 +1,7 @@
 export const me = {
   apiTokenCount: 1,
   groups: [{
+    __typename: 'Group',
     id: 'groupId1',
     name: 'group1',
     displayName: 'c-Group 1',
@@ -27,6 +28,7 @@ export const me = {
     datasets: [],
     jobDefaultActiveDeadlineSeconds: 86400,
   }, {
+    __typename: 'Group',
     id: 'groupId2',
     name: 'group2',
     displayName: 'Group 2',
@@ -46,6 +48,7 @@ export const me = {
       memUsage: 0
     },
   }, {
+    __typename: 'Group',
     id: 'everyone',
     name: 'everyone',
     displayName: 'Group DisplayName',
