@@ -1,10 +1,14 @@
 import React from 'react';
+import {concat} from 'lodash';
 import {Input, Icon, Button} from 'antd';
 import {Empty} from '../empty';
+import {DefaultEnv} from 'interfaces/phAppTemplate';
 
 const InputGroup = Input.Group;
 
 interface Props {
+  defaultEnv?: DefaultEnv[];
+  reloadDefault?: boolean;
   onChange?: (value: object) => void;
   disabled?: boolean;
   value?: object;
@@ -22,13 +26,26 @@ interface State {
 export default class EnvFields extends React.Component<Props, State> {
   constructor(props) {
     super(props);
-    const {value} = props;
+    const {value, defaultEnv} = props;
+    const defaultEnvs = defaultEnv ? defaultEnv.map(item => {
+      return {name: item.name, value: item.defaultValue};
+    }) : [];
     const envs = value ? value.map(env => {
       return {name: env.name, value: env.value};
     }) : [];
     this.state = {
-      fields: envs || [],
+      fields: concat(defaultEnvs, envs) || [],
     };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.defaultEnv !== this.props.defaultEnv || this.props.reloadDefault === true) {
+      const {defaultEnv} = this.props;
+      const defaultEnvs = defaultEnv ? defaultEnv.map(item => {
+        return {name: item.name, value: item.defaultValue, required: !item.optional};
+      }) : [];
+      this.setState({fields: defaultEnvs});
+    }
   }
 
   add = () => {
@@ -118,7 +135,9 @@ export default class EnvFields extends React.Component<Props, State> {
                     { enableReveal && !reveal ? hiddenValueItem : valueItem }
                   </InputGroup>
                   {
-                    disabled ? null : (
+                    disabled ? null : field.required ? (
+                      <Icon type='info-circle' theme='filled' title='Required Environment' />
+                    ) : (
                       <a href='javascript:;' onClick={() => this.remove(i)}>
                         <Icon type='close-circle-o'/>
                       </a>

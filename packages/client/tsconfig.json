@@ -15,6 +15,7 @@
       "context/*": ["./src/context/*"],
       "ee/*": ["./src/ee/*"],
       "constant/*": ["./src/constant/*"],
+      "interfaces/*": ["./src/interfaces/*"],
       "@types/*": ["./src/@types/*"],
     }
   },

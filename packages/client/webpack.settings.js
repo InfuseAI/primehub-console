@@ -26,6 +26,7 @@ module.exports = {
       context: path.resolve(__dirname, 'src/context'),
       ee: path.resolve(__dirname, 'src/ee'),
       constant: path.resolve(__dirname, 'src/constant'),
+      interfaces: path.resolve(__dirname, 'src/interfaces'),
       root: path.resolve(__dirname, 'src'),
       schema: path.resolve(__dirname, 'schema')
     }

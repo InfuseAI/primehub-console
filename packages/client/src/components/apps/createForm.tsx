@@ -1,14 +1,17 @@
 import * as React from 'react';
 import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon, InputNumber, Switch, AutoComplete} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
-import {get, snakeCase, debounce} from 'lodash';
+import {isEmpty, find, get, snakeCase, debounce} from 'lodash';
 import DynamicFields from 'components/share/dynamicFields';
 import EnvFields from 'components/share/envFields';
 import InfuseButton from 'components/infuseButton';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
-import { PhAppTemplate } from 'containers/appCreatePage';
+import PhAppTemplate from 'interfaces/phAppTemplate';
 import defaultLogo from 'images/icon-apps.svg';
 import styled from 'styled-components';
+import PhApplication, {PhAppStatus} from 'interfaces/phApplication';
+import {DefaultEnv} from 'interfaces/PhAppTemplate';
+import Env from 'interfaces/env';
 
 const AppSelect = styled(Select)`
   .ant-select-selection-selected-value {
@@ -26,13 +29,15 @@ type Props = FormComponentProps & {
   onSubmit: ({}) => void;
   onCancel?: ({}) => void;
   loading: boolean;
-  initialValue?: any;
+  initialValue?: {templateId: string} & PhApplication;
   type?: 'edit' | 'create';
 };
 
 interface State {
+  reloadEnv?: boolean;
   revealEnv: boolean;
   appSearchText: string;
+  defaultEnv: DefaultEnv[];
 }
 
 const radioStyle = {
@@ -55,17 +60,13 @@ const radioGroupStyle = {
 };
 
 interface FormValue {
-  groupId: string;
+  groupName: string;
+  templateId: string;
+  appName: string;
   instanceType: string;
   name: string;
   id: string;
-  appName: string;
-  env: Array<{name: string, value: string}>;
-  metadata: object;
-  description: string;
-  updateMessage: string;
-  replicas: number;
-  privateAccess: boolean;
+  env: Env[];
 }
 
 const dashOrNumber = value => value === null ? '-' : value;
@@ -77,11 +78,15 @@ const autoGenId = (name: string) => {
 };
 
 class AppCreateForm extends React.Component<Props, State> {
-  state = {
-    recurrenceError: '',
-    revealEnv: false,
-    appSearchText: ''
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      reloadEnv: false,
+      revealEnv: false,
+      appSearchText: '',
+      defaultEnv: []
+    };
+  }
 
   componentDidMount() {
     const {initialValue} = this.props;
@@ -92,6 +97,9 @@ class AppCreateForm extends React.Component<Props, State> {
 
   componentDidUpdate() {
     this.autoSelectFirstInstanceType();
+    if (this.state.reloadEnv) {
+      this.setState({reloadEnv: false});
+    }
   }
 
   autoSelectFirstInstanceType = () => {
@@ -108,8 +116,6 @@ class AppCreateForm extends React.Component<Props, State> {
     e.preventDefault();
     form.validateFields(async (err, values: FormValue) => {
       if (err) return;
-      if (!values.metadata) values.metadata = {};
-      delete values.privateAccess;
       onSubmit(values);
     });
   }
@@ -128,6 +134,14 @@ class AppCreateForm extends React.Component<Props, State> {
     });
   }
 
+  reloadDefaultEnv = () => {
+    const {form, phAppTemplates} = this.props;
+    const templateId = form.getFieldValue('templateId');
+    const currentTemplate = find(phAppTemplates, v => v.id === templateId);
+    const { defaultEnv } = currentTemplate;
+    this.setState({defaultEnv, reloadEnv: true});
+  }
+
   renderLabel = (defaultLabel: string, invalid: boolean, message: any) => {
     let label = <span>{defaultLabel}</span>;
     if (invalid)
@@ -137,19 +151,22 @@ class AppCreateForm extends React.Component<Props, State> {
     return label;
   }
 
-  handleNameChange = debounce(() => {
+  handleAppChange = debounce(() => {
     const {form} = this.props;
     const values = form.getFieldsValue();
     form.validateFields(['templateId'], (err, val) => {
       if (err) return form.setFieldsValue({ id: '' });
       const id = autoGenId(val.templateId);
-      form.setFieldsValue({ id });
+      form.setFieldsValue({id});
     });
 
   }, 400);
 
   handleSelect = value => {
-    this.setState({appSearchText: ''});
+    const { phAppTemplates } = this.props;
+    const currentTemplate = find(phAppTemplates, v => v.id === value);
+    const { defaultEnv } = currentTemplate;
+    this.setState({appSearchText: '', defaultEnv});
   }
 
   handleSearch = appSearchText => {
@@ -169,10 +186,12 @@ class AppCreateForm extends React.Component<Props, State> {
     } = this.props;
     const {
       templateId,
+      appName,
       id,
-      name,
+      displayName,
       groupName,
       instanceType,
+      appDefaultEnv,
       scope,
       env,
     } = initialValue || {};
@@ -186,6 +205,12 @@ class AppCreateForm extends React.Component<Props, State> {
       'InstanceTypes',
       invalidInitialInstanceType,
       <span>The instance type <b>{instanceType}</b> was deleted.</span>
+    );
+
+    const reloadEnvBtn = (
+      <span onClick={this.reloadDefaultEnv} style={{cursor: 'pointer', marginLeft: '2px'}}>
+        <Icon type='redo' style={{color: '#5b7cc9'}} title='Reload App default environments'/>
+      </span>
     );
 
     const revealBtn = (
@@ -306,14 +331,16 @@ class AppCreateForm extends React.Component<Props, State> {
                   rules: [
                     { whitespace: true, required: true, message: 'Please input an app name!' },
                   ],
-                  initialValue: templateId
+                  initialValue: appName
                 })(
                   <AppSelect
-                    showSearch
+                    disabled={type === 'edit'}
                     placeholder='Search to Select'
+                    showSearch
                     onSearch={this.handleSearch}
                     optionFilterProp='children'
                     optionLabelProp='data-label'
+                    onChange={this.handleAppChange}
                     onSelect={this.handleSelect}
                     filterOption={(input, option) =>
                       option.props['data-name'].toLowerCase().indexOf(input.toLowerCase()) >= 0 ||
@@ -332,8 +359,8 @@ class AppCreateForm extends React.Component<Props, State> {
                 )}
               </Form.Item>
               <Form.Item label={`Name`} style={{marginBottom: '8px'}}>
-                {form.getFieldDecorator('displayName', {
-                  initialValue: name,
+                {form.getFieldDecorator('name', {
+                  initialValue: displayName,
                   rules: [
                     { whitespace: true, required: true, message: 'Please input a name!' },
                     { pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*/, message: `alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`}
@@ -344,12 +371,12 @@ class AppCreateForm extends React.Component<Props, State> {
               </Form.Item>
 
               <Divider />
-              <h3>Environment Variables { showRevealBtn === true ? revealBtn : null }</h3>
+              <h3>Environment Variables { showRevealBtn === true ? revealBtn : null } { !isEmpty(this.state.defaultEnv) ? reloadEnvBtn : null }</h3>
               <Form.Item >
                 {form.getFieldDecorator('env', {
                   initialValue: env
                 })(
-                  <EnvFields empty={null} enableReveal={showRevealBtn} reveal={revealEnv} />
+                  <EnvFields defaultEnv={type === 'edit' ? appDefaultEnv : this.state.defaultEnv} empty={null} reloadDefault={this.state.reloadEnv} enableReveal={showRevealBtn} reveal={revealEnv} />
                 )}
               </Form.Item>
 

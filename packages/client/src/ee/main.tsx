@@ -165,14 +165,14 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       placement: 'bottomRight',
       duration: null,
       btn: (
-        <Button type="primary" onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
+        <Button type='primary' onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
           Login Again
         </Button>
       ),
       key: 'refreshWarning'
     });
   }
-})
+});
 tokenSyncWorker.run().catch(console.error);
 
 // render

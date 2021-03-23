@@ -16,6 +16,7 @@ export const GroupFragment = gql`
     id
     displayName
     name
+    admins
     quotaCpu
     quotaGpu
     quotaMemory

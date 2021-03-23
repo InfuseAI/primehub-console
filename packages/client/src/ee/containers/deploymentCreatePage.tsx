@@ -29,7 +29,6 @@ const breadcrumbs = [
   }
 ];
 
-
 export const GET_MY_GROUPS = gql`
   query me {
     me {
@@ -42,7 +41,7 @@ export const GET_MY_GROUPS = gql`
     }
   }
   ${GroupFragment}
-`
+`;
 
 export const CREATE_DEPLOYMENT = gql`
   mutation createPhDeployment($data: PhDeploymentCreateInput!) {

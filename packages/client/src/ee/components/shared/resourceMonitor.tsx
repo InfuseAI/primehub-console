@@ -1,16 +1,16 @@
 import * as React from 'react';
 import {Spin, Card, Divider} from 'antd';
 import {get} from 'lodash';
-import styled from 'styled-components'
+import styled from 'styled-components';
 
-type Props = {
+interface Props {
   groupContext: any;
-  refetchGroup: Function;
-  showDataset: Boolean;
-  selectedGroup: String;
+  refetchGroup: () => void;
+  showDataset?: boolean;
+  selectedGroup: string;
 }
 
-type State = {
+interface State {
   groupContext: any;
 }
 

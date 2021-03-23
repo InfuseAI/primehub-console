@@ -15,16 +15,6 @@ import PageTitle from 'components/pageTitle';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
 
-export interface PhAppTemplate {
-  id: string;
-  name: string;
-  icon: string;
-  description: string;
-  version: string;
-  docLink: string;
-  defaultEnv: Array<{key: string, value: string}>;
-}
-
 const breadcrumbs = [
   {
     key: 'list',

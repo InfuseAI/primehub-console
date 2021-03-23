@@ -15,15 +15,7 @@ import { GroupContextValue, GroupContext } from 'context/group';
 import { UserContextValue, UserContext } from 'context/user';
 import { Landing } from '../landing';
 import ApiTokenPage from 'containers/apiTokenPage';
-
-export const GroupFragment = gql`
-  fragment GroupInfo on Group {
-    id
-    displayName
-    name
-    admins
-  }
-`;
+import { GroupFragment } from 'containers/list';
 
 export const GET_MY_GROUPS = gql`
   query me {
