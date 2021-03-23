@@ -12,9 +12,9 @@ import Agent, { HttpsAgent } from 'agentkeepalive';
 import koaMount from 'koa-mount';
 import yaml from 'js-yaml';
 import fs from 'fs';
-import NodeCache from 'node-cache'
+import NodeCache from 'node-cache';
 import { v4 as uuidv4 } from 'uuid';
-import { gql, GraphQLClient } from 'graphql-request'
+import { gql, GraphQLClient } from 'graphql-request';
 import Boom from 'boom';
 
 // controller
@@ -186,38 +186,32 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     target: config.graphqlSvcEndpoint.replace('/graphql', ''),
     changeOrigin: true,
     logs: true,
-    rewrite: path => path.replace(staticPath, '/')
+    rewrite: rewritePath => rewritePath.replace(staticPath, '/')
   }));
 
   const sessionTokenCacheExpireTime = 30;
   const sessionTokenCacheStore = new NodeCache({stdTTL: sessionTokenCacheExpireTime});
-  const checkSessionToken = async (ctx: Koa.ParameterizedContext) => {
+
+  const checkSessionToken = async (ctx: Koa.ParameterizedContext) =>  {
     const sessionToken = ctx.cookies.get('phapplication-session-id') || '';
-    const sessionTokenCached = sessionTokenCacheStore.get(sessionToken);
-    const scope = ctx.params.scope || '';
-    if (sessionToken) {
-      if (sessionTokenCached) {
-        return true;
-      }
-      ctx.resetSessionToken = true;
-    }
-    return false
+    return sessionTokenCacheStore.get(sessionToken);
   };
 
-  const updateSessionToken = async (ctx: Koa.ParameterizedContext) => {
+  const createSessionToken = async (ctx: Koa.ParameterizedContext) => {
     const appID = ctx.params.appID;
-    let sessionToken = ctx.cookies.get('phapplication-session-id');
-    if (!sessionToken || ctx.resetSessionToken) {
-      // Generate session token
-      sessionToken = uuidv4();
-      console.log('Generate token');
-      console.log(sessionToken);
-      ctx.cookies.set('phapplication-session-id', sessionToken, {path: `${config.appPrefix}/apps/${appID}`});
-    }
-    console.log('Update Token: ', sessionToken);
+    // Generate session token
+    const sessionToken = uuidv4();
+    ctx.cookies.set('phapplication-session-id', sessionToken, {path: `${config.appPrefix}/apps/${appID}`});
     sessionTokenCacheStore.set(sessionToken, true, sessionTokenCacheExpireTime);
+    console.log('Create Token: ', sessionToken);
 
     return true;
+  };
+
+  const updateSessionTTL = async (ctx: Koa.ParameterizedContext) => {
+    const sessionToken = ctx.cookies.get('phapplication-session-id');
+    sessionTokenCacheStore.ttl(sessionToken, sessionTokenCacheExpireTime);
+    console.log('Update Token TTL: ', sessionToken);
   };
 
   const checkUserGroup = async (ctx: Koa.ParameterizedContext) => {
@@ -252,13 +246,11 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.params.scope = scope;
     ctx.params.service = service;
 
-    console.log(`${config.appPrefix}/apps/${appID}`);
     switch (scope) {
       case 'group':
       case 'primehub':
-        const sessionCached = await checkSessionToken(ctx);
-        if (sessionCached === false) {
-          console.log('Token: ', ctx.cookies.get('phapplication-session-id'));
+        const cachedSessionToken = await checkSessionToken(ctx);
+        if (!cachedSessionToken) {
           return oidcCtrl.loggedIn(ctx, async () => {
             if (scope === 'group') {
               const groupAllowed = await checkUserGroup(ctx);
@@ -266,15 +258,16 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
                 throw Boom.forbidden('Request not authorized');
               }
             }
-            updateSessionToken(ctx);
+            createSessionToken(ctx);
             return ctx.redirect(ctx.url);
           });
         }
+        await updateSessionTTL(ctx);
         await proxies(`${config.appPrefix}/apps/${appID}`, {
           target: `http://${service}`,
           changeOrigin: true,
           logs: true,
-          rewrite: path => path.replace(`${config.appPrefix}/apps/${appID}/`, '/')
+          rewrite: rewritePath => rewritePath.replace(`${config.appPrefix}/apps/${appID}/`, '/')
         })(ctx, next);
         break;
       case 'public':
@@ -282,7 +275,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
           target: `http://${service}`,
           changeOrigin: true,
           logs: true,
-          rewrite: path => path.replace(`${config.appPrefix}/apps/${appID}/`, '/')
+          rewrite: rewritePath => rewritePath.replace(`${config.appPrefix}/apps/${appID}/`, '/')
         })(ctx, next);
         break;
       default:
