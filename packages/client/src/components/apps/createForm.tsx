@@ -9,7 +9,7 @@ import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 import PhAppTemplate from 'interfaces/phAppTemplate';
 import defaultLogo from 'images/icon-apps.svg';
 import styled from 'styled-components';
-import PhApplication, {PhAppStatus} from 'interfaces/phApplication';
+import PhApplication, {PhAppStatus, PhAppScope} from 'interfaces/phApplication';
 import {DefaultEnv} from 'interfaces/PhAppTemplate';
 import Env from 'interfaces/env';
 
@@ -66,6 +66,7 @@ interface FormValue {
   instanceType: string;
   name: string;
   id: string;
+  scope: PhAppScope;
   env: Env[];
 }
 
@@ -197,10 +198,15 @@ class AppCreateForm extends React.Component<Props, State> {
     } = initialValue || {};
     const { revealEnv, appSearchText } = this.state;
     const showRevealBtn = !!(type === 'edit');
-
+    const scopeList = [
+      {label: 'Public', value: PhAppScope.Public},
+      {label: 'PrimeHub users only', value: PhAppScope.PrimeHubUserOnly},
+      {label: 'Group members only', value: PhAppScope.GroupOnly},
+    ];
     const invalidInitialInstanceType = instanceType &&
       !form.getFieldValue('instanceType') &&
       !instanceTypes.find(it => it.id === instanceType);
+
     const instanceTypeLabel = this.renderLabel(
       'InstanceTypes',
       invalidInitialInstanceType,
@@ -371,8 +377,7 @@ class AppCreateForm extends React.Component<Props, State> {
               </Form.Item>
 
               <Divider />
-              <h3>Environment Variables { showRevealBtn === true ? revealBtn : null } { !isEmpty(this.state.defaultEnv) ? reloadEnvBtn : null }</h3>
-              <Form.Item >
+              <Form.Item label={<span>Environment Variables { showRevealBtn === true ? revealBtn : null } { !isEmpty(this.state.defaultEnv) ? reloadEnvBtn : null }</span>} >
                 {form.getFieldDecorator('env', {
                   initialValue: env
                 })(
@@ -381,9 +386,8 @@ class AppCreateForm extends React.Component<Props, State> {
               </Form.Item>
 
               <Divider />
-              <h3>Resources</h3>
               <Row gutter={24}>
-                <Col span={24}>
+                <Col span={16}>
                   <Form.Item label={instanceTypeLabel}>
                     {form.getFieldDecorator('instanceType', {
                       initialValue: instanceType,
@@ -417,9 +421,23 @@ class AppCreateForm extends React.Component<Props, State> {
                       )
                     )}
                   </Form.Item>
+                  <Form.Item label={`Access Scope`}>
+                    {form.getFieldDecorator('scope', {
+                      initialValue: scope || PhAppScope.Public
+                    })(
+                      <Select disabled={type === 'edit'}>
+                        {
+                          scopeList.map(item => {
+                            return (
+                              <Option value={item.value}>{item.label}</Option>
+                            );
+                          })
+                        }
+                      </Select>
+                    )}
+                  </Form.Item>
                 </Col>
               </Row>
-              <Divider />
             </Card>
             <Form.Item style={{textAlign: 'right', marginTop: 12}}>
               {

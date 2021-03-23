@@ -10,6 +10,12 @@ export enum PhAppStatus {
   Stopped = 'Stopped',
 }
 
+export enum PhAppScope {
+  Public = 'public',
+  PrimeHubUserOnly = 'primehub',
+  GroupOnly = 'group'
+}
+
 export default interface PhApplication {
   id: string;
   displayName: string;
@@ -19,7 +25,7 @@ export default interface PhApplication {
   appDefaultEnv: DefaultEnv[];
   groupName: string;
   instanceType: any;
-  scope: string;
+  scope: PhAppScope;
   appUrl: string;
   internalAppUrl: string;
   svcEndpoint: string[];

@@ -9,7 +9,8 @@ export const me = {
     instanceTypes: [{
       id: 'g-it1',
       name: 'IT1',
-      displayName: 'group1 it'
+      displayName: 'group1 it',
+      description: 'Basic instance.'
     }],
     images: [{
       id: 'image-1',
