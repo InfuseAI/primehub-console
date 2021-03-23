@@ -191,45 +191,40 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
 
   const sessionTokenCacheExpireTime = 30;
   const sessionTokenCacheStore = new NodeCache({stdTTL: sessionTokenCacheExpireTime});
-  const checkSessionToken = async (ctx: Koa.ParameterizedContext, next: any) => {
+  const checkSessionToken = async (ctx: Koa.ParameterizedContext) => {
     const sessionToken = ctx.cookies.get('phapplication-session-id') || '';
     const sessionTokenCached = sessionTokenCacheStore.get(sessionToken);
     const scope = ctx.params.scope || '';
     if (sessionToken) {
       if (sessionTokenCached) {
-        return next();
+        return true;
       }
       ctx.resetSessionToken = true;
     }
-    console.log('Token: ', ctx.cookies.get('phapplication-session-id'));
-    return oidcCtrl.loggedIn(ctx, () => {
-      if (scope === 'group') {
-        return checkUserGroup(ctx, next);
-      }
-      return next();
-    });
+    return false
   };
 
-  const updateSessionToken = async (ctx: Koa.ParameterizedContext, next: any) => {
+  const updateSessionToken = async (ctx: Koa.ParameterizedContext) => {
+    const appID = ctx.params.appID;
     let sessionToken = ctx.cookies.get('phapplication-session-id');
     if (!sessionToken || ctx.resetSessionToken) {
       // Generate session token
       sessionToken = uuidv4();
       console.log('Generate token');
       console.log(sessionToken);
-      ctx.cookies.set('phapplication-session-id', sessionToken, {path: `${config.appPrefix}/apps/abc`});
+      ctx.cookies.set('phapplication-session-id', sessionToken, {path: `${config.appPrefix}/apps/${appID}`});
     }
-    console.log('Update Token: ', sessionToken)
+    console.log('Update Token: ', sessionToken);
     sessionTokenCacheStore.set(sessionToken, true, sessionTokenCacheExpireTime);
 
-    return next();
+    return true;
   };
 
-  const checkUserGroup = async (ctx: Koa.ParameterizedContext, next: any) => {
+  const checkUserGroup = async (ctx: Koa.ParameterizedContext) => {
     const {userId} = oidcCtrl.getUserFromContext(ctx);
     const variables = {
       id: userId,
-    }
+    };
     const query = gql`
     query ($id: ID!) {
       user(where: {id: $id}) {
@@ -238,44 +233,56 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
         groups {name}
       }
     }
-    `
+    `;
     const data = await ctx.graphqlClient.request(query, variables);
 
     for (const group of data.user.groups) {
-      console.log(group.name);
       if (group.name === 'phusers') {
-        return next();
+        return true;
       }
     }
-
-    throw Boom.forbidden('request not authorized');
+    return false;
   };
 
   const phApplicationProxyHandler = async (ctx: Koa.ParameterizedContext, next: any) => {
     const appID = ctx.params.appID;
-    const scope = 'public';
+    const scope = ctx.params.appID;
     // const service = 'app-mlflow-xyzab.hub.svc.cluster.local:5000';
     const service = 'localhost:5000';
     ctx.params.scope = scope;
     ctx.params.service = service;
 
-
+    console.log(`${config.appPrefix}/apps/${appID}`);
     switch (scope) {
-      // case 'group':
-      // case 'primehub':
-      //   await checkUserGroup(ctx, next);
-      //   await updateSessionToken(ctx, next);
-      //   await proxies(`${config.appPrefix}/apps/${appID}`, {
-      //     target: `http://${service}`,
-      //     changeOrigin: true,
-      //     logs: true,
-      //   })(ctx, next);
-      //   break;
+      case 'group':
+      case 'primehub':
+        const sessionCached = await checkSessionToken(ctx);
+        if (sessionCached === false) {
+          console.log('Token: ', ctx.cookies.get('phapplication-session-id'));
+          return oidcCtrl.loggedIn(ctx, async () => {
+            if (scope === 'group') {
+              const groupAllowed = await checkUserGroup(ctx);
+              if (groupAllowed === false) {
+                throw Boom.forbidden('Request not authorized');
+              }
+            }
+            updateSessionToken(ctx);
+            return ctx.redirect(ctx.url);
+          });
+        }
+        await proxies(`${config.appPrefix}/apps/${appID}`, {
+          target: `http://${service}`,
+          changeOrigin: true,
+          logs: true,
+          rewrite: path => path.replace(`${config.appPrefix}/apps/${appID}/`, '/')
+        })(ctx, next);
+        break;
       case 'public':
         await proxies(`${config.appPrefix}/apps/${appID}`, {
           target: `http://${service}`,
           changeOrigin: true,
           logs: true,
+          rewrite: path => path.replace(`${config.appPrefix}/apps/${appID}/`, '/')
         })(ctx, next);
         break;
       default:
