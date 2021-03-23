@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {Row, Col, Button, Skeleton, Input, message, Spin, Divider, Alert} from 'antd';
+import {ButtonType} from 'antd/lib/button';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -14,10 +15,70 @@ import Filter from 'ee/components/shared/filter';
 import {Group} from 'ee/components/shared/groupFilter';
 import {errorHandler} from 'utils/errorHandler';
 import AppCard from 'components/apps/card';
-import { PhDeploymentFragment, DeploymentConnection } from 'ee/components/modelDeployment/common';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
+
+export interface ApplicationConnection {
+  pageInfo: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    startCursor?: string;
+    endCursor?: string;
+  };
+  edges: Array<{
+    cursor: string;
+    node: ApplicationInfo;
+  }>;
+}
+
+export const PhApplicationFragment = gql`
+fragment PhApplicationInfo on PhApplication {
+  id
+  icon
+  displayName
+  appVersion
+  appName
+  appIcon
+  appDefaultEnv
+  groupName
+  instanceType
+  scope
+  appUrl
+  internalAppUrl
+  svcEndpoint
+  env
+  stop
+  status
+  message
+}
+`;
+
+export interface ApplicationInfo {
+  id: string;
+  displayName: string;
+  appName: string;
+  appVersion: string;
+  appIcon: string;
+  appDefaultEnv: Array<{name: string, description: string, defaultValue: string, optional: boolean}>;
+  groupName: string;
+  instanceType: {
+    id: string;
+    name: string;
+    displayName: string;
+    cpuLimit: number;
+    memoryLimit: number;
+    gpuLimit: number;
+  };
+  scope: string;
+  appUrl: string;
+  internalAppUrl: string;
+  svcEndpoint: string[];
+  env: Array<{name: string, value: string}>;
+  stop: boolean;
+  status: string;
+  message: string;
+}
 
 const breadcrumbs = [
   {
@@ -29,11 +90,11 @@ const breadcrumbs = [
 ];
 
 const PAGE_SIZE = 12;
-const Search = Input.Search
+const Search = Input.Search;
 
-export const GET_PH_DEPLOYMENT_CONNECTION = gql`
-  query phDeploymentsConnection($where: PhDeploymentWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
-    phDeploymentsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
+export const GET_PH_APPLICATION_CONNECTION = gql`
+  query phApplicationsConnection($where: PhApplicationsWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
+    phApplicationsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
       pageInfo {
         hasNextPage
         hasPreviousPage
@@ -43,12 +104,12 @@ export const GET_PH_DEPLOYMENT_CONNECTION = gql`
       edges {
         cursor
         node {
-          ...PhDeploymentInfo
+          ...PhApplicationInfo
         }
       }
     }
   }
-  ${PhDeploymentFragment}
+  ${PhApplicationFragment}
 `;
 
 type Props = {
@@ -58,7 +119,7 @@ type Props = {
     displayName: string;
     enabledDeployment: boolean;
   }>;
-  getPhDeploymentConnection: {
+  getPhApplicationConnection: {
     error?: any;
     loading: boolean;
     variables: {
@@ -68,12 +129,12 @@ type Props = {
       last?: number,
       before?: string
     };
-    refetch: Function;
-    phDeploymentsConnection: DeploymentConnection
+    refetch: ({}?) => void;
+    phApplicationsConnection: ApplicationConnection
   };
 } & RouteComponentProps & GroupContextComponentProps;
 
-type State = {
+interface State {
   value: string;
 }
 
@@ -90,9 +151,9 @@ class AppListContainer extends React.Component<Props, State> {
   }
 
   nextPage = () => {
-    const {getPhDeploymentConnection} = this.props;
-    const {phDeploymentsConnection, refetch} = getPhDeploymentConnection;
-    const after = phDeploymentsConnection.pageInfo.endCursor;
+    const {getPhApplicationConnection} = this.props;
+    const {phApplicationsConnection, refetch} = getPhApplicationConnection;
+    const after = phApplicationsConnection.pageInfo.endCursor;
     const newVariables = {
       after,
       first: PAGE_SIZE,
@@ -103,9 +164,9 @@ class AppListContainer extends React.Component<Props, State> {
   }
 
   previousPage = () => {
-    const {getPhDeploymentConnection} = this.props;
-    const {phDeploymentsConnection, refetch} = getPhDeploymentConnection;
-    const before = phDeploymentsConnection.pageInfo.startCursor;
+    const {getPhApplicationConnection} = this.props;
+    const {phApplicationsConnection, refetch} = getPhApplicationConnection;
+    const before = phApplicationsConnection.pageInfo.startCursor;
     const newVariables = {
       before,
       last: PAGE_SIZE,
@@ -115,16 +176,16 @@ class AppListContainer extends React.Component<Props, State> {
     refetch(newVariables);
   }
 
-  searchHandler = (queryString) => {
-    const {getPhDeploymentConnection} = this.props;
-    const {phDeploymentsConnection, refetch, variables} = getPhDeploymentConnection;
+  searchHandler = query => {
+    const {getPhApplicationConnection} = this.props;
+    const {phApplicationsConnection, refetch, variables} = getPhApplicationConnection;
     const newVariables = {
       ...variables,
       where: {
         ...variables.where,
-        name_contains: queryString
+        name_contains: query
       }
-    }
+    };
     refetch(newVariables);
   }
 
@@ -132,11 +193,11 @@ class AppListContainer extends React.Component<Props, State> {
     selectedGroups,
     submittedByMe
   }: {
-    selectedGroups: Array<string>;
+    selectedGroups: string[];
     submittedByMe: boolean;
   }) => {
-    const {groupContext, getPhDeploymentConnection} = this.props;
-    const {variables, refetch} = getPhDeploymentConnection;
+    const {groupContext, getPhApplicationConnection} = this.props;
+    const {variables, refetch} = getPhApplicationConnection;
     const newVariables = {
       ...variables,
       where: {
@@ -146,29 +207,29 @@ class AppListContainer extends React.Component<Props, State> {
     };
 
     if (!groupContext) {
-      newVariables.where.groupId_in = selectedGroups;
+      newVariables.where.groupName_in = selectedGroups;
     }
 
     refetch(newVariables);
   }
 
   render() {
-    const { groupContext, getPhDeploymentConnection, groups, history } = this.props;
+    const { groupContext, getPhApplicationConnection, groups, history } = this.props;
     const {
       error,
       loading,
-      phDeploymentsConnection,
+      phApplicationsConnection,
       variables,
       refetch
-    } = getPhDeploymentConnection;
+    } = getPhApplicationConnection;
 
     if (error) {
-      console.log(getPhDeploymentConnection.error);
+      console.log(getPhApplicationConnection.error);
       return 'Error';
     }
 
-    if (!phDeploymentsConnection) {
-      return <Skeleton />
+    if (!phApplicationsConnection) {
+      return <Skeleton />;
     }
 
     let showContent = true;
@@ -176,9 +237,11 @@ class AppListContainer extends React.Component<Props, State> {
     let pageBody = <>
       <div style={{textAlign: 'right'}}>
         <InfuseButton
-          icon="plus"
-          type="primary"
-          onClick={() => history.push(`model-deployment/create`)}
+          icon='plus'
+          type='primary'
+          onClick={() => {
+            history.push(`apps/create`);
+          }}
           style={{marginRight: 16, width: 'auto'}}
         >
           Create Apps
@@ -187,33 +250,27 @@ class AppListContainer extends React.Component<Props, State> {
       </div>
     </>;
 
-    if ( groupContext ) {
-      const group = groups.find(group => group.id === groupContext.id);
-      if ( !group ) {
+    if (groupContext) {
+      const group = groups.find(g => g.id === groupContext.id);
+      if (!group) {
         pageBody = <Alert
-          message="Group not found"
+          message='Group not found'
           description={`Group ${groupContext.name} is not found or not authorized.`}
-          type="error"
-          showIcon/>;
-          showContent = false;
-      } else if ( group.enabledDeployment !== true ) {
-        pageBody = <Alert
-          message="Feature not available"
-          description="Model Deployment is not enabled for this group. Please contact your administrator to enable it."
-          type="warning"
+          type='error'
           showIcon/>;
         showContent = false;
       }
     }
 
-    const content = <div style={{margin: '16px 16px'}}>
+    const content = (
+      <div style={{margin: '16px 16px'}}>
         <Spin spinning={loading}>
-          <Row gutter={24} type="flex">
-            {phDeploymentsConnection.edges.map(edge => {
+          <Row gutter={24} type='flex'>
+            {phApplicationsConnection.edges.map(edge => {
               return (
                 <Col xs={24} md={12} xl={8} xxl={6} key={edge.cursor} style={{marginBottom: 16}}>
                   <AppCard
-                    deployment={edge.node}
+                    application={edge.node}
                     copyClipBoard={this.copyClipBoard}
                   />
                 </Col>
@@ -226,12 +283,13 @@ class AppListContainer extends React.Component<Props, State> {
           style={{position: 'absolute', left: '-1000px', top: '-1000px'}}
         />
         <Pagination
-          hasNextPage={phDeploymentsConnection.pageInfo.hasNextPage}
-          hasPreviousPage={phDeploymentsConnection.pageInfo.hasPreviousPage}
+          hasNextPage={phApplicationsConnection.pageInfo.hasNextPage}
+          hasPreviousPage={phApplicationsConnection.pageInfo.hasPreviousPage}
           nextPage={this.nextPage}
           previousPage={this.previousPage}
         />
       </div>
+    );
 
     return (
       <>
@@ -248,13 +306,13 @@ class AppListContainer extends React.Component<Props, State> {
 
 export default compose(
   withRouter,
-  graphql(GET_PH_DEPLOYMENT_CONNECTION, {
+  graphql(GET_PH_APPLICATION_CONNECTION, {
     options: (props: Props) => {
       const params = queryString.parse(props.location.search.replace(/^\?/, ''));
       const {groupContext} = props;
       const where = JSON.parse(params.where as string || '{}');
       if (groupContext) {
-        where.groupId_in = [groupContext.id];
+        where.groupName_in = [groupContext.name];
       }
 
       return {
@@ -265,6 +323,6 @@ export default compose(
         fetchPolicy: 'cache-and-network'
       };
     },
-    name: 'getPhDeploymentConnection'
+    name: 'getPhApplicationConnection'
   }),
-)(AppListContainer)
+)(AppListContainer);

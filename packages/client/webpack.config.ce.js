@@ -13,7 +13,7 @@ resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/index.ce.schema.
 
 module.exports = {
   entry: {
-    index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
+    cms: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
     'main': devMode ? './src/main.ce.tsx' : ['./src/public-import.js', './src/main.ce.tsx'],
   },
@@ -89,9 +89,9 @@ module.exports = {
   },
   plugins: [
     new HtmlWebPackPlugin({
-      chunks: ['index'],
+      chunks: ['cms'],
       template: 'docs/index.html',
-      filename: 'index.html'
+      filename: 'cms.html'
     }),
     new HtmlWebPackPlugin({
       chunks: ['landing'],
@@ -101,7 +101,7 @@ module.exports = {
     new HtmlWebPackPlugin({
       chunks: ['main'],
       template: 'docs/index.html',
-      filename: 'main.html'
+      filename: 'index.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({

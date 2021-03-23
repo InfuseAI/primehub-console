@@ -2,7 +2,7 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 import {ApolloProvider} from 'react-apollo';
 import {notification, Button} from 'antd';
-import {BrowserRouter, Route} from 'react-router-dom';
+import {BrowserRouter, Route, Redirect} from 'react-router-dom';
 import {BackgroundTokenSyncer} from '../workers/backgroundTokenSyncer';
 import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
@@ -28,6 +28,7 @@ import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
 import AppListContainer from 'containers/appList';
+import AppCreatePage from 'containers/appCreatePage';
 
 const client = createGraphqlClient({
   fakeData,
@@ -115,6 +116,12 @@ class Main extends React.Component {
             <Route path={`${appPrefix}g/:groupName/apps`} exact>
               <ListContainer Com={AppListContainer} />
             </Route>
+
+            <Route path={`${appPrefix}g/:groupName/apps/create`} exact>
+              <AppCreatePage />
+            </Route>
+            {/* No Matched, back to default `/g` */}
+            <Redirect to={`${appPrefix}g/`}/>
           </MainPage>
         </ApolloProvider>
       </BrowserRouter>

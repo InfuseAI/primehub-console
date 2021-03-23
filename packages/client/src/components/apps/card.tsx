@@ -2,16 +2,13 @@ import React from 'react';
 import {Icon, Divider, Tag, Card, Tooltip} from 'antd';
 import {isEmpty} from 'lodash';
 import {RouteComponentProps, withRouter} from 'react-router-dom';
-import {DeploymentInfo, Status} from 'ee/components/modelDeployment/common';
+import {ApplicationInfo} from 'containers/appList';
 import moment from 'moment';
 import Field from 'components/share/field';
-import mlflowLogo from 'images/mlflow.png';
-import matlabLogo from 'images/matlab.svg';
-import gitlabLogo from 'images/gitlab.svg';
 import defaultLogo from 'images/icon-apps.svg';
 
 type Props = RouteComponentProps & {
-  deployment: DeploymentInfo;
+  application: ApplicationInfo;
   copyClipBoard: (text: string) => void;
 };
 
@@ -21,15 +18,15 @@ const textOverflowStyle: React.CSSProperties = {
   textOverflow: 'ellipsis',
   msTextOverflow: 'ellipsis',
   display: 'block',
-}
+};
 
-function getCardColor(deployment: DeploymentInfo) {
-  switch (deployment.status) {
+function getCardColor(application: ApplicationInfo) {
+  switch (application.status) {
     case 'Ready':
       return '#87d068';
     case 'Stopping':
     case 'Starting':
-      return 'orange'
+      return 'orange';
     case 'Error':
       return 'red';
     case 'Stopped':
@@ -40,26 +37,23 @@ function getCardColor(deployment: DeploymentInfo) {
 
 class AppCard extends React.Component<Props> {
   render() {
-    const {deployment, copyClipBoard, history} = this.props;
-    const appType = deployment.name.toLowerCase().indexOf('mlflow') > 0 ? 'MLFlow'
-      : deployment.name.toLowerCase().indexOf('gitlab') > 0 ? 'Gitlab'
-      : deployment.name.toLowerCase().indexOf('lab') > 0 ? 'MATLAB' : 'myapp';
-    const src = appType === 'MLFlow' ? mlflowLogo : appType === 'Gitlab' ? gitlabLogo : appType === 'MATLAB' ? matlabLogo : defaultLogo;
-    const appVersion = appType === 'MLFlow' ? 'v1.9.1' : appType === 'Gitlab' ? 'v13.10.0' : appType === 'MATLAB' ? 'R2020b' : 'v1.0.0';
+    const {application, history} = this.props;
+    const {appName, appIcon, appVersion, appUrl} = application;
+    const src = appIcon && appIcon.length > 0 ? appIcon : defaultLogo;
     return (
       <Card
         style={{
           height: '100%',
         }}
         hoverable
-        onClick={() => history.push(`model-deployment/${deployment.id}`)}
+        onClick={() => history.push(`apps/${application.id}`)}
         actions={[
-          <span><Icon type="setting" key="Manage" /> Manage</span>,
-          (deployment.status === 'Stopped' ?
-            <span><Icon type="caret-right" key="Start" /> Start</span> :
-            (deployment.status === 'Ready' ? <span><Icon type="stop" key="Stop" /> Stop</span> : <span><Icon type="reload" key="Restart" /> Restart</span>)
+          <a href={`apps/${application.id}`}><Icon type='setting' key='Manage' /> Manage</a>,
+          (application.status === 'Stopped' ?
+            <span><Icon type='caret-right' key='Start' /> Start</span> :
+            (application.status === 'Ready' ? <span><Icon type='stop' key='Stop' /> Stop</span> : <span><Icon type='reload' key='Restart' /> Restart</span>)
           ),
-          <span><Icon type="export" key="Open App" /> Open</span>,
+          <a href={`${appUrl}`} target='_blank'><Icon type='export' key='Open App' /> Open</a>,
         ]}
       >
         <div style={{clear: 'both'}}>
@@ -71,7 +65,7 @@ class AppCard extends React.Component<Props> {
             border: '1px solid #ccc',
             borderRadius: '9px',
             overflow: 'hidden',
-            backgroundColor: appType === 'myapp' ? 'rgb(215 222 242)' : null,
+            backgroundColor: src === defaultLogo ? 'rgb(215 222 242)' : null,
             float: 'right'
           }}><img src={src} width='54'/></span>
           <h2 style={{
@@ -81,11 +75,11 @@ class AppCard extends React.Component<Props> {
             msTextOverflow: 'ellipsis',
             display: 'block'
           }}>
-            {deployment.name}
+            {application.displayName}
           </h2>
           <div>
-            <Tag color={getCardColor(deployment)}>{deployment.status}</Tag>
-            <Tag>{appType}:{appVersion}</Tag>
+            <Tag color={getCardColor(application)}>{application.status}</Tag>
+            <Tag>{appName}:{appVersion}</Tag>
           </div>
         </div>
       </Card>
