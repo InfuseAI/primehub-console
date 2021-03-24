@@ -3,7 +3,6 @@ import { Icon, Modal, Card, Divider, Row, Col, Tabs, Input, Button, message} fro
 import { DeploymentInfo, Status, ClientResult } from './common';
 import PageTitle from 'components/pageTitle';
 import InfuseButton from 'components/infuseButton';
-import { appPrefix } from 'utils/env';
 import {Link} from 'react-router-dom';
 import Field from 'components/share/field';
 import ModelDeploymentLogs from 'ee/components/modelDeployment/logs';
@@ -17,29 +16,23 @@ import Breadcrumbs from 'components/share/breadcrumb';
 
 const {confirm} = Modal;
 
-type Props = {
-  //
-  stopPhDeployment: Function;
+interface Props {
+  stopPhDeployment: ({}) => void;
   stopPhDeploymentResult: any;
-  //
-  deletePhDeployment: Function;
+  deletePhDeployment: ({}) => void;
   deletePhDeploymentResult: any;
-  //
-  deployPhDeployment: Function;
+  deployPhDeployment: ({}) => void;
   deployPhDeploymentResult: any;
-  //
-  createPhDeploymentClient: Function;
+  createPhDeploymentClient: ({}) => void;
   createPhDeploymentClientResult: any;
-  //
-  deletePhDeploymentClient: Function;
+  deletePhDeploymentClient: ({}) => void;
   deletePhDeploymentClientResult: any;
-  //
-  refetchPhDeployment: Function;
+  refetchPhDeployment: ({}) => void;
   phDeployment: DeploymentInfo;
   history: any;
 }
 
-type State = {
+interface State {
   clientAdded: ClientResult;
   revealEnv: boolean;
 }

@@ -135,7 +135,7 @@ export default class Detail extends React.Component<Props, State> {
             </AppLogo>
           </Left>
           <h2 style={{margin: '4px 0 0'}}>{phApplication.displayName}</h2>
-          <h4 style={{color: '#aaa'}}>{appTemplate.name}, current version: {phApplication.appVersion}</h4>
+          <h4 style={{color: '#aaa'}}>{appTemplate.name}, app version: {phApplication.appVersion}</h4>
           <ClearBoth/>
           <div>{appTemplate.description}</div>
           <Divider style={{margin: '8px 0'}}/>
