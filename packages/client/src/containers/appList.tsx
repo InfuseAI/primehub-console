@@ -244,7 +244,7 @@ class AppListContainer extends React.Component<Props, State> {
           }}
           style={{marginRight: 16, width: 'auto'}}
         >
-          New Apps
+          New App
         </InfuseButton>
         <InfuseButton onClick={() => refetch()}>Refresh</InfuseButton>
       </div>

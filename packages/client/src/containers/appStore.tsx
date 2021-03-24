@@ -63,7 +63,7 @@ class AppStore extends React.Component<Props> {
                   <Right>
                     <ActionBtn type='primary'>
                       <Link to={`create/${appTemplate.id}`}>
-                        <Icon type='appstore' /> Install App
+                        <Icon type='plus' /> Add to PrimeHub
                       </Link>
                     </ActionBtn>
                   </Right>

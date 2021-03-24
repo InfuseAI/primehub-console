@@ -25,7 +25,7 @@ const breadcrumbs = [
   {
     key: 'create',
     matcher: /\/apps\/create/,
-    title: 'Create Apps'
+    title: 'Add App to PrimeHub'
   }
 ];
 
