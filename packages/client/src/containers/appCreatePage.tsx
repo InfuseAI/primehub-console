@@ -107,7 +107,8 @@ class AppCreatePage extends React.Component<Props, State> {
   }
 
   render() {
-    const {groupContext, getGroups, getPhAppTemplates, createPhApplicationResult, history} = this.props;
+    const {groupContext, getGroups, getPhAppTemplates, createPhApplicationResult, history, match} = this.props;
+    const {params} = match;
     const phAppTemplates = get(getPhAppTemplates, 'phAppTemplates') || [];
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
@@ -122,6 +123,12 @@ class AppCreatePage extends React.Component<Props, State> {
       get(everyoneGroup, 'instanceTypes', []),
       'id'
     );
+    const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
+
+    if (!getPhAppTemplates.phAppTemplates) return null;
+    if (getPhAppTemplates.error) {
+      return getMessage(getPhAppTemplates.error);
+    }
 
     return (
       <React.Fragment>
@@ -131,6 +138,7 @@ class AppCreatePage extends React.Component<Props, State> {
         />
         <div style={{margin: '16px'}}>
           <AppCreateForm
+            templateId={params.templateId}
             groupContext={groupContext}
             phAppTemplates={phAppTemplates}
             refetchGroup={getGroups.refetch}

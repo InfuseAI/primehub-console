@@ -28,6 +28,7 @@ import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
 import AppListContainer from 'containers/appList';
 import AppCreate from 'containers/appCreatePage';
+import AppStore from 'containers/appStore';
 import AppDetail from 'containers/appDetail';
 import AppEdit from 'containers/appEditPage';
 
@@ -117,10 +118,9 @@ class Main extends React.Component {
             <Route path={`${appPrefix}g/:groupName/apps`} exact>
               <ListContainer Com={AppListContainer} />
             </Route>
-
-            <Route path={`${appPrefix}g/:groupName/apps/create`} exact>
-              <AppCreate />
-            </Route>
+            <Route path={`${appPrefix}g/:groupName/apps/store`} exact component={AppStore}/>
+            <Route path={`${appPrefix}g/:groupName/apps/create`} exact component={AppCreate}/>
+            <Route path={`${appPrefix}g/:groupName/apps/create/:templateId`} exact component={AppCreate}/>
             <Route path={`${appPrefix}g/:groupName/apps/:appId`} exact component={AppDetail}/>
             <Route path={`${appPrefix}g/:groupName/apps/:appId/edit`} exact component={AppEdit}/>
 

@@ -11,20 +11,20 @@ import AppInformation from 'components/apps/appInfo';
 import styled from 'styled-components';
 import {AppLogo} from 'components/apps/card';
 
-const ActionBtn = styled(InfuseButton)`
+export const ActionBtn = styled(InfuseButton)`
   margin-right: 8px;
 `;
 
-const ClearBoth = styled.div`
+export const ClearBoth = styled.div`
   clear: both;
 `;
 
-const Right = styled.div`
+export const Right = styled.div`
   float: right;
   text-align: right;
 `;
 
-const Left = styled.div`
+export const Left = styled.div`
   float: left;
   text-align: left;
 `;

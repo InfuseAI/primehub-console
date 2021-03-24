@@ -22,6 +22,7 @@ const AppSelect = styled(Select)`
 const { Option } = Select;
 
 type Props = FormComponentProps & {
+  templateId?: string;
   groupContext: any;
   refetchGroup: ({}?) => void;
   phAppTemplates: PhAppTemplate[];
@@ -81,11 +82,15 @@ const autoGenId = (name: string) => {
 class AppCreateForm extends React.Component<Props, State> {
   constructor(props) {
     super(props);
+    const { phAppTemplates, templateId } = props;
+    const currentTemplate = find(phAppTemplates, v => v.id === templateId);
+    const defaultEnv = currentTemplate ? currentTemplate.defaultEnv : [];
+
     this.state = {
       reloadEnv: false,
       revealEnv: false,
       appSearchText: '',
-      defaultEnv: []
+      defaultEnv: defaultEnv || []
     };
   }
 
@@ -96,10 +101,13 @@ class AppCreateForm extends React.Component<Props, State> {
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     this.autoSelectFirstInstanceType();
     if (this.state.reloadEnv) {
       this.setState({reloadEnv: false});
+    }
+    if (this.props.templateId !== prevProps.templateId) {
+      this.setState({defaultEnv: this.getDefaultEnv(this.props.templateId)});
     }
   }
 
@@ -163,10 +171,15 @@ class AppCreateForm extends React.Component<Props, State> {
 
   }, 400);
 
-  handleSelect = value => {
+  getDefaultEnv = id => {
     const { phAppTemplates } = this.props;
-    const currentTemplate = find(phAppTemplates, v => v.id === value);
+    const currentTemplate = find(phAppTemplates, v => v.id === id);
     const { defaultEnv } = currentTemplate;
+    return defaultEnv;
+  }
+
+  handleSelect = value => {
+    const defaultEnv = this.getDefaultEnv(value);
     this.setState({appSearchText: '', defaultEnv});
   }
 
@@ -176,6 +189,7 @@ class AppCreateForm extends React.Component<Props, State> {
 
   render() {
     const {
+      templateId,
       groupContext,
       refetchGroup,
       phAppTemplates,
@@ -185,6 +199,11 @@ class AppCreateForm extends React.Component<Props, State> {
       initialValue,
       type
     } = this.props;
+    const preloadApp: any = {};
+    if (templateId) {
+      preloadApp.appName = templateId;
+      preloadApp.id = autoGenId(templateId);
+    }
     const {
       appName,
       id,
@@ -194,7 +213,7 @@ class AppCreateForm extends React.Component<Props, State> {
       appDefaultEnv,
       scope,
       env,
-    } = initialValue || {};
+    } = initialValue || preloadApp || {};
     const { revealEnv, appSearchText } = this.state;
     const showRevealBtn = !!(type === 'edit');
     const scopeList = [
@@ -336,7 +355,7 @@ class AppCreateForm extends React.Component<Props, State> {
                   rules: [
                     { whitespace: true, required: true, message: 'Please input an app name!' },
                   ],
-                  initialValue: appName
+                  initialValue: appName || templateId
                 })(
                   <AppSelect
                     disabled={type === 'edit'}

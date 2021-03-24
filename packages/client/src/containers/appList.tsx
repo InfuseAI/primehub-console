@@ -240,11 +240,11 @@ class AppListContainer extends React.Component<Props, State> {
           icon='plus'
           type='primary'
           onClick={() => {
-            history.push(`apps/create`);
+            history.push(`apps/store`);
           }}
           style={{marginRight: 16, width: 'auto'}}
         >
-          Create Apps
+          New Apps
         </InfuseButton>
         <InfuseButton onClick={() => refetch()}>Refresh</InfuseButton>
       </div>

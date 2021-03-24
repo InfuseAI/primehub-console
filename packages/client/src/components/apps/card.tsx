@@ -1,5 +1,6 @@
 import React from 'react';
 import {Icon, Tag, Card, Tooltip} from 'antd';
+import {Link} from 'react-router-dom';
 import {RouteComponentProps, withRouter} from 'react-router-dom';
 import {ApplicationInfo} from 'containers/appList';
 import defaultLogo from 'images/icon-apps.svg';
@@ -58,7 +59,7 @@ class AppCard extends React.Component<Props> {
           backgroundColor: src === defaultLogo ? 'rgb(215 222 242)' : null,
         }}
         actions={[
-          <a href={`apps/${application.id}`}><Icon type='setting' key='Manage' /> Manage</a>,
+          <Link to={`apps/${application.id}`}><Icon type='setting' key='Manage' /> Manage</Link>,
           (application.status === 'Stopped' ?
             <span><Icon type='caret-right' key='Start' /> Start</span> :
             (application.status === 'Ready' ? <span><Icon type='stop' key='Stop' /> Stop</span> : <span><Icon type='reload' key='Restart' /> Restart</span>)
