@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {ApolloProvider} from 'react-apollo';
 import {notification, Button} from 'antd';
-import {BrowserRouter, Route} from 'react-router-dom';
+import {BrowserRouter, Route, Redirect} from 'react-router-dom';
 import {BackgroundTokenSyncer} from '../workers/backgroundTokenSyncer';
 import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
@@ -122,6 +122,8 @@ class Main extends React.Component {
             </Route>
             <Route path={`${appPrefix}g/:groupName/apps/:appId`} exact component={AppDetail}/>
 
+            {/* No Matched, back to default `/g` */}
+            <Redirect to={`${appPrefix}g/`}/>
           </MainPage>
         </ApolloProvider>
       </BrowserRouter>

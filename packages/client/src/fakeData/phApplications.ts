@@ -36,11 +36,11 @@ export const phApplications = [
     ],
     env: [
       {
-        key: 'BACKEND_STORE_URI',
+        name: 'BACKEND_STORE_URI',
         value: 'sqlite://$(PRIMEHUB_APP_ROOT)/mlflow.db'
       },
       {
-        key: 'DEFAULT_ARTIFACT_ROOT',
+        name: 'DEFAULT_ARTIFACT_ROOT',
         value: '$(PRIMEHUB_APP_ROOT)/mlruns'
       }
     ],

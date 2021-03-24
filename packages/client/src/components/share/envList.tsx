@@ -11,20 +11,19 @@ export default function EnvList({envList, valueVisibility}: {envList: EnvVar[], 
   {
     title: 'Name',
     dataIndex: 'name',
-    width: 20,
-    render: value => <div style={{wordBreak: 'break-word'}}>{value}</div>
+    width: '30%',
+    render: value => <span style={{wordBreak: 'break-word'}}>{value}</span>
   }, {
     title: 'Value',
     dataIndex: 'value',
-    width: 80,
-    render: value => <div style={{wordBreak: 'break-word'}}>{valueVisibility ? value : value.replace(/([\w\W])/g, '*')}</div>
+    render: value => <span style={{wordBreak: 'break-word'}}>{valueVisibility ? value : value.replace(/([\w\W])/g, '*')}</span>
   }
   ];
   return (
     <Table
       columns={columns}
       dataSource={envList}
-      scroll={{y: 120}}
+      scroll={{ y: 240 }}
       size='small'
       pagination={false}
     />

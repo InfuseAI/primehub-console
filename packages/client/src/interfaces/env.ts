@@ -1,4 +1,4 @@
 export default interface Env {
-  key: string;
+  name: string;
   value: string;
 }
