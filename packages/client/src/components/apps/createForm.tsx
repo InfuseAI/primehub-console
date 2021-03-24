@@ -29,7 +29,7 @@ type Props = FormComponentProps & {
   onSubmit: ({}) => void;
   onCancel?: ({}) => void;
   loading: boolean;
-  initialValue?: {templateId: string} & PhApplication;
+  initialValue?: PhApplication;
   type?: 'edit' | 'create';
 };
 
@@ -186,7 +186,6 @@ class AppCreateForm extends React.Component<Props, State> {
       type
     } = this.props;
     const {
-      templateId,
       appName,
       id,
       displayName,
@@ -392,10 +391,10 @@ class AppCreateForm extends React.Component<Props, State> {
                     {form.getFieldDecorator('instanceType', {
                       initialValue: instanceType,
                     })(
-                      instanceTypes.length ? (
+                      instanceTypes.length > 0 ? (
                         <Radio.Group style={radioGroupStyle}>
                           {instanceTypes.map(it => (
-                            <Radio style={radioStyle} value={it.name} key={it.id}>
+                            <Radio style={radioStyle} value={it.id} key={it.id}>
                               <div style={radioContentStyle}>
                                 <h4>
                                   {it.displayName || it.name}

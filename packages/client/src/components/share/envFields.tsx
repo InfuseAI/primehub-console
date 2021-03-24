@@ -1,5 +1,5 @@
 import React from 'react';
-import {concat} from 'lodash';
+import {merge} from 'lodash';
 import {Input, Icon, Button} from 'antd';
 import {Empty} from '../empty';
 import {DefaultEnv} from 'interfaces/phAppTemplate';
@@ -34,7 +34,7 @@ export default class EnvFields extends React.Component<Props, State> {
       return {name: env.name, value: env.value};
     }) : [];
     this.state = {
-      fields: concat(defaultEnvs, envs) || [],
+      fields: merge(defaultEnvs, envs) || [],
     };
   }
 

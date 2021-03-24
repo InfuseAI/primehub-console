@@ -10,7 +10,10 @@ export const me = {
       id: 'g-it1',
       name: 'IT1',
       displayName: 'group1 it',
-      description: 'Basic instance.'
+      description: 'Basic instance.',
+      gpuLimit: 0,
+      cpuLimit: 0.5,
+      memoryLimit: 4,
     }],
     images: [{
       id: 'image-1',

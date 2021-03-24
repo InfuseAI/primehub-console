@@ -29,6 +29,7 @@ import ImageListContainer from 'containers/imageList';
 import AppListContainer from 'containers/appList';
 import AppCreate from 'containers/appCreatePage';
 import AppDetail from 'containers/appDetail';
+import AppEdit from 'containers/appEditPage';
 
 const client = createGraphqlClient({
   fakeData,
@@ -121,6 +122,7 @@ class Main extends React.Component {
               <AppCreate />
             </Route>
             <Route path={`${appPrefix}g/:groupName/apps/:appId`} exact component={AppDetail}/>
+            <Route path={`${appPrefix}g/:groupName/apps/:appId/edit`} exact component={AppEdit}/>
 
             {/* No Matched, back to default `/g` */}
             <Redirect to={`${appPrefix}g/`}/>

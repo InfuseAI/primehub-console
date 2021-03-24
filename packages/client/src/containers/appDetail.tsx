@@ -10,7 +10,7 @@ import {PhApplicationFragment} from 'containers/appList';
 import {GET_APP_TEMPLATES} from 'containers/appCreatePage';
 import {get} from 'lodash';
 
-type Props = {
+export type AppDetailProps = {
   getPhApplication: any;
   getPhAppTemplates: any;
 } & RouteComponentProps<{
@@ -28,7 +28,7 @@ export const GET_PH_APPLICATION = gql`
 
 export const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 
-class AppDetailContainer extends React.Component<Props> {
+class AppDetailContainer extends React.Component<AppDetailProps> {
   render() {
     const {getPhApplication, getPhAppTemplates} = this.props;
 
@@ -50,7 +50,7 @@ export default compose(
     name: 'getPhAppTemplates'
   }),
   graphql(GET_PH_APPLICATION, {
-    options: (props: Props) => ({
+    options: (props: AppDetailProps) => ({
       variables: {
         where: {
           id: props.match.params.appId

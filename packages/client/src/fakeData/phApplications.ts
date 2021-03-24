@@ -20,14 +20,7 @@ export const phApplications = [
       }
     ],
     groupName: 'Group1',
-    instanceType: {
-      id: 'everyone-it',
-      name: 'it',
-      displayName: 'gpu0',
-      gpuLimit: 0,
-      cpuLimit: 0.5,
-      memoryLimit: 4,
-    },
+    instanceType: 'g-it1',
     scope: 'public',
     appUrl: 'https://endpoint/modedeployment/example/test/1',
     internalAppUrl: 'app-mlflow-0001:5000/',
