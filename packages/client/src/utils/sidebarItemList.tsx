@@ -81,6 +81,20 @@ export const listEE = [
       marginTop: '-3px',
     }
   },
+  {
+    title: 'Settings',
+    subPath: 'settings',
+    // TODO: change icon
+    icon: iconImages,
+    groupAdminOnly: true,
+    style: {
+      width: 'auto',
+      height: 17,
+      marginLeft: '1px',
+      marginRight: '-1px',
+      marginTop: '-3px',
+    }
+  },
 ];
 
 export const listCE = listEE.filter(item => !item.EEOnly);

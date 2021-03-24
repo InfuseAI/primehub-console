@@ -17,6 +17,7 @@ import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
 import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
+import GroupSettingsPage from 'containers/groupSettingsPage';
 
 const client = createGraphqlClient({
   fakeData,
@@ -53,6 +54,12 @@ class Main extends React.Component {
               exact
               component={ImageEditPage}
             />
+
+            {/* Group Settings */}
+            <Route path={`${appPrefix}g/:groupName/settings`}>
+              <GroupSettingsPage />
+            </Route>
+
           </MainPage>
         </ApolloProvider>
       </BrowserRouter>
