@@ -1,11 +1,22 @@
 import React from 'react';
-import {Icon, Divider, Tag, Card, Tooltip} from 'antd';
-import {isEmpty} from 'lodash';
+import {Icon, Tag, Card, Tooltip} from 'antd';
 import {RouteComponentProps, withRouter} from 'react-router-dom';
 import {ApplicationInfo} from 'containers/appList';
-import moment from 'moment';
-import Field from 'components/share/field';
 import defaultLogo from 'images/icon-apps.svg';
+import styled from 'styled-components';
+
+export const AppLogo = styled.span`
+  display: inline-block;
+  height: 64px;
+  line-height: 52px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 9px;
+  overflow: hidden;
+  img {
+    width: 54px !important;
+  }
+`;
 
 type Props = RouteComponentProps & {
   application: ApplicationInfo;
@@ -44,9 +55,8 @@ class AppCard extends React.Component<Props> {
       <Card
         style={{
           height: '100%',
+          backgroundColor: src === defaultLogo ? 'rgb(215 222 242)' : null,
         }}
-        hoverable
-        onClick={() => history.push(`apps/${application.id}`)}
         actions={[
           <a href={`apps/${application.id}`}><Icon type='setting' key='Manage' /> Manage</a>,
           (application.status === 'Stopped' ?
@@ -57,17 +67,12 @@ class AppCard extends React.Component<Props> {
         ]}
       >
         <div style={{clear: 'both'}}>
-          <span style={{
-            display: 'inline-block',
-            height: '64px',
-            lineHeight: '52px',
-            padding: '5px',
-            border: '1px solid #ccc',
-            borderRadius: '9px',
-            overflow: 'hidden',
+          <AppLogo style={{
+            float: 'right',
             backgroundColor: src === defaultLogo ? 'rgb(215 222 242)' : null,
-            float: 'right'
-          }}><img src={src} width='54'/></span>
+          }}>
+            <img src={src} />
+          </AppLogo>
           <h2 style={{
             overflow: 'hidden',
             whiteSpace: 'nowrap',
