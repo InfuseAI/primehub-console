@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import { get, isNull } from 'lodash';
-import { Form, Tabs, Row, Col, Input, Switch, Card, Checkbox, InputNumber } from 'antd';
+import { Form, Tabs, Row, Col, Card, Switch, Checkbox, Input, InputNumber, Table, Alert } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import { withRouter } from 'react-router';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
@@ -14,6 +14,7 @@ import Breadcrumbs from 'components/share/breadcrumb';
 
 type Props = {
   getGroups: any;
+  extraTabs: React.Component[];
 } & GroupContextComponentProps & UserContextComponentProps & RouteComponentProps;
 
 const breadcrumbs = [
@@ -46,6 +47,11 @@ export const GET_MY_GROUPS = gql`
     projectQuotaGpu
     projectQuotaMemory
     admins
+    users {
+      username
+    }
+    jobDefaultActiveDeadlineSeconds
+    enabledDeployment
   }
 `
 
@@ -109,23 +115,23 @@ class GroupSettingsPage extends React.Component<Props> {
 
     return (
       <>
-        <Row gutter={16}>
+        <Row style={{marginTop: 5}}>
           <Col>
-            <Form.Item label={`Name`}>
+            <Form.Item label={`Name`} style={{marginBottom: 20}}>
               <Input disabled value={group.name} />
             </Form.Item>
           </Col>
         </Row>
         <Row>
           <Col>
-            <Form.Item label={`Display Name`}>
+            <Form.Item label={`Display Name`} style={{marginBottom: 20}}>
               <Input disabled value={group.displayName} />
             </Form.Item>
           </Col>
         </Row>
         <Row>
           <Col>
-            <Form.Item label={`Shared Volume`}>
+            <Form.Item label={`Shared Volume`} style={{marginBottom: 20}}>
               <Switch disabled checked={group.enabledSharedVolume} />
             </Form.Item>
           </Col>
@@ -156,16 +162,46 @@ class GroupSettingsPage extends React.Component<Props> {
     );
   }
 
-  renderMembersPage() {
-    return (
-      <>
-        
-      </>
-    );
+  renderMembersPage(group: any) {
+    if (!group) {
+      return (<div>loading...</div>);
+    }
+
+    const admins = get(group, 'admins', []).split(',');
+    const users = get(group, 'users', []).map(user => {
+      return {
+        username: user.username,
+        admin: admins.includes(user.username),
+      };
+    });
+
+    const columns = [
+      {
+        title: 'Username',
+        dataIndex: 'username',
+        key: 'username',
+      },
+      {
+        title: 'Group Admin',
+        dataIndex: 'admin',
+        key: 'admin',
+        render: (value) => <Checkbox checked={value} disabled />,
+      },
+    ];
+
+    return <Table dataSource={users} columns={columns} style={{marginTop: 15}}/>;
+  }
+
+  renderAlert() {
+    return <Alert
+             message='Only system admins can update these settings'
+             description='Please contact your administrator to configure these settings.'
+             type='warning'
+             showIcon />;
   }
 
   render() {
-    const {groupContext, userContext, getGroups, history} = this.props;
+    const {groupContext, userContext, getGroups, history, extraTabs} = this.props;
     if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
       history.push(`../home`);
     }
@@ -181,11 +217,19 @@ class GroupSettingsPage extends React.Component<Props> {
         <PageBody style={{flex: '1 1 0%'}}>
           <Tabs style={{height: '100%'}}>
             <Tabs.TabPane key="info" tab="Info">
+              {this.renderAlert()}
               {this.renderInfoPage(group)}
             </Tabs.TabPane>
             <Tabs.TabPane key="members" tab="Members">
-              {this.renderMembersPage()}
+              {this.renderAlert()}
+              {this.renderMembersPage(group)}
             </Tabs.TabPane>
+            {
+              extraTabs && extraTabs.length ? extraTabs.map((t: any) => {
+                const Component = t.component;
+                return <Tabs.TabPane key={t.key} tab={t.tab}><Component {...this.props}/></Tabs.TabPane>;
+              }) : []
+            }
           </Tabs>
         </PageBody>
       </>
