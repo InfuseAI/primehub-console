@@ -42,7 +42,7 @@ class AppStore extends React.Component<Props> {
         <Row gutter={24} type='flex'>
         {phAppTemplates.map(appTemplate => {
           return (
-            <Col xs={24} md={12} xl={8} xxl={6} key={appTemplate.id} style={{marginBottom: 16}}>
+            <Col xs={24} md={12} xl={12} xxl={8} key={appTemplate.id} style={{marginBottom: 16}}>
               <Card style={{margin: '16px 16px 0'}} >
                 <Left>
                   <AppLogo style={{marginRight: '8px'}}>
@@ -63,7 +63,7 @@ class AppStore extends React.Component<Props> {
                   <Right>
                     <ActionBtn type='primary'>
                       <Link to={`create/${appTemplate.id}`}>
-                        <Icon type='plus' /> Add to PrimeHub
+                        <Icon type='plus' /> Install to PrimeHub
                       </Link>
                     </ActionBtn>
                   </Right>

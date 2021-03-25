@@ -1,20 +1,21 @@
 import React from 'react';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
-import {get, unionBy} from 'lodash';
+import {get, unionBy, pick} from 'lodash';
 import {notification} from 'antd';
 import {compose} from 'recompose';
 import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'utils/errorHandler';
 import {AppDetailProps, GET_PH_APPLICATION, getMessage} from 'containers/appDetail';
 import {GET_APP_TEMPLATES, GET_MY_GROUPS, sortItems} from 'containers/appCreatePage';
-import {PhApplicationFragment} from 'containers/appList';
+import {PhApplicationFragment} from 'interfaces/phApplication';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import PageTitle from 'components/pageTitle';
 import Breadcrumbs from 'components/share/breadcrumb';
 import AppCreateForm from 'components/apps/createForm';
 
 type AppEditProps = {
+  updatePhApplication: any;
   getGroups: any;
 } & AppDetailProps & GroupContextComponentProps;
 
@@ -33,7 +34,13 @@ class AppEditPage extends React.Component<AppEditProps> {
   }
 
   onSubmit = payload => {
-    return;
+    const {updatePhApplication} = this.props;
+    updatePhApplication({
+      variables: {
+        where: {id: payload.id},
+        data: pick(payload, ['instanceType', 'env'])
+      }
+    });
   }
 
   render() {
@@ -89,6 +96,7 @@ class AppEditPage extends React.Component<AppEditProps> {
         />
         <div style={{margin: '16px'}}>
           <AppCreateForm
+            onSubmit={this.onSubmit}
             groupContext={groupContext}
             phAppTemplates={phAppTemplates}
             refetchGroup={getGroups.refetch}

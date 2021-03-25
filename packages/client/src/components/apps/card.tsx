@@ -1,8 +1,7 @@
 import React from 'react';
 import {Icon, Tag, Card, Tooltip} from 'antd';
-import {Link} from 'react-router-dom';
-import {RouteComponentProps, withRouter} from 'react-router-dom';
-import {ApplicationInfo} from 'containers/appList';
+import {Link, RouteComponentProps, withRouter} from 'react-router-dom';
+import PhApplication from 'interfaces/phApplication';
 import defaultLogo from 'images/icon-apps.svg';
 import styled from 'styled-components';
 
@@ -20,7 +19,9 @@ export const AppLogo = styled.span`
 `;
 
 type Props = RouteComponentProps & {
-  application: ApplicationInfo;
+  startApp: (appId: string, appName: string) => void;
+  stopApp: (appId: string, appName: string) => void;
+  application: PhApplication;
   copyClipBoard: (text: string) => void;
 };
 
@@ -32,7 +33,7 @@ const textOverflowStyle: React.CSSProperties = {
   display: 'block',
 };
 
-function getCardColor(application: ApplicationInfo) {
+function getCardColor(application: PhApplication) {
   switch (application.status) {
     case 'Ready':
       return '#87d068';
@@ -48,8 +49,22 @@ function getCardColor(application: ApplicationInfo) {
 }
 
 class AppCard extends React.Component<Props> {
+  bindStartApp(id: string, name: string) {
+    const {startApp} = this.props;
+    return () => {
+      startApp(id, name);
+    };
+  }
+
+  bindStopApp(id: string, name: string) {
+    const {stopApp} = this.props;
+    return () => {
+      stopApp(id, name);
+    };
+  }
+
   render() {
-    const {application, history} = this.props;
+    const {application, history, startApp, stopApp} = this.props;
     const {appName, appIcon, appVersion, appUrl} = application;
     const src = appIcon && appIcon.length > 0 ? appIcon : defaultLogo;
     return (
@@ -61,8 +76,8 @@ class AppCard extends React.Component<Props> {
         actions={[
           <Link to={`apps/${application.id}`}><Icon type='setting' key='Manage' /> Manage</Link>,
           (application.status === 'Stopped' ?
-            <span><Icon type='caret-right' key='Start' /> Start</span> :
-            (application.status === 'Ready' ? <span><Icon type='stop' key='Stop' /> Stop</span> : <span><Icon type='reload' key='Restart' /> Restart</span>)
+            <span onClick={this.bindStartApp(application.id, application.displayName)}><Icon type='caret-right' key='Start' /> Start</span> :
+            (application.status === 'Ready' ? <span onClick={this.bindStopApp(application.id, application.displayName)}><Icon type='stop' key='Stop' /> Stop</span> : <span><Icon type='loading' key='Loading' /></span>)
           ),
           <a href={`${appUrl}`} target='_blank'><Icon type='export' key='Open App' /> Open</a>,
         ]}

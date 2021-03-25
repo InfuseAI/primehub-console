@@ -11,6 +11,8 @@ import AppInformation from 'components/apps/appInfo';
 import styled from 'styled-components';
 import {AppLogo} from 'components/apps/card';
 
+const {confirm} = Modal;
+
 export const ActionBtn = styled(InfuseButton)`
   margin-right: 8px;
 `;
@@ -41,6 +43,9 @@ interface Props {
   // deletePhDeploymentClient: Function;
   // deletePhDeploymentClientResult: any;
   // refetchPhDeployment: Function;
+  deleteApp: ({}) => void;
+  startApp: ({}) => void;
+  stopApp: ({}) => void;
   phApplication: PhApplication;
   phAppTemplates: PhAppTemplate[];
 }
@@ -62,15 +67,47 @@ export default class Detail extends React.Component<Props, State> {
   }
 
   handleDelete = () => {
-    return;
+    const {phApplication, deleteApp} = this.props;
+    confirm({
+      title: `Uninstall App`,
+      content: <span>Do you really want to uninstall "<b>{phApplication.displayName}</b>"?</span>,
+      iconType: 'info-circle',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        return deleteApp({variables: {where: {id: phApplication.id}}});
+      },
+    });
   }
 
   handleStop = () => {
-    return;
+    const {phApplication, stopApp} = this.props;
+    confirm({
+      title: `Stop App`,
+      content: <span>Do you want to stop "<b>{phApplication.displayName}</b>"?</span>,
+      iconType: 'info-circle',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        return stopApp({variables: {where: {id: phApplication.id}}});
+      },
+    });
   }
 
-  handleDeploy = () => {
-    return;
+  handleStart = () => {
+    const {phApplication, startApp} = this.props;
+    confirm({
+      title: `Start App`,
+      content: <span>Do you want to start "<b>{phApplication.displayName}</b>"?</span>,
+      iconType: 'info-circle',
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk() {
+        return startApp({variables: {where: {id: phApplication.id}}});
+      },
+    });
   }
 
   toggleEnvVisibilty = () => {
@@ -141,7 +178,7 @@ export default class Detail extends React.Component<Props, State> {
           <Divider style={{margin: '8px 0'}}/>
           <div style={{marginBottom: 0}}>
             <Left>
-              <ActionBtn href={`${phApplication.appUrl}`} target='_blank'>
+              <ActionBtn type='primary' href={`${phApplication.appUrl}`} target='_blank'>
                 <Icon type='link' /> Open Web UI
               </ActionBtn>
               <ActionBtn href={`${appTemplate.docLink}`} target='_blank'>
@@ -151,7 +188,7 @@ export default class Detail extends React.Component<Props, State> {
             <Right>
               {
                 this.stopped() ? (
-                  <ActionBtn onClick={this.handleDeploy}>
+                  <ActionBtn onClick={this.handleStart}>
                     <Icon type='play-circle' /> Start
                   </ActionBtn>
                 ) : (
@@ -168,7 +205,7 @@ export default class Detail extends React.Component<Props, State> {
                 </ActionBtn>
               }
               <ActionBtn onClick={this.handleDelete} type='danger'>
-                <Icon type='delete' /> Delete
+                <Icon type='delete' /> Uninstall
               </ActionBtn>
             </Right>
             <ClearBoth/>

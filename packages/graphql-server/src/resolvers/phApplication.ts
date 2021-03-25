@@ -1,20 +1,15 @@
 import { Context } from './interface';
 import {
-  toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, mergeVariables, getGroupIdsByUser
+  toRelay, filter, paginate, extractPagination
 } from './utils';
 import {
   PhApplicationSpec, PhApplicationStatus, PhApplicationScope, PhApplicationPhase, client as kubeClient
 } from '../crdClient/crdClientImpl';
 import CustomResource, { Item } from '../crdClient/customResource';
-import { orderBy, omit, get, isUndefined, isNil, isEmpty, isNull, capitalize, intersection, find } from 'lodash';
-import * as moment from 'moment';
+import { get, find } from 'lodash';
 import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
-import { mapping } from './instanceType';
-import * as logger from '../logger';
 import { keycloakMaxCount } from './constant';
-import { isUserAdmin } from './user';
-import md5 = require('apache-md5');
 import {createConfig} from '../config';
 
 const config = createConfig();
@@ -42,6 +37,8 @@ export interface PhApplication {
   id: string;
   displayName: string;
   appName: string;
+  appVersion: string;
+  appIcon: string;
   appDefaultEnv: DefaultEnvVar[];
   groupName: string;
   instanceType: string;
@@ -58,7 +55,7 @@ export interface PhApplication {
 export interface PhApplicationMutationInput {
   templateId: string;
   id: string;
-  name: string;
+  displayName: string;
   groupName: string;
   env: EnvVar[];
   instanceType: string;
@@ -99,6 +96,8 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
 
   const appTemplate = getAppTemplateFromAnnotations(item);
   const appName = appTemplate.metadata.name;
+  const appVersion = appTemplate.spec.version;
+  const appIcon = appTemplate.spec.icon;
   const appDefaultEnv = appTemplate.spec.defaultEnvs;
 
   let svcEndpoints = [];
@@ -122,6 +121,8 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
     id: item.metadata.name,
     displayName: item.spec.displayName,
     appName,
+    appVersion,
+    appIcon,
     appDefaultEnv,
     groupName: item.spec.groupName,
     instanceType: item.spec.instanceType,
@@ -235,16 +236,19 @@ const createApplication = async (context: Context, data: PhApplicationMutationIn
 
   // Append env to pod template
   if (podTemplate.spec.containers && podTemplate.spec.containers.length > 0) {
-    podTemplate.spec.containers[0].env = podTemplate.spec.containers[0].env.concat(data.env);
+    podTemplate.spec.containers[0].env = get(podTemplate.spec.containers[0], 'env', []).concat(get(data, 'env', []));
+    console.log(1111, podTemplate.spec.containers[0].env, data.env);
   }
 
   if (appTemplate.spec.template.spec && appTemplate.spec.template.spec.httpPort) {
     httpPort = appTemplate.spec.template.spec.httpPort;
   }
 
+  console.log(JSON.stringify(podTemplate.spec), 1122);
+
   const spec = {
     stop: false,
-    displayName: data.name,
+    displayName: data.displayName,
     groupName: data.groupName,
     instanceType: data.instanceType,
     scope: data.scope,
@@ -288,7 +292,7 @@ export const update = async (root, args, context: Context) => {
 
   // Append env to pod template
   if (spec.podTemplate.spec.containers && spec.podTemplate.spec.containers.length > 0) {
-    spec.podTemplate.spec.containers[0].env = appTemplate.spec.template.spec.podTemplate.spec.containers[0].env.concat(data.env);
+    spec.podTemplate.spec.containers[0].env = get(appTemplate.spec.template.spec.podTemplate.spec.containers[0], 'env', []).concat(data.env);
   }
 
   const updated = await context.crdClient.phApplications.patch(args.where.id, {metadata, spec});

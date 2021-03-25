@@ -15,7 +15,7 @@ import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import PageTitle from 'components/pageTitle';
 import Breadcrumbs from 'components/share/breadcrumb';
 
-const breadcrumbs = [
+let breadcrumbs = [
   {
     key: 'list',
     matcher: /\/apps/,
@@ -46,7 +46,12 @@ export const GET_APP_TEMPLATES = gql`
   query phAppTemplates {
     phAppTemplates {
       id
-      defaultEnv
+      icon
+      defaultEnvs {
+        name
+        defaultValue
+        optional
+      }
       name
       icon
       version
@@ -124,6 +129,27 @@ class AppCreatePage extends React.Component<Props, State> {
       'id'
     );
     const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
+    if (params.templateId) {
+      breadcrumbs = [
+        {
+          key: 'list',
+          matcher: /\/apps/,
+          title: 'Apps',
+          link: '/apps?page=1'
+        },
+        {
+          key: 'store',
+          matcher: /\/apps/,
+          title: 'Store',
+          link: '/apps/store'
+        },
+        {
+          key: 'create',
+          matcher: /\/apps\/create/,
+          title: 'Add App to PrimeHub'
+        }
+      ];
+    }
 
     if (!getPhAppTemplates.phAppTemplates) return null;
     if (getPhAppTemplates.error) {
@@ -166,7 +192,7 @@ export default compose(
       onCompleted: (data: any) => {
         const {history} = props;
         history.push({
-          pathname: `../apps`,
+          pathname: `../../apps`,
           search: queryString.stringify({first: 8})
         });
         notification.success({

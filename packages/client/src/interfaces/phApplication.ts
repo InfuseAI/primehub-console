@@ -1,5 +1,6 @@
 import {DefaultEnv} from 'interfaces/phAppTemplate';
 import Env from 'interfaces/env';
+import gql from 'graphql-tag';
 
 export enum PhAppStatus {
   Ready = 'Ready',
@@ -34,3 +35,31 @@ export default interface PhApplication {
   status: PhAppStatus;
   message: string;
 }
+
+export const PhApplicationFragment = gql`
+fragment PhApplicationInfo on PhApplication {
+  id
+  displayName
+  appVersion
+  appName
+  appIcon
+  appDefaultEnv {
+    name
+    defaultValue
+    optional
+  }
+  groupName
+  instanceType
+  scope
+  appUrl
+  internalAppUrl
+  svcEndpoints
+  env {
+    name
+    value
+  }
+  stop
+  status
+  message
+}
+`;

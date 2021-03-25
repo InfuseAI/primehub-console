@@ -65,7 +65,7 @@ interface FormValue {
   templateId: string;
   appName: string;
   instanceType: string;
-  name: string;
+  displayName: string;
   id: string;
   scope: PhAppScope;
   env: Env[];
@@ -383,7 +383,7 @@ class AppCreateForm extends React.Component<Props, State> {
                 )}
               </Form.Item>
               <Form.Item label={`Name`} style={{marginBottom: '8px'}}>
-                {form.getFieldDecorator('name', {
+                {form.getFieldDecorator('displayName', {
                   initialValue: displayName,
                   rules: [
                     { whitespace: true, required: true, message: 'Please input a name!' },
@@ -492,6 +492,5 @@ class AppCreateForm extends React.Component<Props, State> {
     )
   }
 }
-
 
 export default Form.create<Props>()(AppCreateForm);

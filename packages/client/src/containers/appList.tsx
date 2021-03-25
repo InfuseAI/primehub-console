@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Row, Col, Button, Skeleton, Input, message, Spin, Divider, Alert} from 'antd';
+import {Row, Col, Button, Modal, Skeleton, Input, message, Spin, Divider, Alert, notification} from 'antd';
 import {ButtonType} from 'antd/lib/button';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
@@ -18,6 +18,10 @@ import AppCard from 'components/apps/card';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
+import {STOP_APP, START_APP} from 'containers/appDetail';
+import PhApplication, {PhApplicationFragment} from 'interfaces/phApplication';
+
+const {confirm} = Modal;
 
 export interface ApplicationConnection {
   pageInfo: {
@@ -28,56 +32,8 @@ export interface ApplicationConnection {
   };
   edges: Array<{
     cursor: string;
-    node: ApplicationInfo;
+    node: PhApplication;
   }>;
-}
-
-export const PhApplicationFragment = gql`
-fragment PhApplicationInfo on PhApplication {
-  id
-  icon
-  displayName
-  appVersion
-  appName
-  appIcon
-  appDefaultEnv
-  groupName
-  instanceType
-  scope
-  appUrl
-  internalAppUrl
-  svcEndpoint
-  env
-  stop
-  status
-  message
-}
-`;
-
-export interface ApplicationInfo {
-  id: string;
-  displayName: string;
-  appName: string;
-  appVersion: string;
-  appIcon: string;
-  appDefaultEnv: Array<{name: string, description: string, defaultValue: string, optional: boolean}>;
-  groupName: string;
-  instanceType: {
-    id: string;
-    name: string;
-    displayName: string;
-    cpuLimit: number;
-    memoryLimit: number;
-    gpuLimit: number;
-  };
-  scope: string;
-  appUrl: string;
-  internalAppUrl: string;
-  svcEndpoint: string[];
-  env: Array<{name: string, value: string}>;
-  stop: boolean;
-  status: string;
-  message: string;
 }
 
 const breadcrumbs = [
@@ -93,7 +49,7 @@ const PAGE_SIZE = 12;
 const Search = Input.Search;
 
 export const GET_PH_APPLICATION_CONNECTION = gql`
-  query phApplicationsConnection($where: PhApplicationsWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
+  query phApplicationsConnection($where: PhApplicationWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
     phApplicationsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
       pageInfo {
         hasNextPage
@@ -113,6 +69,8 @@ export const GET_PH_APPLICATION_CONNECTION = gql`
 `;
 
 type Props = {
+  startApp: any;
+  stopApp: any;
   groups: Array<{
     id: string;
     name: string;
@@ -174,6 +132,35 @@ class AppListContainer extends React.Component<Props, State> {
       after: undefined,
     };
     refetch(newVariables);
+  }
+
+  startApp = (appId, appName) => {
+    const {startApp} = this.props;
+    confirm({
+      title: `Start App`,
+      content: <span>Do you want to start "<b>{appName}</b>"?</span>,
+      iconType: 'info-circle',
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk() {
+        return startApp({variables: {where: {id: appId}}});
+      },
+    });
+  }
+
+  stopApp = (appId, appName) => {
+    const {stopApp} = this.props;
+    confirm({
+      title: `Stop App`,
+      content: <span>Do you want to stop "<b>{appName}</b>"?</span>,
+      iconType: 'info-circle',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        return stopApp({variables: {where: {id: appId}}});
+      },
+    });
   }
 
   searchHandler = query => {
@@ -244,7 +231,7 @@ class AppListContainer extends React.Component<Props, State> {
           }}
           style={{marginRight: 16, width: 'auto'}}
         >
-          New App
+          Applications
         </InfuseButton>
         <InfuseButton onClick={() => refetch()}>Refresh</InfuseButton>
       </div>
@@ -264,12 +251,14 @@ class AppListContainer extends React.Component<Props, State> {
 
     const content = (
       <div style={{margin: '16px 16px'}}>
-        <Spin spinning={loading}>
+        <Spin spinning={!(phApplicationsConnection && phApplicationsConnection.edges)}>
           <Row gutter={24} type='flex'>
             {phApplicationsConnection.edges.map(edge => {
               return (
                 <Col xs={24} md={12} xl={8} xxl={6} key={edge.cursor} style={{marginBottom: 16}}>
                   <AppCard
+                    startApp={this.startApp}
+                    stopApp={this.stopApp}
                     application={edge.node}
                     copyClipBoard={this.copyClipBoard}
                   />
@@ -306,6 +295,32 @@ class AppListContainer extends React.Component<Props, State> {
 
 export default compose(
   withRouter,
+  graphql(START_APP, {
+    options: (props: any) => ({
+      onCompleted: () => {
+        notification.success({
+          duration: 10,
+          placement: 'bottomRight',
+          message: 'The application is starting.'
+        });
+      },
+      onError: errorHandler
+    }),
+    name: 'startApp'
+  }),
+  graphql(STOP_APP, {
+    options: (props: any) => ({
+      onCompleted: () => {
+        notification.success({
+          duration: 10,
+          placement: 'bottomRight',
+          message: 'The application has been stopped.'
+        });
+      },
+      onError: errorHandler
+    }),
+    name: 'stopApp'
+  }),
   graphql(GET_PH_APPLICATION_CONNECTION, {
     options: (props: Props) => {
       const params = queryString.parse(props.location.search.replace(/^\?/, ''));
@@ -320,7 +335,8 @@ export default compose(
           first: PAGE_SIZE,
           where,
         },
-        fetchPolicy: 'cache-and-network'
+        fetchPolicy: 'cache-and-network',
+        pollInterval: 2000,
       };
     },
     name: 'getPhApplicationConnection'

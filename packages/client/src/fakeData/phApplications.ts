@@ -24,7 +24,7 @@ export const phApplications = [
     scope: 'public',
     appUrl: 'https://endpoint/modedeployment/example/test/1',
     internalAppUrl: 'app-mlflow-0001:5000/',
-    svcEndpoint: [
+    svcEndpoints: [
       'app-mlflow-0001:5000/'
     ],
     env: [
