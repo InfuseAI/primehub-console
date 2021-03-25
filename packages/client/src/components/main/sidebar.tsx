@@ -60,7 +60,7 @@ class Sidebar extends React.Component<Props> {
     sidebarItems.push(userItems.map(item => this.renderSidebarItem(item, group)));
     if (adminItems.length > 0) {
       sidebarItems.push(
-        <Menu.Item style={{margin: 0, height: 10}}>
+        <Menu.Item style={{margin: 0, height: 12}}>
           <Divider style={{marginTop: 5, marginBottom: 5, backgroundColor: '#555666'}}/>
         </Menu.Item>
       );
