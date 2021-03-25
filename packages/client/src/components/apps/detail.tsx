@@ -1,7 +1,8 @@
 import React from 'react';
 import {Icon, Modal, Card, Divider, Tabs, message} from 'antd';
-import {find} from 'lodash';
+import {find, get} from 'lodash';
 import PageTitle from 'components/pageTitle';
+import Log from 'components/share/log';
 import InfuseButton from 'components/infuseButton';
 import {Link} from 'react-router-dom';
 import Breadcrumbs from 'components/share/breadcrumb';
@@ -32,17 +33,6 @@ export const Left = styled.div`
 `;
 
 interface Props {
-  // stopPhDeployment: Function;
-  // stopPhDeploymentResult: any;
-  // deletePhDeployment: Function;
-  // deletePhDeploymentResult: any;
-  // deployPhDeployment: Function;
-  // deployPhDeploymentResult: any;
-  // createPhDeploymentClient: Function;
-  // createPhDeploymentClientResult: any;
-  // deletePhDeploymentClient: Function;
-  // deletePhDeploymentClientResult: any;
-  // refetchPhDeployment: Function;
   deleteApp: ({}) => void;
   startApp: ({}) => void;
   stopApp: ({}) => void;
@@ -139,7 +129,10 @@ export default class Detail extends React.Component<Props, State> {
   }
 
   renderLogs = () => {
-    return <div></div>;
+    const {phApplication} = this.props;
+    const logEndpoint = get(phApplication, 'pods[0].logEndpoint', '');
+    return <Log endpoint={logEndpoint} />
+;
   }
 
   render() {

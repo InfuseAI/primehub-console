@@ -34,6 +34,7 @@ export default interface PhApplication {
   stop: boolean;
   status: PhAppStatus;
   message: string;
+  pods: string[];
 }
 
 export const PhApplicationFragment = gql`
@@ -61,5 +62,8 @@ fragment PhApplicationInfo on PhApplication {
   stop
   status
   message
+  pods {
+    logEndpoint
+  }
 }
 `;
