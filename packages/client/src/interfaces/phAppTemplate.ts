@@ -12,5 +12,5 @@ export default interface PhAppTemplate {
   description: string;
   version: string;
   docLink: string;
-  defaultEnv: DefaultEnv[];
+  defaultEnvs: DefaultEnv[];
 }

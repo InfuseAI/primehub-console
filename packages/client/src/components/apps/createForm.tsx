@@ -36,9 +36,10 @@ type Props = FormComponentProps & {
 
 interface State {
   reloadEnv?: boolean;
+  showRevealBtn?: boolean;
   revealEnv: boolean;
   appSearchText: string;
-  defaultEnv: DefaultEnv[];
+  defaultEnvs: DefaultEnv[];
 }
 
 const radioStyle = {
@@ -84,13 +85,14 @@ class AppCreateForm extends React.Component<Props, State> {
     super(props);
     const { phAppTemplates, templateId } = props;
     const currentTemplate = find(phAppTemplates, v => v.id === templateId);
-    const defaultEnv = currentTemplate ? currentTemplate.defaultEnv : [];
+    const defaultEnvs = currentTemplate ? currentTemplate.defaultEnv : [];
 
     this.state = {
       reloadEnv: false,
       revealEnv: false,
+      showRevealBtn: false,
       appSearchText: '',
-      defaultEnv: defaultEnv || []
+      defaultEnvs
     };
   }
 
@@ -107,7 +109,7 @@ class AppCreateForm extends React.Component<Props, State> {
       this.setState({reloadEnv: false});
     }
     if (this.props.templateId !== prevProps.templateId) {
-      this.setState({defaultEnv: this.getDefaultEnv(this.props.templateId)});
+      this.setState({defaultEnvs: this.getDefaultEnv(this.props.templateId)});
     }
   }
 
@@ -147,8 +149,8 @@ class AppCreateForm extends React.Component<Props, State> {
     const {form, phAppTemplates} = this.props;
     const templateId = form.getFieldValue('templateId');
     const currentTemplate = find(phAppTemplates, v => v.id === templateId);
-    const { defaultEnv } = currentTemplate;
-    this.setState({defaultEnv, reloadEnv: true});
+    const {defaultEnvs} = currentTemplate;
+    this.setState({defaultEnvs, reloadEnv: true});
   }
 
   renderLabel = (defaultLabel: string, invalid: boolean, message: any) => {
@@ -174,13 +176,14 @@ class AppCreateForm extends React.Component<Props, State> {
   getDefaultEnv = id => {
     const { phAppTemplates } = this.props;
     const currentTemplate = find(phAppTemplates, v => v.id === id);
-    const { defaultEnv } = currentTemplate;
-    return defaultEnv;
+    debugger;
+    const { defaultEnvs } = currentTemplate;
+    return defaultEnvs;
   }
 
   handleSelect = value => {
-    const defaultEnv = this.getDefaultEnv(value);
-    this.setState({appSearchText: '', defaultEnv});
+    const defaultEnvs = this.getDefaultEnv(value);
+    this.setState({appSearchText: '', defaultEnvs});
   }
 
   handleSearch = appSearchText => {
@@ -214,8 +217,7 @@ class AppCreateForm extends React.Component<Props, State> {
       scope,
       env,
     } = initialValue || preloadApp || {};
-    const { revealEnv, appSearchText } = this.state;
-    const showRevealBtn = !!(type === 'edit');
+    const { revealEnv, appSearchText, showRevealBtn } = this.state;
     const scopeList = [
       {label: 'Public', value: PhAppScope.Public},
       {label: 'PrimeHub users only', value: PhAppScope.PrimeHubUserOnly},
@@ -395,11 +397,11 @@ class AppCreateForm extends React.Component<Props, State> {
               </Form.Item>
 
               <Divider />
-              <Form.Item label={<span>Environment Variables { showRevealBtn === true ? revealBtn : null } { !isEmpty(this.state.defaultEnv) ? reloadEnvBtn : null }</span>} >
+              <Form.Item label={<span>Environment Variables { showRevealBtn === true ? revealBtn : null } { !isEmpty(this.state.defaultEnvs) ? reloadEnvBtn : null }</span>} >
                 {form.getFieldDecorator('env', {
                   initialValue: env
                 })(
-                  <EnvFields defaultEnv={type === 'edit' ? appDefaultEnv : this.state.defaultEnv} empty={null} reloadDefault={this.state.reloadEnv} enableReveal={showRevealBtn} reveal={revealEnv} />
+                  <EnvFields defaultEnv={type === 'edit' ? appDefaultEnv : this.state.defaultEnvs} empty={null} reloadDefault={this.state.reloadEnv} enableReveal={showRevealBtn} reveal={revealEnv} />
                 )}
               </Form.Item>
 

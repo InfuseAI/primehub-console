@@ -1,5 +1,5 @@
 import React from 'react';
-import {Icon, Row, Col, Divider} from 'antd';
+import {Tag, Icon, Row, Col, Divider} from 'antd';
 import Field from 'components/share/field';
 import PhApplication, {PhAppStatus, PhAppScope} from 'interfaces/phApplication';
 import InstanceTypeField from 'components/share/instanceTypeField';
@@ -35,6 +35,22 @@ export default class AppInformation extends React.Component<Props, State> {
     return mapping[scope];
   }
 
+  renderStatusColor(status: PhAppStatus) {
+    switch (status) {
+      case PhAppStatus.Ready:
+        return 'green';
+      case PhAppStatus.Stopping:
+      case PhAppStatus.Updating:
+      case PhAppStatus.Starting:
+        return 'orange';
+      case PhAppStatus.Error:
+        return 'red';
+      case PhAppStatus.Stopped:
+      default:
+        return '#aaa';
+    }
+  }
+
   render() {
     const {revealEnv} = this.state;
     const {phApplication, ready} = this.props;
@@ -47,7 +63,7 @@ export default class AppInformation extends React.Component<Props, State> {
       <div style={{padding: '16px 36px'}}>
         <Row gutter={36}>
           <Col span={24}>
-            <Field labelCol={4} valueCol={20} label='Status' value={<strong>{phApplication.status}</strong>} />
+            <Field labelCol={4} valueCol={20} label='Status' value={<Tag color={this.renderStatusColor(phApplication.status)}>{phApplication.status}</Tag>} />
             <Field labelCol={4} valueCol={20} label='Message' value={phApplication.message} />
             <Field labelCol={4} valueCol={20} label='App URL' value={ready ? phApplication.appUrl : '-'} />
             <Field labelCol={4} valueCol={20} label='Service Endpoint' value={phApplication.svcEndpoint} />

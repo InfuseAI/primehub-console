@@ -6,7 +6,7 @@ export const phAppTemplates = [
     version: 'v1.14.0',
     docLink: 'https://www.mlflow.org/docs/latest/index.html',
     icon: 'https://avatars.githubusercontent.com/u/39938107?s=400&v=4',
-    defaultEnv: [
+    defaultEnvs: [
       {
         name: 'BACKEND_STORE_URI',
         description: '',
@@ -28,7 +28,7 @@ export const phAppTemplates = [
     version: 'v7.0.1',
     docLink: 'https://www.mathworks.com/products/matlab/getting-started.html',
     icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Matlab_Logo.png/667px-Matlab_Logo.png',
-    defaultEnv: [
+    defaultEnvs: [
     ],
   }
 ];

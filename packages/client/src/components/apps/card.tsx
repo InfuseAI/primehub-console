@@ -36,9 +36,10 @@ const textOverflowStyle: React.CSSProperties = {
 function getCardColor(application: PhApplication) {
   switch (application.status) {
     case 'Ready':
-      return '#87d068';
+      return 'green';
     case 'Stopping':
     case 'Starting':
+    case 'Updating':
       return 'orange';
     case 'Error':
       return 'red';
