@@ -4,6 +4,7 @@ import iconSchedule from 'images/icon-schedule.svg';
 import iconModels from 'images/icon-models.svg';
 import iconImages from 'images/icon-images.png';
 import iconShareFiles from 'images/icon-files.svg';
+import iconSettings from 'images/icon-settings.svg';
 export const listEE = [
   {
     title: 'Notebooks',
@@ -84,14 +85,13 @@ export const listEE = [
   {
     title: 'Settings',
     subPath: 'settings',
-    // TODO: change icon
-    icon: iconImages,
+    icon: iconSettings,
     groupAdminOnly: true,
     style: {
       width: 'auto',
-      height: 17,
-      marginLeft: '1px',
-      marginRight: '-1px',
+      height: 21,
+      marginLeft: '-1px',
+      marginRight: '-4px',
       marginTop: '-3px',
     }
   },
