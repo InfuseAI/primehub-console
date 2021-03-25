@@ -176,7 +176,6 @@ class AppCreateForm extends React.Component<Props, State> {
   getDefaultEnv = id => {
     const { phAppTemplates } = this.props;
     const currentTemplate = find(phAppTemplates, v => v.id === id);
-    debugger;
     const { defaultEnvs } = currentTemplate;
     return defaultEnvs;
   }
