@@ -288,7 +288,6 @@ export const update = async (root, args, context: Context) => {
 
   const spec = item.spec;
   spec.instanceType = data.instanceType;
-  spec.scope = data.scope;
 
   // Append env to pod template
   if (spec.podTemplate.spec.containers && spec.podTemplate.spec.containers.length > 0) {

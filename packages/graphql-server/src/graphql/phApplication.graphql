@@ -79,6 +79,5 @@ input PhApplicationCreateInput {
 input PhApplicationUpdateInput {
   env: JSON
   instanceType: String
-  scope: String
 }
 
