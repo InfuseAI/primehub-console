@@ -142,10 +142,12 @@ export default compose(
   withRouter,
   withGroupContext,
   graphql(CurrentUser, {
-    name: 'currentUser'
+    name: 'currentUser',
+    alias: 'withCurrentUser'
   }),
   graphql(GetPhAppTemplates, {
-    name: 'getPhAppTemplates'
+    name: 'getPhAppTemplates',
+    alias: 'withPhAppTemplates',
   }),
   graphql(CreatePhApplication, {
     options: (props: Props) => ({
@@ -169,6 +171,7 @@ export default compose(
       },
       onError: errorHandler
     }),
-    name: 'createPhApplication'
+    name: 'createPhApplication',
+    alias: 'withCreatePhApplication',
   })
 )(AppCreatePage);

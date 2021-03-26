@@ -81,6 +81,7 @@ class AppStore extends React.Component<Props> {
 
 export default compose(
   graphql(GetPhAppTemplates, {
-    name: 'getPhAppTemplates'
+    name: 'getPhAppTemplates',
+    alias: 'withPhAppTemplates'
   })
 )(AppStore);

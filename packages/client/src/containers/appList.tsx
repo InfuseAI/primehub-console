@@ -267,32 +267,6 @@ class AppListContainer extends React.Component<Props, State> {
 
 export default compose(
   withRouter,
-  graphql(StartPhApplication, {
-    options: () => ({
-      onCompleted: () => {
-        notification.success({
-          duration: 10,
-          placement: 'bottomRight',
-          message: 'The application is starting.'
-        });
-      },
-      onError: errorHandler
-    }),
-    name: 'startApp'
-  }),
-  graphql(StopPhApplication, {
-    options: () => ({
-      onCompleted: () => {
-        notification.success({
-          duration: 10,
-          placement: 'bottomRight',
-          message: 'The application has been stopped.'
-        });
-      },
-      onError: errorHandler
-    }),
-    name: 'stopApp'
-  }),
   graphql(PhApplicationsConnection, {
     options: (props: Props) => {
       const params = queryString.parse(props.location.search.replace(/^\?/, ''));
@@ -311,6 +285,35 @@ export default compose(
         pollInterval: 2000,
       };
     },
-    name: 'getPhApplicationConnection'
+    name: 'getPhApplicationConnection',
+    alias: 'withPhApplicationConnection'
+  }),
+  graphql(StartPhApplication, {
+    options: () => ({
+      onCompleted: () => {
+        notification.success({
+          duration: 10,
+          placement: 'bottomRight',
+          message: 'The application is starting.'
+        });
+      },
+      onError: errorHandler
+    }),
+    name: 'startApp',
+    alias: 'withStartApp'
+  }),
+  graphql(StopPhApplication, {
+    options: () => ({
+      onCompleted: () => {
+        notification.success({
+          duration: 10,
+          placement: 'bottomRight',
+          message: 'The application has been stopped.'
+        });
+      },
+      onError: errorHandler
+    }),
+    name: 'stopApp',
+    alias: 'withStopApp'
   }),
 )(AppListContainer);

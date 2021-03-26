@@ -107,10 +107,12 @@ export default compose(
   withRouter,
   withGroupContext,
   graphql(CurrentUser, {
-    name: 'currentUser'
+    name: 'currentUser',
+    alias: 'withCurrentUser'
   }),
   graphql(GetPhAppTemplates, {
-    name: 'getPhAppTemplates'
+    name: 'getPhAppTemplates',
+    alias: 'withPhAppTemplates'
   }),
   graphql(GetPhApplication, {
     options: (props: AppDetailProps) => ({
@@ -121,7 +123,8 @@ export default compose(
       },
       fetchPolicy: 'cache-and-network',
     }),
-    name: 'getPhApplication'
+    name: 'getPhApplication',
+    alias: 'withPhApplication',
   }),
   graphql(UpdatePhApplication, {
     options: (props: AppEditProps) => ({
@@ -142,6 +145,7 @@ export default compose(
       },
       onError: errorHandler
     }),
-    name: 'updatePhApplication'
+    name: 'updatePhApplication',
+    alias: 'withUpdatePhApplication',
   })
 )(AppEditPage);

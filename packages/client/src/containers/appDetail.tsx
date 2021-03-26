@@ -43,6 +43,38 @@ class AppDetailContainer extends React.Component<AppDetailProps> {
 }
 
 export default compose(
+  graphql(GetPhApplication, {
+    options: (props: AppDetailProps) => ({
+      variables: {
+        where: {
+          id: props.match.params.appId
+        }
+      },
+      fetchPolicy: 'cache-and-network',
+      pollInterval: 2000,
+    }),
+    name: 'getPhApplication',
+    alias: 'withPhApplication',
+  }),
+  graphql(GetPhAppTemplates, {
+    name: 'getPhAppTemplates',
+    alias: 'withPhAppTemplates',
+  }),
+  graphql(DeletePhApplication, {
+    options: (props: AppDetailProps) => ({
+      onCompleted: () => {
+        props.history.push(`../apps`);
+        notification.success({
+          duration: 10,
+          placement: 'bottomRight',
+          message: 'The application has been uninstalled.'
+        });
+      },
+      onError: errorHandler
+    }),
+    name: 'deleteApp',
+    alias: 'withDeleteApp',
+  }),
   graphql(StopPhApplication, {
     options: (props: AppDetailProps) => ({
       refetchQueries: [{
@@ -58,21 +90,8 @@ export default compose(
       },
       onError: errorHandler
     }),
-    name: 'stopApp'
-  }),
-  graphql(DeletePhApplication, {
-    options: (props: AppDetailProps) => ({
-      onCompleted: () => {
-        props.history.push(`../apps`);
-        notification.success({
-          duration: 10,
-          placement: 'bottomRight',
-          message: 'The application has been uninstalled.'
-        });
-      },
-      onError: errorHandler
-    }),
-    name: 'deleteApp'
+    name: 'stopApp',
+    alias: 'withStopApp',
   }),
   graphql(StartPhApplication, {
     options: (props: AppDetailProps) => ({
@@ -89,21 +108,7 @@ export default compose(
       },
       onError: errorHandler
     }),
-    name: 'startApp'
-  }),
-  graphql(GetPhAppTemplates, {
-    name: 'getPhAppTemplates'
-  }),
-  graphql(GetPhApplication, {
-    options: (props: AppDetailProps) => ({
-      variables: {
-        where: {
-          id: props.match.params.appId
-        }
-      },
-      fetchPolicy: 'cache-and-network',
-      pollInterval: 2000,
-    }),
-    name: 'getPhApplication'
+    name: 'startApp',
+    alias: 'withStartApp',
   }),
 )(AppDetailContainer);
