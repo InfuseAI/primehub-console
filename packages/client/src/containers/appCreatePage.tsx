@@ -14,6 +14,7 @@ import Breadcrumbs from 'components/share/breadcrumb';
 import {GetPhAppTemplates} from 'queries/PhAppTemplate.graphql';
 import {CreatePhApplication} from 'queries/PhApplication.graphql';
 import {CurrentUser} from 'queries/User.graphql';
+import {sortNameByAlphaBet} from 'utils/sorting';
 
 let breadcrumbs = [
   {
@@ -28,23 +29,6 @@ let breadcrumbs = [
     title: 'Add App to PrimeHub'
   }
 ];
-
-const compareByAlphabetical = (prev, next) => {
-  if (prev < next) return -1;
-  if (prev > next) return 1;
-  return 0;
-};
-
-export const sortItems = items => {
-  const copiedItems = items.slice();
-  copiedItems
-    .sort((prev, next) => {
-      const prevName = prev.displayName || prev.name;
-      const nextName = next.displayName || next.name;
-      return compareByAlphabetical(prevName, nextName);
-    });
-  return copiedItems;
-};
 
 type Props = RouteComponentProps<{
   templateId: string;
@@ -130,7 +114,7 @@ class AppCreatePage extends React.Component<Props, State> {
             groupContext={groupContext}
             phAppTemplates={phAppTemplates}
             refetchGroup={currentUser.refetch}
-            instanceTypes={sortItems(instanceTypes)}
+            instanceTypes={sortNameByAlphaBet(instanceTypes)}
             onSubmit={this.onSubmit}
             loading={currentUser.loading || createPhApplicationResult.loading}
           />
