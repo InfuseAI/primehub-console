@@ -30,11 +30,11 @@ module.exports = {
     contentBase: path.join(__dirname, 'dist'),
     historyApiFallback: {
       rewrites: [
-        { from: /^\/g/, to: '/main.html' },
-        { from: /^\/app-prefix\/g/, to: '/main.html' },
+        { from: /^\/g/, to: '/index.html' },
+        { from: /^\/app-prefix\/g/, to: '/index.html' },
         { from: /^\/landing$/, to: '/landing.html' },
         { from: /^\/app-prefix\/landing/, to: '/landing.html' },
-        { from: /./, to: '/index.html' }
+        { from: /./, to: '/cms.html' }
       ]
     },
     https: false

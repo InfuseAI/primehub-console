@@ -97,7 +97,7 @@ interface State {
 }
 
 class AppListContainer extends React.Component<Props, State> {
-  textArea: React.RefObject<any> = React.createRef();
+  private textArea: React.RefObject<any> = React.createRef();
 
   copyClipBoard = value => {
     if (this.textArea && this.textArea.current) {
