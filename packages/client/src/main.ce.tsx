@@ -13,6 +13,11 @@ import { listCE } from 'utils/sidebarItemList';
 import Jupyterhub from 'containers/jupyterhubPage';
 import ListContainer from 'containers/list';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
+import AppListContainer from 'containers/appList';
+import AppCreate from 'containers/appCreatePage';
+import AppStore from 'containers/appStore';
+import AppDetail from 'containers/appDetail';
+import AppEdit from 'containers/appEditPage';
 
 import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
@@ -53,6 +58,18 @@ class Main extends React.Component {
               exact
               component={ImageEditPage}
             />
+            {/* Apps */}
+            <Route path={`${appPrefix}g/:groupName/apps`} exact>
+              <ListContainer Com={AppListContainer} />
+            </Route>
+            <Route path={`${appPrefix}g/:groupName/apps/store`} exact component={AppStore}/>
+            <Route path={`${appPrefix}g/:groupName/apps/create`} exact component={AppCreate}/>
+            <Route path={`${appPrefix}g/:groupName/apps/create/:templateId`} exact component={AppCreate}/>
+            <Route path={`${appPrefix}g/:groupName/apps/:appId`} exact component={AppDetail}/>
+            <Route path={`${appPrefix}g/:groupName/apps/:appId/edit`} exact component={AppEdit}/>
+
+            {/* No Matched, back to default `/g` */}
+            <Redirect to={`${appPrefix}g/`}/>
           </MainPage>
         </ApolloProvider>
       </BrowserRouter>
