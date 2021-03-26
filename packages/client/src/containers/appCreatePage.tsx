@@ -46,7 +46,9 @@ export const sortItems = items => {
   return copiedItems;
 };
 
-type Props = RouteComponentProps & GroupContextComponentProps & {
+type Props = RouteComponentProps<{
+  templateId: string;
+}> & GroupContextComponentProps & {
   currentUser: any;
   getPhAppTemplates: any;
   createPhApplication: any;
