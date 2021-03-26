@@ -46,7 +46,7 @@ class AppEditPage extends React.Component<AppEditProps> {
 
     const phAppTemplates = get(getPhAppTemplates, 'phAppTemplates') || [];
     const phApplication = get(getPhApplication, 'phApplication', {});
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+    const everyoneGroupId = window.EVERYONE_GROUP_ID;
     const allGroups = get(currentUser, 'me.groups', []);
     const groups = allGroups
       .filter(g => g.id !== everyoneGroupId)

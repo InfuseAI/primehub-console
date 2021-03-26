@@ -73,7 +73,7 @@ class ListContainer extends React.Component<Props> {
       getMyGroups,
       Com,
     } = this.props;
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+    const everyoneGroupId = window.EVERYONE_GROUP_ID;
     if (getMyGroups.loading) return null;
     if (getMyGroups.error) return 'Error';
 

@@ -25,12 +25,12 @@ export const UPDATE_DEPLOYMENT = gql`
 `;
 
 const compareByAlphabetical = (prev, next) => {
-  if(prev < next) return -1;
-  if(prev > next) return 1;
+  if (prev < next) return -1;
+  if (prev > next) return 1;
   return 0;
-}
+};
 
-export const sortItems = (items) => {
+export const sortItems = items => {
   const copiedItems = items.slice();
   copiedItems
     .sort((prev, next) => {
@@ -39,7 +39,7 @@ export const sortItems = (items) => {
       return compareByAlphabetical(prevName, nextName);
     });
   return copiedItems;
-}
+};
 
 type Props = RouteComponentProps<{deploymentId: string}> & GroupContextComponentProps & {
   getGroups: any;
@@ -47,13 +47,14 @@ type Props = RouteComponentProps<{deploymentId: string}> & GroupContextComponent
   updatePhDeployment: any;
   updatePhDeploymentResult: any;
   getPhDeployment: any;
-}
+};
+
 type State = {
   selectedGroup: string | null;
-}
+};
 
 class DeploymentCreatePage extends React.Component<Props, State> {
-  onSubmit = (payload) => {
+  onSubmit = payload => {
     const {updatePhDeployment} = this.props;
     updatePhDeployment({
       variables: {
@@ -78,7 +79,8 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       metadata: get(getPhDeployment, 'phDeployment.metadata'),
       description: get(getPhDeployment, 'phDeployment.description'),
       updateMessage: get(getPhDeployment, 'phDeployment.updateMessage'),
-    }
+    };
+
     if (isEqual(values, initialValue))
       return history.goBack();
 
@@ -106,7 +108,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       return getMessage(getPhDeployment.error)
     };
 
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+    const everyoneGroupId = window.EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []).filter(group => group.enabledDeployment || group.id === everyoneGroupId);
     const groups = allGroups.filter(group => group.id !== everyoneGroupId);
     const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);

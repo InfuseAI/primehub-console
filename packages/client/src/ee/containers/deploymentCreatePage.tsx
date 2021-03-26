@@ -52,12 +52,12 @@ export const CREATE_DEPLOYMENT = gql`
 `;
 
 const compareByAlphabetical = (prev, next) => {
-  if(prev < next) return -1;
-  if(prev > next) return 1;
+  if (prev < next) return -1;
+  if (prev > next) return 1;
   return 0;
-}
+};
 
-export const sortItems = (items) => {
+export const sortItems = items => {
   const copiedItems = items.slice();
   copiedItems
     .sort((prev, next) => {
@@ -66,16 +66,17 @@ export const sortItems = (items) => {
       return compareByAlphabetical(prevName, nextName);
     });
   return copiedItems;
-}
+};
 
 type Props = RouteComponentProps & GroupContextComponentProps & {
   getGroups: any;
   createPhDeployment: any;
   createPhDeploymentResult: any;
-}
+};
+
 type State = {
   selectedGroup: string | null;
-}
+};
 
 class DeploymentCreatePage extends React.Component<Props, State> {
   state = {
@@ -86,7 +87,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
     this.setState({selectedGroup: id});
   }
 
-  onSubmit = (payload) => {
+  onSubmit = payload => {
     const {createPhDeployment} = this.props;
     createPhDeployment({
       variables: {
@@ -98,7 +99,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
   render() {
     const {selectedGroup} = this.state;
     const {groupContext, getGroups, createPhDeploymentResult, history} = this.props;
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+    const everyoneGroupId = window.EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []).filter(group => group.enabledDeployment || group.id === everyoneGroupId);
     const groups = allGroups
       .filter(group => group.id !== everyoneGroupId)

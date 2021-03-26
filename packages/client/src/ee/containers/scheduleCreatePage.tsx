@@ -40,7 +40,7 @@ export const GET_MY_GROUPS = gql`
     }
   }
   ${GroupFragment}
-`
+`;
 
 export const CREATE_SCHEDULE = gql`
   mutation createPhSchedule($data: PhScheduleCreateInput!) {
@@ -59,15 +59,15 @@ export const GET_TIMEZONE = gql`
       }
     }
   }
-`
+`;
 
 const compareByAlphabetical = (prev, next) => {
-  if(prev < next) return -1;
-  if(prev > next) return 1;
+  if (prev < next) return -1;
+  if (prev > next) return 1;
   return 0;
-}
+};
 
-export const sortItems = (items) => {
+export const sortItems = items => {
   const copiedItems = items.slice();
   copiedItems
     .sort((prev, next) => {
@@ -76,14 +76,15 @@ export const sortItems = (items) => {
       return compareByAlphabetical(prevName, nextName);
     });
   return copiedItems;
-}
+};
 
 type Props = RouteComponentProps & GroupContextComponentProps & {
   getGroups: any;
   createPhSchedule: any;
   createPhScheduleResult: any;
   getTimezone: Function;
-}
+};
+
 type State = {
   selectedGroup: string | null;
 }
@@ -97,7 +98,7 @@ class ScheduleCreatePage extends React.Component<Props, State> {
     this.setState({selectedGroup: id});
   }
 
-  onSubmit = (payload) => {
+  onSubmit = payload => {
     const {createPhSchedule} = this.props;
     createPhSchedule({
       variables: {
@@ -109,7 +110,7 @@ class ScheduleCreatePage extends React.Component<Props, State> {
   render() {
     const {selectedGroup} = this.state;
     const {groupContext, getGroups, getTimezone, createPhScheduleResult, history} = this.props;
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+    const everyoneGroupId = window.EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups
       .filter(group => group.id !== everyoneGroupId)

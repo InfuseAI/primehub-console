@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Spin, Card, Divider} from 'antd';
+import {Card} from 'antd';
 import {get} from 'lodash';
 import styled from 'styled-components';
 
@@ -39,11 +39,11 @@ const Table = styled.table`
 `;
 
 export default class ResrouceMonitor extends React.Component<Props, State> {
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       groupContext: null
-    }
+    };
   }
 
   componentDidMount() {
@@ -56,10 +56,10 @@ export default class ResrouceMonitor extends React.Component<Props, State> {
     }
   }
 
-  fetchGroup = async (groupId) => {
+  fetchGroup = async groupId => {
     if (groupId) {
       const { refetchGroup, groupContext } = this.props;
-      const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+      const everyoneGroupId = window.EVERYONE_GROUP_ID;
       const fetchedResult = await refetchGroup();
       const allGroups = get(fetchedResult, 'data.me.groups', []);
       const groups = allGroups

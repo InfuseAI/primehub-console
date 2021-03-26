@@ -28,7 +28,6 @@ const breadcrumbs = [
   }
 ];
 
-
 export const GET_MY_GROUPS = gql`
   query me {
     me {
@@ -41,7 +40,7 @@ export const GET_MY_GROUPS = gql`
     }
   }
   ${GroupFragment}
-`
+`;
 
 export const CREATE_JOB = gql`
   mutation createPhJob($data: PhJobCreateInput!) {
@@ -49,15 +48,15 @@ export const CREATE_JOB = gql`
       id
     }
   }
-`
+`;
 
 const compareByAlphabetical = (prev, next) => {
-  if(prev < next) return -1;
-  if(prev > next) return 1;
+  if (prev < next) return -1;
+  if (prev > next) return 1;
   return 0;
-}
+};
 
-const sortItems = (items) => {
+const sortItems = items => {
   const copiedItems = items.slice();
   copiedItems
     .sort((prev, next) => {
@@ -66,7 +65,7 @@ const sortItems = (items) => {
       return compareByAlphabetical(prevName, nextName);
     });
   return copiedItems;
-}
+};
 
 type Props = RouteComponentProps & GroupContextComponentProps & {
   getGroups: any;
@@ -74,6 +73,7 @@ type Props = RouteComponentProps & GroupContextComponentProps & {
   createPhJobResult: any;
   defaultValue?: object;
 }
+
 type State = {
   selectedGroup: string | null;
 }
@@ -90,7 +90,7 @@ class JobCreatePage extends React.Component<Props, State> {
     this.setState({selectedGroup: id});
   }
 
-  onSubmit = (payload) => {
+  onSubmit = payload => {
     const {createPhJob} = this.props;
     createPhJob({
       variables: {
@@ -102,7 +102,7 @@ class JobCreatePage extends React.Component<Props, State> {
   render() {
     const {selectedGroup} = this.state;
     const {groupContext, getGroups, createPhJobResult, defaultValue} = this.props;
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+    const everyoneGroupId = window.EVERYONE_GROUP_ID;
     const jobDefaultActiveDeadlineSeconds = (window as any).jobDefaultActiveDeadlineSeconds;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups

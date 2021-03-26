@@ -163,7 +163,7 @@ class ImageEditPage extends React.Component<Props, State> {
       return getMessage(getImage.error);
     }
 
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+    const everyoneGroupId = window.EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups
       .filter(record => record.id !== everyoneGroupId)

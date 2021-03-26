@@ -81,7 +81,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
     groups: Array<GroupContextValue>,
     me: UserContextValue
   } {
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+    const everyoneGroupId = window.EVERYONE_GROUP_ID;
     const {getMyGroups} = this.props;
     const {loading, error, me} = getMyGroups;
     const groups = !loading && !error && me ?

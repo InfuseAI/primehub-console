@@ -41,7 +41,7 @@ export const UPDATE_SCHEDULE = gql`
       id
     }
   }
-`
+`;
 
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 
@@ -54,7 +54,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
     this.setState({selectedGroup: id});
   }
 
-  onSubmit = (payload) => {
+  onSubmit = payload => {
     const {updatePhSchedule, getPhSchedule} = this.props;
     const id = get(getPhSchedule, 'phSchedule.id');
     delete payload.recurrence.__typename;
@@ -112,7 +112,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
       return getMessage(getPhSchedule.error)
     };
     const selectedGroup = this.state.selectedGroup || get(getPhSchedule, 'phSchedule.groupId');
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
+    const everyoneGroupId = window.EVERYONE_GROUP_ID;
     const allGroups = get(getGroups, 'me.groups', []);
     const groups = allGroups.filter(group => group.id !== everyoneGroupId);
     const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
