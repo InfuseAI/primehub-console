@@ -16,6 +16,7 @@
       "ee/*": ["./src/ee/*"],
       "constant/*": ["./src/constant/*"],
       "interfaces/*": ["./src/interfaces/*"],
+      "queries/*": ["./src/queries/*"],
       "@types/*": ["./src/@types/*"],
     }
   },

@@ -3,13 +3,13 @@ import {Icon, Card, Divider, Col, Row} from 'antd';
 import {get} from 'lodash';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
-import {GET_APP_TEMPLATES} from 'containers/appCreatePage';
 import PageTitle from 'components/pageTitle';
 import Breadcrumbs from 'components/share/breadcrumb';
 import PageBody from 'components/pageBody';
 import {AppLogo} from 'components/apps/card';
 import {Link} from 'react-router-dom';
 import {ActionBtn, ClearBoth, Right, Left} from 'components/apps/detail';
+import {GetPhAppTemplates} from 'queries/PhAppTemplate.graphql';
 
 const breadcrumbs = [
   {
@@ -80,7 +80,7 @@ class AppStore extends React.Component<Props> {
 }
 
 export default compose(
-  graphql(GET_APP_TEMPLATES, {
+  graphql(GetPhAppTemplates, {
     name: 'getPhAppTemplates'
   })
 )(AppStore);

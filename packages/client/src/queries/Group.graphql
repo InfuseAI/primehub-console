@@ -1,0 +1,19 @@
+fragment GroupInfo on Group {
+  id
+  displayName
+  name
+  admins
+  quotaCpu
+  quotaGpu
+  quotaMemory
+  datasets {
+    displayName
+  }
+  resourceStatus {
+    cpuUsage
+    memUsage
+    gpuUsage
+  }
+  enabledDeployment
+  jobDefaultActiveDeadlineSeconds
+}

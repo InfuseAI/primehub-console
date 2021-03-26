@@ -1,25 +1,20 @@
 import * as React from 'react';
-import {Row, Col, Button, Modal, Skeleton, Input, message, Spin, Divider, Alert, notification} from 'antd';
-import {ButtonType} from 'antd/lib/button';
-import gql from 'graphql-tag';
+import {Row, Col, Modal, Skeleton, Input, message, Spin, Alert, notification} from 'antd';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
-import {get} from 'lodash';
-import {withRouter, Link} from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import Pagination from 'components/share/pagination';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
-import Filter from 'ee/components/shared/filter';
-import {Group} from 'ee/components/shared/groupFilter';
 import {errorHandler} from 'utils/errorHandler';
 import AppCard from 'components/apps/card';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
-import {STOP_APP, START_APP} from 'containers/appDetail';
-import PhApplication, {PhApplicationFragment} from 'interfaces/phApplication';
+import PhApplication from 'interfaces/phApplication';
+import {PhApplicationsConnection, StopPhApplication, StartPhApplication} from 'queries/PhApplication.graphql';
 
 const {confirm} = Modal;
 
@@ -46,27 +41,6 @@ const breadcrumbs = [
 ];
 
 const PAGE_SIZE = 12;
-const Search = Input.Search;
-
-export const GET_PH_APPLICATION_CONNECTION = gql`
-  query phApplicationsConnection($where: PhApplicationWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
-    phApplicationsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-      }
-      edges {
-        cursor
-        node {
-          ...PhApplicationInfo
-        }
-      }
-    }
-  }
-  ${PhApplicationFragment}
-`;
 
 type Props = {
   startApp: any;
@@ -165,7 +139,7 @@ class AppListContainer extends React.Component<Props, State> {
 
   searchHandler = query => {
     const {getPhApplicationConnection} = this.props;
-    const {phApplicationsConnection, refetch, variables} = getPhApplicationConnection;
+    const {refetch, variables} = getPhApplicationConnection;
     const newVariables = {
       ...variables,
       where: {
@@ -204,9 +178,7 @@ class AppListContainer extends React.Component<Props, State> {
     const { groupContext, getPhApplicationConnection, groups, history } = this.props;
     const {
       error,
-      loading,
       phApplicationsConnection,
-      variables,
       refetch
     } = getPhApplicationConnection;
 
@@ -295,8 +267,8 @@ class AppListContainer extends React.Component<Props, State> {
 
 export default compose(
   withRouter,
-  graphql(START_APP, {
-    options: (props: any) => ({
+  graphql(StartPhApplication, {
+    options: () => ({
       onCompleted: () => {
         notification.success({
           duration: 10,
@@ -308,8 +280,8 @@ export default compose(
     }),
     name: 'startApp'
   }),
-  graphql(STOP_APP, {
-    options: (props: any) => ({
+  graphql(StopPhApplication, {
+    options: () => ({
       onCompleted: () => {
         notification.success({
           duration: 10,
@@ -321,7 +293,7 @@ export default compose(
     }),
     name: 'stopApp'
   }),
-  graphql(GET_PH_APPLICATION_CONNECTION, {
+  graphql(PhApplicationsConnection, {
     options: (props: Props) => {
       const params = queryString.parse(props.location.search.replace(/^\?/, ''));
       const {groupContext} = props;

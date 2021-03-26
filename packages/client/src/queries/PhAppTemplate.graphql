@@ -1,0 +1,16 @@
+query GetPhAppTemplates {
+  phAppTemplates {
+    id
+    icon
+    defaultEnvs {
+      name
+      defaultValue
+      optional
+    }
+    name
+    icon
+    version
+    description
+    docLink
+  }
+}

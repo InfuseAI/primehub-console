@@ -1,13 +1,13 @@
 import * as React from 'react';
 import {notification} from 'antd';
-import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {RouteComponentProps} from 'react-router-dom';
 import {compose} from 'recompose';
 import {errorHandler} from 'utils/errorHandler';
 import Detail from 'components/apps/detail';
-import {PhApplicationFragment} from 'interfaces/phApplication';
-import {GET_APP_TEMPLATES} from 'containers/appCreatePage';
+import {GetPhAppTemplates} from 'queries/PhAppTemplate.graphql';
+import {GetPhApplication, StartPhApplication, StopPhApplication, DeletePhApplication} from 'queries/PhApplication.graphql';
+
 import {get} from 'lodash';
 
 export type AppDetailProps = {
@@ -19,42 +19,6 @@ export type AppDetailProps = {
 } & RouteComponentProps<{
   appId: string;
 }>;
-
-export const STOP_APP = gql`
-  mutation stopPhApplication($where: PhApplicationWhereUniqueInput!) {
-    stopPhApplication(where: $where) {
-      ...PhApplicationInfo
-    }
-  }
-  ${PhApplicationFragment}
-`;
-
-export const START_APP = gql`
-  mutation startPhApplication($where: PhApplicationWhereUniqueInput!) {
-    startPhApplication(where: $where) {
-      ...PhApplicationInfo
-    }
-  }
-  ${PhApplicationFragment}
-`;
-
-export const DELETE_APP = gql`
-  mutation deletePhApplication($where: PhApplicationWhereUniqueInput!) {
-    deletePhApplication(where: $where) {
-      ...PhApplicationInfo
-    }
-  }
-  ${PhApplicationFragment}
-`;
-
-export const GET_PH_APPLICATION = gql`
-  query phApplication($where: PhApplicationWhereUniqueInput!) {
-    phApplication(where: $where) {
-      ...PhApplicationInfo
-    }
-  }
-  ${PhApplicationFragment}
-`;
 
 export const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 
@@ -79,10 +43,10 @@ class AppDetailContainer extends React.Component<AppDetailProps> {
 }
 
 export default compose(
-  graphql(STOP_APP, {
+  graphql(StopPhApplication, {
     options: (props: AppDetailProps) => ({
       refetchQueries: [{
-        query: GET_PH_APPLICATION,
+        query: GetPhApplication,
         variables: {where: {id: props.match.params.appId}}
       }],
       onCompleted: () => {
@@ -96,7 +60,7 @@ export default compose(
     }),
     name: 'stopApp'
   }),
-  graphql(DELETE_APP, {
+  graphql(DeletePhApplication, {
     options: (props: AppDetailProps) => ({
       onCompleted: () => {
         props.history.push(`../apps`);
@@ -110,10 +74,10 @@ export default compose(
     }),
     name: 'deleteApp'
   }),
-  graphql(START_APP, {
+  graphql(StartPhApplication, {
     options: (props: AppDetailProps) => ({
       refetchQueries: [{
-        query: GET_PH_APPLICATION,
+        query: GetPhApplication,
         variables: {where: {id: props.match.params.appId}}
       }],
       onCompleted: () => {
@@ -127,10 +91,10 @@ export default compose(
     }),
     name: 'startApp'
   }),
-  graphql(GET_APP_TEMPLATES, {
+  graphql(GetPhAppTemplates, {
     name: 'getPhAppTemplates'
   }),
-  graphql(GET_PH_APPLICATION, {
+  graphql(GetPhApplication, {
     options: (props: AppDetailProps) => ({
       variables: {
         where: {

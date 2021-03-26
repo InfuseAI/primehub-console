@@ -1,5 +1,4 @@
 import * as React from 'react';
-import gql from 'graphql-tag';
 import {notification} from 'antd';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -9,11 +8,12 @@ import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'utils/errorHandler';
 import AppCreateForm from 'components/apps/createForm';
-import {GroupFragment} from 'containers/list';
-import {appPrefix} from 'utils/env';
-import { GroupContextComponentProps, withGroupContext } from 'context/group';
+import {GroupContextComponentProps, withGroupContext } from 'context/group';
 import PageTitle from 'components/pageTitle';
 import Breadcrumbs from 'components/share/breadcrumb';
+import {GetPhAppTemplates} from 'queries/PhAppTemplate.graphql';
+import {CreatePhApplication} from 'queries/PhApplication.graphql';
+import {CurrentUser} from 'queries/User.graphql';
 
 let breadcrumbs = [
   {
@@ -28,46 +28,6 @@ let breadcrumbs = [
     title: 'Add App to PrimeHub'
   }
 ];
-
-export const GET_MY_GROUPS = gql`
-  query me {
-    me {
-      id
-      groups {
-        ...GroupInfo
-        instanceTypes { id name displayName description spec global gpuLimit memoryLimit cpuLimit }
-      }
-    }
-  }
-  ${GroupFragment}
-`;
-
-export const GET_APP_TEMPLATES = gql`
-  query phAppTemplates {
-    phAppTemplates {
-      id
-      icon
-      defaultEnvs {
-        name
-        defaultValue
-        optional
-      }
-      name
-      icon
-      version
-      description
-      docLink
-    }
-  }
-`;
-
-export const CREATE_APPLICATION = gql`
-  mutation createPhApplication($data: PhApplicationCreateInput!) {
-    createPhApplication(data: $data) {
-      id
-    }
-  }
-`;
 
 const compareByAlphabetical = (prev, next) => {
   if (prev < next) return -1;
@@ -87,7 +47,7 @@ export const sortItems = items => {
 };
 
 type Props = RouteComponentProps & GroupContextComponentProps & {
-  getGroups: any;
+  currentUser: any;
   getPhAppTemplates: any;
   createPhApplication: any;
   createPhApplicationResult: any;
@@ -112,11 +72,11 @@ class AppCreatePage extends React.Component<Props, State> {
   }
 
   render() {
-    const {groupContext, getGroups, getPhAppTemplates, createPhApplicationResult, history, match} = this.props;
+    const {groupContext, currentUser, getPhAppTemplates, createPhApplicationResult, match} = this.props;
     const {params} = match;
     const phAppTemplates = get(getPhAppTemplates, 'phAppTemplates') || [];
     const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
-    const allGroups = get(getGroups, 'me.groups', []);
+    const allGroups = get(currentUser, 'me.groups', []);
     const groups = allGroups
       .filter(g => g.id !== everyoneGroupId)
       .filter(g => !groupContext || groupContext.id === g.id);
@@ -167,10 +127,10 @@ class AppCreatePage extends React.Component<Props, State> {
             templateId={params.templateId}
             groupContext={groupContext}
             phAppTemplates={phAppTemplates}
-            refetchGroup={getGroups.refetch}
+            refetchGroup={currentUser.refetch}
             instanceTypes={sortItems(instanceTypes)}
             onSubmit={this.onSubmit}
-            loading={getGroups.loading || createPhApplicationResult.loading}
+            loading={currentUser.loading || createPhApplicationResult.loading}
           />
         </div>
       </React.Fragment>
@@ -181,13 +141,13 @@ class AppCreatePage extends React.Component<Props, State> {
 export default compose(
   withRouter,
   withGroupContext,
-  graphql(GET_MY_GROUPS, {
-    name: 'getGroups'
+  graphql(CurrentUser, {
+    name: 'currentUser'
   }),
-  graphql(GET_APP_TEMPLATES, {
+  graphql(GetPhAppTemplates, {
     name: 'getPhAppTemplates'
   }),
-  graphql(CREATE_APPLICATION, {
+  graphql(CreatePhApplication, {
     options: (props: Props) => ({
       onCompleted: (data: any) => {
         const {history} = props;

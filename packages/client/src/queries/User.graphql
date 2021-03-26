@@ -1,0 +1,10 @@
+# import GroupInfo from './Group.graphql'
+query CurrentUser {
+  me {
+    id
+    groups {
+      ...GroupInfo
+      instanceTypes { id name displayName description spec global gpuLimit memoryLimit cpuLimit }
+    }
+  }
+}
