@@ -68,8 +68,6 @@ class Main extends React.Component {
             <Route path={`${appPrefix}g/:groupName/apps/:appId`} exact component={AppDetail}/>
             <Route path={`${appPrefix}g/:groupName/apps/:appId/edit`} exact component={AppEdit}/>
 
-            {/* No Matched, back to default `/g` */}
-            <Redirect to={`${appPrefix}g/`}/>
           </MainPage>
         </ApolloProvider>
       </BrowserRouter>

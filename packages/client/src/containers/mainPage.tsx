@@ -138,6 +138,10 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
         <Route path={`${appPrefix}g/:groupName/:actionKey`}>
           <Landing includeHeader={false} />
         </Route>
+
+        <Route path='/'>
+          <Redirect to={`${appPrefix}g`} />
+        </Route>
       </Switch>;
     }
 
