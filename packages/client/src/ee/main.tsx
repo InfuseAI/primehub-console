@@ -1,7 +1,8 @@
 import * as React from 'react';
+import ReactDOM from 'react-dom';
 import {ApolloProvider} from 'react-apollo';
 import {notification, Button} from 'antd';
-import {BrowserRouter, Route, Redirect} from 'react-router-dom';
+import {BrowserRouter, Route} from 'react-router-dom';
 import {BackgroundTokenSyncer} from '../workers/backgroundTokenSyncer';
 import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';

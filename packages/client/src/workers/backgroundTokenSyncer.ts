@@ -45,6 +45,7 @@ export class BackgroundTokenSyncer {
     reLoginNotify: ({loginUrl}: {loginUrl: string}) => void,
     appPrefix?: string
   }) {
+    if (!!window.development) return;
     this.interval = interval || 1000;
 
     if (!accessTokenExp) {
@@ -61,6 +62,7 @@ export class BackgroundTokenSyncer {
   }
 
   public run = async () => {
+    if (!!window.development) return;
     if (!this.accessTokenExp || typeof this.accessTokenExp !== 'number') {
       console.warn('[PrimeHub][BackgroundTokenSyncer] AccessToken not valid to run');
       return;
