@@ -48,9 +48,9 @@ export class BackgroundTokenSyncer {
     this.interval = interval || 1000;
 
     if (!accessTokenExp) {
-      console.warn('no refresh token exp');
+      console.warn('[PrimeHub][BackgroundTokenSyncer] No refresh token exp');
     } else if (typeof accessTokenExp !== 'number') {
-      console.warn(`invalid accessTokenExp. Got ${accessTokenExp}`);
+      console.warn(`[PrimeHub][BackgroundTokenSyncer] Invalid accessTokenExp. Got ${accessTokenExp}`);
     }
 
     this.getNewTokenSet = getNewTokenSet;
@@ -62,12 +62,12 @@ export class BackgroundTokenSyncer {
 
   public run = async () => {
     if (!this.accessTokenExp || typeof this.accessTokenExp !== 'number') {
-      console.warn('accessToken not valid to run');
+      console.warn('[PrimeHub][BackgroundTokenSyncer] AccessToken not valid to run');
       return;
     }
 
     if (!this.refreshTokenExp || typeof this.refreshTokenExp !== 'number') {
-      console.warn('refreshTokenExp not valid to run');
+      console.warn('[PrimeHub][BackgroundTokenSyncer] RefreshTokenExp not valid to run');
       return;
     }
 
@@ -113,9 +113,9 @@ export class BackgroundTokenSyncer {
         window.localStorage.setItem('canner.accessToken', newTokenResponse.accessToken);
 
         // tslint:disable-next-line:max-line-length
-        console.log(`use new refresh token with exp: ${this.refreshTokenExp} & access token with exp ${this.accessTokenExp}`);
+        console.log(`[PrimeHub][BackgroundTokenSyncer] Use new refresh token with exp: ${this.refreshTokenExp} & access token with exp ${this.accessTokenExp}`);
       } catch (e) {
-        console.log('refresh token request failed', e);
+        console.log('[PrimeHub][BackgroundTokenSyncer] Refresh token request failed', e);
       } finally {
         this.requestOnFly = false;
       }
