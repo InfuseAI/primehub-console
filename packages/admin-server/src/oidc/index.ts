@@ -153,6 +153,7 @@ export class OidcCtrl {
 
       ctx.state.accessTokenExp = accessTokenExp;
       ctx.state.refreshTokenExp = refreshTokenExp;
+      ctx.state.userId = accessToken.getContent().sub;
       ctx.state.username = ctx.cookies.get('username');
       ctx.state.thumbnail = ctx.cookies.get('thumbnail');
       ctx.state.isUserAdmin = accessToken.hasRole(this.adminRole);
@@ -302,14 +303,6 @@ export class OidcCtrl {
       username: get(accessToken.getContent(), 'preferred_username')
     });
     return ctx.redirect(`${this.keycloakBaseUrl}/realms/${this.realm}/protocol/openid-connect/logout?${qs}`);
-  }
-
-  public getUserFromContext = (ctx: any) => {
-    const accessToken = new Token(ctx.cookies.get('accessToken', {signed: true}), this.clientId);
-    return {
-      userId: accessToken.getContent().sub,
-      username: accessToken.getContent().preferred_username
-    };
   }
 
   public requestApiToken = async (ctx: any) => {

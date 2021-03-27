@@ -5,20 +5,15 @@ import views from 'koa-views';
 import serve from 'koa-static';
 import Router from 'koa-router';
 import morgan from 'koa-morgan';
-import proxies from 'koa-proxies';
-import cookie from 'cookie';
 
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import koaMount from 'koa-mount';
 import yaml from 'js-yaml';
 import fs from 'fs';
-import NodeCache from 'node-cache';
-import { v4 as uuidv4 } from 'uuid';
-import { gql, GraphQLClient } from 'graphql-request';
-import Boom from 'boom';
 
 // controller
 import { OidcCtrl, mount as mountOidc } from './oidc';
+import { ProxyCtrl} from './proxy';
 
 // config
 import {createConfig, Config} from './config';
@@ -58,12 +53,6 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     token_endpoint: `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/token`,
     userinfo_endpoint: `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/userinfo`,
     jwks_uri: `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/certs`,
-  });
-
-  const graphqlClient = new GraphQLClient(config.graphqlSvcEndpoint, {
-    headers: {
-      authorization: `Bearer ${config.sharedGraphqlSecretKey}`,
-    }
   });
 
   const oidcClient = new issuer.Client({
@@ -124,7 +113,6 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
       logoutLink: config.appPrefix ? `${config.appPrefix}/oidc/logout` : '/oidc/logout',
     });
 
-    ctx.graphqlClient = graphqlClient;
     return next();
   });
 
@@ -150,6 +138,11 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
 
   if (!process.env.TEST) {
     const morganFormat: any = (tokens, req, res) => {
+      // Don't print accesslog for proxy traffic. We have already logged it in another place.
+      if (req.isProxy) {
+        return;
+      }
+
       return logger.info({
         method: tokens.method(req, res),
         url: tokens.url(req, res),
@@ -175,115 +168,6 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     prefix: config.appPrefix
   });
 
-  // file proxy
-  // @ts-ignore
-  proxies.proxy.on('proxyReq', (proxyReq, req, res, options) => {
-    const cookies = cookie.parse(req.headers.cookie || '');
-    const accessToken = cookies.accessToken || '';
-    proxyReq.setHeader('Authorization', `Bearer ${accessToken}`);
-  });
-  app.use(proxies(`${staticPath}files`, {
-    target: config.graphqlSvcEndpoint.replace('/graphql', ''),
-    changeOrigin: true,
-    logs: true,
-    rewrite: rewritePath => rewritePath.replace(staticPath, '/')
-  }));
-
-  const sessionTokenCacheExpireTime = 30;
-  const sessionTokenCacheStore = new NodeCache({stdTTL: sessionTokenCacheExpireTime});
-
-  const checkSessionToken = async (ctx: Koa.ParameterizedContext) =>  {
-    const sessionToken = ctx.cookies.get('phapplication-session-id') || '';
-    return sessionTokenCacheStore.get(sessionToken);
-  };
-
-  const createSessionToken = async (ctx: Koa.ParameterizedContext) => {
-    const appID = ctx.params.appID;
-    // Generate session token
-    const sessionToken = uuidv4();
-    ctx.cookies.set('phapplication-session-id', sessionToken, {path: `${config.appPrefix}/apps/${appID}`});
-    sessionTokenCacheStore.set(sessionToken, true, sessionTokenCacheExpireTime);
-    console.log('Create Token: ', sessionToken);
-
-    return true;
-  };
-
-  const updateSessionTTL = async (ctx: Koa.ParameterizedContext) => {
-    const sessionToken = ctx.cookies.get('phapplication-session-id');
-    sessionTokenCacheStore.ttl(sessionToken, sessionTokenCacheExpireTime);
-    console.log('Update Token TTL: ', sessionToken);
-  };
-
-  const checkUserGroup = async (ctx: Koa.ParameterizedContext) => {
-    const {userId} = oidcCtrl.getUserFromContext(ctx);
-    const variables = {
-      id: userId,
-    };
-    const query = gql`
-    query ($id: ID!) {
-      user(where: {id: $id}) {
-        id
-        username
-        groups {name}
-      }
-    }
-    `;
-    const data = await ctx.graphqlClient.request(query, variables);
-
-    for (const group of data.user.groups) {
-      if (group.name === 'phusers') {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  const phApplicationProxyHandler = async (ctx: Koa.ParameterizedContext, next: any) => {
-    const appID = ctx.params.appID;
-    const scope = ctx.params.appID;
-    // const service = 'app-mlflow-xyzab.hub.svc.cluster.local:5000';
-    const service = 'localhost:5000';
-    ctx.params.scope = scope;
-    ctx.params.service = service;
-
-    switch (scope) {
-      case 'group':
-      case 'primehub':
-        const cachedSessionToken = await checkSessionToken(ctx);
-        if (!cachedSessionToken) {
-          return oidcCtrl.loggedIn(ctx, async () => {
-            if (scope === 'group') {
-              const groupAllowed = await checkUserGroup(ctx);
-              if (groupAllowed === false) {
-                throw Boom.forbidden('Request not authorized');
-              }
-            }
-            createSessionToken(ctx);
-            return ctx.redirect(ctx.url);
-          });
-        }
-        await updateSessionTTL(ctx);
-        await proxies(`${config.appPrefix}/apps/${appID}`, {
-          target: `http://${service}`,
-          changeOrigin: true,
-          logs: true,
-          rewrite: rewritePath => rewritePath.replace(`${config.appPrefix}/apps/${appID}/`, '/')
-        })(ctx, next);
-        break;
-      case 'public':
-        await proxies(`${config.appPrefix}/apps/${appID}`, {
-          target: `http://${service}`,
-          changeOrigin: true,
-          logs: true,
-          rewrite: rewritePath => rewritePath.replace(`${config.appPrefix}/apps/${appID}/`, '/')
-        })(ctx, next);
-        break;
-      default:
-        throw Boom.badRequest('bad request');
-    }
-  };
-  rootRouter.all(`/apps/:appID/(.*)`, phApplicationProxyHandler);
-
   // redirect
   const home = '/g';
   rootRouter.get(['/', '/landing'], async (ctx: any) => {
@@ -299,7 +183,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   rootRouter.get('/font/*', serveStatic);
   rootRouter.get('/css/*', serveStatic);
 
-  // ctrl
+  // oidc
   mountOidc(rootRouter, oidcCtrl);
 
   // main
@@ -332,51 +216,6 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     });
   });
 
-  // job
-  rootRouter.get('/job', oidcCtrl.loggedIn, async ctx => {
-    await ctx.render('job', {
-      title: 'PrimeHub Job Submission',
-      staticPath
-    });
-  });
-
-  rootRouter.get('/job/:jobId', oidcCtrl.loggedIn, async ctx => {
-    await ctx.render('job', {
-      title: 'PrimeHub Job Submission',
-      staticPath
-    });
-  });
-
-  // job schedule
-  rootRouter.get('/schedule', oidcCtrl.loggedIn, async ctx => {
-    await ctx.render('job', {
-      title: 'PrimeHub Job Schedule',
-      staticPath
-    });
-  });
-
-  rootRouter.get('/schedule/:scheduleId', oidcCtrl.loggedIn, async ctx => {
-    await ctx.render('job', {
-      title: 'PrimeHub Job Schedule',
-      staticPath
-    });
-  });
-
-  // model deployment
-  rootRouter.get('/model-deployment', oidcCtrl.loggedIn, async ctx => {
-    await ctx.render('model-deployment', {
-      title: 'PrimeHub Model Deployment',
-      staticPath
-    });
-  });
-
-  rootRouter.get('/model-deployment/*', oidcCtrl.loggedIn, async ctx => {
-    await ctx.render('model-deployment', {
-      title: 'PrimeHub Model Deployment',
-      staticPath
-    });
-  });
-
   // cms
   rootRouter.get('/cms', oidcCtrl.ensureAdmin, async ctx => {
     await ctx.render('cms', {title: 'PrimeHub', staticPath});
@@ -384,6 +223,14 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   rootRouter.get('/cms/*', oidcCtrl.ensureAdmin, async ctx => {
     await ctx.render('cms', {title: 'PrimeHub', staticPath});
   });
+
+  //proxy
+  const proxy = new ProxyCtrl({
+    config,
+    oidcCtrl,
+  });
+  proxy.mount(rootRouter);
+  app.upgradeHandler = proxy.createUpgradeHandler();
 
   // health check
   rootRouter.get('/health', async ctx => {

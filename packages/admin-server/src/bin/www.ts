@@ -4,6 +4,7 @@ import { resolve } from 'path';
 import * as http from 'http';
 import * as https from 'https';
 import * as logger from '../logger';
+import HttpProxy from 'http-proxy';
 const port = process.env.NODE_PORT || 3000;
 
 createApp().then(({app, config}) => {
@@ -28,6 +29,12 @@ createApp().then(({app, config}) => {
       🚀 Server ready on port ${port}
     `);
   });
+
+  // handler for proxy of the websocket
+  const {upgradeHandler} = app as any;
+  if (upgradeHandler) {
+    server.on("upgrade", upgradeHandler);
+  }
 })
 .catch(err => {
   logger.error({
