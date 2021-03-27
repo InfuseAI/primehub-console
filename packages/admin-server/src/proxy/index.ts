@@ -123,14 +123,22 @@ export class ProxyCtrl {
     const appID = ctx.params.appID;
     // Generate session token
     const sessionToken = uuidv4();
-    ctx.cookies.set('phapplication-session-id', sessionToken, {path: `/apps/${appID}`});
+    const cookiePath = this.config.appPrefix ?
+      `${this.config.appPrefix}/apps/${appID}/` :
+      `/apps/${appID}/`;
+    const opts = {
+      signed: true,
+      secure: ctx.request.secure,
+      path: cookiePath,
+    };
+    ctx.cookies.set('phapplication-session-id', sessionToken, opts);
     this.sessionTokenCacheStore.set(sessionToken, true, sessionTokenCacheExpireTime);
 
     return true;
   };
 
   private updateSessionTTL = (ctx: Koa.ParameterizedContext) => {
-    const sessionToken = ctx.cookies.get('phapplication-session-id');
+    const sessionToken = ctx.cookies.get('phapplication-session-id', {signed: true});
     this.sessionTokenCacheStore.ttl(sessionToken, sessionTokenCacheExpireTime);
   };
 
@@ -226,7 +234,7 @@ export class ProxyCtrl {
     switch (appData.scope) {
       case 'group':
       case 'primehub':
-        const sessionToken = ctx.cookies.get('phapplication-session-id') || '';
+        const sessionToken = ctx.cookies.get('phapplication-session-id', {signed: true}) || '';
         const cachedSessionToken = this.sessionTokenCacheStore.get(sessionToken);
         if (!cachedSessionToken) {
           // authentication and authroization

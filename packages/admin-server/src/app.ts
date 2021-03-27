@@ -61,13 +61,8 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   });
   oidcClient.CLOCK_TOLERANCE = 5 * 60;
   const oidcCtrl = new OidcCtrl({
-    realm: config.keycloakRealmName,
-    clientId: config.keycloakClientId,
-    cmsHost: config.cmsHost,
-    keycloakBaseUrl: config.keycloakOidcBaseUrl,
+    config,
     oidcClient,
-    appPrefix: config.appPrefix,
-    enableUserPortal: config.enableUserPortal
   });
 
   // koa
@@ -203,7 +198,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     const apiToken = ctx.cookies.get('apiToken', {signed: true});
     if (apiToken) {
       ctx.state.apiToken = ctx.cookies.get('apiToken', {signed: true});
-      ctx.cookies.set('apiToken', null);
+      ctx.cookies.set('apiToken', {path: staticPath});
     }
 
     await ctx.render('main', {
