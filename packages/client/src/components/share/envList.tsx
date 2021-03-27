@@ -21,6 +21,7 @@ export default function EnvList({envList, valueVisibility}: {envList: EnvVar[], 
   ];
   return (
     <Table
+      rowKey={(_ , index) => `${index}`}
       columns={columns}
       dataSource={envList}
       scroll={{ y: 240 }}
