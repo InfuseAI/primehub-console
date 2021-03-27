@@ -1,33 +1,4 @@
-fragment PhApplicationInfo on PhApplication {
-  id
-  displayName
-  appVersion
-  appName
-  appIcon
-  appDefaultEnv {
-    name
-    defaultValue
-    optional
-  }
-  groupName
-  instanceType
-  scope
-  appUrl
-  internalAppUrl
-  svcEndpoints
-  env {
-    name
-    value
-  }
-  stop
-  status
-  message
-  pods {
-    logEndpoint
-  }
-}
-
-# Queries
+#import './fragments/PhApplicationInfo.graphql'
 query GetPhApplication($where: PhApplicationWhereUniqueInput!) {
   phApplication(where: $where) {
     ...PhApplicationInfo
