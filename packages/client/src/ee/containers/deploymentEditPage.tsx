@@ -14,6 +14,7 @@ import {GET_PH_DEPLOYMENT, getMessage} from 'ee/containers/deploymentDetail';
 import {GET_MY_GROUPS} from './deploymentCreatePage';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
+import {sortNameByAlphaBet} from 'utils/sorting';
 
 export const UPDATE_DEPLOYMENT = gql`
   mutation updatePhDeployment($where: PhDeploymentWhereUniqueInput!, $data: PhDeploymentUpdateInput!) {
@@ -23,23 +24,6 @@ export const UPDATE_DEPLOYMENT = gql`
   }
   ${PhDeploymentFragment}
 `;
-
-const compareByAlphabetical = (prev, next) => {
-  if (prev < next) return -1;
-  if (prev > next) return 1;
-  return 0;
-};
-
-export const sortItems = items => {
-  const copiedItems = items.slice();
-  copiedItems
-    .sort((prev, next) => {
-      const prevName = prev.displayName || prev.name;
-      const nextName = next.displayName || next.name;
-      return compareByAlphabetical(prevName, nextName);
-    });
-  return copiedItems;
-};
 
 type Props = RouteComponentProps<{deploymentId: string}> & GroupContextComponentProps & {
   getGroups: any;
@@ -148,17 +132,17 @@ class DeploymentCreatePage extends React.Component<Props, State> {
         />
         <div style={{margin: '16px'}}>
           <DeploymentCreateForm
-            type="edit"
+            type='edit'
             initialValue={{
               ...(getPhDeployment.phDeployment || {}),
               instanceTypeId: get(getPhDeployment, 'phDeployment.instanceType.id', ''),
               instanceTypeName: get(getPhDeployment, 'phDeployment.instanceType.name', '')
             }}
             selectedGroup={selectedGroup}
-            groups={sortItems(groups)}
+            groups={sortNameByAlphaBet(groups)}
             groupContext={groupContext}
             refetchGroup={getGroups.refetch}
-            instanceTypes={sortItems(instanceTypes)}
+            instanceTypes={sortNameByAlphaBet(instanceTypes)}
             onSubmit={this.onSubmit}
             onCancel={this.onCancel}
             loading={getGroups.loading || updatePhDeploymentResult.loading}

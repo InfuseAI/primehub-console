@@ -14,6 +14,7 @@ import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
+import {sortNameByAlphaBet} from 'utils/sorting';
 
 const breadcrumbs = [
   {
@@ -50,23 +51,6 @@ export const CREATE_DEPLOYMENT = gql`
     }
   }
 `;
-
-const compareByAlphabetical = (prev, next) => {
-  if (prev < next) return -1;
-  if (prev > next) return 1;
-  return 0;
-};
-
-export const sortItems = items => {
-  const copiedItems = items.slice();
-  copiedItems
-    .sort((prev, next) => {
-      const prevName = prev.displayName || prev.name;
-      const nextName = next.displayName || next.name;
-      return compareByAlphabetical(prevName, nextName);
-    });
-  return copiedItems;
-};
 
 type Props = RouteComponentProps & GroupContextComponentProps & {
   getGroups: any;
@@ -121,7 +105,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       <React.Fragment>
         <PageTitle
           breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-          title={"Create Deployment"}
+          title={'Create Deployment'}
         />
         <div style={{margin: '16px'}}>
           <DeploymentCreateForm
@@ -129,9 +113,9 @@ class DeploymentCreatePage extends React.Component<Props, State> {
             refetchGroup={getGroups.refetch}
             onSelectGroup={this.onChangeGroup}
             selectedGroup={selectedGroup}
-            groups={sortItems(groups)}
-            instanceTypes={sortItems(instanceTypes)}
-            images={sortItems(images)}
+            groups={sortNameByAlphaBet(groups)}
+            instanceTypes={sortNameByAlphaBet(instanceTypes)}
+            images={sortNameByAlphaBet(images)}
             onSubmit={this.onSubmit}
             loading={getGroups.loading || createPhDeploymentResult.loading}
           />

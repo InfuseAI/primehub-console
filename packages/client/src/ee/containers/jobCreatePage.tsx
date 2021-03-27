@@ -11,8 +11,9 @@ import {errorHandler} from 'utils/errorHandler';
 import JobCreateForm from 'ee/components/job/createForm';
 import {GroupFragment} from 'containers/list';
 import PageTitle from 'components/pageTitle';
-import { withGroupContext, GroupContextComponentProps } from 'context/group';
+import {withGroupContext, GroupContextComponentProps} from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
+import {sortNameByAlphaBet} from 'utils/sorting';
 
 const breadcrumbs = [
   {
@@ -49,23 +50,6 @@ export const CREATE_JOB = gql`
     }
   }
 `;
-
-const compareByAlphabetical = (prev, next) => {
-  if (prev < next) return -1;
-  if (prev > next) return 1;
-  return 0;
-};
-
-const sortItems = items => {
-  const copiedItems = items.slice();
-  copiedItems
-    .sort((prev, next) => {
-      const prevName = prev.displayName || prev.name;
-      const nextName = next.displayName || next.name;
-      return compareByAlphabetical(prevName, nextName);
-    });
-  return copiedItems;
-};
 
 type Props = RouteComponentProps & GroupContextComponentProps & {
   getGroups: any;
@@ -126,7 +110,7 @@ class JobCreatePage extends React.Component<Props, State> {
       <React.Fragment>
         <PageTitle
           breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-          title={"New Job"}
+          title={'New Job'}
         />
         <div style={{
           margin: '16px',
@@ -157,9 +141,9 @@ class JobCreatePage extends React.Component<Props, State> {
               initialValue={defaultValue}
               selectedGroup={selectedGroup}
               onSelectGroup={this.onChangeGroup}
-              groups={sortItems(groups)}
-              instanceTypes={sortItems(instanceTypes)}
-              images={sortItems(images)}
+              groups={sortNameByAlphaBet(groups)}
+              instanceTypes={sortNameByAlphaBet(instanceTypes)}
+              images={sortNameByAlphaBet(images)}
               defaultActiveDeadlineSeconds={jobActiveDeadlineSeconds}
               onSubmit={this.onSubmit}
               loading={createPhJobResult.loading}
@@ -192,6 +176,6 @@ export default compose(
   }),
   Com => props => {
     const {defaultValue}: {defaultValue?: string} = queryString.parse(props.location.search.replace(/^\?/, ''));
-    return <Com {...props} defaultValue={defaultValue ? JSON.parse(defaultValue.replace(/\n/g, "\\n")) : undefined}  />
+    return <Com {...props} defaultValue={defaultValue ? JSON.parse(defaultValue.replace(/\n/g, "\\n")) : undefined}  />;
   }
-)(JobCreatePage)
+)(JobCreatePage);

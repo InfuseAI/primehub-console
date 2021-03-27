@@ -64,23 +64,6 @@ export const CREATE_IMAGE = gql`
   }
 `;
 
-const compareByAlphabetical = (prev, next) => {
-  if (prev < next) return -1;
-  if (prev > next) return 1;
-  return 0;
-};
-
-export const sortItems = items => {
-  const copiedItems = items.slice();
-  copiedItems
-    .sort((prev, next) => {
-      const prevName = prev.displayName || prev.name;
-      const nextName = next.displayName || next.name;
-      return compareByAlphabetical(prevName, nextName);
-    });
-  return copiedItems;
-};
-
 interface Props extends RouteComponentProps, GroupContextComponentProps, UserContextComponentProps {
   getGroups: any;
   createImage: any;

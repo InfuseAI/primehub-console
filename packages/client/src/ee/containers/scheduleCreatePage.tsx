@@ -11,8 +11,9 @@ import {errorHandler} from 'utils/errorHandler';
 import ScheduleCreateForm from 'ee/components/job/createForm';
 import {GroupFragment} from 'containers/list';
 import PageTitle from 'components/pageTitle';
-import { withGroupContext, GroupContextComponentProps } from 'context/group';
+import {withGroupContext, GroupContextComponentProps} from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
+import {sortNameByAlphaBet} from 'utils/sorting';
 
 const breadcrumbs = [
   {
@@ -65,17 +66,6 @@ const compareByAlphabetical = (prev, next) => {
   if (prev < next) return -1;
   if (prev > next) return 1;
   return 0;
-};
-
-export const sortItems = items => {
-  const copiedItems = items.slice();
-  copiedItems
-    .sort((prev, next) => {
-      const prevName = prev.displayName || prev.name;
-      const nextName = next.displayName || next.name;
-      return compareByAlphabetical(prevName, nextName);
-    });
-  return copiedItems;
 };
 
 type Props = RouteComponentProps & GroupContextComponentProps & {
@@ -143,9 +133,9 @@ class ScheduleCreatePage extends React.Component<Props, State> {
             groupContext={groupContext}
             onSelectGroup={this.onChangeGroup}
             selectedGroup={selectedGroup}
-            groups={sortItems(groups)}
-            instanceTypes={sortItems(instanceTypes)}
-            images={sortItems(images)}
+            groups={sortNameByAlphaBet(groups)}
+            instanceTypes={sortNameByAlphaBet(instanceTypes)}
+            images={sortNameByAlphaBet(images)}
             defaultActiveDeadlineSeconds={jobActiveDeadlineSeconds}
             onSubmit={this.onSubmit}
             loading={getGroups.loading || createPhScheduleResult.loading}
