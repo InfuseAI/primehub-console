@@ -9,15 +9,17 @@ import ScheduleUpdateForm from 'ee/components/job/createForm';
 import Title from 'ee/components/job/title';
 import {errorHandler} from 'utils/errorHandler';
 import {PhScheduleFragment} from 'ee/containers/scheduleList';
-import {GET_MY_GROUPS, GET_TIMEZONE, sortItems} from 'ee/containers/scheduleCreatePage';
+import {GET_TIMEZONE} from 'ee/containers/scheduleCreatePage';
 import {get, unionBy, isEqual} from 'lodash';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
+import {sortNameByAlphaBet} from 'utils/sorting';
+import {CurrentUser} from 'queries/User.graphql';
 
 type Props = {
-  getGroups: any;
+  currentUser: any;
   getPhSchedule: any;
   updatePhSchedule: Function;
   updatePhScheduleResult: any;
@@ -77,7 +79,7 @@ class ScheduleDetailContainer extends React.Component<Props> {
       displayName: get(getPhSchedule, 'phSchedule.displayName'),
       command: get(getPhSchedule, 'phSchedule.command'),
       recurrence: get(getPhSchedule, 'phSchedule.recurrence'),
-    }
+    };
     if (isEqual(values, initialValue))
       return this.back();
 
@@ -106,14 +108,14 @@ class ScheduleDetailContainer extends React.Component<Props> {
   }
 
   render() {
-    const {groupContext, getPhSchedule, getTimezone, getGroups, history, updatePhScheduleResult} = this.props;
+    const {groupContext, getPhSchedule, getTimezone, currentUser, history, updatePhScheduleResult} = this.props;
     if (getPhSchedule.loading) return null;
     if (getPhSchedule.error) {
       return getMessage(getPhSchedule.error)
     };
     const selectedGroup = this.state.selectedGroup || get(getPhSchedule, 'phSchedule.groupId');
     const everyoneGroupId = window.EVERYONE_GROUP_ID;
-    const allGroups = get(getGroups, 'me.groups', []);
+    const allGroups = get(currentUser, 'me.groups', []);
     const groups = allGroups.filter(group => group.id !== everyoneGroupId);
     const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
     const group = groups
@@ -154,11 +156,11 @@ class ScheduleDetailContainer extends React.Component<Props> {
             groupContext={groupContext}
             onSelectGroup={this.onChangeGroup}
             selectedGroup={selectedGroup}
-            groups={sortItems(groups)}
-            instanceTypes={sortItems(instanceTypes)}
-            images={sortItems(images)}
+            groups={sortNameByAlphaBet(groups)}
+            instanceTypes={sortNameByAlphaBet(instanceTypes)}
+            images={sortNameByAlphaBet(images)}
             onSubmit={this.onSubmit}
-            loading={getGroups.loading || updatePhScheduleResult.loading}
+            loading={currentUser.loading || updatePhScheduleResult.loading}
             type="schedule"
             timezone={get(getTimezone, 'system.timezone')}
             initialValue={{
@@ -178,8 +180,9 @@ class ScheduleDetailContainer extends React.Component<Props> {
 export default compose(
   withRouter,
   withGroupContext,
-  graphql(GET_MY_GROUPS, {
-    name: 'getGroups'
+  graphql(CurrentUser, {
+    alias: 'withCurrentUser',
+    name: 'currentUser'
   }),
   graphql(GET_TIMEZONE, {
     name: 'getTimezone'

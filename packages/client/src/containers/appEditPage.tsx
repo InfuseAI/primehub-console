@@ -6,14 +6,14 @@ import {compose} from 'recompose';
 import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'utils/errorHandler';
 import {AppDetailProps, getMessage} from 'containers/appDetail';
-import {sortItems} from 'containers/appCreatePage';
-import { GroupContextComponentProps, withGroupContext } from 'context/group';
+import {GroupContextComponentProps, withGroupContext} from 'context/group';
 import PageTitle from 'components/pageTitle';
 import Breadcrumbs from 'components/share/breadcrumb';
 import AppCreateForm from 'components/apps/createForm';
 import {CurrentUser} from 'queries/User.graphql';
 import {GetPhAppTemplates} from 'queries/PhAppTemplate.graphql';
 import {UpdatePhApplication, GetPhApplication} from 'queries/PhApplication.graphql';
+import {sortNameByAlphaBet} from 'utils/sorting';
 
 type AppEditProps = {
   updatePhApplication: any;
@@ -92,7 +92,7 @@ class AppEditPage extends React.Component<AppEditProps> {
             groupContext={groupContext}
             phAppTemplates={phAppTemplates}
             refetchGroup={currentUser.refetch}
-            instanceTypes={sortItems(instanceTypes)}
+            instanceTypes={sortNameByAlphaBet(instanceTypes)}
             initialValue={phApplication}
             type='edit'
             loading={currentUser.loading || getPhApplication.loading || getPhAppTemplates.loading}

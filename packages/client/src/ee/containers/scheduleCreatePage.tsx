@@ -9,11 +9,11 @@ import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'utils/errorHandler';
 import ScheduleCreateForm from 'ee/components/job/createForm';
-import {GroupFragment} from 'containers/list';
 import PageTitle from 'components/pageTitle';
 import {withGroupContext, GroupContextComponentProps} from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
 import {sortNameByAlphaBet} from 'utils/sorting';
+import {CurrentUser} from 'queries/User.graphql';
 
 const breadcrumbs = [
   {
@@ -28,20 +28,6 @@ const breadcrumbs = [
     title: 'New Schedule',
   }
 ];
-
-export const GET_MY_GROUPS = gql`
-  query me {
-    me {
-      id
-      groups {
-        ...GroupInfo
-        instanceTypes { id name displayName description spec global gpuLimit memoryLimit cpuLimit }
-        images { id name displayName description isReady spec global type }
-      }
-    }
-  }
-  ${GroupFragment}
-`;
 
 export const CREATE_SCHEDULE = gql`
   mutation createPhSchedule($data: PhScheduleCreateInput!) {
@@ -69,7 +55,7 @@ const compareByAlphabetical = (prev, next) => {
 };
 
 type Props = RouteComponentProps & GroupContextComponentProps & {
-  getGroups: any;
+  currentUser: any;
   createPhSchedule: any;
   createPhScheduleResult: any;
   getTimezone: Function;
@@ -99,9 +85,9 @@ class ScheduleCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {groupContext, getGroups, getTimezone, createPhScheduleResult, history} = this.props;
+    const {groupContext, currentUser, getTimezone, createPhScheduleResult, history} = this.props;
     const everyoneGroupId = window.EVERYONE_GROUP_ID;
-    const allGroups = get(getGroups, 'me.groups', []);
+    const allGroups = get(currentUser, 'me.groups', []);
     const groups = allGroups
       .filter(group => group.id !== everyoneGroupId)
       .filter(group => !groupContext || groupContext.id === group.id );
@@ -138,7 +124,7 @@ class ScheduleCreatePage extends React.Component<Props, State> {
             images={sortNameByAlphaBet(images)}
             defaultActiveDeadlineSeconds={jobActiveDeadlineSeconds}
             onSubmit={this.onSubmit}
-            loading={getGroups.loading || createPhScheduleResult.loading}
+            loading={currentUser.loading || createPhScheduleResult.loading}
             timezone={get(getTimezone, 'system.timezone')}
             type="schedule"
           />
@@ -151,8 +137,9 @@ class ScheduleCreatePage extends React.Component<Props, State> {
 export default compose(
   withRouter,
   withGroupContext,
-  graphql(GET_MY_GROUPS, {
-    name: 'getGroups'
+  graphql(CurrentUser, {
+    alias: 'withCurrentUser',
+    name: 'currentUser'
   }),
   graphql(GET_TIMEZONE, {
     name: 'getTimezone'

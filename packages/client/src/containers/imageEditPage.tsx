@@ -11,9 +11,9 @@ import ImageCreateForm from 'components/images/createForm';
 import PageTitle from 'components/pageTitle';
 import {withGroupContext, GroupContextComponentProps} from 'context/group';
 import {withUserContext, UserContextComponentProps } from 'context/user';
-import {sortItems, GET_MY_GROUPS} from 'containers/imageCreatePage';
 import {ImageFragment} from 'containers/imageList';
 import Breadcrumbs from 'components/share/breadcrumb';
+import {CurrentUser} from 'queries/User.graphql';
 
 export const GET_IMAGE = gql`
   query image($where: ImageWhereUniqueInput!) {
@@ -59,7 +59,7 @@ interface Props extends UserContextComponentProps, GroupContextComponentProps, R
   cancelImageBuild: any;
   updateImageResult: any;
   getImage: any;
-  getGroups: any;
+  currentUser: any;
 }
 
 interface State {
@@ -152,7 +152,7 @@ class ImageEditPage extends React.Component<Props, State> {
   }
 
   render() {
-    const {getImage, history, groupContext, userContext, getGroups} = this.props;
+    const {getImage, history, groupContext, userContext, currentUser} = this.props;
     if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
       history.push(`../home`);
     }
@@ -164,7 +164,7 @@ class ImageEditPage extends React.Component<Props, State> {
     }
 
     const everyoneGroupId = window.EVERYONE_GROUP_ID;
-    const allGroups = get(getGroups, 'me.groups', []);
+    const allGroups = get(currentUser, 'me.groups', []);
     const groups = allGroups
       .filter(record => record.id !== everyoneGroupId)
       .filter(record => !groupContext || groupContext.id === record.id);
@@ -217,8 +217,9 @@ export default compose(
   withRouter,
   withGroupContext,
   withUserContext,
-  graphql(GET_MY_GROUPS, {
-    name: 'getGroups'
+  graphql(CurrentUser, {
+    alias: 'withCurrentUser',
+    name: 'currentUser'
   }),
   graphql(GET_IMAGE, {
     options: (props: Props) => ({
@@ -291,4 +292,4 @@ export default compose(
     }),
     name: 'cancelImageBuild'
   })
-)(ImageEditPage)
+)(ImageEditPage);
