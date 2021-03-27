@@ -11,7 +11,7 @@ import PageBody from 'components/pageBody';
 import {errorHandler} from 'utils/errorHandler';
 import AppCard from 'components/apps/card';
 import InfuseButton from 'components/infuseButton';
-import { GroupContextComponentProps } from 'context/group';
+import {GroupContextComponentProps} from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
 import PhApplication from 'interfaces/phApplication';
 import {PhApplicationsConnection, StopPhApplication, StartPhApplication} from 'queries/PhApplication.graphql';
