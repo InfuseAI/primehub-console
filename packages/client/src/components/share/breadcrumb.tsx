@@ -10,24 +10,24 @@ const StyledBreadcrumb = styled(Breadcrumb)`
   font-size: 14px;
 `;
 
-type BreadcrumbItemSetup = {
-  key: string,
-  matcher: RegExp,
-  title: string,
-  link: string
-};
-
-type Props = RouteComponentProps & {
-  pathList?: Array<BreadcrumbItemSetup>;
+export interface BreadcrumbItemSetup {
+  key: string;
+  matcher: RegExp;
+  title: string;
+  link: string;
 }
 
-const parseBreadcrumb = (match: any, basename: string, items: Array<BreadcrumbItemSetup>) => {
+type Props = RouteComponentProps & {
+  pathList?: BreadcrumbItemSetup[];
+};
+
+const parseBreadcrumb = (match: any, basename: string, items: BreadcrumbItemSetup[]) => {
   const result = [];
-  if(items) {
+  if (items) {
     items.forEach((item, index) => {
       const last = index === items.length - 1;
       const {key, matcher, title, link} = item;
-      if(matcher && matcher.test(match.url)) {
+      if (matcher && matcher.test(match.url)) {
         result.push(<Breadcrumb.Item  key={key}>
           <span style={{fontWeight: (last) ? 500 : 'initial', color: (last) ? 'rgba(0, 0, 0, 0.65)' : null}}>
             {
@@ -39,7 +39,7 @@ const parseBreadcrumb = (match: any, basename: string, items: Array<BreadcrumbIt
     });
   }
   return result;
-}
+};
 
 class Breadcrumbs extends React.Component<Props> {
   render() {
@@ -47,11 +47,11 @@ class Breadcrumbs extends React.Component<Props> {
     const params = match.params as any;
     const basename = params.groupName ? `${appPrefix}g/${params.groupName}` : `${appPrefix}`;
     const breadcrumbItems = [
-      <Breadcrumb.Item key="home">
+      <Breadcrumb.Item key='home'>
         {
           params.groupName ?
-          <Link to={`${basename}`}><Icon type="home" /></Link> :
-          <a href={`${basename}`}><Icon type="home" /></a>
+          <Link to={`${basename}`}><Icon type='home' /></Link> :
+          <a href={`${basename}`}><Icon type='home' /></a>
         }
 
       </Breadcrumb.Item>,

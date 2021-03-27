@@ -12,11 +12,20 @@ import {errorHandler} from 'utils/errorHandler';
 import AppCard from 'components/apps/card';
 import InfuseButton from 'components/infuseButton';
 import {GroupContextComponentProps} from 'context/group';
-import Breadcrumbs from 'components/share/breadcrumb';
+import Breadcrumbs, {BreadcrumbItemSetup} from 'components/share/breadcrumb';
 import PhApplication from 'interfaces/phApplication';
 import {PhApplicationsConnection, StopPhApplication, StartPhApplication} from 'queries/PhApplication.graphql';
 
 const {confirm} = Modal;
+const PAGE_SIZE: number = 12;
+const breadcrumbs: BreadcrumbItemSetup[] = [
+  {
+    key: 'list',
+    matcher: /\/apps/,
+    title: 'Apps',
+    link: '/apps?page=1'
+  }
+];
 
 export interface ApplicationConnection {
   pageInfo: {
@@ -30,17 +39,6 @@ export interface ApplicationConnection {
     node: PhApplication;
   }>;
 }
-
-const breadcrumbs = [
-  {
-    key: 'list',
-    matcher: /\/apps/,
-    title: 'Apps',
-    link: '/apps?page=1'
-  }
-];
-
-const PAGE_SIZE = 12;
 
 type Props = {
   startApp: any;

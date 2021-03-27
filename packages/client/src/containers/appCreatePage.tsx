@@ -16,12 +16,18 @@ import {CreatePhApplication} from 'queries/PhApplication.graphql';
 import {CurrentUser} from 'queries/User.graphql';
 import {sortNameByAlphaBet} from 'utils/sorting';
 
-let breadcrumbs = [
+const breadcrumbs = [
   {
     key: 'list',
     matcher: /\/apps/,
     title: 'Apps',
     link: '/apps?page=1'
+  },
+  {
+    key: 'store',
+    matcher: /\/apps\/create\/([\w-])+/,
+    title: 'Store',
+    link: '/apps/store'
   },
   {
     key: 'create',
@@ -75,27 +81,6 @@ class AppCreatePage extends React.Component<Props, State> {
       'id'
     );
     const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
-    if (params.templateId) {
-      breadcrumbs = [
-        {
-          key: 'list',
-          matcher: /\/apps/,
-          title: 'Apps',
-          link: '/apps?page=1'
-        },
-        {
-          key: 'store',
-          matcher: /\/apps/,
-          title: 'Store',
-          link: '/apps/store'
-        },
-        {
-          key: 'create',
-          matcher: /\/apps\/create/,
-          title: 'Add App to PrimeHub'
-        }
-      ];
-    }
 
     if (!getPhAppTemplates.phAppTemplates) return null;
     if (getPhAppTemplates.error) {
