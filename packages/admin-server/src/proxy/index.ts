@@ -123,7 +123,7 @@ export class ProxyCtrl {
     const appID = ctx.params.appID;
     // Generate session token
     const sessionToken = uuidv4();
-    ctx.cookies.set('phapplication-session-id', sessionToken, {path: `${this.config.appPrefix}/apps/${appID}`});
+    ctx.cookies.set('phapplication-session-id', sessionToken, {path: `/apps/${appID}`});
     this.sessionTokenCacheStore.set(sessionToken, true, sessionTokenCacheExpireTime);
 
     return true;
