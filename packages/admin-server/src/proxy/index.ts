@@ -115,7 +115,7 @@ export class ProxyCtrl {
         }[e.code]
         ctx.status = status || 500
         resolve(undefined)
-      })
+      });
     });
   }
 
@@ -196,7 +196,7 @@ export class ProxyCtrl {
           appID,
           scope: 'group',
           group: 'phusers',
-          target: 'http://app-mlflow-yyzab:5000',
+          target: 'http://app-mlflow-xyzab:5000',
           rewrite: false,
         };
       case 'code-server-xyzab':
