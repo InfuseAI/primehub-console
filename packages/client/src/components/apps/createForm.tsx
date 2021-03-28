@@ -245,28 +245,35 @@ class AppCreateForm extends React.Component<Props, State> {
     );
 
     const dataSource = phAppTemplates
-    .map((template, i) => {
-      const title = template.name;
-      const description = template.description || '';
-      const src = template.icon ? template.icon : defaultLogo;
-      const index = title.toLowerCase().indexOf(appSearchText.toLowerCase());
-      const descIndex = description.toLowerCase().indexOf(appSearchText.toLowerCase());
-      const text = index >= 0 ? <span>
-        {title.substr(0, index)}
-        <b style={{
-          background: '#faad14'
-        }}>{title.substr(index, appSearchText.length)}</b>
-        {title.substr(index + appSearchText.length)}
-      </span> : title;
-      const desc = descIndex >= 0 ? <span>
-        {description.substr(0, descIndex)}
-        <b style={{
-          background: '#faad14'
-        }}>{description.substr(descIndex, appSearchText.length)}</b>
-        {description.substr(descIndex + appSearchText.length)}
-      </span> : description;
+      .filter(template => {
+        const title = template.name;
+        const description = template.description || '';
+        const index = title.toLowerCase().indexOf(appSearchText.toLowerCase());
+        const descIndex = description.toLowerCase().indexOf(appSearchText.toLowerCase());
+        return index >= 0 && descIndex >= 0;
+      })
+      .map((template, i) => {
+        const title = template.name;
+        const description = template.description || '';
+        const src = template.icon ? template.icon : defaultLogo;
+        const index = title.toLowerCase().indexOf(appSearchText.toLowerCase());
+        const descIndex = description.toLowerCase().indexOf(appSearchText.toLowerCase());
+        const text = index >= 0 ? <span>
+          {title.substr(0, index)}
+          <b style={{
+            background: '#faad14'
+          }}>{title.substr(index, appSearchText.length)}</b>
+          {title.substr(index + appSearchText.length)}
+        </span> : title;
+        const desc = descIndex >= 0 ? <span>
+          {description.substr(0, descIndex)}
+          <b style={{
+            background: '#faad14'
+          }}>{description.substr(descIndex, appSearchText.length)}</b>
+          {description.substr(descIndex + appSearchText.length)}
+        </span> : description;
 
-      const label = (
+        const label = (
           <Row>
             <Col span={2}>
               <span style={{
@@ -290,54 +297,54 @@ class AppCreateForm extends React.Component<Props, State> {
               </span>
             </Col>
           </Row>
-      );
+        );
 
-      return (
-        <Option value={template.id} key={template.id} data-name={template.name} data-desc={template.description} data-label={label}>
-          <Row>
-            <Col span={2}>
-              <span style={{
-                display: 'inline-block',
-                height: '36px',
-                padding: '5px',
-                lineHeight: '24px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                backgroundColor: src === defaultLogo ? 'rgb(215 222 242)' : null,
-              }}><img src={src} width='24px'/></span>
-            </Col>
-            <Col span={21}>
-              <span style={{fontWeight: 'bold'}}>{text}</span>
-              <span
-                style={
-                  {
-                    float: 'right',
-                    fontWeight: 'bold',
-                    clear: 'both'
+        return (
+          <Option value={template.id} key={template.id} data-name={template.name} data-desc={template.description} data-label={label}>
+            <Row>
+              <Col span={2}>
+                <span style={{
+                  display: 'inline-block',
+                  height: '36px',
+                  padding: '5px',
+                  lineHeight: '24px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  backgroundColor: src === defaultLogo ? 'rgb(215 222 242)' : null,
+                }}><img src={src} width='24px'/></span>
+              </Col>
+              <Col span={21}>
+                <span style={{fontWeight: 'bold'}}>{text}</span>
+                <span
+                  style={
+                    {
+                      float: 'right',
+                      fontWeight: 'bold',
+                      clear: 'both'
+                    }
                   }
-                }
-              >
-                {template.version}
-              </span>
-              <div
-                style={{
-                  display: '-webkit-box',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  whiteSpace: 'break-spaces'
-              }}>
-                {desc}
-              </div>
-            </Col>
-            <Col span={1} style={{textAlign: 'center'}}>
-              <a href={template.docLink} target='_blank'><Icon type='link'/></a>
-            </Col>
-          </Row>
-        </Option>
-      );
-    });
+                >
+                  {template.version}
+                </span>
+                <div
+                  style={{
+                    display: '-webkit-box',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    whiteSpace: 'break-spaces'
+                  }}>
+                    {desc}
+                  </div>
+                </Col>
+                <Col span={1} style={{textAlign: 'center'}}>
+                  <a href={template.docLink} target='_blank'><Icon type='link'/></a>
+                </Col>
+              </Row>
+            </Option>
+          );
+      });
 
     return (
       <Form onSubmit={this.submit}>
