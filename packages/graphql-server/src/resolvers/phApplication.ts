@@ -75,6 +75,9 @@ const labelStringify = (labels: Record<string, string>) => {
 
 export const typeResolvers = {
   async instanceTypeSpec(parent, args, context: Context) {
+    if (!parent.instanceTypeSpec) {
+      return null;
+    }
     return mapping(parent.instanceTypeSpec);
   },
   async pods(parent, args, context: Context) {
