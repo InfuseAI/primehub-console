@@ -75,7 +75,7 @@ export default class AppInformation extends React.Component<Props, State> {
             <Field labelCol={4} valueCol={20} label='App ID' value={phApplication.id} />
             <Field labelCol={4} valueCol={20} label='Name' value={phApplication.displayName} />
             <Field labelCol={4} valueCol={20} label='App' value={phApplication.appName} />
-            <Field labelCol={4} valueCol={20} label='Instance Type' value={phApplication.status !== PhAppStatus.Stopped ? <InstanceTypeField instanceType={phApplication.instanceType || {}}/> : '-'} />
+            <Field labelCol={4} valueCol={20} label='Instance Type' value={phApplication.status !== PhAppStatus.Stopped ? <InstanceTypeField instanceType={phApplication.instanceTypeSpec || {}}/> : '-'} />
             <Field labelCol={4} valueCol={20} label='Access Scope' value={this.translateScope(phApplication.scope)} />
             <Field type='vertical'
               label={<span>Environment Variables {revealBtn}</span>}

@@ -3,8 +3,9 @@ import {
   toRelay, filter, paginate, extractPagination
 } from './utils';
 import {
-  PhApplicationSpec, PhApplicationStatus, PhApplicationScope, PhApplicationPhase, client as kubeClient
+  PhApplicationSpec, PhApplicationStatus, PhApplicationScope, PhApplicationPhase, InstanceTypeSpec, client as kubeClient
 } from '../crdClient/crdClientImpl';
+import { mapping } from './instanceType';
 import CustomResource, { Item } from '../crdClient/customResource';
 import { get, find } from 'lodash';
 import { ApolloError } from 'apollo-server';
@@ -16,9 +17,11 @@ const config = createConfig();
 
 const ANNOTATIONS_TEMPLATE_NAME = 'phapplication.primehub.io/template';
 const ANNOTATIONS_TEMPLATE_DATA_NAME = 'phapplication.primehub.io/template-data';
+const ANNOTATIONS_INSTANCE_TYPE_NAME = 'phapplication.primehub.io/instance-type';
 
 const APP_TEMPLATE_NOT_FOUND = 'APP_TEMPLATE_NOT_FOUND';
 const APP_TEMPLATE_DATA_NOT_FOUND = 'APP_TEMPLATE_DATA_NOT_FOUND';
+const APP_INSTANCE_TYPE_NOT_FOUND = 'APP_INSTANCE_TYPE_NOT_FOUND';
 const NOT_AUTH_ERROR = 'NOT_AUTH';
 
 interface EnvVar {
@@ -42,6 +45,7 @@ export interface PhApplication {
   appDefaultEnv: DefaultEnvVar[];
   groupName: string;
   instanceType: string;
+  instanceTypeSpec: InstanceTypeSpec;
   scope: PhApplicationScope;
   appUrl: string;
   internalAppUrl: string;
@@ -70,6 +74,9 @@ const labelStringify = (labels: Record<string, string>) => {
 };
 
 export const typeResolvers = {
+  async instanceTypeSpec(parent, args, context: Context) {
+    return mapping(parent.instanceTypeSpec);
+  },
   async pods(parent, args, context: Context) {
     const labelSelector = labelStringify({
       'app': 'primehub-app',
@@ -99,6 +106,7 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
   const appVersion = appTemplate.spec.version;
   const appIcon = appTemplate.spec.icon;
   const appDefaultEnv = appTemplate.spec.defaultEnvs;
+  const instanceTypeSpec = getInstanceTypeFromAnnotations(item);
 
   let svcEndpoints = [];
   let internalAppUrl = null;
@@ -126,6 +134,7 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
     appDefaultEnv,
     groupName: item.spec.groupName,
     instanceType: item.spec.instanceType,
+    instanceTypeSpec,
     scope: item.spec.scope,
     appUrl: `${config.graphqlHost}/console/apps/${item.metadata.name}`,
     internalAppUrl,
@@ -207,6 +216,14 @@ const getAppTemplateFromAnnotations = (item: Item<PhApplicationSpec, PhApplicati
   throw new ApolloError(`No template in PhApplication '${item.metadata.name}'`, APP_TEMPLATE_NOT_FOUND);
 };
 
+const getInstanceTypeFromAnnotations = (item: Item<PhApplicationSpec, PhApplicationStatus>) => {
+  const instanceTypeString = item.metadata && item.metadata.annotations && item.metadata.annotations[ANNOTATIONS_INSTANCE_TYPE_NAME];
+  if (instanceTypeString) {
+    return JSON.parse(instanceTypeString.trim());
+  }
+  throw new ApolloError(`No instance type in PhApplication '${item.metadata.name}'`, APP_INSTANCE_TYPE_NOT_FOUND);
+};
+
 const patchAppTemplateData = (item: Item<PhApplicationSpec, PhApplicationStatus>, data: Partial<PhApplicationMutationInput>) => {
   const dataString = item.metadata && item.metadata.annotations && item.metadata.annotations[ANNOTATIONS_TEMPLATE_DATA_NAME];
   if (dataString) {
@@ -221,12 +238,14 @@ const createApplication = async (context: Context, data: PhApplicationMutationIn
   const {crdClient} = context;
 
   const appTemplate = await crdClient.phAppTemplates.get(data.templateId);
+  const instanceType = await crdClient.instanceTypes.get(data.instanceType);
 
   const metadata = {
     name: data.id.toLowerCase(),
     annotations: {
       [ANNOTATIONS_TEMPLATE_NAME]: JSON.stringify(appTemplate),
       [ANNOTATIONS_TEMPLATE_DATA_NAME]: JSON.stringify(data),
+      [ANNOTATIONS_INSTANCE_TYPE_NAME]: JSON.stringify(instanceType),
     }
   };
 
@@ -280,10 +299,12 @@ export const update = async (root, args, context: Context) => {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
   }
   const appTemplate = getAppTemplateFromAnnotations(item);
+  const instanceType = await crdClient.instanceTypes.get(data.instanceType);
   const metadata = item.metadata;
 
   if (metadata && metadata.annotations) {
     metadata.annotations[ANNOTATIONS_TEMPLATE_DATA_NAME] = patchAppTemplateData(item, data);
+    metadata.annotations[ANNOTATIONS_INSTANCE_TYPE_NAME] = JSON.stringify(instanceType);
   }
 
   const spec = item.spec;

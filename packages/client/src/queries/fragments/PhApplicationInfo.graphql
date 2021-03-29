@@ -11,6 +11,13 @@ fragment PhApplicationInfo on PhApplication {
   }
   groupName
   instanceType
+  instanceTypeSpec {
+    name
+    displayName
+    cpuLimit
+    memoryLimit
+    gpuLimit
+  }
   scope
   appUrl
   internalAppUrl
