@@ -38,7 +38,7 @@ export interface PhAppTemplate {
   };
 }
 
-export const transform = async (item: Item<PhAppTemplateSpec>, kcAdminClient: KeycloakAdminClient): Promise<PhAppTemplate> => {
+export const transform = async (item: Item<PhAppTemplateSpec>): Promise<PhAppTemplate> => {
   return {
     id: item.metadata.name,
     name: item.spec.name,
@@ -56,13 +56,13 @@ const listQuery = async (client: CustomResource<PhAppTemplateSpec>, where: any, 
   const {namespace, graphqlHost, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phAppTemplate = await client.get(where.id);
-    const transformed = await transform(phAppTemplate, kcAdminClient);
+    const transformed = await transform(phAppTemplate);
     return [transformed];
   }
 
   const phAppTemplates = await client.list();
   const transformedPhAppTemplates = await Promise.all(
-    phAppTemplates.map(item => transform(item, kcAdminClient)));
+    phAppTemplates.map(item => transform(item)));
 
   return filter(transformedPhAppTemplates, where);
 };
@@ -86,6 +86,6 @@ export const queryOne = async (root, args, context: Context) => {
   const {crdClient, userId: currentUserId} = context;
   const phAppTemplate = await crdClient.phAppTemplates.get(id);
   const transformed =
-    await transform(phAppTemplate, context.kcAdminClient);
+    await transform(phAppTemplate);
   return transformed;
 };

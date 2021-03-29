@@ -1,5 +1,6 @@
 # import PageInfo from "common.graphql"
 # import InstanceType from "instanceType.graphql"
+# import PhAppTemplate from "phAppTemplate.graphql"
 
 type Pod {
   name: String
@@ -25,6 +26,7 @@ type PhApplication {
   appVersion: String
   appIcon: String
   appDefaultEnv: [DefaultEnvVar]
+  appTemplate: PhAppTemplate
   groupName: String
   instanceType: String
   instanceTypeSpec: InstanceType

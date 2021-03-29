@@ -5,6 +5,7 @@ import {
 import {
   PhApplicationSpec, PhApplicationStatus, PhApplicationScope, PhApplicationPhase, InstanceTypeSpec, client as kubeClient
 } from '../crdClient/crdClientImpl';
+import { transform as templateTransform, PhAppTemplate } from './phAppTemplate';
 import { mapping } from './instanceType';
 import CustomResource, { Item } from '../crdClient/customResource';
 import { get, find } from 'lodash';
@@ -43,6 +44,7 @@ export interface PhApplication {
   appVersion: string;
   appIcon: string;
   appDefaultEnv: DefaultEnvVar[];
+  appTemplate: PhAppTemplate;
   groupName: string;
   instanceType: string;
   instanceTypeSpec: InstanceTypeSpec;
@@ -136,6 +138,7 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
     appVersion,
     appIcon,
     appDefaultEnv,
+    appTemplate: await templateTransform(appTemplate),
     groupName: item.spec.groupName,
     instanceType: item.spec.instanceType,
     instanceTypeSpec,
