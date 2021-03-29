@@ -5,7 +5,7 @@ export const phAppTemplates = [
     description: 'MLflow is an open source platform to manage the ML lifecycle, including experimentation, reproducibility, deployment, and a central model registry.',
     version: 'v1.14.0',
     docLink: 'https://www.mlflow.org/docs/latest/index.html',
-    icon: 'http://nolink',
+    icon: 'https://avatars.githubusercontent.com/u/39938107?s=400&v=4',
     defaultEnvs: [
       {
         name: 'BACKEND_STORE_URI',

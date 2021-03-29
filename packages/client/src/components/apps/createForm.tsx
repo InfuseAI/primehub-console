@@ -85,7 +85,7 @@ class AppCreateForm extends React.Component<Props, State> {
     super(props);
     const { phAppTemplates, templateId } = props;
     const currentTemplate = find(phAppTemplates, v => v.id === templateId);
-    const defaultEnvs = currentTemplate ? currentTemplate.defaultEnv : [];
+    const defaultEnvs = currentTemplate ? currentTemplate.defaultEnvs : [];
 
     this.state = {
       reloadEnv: false,
