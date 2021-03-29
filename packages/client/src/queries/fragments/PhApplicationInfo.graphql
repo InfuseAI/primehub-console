@@ -9,6 +9,11 @@ fragment PhApplicationInfo on PhApplication {
     defaultValue
     optional
   }
+  appTemplate {
+    name
+    docLink
+    description
+  }
   groupName
   instanceType
   instanceTypeSpec {

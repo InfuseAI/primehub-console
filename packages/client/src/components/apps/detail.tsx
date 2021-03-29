@@ -123,11 +123,6 @@ export default class Detail extends React.Component<Props, State> {
     return (phApplication.status === PhAppStatus.Ready);
   }
 
-  getAppTemplate(id): PhAppTemplate {
-    const {phAppTemplates} = this.props;
-    return find(phAppTemplates, t => t.id === id);
-  }
-
   renderLogs = () => {
     const {phApplication} = this.props;
     const logEndpoint = get(phApplication, 'pods[0].logEndpoint', '');
@@ -137,7 +132,7 @@ export default class Detail extends React.Component<Props, State> {
 
   render() {
     const {phApplication} = this.props;
-    const appTemplate = this.getAppTemplate(phApplication.appName);
+    const appTemplate = phApplication.appTemplate;
     const breadcrumbs = [
       {
         key: 'list',

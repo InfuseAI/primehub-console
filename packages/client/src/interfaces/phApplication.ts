@@ -1,4 +1,5 @@
 import {DefaultEnv} from 'interfaces/phAppTemplate';
+import PhAppTemplate from './phAppTemplate';
 import Env from 'interfaces/env';
 import gql from 'graphql-tag';
 
@@ -24,6 +25,7 @@ export default interface PhApplication {
   appVersion: string;
   appIcon: string;
   appDefaultEnv: DefaultEnv[];
+  appTemplate: PhAppTemplate;
   groupName: string;
   instanceType: any;
   scope: PhAppScope;
