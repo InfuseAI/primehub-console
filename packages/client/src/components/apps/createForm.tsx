@@ -189,6 +189,11 @@ class AppCreateForm extends React.Component<Props, State> {
     this.setState({appSearchText});
   }
 
+  handleImgError = e => {
+    e.currentTarget.src = defaultLogo;
+    e.currentTarget.closest('span').style.backgroundColor = 'rgb(215 222 242)';
+  }
+
   render() {
     const {
       templateId,
@@ -311,7 +316,7 @@ class AppCreateForm extends React.Component<Props, State> {
                   border: '1px solid #ccc',
                   borderRadius: '4px',
                   backgroundColor: src === defaultLogo ? 'rgb(215 222 242)' : null,
-                }}><img src={src} width='24px'/></span>
+                }}><img src={src} onError={this.handleImgError} width='24px'/></span>
               </Col>
               <Col span={21}>
                 <span style={{fontWeight: 'bold'}}>{text}</span>

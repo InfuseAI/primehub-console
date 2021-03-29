@@ -10,7 +10,7 @@ import PhApplication, {PhAppStatus} from 'interfaces/phApplication';
 import PhAppTemplate from 'interfaces/phAppTemplate';
 import AppInformation from 'components/apps/appInfo';
 import styled from 'styled-components';
-import {AppLogo} from 'components/apps/card';
+import AppLogo from 'components/apps/appLogo';
 
 const {confirm} = Modal;
 
@@ -160,9 +160,7 @@ export default class Detail extends React.Component<Props, State> {
         />
         <Card style={{margin: '16px 16px 0'}} >
           <Left>
-            <AppLogo style={{marginRight: '8px'}}>
-              <img src={phApplication.appIcon}/>
-            </AppLogo>
+            <AppLogo style={{marginRight: '8px'}} src={phApplication.appIcon}/>
           </Left>
           <h2 style={{margin: '4px 0 0'}}>{phApplication.displayName}</h2>
           <h4 style={{color: '#aaa'}}>{appTemplate.name}, app version: {phApplication.appVersion}</h4>

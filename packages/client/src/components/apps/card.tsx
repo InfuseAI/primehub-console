@@ -2,21 +2,7 @@ import React from 'react';
 import {Icon, Tag, Card, Tooltip} from 'antd';
 import {Link, RouteComponentProps, withRouter} from 'react-router-dom';
 import PhApplication from 'interfaces/phApplication';
-import defaultLogo from 'images/icon-apps.svg';
-import styled from 'styled-components';
-
-export const AppLogo = styled.span`
-  display: inline-block;
-  height: 64px;
-  line-height: 52px;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 9px;
-  overflow: hidden;
-  img {
-    width: 54px !important;
-  }
-`;
+import AppLogo from 'components/apps/appLogo';
 
 type Props = RouteComponentProps & {
   startApp: (appId: string, appName: string) => void;
@@ -67,12 +53,10 @@ class AppCard extends React.Component<Props> {
   render() {
     const {application, history, startApp, stopApp} = this.props;
     const {appName, appIcon, appVersion, appUrl} = application;
-    const src = appIcon && appIcon.length > 0 ? appIcon : defaultLogo;
     return (
       <Card
         style={{
           height: '100%',
-          backgroundColor: src === defaultLogo ? 'rgb(215 222 242)' : null,
         }}
         actions={[
           <Link to={`apps/${application.id}`}><Icon type='setting' key='Manage' /> Manage</Link>,
@@ -84,12 +68,7 @@ class AppCard extends React.Component<Props> {
         ]}
       >
         <div style={{clear: 'both'}}>
-          <AppLogo style={{
-            float: 'right',
-            backgroundColor: src === defaultLogo ? 'rgb(215 222 242)' : null,
-          }}>
-            <img src={src} />
-          </AppLogo>
+          <AppLogo style={{ float: 'right' }} src={appIcon}/>
           <h2 style={{
             overflow: 'hidden',
             whiteSpace: 'nowrap',

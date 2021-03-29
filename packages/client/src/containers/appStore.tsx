@@ -6,11 +6,11 @@ import {compose} from 'recompose';
 import PageTitle from 'components/pageTitle';
 import Breadcrumbs from 'components/share/breadcrumb';
 import PageBody from 'components/pageBody';
-import {AppLogo} from 'components/apps/card';
 import {Link} from 'react-router-dom';
 import {ActionBtn, ClearBoth, Right, Left} from 'components/apps/detail';
 import {GetPhAppTemplates} from 'queries/PhAppTemplate.graphql';
 import PhAppTemplate from 'interfaces/phAppTemplate';
+import AppLogo from 'components/apps/appLogo';
 
 const {Search} = Input;
 
@@ -105,9 +105,7 @@ class AppStore extends React.Component<Props, State> {
             <Col xs={24} span={12} md={12} xxl={8} key={appTemplate.id} style={{marginBottom: 16}}>
               <Card style={{borderRadius: '4px'}}>
                 <Left>
-                  <AppLogo style={{marginRight: '8px'}}>
-                    <img src={appTemplate.icon}/>
-                  </AppLogo>
+                  <AppLogo src={appTemplate.icon} style={{marginRight: '8px'}}/>
                 </Left>
                 <h2 style={{margin: '4px 0 0'}}>{text}</h2>
                 <h4>{appTemplate.version}</h4>
