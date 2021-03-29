@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Card } from 'antd';
 import emptyBox from 'images/empty-box.svg';
 
-export const Empty = (props: {style: object, height: number, description?: string}) => (
+export const Empty = (props: {style?: object, height?: number, description?: any}) => (
   <Card
     style={{
       width: '100%',

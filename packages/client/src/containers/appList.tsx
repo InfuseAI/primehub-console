@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Row, Col, Modal, Skeleton, Input, message, Spin, Alert, notification} from 'antd';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
-import {withRouter} from 'react-router-dom';
+import {Link, withRouter} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import Pagination from 'components/share/pagination';
@@ -15,6 +15,7 @@ import {GroupContextComponentProps} from 'context/group';
 import Breadcrumbs, {BreadcrumbItemSetup} from 'components/share/breadcrumb';
 import PhApplication from 'interfaces/phApplication';
 import {PhApplicationsConnection, StopPhApplication, StartPhApplication} from 'queries/PhApplication.graphql';
+import {Empty} from 'components/empty';
 
 const {confirm} = Modal;
 const PAGE_SIZE: number = 12;
@@ -219,7 +220,7 @@ class AppListContainer extends React.Component<Props, State> {
       }
     }
 
-    const content = (
+    const content = phApplicationsConnection.edges.length > 0 ? (
       <div style={{margin: '16px 16px'}}>
         <Spin spinning={!(phApplicationsConnection && phApplicationsConnection.edges)}>
           <Row gutter={24} type='flex'>
@@ -247,6 +248,10 @@ class AppListContainer extends React.Component<Props, State> {
           nextPage={this.nextPage}
           previousPage={this.previousPage}
         />
+      </div>
+    ) : (
+      <div style={{margin: '16px 16px'}}>
+        <Empty description={<span>No Applications, <Link to='apps/store'>add one.</Link></span>}/>
       </div>
     );
 
