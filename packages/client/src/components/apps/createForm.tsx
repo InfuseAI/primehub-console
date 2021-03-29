@@ -83,9 +83,9 @@ const autoGenId = (name: string) => {
 class AppCreateForm extends React.Component<Props, State> {
   constructor(props) {
     super(props);
-    const { phAppTemplates, templateId } = props;
+    const { phAppTemplates, templateId, initialValue, type } = props;
     const currentTemplate = find(phAppTemplates, v => v.id === templateId);
-    const defaultEnvs = currentTemplate ? currentTemplate.defaultEnvs : [];
+    const defaultEnvs = currentTemplate ? currentTemplate.defaultEnvs : type === 'edit' ? initialValue.appDefaultEnv : [];
 
     this.state = {
       reloadEnv: false,
@@ -408,7 +408,7 @@ class AppCreateForm extends React.Component<Props, State> {
                 {form.getFieldDecorator('env', {
                   initialValue: env
                 })(
-                  <EnvFields defaultEnv={type === 'edit' ? appDefaultEnv : this.state.defaultEnvs} empty={null} reloadDefault={this.state.reloadEnv} enableReveal={showRevealBtn} reveal={revealEnv} />
+                  <EnvFields defaultEnv={this.state.defaultEnvs} empty={null} reloadDefault={this.state.reloadEnv} enableReveal={showRevealBtn} reveal={revealEnv} />
                 )}
               </Form.Item>
 
