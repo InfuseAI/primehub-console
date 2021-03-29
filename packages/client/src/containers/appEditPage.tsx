@@ -35,6 +35,11 @@ class AppEditPage extends React.Component<AppEditProps> {
     });
   }
 
+  onCancel = () => {
+    const {history} = this.props;
+    return history.goBack();
+  }
+
   render() {
     const {getPhApplication, getPhAppTemplates, currentUser, groupContext, match} = this.props;
     const {params} = match;
@@ -89,6 +94,7 @@ class AppEditPage extends React.Component<AppEditProps> {
         <div style={{margin: '16px'}}>
           <AppCreateForm
             onSubmit={this.onSubmit}
+            onCancel={this.onCancel}
             groupContext={groupContext}
             phAppTemplates={phAppTemplates}
             refetchGroup={currentUser.refetch}
