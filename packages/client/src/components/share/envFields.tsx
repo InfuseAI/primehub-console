@@ -26,7 +26,7 @@ interface State {
 export default class EnvFields extends React.Component<Props, State> {
   constructor(props) {
     super(props);
-    const {value, defaultEnv} = props;
+    const {value, defaultEnv, onChange} = props;
     const defaultEnvs = defaultEnv ? defaultEnv.map(item => {
       return {name: item.name, value: item.defaultValue};
     }) : [];
@@ -36,6 +36,7 @@ export default class EnvFields extends React.Component<Props, State> {
     this.state = {
       fields: merge(defaultEnvs, envs) || [],
     };
+    onChange(this.state.fields);
   }
 
   componentDidUpdate(prevProps) {
