@@ -109,11 +109,12 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
   const appVersion = appTemplate.spec.version;
   const appIcon = appTemplate.spec.icon;
   const appDefaultEnv = appTemplate.spec.defaultEnvs;
+  const userPostedData = getAppTemplateDataFromAnnotations(item);
   const instanceTypeSpec = getInstanceTypeFromAnnotations(item);
 
   let svcEndpoints = [];
   let internalAppUrl = null;
-  let env = null;
+  let env = [];
 
   const svcName = item.status && item.status.serviceName;
   if (svcName && svcSpec.ports && svcSpec.ports.length > 0) {
@@ -124,8 +125,8 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
     internalAppUrl = `http://${svcName}:${item.spec.httpPort}/console/apps/${item.metadata.name}`;
   }
 
-  if (podSpec.containers && podSpec.containers.length > 0) {
-    env = podSpec.containers[0].env;
+  if (userPostedData.env && userPostedData.env.length > 0) {
+    env = userPostedData.env;
   }
 
   return {
@@ -227,6 +228,14 @@ const getInstanceTypeFromAnnotations = (item: Item<PhApplicationSpec, PhApplicat
   throw new ApolloError(`No instance type in PhApplication '${item.metadata.name}'`, APP_INSTANCE_TYPE_NOT_FOUND);
 };
 
+const getAppTemplateDataFromAnnotations = (item: Item<PhApplicationSpec, PhApplicationStatus>) => {
+  const dataString = item.metadata && item.metadata.annotations && item.metadata.annotations[ANNOTATIONS_TEMPLATE_DATA_NAME];
+  if (dataString) {
+    return JSON.parse(dataString.trim());
+  }
+  throw new ApolloError(`No template data in PhApplication '${item.metadata.name}'`, APP_TEMPLATE_DATA_NOT_FOUND);
+};
+
 const patchAppTemplateData = (item: Item<PhApplicationSpec, PhApplicationStatus>, data: Partial<PhApplicationMutationInput>) => {
   const dataString = item.metadata && item.metadata.annotations && item.metadata.annotations[ANNOTATIONS_TEMPLATE_DATA_NAME];
   if (dataString) {
@@ -259,14 +268,11 @@ const createApplication = async (context: Context, data: PhApplicationMutationIn
   // Append env to pod template
   if (podTemplate.spec.containers && podTemplate.spec.containers.length > 0) {
     podTemplate.spec.containers[0].env = get(podTemplate.spec.containers[0], 'env', []).concat(get(data, 'env', []));
-    console.log(1111, podTemplate.spec.containers[0].env, data.env);
   }
 
   if (appTemplate.spec.template.spec && appTemplate.spec.template.spec.httpPort) {
     httpPort = appTemplate.spec.template.spec.httpPort;
   }
-
-  console.log(JSON.stringify(podTemplate.spec), 1122);
 
   const spec = {
     stop: false,

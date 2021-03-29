@@ -146,11 +146,7 @@ class AppCreateForm extends React.Component<Props, State> {
   }
 
   reloadDefaultEnv = () => {
-    const {form, phAppTemplates} = this.props;
-    const templateId = form.getFieldValue('templateId');
-    const currentTemplate = find(phAppTemplates, v => v.id === templateId);
-    const {defaultEnvs} = currentTemplate;
-    this.setState({defaultEnvs, reloadEnv: true});
+    this.setState({reloadEnv: true});
   }
 
   renderLabel = (defaultLabel: string, invalid: boolean, message: any) => {
@@ -408,7 +404,7 @@ class AppCreateForm extends React.Component<Props, State> {
               </Form.Item>
 
               <Divider />
-              <Form.Item label={<span>Environment Variables { showRevealBtn === true ? revealBtn : null } { !isEmpty(this.state.defaultEnvs) ? reloadEnvBtn : null }</span>} >
+              <Form.Item label={<span>Environment Variables { showRevealBtn === true ? revealBtn : null } {reloadEnvBtn}</span>} >
                 {form.getFieldDecorator('env', {
                   initialValue: env
                 })(

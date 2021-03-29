@@ -28,7 +28,7 @@ export default class EnvFields extends React.Component<Props, State> {
     super(props);
     const {value, defaultEnv, onChange} = props;
     const defaultEnvs = defaultEnv ? defaultEnv.map(item => {
-      return {name: item.name, value: item.defaultValue};
+      return {name: item.name, value: item.defaultValue, required: !item.optional};
     }) : [];
     const envs = value ? value.map(env => {
       return {name: env.name, value: env.value};
