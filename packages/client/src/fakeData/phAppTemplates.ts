@@ -3,9 +3,61 @@ export const phAppTemplates = [
     id: 'mlflow',
     name: 'MLflow',
     description: 'MLflow is an open source platform to manage the ML lifecycle, including experimentation, reproducibility, deployment, and a central model registry.',
-    version: 'v1.14.0',
+    version: 'v1.9.1',
     docLink: 'https://www.mlflow.org/docs/latest/index.html',
     icon: 'https://avatars.githubusercontent.com/u/39938107?s=400&v=4',
+    template: {
+      "spec": {
+        "httpPort": 5000,
+        "podTemplate": {
+          "spec": {
+            "containers": [
+              {
+                "args": [
+                  "server",
+                  "--host",
+                  "0.0.0.0",
+                  "--default-artifact-root",
+                  "$(DEFAULT_ARTIFACT_ROOT)",
+                  "--backend-store-uri",
+                  "$(BACKEND_STORE_URI)"
+                ],
+                "command": [
+                  "mlflow"
+                ],
+                "env": [
+                  {
+                    "name": "FOO",
+                    "value": "bar"
+                  }
+                ],
+                "image": "larribas/mlflow:1.9.1",
+                "name": "mlflow",
+                "ports": [
+                  {
+                    "containerPort": 5000,
+                    "name": "http",
+                    "protocol": "TCP"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "svcTemplate": {
+          "spec": {
+            "ports": [
+              {
+                "name": "http",
+                "port": 5000,
+                "protocol": "TCP",
+                "targetPort": 5000
+              }
+            ]
+          }
+        }
+      }
+    },
     defaultEnvs: [
       {
         name: 'BACKEND_STORE_URI',

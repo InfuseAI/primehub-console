@@ -2,6 +2,7 @@ query GetPhAppTemplates {
   phAppTemplates {
     id
     icon
+    template
     defaultEnvs {
       name
       defaultValue

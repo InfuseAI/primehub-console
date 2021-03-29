@@ -1,5 +1,5 @@
 import React from 'react';
-import {Icon, Card, Divider, Col, Row, Input} from 'antd';
+import {Typography, Tag, Icon, Card, Divider, Col, Row, Input} from 'antd';
 import {get} from 'lodash';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -13,6 +13,7 @@ import PhAppTemplate from 'interfaces/phAppTemplate';
 import AppLogo from 'components/apps/appLogo';
 
 const {Search} = Input;
+const {Text} = Typography;
 
 const breadcrumbs = [
   {
@@ -84,6 +85,7 @@ class AppStore extends React.Component<Props, State> {
         <Row gutter={24} type='flex'>
         {filteredPhAppTemplates.map((appTemplate: PhAppTemplate): JSX.Element => {
           const title = appTemplate.name;
+          const imageTag = get(appTemplate, 'template.spec.podTemplate.spec.containers[0].image', 'unknow');
           const description = appTemplate.description || '';
           const index = title.toLowerCase().indexOf(searchText.toLowerCase());
           const descIndex = description.toLowerCase().indexOf(searchText.toLowerCase());
@@ -107,8 +109,8 @@ class AppStore extends React.Component<Props, State> {
                 <Left>
                   <AppLogo src={appTemplate.icon} style={{marginRight: '8px'}}/>
                 </Left>
-                <h2 style={{margin: '4px 0 0'}}>{text}</h2>
-                <h4>{appTemplate.version}</h4>
+                <h2 style={{margin: '4px 0 0'}}>{text} <Text type='secondary' style={{fontSize: 12}}>{appTemplate.version}</Text></h2>
+                <Tag>{imageTag}</Tag>
                 <ClearBoth/>
                 <div>{desc}</div>
                 <Divider style={{margin: '8px 0'}}/>
