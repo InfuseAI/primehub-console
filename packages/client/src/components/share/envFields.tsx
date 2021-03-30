@@ -28,7 +28,7 @@ export default class EnvFields extends React.Component<Props, State> {
     super(props);
     const {value, defaultEnv, onChange} = props;
     const defaultEnvs = defaultEnv ? defaultEnv.map(item => {
-      return {name: item.name, value: item.defaultValue, required: !item.optional};
+      return {name: item.name, value: item.defaultValue, required: !item.optional, description: item.description};
     }) : [];
     const envs = value ? value.map(env => {
       return {name: env.name, value: env.value};
@@ -126,7 +126,7 @@ export default class EnvFields extends React.Component<Props, State> {
               <React.Fragment key={i}>
                 <div style={{display: 'flex', alignItems: 'center', marginBottom: 8, userSelect: 'none'}}>
                   <div style={{marginRight: 16}}>{i + 1}</div>
-                  <InputGroup compact style={{width: '50%', marginRight: 16}}>
+                  <InputGroup compact style={{width: '50%', marginRight: 8}}>
                     <Input
                       disabled={disabled}
                       placeholder='name' style={{ width: '40%'}}
@@ -137,7 +137,16 @@ export default class EnvFields extends React.Component<Props, State> {
                   </InputGroup>
                   {
                     disabled ? null : field.required ? (
-                      <Icon type='info-circle' theme='filled' title='Required Environment' />
+                      <span>
+                        <Icon type='info-circle' theme='filled' style={
+                          {
+                            display: field.description ? 'inline' : 'none',
+                            marginRight: 8,
+                            verticalAlign: 'baseline'
+                          }
+                        } title={field.description} />
+                        <span style={{color: 'red'}}>*</span>
+                      </span>
                     ) : (
                       <a href='javascript:;' onClick={() => this.remove(i)}>
                         <Icon type='close-circle-o'/>

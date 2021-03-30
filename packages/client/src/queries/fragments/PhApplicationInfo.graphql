@@ -8,6 +8,7 @@ fragment PhApplicationInfo on PhApplication {
     name
     defaultValue
     optional
+    description
   }
   appTemplate {
     name

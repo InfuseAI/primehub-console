@@ -13,7 +13,7 @@ export const phApplications = [
     appDefaultEnv: [
       {
         name: 'BACKEND_STORE_URI',
-        description: '',
+        description: 'Backend Store URI',
         defaultValue: 'sqlite://$(PRIMEHUB_APP_ROOT)/mlflow.db',
         optional: false
       },
