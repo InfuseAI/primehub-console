@@ -218,9 +218,9 @@ class AppCreateForm extends React.Component<Props, State> {
     } = initialValue || preloadApp || {};
     const { revealEnv, appSearchText, showRevealBtn } = this.state;
     const scopeList = [
-      {label: 'Public', value: PhAppScope.Public},
-      {label: 'PrimeHub users only', value: PhAppScope.PrimeHubUserOnly},
       {label: 'Group members only', value: PhAppScope.GroupOnly},
+      {label: 'PrimeHub users only', value: PhAppScope.PrimeHubUserOnly},
+      {label: 'Public', value: PhAppScope.Public},
     ];
     const invalidInitialInstanceType = instanceType &&
       !form.getFieldValue('instanceType') &&
@@ -449,7 +449,7 @@ class AppCreateForm extends React.Component<Props, State> {
                   </Form.Item>
                   <Form.Item label={`Access Scope`}>
                     {form.getFieldDecorator('scope', {
-                      initialValue: scope || PhAppScope.Public
+                      initialValue: scope || PhAppScope.GroupOnly
                     })(
                       <Select>
                         {
