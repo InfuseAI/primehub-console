@@ -2,6 +2,7 @@
 query CurrentUser {
   me {
     id
+    username
     groups {
       ...GroupInfo
       instanceTypes {
