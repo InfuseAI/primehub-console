@@ -257,7 +257,7 @@ export class ProxyCtrl {
         const sessionToken = ctx.cookies.get('phapplication-session-id', {signed: true}) || '';
         const cachedSessionToken = this.sessionTokenCacheStore.get(sessionToken);
         if (!cachedSessionToken) {
-          // authentication and authroization
+          // authentication and authorization
           return this.oidcCtrl.loggedIn(ctx, async () => {
             if (appData.scope === 'group') {
               const isGroupMember = await this.isMemberOfGroup(ctx.state.userId, appData.group);
@@ -336,7 +336,7 @@ export class ProxyCtrl {
         logger.error({
           component: logger.components.proxy,
           type: 'PROXY_WS_ERROR',
-          erorr: e,
+          error: e,
         });
       });
     };
