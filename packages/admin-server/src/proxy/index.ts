@@ -11,6 +11,7 @@ import pathMatch from 'path-match';
 import * as logger from '../logger';
 
 const sessionTokenCacheExpireTime = 3600;
+const phApplicationCacheExpireTime = 60;
 const route = pathMatch({
   sensitive: false,
   strict: false,
@@ -35,6 +36,7 @@ export class ProxyCtrl {
   private config: Config;
   private proxy;
   private sessionTokenCacheStore: NodeCache;
+  private phApplicationCacheStore: NodeCache;
   private graphqlClient: GraphQLClient;
   private apiPrefix: string;
   private apiTarget: string;
@@ -46,6 +48,7 @@ export class ProxyCtrl {
     this.oidcCtrl = oidcCtrl;
 
     this.sessionTokenCacheStore = new NodeCache({stdTTL: sessionTokenCacheExpireTime});
+    this.phApplicationCacheStore = new NodeCache({stdTTL: phApplicationCacheExpireTime});
 
     this.graphqlClient = new GraphQLClient(config.graphqlSvcEndpoint, {
       headers: {
@@ -178,54 +181,54 @@ export class ProxyCtrl {
     return false;
   }
 
-  private getAppData = async (appID: string): Promise<AppData> => {
-    switch (appID) {
-      case 'public':
-        return {
-          appID,
-          scope: 'public',
-          group: 'phusers',
-          target: 'http://localhost:5000',
-          rewrite: true,
-        };
-      case 'primehub':
-        return {
-          appID,
-          scope: 'primehub',
-          group: 'phusers',
-          target: 'http://localhost:5000',
-          rewrite: true,
-        };
-      case 'group':
-        return {
-          appID,
-          scope: 'group',
-          group: 'phusers',
-          target: 'http://localhost:5000',
-          rewrite: true,
-        };
-      case 'mlflow-xyzab':
-        return {
-          appID,
-          scope: 'group',
-          group: 'phusers',
-          target: 'http://app-mlflow-xyzab:5000',
-          rewrite: false,
-        };
-      case 'code-server-xyzab':
-        return {
-          appID,
-          scope: 'group',
-          group: 'phusers',
-          target: 'http://app-code-server-xyzab:8080',
-          rewrite: true,
-        };
+  private queryAppData = async (appID: string): Promise<AppData> => {
+    const variables = {
+      id: appID
+    };
+    const query = gql`
+    query ($id: ID!) {
+      phApplication(where: {id: $id}){
+        id
+        scope
+        groupName
+        internalAppUrl
+        status
+      }
+    }`;
+    const data = await this.graphqlClient.request(query, variables);
+
+    if (data.phApplication === null || data.phApplication.status !== 'Ready') {
+      return undefined;
     }
 
-    // todo: get the app data from graphql and cache
-    //
-    // this.graphqlClient.request(...)
-    return undefined;
+    const internalAppUrl = new URL(data.phApplication.internalAppUrl);
+    return {
+      appID,
+      scope: data.phApplication.scope,
+      group: data.phApplication.groupName,
+      target: `${internalAppUrl.protocol}//${internalAppUrl.host}`,
+      rewrite: false,
+    };
+  }
+
+  private getAppData = async (appID: string): Promise<AppData> => {
+    const cachedAppData: AppData = this.phApplicationCacheStore.get(appID);
+    if (cachedAppData) {
+      return cachedAppData;
+    }
+    try {
+      const appData = await this.queryAppData(appID);
+      this.phApplicationCacheStore.set(appID, appData, phApplicationCacheExpireTime);
+      return appData;
+    } catch (error) {
+      const msg = (error.response.errors) ? error.response.errors.map(e => e.message) : error;
+      logger.error({
+        appID,
+        reason: 'getAppData failed',
+        message: msg
+      });
+      return undefined;
+    }
   }
 
   private handleAppWeb = async (ctx: Koa.ParameterizedContext, next: any) => {
