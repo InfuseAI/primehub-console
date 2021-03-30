@@ -33,6 +33,7 @@ import AppStore from 'containers/appStore';
 import AppDetail from 'containers/appDetail';
 import AppEdit from 'containers/appEditPage';
 import GroupSettingsPage from 'containers/groupSettingsPage';
+import GroupSettingsJobs from 'ee/components/groupSettings/jobs';
 
 const client = createGraphqlClient({
   fakeData,
@@ -73,7 +74,9 @@ class Main extends React.Component {
 
             {/* Group Settings */}
             <Route path={`${appPrefix}g/:groupName/settings`}>
-              <GroupSettingsPage />
+              <GroupSettingsPage extraTabs={[
+                { component: GroupSettingsJobs, key: 'jobs', tab: 'Jobs' },
+              ]} />
             </Route>
 
             {/* Job Submission */}
