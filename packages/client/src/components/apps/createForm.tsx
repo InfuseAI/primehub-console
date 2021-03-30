@@ -451,7 +451,7 @@ class AppCreateForm extends React.Component<Props, State> {
                     {form.getFieldDecorator('scope', {
                       initialValue: scope || PhAppScope.Public
                     })(
-                      <Select disabled={type === 'edit'}>
+                      <Select>
                         {
                           scopeList.map(item => {
                             return (
