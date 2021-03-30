@@ -219,7 +219,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     await ctx.render('cms', {title: 'PrimeHub', staticPath});
   });
 
-  //proxy
+  // proxy
   const proxy = new ProxyCtrl({
     config,
     oidcCtrl,

@@ -1,6 +1,6 @@
-import NodeCache from "node-cache";
-import { Config } from "../config";
-import { OidcCtrl } from "../oidc";
+import NodeCache from 'node-cache';
+import { Config } from '../config';
+import { OidcCtrl } from '../oidc';
 import cookie from 'cookie';
 import Koa from 'koa';
 import { v4 as uuidv4 } from 'uuid';
