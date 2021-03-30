@@ -9,6 +9,7 @@ import * as logger from '../logger';
 import { get } from 'lodash';
 import { createHash } from 'crypto';
 import UUID from 'uuid';
+import { Config } from '../config';
 
 const CALLBACK_PATH = '/oidc/callback';
 const REQUEST_API_TOKEN_PATH = '/oidc/request-api-token';
@@ -17,6 +18,11 @@ const NONCE_COOKIE = 'oidc.nonce';
 
 const ERRORS = {
   FORCE_LOGIN: 'FORCE_LOGIN'
+};
+
+interface OidcCtrlOptions {
+  oidcClient: any,
+  config: Config,
 };
 
 export class OidcCtrl {
@@ -28,40 +34,27 @@ export class OidcCtrl {
   private redirectUri: string;
   private adminRole: string;
   private appPrefix?: string;
+  private cookiePath: string;
   private defaultReturnPath: string;
-  private enableUserPortal: boolean;
 
   constructor({
-    realm,
-    clientId,
-    cmsHost,
-    keycloakBaseUrl,
     oidcClient,
-    appPrefix,
-    enableUserPortal
-  }: {
-    realm: string,
-    clientId: string,
-    cmsHost: string,
-    keycloakBaseUrl: string,
-    oidcClient: any,
-    appPrefix?: string,
-    enableUserPortal: boolean,
-  }) {
-    this.clientId = clientId;
-    this.cmsHost = cmsHost;
-    this.realm = realm;
-    this.keycloakBaseUrl = keycloakBaseUrl;
+    config,
+  }: OidcCtrlOptions) {
+    this.clientId = config.keycloakClientId;
+    this.cmsHost = config.cmsHost;
+    this.realm = config.keycloakRealmName;
+    this.keycloakBaseUrl = config.keycloakOidcBaseUrl;
     this.oidcClient = oidcClient;
-    this.redirectUri = `${this.cmsHost}${appPrefix || ''}${CALLBACK_PATH}`;
+    this.redirectUri = `${this.cmsHost}${config.appPrefix || ''}${CALLBACK_PATH}`;
     this.adminRole = (this.realm === 'master') ? 'realm:admin' : 'realm-management:realm-admin';
-    this.appPrefix = appPrefix;
-    this.enableUserPortal = enableUserPortal;
+    this.appPrefix = config.appPrefix;
+    this.cookiePath = config.appPrefix ? `${config.appPrefix}/` : '/';
 
     // build default return path
     const returnPath = '/g';
-    this.defaultReturnPath = appPrefix ?
-      `${appPrefix}${returnPath}` :
+    this.defaultReturnPath = config.appPrefix ?
+      `${config.appPrefix}${returnPath}` :
       returnPath;
   }
 
@@ -88,9 +81,13 @@ export class OidcCtrl {
       // get new access token if it's going to expire in 5 sec, or already expired
       if (accessToken.isExpiredIn(5000)) {
         const tokenSet = await this.oidcClient.refresh(refreshToken);
-        const secureRequest = ctx.request.secure;
-        ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true, secure: secureRequest});
-        ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true, secure: secureRequest});
+        const opts = {
+          signed: true,
+          secure: ctx.request.secure,
+          path: this.cookiePath,
+        };
+        ctx.cookies.set('accessToken', tokenSet.access_token, opts);
+        ctx.cookies.set('refreshToken', tokenSet.refresh_token, opts);
         accessTokenExp = parseInt(new Token(tokenSet.access_token, this.clientId).getContent().exp, 10);
         refreshTokenExp = parseInt(new Token(tokenSet.refresh_token, this.clientId).getContent().exp, 10);
 
@@ -141,9 +138,13 @@ export class OidcCtrl {
       // get new access token if it's going to expire in 5 sec, or already expired
       if (accessToken.isExpiredIn(5000)) {
         const tokenSet = await this.oidcClient.refresh(refreshToken);
-        const secureRequest = ctx.request.secure;
-        ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true, secure: secureRequest});
-        ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true, secure: secureRequest});
+        const opts = {
+          signed: true,
+          secure: ctx.request.secure,
+          path: this.cookiePath,
+        };
+        ctx.cookies.set('accessToken', tokenSet.access_token, opts);
+        ctx.cookies.set('refreshToken', tokenSet.refresh_token, opts);
         accessTokenExp = parseInt(new Token(tokenSet.access_token, this.clientId).getContent().exp, 10);
         refreshTokenExp = parseInt(new Token(tokenSet.refresh_token, this.clientId).getContent().exp, 10);
 
@@ -153,6 +154,7 @@ export class OidcCtrl {
 
       ctx.state.accessTokenExp = accessTokenExp;
       ctx.state.refreshTokenExp = refreshTokenExp;
+      ctx.state.userId = accessToken.getContent().sub;
       ctx.state.username = ctx.cookies.get('username');
       ctx.state.thumbnail = ctx.cookies.get('thumbnail');
       ctx.state.isUserAdmin = accessToken.hasRole(this.adminRole);
@@ -200,9 +202,13 @@ export class OidcCtrl {
 
       const tokenSet = await this.oidcClient.refresh(refreshToken);
       // set refreshToken, accessToken on cookie
-      const secureRequest = ctx.request.secure;
-      ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true, secure: secureRequest});
-      ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true, secure: secureRequest});
+      const opts = {
+        signed: true,
+        secure: ctx.request.secure,
+        path: this.cookiePath,
+      };
+      ctx.cookies.set('accessToken', tokenSet.access_token, opts);
+      ctx.cookies.set('refreshToken', tokenSet.refresh_token, opts);
       const newAccessToken = new Token(tokenSet.access_token, this.clientId);
       const newRefreshToken = new Token(tokenSet.refresh_token, this.clientId);
 
@@ -265,14 +271,18 @@ export class OidcCtrl {
     const accessToken = new Token(tokenSet.access_token, this.clientId);
 
     // redirect to frontend
-    const secureRequest = ctx.request.secure;
-    ctx.cookies.set('accessToken', tokenSet.access_token, {signed: true, secure: secureRequest});
-    ctx.cookies.set('refreshToken', tokenSet.refresh_token, {signed: true, secure: secureRequest});
-    ctx.cookies.set('username', accessToken.getContent().preferred_username, {signed: true, secure: secureRequest});
+    const opts = {
+      signed: true,
+      secure: ctx.request.secure,
+      path: this.cookiePath,
+    };
+    ctx.cookies.set('accessToken', tokenSet.access_token, opts);
+    ctx.cookies.set('refreshToken', tokenSet.refresh_token, opts);
+    ctx.cookies.set('username', accessToken.getContent().preferred_username, opts);
     ctx.cookies.set('thumbnail',
       accessToken.getContent().email ?
       gravatar.url(accessToken.getContent().email)
-      : '', {signed: true, secure: secureRequest});
+      : '', opts);
 
     const backUrl = query.backUrl || this.defaultReturnPath;
 
@@ -304,14 +314,6 @@ export class OidcCtrl {
     return ctx.redirect(`${this.keycloakBaseUrl}/realms/${this.realm}/protocol/openid-connect/logout?${qs}`);
   }
 
-  public getUserFromContext = (ctx: any) => {
-    const accessToken = new Token(ctx.cookies.get('accessToken', {signed: true}), this.clientId);
-    return {
-      userId: accessToken.getContent().sub,
-      username: accessToken.getContent().preferred_username
-    };
-  }
-
   public requestApiToken = async (ctx: any) => {
     const nonce = this.saveNonceSecret(ctx);
     const query = ctx.query;
@@ -339,7 +341,12 @@ export class OidcCtrl {
 
     // redirect to frontend
     const secureRequest = ctx.request.secure;
-    const opts = {expires: new Date(Date.now() + 60000), signed: true, secure: secureRequest};
+    const opts = {
+      expires: new Date(Date.now() + 60000),
+      signed: true,
+      secure: secureRequest,
+      path: this.cookiePath,
+    };
     ctx.cookies.set('apiToken', tokenSet.refresh_token, opts);
 
     const backUrl = query.backUrl || `${this.cmsHost}${this.appPrefix}/api-token`;
@@ -369,7 +376,7 @@ export class OidcCtrl {
   private saveNonceSecret = (ctx: Koa.ParameterizedContext) => {
     const secret = UUID.v1();
     const secureRequest = ctx.request.secure;
-    ctx.cookies.set(NONCE_COOKIE, secret, {signed: true, secure: secureRequest});
+    ctx.cookies.set(NONCE_COOKIE, secret, {signed: true, secure: secureRequest, path: this.cookiePath});
     return createHash('sha256').update(secret).digest('hex');
   }
 
