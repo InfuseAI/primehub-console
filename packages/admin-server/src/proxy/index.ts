@@ -28,7 +28,7 @@ interface AppData {
   scope: string;
   target: string;
   rewrite?: boolean;
-}
+};
 
 export class ProxyCtrl {
   private oidcCtrl: OidcCtrl;
@@ -101,7 +101,13 @@ export class ProxyCtrl {
       ctx.req.isProxy = true;
 
       ctx.res.on('close', () => {
-        reject(new Error(`Http response closed while proxying ${oldPath}`))
+        const message = `Http response closed while proxying ${oldPath}`;
+        logger.error({
+          component: logger.components.proxy,
+          type: 'PROXY_WEB',
+          message: ""
+        });
+        reject(new Error(message));
       })
 
       ctx.res.on('finish', () => {
@@ -109,6 +115,13 @@ export class ProxyCtrl {
       })
 
       this.proxy.web(ctx.req, ctx.res, opts, e => {
+        const message = `Proxying error: ${e.code}`;
+        logger.error({
+          component: logger.components.proxy,
+          type: 'PROXY_WEB',
+          message: message,
+        });
+
         const status = {
           ECONNREFUSED: 503,
           ETIMEOUT: 504
@@ -223,6 +236,10 @@ export class ProxyCtrl {
       next;
     }
 
+    if (ctx.url === prefix) {
+      return ctx.redirect(ctx.url + '/');
+    }
+
     const proxyOpts = {
       target: appData.target,
       changeOrigin: true,
@@ -303,7 +320,7 @@ export class ProxyCtrl {
       const proxyOpts = {
         target: appData.target,
         changeOrigin: true,
-      }
+      };
 
       logger.debug({
         component: logger.components.proxy,
@@ -324,6 +341,7 @@ export class ProxyCtrl {
 
 
   public mount(rootRouter) {
+    rootRouter.all(`/apps/:appID`, this.handleAppWeb);
     rootRouter.all(`/apps/:appID/(.*)`, this.handleAppWeb);
     rootRouter.all(`/files/(.*)`, this.oidcCtrl.loggedIn, this.handleFiles);
   }
