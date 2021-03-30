@@ -27,7 +27,6 @@ export default class EnvFields extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     const {value, defaultEnv, onChange} = props;
-    console.log(defaultEnv, 3030303);
     const defaultEnvs = defaultEnv ? defaultEnv.map(item => {
       return {name: item.name, value: item.defaultValue, required: !item.optional};
     }) : [];
@@ -37,7 +36,6 @@ export default class EnvFields extends React.Component<Props, State> {
     this.state = {
       fields: merge(defaultEnvs, envs) || [],
     };
-    console.log(this.state.fields);
     onChange(this.state.fields);
   }
 
