@@ -24,8 +24,11 @@ import GroupRepresentation from 'keycloak-admin/lib/defs/groupRepresentation';
 import {createConfig} from '../config';
 import { transform } from './groupUtils';
 import { isGroupNameAvailable } from '../utils/groupCheck';
+import { isUserAdmin } from './user';
 
 const config = createConfig();
+
+const NOT_AUTH_ERROR = 'NOT_AUTH';
 
 // constants
 const attrSchema = {
@@ -63,6 +66,12 @@ const validateSharedVolumeAttrs = (attrs: Attributes) => {
 /**
  * Mutation
  */
+
+const isGroupAdmin = async (groupId: string, context: Context) => {
+  const group = await context.kcAdminClient.groups.findOne({id: groupId});
+  const admins = group && group.attributes && group.attributes.admins || [];
+  return (admins.indexOf(context.username) >= 0);
+};
 
 export const create = async (root, args, context: Context) => {
   const kcAdminClient = context.kcAdminClient;
@@ -160,8 +169,13 @@ export const create = async (root, args, context: Context) => {
 };
 
 export const update = async (root, args, context: Context) => {
+  const {realm, userId, kcAdminClient} = context;
   const groupId = args.where.id;
-  const kcAdminClient = context.kcAdminClient;
+  // only system admin and group admin can update group
+  const mutable = await isUserAdmin(realm, userId, kcAdminClient) ? true : await isGroupAdmin(groupId, context);
+  if (!mutable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
 
   // update resource
   const payload = args.data;
