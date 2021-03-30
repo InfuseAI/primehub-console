@@ -40,6 +40,7 @@ interface State {
   revealEnv: boolean;
   appSearchText: string;
   defaultEnvs: DefaultEnv[];
+  preloadApp: any;
 }
 
 const radioStyle = {
@@ -92,15 +93,22 @@ class AppCreateForm extends React.Component<Props, State> {
       revealEnv: false,
       showRevealBtn: false,
       appSearchText: '',
+      preloadApp: {},
       defaultEnvs
     };
   }
 
   componentDidMount() {
-    const {initialValue} = this.props;
+    const {initialValue, templateId} = this.props;
     if (!initialValue) {
       this.autoSelectFirstInstanceType();
     }
+    const preloadApp: any = {};
+    if (templateId) {
+      preloadApp.appName = templateId;
+      preloadApp.id = autoGenId(templateId);
+    }
+    this.setState({preloadApp});
   }
 
   componentDidUpdate(prevProps) {
@@ -201,11 +209,6 @@ class AppCreateForm extends React.Component<Props, State> {
       initialValue,
       type
     } = this.props;
-    const preloadApp: any = {};
-    if (templateId) {
-      preloadApp.appName = templateId;
-      preloadApp.id = autoGenId(templateId);
-    }
     const {
       appName,
       id,
@@ -215,7 +218,7 @@ class AppCreateForm extends React.Component<Props, State> {
       appDefaultEnv,
       scope,
       env,
-    } = initialValue || preloadApp || {};
+    } = initialValue || this.state.preloadApp || {};
     const { revealEnv, appSearchText, showRevealBtn } = this.state;
     const scopeList = [
       {label: 'Group members only', value: PhAppScope.GroupOnly},
