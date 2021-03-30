@@ -61,13 +61,13 @@ export const phAppTemplates = [
     defaultEnvs: [
       {
         name: 'BACKEND_STORE_URI',
-        description: '',
+        description: 'Back store uri',
         defaultValue: 'sqlite://$(PRIMEHUB_APP_ROOT)/mlflow.db',
         optional: false
       },
       {
         name: 'DEFAULT_ARTIFACT_ROOT',
-        description: '',
+        description: 'Default artifact path',
         defaultValue: '$(PRIMEHUB_APP_ROOT)/mlruns',
         optional: false
       }

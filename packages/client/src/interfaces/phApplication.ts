@@ -18,6 +18,14 @@ export enum PhAppScope {
   GroupOnly = 'group'
 }
 
+export interface InstanceTypeSpec {
+  displayName?: string;
+  description?: string;
+  gpuLimit?: number;
+  cpuLimit?: number;
+  memoryLimit?: number;
+}
+
 export default interface PhApplication {
   id: string;
   displayName: string;
@@ -28,10 +36,11 @@ export default interface PhApplication {
   appTemplate: PhAppTemplate;
   groupName: string;
   instanceType: any;
+  instanceTypeSpec: InstanceTypeSpec;
   scope: PhAppScope;
   appUrl: string;
   internalAppUrl: string;
-  svcEndpoint: string[];
+  svcEndpoints: string[];
   env: Env[];
   stop: boolean;
   status: PhAppStatus;

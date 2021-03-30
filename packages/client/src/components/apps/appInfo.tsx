@@ -59,6 +59,17 @@ export default class AppInformation extends React.Component<Props, State> {
       { revealEnv ? <Icon type='eye' title='Hide value' /> : <Icon type='eye-invisible' title='Show value' /> }
       </span>
     );
+    const svcEndpointEl = (
+      <ul style={{padding: 0, listStyle: 'none'}}>
+        {
+          phApplication.svcEndpoints.map(svc => {
+            return (
+              <li>{svc}</li>
+            );
+          })
+        }
+      </ul>
+    );
     return (
       <div style={{padding: '16px 36px'}}>
         <Row gutter={36}>
@@ -66,7 +77,7 @@ export default class AppInformation extends React.Component<Props, State> {
             <Field labelCol={4} valueCol={20} label='Status' value={<Tag color={this.renderStatusColor(phApplication.status)}>{phApplication.status}</Tag>} />
             <Field labelCol={4} valueCol={20} label='Message' value={phApplication.message} />
             <Field labelCol={4} valueCol={20} label='App URL' value={ready ? phApplication.appUrl : '-'} />
-            <Field labelCol={4} valueCol={20} label='Service Endpoint' value={phApplication.svcEndpoint} />
+            <Field labelCol={4} valueCol={20} label='Service Endpoints' value={svcEndpointEl} />
           </Col>
         </Row>
         <Divider />
