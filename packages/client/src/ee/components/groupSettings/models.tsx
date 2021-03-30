@@ -1,7 +1,7 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
-import {Form, Tabs, Row, Col, Select, Input, InputNumber, notification } from 'antd';
+import {Form, Tabs, Row, Col, Switch, notification } from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import {compose} from 'recompose';
 import {get} from 'lodash';
@@ -10,7 +10,7 @@ import {errorHandler} from 'utils/errorHandler';
 import { RouteComponentProps } from 'react-router-dom';
 import { GroupContextComponentProps } from 'context/group';
 import { UserContextComponentProps } from 'context/user';
-import NumberWithSelectMultipler from 'cms-components/customize-number-with_select_multiplier'
+import { renderAlert } from 'containers/GroupSettingsPage';
 
 type Props = FormComponentProps & {
   getGroups: any;
@@ -23,7 +23,7 @@ interface State {
 
 type FormValue = {
   groupId: string;
-  jobDefaultActiveDeadlineSeconds: number;
+  enabledDeployment: boolean;
 };
 
 const UPDATE_GROUP = gql`
@@ -32,23 +32,7 @@ const UPDATE_GROUP = gql`
   }
 `;
 
-const options = [
-  {
-    text: 'Minutes',
-    value: 'm',
-    multiplier: 60
-  }, {
-    text: 'Hours',
-    value: 'h',
-    multiplier: 60*60
-  }, {
-    text: 'Days',
-    value: 'd',
-    multiplier: 60*60*24
-  }
-];
-
-class GroupSettingsJobs extends React.Component<Props, State> {
+class GroupSettingsModels extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
@@ -85,8 +69,8 @@ class GroupSettingsJobs extends React.Component<Props, State> {
           data: values,
         }
       }).then(() => {
-        group.jobDefaultActiveDeadlineSeconds = values.jobDefaultActiveDeadlineSeconds;
-        form.setFieldsValue({jobDefaultActiveDeadlineSeconds: values.jobDefaultActiveDeadlineSeconds});
+        group.enabledDeployment = values.enabledDeployment;
+        form.setFieldsValue({enabledDeployment: values.enabledDeployment});
       });
     });
   }
@@ -99,32 +83,26 @@ class GroupSettingsJobs extends React.Component<Props, State> {
     }
 
     return (
-      <Form onSubmit={this.submit}>
-        <Row style={{marginLeft: 5, marginRight: 5}}>
-          <Col>
-            <Form.Item label={`Default Timeout Setting`} style={{marginBottom: 20}}>
-              {form.getFieldDecorator('jobDefaultActiveDeadlineSeconds', {
-                initialValue: group.jobDefaultActiveDeadlineSeconds,
-              })(
-                <NumberWithSelectMultipler
-                  uiParams={{
-                    options: options,
-                    styleOnSelect: {width: 200},
-                    defaultSelected: 1,
-                    styleOnInput: {width: 100, marginRight: 10},
-                    min: 0,
-                    max: 999,
-                    step: 1,
-                  }}
-                />
-              )}
-            </Form.Item>
-            <Form.Item style={{textAlign: 'right', marginTop: 20, marginBottom: 5}}>
-              <InfuseButton type='primary' htmlType='submit'>Save</InfuseButton>
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
+      <>
+        {renderAlert()}
+        <Form onSubmit={this.submit}>
+          <Row style={{marginTop: 5, marginLeft: 5, marginRight: 5}}>
+            <Col>
+              <Form.Item label={`Model Deployment`} style={{marginBottom: 20}}>
+                {form.getFieldDecorator('enabledDeployment', {
+                  initialValue: group.enabledDeployment,
+                  valuePropName: 'checked',
+                })(
+                  <Switch />
+                )}
+              </Form.Item>
+              <Form.Item style={{textAlign: 'right', marginTop: 20, marginBottom: 5}}>
+                <InfuseButton type='primary' htmlType='submit'>Save</InfuseButton>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </>
     );
   }
 }
@@ -150,4 +128,4 @@ export default compose(
     name: 'updateGroup'
   }),
   Form.create<Props>(),
-)(GroupSettingsJobs);
+)(GroupSettingsModels);
