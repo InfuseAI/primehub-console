@@ -85,7 +85,7 @@ class AppCreateForm extends React.Component<Props, State> {
     super(props);
     const { phAppTemplates, templateId, initialValue, type } = props;
     const currentTemplate = find(phAppTemplates, v => v.id === templateId);
-    const defaultEnvs = currentTemplate ? currentTemplate.defaultEnvs : type === 'edit' ? initialValue.appDefaultEnv : [];
+    const defaultEnvs = type === 'edit' ? initialValue.appDefaultEnv : currentTemplate ? currentTemplate.defaultEnvs : [];
 
     this.state = {
       reloadEnv: false,
@@ -104,7 +104,6 @@ class AppCreateForm extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps) {
-    this.autoSelectFirstInstanceType();
     if (this.state.reloadEnv) {
       this.setState({reloadEnv: false});
     }
@@ -117,7 +116,7 @@ class AppCreateForm extends React.Component<Props, State> {
     const {instanceTypes, form} = this.props;
     const currentInstanceType = form.getFieldValue('instanceType');
     const validInstanceType = instanceTypes.some(instanceType => instanceType.id === currentInstanceType);
-    if ((!form.getFieldValue('instanceType') || !validInstanceType) && instanceTypes.length) {
+    if ((!currentInstanceType || !validInstanceType) && instanceTypes.length) {
       form.setFieldsValue({instanceType: instanceTypes[0].id});
     }
   }
