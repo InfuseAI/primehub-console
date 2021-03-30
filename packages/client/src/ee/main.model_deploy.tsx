@@ -12,6 +12,7 @@ import { createGraphqlClient } from 'utils/graphqlClient';
 // Icons
 import iconModels from 'images/icon-models.svg'
 import iconShareFiles from 'images/icon-files.svg';
+import iconApps from 'images/icon-apps.svg';
 
 // Components
 import ListContainer from 'containers/list';
@@ -30,7 +31,6 @@ const client = createGraphqlClient({
 class Main extends React.Component {
   render() {
     const sidebarItems: MainPageSidebarItem[] = [
-
       {
         title: 'Models',
         subPath: 'model-deployment',
@@ -55,6 +55,17 @@ class Main extends React.Component {
           marginTop: '-3px',
         }
       },
+      {
+        title: 'Apps',
+        subPath: 'apps',
+        icon: iconApps,
+        style: {
+          width: 'auto',
+          height: 20,
+          marginRight: '-4px',
+          marginTop: '-2px',
+        },
+      }
     ];
 
     return (
