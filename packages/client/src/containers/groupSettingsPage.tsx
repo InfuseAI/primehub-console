@@ -57,15 +57,15 @@ export const GET_MY_GROUPS = gql`
   }
 `
 
-class GroupSettingsPage extends React.Component<Props> {
+export const renderAlert = () => {
+  return <Alert
+           message='Only system admins can update these settings'
+           description='Please contact your administrator to configure these settings.'
+           type='warning'
+           showIcon />;
+};
 
-  renderAlert() {
-    return <Alert
-             message='Only system admins can update these settings'
-             description='Please contact your administrator to configure these settings.'
-             type='warning'
-             showIcon />;
-  }
+class GroupSettingsPage extends React.Component<Props> {
 
   render() {
     const {groupContext, userContext, getGroups, history, extraTabs} = this.props;
@@ -84,11 +84,11 @@ class GroupSettingsPage extends React.Component<Props> {
         <PageBody style={{flex: '1 1 0%'}}>
           <Tabs style={{height: '100%'}}>
             <Tabs.TabPane key="info" tab="Info">
-              {this.renderAlert()}
+              {renderAlert()}
               <GroupSettingsInfo group={group} />
             </Tabs.TabPane>
             <Tabs.TabPane key="members" tab="Members">
-              {this.renderAlert()}
+              {renderAlert()}
               <GroupSettingsMembers group={group} />
             </Tabs.TabPane>
             {

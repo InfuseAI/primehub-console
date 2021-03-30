@@ -29,6 +29,7 @@ import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
 import GroupSettingsPage from 'containers/groupSettingsPage';
 import GroupSettingsJobs from 'ee/components/groupSettings/jobs';
+import GroupSettingsModels from 'ee/components/groupSettings/models';
 
 const client = createGraphqlClient({
   fakeData,
@@ -71,6 +72,7 @@ class Main extends React.Component {
             <Route path={`${appPrefix}g/:groupName/settings`}>
               <GroupSettingsPage extraTabs={[
                 { component: GroupSettingsJobs, key: 'jobs', tab: 'Jobs' },
+                { component: GroupSettingsModels, key: 'models', tab: 'Models' },
               ]} />
             </Route>
 
