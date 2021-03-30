@@ -15,12 +15,12 @@ const route = pathMatch({
   sensitive: false,
   strict: false,
   end: false
-})
+});
 
 interface ProxyCtrlOptions {
   config: Config;
   oidcCtrl: OidcCtrl;
-};
+}
 
 interface AppData {
   appID: string;
@@ -28,11 +28,11 @@ interface AppData {
   scope: string;
   target: string;
   rewrite?: boolean;
-};
+}
 
 export class ProxyCtrl {
   private oidcCtrl: OidcCtrl;
-  private config: Config
+  private config: Config;
   private proxy;
   private sessionTokenCacheStore: NodeCache;
   private graphqlClient: GraphQLClient;
@@ -80,7 +80,7 @@ export class ProxyCtrl {
     };
   }
 
-  private async proxyWeb (ctx, opts) {
+  private async proxyWeb(ctx, opts) {
     return new Promise((resolve, reject) => {
       const oldPath = ctx.req.url;
       const {urlRewrite} = opts;
@@ -105,34 +105,34 @@ export class ProxyCtrl {
         logger.error({
           component: logger.components.proxy,
           type: 'PROXY_WEB',
-          message: ""
+          message: ''
         });
         reject(new Error(message));
-      })
+      });
 
       ctx.res.on('finish', () => {
-        resolve(undefined)
-      })
+        resolve(undefined);
+      });
 
       this.proxy.web(ctx.req, ctx.res, opts, e => {
-        const message = `Proxying error: ${e.code}`;
+        const msg = `Proxying error: ${e.code}`;
         logger.error({
           component: logger.components.proxy,
           type: 'PROXY_WEB',
-          message: message,
+          message: msg,
         });
 
         const status = {
           ECONNREFUSED: 503,
           ETIMEOUT: 504
-        }[e.code]
-        ctx.status = status || 500
-        resolve(undefined)
+        }[e.code];
+        ctx.status = status || 500;
+        resolve(undefined);
       });
     });
   }
 
-  private createSessionToken (ctx: Koa.ParameterizedContext) {
+  private createSessionToken(ctx: Koa.ParameterizedContext) {
     const appID = ctx.params.appID;
     // Generate session token
     const sessionToken = uuidv4();
@@ -148,12 +148,12 @@ export class ProxyCtrl {
     this.sessionTokenCacheStore.set(sessionToken, true, sessionTokenCacheExpireTime);
 
     return true;
-  };
+  }
 
   private updateSessionTTL = (ctx: Koa.ParameterizedContext) => {
     const sessionToken = ctx.cookies.get('phapplication-session-id', {signed: true});
     this.sessionTokenCacheStore.ttl(sessionToken, sessionTokenCacheExpireTime);
-  };
+  }
 
   private isMemberOfGroup = async (userId: string, group: string): Promise<boolean> => {
     const variables = {
@@ -176,7 +176,7 @@ export class ProxyCtrl {
       }
     }
     return false;
-  };
+  }
 
   private getAppData = async (appID: string): Promise<AppData> => {
     switch (appID) {
@@ -230,10 +230,10 @@ export class ProxyCtrl {
 
   private handleAppWeb = async (ctx: Koa.ParameterizedContext, next: any) => {
     const appID = ctx.params.appID;
-    const prefix = `${this.config.appPrefix}/apps/${appID}`
+    const prefix = `${this.config.appPrefix}/apps/${appID}`;
     const appData = await this.getAppData(appID);
     if (!appData) {
-      next;
+      return next();
     }
 
     if (ctx.url === prefix) {
@@ -275,7 +275,7 @@ export class ProxyCtrl {
       default:
         throw Boom.badRequest('bad request');
     }
-  };
+  }
 
   private handleFiles = async (ctx: Koa.ParameterizedContext, next: any) => {
     const target = this.apiTarget;
@@ -306,14 +306,14 @@ export class ProxyCtrl {
       }
 
       const {appID} = params;
-      const appData = await this.getAppData(appID)
+      const appData = await this.getAppData(appID);
       if (!appData) {
         return;
       }
 
       const oldPath = req.url;
       if (appData.rewrite) {
-        const prefix = `${this.config.appPrefix}/apps/${appID}`
+        const prefix = `${this.config.appPrefix}/apps/${appID}`;
         req.url = req.url.slice(prefix.length);
       }
 
@@ -336,9 +336,8 @@ export class ProxyCtrl {
           erorr: e,
         });
       });
-    }
-  };
-
+    };
+  }
 
   public mount(rootRouter) {
     rootRouter.all(`/apps/:appID`, this.handleAppWeb);
