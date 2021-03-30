@@ -5,6 +5,7 @@ export interface GroupContextValue {
   name: string;
   displayName: string;
   admins: string;
+  enabledSharedVolume: boolean;
 }
 
 export const GroupContext = React.createContext<GroupContextValue>(undefined);

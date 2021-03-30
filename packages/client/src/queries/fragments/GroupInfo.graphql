@@ -15,5 +15,6 @@ fragment GroupInfo on Group {
     gpuUsage
   }
   enabledDeployment
+  enabledSharedVolume
   jobDefaultActiveDeadlineSeconds
 }

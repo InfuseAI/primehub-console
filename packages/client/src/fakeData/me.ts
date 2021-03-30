@@ -6,6 +6,7 @@ export const me = {
     name: 'group1',
     displayName: 'c-Group 1',
     enabledDeployment: true,
+    enabledSharedVolume: true,
     instanceTypes: [
       {
         id: 'g-it1',

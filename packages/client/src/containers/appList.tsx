@@ -260,6 +260,16 @@ class AppListContainer extends React.Component<Props, State> {
           breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
           title={'Apps'}
         />
+        {
+          (!groupContext.enabledSharedVolume) ? (
+          <Alert
+            message='No group shared volume.'
+            description='The data which is not available after stop the application, please contact your administrator to enable the shared volume.'
+            type='warning'
+            showIcon
+          />
+          ) : <></>
+        }
         <PageBody>{pageBody}</PageBody>
         { showContent ? content : <></> }
       </>
