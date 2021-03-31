@@ -56,6 +56,7 @@ export interface PhApplication {
   env: EnvVar[];
   status: PhApplicationPhase;
   message: string;
+  rewrite?: boolean;
 }
 
 export interface PhApplicationMutationInput {
@@ -150,6 +151,7 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
     env,
     status: item.status ? item.status.phase : PhApplicationPhase.Error,
     message: item.status ? item.status.message : null,
+    rewrite: item.spec.rewrite ? item.spec.rewrite : false,
   };
 };
 
@@ -267,6 +269,7 @@ const createApplication = async (context: Context, data: PhApplicationMutationIn
   const podTemplate = appTemplate.spec.template.spec && appTemplate.spec.template.spec.podTemplate;
   const svcTemplate = appTemplate.spec.template.spec && appTemplate.spec.template.spec.svcTemplate;
   let httpPort = null;
+  let rewrite = false;
 
   // Append env to pod template
   if (podTemplate.spec.containers && podTemplate.spec.containers.length > 0) {
@@ -275,6 +278,10 @@ const createApplication = async (context: Context, data: PhApplicationMutationIn
 
   if (appTemplate.spec.template.spec && appTemplate.spec.template.spec.httpPort) {
     httpPort = appTemplate.spec.template.spec.httpPort;
+  }
+
+  if (appTemplate.spec.template.spec && appTemplate.spec.template.spec.rewrite) {
+    rewrite = appTemplate.spec.template.spec.rewrite;
   }
 
   const spec = {
@@ -286,6 +293,7 @@ const createApplication = async (context: Context, data: PhApplicationMutationIn
     podTemplate,
     svcTemplate,
     httpPort,
+    rewrite,
   };
   return crdClient.phApplications.create(metadata, spec);
 };

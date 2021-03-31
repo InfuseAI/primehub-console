@@ -20,7 +20,6 @@ export const permissions = shield({
     'phApplications': or(isAdmin, isUser, isClient),
     'phApplicationsConnection': or(isAdmin, isUser, isClient),
     'instanceType': or(isAdmin, isClient),
-    'phApplication': or(isAdmin, isUser, isClient),
     'phJob': or(isAdmin, isUser),
     'phJobs': or(isAdmin, isUser),
     'phJobsConnection': or(isAdmin, isUser),

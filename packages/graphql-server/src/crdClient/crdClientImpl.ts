@@ -272,6 +272,7 @@ export interface PhApplicationSpec {
   podTemplate: any;
   svcTemplate: any;
   httpPort: number;
+  rewrite?: boolean;
 }
 
 export interface PhApplicationStatus {
@@ -297,6 +298,7 @@ export interface PhAppTemplateSpec {
       podTemplate: any;
       svcTemplate: any;
       httpPort: number;
+      rewrite?: boolean;
     }
   };
 }
