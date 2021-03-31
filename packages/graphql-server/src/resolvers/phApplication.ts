@@ -209,7 +209,7 @@ export const queryOne = async (root, args, context: Context) => {
   const transformed =
     await transform(phApplication, context.kcAdminClient);
   const viewable = await isUserInGroup(currentUserId, transformed.groupName, context);
-  if (!viewable) {
+  if (!viewable && currentUserId !== 'jupyterHub') {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
   }
   return transformed;

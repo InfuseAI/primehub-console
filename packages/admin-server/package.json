@@ -33,6 +33,7 @@
     "graphql": "^15.5.0",
     "graphql-request": "^3.4.0",
     "gravatar": "^1.6.0",
+    "http-proxy": "^1.18.1",
     "js-yaml": "^3.12.0",
     "json-stream": "^1.0.0",
     "json-stringify-safe": "^5.0.1",
@@ -53,6 +54,7 @@
     "node-cache": "^5.1.2",
     "openid-client": "^2.3.0",
     "p-is-promise": "^2.0.0",
+    "path-match": "^1.2.4",
     "pluralize": "^7.0.0",
     "pug": "^2.0.3",
     "shortid": "^2.2.14"

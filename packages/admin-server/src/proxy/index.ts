@@ -1,6 +1,6 @@
-import NodeCache from "node-cache";
-import { Config } from "../config";
-import { OidcCtrl } from "../oidc";
+import NodeCache from 'node-cache';
+import { Config } from '../config';
+import { OidcCtrl } from '../oidc';
 import cookie from 'cookie';
 import Koa from 'koa';
 import { v4 as uuidv4 } from 'uuid';
@@ -11,16 +11,17 @@ import pathMatch from 'path-match';
 import * as logger from '../logger';
 
 const sessionTokenCacheExpireTime = 3600;
+const phApplicationCacheExpireTime = 60;
 const route = pathMatch({
   sensitive: false,
   strict: false,
   end: false
-})
+});
 
 interface ProxyCtrlOptions {
   config: Config;
   oidcCtrl: OidcCtrl;
-};
+}
 
 interface AppData {
   appID: string;
@@ -28,13 +29,14 @@ interface AppData {
   scope: string;
   target: string;
   rewrite?: boolean;
-};
+}
 
 export class ProxyCtrl {
   private oidcCtrl: OidcCtrl;
-  private config: Config
+  private config: Config;
   private proxy;
   private sessionTokenCacheStore: NodeCache;
+  private phApplicationCacheStore: NodeCache;
   private graphqlClient: GraphQLClient;
   private apiPrefix: string;
   private apiTarget: string;
@@ -46,6 +48,7 @@ export class ProxyCtrl {
     this.oidcCtrl = oidcCtrl;
 
     this.sessionTokenCacheStore = new NodeCache({stdTTL: sessionTokenCacheExpireTime});
+    this.phApplicationCacheStore = new NodeCache({stdTTL: phApplicationCacheExpireTime});
 
     this.graphqlClient = new GraphQLClient(config.graphqlSvcEndpoint, {
       headers: {
@@ -80,7 +83,7 @@ export class ProxyCtrl {
     };
   }
 
-  private async proxyWeb (ctx, opts) {
+  private async proxyWeb(ctx, opts) {
     return new Promise((resolve, reject) => {
       const oldPath = ctx.req.url;
       const {urlRewrite} = opts;
@@ -105,34 +108,34 @@ export class ProxyCtrl {
         logger.error({
           component: logger.components.proxy,
           type: 'PROXY_WEB',
-          message: ""
+          message: ''
         });
         reject(new Error(message));
-      })
+      });
 
       ctx.res.on('finish', () => {
-        resolve(undefined)
-      })
+        resolve(undefined);
+      });
 
       this.proxy.web(ctx.req, ctx.res, opts, e => {
-        const message = `Proxying error: ${e.code}`;
+        const msg = `Proxying error: ${e.code}`;
         logger.error({
           component: logger.components.proxy,
           type: 'PROXY_WEB',
-          message: message,
+          message: msg,
         });
 
         const status = {
           ECONNREFUSED: 503,
           ETIMEOUT: 504
-        }[e.code]
-        ctx.status = status || 500
-        resolve(undefined)
+        }[e.code];
+        ctx.status = status || 500;
+        resolve(undefined);
       });
     });
   }
 
-  private createSessionToken (ctx: Koa.ParameterizedContext) {
+  private createSessionToken(ctx: Koa.ParameterizedContext) {
     const appID = ctx.params.appID;
     // Generate session token
     const sessionToken = uuidv4();
@@ -148,12 +151,12 @@ export class ProxyCtrl {
     this.sessionTokenCacheStore.set(sessionToken, true, sessionTokenCacheExpireTime);
 
     return true;
-  };
+  }
 
   private updateSessionTTL = (ctx: Koa.ParameterizedContext) => {
     const sessionToken = ctx.cookies.get('phapplication-session-id', {signed: true});
     this.sessionTokenCacheStore.ttl(sessionToken, sessionTokenCacheExpireTime);
-  };
+  }
 
   private isMemberOfGroup = async (userId: string, group: string): Promise<boolean> => {
     const variables = {
@@ -176,64 +179,64 @@ export class ProxyCtrl {
       }
     }
     return false;
-  };
+  }
 
-  private getAppData = async (appID: string): Promise<AppData> => {
-    switch (appID) {
-      case 'public':
-        return {
-          appID,
-          scope: 'public',
-          group: 'phusers',
-          target: 'http://localhost:5000',
-          rewrite: true,
-        };
-      case 'primehub':
-        return {
-          appID,
-          scope: 'primehub',
-          group: 'phusers',
-          target: 'http://localhost:5000',
-          rewrite: true,
-        };
-      case 'group':
-        return {
-          appID,
-          scope: 'group',
-          group: 'phusers',
-          target: 'http://localhost:5000',
-          rewrite: true,
-        };
-      case 'mlflow-xyzab':
-        return {
-          appID,
-          scope: 'group',
-          group: 'phusers',
-          target: 'http://app-mlflow-xyzab:5000',
-          rewrite: false,
-        };
-      case 'code-server-xyzab':
-        return {
-          appID,
-          scope: 'group',
-          group: 'phusers',
-          target: 'http://app-code-server-xyzab:8080',
-          rewrite: true,
-        };
+  private queryAppData = async (appID: string): Promise<AppData> => {
+    const variables = {
+      id: appID
+    };
+    const query = gql`
+    query ($id: ID!) {
+      phApplication(where: {id: $id}){
+        id
+        scope
+        groupName
+        internalAppUrl
+        status
+      }
+    }`;
+    const data = await this.graphqlClient.request(query, variables);
+
+    if (data.phApplication === null || data.phApplication.status !== 'Ready') {
+      return undefined;
     }
 
-    // todo: get the app data from graphql and cache
-    //
-    // this.graphqlClient.request(...)
-    return undefined;
+    const internalAppUrl = new URL(data.phApplication.internalAppUrl);
+    return {
+      appID,
+      scope: data.phApplication.scope,
+      group: data.phApplication.groupName,
+      target: `${internalAppUrl.protocol}//${internalAppUrl.host}`,
+      rewrite: false,
+    };
+  }
+
+  private getAppData = async (appID: string): Promise<AppData> => {
+    const cachedAppData: AppData = this.phApplicationCacheStore.get(appID);
+    if (cachedAppData) {
+      return cachedAppData;
+    }
+    try {
+      const appData = await this.queryAppData(appID);
+      this.phApplicationCacheStore.set(appID, appData, phApplicationCacheExpireTime);
+      return appData;
+    } catch (error) {
+      const msg = (error.response.errors) ? error.response.errors.map(e => e.message) : error;
+      logger.error({
+        appID,
+        reason: 'getAppData failed',
+        message: msg
+      });
+      return undefined;
+    }
   }
 
   private handleAppWeb = async (ctx: Koa.ParameterizedContext, next: any) => {
     const appID = ctx.params.appID;
-    const prefix = `${this.config.appPrefix}/apps/${appID}`
+    const prefix = `${this.config.appPrefix}/apps/${appID}`;
     const appData = await this.getAppData(appID);
     if (!appData) {
-      next;
+      return next();
     }
 
     if (ctx.url === prefix) {
@@ -254,7 +257,7 @@ export class ProxyCtrl {
         const sessionToken = ctx.cookies.get('phapplication-session-id', {signed: true}) || '';
         const cachedSessionToken = this.sessionTokenCacheStore.get(sessionToken);
         if (!cachedSessionToken) {
-          // authentication and authroization
+          // authentication and authorization
           return this.oidcCtrl.loggedIn(ctx, async () => {
             if (appData.scope === 'group') {
               const isGroupMember = await this.isMemberOfGroup(ctx.state.userId, appData.group);
@@ -275,7 +278,7 @@ export class ProxyCtrl {
       default:
         throw Boom.badRequest('bad request');
     }
-  };
+  }
 
   private handleFiles = async (ctx: Koa.ParameterizedContext, next: any) => {
     const target = this.apiTarget;
@@ -306,14 +309,14 @@ export class ProxyCtrl {
       }
 
       const {appID} = params;
-      const appData = await this.getAppData(appID)
+      const appData = await this.getAppData(appID);
       if (!appData) {
         return;
       }
 
       const oldPath = req.url;
       if (appData.rewrite) {
-        const prefix = `${this.config.appPrefix}/apps/${appID}`
+        const prefix = `${this.config.appPrefix}/apps/${appID}`;
         req.url = req.url.slice(prefix.length);
       }
 
@@ -333,12 +336,11 @@ export class ProxyCtrl {
         logger.error({
           component: logger.components.proxy,
           type: 'PROXY_WS_ERROR',
-          erorr: e,
+          error: e,
         });
       });
-    }
-  };
-
+    };
+  }
 
   public mount(rootRouter) {
     rootRouter.all(`/apps/:appID`, this.handleAppWeb);
