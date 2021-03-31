@@ -10,6 +10,7 @@ import {graphql} from 'react-apollo';
 import Breadcrumbs, {BreadcrumbItemSetup} from 'components/share/breadcrumb';
 import {PhJobsConnection} from 'queries/PhJob.graphql';
 import moment from 'moment';
+import groupBy from 'lodash.groupby'
 
 const breadcrumbs: BreadcrumbItemSetup[] = [
   {
@@ -70,6 +71,7 @@ class Landing extends React.Component<Props> {
         statusColor: j.node.phase === "Succeeded" ? "green" : "red"
       };
     })
+    const groupedTasks = groupBy(recentTasks, t => t.time.startOf('date').fromNow())
     return (
       <Layout>
         <PageTitle
@@ -124,18 +126,22 @@ class Landing extends React.Component<Props> {
               <Divider></Divider>
               <ThinTitle level={2}>Recent</ThinTitle>
               <SubContent>
-                <ThinTitle level={3}>Yesterday</ThinTitle>
-                  <GuideList>
-                    {recentTasks.map(t => {
-                      return (
-                        <li>
-                          <a href=''>[{t.type}] {t.name}</a> <Tag color={t.statusColor}>{t.status}</Tag>
-                          <br/>
-                          <Text type="secondary">{t.time.isValid() ? t.time.format("YYYY-MM-DD HH:mm:ss") : ''}</Text>
-                        </li>
-                      )
-                    })}
-                  </GuideList>
+                {Object.keys(groupedTasks).map((k, i) => {
+                  return (<React.Fragment>
+                    <ThinTitle level={3} style={{marginTop: i > 0 ? '0.5em' : ''}}>{k}</ThinTitle>
+                    <GuideList>
+                      {groupedTasks[k].map(t => {
+                        return (
+                          <li>
+                            <a href=''>[{t.type}] {t.name}</a> <Tag color={t.statusColor}>{t.status}</Tag>
+                            <br/>
+                            <Text type="secondary">{t.time.isValid() ? t.time.format("YYYY-MM-DD HH:mm:ss") : ''}</Text>
+                          </li>
+                        )
+                      })}
+                    </GuideList>
+                  </React.Fragment>)
+                })}
               </SubContent>
             </Content>
           </Col>
