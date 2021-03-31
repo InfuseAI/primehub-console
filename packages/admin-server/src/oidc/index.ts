@@ -299,11 +299,14 @@ export class OidcCtrl {
   public logout = async (ctx: any) => {
     const qs = querystring.stringify({redirect_uri: `${this.cmsHost}${this.defaultReturnPath}`});
     const accessToken = new Token(ctx.cookies.get('accessToken', {signed: true}), this.clientId);
-    ctx.cookies.set('accessToken', null);
-    ctx.cookies.set('refreshToken', null);
-    ctx.cookies.set('username', null);
-    ctx.cookies.set('thumbnail', null);
-    ctx.cookies.set(NONCE_COOKIE, null);
+    const opts = {
+      path: this.cookiePath,
+    };
+    ctx.cookies.set('accessToken', null, opts);
+    ctx.cookies.set('refreshToken', null, opts);
+    ctx.cookies.set('username', null, opts);
+    ctx.cookies.set('thumbnail', null, opts);
+    ctx.cookies.set(NONCE_COOKIE, null, opts);
 
     logger.info({
       component: logger.components.user,
