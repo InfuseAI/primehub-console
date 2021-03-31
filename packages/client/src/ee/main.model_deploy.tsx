@@ -13,6 +13,7 @@ import { createGraphqlClient } from 'utils/graphqlClient';
 import iconModels from 'images/icon-models.svg'
 import iconShareFiles from 'images/icon-files.svg';
 import iconApps from 'images/icon-apps.svg';
+import iconSettings from 'images/icon-settings.svg';
 
 // Components
 import ListContainer from 'containers/list';
@@ -21,7 +22,9 @@ import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
-
+import GroupSettingsPage from 'containers/groupSettingsPage';
+import GroupSettingsJobs from 'ee/components/groupSettings/jobs';
+import GroupSettingsModels from 'ee/components/groupSettings/models';
 
 const client = createGraphqlClient({
   fakeData,
@@ -65,7 +68,20 @@ class Main extends React.Component {
           marginRight: '-4px',
           marginTop: '-2px',
         },
-      }
+      },
+      {
+        title: 'Settings',
+        subPath: 'settings',
+        icon: iconSettings,
+        groupAdminOnly: true,
+        style: {
+          width: 'auto',
+          height: 21,
+          marginLeft: '-1px',
+          marginRight: '-4px',
+          marginTop: '-3px',
+        }
+      },
     ];
 
     return (
@@ -93,6 +109,14 @@ class Main extends React.Component {
               exact
             >
               <DeploymentEditPage />
+            </Route>
+
+            {/* Group Settings */}
+            <Route path={`${appPrefix}g/:groupName/settings`}>
+              <GroupSettingsPage extraTabs={[
+                { component: GroupSettingsJobs, key: 'jobs', tab: 'Jobs' },
+                { component: GroupSettingsModels, key: 'models', tab: 'Models' },
+              ]} />
             </Route>
           </MainPage>
         </ApolloProvider>
