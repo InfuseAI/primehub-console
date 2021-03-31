@@ -9,11 +9,12 @@ import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
 import {errorHandler} from 'utils/errorHandler';
 import DeploymentCreateForm from 'ee/components/modelDeployment/createForm';
-import {GroupFragment} from 'containers/list';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
-import { GroupContextComponentProps, withGroupContext } from 'context/group';
+import {GroupContextComponentProps, withGroupContext} from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
+import {sortNameByAlphaBet} from 'utils/sorting';
+import {CurrentUser} from 'queries/User.graphql';
 
 const breadcrumbs = [
   {
@@ -29,21 +30,6 @@ const breadcrumbs = [
   }
 ];
 
-
-export const GET_MY_GROUPS = gql`
-  query me {
-    me {
-      id
-      groups {
-        ...GroupInfo
-        instanceTypes { id name displayName description spec global gpuLimit memoryLimit cpuLimit }
-        images { id name displayName description spec global type }
-      }
-    }
-  }
-  ${GroupFragment}
-`
-
 export const CREATE_DEPLOYMENT = gql`
   mutation createPhDeployment($data: PhDeploymentCreateInput!) {
     createPhDeployment(data: $data) {
@@ -52,31 +38,15 @@ export const CREATE_DEPLOYMENT = gql`
   }
 `;
 
-const compareByAlphabetical = (prev, next) => {
-  if(prev < next) return -1;
-  if(prev > next) return 1;
-  return 0;
-}
-
-export const sortItems = (items) => {
-  const copiedItems = items.slice();
-  copiedItems
-    .sort((prev, next) => {
-      const prevName = prev.displayName || prev.name;
-      const nextName = next.displayName || next.name;
-      return compareByAlphabetical(prevName, nextName);
-    });
-  return copiedItems;
-}
-
 type Props = RouteComponentProps & GroupContextComponentProps & {
-  getGroups: any;
+  currentUser: any;
   createPhDeployment: any;
   createPhDeploymentResult: any;
-}
+};
+
 type State = {
   selectedGroup: string | null;
-}
+};
 
 class DeploymentCreatePage extends React.Component<Props, State> {
   state = {
@@ -87,7 +57,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
     this.setState({selectedGroup: id});
   }
 
-  onSubmit = (payload) => {
+  onSubmit = payload => {
     const {createPhDeployment} = this.props;
     createPhDeployment({
       variables: {
@@ -98,9 +68,9 @@ class DeploymentCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {groupContext, getGroups, createPhDeploymentResult, history} = this.props;
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
-    const allGroups = get(getGroups, 'me.groups', []).filter(group => group.enabledDeployment || group.id === everyoneGroupId);
+    const {groupContext, currentUser, createPhDeploymentResult, history} = this.props;
+    const everyoneGroupId = window.EVERYONE_GROUP_ID;
+    const allGroups = get(currentUser, 'me.groups', []).filter(group => group.enabledDeployment || group.id === everyoneGroupId);
     const groups = allGroups
       .filter(group => group.id !== everyoneGroupId)
       .filter(group => !groupContext || groupContext.id === group.id );
@@ -121,19 +91,19 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       <React.Fragment>
         <PageTitle
           breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-          title={"Create Deployment"}
+          title={'Create Deployment'}
         />
         <div style={{margin: '16px'}}>
           <DeploymentCreateForm
             groupContext={groupContext}
-            refetchGroup={getGroups.refetch}
+            refetchGroup={currentUser.refetch}
             onSelectGroup={this.onChangeGroup}
             selectedGroup={selectedGroup}
-            groups={sortItems(groups)}
-            instanceTypes={sortItems(instanceTypes)}
-            images={sortItems(images)}
+            groups={sortNameByAlphaBet(groups)}
+            instanceTypes={sortNameByAlphaBet(instanceTypes)}
+            images={sortNameByAlphaBet(images)}
             onSubmit={this.onSubmit}
-            loading={getGroups.loading || createPhDeploymentResult.loading}
+            loading={currentUser.loading || createPhDeploymentResult.loading}
           />
         </div>
       </React.Fragment>
@@ -144,8 +114,9 @@ class DeploymentCreatePage extends React.Component<Props, State> {
 export default compose(
   withRouter,
   withGroupContext,
-  graphql(GET_MY_GROUPS, {
-    name: 'getGroups'
+  graphql(CurrentUser, {
+    alias: 'withCurrentUser',
+    name: 'currentUser'
   }),
   graphql(CREATE_DEPLOYMENT, {
     options: (props: Props) => ({

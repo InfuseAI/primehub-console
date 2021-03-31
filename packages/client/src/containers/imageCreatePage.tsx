@@ -8,12 +8,12 @@ import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {errorHandler} from 'utils/errorHandler';
 import ImageCreateForm from 'components/images/createForm';
-import {GroupFragment} from 'containers/list';
 import PageTitle from 'components/pageTitle';
 import {withRouter} from 'react-router-dom';
 import {withGroupContext, GroupContextComponentProps} from 'context/group';
 import {withUserContext, UserContextComponentProps} from 'context/user';
 import Breadcrumbs from 'components/share/breadcrumb';
+import {CurrentUser} from 'queries/User.graphql';
 
 const breadcrumbs = [
   {
@@ -29,32 +29,6 @@ const breadcrumbs = [
   }
 ];
 
-export const GET_MY_GROUPS = gql`
-  query me {
-    me {
-      id
-      groups {
-        ...GroupInfo
-        images {
-          id
-          name
-          displayName
-          description
-          groupName
-          isReady
-          url
-          urlForGpu
-          useImagePullSecret
-          spec
-          global
-          type
-        }
-      }
-    }
-  }
-  ${GroupFragment}
-`;
-
 export const CREATE_IMAGE = gql`
   mutation createImage($data: ImageCreateInput!) {
     createImage(data: $data) {
@@ -64,25 +38,8 @@ export const CREATE_IMAGE = gql`
   }
 `;
 
-const compareByAlphabetical = (prev, next) => {
-  if (prev < next) return -1;
-  if (prev > next) return 1;
-  return 0;
-};
-
-export const sortItems = items => {
-  const copiedItems = items.slice();
-  copiedItems
-    .sort((prev, next) => {
-      const prevName = prev.displayName || prev.name;
-      const nextName = next.displayName || next.name;
-      return compareByAlphabetical(prevName, nextName);
-    });
-  return copiedItems;
-};
-
 interface Props extends RouteComponentProps, GroupContextComponentProps, UserContextComponentProps {
-  getGroups: any;
+  currentUser: any;
   createImage: any;
   createImageResult: any;
   defaultValue?: object;
@@ -116,12 +73,12 @@ class ImageCreatePage extends React.Component<Props, State> {
   }
 
   render() {
-    const {userContext, groupContext, history, getGroups, createImageResult, defaultValue} = this.props;
+    const {userContext, groupContext, history, currentUser, createImageResult, defaultValue} = this.props;
     if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
       history.push(`../home`);
     }
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
-    const allGroups = get(getGroups, 'me.groups', []);
+    const everyoneGroupId = window.EVERYONE_GROUP_ID;
+    const allGroups = get(currentUser, 'me.groups', []);
     const groups = allGroups
       .filter(record => record.id !== everyoneGroupId)
       .filter(record => !groupContext || groupContext.id === record.id);
@@ -139,7 +96,7 @@ class ImageCreatePage extends React.Component<Props, State> {
           margin: '16px',
         }}>
 
-          {getGroups.loading ? (
+          {currentUser.loading ? (
             <Row>
               <Col>
                 <Card>
@@ -152,7 +109,7 @@ class ImageCreatePage extends React.Component<Props, State> {
           ) : (
             <ImageCreateForm
               showResources={true}
-              refetchGroup={getGroups.refetch}
+              refetchGroup={currentUser.refetch}
               initialValue={defaultValue}
               availableImages={availableImages}
               onSubmit={this.onSubmit}
@@ -170,8 +127,9 @@ export default compose(
   withRouter,
   withGroupContext,
   withUserContext,
-  graphql(GET_MY_GROUPS, {
-    name: 'getGroups'
+  graphql(CurrentUser, {
+    alias: 'withCurrentUser',
+    name: 'currentUser'
   }),
   graphql(CREATE_IMAGE, {
     options: (props: Props) => ({

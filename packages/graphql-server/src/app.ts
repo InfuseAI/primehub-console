@@ -95,6 +95,7 @@ export const resolvers = {
     files: store.query,
     phApplication: phApplication.queryOne,
     phApplications: phApplication.query,
+    phApplicationsConnection: phApplication.connectionQuery,
     phAppTemplate: phAppTemplate.queryOne,
     phAppTemplates: phAppTemplate.query,
     ...instanceType.resolvers(),

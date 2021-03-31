@@ -1,4 +1,6 @@
 # import PageInfo from "common.graphql"
+# import InstanceType from "instanceType.graphql"
+# import PhAppTemplate from "phAppTemplate.graphql"
 
 type Pod {
   name: String
@@ -21,9 +23,13 @@ type PhApplication {
   id: ID!
   displayName: String
   appName: String
+  appVersion: String
+  appIcon: String
   appDefaultEnv: [DefaultEnvVar]
+  appTemplate: PhAppTemplate
   groupName: String
   instanceType: String
+  instanceTypeSpec: InstanceType
   scope: String
   appUrl: String
   internalAppUrl: String
@@ -44,7 +50,7 @@ type PhApplicationEdge {
   cursor: String!
 }
 
-type PhApplicationConnection {
+type PhApplicationsConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
@@ -59,6 +65,7 @@ input PhApplicationWhereUniqueInput {
 input PhApplicationWhereInput {
   id: ID
   appName_contains: String
+  groupName_in: [String]
 }
 
 
@@ -66,7 +73,7 @@ input PhApplicationWhereInput {
 input PhApplicationCreateInput {
   templateId: String
   id: ID!
-  name: String
+  displayName: String
   groupName: String
   env: JSON
   instanceType: String
@@ -76,6 +83,5 @@ input PhApplicationCreateInput {
 input PhApplicationUpdateInput {
   env: JSON
   instanceType: String
-  scope: String
 }
 

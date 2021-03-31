@@ -26,7 +26,7 @@ export interface DeploymentConnection {
   edges: Array<{
     cursor: string;
     node: DeploymentInfo;
-  }>
+  }>;
 }
 
 export interface HistoryItem {
@@ -55,19 +55,19 @@ export interface DeploymentInfo {
   metadata: object;
   groupId: string;
   groupName: string;
-  creationTime: string
+  creationTime: string;
   lastUpdatedTime: string;
   endpoint: string;
   endpointAccessType: string;
-  endpointClients: Array<ClientItem>;
+  endpointClients: ClientItem[];
   modelImage: string;
   modelURI: string;
   pods: Array<{
     name: string;
     logEndpoint: string;
     phase: Phase;
-  }>,
-  availableReplicas: number,
+  }>;
+  availableReplicas: number;
   replicas: number;
   imagePullSecret: string;
   instanceType: {
@@ -78,7 +78,7 @@ export interface DeploymentInfo {
     memoryLimit: number;
     gpuLimit: number;
   };
-  history: Array<HistoryItem>;
+  history: HistoryItem[];
 }
 
 export const PhDeploymentFragment = gql`

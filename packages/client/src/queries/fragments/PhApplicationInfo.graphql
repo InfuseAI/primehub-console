@@ -1,0 +1,42 @@
+fragment PhApplicationInfo on PhApplication {
+  id
+  displayName
+  appVersion
+  appName
+  appIcon
+  appDefaultEnv {
+    name
+    defaultValue
+    optional
+    description
+  }
+  appTemplate {
+    name
+    docLink
+    description
+  }
+  groupName
+  instanceType
+  instanceTypeSpec {
+    name
+    displayName
+    cpuLimit
+    memoryLimit
+    gpuLimit
+  }
+  scope
+  appUrl
+  internalAppUrl
+  svcEndpoints
+  env {
+    name
+    value
+  }
+  stop
+  status
+  message
+  pods {
+    logEndpoint
+  }
+}
+

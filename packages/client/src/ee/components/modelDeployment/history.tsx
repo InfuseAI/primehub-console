@@ -4,7 +4,7 @@ import {renderTime, renderInstanceType} from 'ee/components/modelDeployment/deta
 import Field from 'components/share/field';
 import {HistoryItem} from 'ee/components/modelDeployment/common';
 import Metadata from 'ee/components/modelDeployment/metadata';
-import EnvList from 'ee/components/modelDeployment/envList';
+import EnvList from 'components/share/envList';
 import moment from 'moment';
 import styled from 'styled-components';
 

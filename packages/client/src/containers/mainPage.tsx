@@ -4,39 +4,16 @@ import {Route, Switch, RouteComponentProps} from 'react-router-dom';
 import Header from 'components/header';
 import GroupSelector from 'components/groupSelector';
 import Sidebar from 'components/main/sidebar';
-import styled from 'styled-components';
 import {get} from 'lodash';
 import { Redirect, withRouter } from 'react-router';
 import {appPrefix} from 'utils/env';
-import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import { GroupContextValue, GroupContext } from 'context/group';
 import { UserContextValue, UserContext } from 'context/user';
 import { Landing } from '../landing';
 import ApiTokenPage from 'containers/apiTokenPage';
-
-export const GroupFragment = gql`
-  fragment GroupInfo on Group {
-    id
-    displayName
-    name
-    admins
-  }
-`;
-
-export const GET_MY_GROUPS = gql`
-  query me {
-    me {
-      id
-      username
-      groups {
-        ...GroupInfo
-      }
-    }
-  }
-  ${GroupFragment}
-`;
+import {CurrentUser} from 'queries/User.graphql';
 
 export interface MainPageSidebarItem {
   title: string;
@@ -51,7 +28,7 @@ export type MainPageProps = {
   sidebarItems: MainPageSidebarItem[];
   notification?: React.ReactNode;
   children?: React.ReactNode;
-  getMyGroups: any;
+  currentUser: any;
 } & RouteComponentProps;
 
 export interface MainPageState {
@@ -89,9 +66,9 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
     groups: Array<GroupContextValue>,
     me: UserContextValue
   } {
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
-    const {getMyGroups} = this.props;
-    const {loading, error, me} = getMyGroups;
+    const everyoneGroupId = window.EVERYONE_GROUP_ID;
+    const {currentUser} = this.props;
+    const {loading, error, me} = currentUser;
     const groups = !loading && !error && me ?
       me.groups.filter(group => group.id !== everyoneGroupId) :
       undefined;
@@ -161,6 +138,10 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
         <Route path={`${appPrefix}g/:groupName/:actionKey`}>
           <Landing includeHeader={false} />
         </Route>
+
+        <Route path='/'>
+          <Redirect to={`${appPrefix}g`} />
+        </Route>
       </Switch>;
     }
 
@@ -209,16 +190,17 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
         </Layout>
       </UserContext.Provider>
       </GroupContext.Provider>
-    )
+    );
   }
 }
 
 export default compose(
   withRouter,
-  graphql(GET_MY_GROUPS, {
-    name: 'getMyGroups',
-    options: (props: any) => ({
+  graphql(CurrentUser, {
+    alias: 'withCurrentUser',
+    name: 'currentUser',
+    options: () => ({
       fetchPolicy: 'cache-and-network'
     }),
   })
-)(MainPage)
+)(MainPage);

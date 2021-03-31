@@ -13,7 +13,7 @@ resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/index.ce.schema.
 
 module.exports = {
   entry: {
-    index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
+    cms: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
     'main': devMode ? './src/main.ce.tsx' : ['./src/public-import.js', './src/main.ce.tsx'],
   },
@@ -30,11 +30,11 @@ module.exports = {
     contentBase: path.join(__dirname, 'dist'),
     historyApiFallback: {
       rewrites: [
-        { from: /^\/g/, to: '/main.html' },
-        { from: /^\/app-prefix\/g/, to: '/main.html' },
+        { from: /^\/g/, to: '/index.html' },
+        { from: /^\/app-prefix\/g/, to: '/index.html' },
         { from: /^\/landing$/, to: '/landing.html' },
         { from: /^\/app-prefix\/landing/, to: '/landing.html' },
-        { from: /./, to: '/index.html' }
+        { from: /./, to: '/cms.html' }
       ]
     },
     https: false
@@ -56,6 +56,11 @@ module.exports = {
             })]
           }),
         }
+      },
+      {
+        test: /\.(graphql|gql)$/,
+        exclude: /node_modules/,
+        loader: 'graphql-tag/loader',
       },
       {
         test: /(\.schema\.js|canner\.def\.js)$/,
@@ -89,9 +94,9 @@ module.exports = {
   },
   plugins: [
     new HtmlWebPackPlugin({
-      chunks: ['index'],
+      chunks: ['cms'],
       template: 'docs/index.html',
-      filename: 'index.html'
+      filename: 'cms.html'
     }),
     new HtmlWebPackPlugin({
       chunks: ['landing'],
@@ -101,7 +106,7 @@ module.exports = {
     new HtmlWebPackPlugin({
       chunks: ['main'],
       template: 'docs/index.html',
-      filename: 'main.html'
+      filename: 'index.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({

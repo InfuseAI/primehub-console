@@ -1,0 +1,56 @@
+#import './fragments/PhApplicationInfo.graphql'
+query GetPhApplication($where: PhApplicationWhereUniqueInput!) {
+  phApplication(where: $where) {
+    ...PhApplicationInfo
+  }
+}
+
+query PhApplicationsConnection($where: PhApplicationWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
+  phApplicationsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
+    pageInfo {
+      hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+    }
+    edges {
+      cursor
+        node {
+          ...PhApplicationInfo
+        }
+    }
+  }
+}
+
+# Mutations
+
+mutation CreatePhApplication($data: PhApplicationCreateInput!) {
+  createPhApplication(data: $data) {
+    id
+  }
+}
+
+mutation UpdatePhApplication($where: PhApplicationWhereUniqueInput!, $data: PhApplicationUpdateInput!) {
+  updatePhApplication(where: $where, data: $data) {
+    ...PhApplicationInfo
+  }
+}
+
+mutation DeletePhApplication($where: PhApplicationWhereUniqueInput!) {
+  deletePhApplication(where: $where) {
+    ...PhApplicationInfo
+  }
+}
+
+mutation StartPhApplication($where: PhApplicationWhereUniqueInput!) {
+  startPhApplication(where: $where) {
+    ...PhApplicationInfo
+  }
+}
+
+mutation StopPhApplication($where: PhApplicationWhereUniqueInput!) {
+  stopPhApplication(where: $where) {
+    ...PhApplicationInfo
+  }
+}
+

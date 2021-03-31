@@ -3,13 +3,12 @@ import { Icon, Modal, Card, Divider, Row, Col, Tabs, Input, Button, message} fro
 import { DeploymentInfo, Status, ClientResult } from './common';
 import PageTitle from 'components/pageTitle';
 import InfuseButton from 'components/infuseButton';
-import { appPrefix } from 'utils/env';
 import {Link} from 'react-router-dom';
 import Field from 'components/share/field';
 import ModelDeploymentLogs from 'ee/components/modelDeployment/logs';
 import ModelDeploymentHistory from 'ee/components/modelDeployment/history';
 import Metadata from 'ee/components/modelDeployment/metadata';
-import EnvList from 'ee/components/modelDeployment/envList';
+import EnvList from 'components/share/envList';
 import Message from 'components/share/message';
 import moment from 'moment';
 import ModelDeploymentClients from './client';
@@ -17,29 +16,23 @@ import Breadcrumbs from 'components/share/breadcrumb';
 
 const {confirm} = Modal;
 
-type Props = {
-  //
-  stopPhDeployment: Function;
+interface Props {
+  stopPhDeployment: ({}) => void;
   stopPhDeploymentResult: any;
-  //
-  deletePhDeployment: Function;
+  deletePhDeployment: ({}) => void;
   deletePhDeploymentResult: any;
-  //
-  deployPhDeployment: Function;
+  deployPhDeployment: ({}) => void;
   deployPhDeploymentResult: any;
-  //
-  createPhDeploymentClient: Function;
+  createPhDeploymentClient: ({}) => void;
   createPhDeploymentClientResult: any;
-  //
-  deletePhDeploymentClient: Function;
+  deletePhDeploymentClient: ({}) => void;
   deletePhDeploymentClientResult: any;
-  //
-  refetchPhDeployment: Function;
+  refetchPhDeployment: ({}) => void;
   phDeployment: DeploymentInfo;
   history: any;
 }
 
-type State = {
+interface State {
   clientAdded: ClientResult;
   revealEnv: boolean;
 }
@@ -153,53 +146,53 @@ export default class Detail extends React.Component<Props, State> {
     const {phDeployment} = this.props;
     const example = `curl -X POST \\\n` +
     (phDeployment.endpointAccessType === 'private' ?
-    `    -u <client-name>:<client-token> \\\n` : "") +
-    `    -d '{"data":{"names":["a","b"],"tensor":{"shape":[2,2],"values":[0,0,1,1]}}}' \\\n`+
+    `    -u <client-name>:<client-token> \\\n` : '') +
+    `    -d '{"data":{"names":["a","b"],"tensor":{"shape":[2,2],"values":[0,0,1,1]}}}' \\\n` +
     `    -H "Content-Type: application/json" \\\n` +
     `    ${phDeployment.endpoint || '<endpoint>'}`;
     const revealBtn = (
       <span onClick={this.toggleEnvVisibilty} style={{cursor: 'pointer', verticalAlign: '-0.05em'}}>
-      { revealEnv ? <Icon type="eye" title='Hide value' /> : <Icon type="eye-invisible" title="Show value" /> }
+      { revealEnv ? <Icon type='eye' title='Hide value' /> : <Icon type='eye-invisible' title='Show value' /> }
       </span>
-    )
+    );
 
     return (
       <div style={{padding: '16px 36px'}}>
         <Row gutter={36}>
           <Col span={24}>
-            <Field labelCol={4} valueCol={20} label="Status" value={<strong>{phDeployment.status}</strong>} />
-            <Field labelCol={4} valueCol={20} label="Message" value={getMessage(phDeployment)} />
-            <Field labelCol={4} valueCol={20} label="Endpoint" value={phDeployment.status === Status.Deployed ? phDeployment.endpoint : '-'} />
-            <Field labelCol={4} valueCol={20} label="Creation Time" value={renderTime(phDeployment.creationTime)} />
-            <Field labelCol={4} valueCol={20} label="Last Updated" value={renderTime(phDeployment.lastUpdatedTime)} />
+            <Field labelCol={4} valueCol={20} label='Status' value={<strong>{phDeployment.status}</strong>} />
+            <Field labelCol={4} valueCol={20} label='Message' value={getMessage(phDeployment)} />
+            <Field labelCol={4} valueCol={20} label='Endpoint' value={phDeployment.status === Status.Deployed ? phDeployment.endpoint : '-'} />
+            <Field labelCol={4} valueCol={20} label='Creation Time' value={renderTime(phDeployment.creationTime)} />
+            <Field labelCol={4} valueCol={20} label='Last Updated' value={renderTime(phDeployment.lastUpdatedTime)} />
           </Col>
         </Row>
         <Divider />
         <Row gutter={36}>
           <Col span={12}>
-            <Field label="Model Image" value={phDeployment.status !== Status.Stopped ? phDeployment.modelImage : '-'} />
-            <Field label="Image Pull Secret" value={phDeployment.imagePullSecret ? phDeployment.imagePullSecret : '-'} />
-            <Field label="Model URI" value={(phDeployment.status !== Status.Stopped && phDeployment.modelURI) ? phDeployment.modelURI : '-'} />
-            <Field label="Description" value={(
+            <Field label='Model Image' value={phDeployment.status !== Status.Stopped ? phDeployment.modelImage : '-'} />
+            <Field label='Image Pull Secret' value={phDeployment.imagePullSecret ? phDeployment.imagePullSecret : '-'} />
+            <Field label='Model URI' value={(phDeployment.status !== Status.Stopped && phDeployment.modelURI) ? phDeployment.modelURI : '-'} />
+            <Field label='Description' value={(
               <div style={{whiteSpace: 'pre-line'}}>
                 {phDeployment.description || '-'}
               </div>
             )} />
-            <Field label="Instance Type" value={phDeployment.status !== Status.Stopped ? renderInstanceType(phDeployment.instanceType || {}) : '-'} />
-            <Field label="Replicas" value={`${(phDeployment.availableReplicas || 0)}/${phDeployment.replicas}`} />
-            <Field label="Access Type" value={phDeployment.endpointAccessType === 'private' ? 'private' : 'public'} />
+            <Field label='Instance Type' value={phDeployment.status !== Status.Stopped ? renderInstanceType(phDeployment.instanceType || {}) : '-'} />
+            <Field label='Replicas' value={`${(phDeployment.availableReplicas || 0)}/${phDeployment.replicas}`} />
+            <Field label='Access Type' value={phDeployment.endpointAccessType === 'private' ? 'private' : 'public'} />
           </Col>
           <Col span={12}>
-            <Field type="vertical" label="Metadata" value={<Metadata metadata={phDeployment.metadata} />} />
-            <Field type="vertical" label={<span>Environment Variables {revealBtn}</span>} value={<EnvList envList={phDeployment.env} valueVisibility={revealEnv} />} />
+            <Field type='vertical' label='Metadata' value={<Metadata metadata={phDeployment.metadata} />} />
+            <Field type='vertical' label={<span>Environment Variables {revealBtn}</span>} value={<EnvList envList={phDeployment.env} valueVisibility={revealEnv} />} />
           </Col>
         </Row>
-        <Field style={{marginTop: 32}} type="vertical" label="Run an Example" value={(
+        <Field style={{marginTop: 32}} type='vertical' label='Run an Example' value={(
           <>
             <Button
-              icon="copy"
+              icon='copy'
               ghost={true}
-              size="small"
+              size='small'
               style={{
                 float: 'right',
                 top: 35,

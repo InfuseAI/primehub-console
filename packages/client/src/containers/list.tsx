@@ -1,5 +1,4 @@
 import * as React from 'react';
-import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {get} from 'lodash';
@@ -7,59 +6,11 @@ import queryString from 'querystring';
 import {withRouter} from 'react-router';
 import {RouteComponentProps} from 'react-router-dom';
 import withPath, { PathComponentProps } from 'ee/components/job/withPath';
-import {appPrefix} from 'utils/env';
-import {withGroupContext, GroupContextComponentProps, GroupContext} from 'context/group';
-import {ImageFragment} from 'containers/imageList';
-
-export const GroupFragment = gql`
-  fragment GroupInfo on Group {
-    id
-    displayName
-    name
-    quotaCpu
-    quotaGpu
-    quotaMemory
-    datasets {
-      displayName
-    }
-    resourceStatus {
-      cpuUsage
-      memUsage
-      gpuUsage
-    }
-    enabledDeployment
-    jobDefaultActiveDeadlineSeconds
-  }
-`;
-
-export const GET_MY_GROUPS = gql`
-  query me {
-    me {
-      id
-      groups {
-        ...GroupInfo
-        images {
-          id
-          name
-          displayName
-          description
-          groupName
-          isReady
-          url
-          urlForGpu
-          useImagePullSecret
-          spec
-          global
-          type
-        }
-      }
-    }
-  }
-  ${GroupFragment}
-`;
+import {withGroupContext, GroupContextComponentProps} from 'context/group';
+import {CurrentUser} from 'queries/User.graphql';
 
 type Props = {
-  getMyGroups: any;
+  currentUser: any;
   Com: any;
 } & RouteComponentProps
   & PathComponentProps
@@ -69,14 +20,14 @@ class ListContainer extends React.Component<Props> {
   render() {
     const {
       groupContext,
-      getMyGroups,
+      currentUser,
       Com,
     } = this.props;
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
-    if (getMyGroups.loading) return null;
-    if (getMyGroups.error) return 'Error';
+    const everyoneGroupId = window.EVERYONE_GROUP_ID;
+    if (currentUser.loading) return null;
+    if (currentUser.error) return 'Error';
 
-    const groups = get(getMyGroups, 'me.groups', [])
+    const groups = get(currentUser, 'me.groups', [])
       .filter(group => group.id !== everyoneGroupId);
 
     return (
@@ -92,10 +43,11 @@ export default compose(
   withRouter,
   withPath,
   withGroupContext,
-  graphql(GET_MY_GROUPS, {
-    name: 'getMyGroups',
+  graphql(CurrentUser, {
+    alias: 'withCurrentUser',
+    name: 'currentUser',
     options: (props: Props) => ({
-      onCompleted: data => {
+      onCompleted: () => {
         // default  page=1
         if (props.location.search) return;
         props.history.replace({
@@ -106,4 +58,4 @@ export default compose(
       fetchPolicy: 'cache-and-network'
     }),
   })
-)(ListContainer)
+)(ListContainer);

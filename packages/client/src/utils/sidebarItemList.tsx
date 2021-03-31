@@ -4,6 +4,8 @@ import iconSchedule from 'images/icon-schedule.svg';
 import iconModels from 'images/icon-models.svg';
 import iconImages from 'images/icon-images.png';
 import iconShareFiles from 'images/icon-files.svg';
+import iconApps from 'images/icon-apps.svg';
+
 export const listEE = [
   {
     title: 'Notebooks',
@@ -79,8 +81,19 @@ export const listEE = [
       marginLeft: '1px',
       marginRight: '-1px',
       marginTop: '-3px',
-    }
+    },
   },
+  {
+    title: 'Apps',
+    subPath: 'apps',
+    icon: iconApps,
+    style: {
+      width: 'auto',
+      height: 20,
+      marginRight: '-4px',
+      marginTop: '-2px',
+    },
+  }
 ];
 
 export const listCE = listEE.filter(item => !item.EEOnly);

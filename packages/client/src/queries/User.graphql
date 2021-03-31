@@ -1,0 +1,35 @@
+#import './fragments/GroupInfo.graphql'
+query CurrentUser {
+  me {
+    id
+    username
+    groups {
+      ...GroupInfo
+      instanceTypes {
+        id
+        name
+        displayName
+        description
+        spec
+        global
+        gpuLimit
+        memoryLimit
+        cpuLimit
+      }
+      images {
+        id
+        name
+        displayName
+        description
+        groupName
+        isReady
+        url
+        urlForGpu
+        useImagePullSecret
+        spec
+        global
+        type
+      }
+    }
+  }
+}

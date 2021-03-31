@@ -27,6 +27,11 @@ import DeploymentEditPage from 'ee/containers/deploymentEditPage';
 import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
+import AppListContainer from 'containers/appList';
+import AppCreate from 'containers/appCreatePage';
+import AppStore from 'containers/appStore';
+import AppDetail from 'containers/appDetail';
+import AppEdit from 'containers/appEditPage';
 
 const client = createGraphqlClient({
   fakeData,
@@ -109,10 +114,21 @@ class Main extends React.Component {
             >
               <DeploymentEditPage />
             </Route>
+
+            {/* Apps */}
+            <Route path={`${appPrefix}g/:groupName/apps`} exact>
+              <ListContainer Com={AppListContainer} />
+            </Route>
+            <Route path={`${appPrefix}g/:groupName/apps/store`} exact component={AppStore}/>
+            <Route path={`${appPrefix}g/:groupName/apps/create`} exact component={AppCreate}/>
+            <Route path={`${appPrefix}g/:groupName/apps/create/:templateId`} exact component={AppCreate}/>
+            <Route path={`${appPrefix}g/:groupName/apps/:appId`} exact component={AppDetail}/>
+            <Route path={`${appPrefix}g/:groupName/apps/:appId/edit`} exact component={AppEdit}/>
+
           </MainPage>
         </ApolloProvider>
       </BrowserRouter>
-    )
+    );
   }
 }
 
@@ -152,14 +168,14 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       placement: 'bottomRight',
       duration: null,
       btn: (
-        <Button type="primary" onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
+        <Button type='primary' onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
           Login Again
         </Button>
       ),
       key: 'refreshWarning'
     });
   }
-})
+});
 tokenSyncWorker.run().catch(console.error);
 
 // render

@@ -11,9 +11,10 @@ import DeploymentCreateForm from 'ee/components/modelDeployment/createForm';
 import PageTitle from 'components/pageTitle';
 import {PhDeploymentFragment} from 'ee/components/modelDeployment/common';
 import {GET_PH_DEPLOYMENT, getMessage} from 'ee/containers/deploymentDetail';
-import {GET_MY_GROUPS} from './deploymentCreatePage';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
+import {sortNameByAlphaBet} from 'utils/sorting';
+import {CurrentUser} from 'queries/User.graphql';
 
 export const UPDATE_DEPLOYMENT = gql`
   mutation updatePhDeployment($where: PhDeploymentWhereUniqueInput!, $data: PhDeploymentUpdateInput!) {
@@ -24,36 +25,20 @@ export const UPDATE_DEPLOYMENT = gql`
   ${PhDeploymentFragment}
 `;
 
-const compareByAlphabetical = (prev, next) => {
-  if(prev < next) return -1;
-  if(prev > next) return 1;
-  return 0;
-}
-
-export const sortItems = (items) => {
-  const copiedItems = items.slice();
-  copiedItems
-    .sort((prev, next) => {
-      const prevName = prev.displayName || prev.name;
-      const nextName = next.displayName || next.name;
-      return compareByAlphabetical(prevName, nextName);
-    });
-  return copiedItems;
-}
-
 type Props = RouteComponentProps<{deploymentId: string}> & GroupContextComponentProps & {
-  getGroups: any;
+  currentUser: any;
   refetchGroup: any;
   updatePhDeployment: any;
   updatePhDeploymentResult: any;
   getPhDeployment: any;
-}
+};
+
 type State = {
   selectedGroup: string | null;
-}
+};
 
 class DeploymentCreatePage extends React.Component<Props, State> {
-  onSubmit = (payload) => {
+  onSubmit = payload => {
     const {updatePhDeployment} = this.props;
     updatePhDeployment({
       variables: {
@@ -78,7 +63,8 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       metadata: get(getPhDeployment, 'phDeployment.metadata'),
       description: get(getPhDeployment, 'phDeployment.description'),
       updateMessage: get(getPhDeployment, 'phDeployment.updateMessage'),
-    }
+    };
+
     if (isEqual(values, initialValue))
       return history.goBack();
 
@@ -98,7 +84,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
   }
 
   render() {
-    const {getGroups, updatePhDeploymentResult, history, getPhDeployment, groupContext, refetchGroup, match} = this.props;
+    const {currentUser, updatePhDeploymentResult, history, getPhDeployment, groupContext, refetchGroup, match} = this.props;
     const {params} = match;
 
     if (getPhDeployment.loading) return null;
@@ -106,8 +92,8 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       return getMessage(getPhDeployment.error)
     };
 
-    const everyoneGroupId = (window as any).EVERYONE_GROUP_ID;
-    const allGroups = get(getGroups, 'me.groups', []).filter(group => group.enabledDeployment || group.id === everyoneGroupId);
+    const everyoneGroupId = window.EVERYONE_GROUP_ID;
+    const allGroups = get(currentUser, 'me.groups', []).filter(group => group.enabledDeployment || group.id === everyoneGroupId);
     const groups = allGroups.filter(group => group.id !== everyoneGroupId);
     const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
     const selectedGroup = getPhDeployment.phDeployment.groupId;
@@ -146,20 +132,20 @@ class DeploymentCreatePage extends React.Component<Props, State> {
         />
         <div style={{margin: '16px'}}>
           <DeploymentCreateForm
-            type="edit"
+            type='edit'
             initialValue={{
               ...(getPhDeployment.phDeployment || {}),
               instanceTypeId: get(getPhDeployment, 'phDeployment.instanceType.id', ''),
               instanceTypeName: get(getPhDeployment, 'phDeployment.instanceType.name', '')
             }}
             selectedGroup={selectedGroup}
-            groups={sortItems(groups)}
+            groups={sortNameByAlphaBet(groups)}
             groupContext={groupContext}
-            refetchGroup={getGroups.refetch}
-            instanceTypes={sortItems(instanceTypes)}
+            refetchGroup={currentUser.refetch}
+            instanceTypes={sortNameByAlphaBet(instanceTypes)}
             onSubmit={this.onSubmit}
             onCancel={this.onCancel}
-            loading={getGroups.loading || updatePhDeploymentResult.loading}
+            loading={currentUser.loading || updatePhDeploymentResult.loading}
           />
         </div>
       </React.Fragment>
@@ -170,8 +156,9 @@ class DeploymentCreatePage extends React.Component<Props, State> {
 export default compose(
   withRouter,
   withGroupContext,
-  graphql(GET_MY_GROUPS, {
-    name: 'getGroups'
+  graphql(CurrentUser, {
+    alias: 'withCurrentUser',
+    name: 'currentUser'
   }),
   graphql(GET_PH_DEPLOYMENT, {
     options: (props: Props) => ({

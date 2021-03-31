@@ -53,7 +53,7 @@ class Sidebar extends React.Component<Props> {
 
   render() {
     const { history, match, userContext} = this.props;
-    const pathKeyList = ['home', 'hub', 'job', 'schedule', 'model-deployment', 'browse', 'images'];
+    const pathKeyList = ['home', 'hub', 'job', 'schedule', 'model-deployment', 'browse', 'images', 'apps'];
     let key = '';
     pathKeyList.forEach(val => {
       if (history.location.pathname.split('/').includes(val)) {

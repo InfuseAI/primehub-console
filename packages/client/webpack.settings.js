@@ -1,4 +1,3 @@
-
 const path = require('path');
 
 module.exports = {
@@ -13,7 +12,7 @@ module.exports = {
     'moment': 'moment'
   },
   resolve: {
-    extensions: ['.js', '.ts', '.tsx'],
+    extensions: ['.js', '.ts', '.tsx', '.graphql'],
     alias: {
       'styled-components': path.resolve(__dirname, 'node_modules', 'styled-components'),
       styledShare: path.resolve(__dirname, 'src/styled_share'),
@@ -26,7 +25,9 @@ module.exports = {
       context: path.resolve(__dirname, 'src/context'),
       ee: path.resolve(__dirname, 'src/ee'),
       constant: path.resolve(__dirname, 'src/constant'),
+      interfaces: path.resolve(__dirname, 'src/interfaces'),
       root: path.resolve(__dirname, 'src'),
+      queries: path.resolve(__dirname, 'src/queries'),
       schema: path.resolve(__dirname, 'schema')
     }
   }

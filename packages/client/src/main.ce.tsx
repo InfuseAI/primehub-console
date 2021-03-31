@@ -2,7 +2,7 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 import {ApolloProvider} from 'react-apollo';
 import {notification, Button} from 'antd';
-import {BrowserRouter, Route} from 'react-router-dom';
+import {BrowserRouter, Route, Redirect} from 'react-router-dom';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
@@ -13,6 +13,11 @@ import { listCE } from 'utils/sidebarItemList';
 import Jupyterhub from 'containers/jupyterhubPage';
 import ListContainer from 'containers/list';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
+import AppListContainer from 'containers/appList';
+import AppCreate from 'containers/appCreatePage';
+import AppStore from 'containers/appStore';
+import AppDetail from 'containers/appDetail';
+import AppEdit from 'containers/appEditPage';
 
 import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
@@ -53,6 +58,16 @@ class Main extends React.Component {
               exact
               component={ImageEditPage}
             />
+            {/* Apps */}
+            <Route path={`${appPrefix}g/:groupName/apps`} exact>
+              <ListContainer Com={AppListContainer} />
+            </Route>
+            <Route path={`${appPrefix}g/:groupName/apps/store`} exact component={AppStore}/>
+            <Route path={`${appPrefix}g/:groupName/apps/create`} exact component={AppCreate}/>
+            <Route path={`${appPrefix}g/:groupName/apps/create/:templateId`} exact component={AppCreate}/>
+            <Route path={`${appPrefix}g/:groupName/apps/:appId`} exact component={AppDetail}/>
+            <Route path={`${appPrefix}g/:groupName/apps/:appId/edit`} exact component={AppEdit}/>
+
           </MainPage>
         </ApolloProvider>
       </BrowserRouter>

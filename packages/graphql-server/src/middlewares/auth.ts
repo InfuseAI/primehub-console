@@ -15,6 +15,10 @@ export const permissions = shield({
     'image': or(isAdmin, isUser, isClient),
     'images': or(isAdmin, isUser, isClient),
     'imagesConnection': or(isAdmin, isUser, isClient),
+    'phAppTemplates': or(isAdmin, isUser, isClient),
+    'phApplication': or(isAdmin, isUser, isClient),
+    'phApplications': or(isAdmin, isUser, isClient),
+    'phApplicationsConnection': or(isAdmin, isUser, isClient),
     'groupImagesConnection': or(isAdmin, isUser, isClient),
     'files': or(isAdmin, isUser),
   },
@@ -27,6 +31,11 @@ export const permissions = shield({
     'cancelImageBuild': or(isAdmin, isUser),
     'deleteImage': or(isAdmin, isUser),
     'deleteFiles': or(isAdmin, isUser),
+    'createPhApplication': or(isAdmin, isUser),
+    'updatePhApplication': or(isAdmin, isUser),
+    'deletePhApplication': or(isAdmin, isUser),
+    'startPhApplication': or(isAdmin, isUser),
+    'stopPhApplication': or(isAdmin, isUser),
   },
 }, {
   allowExternalErrors: true

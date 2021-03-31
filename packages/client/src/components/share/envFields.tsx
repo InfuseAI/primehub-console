@@ -1,12 +1,14 @@
 import React from 'react';
+import {merge} from 'lodash';
 import {Input, Icon, Button} from 'antd';
-import get from 'lodash/get';
-import isEmpty from 'lodash/isEmpty';
 import {Empty} from '../empty';
+import {DefaultEnv} from 'interfaces/phAppTemplate';
 
 const InputGroup = Input.Group;
 
-type Props = {
+interface Props {
+  defaultEnv?: DefaultEnv[];
+  reloadDefault?: boolean;
   onChange?: (value: object) => void;
   disabled?: boolean;
   value?: object;
@@ -15,25 +17,36 @@ type Props = {
   enableReveal: boolean;
 }
 
-type State = {
-  fields: Array<any>,
-  errorIndex?: number,
-  errorMessage?: string,
+interface State {
+  fields: any[];
+  errorIndex?: number;
+  errorMessage?: string;
 }
 
 export default class EnvFields extends React.Component<Props, State> {
-  private callbackId: string;
-
   constructor(props) {
     super(props);
-    const {value, onDeploy, refId, onChange} = props;
-    const envs = value ? value.map( env => {
+    const {value, defaultEnv, onChange} = props;
+    const defaultEnvs = defaultEnv ? defaultEnv.map(item => {
+      return {name: item.name, value: item.defaultValue, required: !item.optional, description: item.description};
+    }) : [];
+    const envs = value ? value.map(env => {
       return {name: env.name, value: env.value};
     }) : [];
     this.state = {
-      fields: envs || [],
+      fields: merge(defaultEnvs, envs) || [],
     };
-    this.callbackId = null;
+    onChange(this.state.fields);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.defaultEnv !== this.props.defaultEnv || this.props.reloadDefault === true) {
+      const {defaultEnv} = this.props;
+      const defaultEnvs = defaultEnv ? defaultEnv.map(item => {
+        return {name: item.name, value: item.defaultValue, required: !item.optional};
+      }) : [];
+      this.setState({fields: defaultEnvs});
+    }
   }
 
   add = () => {
@@ -49,7 +62,7 @@ export default class EnvFields extends React.Component<Props, State> {
   remove = index => {
     const {fields} = this.state;
     const {onChange} = this.props;
-    fields.splice(index, 1)
+    fields.splice(index, 1);
     this.setState({
       fields,
       errorIndex: -1,
@@ -87,24 +100,24 @@ export default class EnvFields extends React.Component<Props, State> {
     const {enableReveal, reveal, disabled, empty = <Empty
       style={{ width: 'calc(50% + 16px)'}}
       height={200}
-      description="Empty."
+      description='Empty.'
     />} = this.props;
 
     return (
       <React.Fragment>
         {
-          fields.length === 0 ? empty :fields.map((field, i) => {
+          fields.length === 0 ? empty : fields.map((field, i) => {
             const valueItem = <Input
                     disabled={disabled}
-                    placeholder="value"
+                    placeholder='value'
                     style={{ width: '60%'}}
                     value={field.value}
                     onChange={e => this.changeValue(e.target.value, i)}
                   />;
             const hiddenValueItem = <Input
-                    type="password"
+                    type='password'
                     disabled={disabled}
-                    placeholder="value"
+                    placeholder='value'
                     style={{ width: '60%'}}
                     value={field.value}
                     onChange={e => this.changeValue(e.target.value, i)}
@@ -113,19 +126,30 @@ export default class EnvFields extends React.Component<Props, State> {
               <React.Fragment key={i}>
                 <div style={{display: 'flex', alignItems: 'center', marginBottom: 8, userSelect: 'none'}}>
                   <div style={{marginRight: 16}}>{i + 1}</div>
-                  <InputGroup compact style={{width: '50%', marginRight: 16}}>
+                  <InputGroup compact style={{width: '50%', marginRight: 8}}>
                     <Input
                       disabled={disabled}
-                      placeholder="name" style={{ width: '40%'}}
+                      placeholder='name' style={{ width: '40%'}}
                       value={field.name}
                       onChange={e => this.changeName(e.target.value, i)}
                     />
                     { enableReveal && !reveal ? hiddenValueItem : valueItem }
                   </InputGroup>
                   {
-                    disabled ? null :(
-                      <a href="javascript:;" onClick={() => this.remove(i)}>
-                        <Icon type="close-circle-o"/>
+                    disabled ? null : field.required ? (
+                      <span>
+                        <Icon type='info-circle' theme='filled' style={
+                          {
+                            display: field.description ? 'inline' : 'none',
+                            marginRight: 8,
+                            verticalAlign: 'baseline'
+                          }
+                        } title={field.description} />
+                        <span style={{color: 'red'}}>*</span>
+                      </span>
+                    ) : (
+                      <a href='javascript:;' onClick={() => this.remove(i)}>
+                        <Icon type='close-circle-o'/>
                       </a>
                     )
                   }
@@ -145,39 +169,12 @@ export default class EnvFields extends React.Component<Props, State> {
           disabled === true ? (
             null
           ) : (
-            <Button type="dashed" data-testid="add-field-button" onClick={this.add} style={{ width: 'calc(50% + 16px)', marginTop: 16 }}>
-              <Icon type="plus" /> Add field
+            <Button type='dashed' data-testid='add-field-button' onClick={this.add} style={{ width: 'calc(50% + 16px)', marginTop: 16 }}>
+              <Icon type='plus' /> Add field
             </Button>
           )
         }
       </React.Fragment>
-    )
+    );
   }
 }
-
-//function objectToArray(obj) {
-  //return Object.keys(obj).reduce((result, key) => {
-    //if (key === '__typename') {
-      //return result;
-    //}
-    //result.push({
-      //key,
-      //value: obj[key]
-    //});
-    //return result;
-  //}, []);
-//}
-
-//function arrayToObject(arr) {
-  //const result = arr.reduce((result, item) => {
-    //if (item.key === '__typename') {
-      //return result;
-    //} 
-    //result[item.key] = item.value;
-    //return result;
-  //}, {});
-  //if (isEmpty(result)) {
-    //return null;
-  //}
-  //return result;
-//}

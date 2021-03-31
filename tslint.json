@@ -16,6 +16,7 @@
     "quotemark": [true, "single"],
     "no-implicit-dependencies": [true, "dev"],
     "no-submodule-imports": false,
+    "no-console": ["log", "table"],
     "object-literal-sort-keys": false,
     "trailing-comma": false,
     "arrow-parens": [true, "ban-single-arg-parens"],
