@@ -54,6 +54,9 @@ export const phJobs = [
     },
     displayName: 'IT2',
     phase: 'Failed',
+    createTime: '2021-03-30T14:48:00.000Z',
+    startTime: '2021-03-30T14:48:00.000Z',
+    finishTime: '2021-03-31T15:48:00.000Z',
     message: `
     batch1
     batch2

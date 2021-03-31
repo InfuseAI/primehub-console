@@ -6,6 +6,9 @@ fragment GroupInfo on Group {
   quotaCpu
   quotaGpu
   quotaMemory
+  projectQuotaCpu
+  projectQuotaGpu
+  projectQuotaMemory
   datasets {
     displayName
   }

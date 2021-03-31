@@ -69,11 +69,13 @@ fragment PhDeploymentInfo on PhDeployment {
   }
 }
 
-query PhDeploymentsConnection($where: PhDeploymentWhereInput, $page: Int) {
-  phDeploymentsConnection(where: $where, page: $page) {
+query PhDeploymentsConnection($where: PhDeploymentWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
+  phDeploymentsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
     pageInfo {
-      totalPage
-      currentPage
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
     }
     edges {
       cursor

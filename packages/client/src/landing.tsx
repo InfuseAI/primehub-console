@@ -1,17 +1,14 @@
 import * as React from 'react';
 import {Tag, Divider, Typography, Layout, Row, Col, Card, notification, Button} from 'antd';
 import PageTitle from 'components/pageTitle';
-import styled from 'styled-components';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
+import UserResourceMonitor from 'components/share/userResourceMonitor';
 import {withGroupContext, GroupContextComponentProps} from 'context/group';
 import {CurrentUser} from 'queries/User.graphql';
 import {compose} from 'recompose';
 import {graphql} from 'react-apollo';
 import Breadcrumbs, {BreadcrumbItemSetup} from 'components/share/breadcrumb';
-import {PhJobsConnection} from 'queries/PhJob.graphql';
-import {PhDeploymentsConnection} from 'queries/PhDeployment.graphql'
-import moment from 'moment';
-import groupBy from 'lodash.groupby'
+import RecentTasks, {ThinTitle, GuideList, Content, SubContent} from 'components/landing/recentTasks';
 
 const breadcrumbs: BreadcrumbItemSetup[] = [
   {
@@ -21,77 +18,15 @@ const breadcrumbs: BreadcrumbItemSetup[] = [
   }
 ];
 
-const {Title, Text} = Typography;
-
-const PAGE_PADDING = 64;
-const HEADER_HEIGHT = 64;
-
-const ThinTitle = styled(Title)`
-  font-weight: 200 !important;
-`;
-
-const GuideList = styled.li`
-  list-style: none;
-  padding-left: 1em;
-  > li {
-    margin-top: 1em;
-  }
-`;
-
-const SubContent = styled.div`
-  margin-bottom: 2em;
-`;
-
-const Content = styled(Layout.Content)`
-  margin: ${HEADER_HEIGHT + 24}px ${PAGE_PADDING}px;
-  padding: 24;
-  min-height: calc(100vh - 64px);
-`;
-
 type Props = {
   currentUser: any;
-  getPhJobsConnection: any;
-  getPhDeploymentsConnection: any;
 } & GroupContextComponentProps;
 
 class Landing extends React.Component<Props> {
-  getRecentPhJobs() {
-    const {getPhJobsConnection} = this.props;
-    const phJobsConnection = getPhJobsConnection.phJobsConnection;
-    return phJobsConnection ? phJobsConnection.edges.slice(0, 2) : [];
-  }
-
-  getRecentPhDeployments() {
-    const {getPhDeploymentsConnection} = this.props;
-    const phDeploymentsConnection = getPhDeploymentsConnection.phDeploymentsConnection
-    return phDeploymentsConnection ? phDeploymentsConnection.edges.slice(0, 2) : [];
-  }
 
   render() {
     const {groupContext, currentUser} = this.props;
-
-    const recentPhJobs = this.getRecentPhJobs();
-    const recentPhDeployments = this.getRecentPhDeployments();
-
-    const recentTasks = recentPhJobs.map(j => {
-      return {
-        type: "Job",
-        name: j.node.displayName,
-        status: j.node.phase,
-        time: moment(j.node.createTime),
-        statusColor: j.node.phase === "Succeeded" ? "green" : "red"
-      };
-    }).concat(recentPhDeployments.map(d => {
-      return {
-        type: "Model",
-        name: d.node.name,
-        status: "Deployed",
-        statusColor: 'green',
-        time: moment(d.node.lastUpdatedTime)
-      }
-    }))
-
-    const groupedTasks = groupBy(recentTasks, t => t.time.startOf('date').fromNow())
+    console.log(groupContext);
 
     return (
       <Layout>
@@ -144,32 +79,33 @@ class Landing extends React.Component<Props> {
                   </SubContent>
                 </Col>
               </Row>
-              <Divider></Divider>
-              <ThinTitle level={2}>Recent</ThinTitle>
-              <SubContent>
-                {Object.keys(groupedTasks).map((k, i) => {
-                  return (<React.Fragment>
-                    <ThinTitle level={3} style={{marginTop: i > 0 ? '0.5em' : ''}}>{k}</ThinTitle>
-                    <GuideList>
-                      {groupedTasks[k].map(t => {
-                        return (
-                          <li>
-                            <a href=''>[{t.type}] {t.name}</a> <Tag color={t.statusColor}>{t.status}</Tag>
-                            <br/>
-                            <Text type="secondary">{t.time.isValid() ? t.time.format("YYYY-MM-DD HH:mm:ss") : ''}</Text>
-                          </li>
-                        )
-                      })}
-                    </GuideList>
-                  </React.Fragment>)
-                })}
-              </SubContent>
+              {
+                // @ts-ignore
+                (primehubCE) ? (
+                  <></>
+                ) : (
+                  <div>
+                    <Divider></Divider>
+                    <RecentTasks />
+                  </div>
+                )
+              }
             </Content>
           </Col>
           <Col span={8}>
+            {
+              // @ts-ignore
+              (modelDeploymentOnly) ? (
+                <></>
+              ) : (
+              <UserResourceMonitor groupContext={groupContext} style={
+                { marginTop: 24, marginRight: 24 }
+              }/>
+              )
+            }
             <ResourceMonitor
               style={
-                { marginTop: 24, marginRight: 24 }
+                { marginTop: 16, marginRight: 24 }
               }
               groupContext={groupContext}
               refetchGroup={currentUser.refetch}
@@ -187,44 +123,5 @@ export default compose(
   graphql(CurrentUser, {
     alias: 'withCurrentUser',
     name: 'currentUser'
-  }),
-  graphql(PhJobsConnection, {
-  options: (props: Props) => {
-    const {groupContext} = props;
-    const where = {} as any;
-    if (groupContext) {
-      where.groupId_in = [groupContext.id];
-    }
-
-    return {
-      variables: {
-        where,
-        orderBy: {},
-        page: 1,
-      },
-      fetchPolicy: 'cache-and-network'
-    };
-  },
-  name: 'getPhJobsConnection',
-  alias: 'withGetPhJobsConnection',
-  }),
-  graphql(PhDeploymentsConnection, {
-  options: (props: Props) => {
-    const {groupContext} = props;
-    const where = {} as any;
-    if (groupContext) {
-      where.groupId_in = [groupContext.id];
-    }
-
-    return {
-      variables: {
-        where,
-        page: 1,
-      },
-      fetchPolicy: 'cache-and-network'
-    };
-  },
-  name: 'getPhDeploymentsConnection',
-  alias: 'withGetPhDeploymentsConnection',
   }),
 )(Landing);

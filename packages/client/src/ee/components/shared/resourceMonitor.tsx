@@ -92,17 +92,17 @@ export default class ResrouceMonitor extends React.Component<Props, State> {
                   <tr>
                     <td>CPU</td>
                     <td>{groupContext.resourceStatus.cpuUsage}</td>
-                    <td>{groupContext.quotaCpu == null ? '∞' : groupContext.quotaCpu}</td>
+                    <td>{groupContext.projectQuotaCpu == null ? '∞' : groupContext.projectQuotaCpu}</td>
                   </tr>
                   <tr>
                     <td>Memory</td>
                     <td>{groupContext.resourceStatus.memUsage} GB</td>
-                    <td>{groupContext.quotaMemory == null ? '∞' : `${groupContext.quotaMemory} GB`} </td>
+                    <td>{groupContext.projectQuotaMemory == null ? '∞' : `${groupContext.projectQuotaMemory} GB`} </td>
                   </tr>
                   <tr>
                     <td>GPU</td>
                     <td>{groupContext.resourceStatus.gpuUsage} </td>
-                    <td>{groupContext.quotaGpu == null ? '∞' : groupContext.quotaGpu}</td>
+                    <td>{groupContext.projectQuotaGpu == null ? '∞' : groupContext.projectQuotaGpu}</td>
                   </tr>
                 </tbody>
               </Table>
