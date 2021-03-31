@@ -13,6 +13,7 @@ import PageBody from 'components/pageBody';
 import Breadcrumbs from 'components/share/breadcrumb';
 import GroupSettingsInfo from 'components/groupSettings/info';
 import GroupSettingsMembers from 'components/groupSettings/members';
+import GroupSettingsAlert from 'components/groupSettings/alert';
 
 type Props = {
   getGroups: any;
@@ -57,14 +58,6 @@ export const GET_MY_GROUPS = gql`
   }
 `
 
-export const renderAlert = () => {
-  return <Alert
-           message='Only system admins can update these settings'
-           description='Please contact your administrator to configure these settings.'
-           type='warning'
-           showIcon />;
-};
-
 class GroupSettingsPage extends React.Component<Props> {
 
   render() {
@@ -84,11 +77,11 @@ class GroupSettingsPage extends React.Component<Props> {
         <PageBody style={{flex: '1 1 0%'}}>
           <Tabs style={{height: '100%'}}>
             <Tabs.TabPane key="info" tab="Info">
-              {renderAlert()}
+              <GroupSettingsAlert />
               <GroupSettingsInfo group={group} />
             </Tabs.TabPane>
             <Tabs.TabPane key="members" tab="Members">
-              {renderAlert()}
+              <GroupSettingsAlert />
               <GroupSettingsMembers group={group} />
             </Tabs.TabPane>
             {
