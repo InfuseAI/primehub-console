@@ -8,6 +8,7 @@ import {CurrentUser} from 'queries/User.graphql';
 import {compose} from 'recompose';
 import {graphql} from 'react-apollo';
 import Breadcrumbs, {BreadcrumbItemSetup} from 'components/share/breadcrumb';
+import {PhJobsConnection} from 'queries/PhJob.graphql';
 
 const breadcrumbs: BreadcrumbItemSetup[] = [
   {
@@ -46,11 +47,19 @@ const Content = styled(Layout.Content)`
 
 type Props = {
   currentUser: any;
+  getPhJobsConnection: any;
 } & GroupContextComponentProps;
 
 class Landing extends React.Component<Props> {
+  getRecentPhJobs() {
+    const {getPhJobsConnection} = this.props;
+    const phJobsConnection = getPhJobsConnection.phJobsConnection;
+    return phJobsConnection ? phJobsConnection.edges.slice(0, 2) : [];
+  }
+
   render() {
     const {groupContext, currentUser} = this.props;
+    const recentPhJobs = this.getRecentPhJobs();
     return (
       <Layout>
         <PageTitle
@@ -147,5 +156,25 @@ export default compose(
   graphql(CurrentUser, {
     alias: 'withCurrentUser',
     name: 'currentUser'
+  }),
+  graphql(PhJobsConnection, {
+  options: (props: Props) => {
+    const {groupContext} = props;
+    const where = {} as any;
+    if (groupContext) {
+      where.groupId_in = [groupContext.id];
+    }
+
+    return {
+      variables: {
+        where,
+        orderBy: {},
+        page: 1,
+      },
+      fetchPolicy: 'cache-and-network'
+    };
+  },
+  name: 'getPhJobsConnection',
+  alias: 'withGetPhJobsConnection',
   }),
 )(Landing);
