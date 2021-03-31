@@ -73,7 +73,7 @@ class Landing extends React.Component<Props> {
                         <a href='apps'>Install Application</a>
                       </li>
                       <li>
-                        <a href='browse'>Browse Shared Files...</a>
+                        <a href='browse'>Upload Share Files...</a>
                       </li>
                     </GuideList>
                   </SubContent>
