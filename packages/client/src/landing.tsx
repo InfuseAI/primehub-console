@@ -26,7 +26,8 @@ class Landing extends React.Component<Props> {
 
   render() {
     const {groupContext, currentUser} = this.props;
-    console.log(groupContext);
+    // @ts-ignore
+    const qsLink = modelDeploymentOnly ? 'https://docs.primehub.io/docs/quickstart/qs-primehub-deploy' : 'https://docs.primehub.io/docs/quickstart/qs-primehub';
 
     return (
       <Layout>
@@ -45,13 +46,14 @@ class Landing extends React.Component<Props> {
                   <SubContent>
                     <GuideList>
                       <li>
-                        <a href={`https://docs.primehub.io/docs/quickstart/primehub?utm_source=primehub&utm_medium=ce&utm_campaign=${window.primehubVersion}`}>Learn How To use PrimeHub Platform</a>
+                        <a href={qsLink} target='_blank'>Learn How To use PrimeHub Platform</a>
+                      </li>
+                      <li><a href='https://docs.primehub.io/docs/introduction'>PrimeHub User Guide</a></li>
+                      <li>
+                        <a href='https://docs.primehub.io/docs/getting-started-admin' target='_blank'>Administration Guide</a>
                       </li>
                       <li>
-                        <a href=''>Administration Guide</a>
-                      </li>
-                      <li>
-                        <a href=''>Release Notes</a>
+                        <a href='https://docs.primehub.io/docs/release-note'>Release Notes</a>
                       </li>
                     </GuideList>
                   </SubContent>
