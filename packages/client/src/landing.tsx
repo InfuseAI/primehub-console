@@ -9,6 +9,7 @@ import {compose} from 'recompose';
 import {graphql} from 'react-apollo';
 import Breadcrumbs, {BreadcrumbItemSetup} from 'components/share/breadcrumb';
 import {PhJobsConnection} from 'queries/PhJob.graphql';
+import moment from 'moment';
 
 const breadcrumbs: BreadcrumbItemSetup[] = [
   {
@@ -60,6 +61,15 @@ class Landing extends React.Component<Props> {
   render() {
     const {groupContext, currentUser} = this.props;
     const recentPhJobs = this.getRecentPhJobs();
+    const recentTasks = recentPhJobs.map(j => {
+      return {
+        type: "Job",
+        name: j.node.displayName,
+        status: j.node.phase,
+        time: moment(j.node.createTime),
+        statusColor: j.node.phase === "Succeeded" ? "green" : "red"
+      };
+    })
     return (
       <Layout>
         <PageTitle
@@ -116,21 +126,15 @@ class Landing extends React.Component<Props> {
               <SubContent>
                 <ThinTitle level={3}>Yesterday</ThinTitle>
                   <GuideList>
-                    <li>
-                      <a href=''>[Job] test artifacts</a> <Tag color='green'>Succeed</Tag>
-                      <br/>
-                      <Text type="secondary">2021-03-29 23:48:00</Text>
-                    </li>
-                    <li>
-                      <a href=''>[Job] Retrain model</a> <Tag color='red'>Failed</Tag>
-                      <br/>
-                      <Text type="secondary">2021-03-29 23:48:00</Text>
-                    </li>
-                    <li>
-                      <a href=''>[Model] my model</a> <Tag color='green'>Deployed</Tag>
-                      <br/>
-                      <Text type="secondary">2021-03-29 23:48:00</Text>
-                    </li>
+                    {recentTasks.map(t => {
+                      return (
+                        <li>
+                          <a href=''>[{t.type}] {t.name}</a> <Tag color={t.statusColor}>{t.status}</Tag>
+                          <br/>
+                          <Text type="secondary">{t.time.isValid() ? t.time.format("YYYY-MM-DD HH:mm:ss") : ''}</Text>
+                        </li>
+                      )
+                    })}
                   </GuideList>
               </SubContent>
             </Content>
