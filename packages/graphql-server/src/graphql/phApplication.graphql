@@ -39,6 +39,7 @@ type PhApplication {
   status: String
   message: String
   pods: [Pod]
+  rewrite: Boolean
 }
 
 """An edge in a connection."""

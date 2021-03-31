@@ -192,6 +192,7 @@ export class ProxyCtrl {
         scope
         groupName
         internalAppUrl
+        rewrite
         status
       }
     }`;
@@ -207,7 +208,7 @@ export class ProxyCtrl {
       scope: data.phApplication.scope,
       group: data.phApplication.groupName,
       target: `${internalAppUrl.protocol}//${internalAppUrl.host}`,
-      rewrite: false,
+      rewrite: data.phApplication.rewrite,
     };
   }
 

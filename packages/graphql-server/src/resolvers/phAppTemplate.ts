@@ -34,6 +34,7 @@ export interface PhAppTemplate {
       podTemplate: any;
       svcTemplate: any;
       httpPort: number;
+      rewrite?: boolean;
     }
   };
 }

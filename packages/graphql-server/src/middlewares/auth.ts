@@ -14,7 +14,6 @@ export const permissions = shield({
     'secrets': or(isAdmin, isUser, isClient),
     'image': or(isAdmin, isUser, isClient),
     'images': or(isAdmin, isUser, isClient),
-    'phApplication': or(isAdmin, isUser, isClient),
     'imagesConnection': or(isAdmin, isUser, isClient),
     'phAppTemplates': or(isAdmin, isUser, isClient),
     'phApplication': or(isAdmin, isUser, isClient),
