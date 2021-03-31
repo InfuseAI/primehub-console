@@ -5,7 +5,7 @@ import {get} from 'lodash';
 import { RouteComponentProps } from 'react-router-dom';
 import { GroupContextComponentProps } from 'context/group';
 import { UserContextComponentProps } from 'context/user';
-import { renderAlert } from 'containers/GroupSettingsPage';
+import { renderAlert } from '../../../containers/GroupSettingsPage';
 
 type Props = FormComponentProps & {
   getGroups: any;
