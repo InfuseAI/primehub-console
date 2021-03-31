@@ -1,25 +1,42 @@
 import * as React from 'react';
-import ReactDOM from 'react-dom';
-import {Layout, Row, Col, Card, notification, Button} from 'antd';
-import Header from 'components/header';
+import {Tag, Divider, Typography, Layout, Row, Col, Card, notification, Button} from 'antd';
+import PageTitle from 'components/pageTitle';
 import styled from 'styled-components';
-// @ts-ignore
-import logo from 'images/primehub-logo.svg';
-// @ts-ignore
-import emptyBox from 'images/empty-box.svg';
-import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
+import ResourceMonitor from 'ee/components/shared/resourceMonitor';
+import {withGroupContext, GroupContextComponentProps} from 'context/group';
+import {CurrentUser} from 'queries/User.graphql';
+import {compose} from 'recompose';
+import {graphql} from 'react-apollo';
+import Breadcrumbs, {BreadcrumbItemSetup} from 'components/share/breadcrumb';
+
+const breadcrumbs: BreadcrumbItemSetup[] = [
+  {
+    key: 'home',
+    matcher: /\/home/,
+    title: 'Home',
+  }
+];
+
+const {Title, Text} = Typography;
 
 const PAGE_PADDING = 64;
 const HEADER_HEIGHT = 64;
 
-const Logo = styled.div`
-  background-image: url(${logo});
-  background-size: contain;
-  background-position: left;
-  background-repeat: no-repeat;
-  width: 200px;
-  margin: 8px 0;
-` as any;
+const ThinTitle = styled(Title)`
+  font-weight: 200 !important;
+`;
+
+const GuideList = styled.li`
+  list-style: none;
+  padding-left: 1em;
+  > li {
+    margin-top: 1em;
+  }
+`;
+
+const SubContent = styled.div`
+  margin-bottom: 2em;
+`;
 
 const Content = styled(Layout.Content)`
   margin: ${HEADER_HEIGHT + 24}px ${PAGE_PADDING}px;
@@ -27,204 +44,108 @@ const Content = styled(Layout.Content)`
   min-height: calc(100vh - 64px);
 `;
 
-const Empty = (props: {height: number, description?: string}) => (
-  <Card
-    style={{
-      width: '100%',
-      height: props.height
-    }}
-    bodyStyle={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100%'
-    }}
-  >
-    <div style={{textAlign: 'center'}}>
-      <img src={emptyBox} />
-      <p style={{marginTop: 12, color: '#aaa'}}>
-        {props.description || 'no data'}
-      </p>
-    </div>
-  </Card>
-)
-
 type Props = {
-  includeHeader: boolean
-}
+  currentUser: any;
+} & GroupContextComponentProps;
 
-export class Landing extends React.Component<Props> {
+class Landing extends React.Component<Props> {
   render() {
-    const { includeHeader } = this.props;
-    const isUserAdmin = (window as any).isUserAdmin || false;
-    const portal = ((includeHeader === false) ? (window as any).home : (window as any).portal) || {
-      services: [],
-      welcomeMessage: ''
-    };
-    const {services, welcomeMessage} = portal;
-    const normalServices = services.filter(sv => !sv.adminOnly);
-    let header = (includeHeader === false) ? null : <Header />;
+    const {groupContext, currentUser} = this.props;
     return (
       <Layout>
-        { header }
-      <Content style={
-        (includeHeader === false) ? {marginTop: 24} : {}
-      }>
-          <Section title="">
-            <ServiceCards services={normalServices} colHeight={200} />
-          </Section>
-          {
-            isUserAdmin && services.filter(sv => sv.adminOnly).length > 0 && (
-              <Section title="Admin Section">
-                <ServiceCards services={services.filter(sv => sv.adminOnly)} colHeight={200} />
-              </Section>
-            )
-          }
-          <Section>
-            <div dangerouslySetInnerHTML={{ __html: welcomeMessage}} />
-          </Section>
-        </Content>
-      </Layout>
-    )
-  }
-}
-
-type Service = {
-  name: string,
-  uri: string,
-  adminOnly: boolean,
-  image: string,
-  target: string
-};
-type CardProps = {
-  service: Service,
-  imageHeight: number
-}
-
-type CardsProps = {
-  services: Array<Service>,
-  colHeight: number
-}
-
-type SectionProps = {
-  title?: string,
-  children: any;
-}
-
-const Section = (props: SectionProps) => {
-  const {title, children} = props;
-  return (
-    <div style={{marginBottom: 64}}>
-      {title && (<h2>{title}</h2>)}
-      <div style={{marginTop: 32}}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-const ServiceCard = (props: CardProps) => {
-  const {service, imageHeight} = props;
-  return (<>
-    <a href={service.uri} target={ service.target ? service.target : '_self' }>
-      <Card
-        hoverable
-      >
-        <div style={{
-          cursor: 'pointer',
-          backgroundImage: `url(${service.image})`,
-          backgroundSize: 'contain',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          height: imageHeight
-        }} />
-      </Card>
-    </a>
-    <h3
-      style={{
-        fontWeight: 'normal',
-        textAlign: 'center',
-        marginTop: 8,
-        marginBottom: 20,
-        letterSpacing: 1,
-        color: '#6a6a6a'
-      }}
-    >
-      {service.name}
-    </h3>
-  </>);
-}
-
-const ServiceCards = (props: CardsProps) => {
-  const {services, colHeight} = props;
-  if (!services.length) {
-    return (
-      <Empty
-        height={colHeight}
-        description="There is no any service."
-      />
-    )
-  }
-  return (
-    <Row type="flex" gutter={32} >
-      {services.map(service => {
-        return (
-          <Col xs={24} sm={12} md={12} lg={8} xl={8} xxl={4}>
-            <ServiceCard service={service} imageHeight={colHeight}/>
+        <PageTitle
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
+          title={'Home'}
+        />
+        <Row>
+          <Col span={16}>
+            <Content style={
+                {margin: 24, padding: '24px 36px', backgroundColor: '#fff'}
+            }>
+              <Row>
+                <Col span={12}>
+                  <ThinTitle level={2}>Getting Started</ThinTitle>
+                  <SubContent>
+                    <GuideList>
+                      <li>
+                        <a href={`https://docs.primehub.io/docs/quickstart/primehub?utm_source=primehub&utm_medium=ce&utm_campaign=${window.primehubVersion}`}>Learn How To use PrimeHub Platform</a>
+                      </li>
+                      <li>
+                        <a href=''>Administration Guide</a>
+                      </li>
+                      <li>
+                        <a href=''>Release Notes</a>
+                      </li>
+                    </GuideList>
+                  </SubContent>
+                </Col>
+                <Col span={12}>
+                  <ThinTitle level={2}>Open</ThinTitle>
+                  <SubContent>
+                    <GuideList>
+                      <li>
+                        <a href='hub'>Open Jupyter Notebook</a>
+                      </li>
+                      <li>
+                        <a href='jobs'>Create New Job</a>
+                      </li>
+                      <li>
+                        <a href='model-deployment'>Deploy Model</a>
+                      </li>
+                      <li>
+                        <a href='apps'>Install Application</a>
+                      </li>
+                      <li>
+                        <a href='browse'>Browse Shared Files...</a>
+                      </li>
+                    </GuideList>
+                  </SubContent>
+                </Col>
+              </Row>
+              <Divider></Divider>
+              <ThinTitle level={2}>Recent</ThinTitle>
+              <SubContent>
+                <ThinTitle level={3}>Yesterday</ThinTitle>
+                  <GuideList>
+                    <li>
+                      <a href=''>[Job] test artifacts</a> <Tag color='green'>Succeed</Tag>
+                      <br/>
+                      <Text type="secondary">2021-03-29 23:48:00</Text>
+                    </li>
+                    <li>
+                      <a href=''>[Job] Retrain model</a> <Tag color='red'>Failed</Tag>
+                      <br/>
+                      <Text type="secondary">2021-03-29 23:48:00</Text>
+                    </li>
+                    <li>
+                      <a href=''>[Model] my model</a> <Tag color='green'>Deployed</Tag>
+                      <br/>
+                      <Text type="secondary">2021-03-29 23:48:00</Text>
+                    </li>
+                  </GuideList>
+              </SubContent>
+            </Content>
           </Col>
-        )
-      })}
-    </Row>
-  )
-}
-
-/**
- * Background worker
- */
-function checkStatus(response) {
-  if (response.status >= 200 && response.status < 300) {
-    return response;
-  } else {
-    const error = new Error(response.statusText);
-    (error as any).response = response;
-    throw error;
+          <Col span={8}>
+            <ResourceMonitor
+              style={
+                { marginTop: 24, marginRight: 24 }
+              }
+              groupContext={groupContext}
+              refetchGroup={currentUser.refetch}
+              selectedGroup={groupContext.id}
+            />
+          </Col>
+        </Row>
+      </Layout>
+    );
   }
 }
 
-function parseJSON(response) {
-  return response.json();
-}
-
-const tokenSyncWorker = new BackgroundTokenSyncer({
-  appPrefix: (window as any).APP_PREFIX,
-  refreshTokenExp: (window as any).refreshTokenExp,
-  accessTokenExp: (window as any).accessTokenExp,
-  getNewTokenSet: () => {
-    return fetch(`${(window as any).APP_PREFIX}oidc/refresh-token-set`, {
-      method: 'POST'
-    })
-    .then(checkStatus)
-    .then(parseJSON);
-  },
-  reLoginNotify: ({loginUrl}) => {
-    // notify with fixed card
-    notification.warning({
-      message: 'Warning',
-      description: 'In less than 1 minute, you\'re going to be redirected to login page.',
-      placement: 'bottomRight',
-      duration: null,
-      btn: (
-        <Button type="primary" onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
-          Login Again
-        </Button>
-      ),
-      key: 'refreshWarning'
-    });
-  }
-})
-tokenSyncWorker.run().catch(console.error);
-
-// render
-ReactDOM.render(
-  <Landing />
-, document.getElementById('root'));
+export default compose(
+  withGroupContext,
+  graphql(CurrentUser, {
+    alias: 'withCurrentUser',
+    name: 'currentUser'
+  }),
+)(Landing);

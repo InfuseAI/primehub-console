@@ -11,7 +11,7 @@ import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import { GroupContextValue, GroupContext } from 'context/group';
 import { UserContextValue, UserContext } from 'context/user';
-import { Landing } from '../landing';
+import Landing from '../landing';
 import ApiTokenPage from 'containers/apiTokenPage';
 import {CurrentUser} from 'queries/User.graphql';
 

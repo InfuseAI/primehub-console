@@ -8,6 +8,7 @@ interface Props {
   refetchGroup: () => void;
   showDataset?: boolean;
   selectedGroup: string;
+  style: any;
 }
 
 interface State {
@@ -72,12 +73,12 @@ export default class ResrouceMonitor extends React.Component<Props, State> {
   }
 
   render() {
-    const { showDataset } = this.props;
+    const { showDataset, style } = this.props;
     const { groupContext } = this.state;
     if (groupContext) {
       return (
         <>
-            <Card style={{overflow: 'auto'}}>
+            <Card style={{overflow: 'auto', ...style}}>
               <h3>Group Resource</h3>
               <Table>
                 <thead>
