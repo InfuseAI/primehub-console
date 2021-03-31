@@ -9,6 +9,7 @@ import {compose} from 'recompose';
 import {graphql} from 'react-apollo';
 import Breadcrumbs, {BreadcrumbItemSetup} from 'components/share/breadcrumb';
 import {PhJobsConnection} from 'queries/PhJob.graphql';
+import {PhDeploymentsConnection} from 'queries/PhDeployment.graphql'
 import moment from 'moment';
 import groupBy from 'lodash.groupby'
 
@@ -50,6 +51,7 @@ const Content = styled(Layout.Content)`
 type Props = {
   currentUser: any;
   getPhJobsConnection: any;
+  getPhDeploymentsConnection: any;
 } & GroupContextComponentProps;
 
 class Landing extends React.Component<Props> {
@@ -59,9 +61,18 @@ class Landing extends React.Component<Props> {
     return phJobsConnection ? phJobsConnection.edges.slice(0, 2) : [];
   }
 
+  getRecentPhDeployments() {
+    const {getPhDeploymentsConnection} = this.props;
+    const phDeploymentsConnection = getPhDeploymentsConnection.phDeploymentsConnection
+    return phDeploymentsConnection ? phDeploymentsConnection.edges.slice(0, 2) : [];
+  }
+
   render() {
     const {groupContext, currentUser} = this.props;
+
     const recentPhJobs = this.getRecentPhJobs();
+    const recentPhDeployments = this.getRecentPhDeployments();
+
     const recentTasks = recentPhJobs.map(j => {
       return {
         type: "Job",
@@ -70,8 +81,18 @@ class Landing extends React.Component<Props> {
         time: moment(j.node.createTime),
         statusColor: j.node.phase === "Succeeded" ? "green" : "red"
       };
-    })
+    }).concat(recentPhDeployments.map(d => {
+      return {
+        type: "Model",
+        name: d.node.name,
+        status: "Deployed",
+        statusColor: 'green',
+        time: moment(d.node.lastUpdatedTime)
+      }
+    }))
+
     const groupedTasks = groupBy(recentTasks, t => t.time.startOf('date').fromNow())
+
     return (
       <Layout>
         <PageTitle
@@ -186,5 +207,24 @@ export default compose(
   },
   name: 'getPhJobsConnection',
   alias: 'withGetPhJobsConnection',
+  }),
+  graphql(PhDeploymentsConnection, {
+  options: (props: Props) => {
+    const {groupContext} = props;
+    const where = {} as any;
+    if (groupContext) {
+      where.groupId_in = [groupContext.id];
+    }
+
+    return {
+      variables: {
+        where,
+        page: 1,
+      },
+      fetchPolicy: 'cache-and-network'
+    };
+  },
+  name: 'getPhDeploymentsConnection',
+  alias: 'withGetPhDeploymentsConnection',
   }),
 )(Landing);
