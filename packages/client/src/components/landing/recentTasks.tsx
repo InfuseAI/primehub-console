@@ -56,7 +56,8 @@ class RecentTasks extends React.Component<Props> {
   }
 
   render() {
-    const recentPhJobs = this.getRecentPhJobs();
+    // @ts-ignore
+    const recentPhJobs = modelDeploymentOnly ? [] : this.getRecentPhJobs();
     const recentPhDeployments = this.getRecentPhDeployments();
 
     const recentTasks = recentPhJobs.map(j => {

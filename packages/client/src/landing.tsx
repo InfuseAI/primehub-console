@@ -60,25 +60,53 @@ class Landing extends React.Component<Props> {
                 </Col>
                 <Col span={12}>
                   <ThinTitle level={2}>Open</ThinTitle>
-                  <SubContent>
-                    <GuideList>
-                      <li>
-                        <a href='hub'>Open Jupyter Notebook</a>
-                      </li>
-                      <li>
-                        <a href='jobs'>Create New Job</a>
-                      </li>
-                      <li>
-                        <a href='model-deployment'>Deploy Model</a>
-                      </li>
-                      <li>
-                        <a href='apps'>Install Application</a>
-                      </li>
-                      <li>
-                        <a href='browse'>Upload Share Files...</a>
-                      </li>
-                    </GuideList>
-                  </SubContent>
+                  {
+                    // @ts-ignore
+                    (modelDeploymentOnly) ? (
+                      <SubContent>
+                        <GuideList>
+                          <li>
+                            <a href='model-deployment'>Deploy Model</a>
+                          </li>
+                        </GuideList>
+                      </SubContent>
+                    // @ts-ignore
+                    ) : primehubCE ? (
+                      <SubContent>
+                        <GuideList>
+                          <li>
+                            <a href='hub'>Open Jupyter Notebook</a>
+                          </li>
+                          <li>
+                            <a href='apps'>Install Application</a>
+                          </li>
+                          <li>
+                            <a href='browse'>Upload Share Files...</a>
+                          </li>
+                        </GuideList>
+                      </SubContent>
+                    ) : (
+                      <SubContent>
+                        <GuideList>
+                          <li>
+                            <a href='hub'>Open Jupyter Notebook</a>
+                          </li>
+                          <li>
+                            <a href='jobs'>Create New Job</a>
+                          </li>
+                          <li>
+                            <a href='model-deployment'>Deploy Model</a>
+                          </li>
+                          <li>
+                            <a href='apps'>Install Application</a>
+                          </li>
+                          <li>
+                            <a href='browse'>Upload Share Files...</a>
+                          </li>
+                        </GuideList>
+                      </SubContent>
+                    )
+                  }
                 </Col>
               </Row>
               {
