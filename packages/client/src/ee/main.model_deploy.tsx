@@ -23,7 +23,6 @@ import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
 import GroupSettingsPage from 'containers/groupSettingsPage';
-import GroupSettingsJobs from 'ee/components/groupSettings/jobs';
 import GroupSettingsModels from 'ee/components/groupSettings/models';
 
 const client = createGraphqlClient({
@@ -114,7 +113,6 @@ class Main extends React.Component {
             {/* Group Settings */}
             <Route path={`${appPrefix}g/:groupName/settings`}>
               <GroupSettingsPage extraTabs={[
-                { component: GroupSettingsJobs, key: 'jobs', tab: 'Jobs' },
                 { component: GroupSettingsModels, key: 'models', tab: 'Models' },
               ]} />
             </Route>
