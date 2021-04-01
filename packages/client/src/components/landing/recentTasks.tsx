@@ -83,7 +83,7 @@ class RecentTasks extends React.Component<Props> {
       };
     })).sort((item, next) => item.time.isAfter(next.time) ? -1 : 1);
 
-    const groupedTasks = groupBy(recentTasks, t => t.time.clone().startOf('date').fromNow());
+    const groupedTasks = groupBy(recentTasks, t => t.time.clone().startOf('minute').fromNow());
     return (
       <Fragment>
         <ThinTitle level={2}>Recent</ThinTitle>
