@@ -92,7 +92,7 @@ class Landing extends React.Component<Props> {
                             <a href='hub'>Open Jupyter Notebook</a>
                           </li>
                           <li>
-                            <a href='jobs'>Create New Job</a>
+                            <a href='job'>Create New Job</a>
                           </li>
                           <li>
                             <a href='model-deployment'>Deploy Model</a>
