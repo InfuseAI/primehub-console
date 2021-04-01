@@ -32,6 +32,9 @@ import AppCreate from 'containers/appCreatePage';
 import AppStore from 'containers/appStore';
 import AppDetail from 'containers/appDetail';
 import AppEdit from 'containers/appEditPage';
+import GroupSettingsPage from 'containers/groupSettingsPage';
+import GroupSettingsJobs from 'ee/components/groupSettings/jobs';
+import GroupSettingsModels from 'ee/components/groupSettings/models';
 
 const client = createGraphqlClient({
   fakeData,
@@ -69,6 +72,14 @@ class Main extends React.Component {
               exact
               component={ImageEditPage}
             />
+
+            {/* Group Settings */}
+            <Route path={`${appPrefix}g/:groupName/settings`}>
+              <GroupSettingsPage extraTabs={[
+                { component: GroupSettingsJobs, key: 'jobs', tab: 'Jobs' },
+                { component: GroupSettingsModels, key: 'models', tab: 'Models' },
+              ]} />
+            </Route>
 
             {/* Job Submission */}
             <Route path={`${appPrefix}g/:groupName/job`} exact>

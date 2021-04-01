@@ -35,6 +35,7 @@ export const permissions = shield({
   },
   Mutation: {
     '*': isAdmin,
+    'updateGroup': or(isAdmin, isUser),
     'revokeApiToken': or(isAdmin, isUser),
     'createPhJob': or(isAdmin, isUser),
     'rerunPhJob': or(isAdmin, isUser),

@@ -22,6 +22,7 @@ import AppEdit from 'containers/appEditPage';
 import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
+import GroupSettingsPage from 'containers/groupSettingsPage';
 
 const client = createGraphqlClient({
   fakeData,
@@ -58,6 +59,7 @@ class Main extends React.Component {
               exact
               component={ImageEditPage}
             />
+
             {/* Apps */}
             <Route path={`${appPrefix}g/:groupName/apps`} exact>
               <ListContainer Com={AppListContainer} />
@@ -67,6 +69,11 @@ class Main extends React.Component {
             <Route path={`${appPrefix}g/:groupName/apps/create/:templateId`} exact component={AppCreate}/>
             <Route path={`${appPrefix}g/:groupName/apps/:appId`} exact component={AppDetail}/>
             <Route path={`${appPrefix}g/:groupName/apps/:appId/edit`} exact component={AppEdit}/>
+
+            {/* Group Settings */}
+            <Route path={`${appPrefix}g/:groupName/settings`}>
+              <GroupSettingsPage />
+            </Route>
 
           </MainPage>
         </ApolloProvider>

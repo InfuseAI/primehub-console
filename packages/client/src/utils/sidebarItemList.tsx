@@ -5,6 +5,7 @@ import iconModels from 'images/icon-models.svg';
 import iconImages from 'images/icon-images.png';
 import iconShareFiles from 'images/icon-files.svg';
 import iconApps from 'images/icon-apps.svg';
+import iconSettings from 'images/icon-settings.svg';
 
 export const listEE = [
   {
@@ -93,7 +94,20 @@ export const listEE = [
       marginRight: '-4px',
       marginTop: '-2px',
     },
-  }
+  },
+  {
+    title: 'Settings',
+    subPath: 'settings',
+    icon: iconSettings,
+    groupAdminOnly: true,
+    style: {
+      width: 'auto',
+      height: 21,
+      marginLeft: '-1px',
+      marginRight: '-4px',
+      marginTop: '-3px',
+    }
+  },
 ];
 
 export const listCE = listEE.filter(item => !item.EEOnly);

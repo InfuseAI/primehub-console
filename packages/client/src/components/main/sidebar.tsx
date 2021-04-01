@@ -1,5 +1,5 @@
 import React from 'react';
-import {Layout, Menu} from 'antd';
+import {Layout, Menu, Divider} from 'antd';
 import {Link} from 'react-router-dom';
 import {appPrefix} from 'utils/env';
 import { withRouter, RouteComponentProps } from 'react-router';
@@ -40,6 +40,36 @@ type Props = UserContextComponentProps & RouteComponentProps & {
 };
 
 class Sidebar extends React.Component<Props> {
+  renderSidebarItem(item: MainPageSidebarItem, group: string) {
+    return (
+      <Menu.Item key={item.subPath} style={{paddingLeft: 26}}>
+        <Link to={`${appPrefix}g/${group}/${item.subPath}`}>
+          <Icon src={item.icon} style={item.style}/>
+          <Title>{item.title}</Title>
+          {this.renderStageBadge(item)}
+        </Link>
+      </Menu.Item>
+      );
+  }
+
+  renderSidebarItems(items: MainPageSidebarItem[], group: string) {
+    const sidebarItems = [];
+    const userItems = items.filter(item => !item.groupAdminOnly);
+    const adminItems = items.filter(item => item.groupAdminOnly && item.groupAdminOnly === true);
+
+    sidebarItems.push(userItems.map(item => this.renderSidebarItem(item, group)));
+    if (adminItems.length > 0) {
+      sidebarItems.push(
+        <Menu.Item style={{margin: 0, height: 12}}>
+          <Divider style={{marginTop: 5, marginBottom: 5, backgroundColor: '#555666'}}/>
+        </Menu.Item>
+      );
+      sidebarItems.push(adminItems.map(item => this.renderSidebarItem(item, group)));
+    }
+
+    return sidebarItems;
+  }
+
   renderStageBadge(item: MainPageSidebarItem) {
 
     if (item.stage === 'beta') {
@@ -53,7 +83,7 @@ class Sidebar extends React.Component<Props> {
 
   render() {
     const { history, match, userContext} = this.props;
-    const pathKeyList = ['home', 'hub', 'job', 'schedule', 'model-deployment', 'browse', 'images', 'apps'];
+    const pathKeyList = ['home', 'hub', 'job', 'schedule', 'model-deployment', 'browse', 'images', 'apps', 'settings'];
     let key = '';
     pathKeyList.forEach(val => {
       if (history.location.pathname.split('/').includes(val)) {
@@ -83,17 +113,7 @@ class Sidebar extends React.Component<Props> {
           </Menu.Item>
 
           {group &&
-            sidebarItems ? sidebarItems.map(item => {
-              return (
-                <Menu.Item key={item.subPath} style={{paddingLeft: 26}}>
-                  <Link to={`${appPrefix}g/${group}/${item.subPath}`}>
-                    <Icon src={item.icon} style={item.style}/>
-                    <Title>{item.title}</Title>
-                    {this.renderStageBadge(item)}
-                  </Link>
-                </Menu.Item>
-              );
-            }) : []
+            sidebarItems ? this.renderSidebarItems(sidebarItems, group) : []
           }
         </Menu>
       </Layout.Sider>
