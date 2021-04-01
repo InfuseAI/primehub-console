@@ -6,6 +6,9 @@ fragment GroupInfo on Group {
   quotaCpu
   quotaGpu
   quotaMemory
+  projectQuotaCpu
+  projectQuotaGpu
+  projectQuotaMemory
   datasets {
     displayName
   }
@@ -13,6 +16,9 @@ fragment GroupInfo on Group {
     cpuUsage
     memUsage
     gpuUsage
+  }
+  users {
+    username
   }
   enabledDeployment
   enabledSharedVolume

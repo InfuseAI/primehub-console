@@ -8,7 +8,7 @@ import { UserContextComponentProps } from 'context/user';
 import GroupSettingsAlert from 'components/groupSettings/alert';
 
 type Props = FormComponentProps & {
-  getGroups: any;
+  currentUser: any;
 } & GroupContextComponentProps & UserContextComponentProps & RouteComponentProps;
 
 interface State {
@@ -25,22 +25,22 @@ class GroupSettingsModels extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const { groupContext, getGroups } = this.props;
-    const group = get(getGroups, 'me.groups', []).find(group => group.id === groupContext.id);
+    const { groupContext, currentUser } = this.props;
+    const group = get(currentUser, 'me.groups', []).find(group => group.id === groupContext.id);
     this.setState({group});
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { groupContext, getGroups, form } = this.props;
+    const { groupContext, currentUser, form } = this.props;
     const { group } = this.state;
     if (group.id !== groupContext.id) {
-      const newGroup = get(getGroups, 'me.groups', []).find(group => group.id === groupContext.id);
+      const newGroup = get(currentUser, 'me.groups', []).find(group => group.id === groupContext.id);
       this.setState({group: newGroup});
     }
   }
 
   render() {
-    const {groupContext, userContext, getGroups, history, form} = this.props;
+    const {groupContext, userContext, currentUser, history, form} = this.props;
     const {group} = this.state;
     if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
       history.push(`./home`);

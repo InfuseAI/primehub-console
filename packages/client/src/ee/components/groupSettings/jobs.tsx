@@ -13,7 +13,7 @@ import { UserContextComponentProps } from 'context/user';
 import NumberWithSelectMultipler from 'cms-components/customize-number-with_select_multiplier'
 
 type Props = FormComponentProps & {
-  getGroups: any;
+  currentUser: any;
   updateGroup: any;
 } & GroupContextComponentProps & UserContextComponentProps & RouteComponentProps;
 
@@ -58,16 +58,16 @@ class GroupSettingsJobs extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const { groupContext, getGroups } = this.props;
-    const group = get(getGroups, 'me.groups', []).find(group => group.id === groupContext.id);
+    const { groupContext, currentUser } = this.props;
+    const group = get(currentUser, 'me.groups', []).find(group => group.id === groupContext.id);
     this.setState({group});
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { groupContext, getGroups, form } = this.props;
+    const { groupContext, currentUser, form } = this.props;
     const { group } = this.state;
     if (group.id !== groupContext.id) {
-      const newGroup = get(getGroups, 'me.groups', []).find(group => group.id === groupContext.id);
+      const newGroup = get(currentUser, 'me.groups', []).find(group => group.id === groupContext.id);
       form.resetFields();
       this.setState({group: newGroup});
     }
@@ -92,7 +92,7 @@ class GroupSettingsJobs extends React.Component<Props, State> {
   }
 
   render() {
-    const {groupContext, userContext, getGroups, history, form} = this.props;
+    const {groupContext, userContext, currentUser, history, form} = this.props;
     const {group} = this.state;
     if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
       history.push(`./home`);

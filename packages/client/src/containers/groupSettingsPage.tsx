@@ -14,9 +14,10 @@ import Breadcrumbs from 'components/share/breadcrumb';
 import GroupSettingsInfo from 'components/groupSettings/info';
 import GroupSettingsMembers from 'components/groupSettings/members';
 import GroupSettingsAlert from 'components/groupSettings/alert';
+import {CurrentUser} from 'queries/User.graphql';
 
 type Props = {
-  getGroups: any;
+  currentUser: any;
   extraTabs: React.Component[];
 } & GroupContextComponentProps & UserContextComponentProps & RouteComponentProps;
 
@@ -61,12 +62,12 @@ export const GET_MY_GROUPS = gql`
 class GroupSettingsPage extends React.Component<Props> {
 
   render() {
-    const {groupContext, userContext, getGroups, history, extraTabs} = this.props;
+    const {groupContext, userContext, currentUser, history, extraTabs} = this.props;
     if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
       history.push(`../home`);
     }
 
-    const group = get(getGroups, 'me.groups', []).find(group => group.id === groupContext.id);
+    const group = get(currentUser, 'me.groups', []).find(group => group.id === groupContext.id);
 
     return (
       <>
@@ -101,7 +102,7 @@ export default compose(
   withRouter,
   withUserContext,
   withGroupContext,
-  graphql(GET_MY_GROUPS, {
-    name: 'getGroups'
+  graphql(CurrentUser, {
+    name: 'currentUser'
   }),
 )(GroupSettingsPage)
