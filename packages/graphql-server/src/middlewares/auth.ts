@@ -9,6 +9,7 @@ export const permissions = shield({
     'user': or(isAdmin, isClient),
     'group': or(isAdmin, isClient),
     'groups': or(isAdmin, isClient),
+    'datasets': or(isAdmin, isClient),
     'instanceType': or(isAdmin, isClient),
     'secret': or(isAdmin, isUser, isClient),
     'secrets': or(isAdmin, isUser, isClient),
