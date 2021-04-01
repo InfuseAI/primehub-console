@@ -30,35 +30,6 @@ const breadcrumbs = [
   }
 ];
 
-export const GET_MY_GROUPS = gql`
-  query me {
-    me {
-      id
-      groups {
-        ...GroupInfo
-      }
-    }
-  }
-  fragment GroupInfo on Group {
-    id
-    name
-    displayName
-    enabledSharedVolume
-    quotaCpu
-    quotaGpu
-    quotaMemory
-    projectQuotaCpu
-    projectQuotaGpu
-    projectQuotaMemory
-    admins
-    users {
-      username
-    }
-    jobDefaultActiveDeadlineSeconds
-    enabledDeployment
-  }
-`
-
 class GroupSettingsPage extends React.Component<Props> {
 
   render() {
@@ -103,6 +74,7 @@ export default compose(
   withUserContext,
   withGroupContext,
   graphql(CurrentUser, {
-    name: 'currentUser'
+    name: 'currentUser',
+    alias: 'withCurrentUser'
   }),
 )(GroupSettingsPage)
