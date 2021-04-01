@@ -26,6 +26,7 @@ export const GuideList = styled.li`
 
 export const SubContent = styled.div`
   margin-bottom: 2em;
+  font-size: 15px;
 `;
 
 const PAGE_PADDING = 64;
