@@ -46,14 +46,14 @@ class Landing extends React.Component<Props> {
                   <SubContent>
                     <GuideList>
                       <li>
-                        <a href={qsLink} target='_blank'>Learn How To use PrimeHub Platform</a>
+                        <a href={qsLink} target='_blank'>Learn How To Use PrimeHub Platform</a>
                       </li>
-                      <li><a href='https://docs.primehub.io/docs/introduction'>PrimeHub User Guide</a></li>
+                      <li><a href='https://docs.primehub.io/docs/introduction#user-portal' target='_blank'>PrimeHub User Guide</a></li>
                       <li>
-                        <a href='https://docs.primehub.io/docs/getting-started-admin' target='_blank'>Administration Guide</a>
+                        <a href='https://docs.primehub.io/docs/introduction#admin-portal' target='_blank'>Administration Guide</a>
                       </li>
                       <li>
-                        <a href='https://docs.primehub.io/docs/release-note'>Release Notes</a>
+                        <a href='https://docs.primehub.io/docs/release-note' target='_blank'>Release Notes</a>
                       </li>
                     </GuideList>
                   </SubContent>
@@ -81,7 +81,7 @@ class Landing extends React.Component<Props> {
                             <a href='apps'>Install Application</a>
                           </li>
                           <li>
-                            <a href='browse'>Upload Share Files...</a>
+                            <a href='browse'>Upload Shared Files...</a>
                           </li>
                         </GuideList>
                       </SubContent>
@@ -101,7 +101,7 @@ class Landing extends React.Component<Props> {
                             <a href='apps'>Install Application</a>
                           </li>
                           <li>
-                            <a href='browse'>Upload Share Files...</a>
+                            <a href='browse'>Upload Shared Files...</a>
                           </li>
                         </GuideList>
                       </SubContent>
