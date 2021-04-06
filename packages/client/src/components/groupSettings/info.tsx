@@ -86,6 +86,32 @@ export default class GroupSettingsInfo extends React.Component<Props> {
           <Col>
             <Form.Item label={`Shared Volume`} style={{marginBottom: 20}}>
               <Switch disabled checked={group.enabledSharedVolume} />
+              {group.enabledSharedVolume ?
+                <Card title={`Shared Volume`} style={{marginTop: 10}}>
+                  <Row>
+                    <Col sm={8} xs={24}>
+                      <Form.Item label={`Shared Volume Capacity`}>
+                        <InputNumber
+                          style={{width: 'auto'}}
+                          formatter={value => `${value} GB`}
+                          value={group.sharedVolumeCapacity}
+                          disabled
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col sm={8} xs={24}>
+                      <Form.Item label={`Launch Group Only`}>
+                        <Switch
+                          checked={group.launchGroupOnly}
+                          checkedChildren="yes"
+                          unCheckedChildren="no"
+                          disabled
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                </Card>
+              : <></>}
             </Form.Item>
           </Col>
         </Row>
