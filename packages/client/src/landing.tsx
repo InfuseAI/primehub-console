@@ -29,6 +29,8 @@ class Landing extends React.Component<Props> {
     // @ts-ignore
     const qsLink = modelDeploymentOnly ? 'https://docs.primehub.io/docs/quickstart/qs-primehub-deploy' : 'https://docs.primehub.io/docs/quickstart/qs-primehub';
 
+    if (!groupContext) return <div></div>;
+
     return (
       <Layout>
         <PageTitle
