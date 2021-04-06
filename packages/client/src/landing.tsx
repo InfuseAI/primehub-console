@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {Tag, Divider, Typography, Layout, Row, Col, Card, notification, Button} from 'antd';
+import {Link} from 'react-router-dom';
 import PageTitle from 'components/pageTitle';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 import UserResourceMonitor from 'components/share/userResourceMonitor';
@@ -68,7 +69,7 @@ class Landing extends React.Component<Props> {
                       <SubContent>
                         <GuideList>
                           <li>
-                            <a href='model-deployment'>Deploy Model</a>
+                            <Link to='model-deployment'>Deploy Model</Link>
                           </li>
                         </GuideList>
                       </SubContent>
@@ -77,13 +78,13 @@ class Landing extends React.Component<Props> {
                       <SubContent>
                         <GuideList>
                           <li>
-                            <a href='hub'>Open Jupyter Notebook</a>
+                            <Link to='hub'>Open Jupyter Notebook</Link>
                           </li>
                           <li>
-                            <a href='apps'>Install Application</a>
+                            <Link to='apps'>Install Application</Link>
                           </li>
                           <li>
-                            <a href='browse'>Upload Shared Files...</a>
+                            <Link to='browse'>Upload Shared Files...</Link>
                           </li>
                         </GuideList>
                       </SubContent>
@@ -91,19 +92,19 @@ class Landing extends React.Component<Props> {
                       <SubContent>
                         <GuideList>
                           <li>
-                            <a href='hub'>Open Jupyter Notebook</a>
+                            <Link to='hub'>Open Jupyter Notebook</Link>
                           </li>
                           <li>
-                            <a href='job'>Create New Job</a>
+                            <Link to='job'>Create New Job</Link>
                           </li>
                           <li>
-                            <a href='model-deployment'>Deploy Model</a>
+                            <Link to='model-deployment'>Deploy Model</Link>
                           </li>
                           <li>
-                            <a href='apps'>Install Application</a>
+                            <Link to='apps'>Install Application</Link>
                           </li>
                           <li>
-                            <a href='browse'>Upload Shared Files...</a>
+                            <Link to='browse'>Upload Shared Files...</Link>
                           </li>
                         </GuideList>
                       </SubContent>
