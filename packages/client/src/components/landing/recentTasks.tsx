@@ -77,8 +77,8 @@ class RecentTasks extends React.Component<Props> {
         name: d.node.name,
         id: d.node.id,
         link: `model-deployment/${d.node.id}`,
-        status: 'Deployed',
-        statusColor: 'green',
+        status: d.node.status
+        statusColor: d.node.status === 'Deployed' ? 'green' : 'red',
         time: moment(d.node.lastUpdatedTime)
       };
     })).sort((item, next) => item.time.isAfter(next.time) ? -1 : 1);
