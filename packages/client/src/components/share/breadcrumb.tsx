@@ -14,7 +14,7 @@ export interface BreadcrumbItemSetup {
   key: string;
   matcher: RegExp;
   title: string;
-  link: string;
+  link?: string;
 }
 
 type Props = RouteComponentProps & {

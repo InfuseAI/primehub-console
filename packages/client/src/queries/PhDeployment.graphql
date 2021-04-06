@@ -1,0 +1,87 @@
+fragment PhDeploymentInfo on PhDeployment {
+  id
+  status
+  message
+  name
+  description
+  updateMessage
+  env {
+    name
+    value
+  }
+  metadata
+  groupId
+  groupName
+  creationTime
+  lastUpdatedTime
+  endpoint
+  endpointAccessType
+  endpointClients {
+    name
+  }
+  modelImage
+  modelURI
+  pods {
+    name
+    logEndpoint
+  }
+  availableReplicas
+  replicas
+  imagePullSecret
+  instanceType {
+    id
+    name
+    displayName
+    cpuLimit
+    memoryLimit
+    gpuLimit
+  }
+  history {
+    deployment {
+      id
+      userName
+      stop
+      modelImage
+      modelURI
+      replicas
+      groupName
+      description
+      updateMessage
+      metadata
+      env {
+        name
+        value
+      }
+      endpointClients {
+        name
+      }
+      endpointAccessType
+      instanceType {
+        id
+        name
+        displayName
+        cpuLimit
+        memoryLimit
+        gpuLimit
+      }
+    }
+    time
+  }
+}
+
+query PhDeploymentsConnection($where: PhDeploymentWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
+  phDeploymentsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    edges {
+      cursor
+      node {
+        ...PhDeploymentInfo
+      }
+    }
+  }
+}

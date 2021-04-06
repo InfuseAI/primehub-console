@@ -110,7 +110,8 @@ module.exports = {
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({
-      modelDeploymentOnly: false
+      modelDeploymentOnly: false,
+      primehubCE: true,
     }),
     new MiniCssExtractPlugin({
       filename: devMode ? '[name].css' : '[name].[hash].css',

@@ -1,0 +1,42 @@
+fragment PhJobInfo on PhJob {
+  id
+  displayName
+  cancel
+  command
+  groupId
+  groupName
+  schedule
+  image
+  instanceType {
+    id
+    name
+    displayName
+    cpuLimit
+    memoryLimit
+    gpuLimit
+  }
+  userId
+  userName
+  phase
+  reason
+  message
+  createTime
+  startTime
+  finishTime
+  logEndpoint
+}
+
+query PhJobsConnection($where: PhJobWhereInput, $page: Int, $orderBy: PhJobOrderByInput) {
+  phJobsConnection(where: $where, page: $page, orderBy: $orderBy) {
+    pageInfo {
+      totalPage
+      currentPage
+    }
+    edges {
+      cursor
+      node {
+        ...PhJobInfo
+      }
+    }
+  }
+}
