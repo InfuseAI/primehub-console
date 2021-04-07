@@ -30,7 +30,7 @@ class AppEditPage extends React.Component<AppEditProps> {
     updatePhApplication({
       variables: {
         where: {id: payload.id},
-        data: pick(payload, ['instanceType', 'env'])
+        data: pick(payload, ['instanceType', 'env', 'scope', 'displayName'])
       }
     });
   }

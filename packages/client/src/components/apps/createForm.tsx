@@ -401,7 +401,7 @@ class AppCreateForm extends React.Component<Props, State> {
                     { pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*/, message: `alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`}
                   ],
                 })(
-                  <Input disabled={type === 'edit'} />
+                  <Input />
                 )}
               </Form.Item>
 
