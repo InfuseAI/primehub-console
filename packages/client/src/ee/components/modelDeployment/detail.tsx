@@ -147,7 +147,7 @@ export default class Detail extends React.Component<Props, State> {
     const example = `curl -X POST \\\n` +
     (phDeployment.endpointAccessType === 'private' ?
     `    -u <client-name>:<client-token> \\\n` : '') +
-    `    -d '{"data":{"names":["a","b"],"tensor":{"shape":[2,2],"values":[0,0,1,1]}}}' \\\n` +
+    "    -d '${YOUR_DATA}' \\\n" +
     `    -H "Content-Type: application/json" \\\n` +
     `    ${phDeployment.endpoint || '<endpoint>'}`;
     const revealBtn = (
