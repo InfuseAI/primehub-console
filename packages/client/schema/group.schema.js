@@ -127,33 +127,6 @@ export default () => (
       </Condition>
       <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
         <ShareVolumn />
-        <number keyName="jobDefaultActiveDeadlineSeconds" 
-          title="${group.jobDefaultActiveDeadlineSeconds}"
-          packageName="../src/cms-components/customize-number-with_select_multiplier"
-          defaultValue={() => null}
-          nullable
-          uiParams={{
-            options: [{
-              text: 'Minutes',
-              value: 'm',
-              multiplier: 60
-            }, {
-              text: 'Hours',
-              value: 'h',
-              multiplier: 60*60
-            }, {
-              text: 'Days',
-              value: 'd',
-              multiplier: 60*60*24
-            }],
-            styleOnSelect: {width: 200},
-            defaultSelected: 1,
-            styleOnInput: {width: 100, marginRight: 10},
-            min: 0,
-            max: 999,
-            step: 1
-          }}
-        />
       </Condition>
       <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
         <Block title="User Quota">
@@ -243,6 +216,76 @@ export default () => (
         </relation>
       </Block>
     </Default>
+    { /* Instance Type tabular */}
+    <Default keyName="instanceTypes" title="Instance Types">
+      <Block title="${instanceTypes}">
+        <array keyName="instanceTypes"
+          packageName="../src/cms-components/customize-array-instance_in_groups"
+          uiParams={{
+            removeActions: true,
+            columns: [{
+              title: '${displayName}',
+              dataIndex: 'displayName'
+            }, {
+              title: '${description}',
+              dataIndex: 'description'
+            }, {
+              title: '${cpuLimit}',
+              dataIndex: 'cpuLimit'
+            }, {
+              title: '${memoryLimit}',
+              dataIndex: 'memoryLimit'
+            }, {
+              title: '${gpuLimit}',
+              dataIndex: 'gpuLimit'
+            }]
+          }}
+        >
+          <string keyName="id" />
+          <string keyName="displayName" title="${displayName}" />
+          <string keyName="description" title="${description}" />
+          <string keyName="cpuLimit" title="${cpuLimit}" />
+          <string keyName="memoryLimit" title="${memoryLimit}" />
+          <string keyName="gpuLimit" title="${gpuLimit}" />
+        </array>
+      </Block>
+    </Default>
+    { /* Images tabular */}
+    <Default keyName="images" match={() => !modelDeploymentOnly}  title="Images">
+      <Block title="${images}">
+        <array keyName="images"
+          packageName="../src/cms-components/customize-array-images_in_groups"
+          uiParams={{
+            removeActions: true,
+            columns: [{
+              title: '${displayName}',
+              dataIndex: 'displayName'
+            }, {
+              title: '${type}',
+              dataIndex: 'type',
+              render: (value) => {
+                if (!value) {
+                    return '-';
+                }
+                if (value === 'both') {
+                    return 'universal';
+                }
+                return value;
+              }
+            }, {
+              title: '${description}',
+              dataIndex: 'description'
+            }]
+          }}
+        >
+          <string keyName="id" />
+          <string keyName="displayName" title="${displayName}" />
+          <string keyName="type" title="${type} "/>
+          <string keyName="description" title="${description}" />
+        </array>
+      </Block>
+    </Default>
+    { /* Datasets tabular */}
     <Default keyName="dataset"  match={() => !modelDeploymentOnly} title="Datasets">
       <Block title="${dataset}">
         <array keyName="datasets"
@@ -289,75 +332,6 @@ export default () => (
         </array>
       </Block>
       <boolean keyName="writable" hidden />
-    </Default>
-    { /* Images tabular */}
-    <Default keyName="images" match={() => !modelDeploymentOnly}  title="Images">
-      <Block title="${images}">
-        <array keyName="images"
-          packageName="../src/cms-components/customize-array-images_in_groups"
-          uiParams={{
-            removeActions: true,
-            columns: [{
-              title: '${displayName}',
-              dataIndex: 'displayName'
-            }, {
-              title: '${type}',
-              dataIndex: 'type',
-              render: (value) => {
-                if (!value) {
-                    return '-';
-                }
-                if (value === 'both') {
-                    return 'universal';
-                }
-                return value;
-              }
-            }, {
-              title: '${description}',
-              dataIndex: 'description'
-            }]
-          }}
-        >
-          <string keyName="id" />
-          <string keyName="displayName" title="${displayName}" />
-          <string keyName="type" title="${type} "/>
-          <string keyName="description" title="${description}" />
-        </array>
-      </Block>
-    </Default>
-    { /* Instance Type tabular */}
-    <Default keyName="instanceTypes" title="Instance Types">
-      <Block title="${instanceTypes}">
-        <array keyName="instanceTypes"
-          packageName="../src/cms-components/customize-array-instance_in_groups"
-          uiParams={{
-            removeActions: true,
-            columns: [{
-              title: '${displayName}',
-              dataIndex: 'displayName'
-            }, {
-              title: '${description}',
-              dataIndex: 'description'
-            }, {
-              title: '${cpuLimit}',
-              dataIndex: 'cpuLimit'
-            }, {
-              title: '${memoryLimit}',
-              dataIndex: 'memoryLimit'
-            }, {
-              title: '${gpuLimit}',
-              dataIndex: 'gpuLimit'
-            }]
-          }}
-        >
-          <string keyName="id" />
-          <string keyName="displayName" title="${displayName}" />
-          <string keyName="description" title="${description}" />
-          <string keyName="cpuLimit" title="${cpuLimit}" />
-          <string keyName="memoryLimit" title="${memoryLimit}" />
-          <string keyName="gpuLimit" title="${gpuLimit}" />
-        </array>
-      </Block>
     </Default>
   </Tabs>
   </array>

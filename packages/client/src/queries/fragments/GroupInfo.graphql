@@ -23,4 +23,6 @@ fragment GroupInfo on Group {
   enabledDeployment
   enabledSharedVolume
   jobDefaultActiveDeadlineSeconds
+  sharedVolumeCapacity
+  launchGroupOnly
 }
