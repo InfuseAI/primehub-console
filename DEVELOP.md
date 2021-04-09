@@ -2,13 +2,13 @@
 
 ## Develop on local
 
-We recommend to use node version 10 lts for primehub-console development, you can use [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md) to install and manage differnet node runtime on the local machine.
+We recommend to use node version 10 lts for primehub-console development, you can use [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md) to install and manage different node runtime on the local machine.
 
 ```shell
 $ nvm install v10
 ```
 
-First, make sure you have node enviroment and install yarn in your local machine already.
+First, make sure you have node environment and install yarn in your local machine already.
 
 ```shell
 $ npm install -g yarn
@@ -18,7 +18,7 @@ $ yarn install
 ### Overview
 
 In PrimeHub Console, we have 4 sub components in `packages`, the web server, graphql server, front-end client and watcher.
-All components can run as a standalone server for test individual, you also can combine them together as a compelete primehub-console on the local machine.
+All components can run as a standalone server for test individual, you also can combine them together as a complete primehub-console on the local machine.
 
 ### Graphql dev server
 
