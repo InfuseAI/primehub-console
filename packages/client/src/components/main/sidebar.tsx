@@ -96,6 +96,9 @@ class Sidebar extends React.Component<Props> {
       if (item.groupAdminOnly) {
         return get(userContext, 'isCurrentGroupAdmin', false);
       }
+      if (item.hidden) {
+        return false;
+      }
       return true;
     });
 

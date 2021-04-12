@@ -92,6 +92,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.state.enablePhfs = config.enablePhfs;
     ctx.state.enableJobArtifact = config.enableJobArtifact;
     ctx.state.enableJobMonitoring = config.enableJobMonitoring;
+    ctx.state.enableApp = config.enableApp;
     ctx.state.disableGroup = config.enableLicenseCheck ? config.licenseStatus !== 'unexpired' : false;
     ctx.state.everyoneGroupId = config.keycloakEveryoneGroupId;
     ctx.state.jobDefaultActiveDeadlineSeconds = config.jobDefaultActiveDeadlineSeconds;

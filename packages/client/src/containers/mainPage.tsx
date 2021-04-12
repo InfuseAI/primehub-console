@@ -21,6 +21,7 @@ export interface MainPageSidebarItem {
   icon: string;
   style?: any;
   stage?: string;
+  hidden?: boolean;
   groupAdminOnly?: boolean;
 }
 
