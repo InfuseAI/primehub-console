@@ -3,4 +3,5 @@ interface Window {
   EVERYONE_GROUP_ID: string;
   development: boolean;
   primehubVersion: string;
+  enableApp: boolean;
 }
