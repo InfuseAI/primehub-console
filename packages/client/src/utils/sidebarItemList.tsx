@@ -89,7 +89,7 @@ export const listEE = [
     subPath: 'apps',
     icon: iconApps,
     stage: 'alpha',
-    hidden: !(window as any).enableApp,
+    hidden: window.enableApp,
     style: {
       width: 'auto',
       height: 20,
