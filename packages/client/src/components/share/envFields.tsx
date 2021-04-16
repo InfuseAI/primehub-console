@@ -1,6 +1,6 @@
 import React from 'react';
 import {merge} from 'lodash';
-import {Input, Icon, Button} from 'antd';
+import {Tooltip, Input, Icon, Button} from 'antd';
 import {Empty} from '../empty';
 import {DefaultEnv} from 'interfaces/phAppTemplate';
 
@@ -43,7 +43,7 @@ export default class EnvFields extends React.Component<Props, State> {
     if (prevProps.defaultEnv !== this.props.defaultEnv || this.props.reloadDefault === true) {
       const {defaultEnv} = this.props;
       const defaultEnvs = defaultEnv ? defaultEnv.map(item => {
-        return {name: item.name, value: item.defaultValue, required: !item.optional};
+        return {name: item.name, value: item.defaultValue, required: !item.optional, description: item.description};
       }) : [];
       this.setState({fields: defaultEnvs});
     }
@@ -137,16 +137,18 @@ export default class EnvFields extends React.Component<Props, State> {
                   </InputGroup>
                   {
                     disabled ? null : field.required ? (
-                      <span>
-                        <Icon type='info-circle' theme='filled' style={
-                          {
-                            display: field.description ? 'inline' : 'none',
-                            marginRight: 8,
-                            verticalAlign: 'baseline'
-                          }
-                        } title={field.description} />
-                        <span style={{color: 'red'}}>*</span>
-                      </span>
+                        <span>
+                          <Tooltip title={field.description} placement='right'>
+                            <Icon type='info-circle' theme='filled' style={
+                              {
+                                display: field.description ? 'inline' : 'none',
+                                marginRight: 8,
+                                verticalAlign: 'baseline'
+                              }
+                            }/>
+                          </Tooltip>
+                          <span style={{color: 'red'}}>*</span>
+                        </span>
                     ) : (
                       <a href='javascript:;' onClick={() => this.remove(i)}>
                         <Icon type='close-circle-o'/>
