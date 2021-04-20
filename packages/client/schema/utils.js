@@ -448,7 +448,7 @@ exports.dict = {
     // smtp
     smtpSettings: 'Email Settings',
     'smtp.host': 'SMTP Host',
-    'smtp.port': 'SMTP port',
+    'smtp.port': 'SMTP Port',
     'smtp.fromDisplayName': 'From Display Name',
     'smtp.from': 'From',
     'smtp.replyToDisplayName': 'Reply To Display Name',
