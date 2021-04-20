@@ -271,7 +271,7 @@ class ImageCreateForm extends React.Component<Props, State> {
     if (formType === FormType.Edit) {
       return (
         <StyledFormItem
-          label={<span>Container image url : {this.renderBuildingLink(isReady, get(jobStatus, 'phase', ''))}</span>}
+          label={<span>Container Image URL : {this.renderBuildingLink(isReady, get(jobStatus, 'phase', ''))}</span>}
           style={{marginBottom: '12px'}}>
           {form.getFieldDecorator('url', {
             initialValue: url
@@ -325,7 +325,7 @@ class ImageCreateForm extends React.Component<Props, State> {
         <Row>
           <Col>
             <Card loading={loading} style={{overflow: 'auto'}}>
-              <Form.Item label={`Display name`} style={{marginBottom: '8px'}}>
+              <Form.Item label={`Display Name`} style={{marginBottom: '8px'}}>
                 {form.getFieldDecorator('displayName', {
                   initialValue: displayName,
                   rules: [
@@ -343,7 +343,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                   <Input onChange={this.handleNameChange} />
                 )}
               </Form.Item>
-              <Form.Item label={`Image name`}>
+              <Form.Item label={`Image Name`}>
                 {form.getFieldDecorator('name', {
                   initialValue: name
                 })(
@@ -372,7 +372,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                   onChange={this.handleBuildingType}
                   value={this.state.buildType}>
                   <Radio value={BuildType.EXIST}>
-                    Use existing one
+                    Use Existing One
                   </Radio>
                   <Radio value={BuildType.CUSTOM} disabled={DISABLE_BUILD_IMAGE}>
                     Build Custom Image
@@ -390,9 +390,9 @@ class ImageCreateForm extends React.Component<Props, State> {
                   ]
                 })(
                   <Select style={{width: '200px'}} onChange={this.handleTypeChange}>
-                    <Option key='cpu' value='cpu'>cpu</Option>
-                    <Option key='gpu' value='gpu'>gpu</Option>
-                    <Option key='both' value='both'>universal</Option>
+                    <Option key='cpu' value='cpu'>CPU</Option>
+                    <Option key='gpu' value='gpu'>GPU</Option>
+                    <Option key='both' value='both'>Universal</Option>
                   </Select>
                 )}
               </Form.Item>
@@ -402,7 +402,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                   <>
                     <Row gutter={24}>
                       <Col span={12}>
-                        <Form.Item label='Container image url' style={{marginBottom: '12px'}}>
+                        <Form.Item label='Container Image URL' style={{marginBottom: '12px'}}>
                           {form.getFieldDecorator('url', {
                             initialValue: url
                           })(
@@ -426,7 +426,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                           <Checkbox style={{color: '#000000D9'}}
                             checked={this.state.showGpuUrl}
                             onChange={this.handleGpuVisible}>
-                            Specific container image url for GPU
+                            Specific Container Image URL for GPU
                           </Checkbox>
                         </Form.Item>
                         <Form.Item>

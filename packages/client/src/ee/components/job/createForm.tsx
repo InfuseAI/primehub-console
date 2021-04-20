@@ -233,7 +233,7 @@ class CreateForm extends React.Component<Props, State> {
     } = initialValue || {};
     let recurrenceLabel = `Recurrence Options`;
     if (timezone) {
-      recurrenceLabel += `(${this.stringifyZone(timezone, 'GMT')})`;
+      recurrenceLabel += ` (${this.stringifyZone(timezone, 'GMT')})`;
     }
 
     const invalidInitialGroup = groupId && !form.getFieldValue('groupId') && !groups.find(group => group.id === groupId);
