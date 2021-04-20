@@ -111,19 +111,19 @@ export default () => (
       packageName="../src/cms-components/customize-string-select"
       uiParams={{
         options: [{
-          text: 'persistent volume',
+          text: 'Persistent Volume',
           value: 'pv'
         }, {
-          text: 'nfs',
+          text: 'NFS',
           value: 'nfs'
         }, {
-          text: 'host path',
+          text: 'Host Path',
           value: 'hostPath'
         },{
-          text: 'git',
+          text: 'Git',
           value: 'git'
         }, {
-          text: 'env',
+          text: 'Env',
           value: 'env'
         }],
         style: {width: 200},

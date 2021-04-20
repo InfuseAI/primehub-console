@@ -162,7 +162,7 @@ export default class RelationGroupUsersTable extends PureComponent {
                 id="relation.multipleSelect.connect"
                 defaultMessage="edit "
               />
-              <span style={{marginLeft: 4}}>
+              <span style={{marginLeft: 4, textTransform: 'capitalize'}}>
                 {pluralize.plural(schema[relation.to].keyName)}
               </span>
             </Button>
