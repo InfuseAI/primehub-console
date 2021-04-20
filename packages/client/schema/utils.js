@@ -351,9 +351,8 @@ exports.dict = {
     type: 'Type',
     images: 'Images',
     global: 'Global',
-    imageUrl: 'Container image url',
-    imageUrl: 'Container image url',
-    datasetUrl: 'Url',
+    imageUrl: 'Container Image URL',
+    datasetUrl: 'URL',
     variables: 'Variables',
     config: 'Config',
     priority: 'Priority',
@@ -448,8 +447,8 @@ exports.dict = {
 
     // smtp
     smtpSettings: 'Email Settings',
-    'smtp.host': 'Smtp Host',
-    'smtp.port': 'Smtp port',
+    'smtp.host': 'SMTP Host',
+    'smtp.port': 'SMTP port',
     'smtp.fromDisplayName': 'From Display Name',
     'smtp.from': 'From',
     'smtp.replyToDisplayName': 'Reply To Display Name',
@@ -480,7 +479,7 @@ exports.dict = {
     'secret.password': 'Password',
 
     // image
-    'images.urlForGpu': 'Specific container image url for GPU',
+    'images.urlForGpu': 'Specific Container Image URL for GPU',
     'images.useImagePullSecret': 'Use Image Pull Secret',
     'image.useImagePullSecret.component.select.placeholder': 'Select Secret',
 
@@ -604,7 +603,7 @@ exports.dict = {
     images: 'Images',
     global: 'Global',
     imageUrl: 'Container image url',
-    datasetUrl: 'Url',
+    datasetUrl: 'URL',
     variables: 'Variables',
     config: 'Config',
     priority: 'Priority',
@@ -697,9 +696,9 @@ exports.dict = {
     clientSecret: 'ClientSecret',
 
     // smtp
-    smtpSettings: 'Smtp 設定',
-    'smtp.host': 'Smtp Host',
-    'smtp.port': 'Smtp Port',
+    smtpSettings: 'SMTP 設定',
+    'smtp.host': 'SMTP Host',
+    'smtp.port': 'SMTP Port',
     'smtp.fromDisplayName': 'From Display Name',
     'smtp.from': 'From',
     'smtp.replyToDisplayName': 'Reply To Display Name',
@@ -730,7 +729,7 @@ exports.dict = {
     'secret.password': 'Password',
 
     // image
-    'images.urlForGpu': 'Specific container image url for GPU',
+    'images.urlForGpu': 'Specific Container Image URL for GPU',
     'images.useImagePullSecret': 'Use Image Pull Secret',
     'image.useImagePullSecret.component.select.placeholder': 'Select Secret',
 

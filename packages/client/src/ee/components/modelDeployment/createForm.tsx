@@ -204,7 +204,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       !form.getFieldValue('instanceType') &&
       !instanceTypes.find(it => it.id === instanceTypeId);
     const instanceTypeLabel = this.renderLabel(
-      'InstanceTypes',
+      'Instance Types',
       invalidInitialInstanceType,
       <span>The instance type <b>{instanceTypeName}</b> was deleted.</span>
     )
@@ -261,7 +261,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                 )
               }
             <Card loading={loading} style={{overflow: 'auto'}}>
-              <Form.Item label={`Deployment name`} style={{marginBottom: '8px'}}>
+              <Form.Item label={`Deployment Name`} style={{marginBottom: '8px'}}>
                 {form.getFieldDecorator('name', {
                   initialValue: name,
                   rules: [
