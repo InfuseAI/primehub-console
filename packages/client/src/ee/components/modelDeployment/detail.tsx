@@ -253,13 +253,13 @@ export default class Detail extends React.Component<Props, State> {
     const breadcrumbs = [
       {
         key: 'list',
-        matcher: /\/model-deployment/,
-        title: 'Model Deployments',
-        link: '/model-deployment?page=1'
+        matcher: /\/deployments/,
+        title: 'Deployments',
+        link: '/deployments?page=1'
       },
       {
         key: 'detail',
-        matcher: /\/model-deployment\/([\w-])+/,
+        matcher: /\/deployments\/([\w-])+/,
         title: `Deployment: ${phDeployment.name}`
       }
     ];
