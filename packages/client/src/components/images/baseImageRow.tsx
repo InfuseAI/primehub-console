@@ -92,13 +92,13 @@ export default class BaseImageRow extends React.Component<Props, State> {
     return (
       <Row gutter={24}>
         <Col span={12}>
-          <Form.Item label='Base image url' style={{marginBottom: '12px'}}>
+          <Form.Item label='Base Image URL' style={{marginBottom: '12px'}}>
             {form.getFieldDecorator('imageSpec.baseImage', {
               initialValue: get(imageSpec, 'baseImage', ''),
               rules: [
                 {
                   required: true,
-                  message: 'Please give a base image url'
+                  message: 'Please give a base image URL'
                 }
               ]
             })(

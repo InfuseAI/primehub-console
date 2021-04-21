@@ -123,7 +123,7 @@ export default class DatesetGroupTable extends PureComponent {
                       id="relation.multipleSelect.connect"
                       defaultMessage="edit "
                     />
-                    <span style={{marginLeft: 4}}>
+                    <span style={{marginLeft: 4, textTransform: 'capitalize'}}>
                       {pluralize.plural(schema[relation.to].keyName)}
                     </span>
                   </Button>
@@ -176,7 +176,7 @@ export default class DatesetGroupTable extends PureComponent {
                       id="relation.multipleSelect.connect"
                       defaultMessage="edit "
                     />
-                    <span style={{marginLeft: 4}}>
+                    <span style={{marginLeft: 4, textTransform: 'capitalize'}}>
                       {pluralize.plural(schema[relation.to].keyName)}
                     </span>
                   </Button>

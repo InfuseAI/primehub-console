@@ -95,13 +95,13 @@ export default () => (
         title="${type}"
         uiParams={{
           options: [{
-            text: 'cpu',
+            text: 'CPU',
             value: 'cpu'
           }, {
-            text: 'gpu',
+            text: 'GPU',
             value: 'gpu'
           }, {
-            text: 'universal',
+            text: 'Universal',
             value: 'both'
           }]
         }}

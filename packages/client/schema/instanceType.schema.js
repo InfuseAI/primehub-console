@@ -143,7 +143,7 @@ export default () => (
       <Default title="Tolerations" keyName="tolerations">
         <Tolerations />
       </Default>
-      <Default title="NodeSelector" keyName="nodeSelector">
+      <Default title="Node Selector" keyName="nodeSelector">
         <Layout component={DisableModeLayout}>
           <NodeSelectors />
         </Layout>

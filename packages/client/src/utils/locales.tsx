@@ -11,7 +11,7 @@ export default {
     'deploy.confirm.content': `Your changes will be lost. Are you sure?`,
     'deploy.confirm.ok': `Discard`,
     'deploy.confirm.cancel': `Cancel`,
-    "relation.multipleSelect.connect": `edit `
+    "relation.multipleSelect.connect": `Edit `
   },
   zh: {
     'deploy.error.message': '有地方出錯了!',

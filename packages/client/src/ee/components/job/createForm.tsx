@@ -233,7 +233,7 @@ class CreateForm extends React.Component<Props, State> {
     } = initialValue || {};
     let recurrenceLabel = `Recurrence Options`;
     if (timezone) {
-      recurrenceLabel += `(${this.stringifyZone(timezone, 'GMT')})`;
+      recurrenceLabel += ` (${this.stringifyZone(timezone, 'GMT')})`;
     }
 
     const invalidInitialGroup = groupId && !form.getFieldValue('groupId') && !groups.find(group => group.id === groupId);
@@ -248,7 +248,7 @@ class CreateForm extends React.Component<Props, State> {
       !instanceTypes.find(it => it.id === instanceTypeId);
 
     const instanceTypeLabel = this.renderLabel(
-      'InstanceTypes',
+      'Instance Types',
       invalidInitialInstanceType,
       <span>The instance type <b>{instanceTypeName}</b> was deleted.</span>
     )
@@ -370,7 +370,7 @@ class CreateForm extends React.Component<Props, State> {
             <Card>
               <h3>{startCase(type || 'job')} Details</h3>
               <Divider />
-              <Form.Item label={`${startCase(type || 'job')} name`}>
+              <Form.Item label={`${startCase(type || 'job')} Name`}>
                 {form.getFieldDecorator('displayName', {
                   initialValue: displayName,
                   rules: [

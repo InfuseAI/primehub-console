@@ -198,7 +198,7 @@ class ImageList extends React.Component<Props> {
       sorter: true,
       dataIndex: 'description'
     }, {
-      title: 'type',
+      title: 'Type',
       sorter: true,
       dataIndex: 'type',
       render: (value) => {
@@ -206,9 +206,9 @@ class ImageList extends React.Component<Props> {
           return '-';
         }
         if (value === 'both') {
-          return 'universal';
+          return 'Universal';
         }
-        return value;
+        return value.toUpperCase();
       }
     }, {
       title: 'Actions',

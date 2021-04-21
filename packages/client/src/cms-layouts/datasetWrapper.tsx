@@ -114,7 +114,7 @@ export default class DatasetWrapper extends React.Component {
             {intl.formatMessage({id: 'hocs.route.confirmText'})}
           </Button>
           <Button onClick={this.reset} data-testid="reset-button">
-            {intl.formatMessage({id: 'hocs.route.resetText'})}
+            {intl.formatMessage({id: 'deploy.confirm.cancel'})}
           </Button>
         </ButtonWrapper>
       </Spin>

@@ -63,7 +63,7 @@ export default class Tab extends React.Component {
                     {
                       child.keyName === 'basicInfo' && <ButtonWrapper>
                         <Button style={{marginRight: 16}} type="primary" onClick={() => this.deploy(props.deploy)}>Confirm</Button>
-                        <Button onClick={() => this.reset(props.reset)}>Reset</Button>
+                        <Button onClick={() => this.reset(props.reset)}>Cancel</Button>
                       </ButtonWrapper>
                     }
                   </TabPane>
