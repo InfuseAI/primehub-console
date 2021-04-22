@@ -35,6 +35,7 @@ import AppEdit from 'containers/appEditPage';
 import GroupSettingsPage from 'containers/groupSettingsPage';
 import GroupSettingsJobs from 'ee/components/groupSettings/jobs';
 import GroupSettingsModels from 'ee/components/groupSettings/models';
+import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
 
 const client = createGraphqlClient({
   fakeData,
@@ -78,6 +79,7 @@ class Main extends React.Component {
               <GroupSettingsPage extraTabs={[
                 { component: GroupSettingsJobs, key: 'jobs', tab: 'Jobs' },
                 { component: GroupSettingsModels, key: 'models', tab: 'Models' },
+                { component: GroupSettingsMLflow, key: 'mlflow', tab: 'MLflow' },
               ]} />
             </Route>
 

@@ -101,7 +101,7 @@ export const listEE = [
     title: 'Settings',
     subPath: 'settings',
     icon: iconSettings,
-    groupAdminOnly: true,
+    groupAdminOnly: false,
     style: {
       width: 'auto',
       height: 21,

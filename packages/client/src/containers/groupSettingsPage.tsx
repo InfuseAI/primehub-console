@@ -34,25 +34,25 @@ class GroupSettingsPage extends React.Component<Props> {
 
   render() {
     const {groupContext, userContext, currentUser, history, extraTabs} = this.props;
-    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
+    if (false && userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
       history.push(`../home`);
     }
 
-    const group = get(currentUser, 'me.groups', []).find(group => group.id === groupContext.id);
+    const group = get(currentUser, 'me.groups', []).find(g => g.id === groupContext.id);
 
     return (
       <>
         <PageTitle
           breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-          title={"Settings"}
+          title={'Settings'}
         />
         <PageBody style={{flex: '1 1 0%'}}>
           <Tabs style={{height: '100%'}}>
-            <Tabs.TabPane key="info" tab="Information">
+            <Tabs.TabPane key='info' tab='Information'>
               <GroupSettingsAlert />
               <GroupSettingsInfo group={group} />
             </Tabs.TabPane>
-            <Tabs.TabPane key="members" tab="Members">
+            <Tabs.TabPane key='members' tab='Members'>
               <GroupSettingsAlert />
               <GroupSettingsMembers group={group} />
             </Tabs.TabPane>
