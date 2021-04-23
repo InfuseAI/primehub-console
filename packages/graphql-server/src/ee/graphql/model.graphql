@@ -23,3 +23,9 @@ input ModelWhereUniqueInput {
 input ModelWhereInput {
   group: String
 }
+
+input ModelVersionWhereUniqueInput {
+  group: String
+  name: String
+  version: String
+}

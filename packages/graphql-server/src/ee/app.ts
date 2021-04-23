@@ -112,6 +112,8 @@ const eeResolvers = {
     license: license.query,
     model: model.queryOne,
     models: model.query,
+    modelVersion: model.queryVersion,
+    modelVersions: model.queryVersions,
   },
   Mutation: {
     createBuildImage: buildImage.create,
