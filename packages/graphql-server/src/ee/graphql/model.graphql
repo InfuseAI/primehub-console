@@ -1,3 +1,5 @@
+# import PageInfo from "../../graphql/common.graphql"
+
 type Model {
   name: String
   creationTimestamp: String
@@ -13,6 +15,23 @@ type ModelVersion {
   lastUpdatedTimestamp: String
   description: String
   run: JSON
+}
+
+"""An edge in a connection."""
+type ModelVersionEdge {
+  """The item at the end of the edge."""
+  node: ModelVersion!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type ModelVersionsConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [ModelVersionEdge]!
 }
 
 input ModelWhereUniqueInput {

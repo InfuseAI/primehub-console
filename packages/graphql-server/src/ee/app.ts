@@ -114,6 +114,7 @@ const eeResolvers = {
     models: model.query,
     modelVersion: model.queryVersion,
     modelVersions: model.queryVersions,
+    modelVersionsConnection: model.connectionQueryVersions,
   },
   Mutation: {
     createBuildImage: buildImage.create,

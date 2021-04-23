@@ -138,7 +138,22 @@ type Query {
   model(where: ModelWhereUniqueInput!): Model
   models(where: ModelWhereInput!) : [Model]
   modelVersion(where: ModelVersionWhereUniqueInput!): ModelVersion
-  modelVersions(where: ModelWhereUniqueInput!): [ModelVersion]
+  modelVersions(
+    where: ModelWhereUniqueInput!
+    page: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [ModelVersion]!
+  modelVersionsConnection(
+    where: ModelWhereUniqueInput!
+    page: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): ModelVersionsConnection!
 }
 
 type Mutation {
