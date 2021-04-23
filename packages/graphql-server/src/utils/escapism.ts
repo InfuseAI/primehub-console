@@ -44,3 +44,7 @@ export const escapePodName = (input: string) => {
 export const escapeToPrimehubLabel = (input: string) => {
   return `${ESCAPE_LABEL_PREFIX}${escapeToDnsLabel(input)}`;
 };
+
+export const toPrimehubLabel = (input: string) => {
+  return `${escapeToDnsLabel(input)}`;
+};
