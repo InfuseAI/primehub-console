@@ -77,4 +77,4 @@ export default compose(
     name: 'currentUser',
     alias: 'withCurrentUser'
   }),
-)(GroupSettingsPage)
+)(GroupSettingsPage);
