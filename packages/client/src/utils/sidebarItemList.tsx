@@ -47,8 +47,8 @@ export const listEE = [
     }
   },
   {
-    title: 'Models',
-    subPath: 'model-deployment',
+    title: 'Deployments',
+    subPath: 'deployments',
     icon: iconModels,
     EEOnly: true,
     style: {

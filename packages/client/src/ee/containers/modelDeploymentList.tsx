@@ -22,9 +22,9 @@ import Breadcrumbs from 'components/share/breadcrumb';
 const breadcrumbs = [
   {
     key: 'list',
-    matcher: /\/model-deployment/,
-    title: 'Model Deployments',
-    link: '/model-deployment?page=1'
+    matcher: /\/deployments/,
+    title: 'Deployments',
+    link: '/deployments?page=1'
   }
 ];
 
@@ -183,7 +183,7 @@ class DeploymentListContainer extends React.Component<Props, State> {
         <InfuseButton
           icon="plus"
           type="primary"
-          onClick={() => history.push(`model-deployment/create`)}
+          onClick={() => history.push(`deployments/create`)}
           style={{marginRight: 16, width: 'auto'}}
         >
           Create Deployment

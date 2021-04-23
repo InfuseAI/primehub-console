@@ -44,7 +44,7 @@ class DeploymentCard extends React.Component<Props> {
           borderLeft: `8px solid ${getCardColor(deployment)}`
         }}
         hoverable
-        onClick={() => history.push(`model-deployment/${deployment.id}`)}
+        onClick={() => history.push(`deployments/${deployment.id}`)}
       >
         <h2 style={{
           overflow: 'hidden',

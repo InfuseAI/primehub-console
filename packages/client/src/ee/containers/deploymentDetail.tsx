@@ -149,7 +149,7 @@ export default compose(
   graphql(DELETE_DEPLOYMENT, {
     options: (props: Props) => ({
       onCompleted: () => {
-        props.history.push(`../model-deployment`);
+        props.history.push(`../deployments`);
         notification.success({
           duration: 10,
           placement: 'bottomRight',

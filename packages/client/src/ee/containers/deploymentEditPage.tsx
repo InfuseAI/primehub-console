@@ -107,20 +107,20 @@ class DeploymentCreatePage extends React.Component<Props, State> {
     const breadcrumbs = [
       {
         key: 'list',
-        matcher: /\/model-deployment/,
-        title: 'Model Deployments',
-        link: '/model-deployment?page=1'
+        matcher: /\/deployments/,
+        title: 'Deployments',
+        link: '/deployments?page=1'
       },
       {
         key: 'detail',
-        matcher: /\/model-deployment\/([\w-])+/,
+        matcher: /\/deployments\/([\w-])+/,
         title: `Deployment: ${get(getPhDeployment, 'phDeployment.name')}`,
-        link: `/model-deployment/${params.deploymentId}`
+        link: `/deployments/${params.deploymentId}`
       },
       {
         key: 'update',
-        matcher: /\/model-deployment\/([\w-])+\/edit/,
-        title: 'Update Deployment',
+        matcher: /\/deployment\/([\w-])+\/edit/,
+        title: 'Update Deployments',
       }
     ];
 
@@ -175,7 +175,7 @@ export default compose(
     options: (props: Props) => ({
       onCompleted: (data: any) => {
         const {history} = props;
-        history.push(`../../model-deployment`);
+        history.push(`../../deployments`);
         notification.success({
           duration: 10,
           placement: 'bottomRight',
@@ -183,7 +183,7 @@ export default compose(
           description: (
             <>
               Your update has begun deploying.
-              Click <a onClick={() => history.push(`model-deployment/${data.updatePhDeployment.id}`)}>here</a> to view.
+              Click <a onClick={() => history.push(`deployments/${data.updatePhDeployment.id}`)}>here</a> to view.
             </>
           )
         });
