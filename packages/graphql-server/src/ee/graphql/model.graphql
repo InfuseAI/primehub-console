@@ -1,0 +1,25 @@
+type Model {
+  name: String
+  creationTimestamp: String
+  lastUpdatedTimestamp: String
+  description: String
+  latestVersions: [ModelVersion]
+}
+
+type ModelVersion {
+  name: String
+  version: String
+  creationTimestamp: String
+  lastUpdatedTimestamp: String
+  description: String
+  run: JSON
+}
+
+input ModelWhereUniqueInput {
+  group: String
+  name: String
+}
+
+input ModelWhereInput {
+  group: String
+}
