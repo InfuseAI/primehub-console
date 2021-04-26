@@ -2,8 +2,7 @@ import { get, find } from 'lodash';
 import { ApolloError } from 'apollo-server';
 import fetch from 'node-fetch';
 import { Context } from '../../resolvers/interface';
-import { toRelay, filter, paginate, extractPagination } from '../../resolvers/utils';
-import { isGroupMember } from '../../resolvers/utils';
+import { toRelay, filter, paginate, extractPagination, isGroupMember } from '../../resolvers/utils';
 
 // mlflow api endpoints
 const API_ENDPOINT_MODEL_LIST = '/api/2.0/preview/mlflow/registered-models/list';
@@ -16,11 +15,11 @@ const API_ENDPOINT_RUN_GET = '/api/2.0/preview/mlflow/runs/get';
 const NOT_AUTH_ERROR = 'NOT_AUTH';
 
 const requestApi = async (trackingUri: string, endpoint: string, params = {}) => {
-  let url = new URL(`${trackingUri}${endpoint}`);
+  const url = new URL(`${trackingUri}${endpoint}`);
   Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
   const response = await fetch(url);
-  return await response.json();
+  return response.json();
 };
 
 const getTrackingUri = (group: string) => {
@@ -51,7 +50,7 @@ const transform = (item: any) => {
         description: v.description,
         // TODO: implement run structure
         run: {},
-      }
+      };
     }),
   };
 };
@@ -148,6 +147,6 @@ export const queryVersions = async (root, args, context: Context) => {
 
 export const connectionQueryVersions = async (root, args, context: Context) => {
   const where = args && args.where;
-  let modelVersions = await listQueryVersions(where, context);
+  const modelVersions = await listQueryVersions(where, context);
   return toRelay(modelVersions, extractPagination(args));
 };

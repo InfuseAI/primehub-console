@@ -1,13 +1,12 @@
 import { Context } from './interface';
 import {
-  toRelay, filter, paginate, extractPagination
+  toRelay, filter, paginate, extractPagination, isGroupMember
 } from './utils';
 import {
   PhApplicationSpec, PhApplicationStatus, PhApplicationScope, PhApplicationPhase, InstanceTypeSpec, client as kubeClient
 } from '../crdClient/crdClientImpl';
 import { transform as templateTransform, PhAppTemplate } from './phAppTemplate';
 import { mapping } from './instanceType';
-import { isGroupMember } from './utils';
 import CustomResource, { Item } from '../crdClient/customResource';
 import { get, find } from 'lodash';
 import { ApolloError } from 'apollo-server';
