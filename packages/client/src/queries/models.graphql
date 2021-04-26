@@ -1,0 +1,42 @@
+fragment ModelInfo on Model {
+  id
+  name
+  creationTimestamp
+  lastUpdatedTimestamp
+  description
+  latestVersions {
+    name
+    version
+    currentStage
+  }
+}
+
+query QueryModel($where: ModelWhereUniqueInput) {
+  modelsConnection(where: $where) {
+    ...ModelInfo
+  }
+}
+
+query QueryModels($where: ModelWhereInput) {
+  modelsConnection(where: $where) {
+    ...ModelInfo
+  }
+}
+
+query QueryModelsConnection($where: ModelWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
+  modelsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    edges {
+      cursor
+      node {
+        ...ModelInfo
+      }
+    }
+  }
+}
+
