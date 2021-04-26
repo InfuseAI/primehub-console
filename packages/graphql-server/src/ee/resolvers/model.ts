@@ -1,8 +1,11 @@
 import { get, find } from 'lodash';
 import { ApolloError } from 'apollo-server';
 import fetch from 'node-fetch';
+import KcAdminClient from 'keycloak-admin';
+import { keycloakMaxCount } from '../../resolvers/constant';
 import { Context } from '../../resolvers/interface';
 import { toRelay, filter, paginate, extractPagination, isGroupMember } from '../../resolvers/utils';
+import { transform as transformGroup } from '../../resolvers/groupUtils';
 import * as logger from '../../logger';
 import { ErrorCodes } from '../../errorCodes';
 const { NOT_AUTH_ERROR, INTERNAL_ERROR } = ErrorCodes;
@@ -14,6 +17,8 @@ const API_ENDPOINT_MODEL_VERSION_SEARCH = '/api/2.0/preview/mlflow/model-version
 const API_ENDPOINT_MODEL_VERSION_GET = '/api/2.0/preview/mlflow/model-versions/get';
 const API_ENDPOINT_RUN_GET = '/api/2.0/preview/mlflow/runs/get';
 
+const TRACKING_URI_NOT_FOUND = 'TRACKING_URI_NOT_FOUND';
+
 const requestApi = async (trackingUri: string, endpoint: string, params = {}) => {
   const url = new URL(`${trackingUri}${endpoint}`);
   Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
@@ -22,8 +27,15 @@ const requestApi = async (trackingUri: string, endpoint: string, params = {}) =>
   return response.json();
 };
 
-const getTrackingUri = (group: string) => {
-  // TODO: get tracking uri from group
+const getTrackingUri = async (groupName: string, kcAdminClient: KcAdminClient) => {
+  const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});
+  const groupData = find(groups, ['name', groupName]);
+  const group = await kcAdminClient.groups.findOne({id: get(groupData, 'id', '')});
+  const transformed = transformGroup(group);
+  if (transformed.mlflow && transformed.mlflow.trackingUri) {
+    return transformed.mlflow.trackingUri;
+  }
+  // TODO: return null if tracking uri not found
   return 'http://localhost:5000';
 };
 
@@ -48,8 +60,6 @@ const transform = (item: any) => {
         creationTimestamp: v.creation_timestamp,
         lastUpdatedTimestamp: v.last_updated_timestamp,
         description: v.description,
-        // TODO: implement run structure
-        run: {},
       };
     }),
   };
@@ -89,7 +99,12 @@ export const queryOne = async (root, args, context: Context) => {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
   }
 
-  const json = await requestApi(getTrackingUri(where.group), API_ENDPOINT_MODEL_GET, { name: where.name });
+  const trackingUri = await getTrackingUri(where.group, kcAdminClient);
+  if (!trackingUri) {
+    throw new ApolloError('tracking uri not found', TRACKING_URI_NOT_FOUND);
+  }
+
+  const json = await requestApi(trackingUri, API_ENDPOINT_MODEL_GET, { name: where.name });
   if (json.registered_model) {
     return transform(json.registered_model);
   } else if (json.error_code) {
@@ -112,7 +127,12 @@ export const query = async (root, args, context: Context) => {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
   }
 
-  const json = await requestApi(getTrackingUri(where.group), API_ENDPOINT_MODEL_LIST);
+  const trackingUri = await getTrackingUri(where.group, kcAdminClient);
+  if (!trackingUri) {
+    throw new ApolloError('tracking uri not found', TRACKING_URI_NOT_FOUND);
+  }
+
+  const json = await requestApi(trackingUri, API_ENDPOINT_MODEL_LIST);
   if (json.registered_models) {
     return paginate(json.registered_models.map(m => transform(m)), extractPagination(args));
   } else if (json.error_code) {
@@ -134,7 +154,11 @@ export const queryVersion = async (root, args, context: Context) => {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
   }
 
-  const trackingUri = getTrackingUri(where.group);
+  const trackingUri = await getTrackingUri(where.group, kcAdminClient);
+  if (!trackingUri) {
+    throw new ApolloError('tracking uri not found', TRACKING_URI_NOT_FOUND);
+  }
+
   const json = await requestApi(trackingUri, API_ENDPOINT_MODEL_VERSION_GET, { name: where.name, version: where.version });
   if (json.model_version) {
     json.model_version.run = await getRun(trackingUri, json.model_version.run_id);
@@ -158,7 +182,11 @@ const listQueryVersions = async (where: any, context: Context) => {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
   }
 
-  const trackingUri = getTrackingUri(where.group);
+  const trackingUri = await getTrackingUri(where.group, kcAdminClient);
+  if (!trackingUri) {
+    throw new ApolloError('tracking uri not found', TRACKING_URI_NOT_FOUND);
+  }
+
   const search = `name='${where.name}'`;
   const json = await requestApi(trackingUri, API_ENDPOINT_MODEL_VERSION_SEARCH, { filter: search });
   if (json.model_versions) {
