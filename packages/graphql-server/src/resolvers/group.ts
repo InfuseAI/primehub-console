@@ -4,6 +4,10 @@ import {
   mutateRelation,
   parseDiskQuota,
   stringifyDiskQuota,
+  splitByComma,
+  joinByComma,
+  serializeEnvs,
+  deserializeEnvs,
   parseMemory,
   stringifyMemory,
   filter,
@@ -20,7 +24,6 @@ import { keycloakMaxCount } from './constant';
 import { ApolloError } from 'apollo-server';
 import * as logger from '../logger';
 import Boom from 'boom';
-import GroupRepresentation from 'keycloak-admin/lib/defs/groupRepresentation';
 import {createConfig} from '../config';
 import { transform } from './groupUtils';
 import { isGroupNameAvailable } from '../utils/groupCheck';
@@ -48,7 +51,11 @@ const attrSchema = {
   enabledDeployment: {type: FieldType.boolean, rename: 'enabled-deployment'},
   jobDefaultActiveDeadlineSeconds: {type: FieldType.integer, rename: 'job-default-active-deadline-seconds'},
   // group admin
-  admins: {type: FieldType.string}
+  admins: {serialize: splitByComma, deserialize: joinByComma},
+  trackingUri: {type: FieldType.string, rename: 'mlflow-tracking-uri'},
+  uiUrl: {type: FieldType.string, rename: 'mlflow-ui-url'},
+  trackingEnvs: {serialize: serializeEnvs, deserialize: deserializeEnvs, rename: 'mlflow-tracking-envs'},
+  artifactEnvs: {serialize: serializeEnvs, deserialize: deserializeEnvs, rename: 'mlflow-artifact-envs'},
 };
 
 const groupAttrs = Object.keys(attrSchema);

@@ -159,6 +159,10 @@ input GroupUpdateInput {
   jobDefaultActiveDeadlineSeconds: Int
   # group admin
   admins: String
+  trackingUri: String
+  uiUrl: String
+  trackingEnvs: JSON
+  artifactEnvs: JSON
 }
 
 """Relation input"""
