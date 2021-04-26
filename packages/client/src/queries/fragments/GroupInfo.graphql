@@ -26,3 +26,20 @@ fragment GroupInfo on Group {
   sharedVolumeCapacity
   launchGroupOnly
 }
+
+fragment GroupMLflowConfig on Group {
+  id
+  name
+  mlflow {
+    trackingUri
+    uiUrl
+    trackingEnvs {
+      name
+      value
+    }
+    artifactEnvs {
+      name
+      value
+    }
+  }
+}

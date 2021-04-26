@@ -3,6 +3,7 @@ import {merge} from 'lodash';
 import {Tooltip, Input, Icon, Button} from 'antd';
 import {Empty} from '../empty';
 import {DefaultEnv} from 'interfaces/phAppTemplate';
+import Env from 'interfaces/env';
 
 const InputGroup = Input.Group;
 
@@ -11,7 +12,8 @@ interface Props {
   reloadDefault?: boolean;
   onChange?: (value: object) => void;
   disabled?: boolean;
-  value?: object;
+  value?: Env[];
+  dumbValue?: Env[];
   empty?: React.ReactNode;
   reveal: boolean;
   enableReveal: boolean;
@@ -46,6 +48,10 @@ export default class EnvFields extends React.Component<Props, State> {
         return {name: item.name, value: item.defaultValue, required: !item.optional, description: item.description};
       }) : [];
       this.setState({fields: defaultEnvs});
+    }
+    if (prevProps.dumbValue !== this.props.dumbValue) {
+      const fields = this.props.value ? this.props.dumbValue : [];
+      this.setState({fields});
     }
   }
 
