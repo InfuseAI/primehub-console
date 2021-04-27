@@ -1,3 +1,51 @@
-export const modelVersions = [];
+export const modelVersions = [
+  {
+    "group": "group1",
+    "name": "Hello",
+    "version": "1",
+    "creationTimestamp": "1617865867887",
+    "lastUpdatedTimestamp": "1617872757470",
+    "currentStage": "None",
+    "description": "",
+    "runId": "ff02a452eb27403ba60fa09f3fee3d5c",
+    "status": "READY",
+  },
+  {
+    "group": "group1",
+    "name": "Hello",
+    "version": "3",
+    "creationTimestamp": "1617933805566",
+    "lastUpdatedTimestamp": "1617934283443",
+    "currentStage": "Production",
+    "description": "",
+    "source": "/tmp/mlruns/0/a886396463ed431490db61dd08a77982/artifacts/model",
+    "runId": "a886396463ed431490db61dd08a77982",
+    "status": "READY",
+  },
+  {
+    "group": "group1",
+    "name": "Hello",
+    "version": "4",
+    "creationTimestamp": "1617934246402",
+    "lastUpdatedTimestamp": "1617934283443",
+    "currentStage": "Archived",
+    "description": "",
+    "source": "/tmp/mlruns/0/c11f8b6adabd4d95bbae0cb2a9d5c859/artifacts/model",
+    "runId": "c11f8b6adabd4d95bbae0cb2a9d5c859",
+    "status": "READY",
+  },
+  {
+    "group": "group1",
+    "name": "Hello",
+    "version": "5",
+    "creationTimestamp": "1618538104273",
+    "lastUpdatedTimestamp": "1618538104273",
+    "currentStage": "None",
+    "description": "",
+    "source": "/tmp/mlruns/0/b92a8c4165bc4bca9c928ace588d05d8/artifacts/model",
+    "runId": "b92a8c4165bc4bca9c928ace588d05d8",
+    "status": "READY",
+  }
+];
 
 export default modelVersions;

@@ -11,20 +11,34 @@ fragment ModelInfo on Model {
   }
 }
 
+fragment ModelVersionInfo on ModelVersion {
+  id
+  name
+  version
+  creationTimestamp
+  lastUpdatedTimestamp
+}
+
 query QueryModel($where: ModelWhereUniqueInput) {
-  modelsConnection(where: $where) {
+  model(where: $where) {
     ...ModelInfo
   }
 }
 
 query QueryModels($where: ModelWhereInput) {
-  modelsConnection(where: $where) {
+  models(where: $where) {
     ...ModelInfo
   }
 }
 
-query QueryModelsConnection($where: ModelWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
-  modelsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
+query QueryModelVersion($where: ModelVersionWhereUniqueInput) {
+  modelVersion(where: $where) {
+    ...ModelVersionInfo
+  }
+}
+
+query QueryModelVersionsConnection($where: ModelVersionWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
+  modelVersionsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
     pageInfo {
       hasNextPage
       hasPreviousPage
@@ -34,9 +48,8 @@ query QueryModelsConnection($where: ModelWhereInput, $first: Int, $after: String
     edges {
       cursor
       node {
-        ...ModelInfo
+        ...ModelVersionInfo
       }
     }
   }
 }
-
