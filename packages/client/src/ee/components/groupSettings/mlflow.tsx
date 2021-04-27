@@ -25,13 +25,17 @@ interface FormValue {
 
 class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
   trackingEnvsTips = (
-    <Tooltip placement='right' title={<span>This is used to access the MLflow tracking server, <a target='_blank' href='https://www.mlflow.org/docs/latest/tracking.html#logging-to-a-tracking-server'>Learn more</a></span>}>
+    <Tooltip
+      placement='right'
+      title={<span>This is used to access the MLflow tracking server, <a style={{color: '#739af3'}} target='_blank' href='https://www.mlflow.org/docs/latest/tracking.html#logging-to-a-tracking-server'>Learn more</a></span>}>
       <Icon type='question-circle' />
     </Tooltip>
   );
 
   artifactEnvsTips = (
-    <Tooltip placement='right' title={<span>This is used to access the MLflow artifact stores, <a target='_blank' href='https://www.mlflow.org/docs/latest/tracking.html#artifact-stores'>Learn more</a></span>}>
+    <Tooltip
+      placement='right'
+      title={<span>This is used to access the MLflow artifact stores, <a style={{color: '#739af3'}} target='_blank' href='https://www.mlflow.org/docs/latest/tracking.html#artifact-stores'>Learn more</a></span>}>
       <Icon type='question-circle' />
     </Tooltip>
   );
