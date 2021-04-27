@@ -35,8 +35,7 @@ const getTrackingUri = async (groupName: string, kcAdminClient: KcAdminClient) =
   if (transformed.mlflow && transformed.mlflow.trackingUri) {
     return transformed.mlflow.trackingUri;
   }
-  // TODO: return null if tracking uri not found
-  return 'http://localhost:5000';
+  return null;
 };
 
 const getRun = async (trackingUri: string, runId: string) => {
