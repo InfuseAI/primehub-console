@@ -108,7 +108,6 @@ export class Attributes {
       const typeTransform = transforms[value.type];
       const customTransform = value.deserialize;
       const transform = customTransform || typeTransform || noop;
-      // admins transform
       result[key] = (arrayTypeList.includes(fieldName)) ?
         transform(keycloakAttr[fieldName]) : transform(keycloakAttr[fieldName][0]);
       return result;
