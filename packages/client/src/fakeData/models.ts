@@ -1,6 +1,7 @@
 export const models = [
   {
     "name": "Hello",
+    "group": "group1",
     "creationTimestamp": "1617865867845",
     "lastUpdatedTimestamp": "1618538104273",
     "description": "## safasf\nThis is markdown format",
@@ -21,6 +22,7 @@ export const models = [
   },
   {
     "name": "ooxx",
+    "group": "group1",
     "creationTimestamp": "1616326954991",
     "lastUpdatedTimestamp": "1617865708093"
   }

@@ -20,6 +20,7 @@ export const fakeData = {
   images,
   phSchedules,
   models,
+  modelVersions,
   phDeployments,
   phApplications,
   phAppTemplates,

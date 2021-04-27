@@ -21,6 +21,7 @@ import ScheduleDetailContainer from 'ee/containers/scheduleDetail';
 import ScheduleCreatePage from 'ee/containers/scheduleCreatePage';
 import ScheduleListContainer from 'ee/containers/scheduleList';
 import ModelListContainer from 'ee/containers/modelList';
+import ModelDetailContainer from 'ee/containers/modelDetail';
 import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
@@ -114,6 +115,11 @@ class Main extends React.Component {
             <Route path={`${appPrefix}g/:groupName/models`} exact>
               <ListContainer Com={ModelListContainer} />
             </Route>
+            <Route
+              path={`${appPrefix}g/:groupName/models/:modelName`}
+              exact
+              component={ModelDetailContainer}
+            />
 
             {/* Model Deployment */}
             <Route path={`${appPrefix}g/:groupName/deployments`} exact>

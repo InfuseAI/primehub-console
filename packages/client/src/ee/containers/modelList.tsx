@@ -3,15 +3,15 @@ import {Skeleton, Input, Alert, Button, Table} from 'antd';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {get} from 'lodash';
-import {withRouter} from 'react-router-dom';
+import {Link, withRouter} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
-import { GroupContextComponentProps } from 'context/group';
+import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
-import {QueryModelsConnection} from 'queries/models.graphql';
+import {QueryModels} from 'queries/models.graphql';
 
 const breadcrumbs = [
   {
@@ -25,18 +25,14 @@ const breadcrumbs = [
 const PAGE_SIZE = 20;
 
 type Props = {
-  getModelsConnection: {
+  getModels: {
     error?: any;
     loading: boolean;
     variables: {
       where?;
-      after?: string,
-      first?: number,
-      last?: number,
-      before?: string
     };
     refetch: Function;
-    modelsConnection?: any;
+    models?: any;
   };
 } & RouteComponentProps & GroupContextComponentProps;
 
@@ -45,28 +41,35 @@ type State = {
 }
 
 class ModelListContainer extends React.Component<Props, State> {
+  const renderName = text => text ? (
+    <Link to={`models/${text}`}>
+      {text}
+    </Link>
+  ) : '-'
+
   render() {
-    const { groupContext, getModelsConnection} = this.props;
+    const { groupContext, getModels} = this.props;
     const {
       error,
       loading,
-      modelsConnection,
+      models,
       variables,
       refetch
-    } = getModelsConnection;
+    } = getModels;
 
     if (error) {
-      console.log(getModelsConnection.error);
+      console.log(getModels.error);
       return 'Error';
     }
 
-    if (!modelsConnection) {
+    if (!models) {
       return <Skeleton />
     }
 
     const columns = [{
       title: 'Name',
       dataIndex: 'name',
+      render: this.renderName,
     }, {
       title: 'Creation Time',
       dataIndex: 'creationTimestamp',
@@ -74,7 +77,6 @@ class ModelListContainer extends React.Component<Props, State> {
       title: 'Updated Time',
       dataIndex: 'lastUpdatedTimestamp',
     }]
-    const data = modelsConnection.edges.map(edge => edge.node);
 
     let pageBody = <>
       <div style={{textAlign: 'right'}}>
@@ -83,7 +85,7 @@ class ModelListContainer extends React.Component<Props, State> {
         </Button>
         <Table
           style={{paddingTop: 8}}
-          dataSource={data}
+          dataSource={models}
           columns={columns}
           rowKey="name"
           loading={loading}
@@ -94,7 +96,7 @@ class ModelListContainer extends React.Component<Props, State> {
       <>
         <PageTitle
           breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-          title={"Model Deployments"}
+          title={"Model Management"}
         />
         <PageBody>{pageBody}</PageBody>
       </>
@@ -104,23 +106,22 @@ class ModelListContainer extends React.Component<Props, State> {
 
 export default compose(
   withRouter,
-  graphql(QueryModelsConnection, {
+  withGroupContext,
+  graphql(QueryModels, {
     options: (props: Props) => {
-      const params = queryString.parse(props.location.search.replace(/^\?/, ''));
       const {groupContext} = props;
-      const where = JSON.parse(params.where as string || '{}');
+      const where = {} as any;
       if (groupContext) {
-        where.groupId_in = [groupContext.id];
+        where.group = groupContext.name;
       }
 
       return {
         variables: {
-          first: PAGE_SIZE,
           where,
         },
         fetchPolicy: 'cache-and-network'
       }
     },
-    name: 'getModelsConnection'
+    name: 'getModels'
   }),
 )(ModelListContainer)
