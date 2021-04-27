@@ -1,8 +1,8 @@
 import React from 'react';
 import {graphql} from 'react-apollo';
-import {get, unionBy, pick} from 'lodash';
+import {get, pick} from 'lodash';
 import {compose} from 'recompose';
-import {notification, Form, Row, Col, Input, Alert} from 'antd';
+import {Tooltip, Icon, notification, Form, Row, Col, Input, Alert} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import InfuseButton from 'components/infuseButton';
 import EnvFields from 'components/share/envFields';
@@ -24,6 +24,17 @@ interface FormValue {
 }
 
 class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
+  trackingEnvsTips = (
+    <Tooltip placement='right' title={<span>This is used to access the MLflow tracking server, <a target='_blank' href='https://www.mlflow.org/docs/latest/tracking.html#logging-to-a-tracking-server'>Learn more</a></span>}>
+      <Icon type='question-circle' />
+    </Tooltip>
+  );
+
+  artifactEnvsTips = (
+    <Tooltip placement='right' title={<span>This is used to access the MLflow artifact stores, <a target='_blank' href='https://www.mlflow.org/docs/latest/tracking.html#artifact-stores'>Learn more</a></span>}>
+      <Icon type='question-circle' />
+    </Tooltip>
+  );
 
   onSubmit = e => {
     const {updateGroupMLflowConfig, groupContext, form} = this.props;
@@ -76,7 +87,7 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
         </Row>
         <Row>
           <Col>
-            <Form.Item label={`Tracking Environment Variables`} style={{marginBottom: 20}}>
+            <Form.Item label={<span>Tracking Environment Variables {this.trackingEnvsTips}</span>} style={{marginBottom: 20}}>
               {form.getFieldDecorator('trackingEnvs', {
                 initialValue: groupMLflowConfig.trackingEnvs
               })(
@@ -87,7 +98,7 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
         </Row>
         <Row>
           <Col>
-            <Form.Item label={`Artifact Store Environment Variables`} style={{marginBottom: 20}}>
+            <Form.Item label={<span>Artifact Store Environment Variables {this.artifactEnvsTips}</span>} style={{marginBottom: 20}}>
               {form.getFieldDecorator('artifactEnvs', {
                 initialValue: groupMLflowConfig.artifactEnvs
               })(
