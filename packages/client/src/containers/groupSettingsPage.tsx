@@ -1,8 +1,7 @@
 import * as React from 'react';
-import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
-import { get, isNull } from 'lodash';
+import { get } from 'lodash';
 import { Form, Tabs, Row, Col, Card, Switch, Checkbox, Input, InputNumber, Table, Alert } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import { withRouter } from 'react-router';
@@ -34,7 +33,7 @@ class GroupSettingsPage extends React.Component<Props> {
 
   render() {
     const {groupContext, userContext, currentUser, history, extraTabs} = this.props;
-    if (false && userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
+    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
       history.push(`../home`);
     }
 
