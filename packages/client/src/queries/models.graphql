@@ -1,5 +1,4 @@
 fragment ModelInfo on Model {
-  id
   name
   creationTimestamp
   lastUpdatedTimestamp
@@ -7,46 +6,37 @@ fragment ModelInfo on Model {
   latestVersions {
     name
     version
-    currentStage
   }
 }
 
 fragment ModelVersionInfo on ModelVersion {
-  id
   name
   version
   creationTimestamp
   lastUpdatedTimestamp
 }
 
-query QueryModel($where: ModelWhereUniqueInput) {
+query QueryModel($where: ModelWhereUniqueInput!) {
   model(where: $where) {
     ...ModelInfo
   }
 }
 
-query QueryModels($where: ModelWhereInput) {
+query QueryModels($where: ModelWhereInput!) {
   models(where: $where) {
     ...ModelInfo
   }
 }
 
-query QueryModelVersion($where: ModelVersionWhereUniqueInput) {
+query QueryModelVersion($where: ModelVersionWhereUniqueInput!) {
   modelVersion(where: $where) {
     ...ModelVersionInfo
   }
 }
 
-query QueryModelVersionsConnection($where: ModelVersionWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
+query QueryModelVersionsConnection($where: ModelWhereUniqueInput!, $first: Int, $after: String, $last: Int, $before: String) {
   modelVersionsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      startCursor
-      endCursor
-    }
     edges {
-      cursor
       node {
         ...ModelVersionInfo
       }
