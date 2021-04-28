@@ -11,6 +11,7 @@ import PageBody from 'components/pageBody';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
 import {QueryModel, QueryModelVersionsConnection} from 'queries/models.graphql';
+import {formatTimestamp} from 'ee/components/modelMngt/common';
 
 const PAGE_SIZE = 20;
 
@@ -41,7 +42,7 @@ type Props = {
 } & RouteComponentProps & GroupContextComponentProps;
 
 class ModelDetailContainer extends React.Component<Props> {
-  const renderVersion = model => version => (
+  private renderVersion = model => version => (
     <Link to={`${model}/versions/${version}`}>
       {`Version ${version}`}
     </Link>
@@ -49,7 +50,8 @@ class ModelDetailContainer extends React.Component<Props> {
 
   render() {
     const { groupContext, getModel, getModelVersionsConnection, match} = this.props;
-    const {modelName} = match.params as any;
+    let {modelName} = match.params as any;
+    modelName = decodeURIComponent(modelName)
 
     const {
       model,
@@ -89,24 +91,26 @@ class ModelDetailContainer extends React.Component<Props> {
     }, {
       title: 'Creation Time',
       dataIndex: 'creationTimestamp',
+      render: formatTimestamp,
     }, {
       title: 'Updated Time',
       dataIndex: 'lastUpdatedTimestamp',
+      render: formatTimestamp,
     }]
     const data = modelVersionsConnection.edges.map(edge => edge.node);
 
     let pageBody = <>
       <div style={{textAlign: 'right'}}>
         <Button>
-          MLFlow UI
+          MLflow UI
         </Button>
       </div>
         <Row gutter={36}>
           <Col span={12}>
-            <Field labelCol={4} valueCol={8} label='Created Time' value={model.creationTimestamp} />
+            <Field labelCol={4} valueCol={8} label='Created Time' value={formatTimestamp(model.creationTimestamp)} />
           </Col>
           <Col span={12}>
-            <Field labelCol={4} valueCol={8} label='Last Modified' value={model.lastUpdatedTimestamp} />
+            <Field labelCol={4} valueCol={8} label='Last Modified' value={formatTimestamp(model.lastUpdatedTimestamp)} />
           </Col>
         </Row>
       <Table
@@ -135,7 +139,8 @@ export default compose(
   graphql(QueryModel, {
     options: (props: Props) => {
       const {groupContext, match} = props;
-      const {modelName} = match.params as any;
+      let {modelName} = match.params as any;
+      modelName = decodeURIComponent(modelName)
       const where = {
         name: modelName
       } as any;

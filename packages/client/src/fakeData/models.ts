@@ -25,7 +25,13 @@ export const models = [
     "group": "group1",
     "creationTimestamp": "1616326954991",
     "lastUpdatedTimestamp": "1617865708093"
-  }
+  },
+  {
+    "name": "is/this\a$valid#model?",
+    "group": "group1",
+    "creationTimestamp": "1616326954991",
+    "lastUpdatedTimestamp": "1617865708093"
+  },
 ]
 
 export default models;

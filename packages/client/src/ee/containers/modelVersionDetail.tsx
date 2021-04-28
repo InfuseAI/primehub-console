@@ -11,6 +11,7 @@ import PageBody from 'components/pageBody';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
 import {QueryModelVersion} from 'queries/models.graphql';
+import {formatTimestamp} from 'ee/components/modelMngt/common';
 
 const PAGE_SIZE = 20;
 
@@ -35,7 +36,8 @@ class ModelVersionDetailContainer extends React.Component<Props> {
 
   render() {
     const { groupContext, getModelVersion, match} = this.props;
-    const {modelName, version} = match.params as any;
+    let {modelName, version} = match.params as any;
+    modelName = decodeURIComponent(modelName)
 
     const {
       modelVersion,
@@ -61,13 +63,13 @@ class ModelVersionDetailContainer extends React.Component<Props> {
         key: 'model',
         matcher: /\/models/,
         title: `${modelName}`,
-        link: `/models/${modelName}`
+        link: `/models/${encodeURIComponent(modelName)}`
       },
       {
         key: 'version',
         matcher: /\/models/,
         title: `Version: ${version}`,
-        link: `/models/${modelName}/versions/${version}`
+        link: `/models/${encodeURIComponent(modelName)}/versions/${version}`
       },
     ];
 
@@ -75,13 +77,13 @@ class ModelVersionDetailContainer extends React.Component<Props> {
     let pageBody = <>
       <div style={{textAlign: 'right'}}>
         <Button>
-          MLFlow UI
+          MLflow UI
         </Button>
       </div>
       <Row gutter={36}>
         <Col span={24}>
-          <Field labelCol={4} valueCol={8} label='Registered Time' value={modelVersion.creationTimestamp} />
-          <Field labelCol={4} valueCol={8} label='Last Modified' value={modelVersion.lastUpdatedTimestamp} />
+          <Field labelCol={4} valueCol={8} label='Registered Time' value={formatTimestamp(modelVersion.creationTimestamp)} />
+          <Field labelCol={4} valueCol={8} label='Last Modified' value={formatTimestamp(modelVersion.lastUpdatedTimestamp)} />
         </Col>
       </Row>
     </>;
@@ -103,7 +105,8 @@ export default compose(
   graphql(QueryModelVersion, {
     options: (props: Props) => {
       const {groupContext, match} = props;
-      const {modelName, version} = match.params as any;
+      let {modelName, version} = match.params as any;
+      modelName = decodeURIComponent(modelName)
       const where = {
         name: modelName,
         version: version,

@@ -11,6 +11,7 @@ import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
+import {formatTimestamp} from 'ee/components/modelMngt/common';
 import {QueryModels} from 'queries/models.graphql';
 
 const breadcrumbs = [
@@ -42,7 +43,7 @@ type State = {
 
 class ModelListContainer extends React.Component<Props, State> {
   private renderName = text => text ? (
-    <Link to={`models/${text}`}>
+    <Link to={`models/${encodeURIComponent(text)}`}>
       {text}
     </Link>
   ) : '-'
@@ -60,7 +61,7 @@ class ModelListContainer extends React.Component<Props, State> {
 
     const latestVersion = max(latestVersions);
 
-    return <Link to={`models/${model.name}/versions/${latestVersion}`}>
+    return <Link to={`models/${encodeURIComponent(model.name)}/versions/${latestVersion}`}>
       {`Version ${latestVersion}`}
     </Link>
   }
@@ -95,15 +96,17 @@ class ModelListContainer extends React.Component<Props, State> {
     }, {
       title: 'Creation Time',
       dataIndex: 'creationTimestamp',
+      render: formatTimestamp,
     }, {
       title: 'Updated Time',
       dataIndex: 'lastUpdatedTimestamp',
+      render: formatTimestamp,
     }]
 
     let pageBody = <>
       <div style={{textAlign: 'right'}}>
         <Button>
-          MLFlow UI
+          MLflow UI
         </Button>
         <Table
           style={{paddingTop: 8}}
