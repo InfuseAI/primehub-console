@@ -1,7 +1,7 @@
 export const phDeployments = [
   {
     id: 'd0',
-    name: 'My MLFlow',
+    name: 'My MLflow',
     description: 'd0',
     schedule: 'd0',
     status: 'Error',
@@ -70,7 +70,7 @@ export const phDeployments = [
     }]
   }, {
     id: 'd1',
-    name: 'My MLFlow 2',
+    name: 'My MLflow 2',
     description: 'd1',
     schedule: 'd1',
     status: 'Ready',
