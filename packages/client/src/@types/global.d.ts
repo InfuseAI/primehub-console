@@ -4,4 +4,5 @@ interface Window {
   development: boolean;
   primehubVersion: string;
   enableApp: boolean;
+  enableModelDeployment: boolean;
 }
