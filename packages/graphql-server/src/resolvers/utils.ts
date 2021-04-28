@@ -18,6 +18,7 @@ import KcAdminClient from 'keycloak-admin';
 import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
 import { EOL } from 'os';
 import { Context, Role } from './interface';
+import { keycloakMaxCount } from './constant';
 const ITEMS_PER_PAGE = 10;
 
 export enum QueryImageMode {
@@ -47,11 +48,27 @@ export const isAdmin = (ctx: Context): boolean => {
 };
 
 export const isGroupAdmin = async (username: string, groupName: string, kcAdminClient: KcAdminClient): Promise<boolean> => {
-  const groups = await kcAdminClient.groups.find({max: 99999});
+  const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});
   const groupData = find(groups, ['name', groupName]);
   const group = await kcAdminClient.groups.findOne({id: get(groupData, 'id', '')});
   const admins = get(group, 'attributes.admins', []);
   return admins.includes(username);
+};
+
+// TODO: This is deprecated. Please use 'isGroupMember' in middlewares/auth.ts
+export const isGroupMember = async (userId: string, groupName: string, kcAdminClient: KcAdminClient): Promise<boolean> => {
+  const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});
+  const groupData = find(groups, ['name', groupName]);
+  if (!groupData) {
+    // false if group not found
+    return false;
+  }
+  const members = await kcAdminClient.groups.listMembers({
+    id: get(groupData, 'id', ''),
+    max: keycloakMaxCount
+  });
+  const memberIds = members.map(user => user.id);
+  return (memberIds.indexOf(userId) >= 0);
 };
 
 export const numberedPaginate = (rows: any[], pagination?: Pagination) => {

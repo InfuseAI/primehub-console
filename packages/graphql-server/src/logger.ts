@@ -30,6 +30,7 @@ export enum components {
   resourceStatus = 'ResourceStatus',
   telemetry = 'Telemetry',
   store = 'Store',
+  model = 'Model',
 }
 
 export const log = (levelType: level = level.info, payload?: any) => {

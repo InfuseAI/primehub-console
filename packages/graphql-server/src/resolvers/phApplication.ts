@@ -1,6 +1,6 @@
 import { Context } from './interface';
 import {
-  toRelay, filter, paginate, extractPagination
+  toRelay, filter, paginate, extractPagination, isGroupMember
 } from './utils';
 import {
   PhApplicationSpec, PhApplicationStatus, PhApplicationScope, PhApplicationPhase, InstanceTypeSpec, client as kubeClient
@@ -11,7 +11,6 @@ import CustomResource, { Item } from '../crdClient/customResource';
 import { get, find } from 'lodash';
 import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
-import { keycloakMaxCount } from './constant';
 import {createConfig} from '../config';
 
 const config = createConfig();
@@ -155,28 +154,13 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
   };
 };
 
-const isUserInGroup = async (userId: string, groupName: string, context: Context): Promise<boolean> => {
-  const groups = await context.kcAdminClient.groups.find({max: keycloakMaxCount});
-  const groupData = find(groups, ['name', groupName]);
-  if (!groupData) {
-    // false if group not found
-    return false;
-  }
-  const members = await context.kcAdminClient.groups.listMembers({
-    id: get(groupData, 'id', ''),
-    max: keycloakMaxCount
-  });
-  const memberIds = members.map(user => user.id);
-  return (memberIds.indexOf(userId) >= 0);
-};
-
 // tslint:disable-next-line:max-line-length
 const listQuery = async (client: CustomResource<PhApplicationSpec, PhApplicationStatus>, where: any, context: Context): Promise<PhApplication[]> => {
   const {namespace, graphqlHost, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phApplication = await client.get(where.id);
     const transformed = await transform(phApplication, kcAdminClient);
-    const viewable = await isUserInGroup(currentUserId, transformed.groupName, context);
+    const viewable = await isGroupMember(currentUserId, transformed.groupName, kcAdminClient);
     if (!viewable) {
       throw new ApolloError('user not auth', NOT_AUTH_ERROR);
     }
@@ -206,11 +190,11 @@ export const connectionQuery = async (root, args, context: Context) => {
 
 export const queryOne = async (root, args, context: Context) => {
   const id = args.where.id;
-  const {crdClient, userId: currentUserId} = context;
+  const {crdClient, userId: currentUserId, kcAdminClient} = context;
   const phApplication = await crdClient.phApplications.get(id);
   const transformed =
     await transform(phApplication, context.kcAdminClient);
-  const viewable = await isUserInGroup(currentUserId, transformed.groupName, context);
+  const viewable = await isGroupMember(currentUserId, transformed.groupName, kcAdminClient);
   if (!viewable && currentUserId !== 'jupyterHub') {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
   }
@@ -301,7 +285,7 @@ const createApplication = async (context: Context, data: PhApplicationMutationIn
 export const create = async (root, args, context: Context) => {
   const data: PhApplicationMutationInput = args.data;
   // TODO: validate data.env
-  const mutable = await isUserInGroup(context.userId, data.groupName, context);
+  const mutable = await isGroupMember(context.userId, data.groupName, context.kcAdminClient);
   if (!mutable) {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
   }
@@ -314,7 +298,7 @@ export const update = async (root, args, context: Context) => {
   const data: Partial<PhApplicationMutationInput> = args.data;
   // TODO: validate data.env
   const item = await crdClient.phApplications.get(args.where.id);
-  const mutable = await isUserInGroup(userId, item.spec.groupName, context);
+  const mutable = await isGroupMember(userId, item.spec.groupName, context.kcAdminClient);
   if (!mutable) {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
   }
@@ -345,7 +329,7 @@ export const destroy = async (root, args, context: Context) => {
   const {crdClient, userId} = context;
   const {id} = args.where;
   const phApplication = await crdClient.phApplications.get(id);
-  const mutable = await isUserInGroup(userId, phApplication.spec.groupName, context);
+  const mutable = await isGroupMember(userId, phApplication.spec.groupName, context.kcAdminClient);
   if (!mutable) {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
   }
@@ -358,7 +342,7 @@ const toggleApplication = async (isStop: boolean, args, context: Context) => {
   const {crdClient, userId} = context;
   const {id} = args.where;
   const item = await crdClient.phApplications.get(args.where.id);
-  const mutable = await isUserInGroup(userId, item.spec.groupName, context);
+  const mutable = await isGroupMember(userId, item.spec.groupName, context.kcAdminClient);
   if (!mutable) {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
   }

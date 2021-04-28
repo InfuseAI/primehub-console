@@ -5,6 +5,7 @@
 # import PhSchedule, PhScheduleOrderByInput, PhScheduleConnection, PhScheduleWhereUniqueInput, PhScheduleWhereInput, PhScheduleCreateInput, PhScheduleUpdateInput, PhScheduleDeleteResponse, PhScheduleRunResponse from "./phSchedule.graphql"
 # import PhDeployment, PhDeploymentConnection, PhDeploymentWhereUniqueInput, PhDeploymentWhereInput, PhDeploymentCreateInput, PhDeploymentUpdateInput, PhDeploymentClientCreateInput, PhDeploymentClientCreateResponse, PhDeploymentClientWhereUniqueInput from "./phDeployment.graphql"
 # import UsageReport, UsageReportOrderByInput, UsageReportConnection, UsageReportWhereInput from "./usageReport.graphql"
+# import Model, ModelVersion, ModelWhereUniqueInput, ModelWhereInput, ModelVersionWhereUniqueInput from "./model.graphql"
 
 scalar JSON
 
@@ -132,6 +133,27 @@ type Query {
     first: Int
     last: Int
   ): UsageReportConnection!
+
+  """Model"""
+  model(where: ModelWhereUniqueInput!): Model
+  models(where: ModelWhereInput!) : [Model]
+  modelVersion(where: ModelVersionWhereUniqueInput!): ModelVersion
+  modelVersions(
+    where: ModelWhereUniqueInput!
+    page: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): [ModelVersion]!
+  modelVersionsConnection(
+    where: ModelWhereUniqueInput!
+    page: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): ModelVersionsConnection!
 }
 
 type Mutation {

@@ -24,6 +24,7 @@ import * as phJob from './resolvers/phJob';
 import * as phSchedule from './resolvers/phSchedule';
 import * as phDeployment from './resolvers/phDeployment';
 import * as usageReport from './resolvers/usageReport';
+import * as model from './resolvers/model';
 import { resolvers as ceResolvers } from '../app';
 import { crd as instanceType} from '../resolvers/instanceType';
 import { crd as image} from '../resolvers/image';
@@ -109,6 +110,11 @@ const eeResolvers = {
     usageReports: usageReport.query,
     usageReportsConnection: usageReport.connectionQuery,
     license: license.query,
+    model: model.queryOne,
+    models: model.query,
+    modelVersion: model.queryVersion,
+    modelVersions: model.queryVersions,
+    modelVersionsConnection: model.connectionQueryVersions,
   },
   Mutation: {
     createBuildImage: buildImage.create,
