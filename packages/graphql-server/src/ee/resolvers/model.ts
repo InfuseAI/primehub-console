@@ -82,7 +82,7 @@ const transform = (item: any) => {
     creationTimestamp: item.creation_timestamp,
     lastUpdatedTimestamp: item.last_updated_timestamp,
     description: item.description,
-    latestVersions: item.latest_versions.map(v => {
+    latestVersions: (item.latest_versions || []).map(v => {
       return {
         name: v.name,
         version: v.version,

@@ -52,7 +52,7 @@ class LicenseWarningBanner extends React.Component<Props, State> {
 
   reachedModelDeployLimit = (
     <Alert
-      message='Please contact your system administrator for assistance to upgrade your license to run more models.'
+      message='Please contact your system administrator for assistance to upgrade your license to run more deployments.'
       description=' '
       type='warning'
       showIcon />
