@@ -1,5 +1,5 @@
 import { rule, shield, and, or, not } from 'graphql-shield';
-import { isAdmin, isClient, isUser } from '../../utils/roles';
+import { isAdmin, isClient, isUser, isGroupMember } from '../../utils/roles';
 
 export const permissions = shield({
   Query: {
@@ -32,8 +32,11 @@ export const permissions = shield({
     'phDeploymentsConnection': or(isAdmin, isUser),
     'license': or(isAdmin, isUser),
     'files': or(isAdmin, isUser),
-    'model': or(isAdmin, isUser),
-    'models': or(isAdmin, isUser),
+    'model': or(isAdmin, isGroupMember),
+    'models': or(isAdmin, isGroupMember),
+    'modelVersion': or(isAdmin, isGroupMember),
+    'modelVersions': or(isAdmin, isGroupMember),
+    'modelVersionsConnection': or(isAdmin, isGroupMember),
   },
   Mutation: {
     '*': isAdmin,

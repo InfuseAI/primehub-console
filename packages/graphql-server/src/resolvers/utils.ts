@@ -55,6 +55,7 @@ export const isGroupAdmin = async (username: string, groupName: string, kcAdminC
   return admins.includes(username);
 };
 
+// TODO: This is deprecated. Please use 'isGroupMember' in middlewares/auth.ts
 export const isGroupMember = async (userId: string, groupName: string, kcAdminClient: KcAdminClient): Promise<boolean> => {
   const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});
   const groupData = find(groups, ['name', groupName]);

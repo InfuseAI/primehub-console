@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import KcAdminClient from 'keycloak-admin';
 import { keycloakMaxCount } from '../../resolvers/constant';
 import { Context } from '../../resolvers/interface';
-import { toRelay, filter, paginate, extractPagination, isGroupMember } from '../../resolvers/utils';
+import { toRelay, filter, paginate, extractPagination } from '../../resolvers/utils';
 import { transform as transformGroup } from '../../resolvers/groupUtils';
 import * as logger from '../../logger';
 import { ErrorCodes } from '../../errorCodes';
@@ -91,14 +91,9 @@ const transformRun = (item: any) => {
 };
 
 export const queryOne = async (root, args, context: Context) => {
-  const {userId, kcAdminClient} = context;
   const where = args && args.where;
-  const viewable = await isGroupMember(userId, where.group, kcAdminClient);
-  if (!viewable) {
-    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
-  }
 
-  const trackingUri = await getTrackingUri(where.group, kcAdminClient);
+  const trackingUri = await getTrackingUri(where.group, context.kcAdminClient);
   if (!trackingUri) {
     throw new ApolloError('tracking uri not found', TRACKING_URI_NOT_FOUND);
   }
@@ -119,14 +114,9 @@ export const queryOne = async (root, args, context: Context) => {
 };
 
 export const query = async (root, args, context: Context) => {
-  const {userId, kcAdminClient} = context;
   const where = args && args.where;
-  const viewable = await isGroupMember(userId, where.group, kcAdminClient);
-  if (!viewable) {
-    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
-  }
 
-  const trackingUri = await getTrackingUri(where.group, kcAdminClient);
+  const trackingUri = await getTrackingUri(where.group, context.kcAdminClient);
   if (!trackingUri) {
     throw new ApolloError('tracking uri not found', TRACKING_URI_NOT_FOUND);
   }
@@ -146,14 +136,9 @@ export const query = async (root, args, context: Context) => {
 };
 
 export const queryVersion = async (root, args, context: Context) => {
-  const {userId, kcAdminClient} = context;
   const where = args && args.where;
-  const viewable = await isGroupMember(userId, where.group, kcAdminClient);
-  if (!viewable) {
-    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
-  }
 
-  const trackingUri = await getTrackingUri(where.group, kcAdminClient);
+  const trackingUri = await getTrackingUri(where.group, context.kcAdminClient);
   if (!trackingUri) {
     throw new ApolloError('tracking uri not found', TRACKING_URI_NOT_FOUND);
   }
@@ -175,13 +160,7 @@ export const queryVersion = async (root, args, context: Context) => {
 };
 
 const listQueryVersions = async (where: any, context: Context) => {
-  const {userId, kcAdminClient} = context;
-  const viewable = await isGroupMember(userId, where.group, kcAdminClient);
-  if (!viewable) {
-    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
-  }
-
-  const trackingUri = await getTrackingUri(where.group, kcAdminClient);
+  const trackingUri = await getTrackingUri(where.group, context.kcAdminClient);
   if (!trackingUri) {
     throw new ApolloError('tracking uri not found', TRACKING_URI_NOT_FOUND);
   }
