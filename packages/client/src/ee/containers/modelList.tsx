@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Skeleton, Input, Alert, Button, Table} from 'antd';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
-import {get} from 'lodash';
+import {get, max} from 'lodash';
 import {Link, withRouter} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
@@ -41,11 +41,29 @@ type State = {
 }
 
 class ModelListContainer extends React.Component<Props, State> {
-  const renderName = text => text ? (
+  private renderName = text => text ? (
     <Link to={`models/${text}`}>
       {text}
     </Link>
   ) : '-'
+
+  private renderLatestVersion= (latestVersions, model) => {
+    if (!latestVersions || !Array.isArray(latestVersions)) {
+      return '-';
+    }
+
+    latestVersions = latestVersions.map(a => parseInt(a.version));
+    latestVersions = latestVersions.filter(a => !isNaN(a));
+    if (latestVersions.length === 0) {
+      return '-';
+    }
+
+    const latestVersion = max(latestVersions);
+
+    return <Link to={`models/${model.name}/versions/${latestVersion}`}>
+      {`Version ${latestVersion}`}
+    </Link>
+  }
 
   render() {
     const { groupContext, getModels} = this.props;
@@ -70,6 +88,10 @@ class ModelListContainer extends React.Component<Props, State> {
       title: 'Name',
       dataIndex: 'name',
       render: this.renderName,
+    }, {
+      title: 'Latest Version',
+      dataIndex: 'latestVersions',
+      render: this.renderLatestVersion,
     }, {
       title: 'Creation Time',
       dataIndex: 'creationTimestamp',
