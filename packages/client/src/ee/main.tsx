@@ -22,6 +22,7 @@ import ScheduleCreatePage from 'ee/containers/scheduleCreatePage';
 import ScheduleListContainer from 'ee/containers/scheduleList';
 import ModelListContainer from 'ee/containers/modelList';
 import ModelDetailContainer from 'ee/containers/modelDetail';
+import ModelVersionDetailContainer from 'ee/containers/modelVersionDetail';
 import DeploymentListContainer from 'ee/containers/deploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
@@ -119,6 +120,11 @@ class Main extends React.Component {
               path={`${appPrefix}g/:groupName/models/:modelName`}
               exact
               component={ModelDetailContainer}
+            />
+            <Route
+              path={`${appPrefix}g/:groupName/models/:modelName/versions/:version`}
+              exact
+              component={ModelVersionDetailContainer}
             />
 
             {/* Model Deployment */}
