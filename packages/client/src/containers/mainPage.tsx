@@ -4,7 +4,6 @@ import {Route, Switch, RouteComponentProps} from 'react-router-dom';
 import Header from 'components/header';
 import GroupSelector from 'components/groupSelector';
 import Sidebar from 'components/main/sidebar';
-import {get} from 'lodash';
 import { Redirect, withRouter } from 'react-router';
 import {appPrefix} from 'utils/env';
 import {graphql} from 'react-apollo';
@@ -14,6 +13,7 @@ import { UserContextValue, UserContext } from 'context/user';
 import Landing from '../landing';
 import ApiTokenPage from 'containers/apiTokenPage';
 import {CurrentUser} from 'queries/User.graphql';
+import {checkUserIsGroupAdmin} from '../utils';
 
 export interface MainPageSidebarItem {
   title: string;
@@ -52,19 +52,10 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
     }
   }
 
-  checkUserIsGroupAdmin(currentGroup: GroupContextValue, currentUser: UserContextValue): boolean {
-    if (!currentUser) {
-      return false;
-    }
-    const admins = get(currentGroup, 'admins', "");
-    const adminList = admins ? admins.split(',') : [];
-    return adminList.includes(currentUser.username);
-  }
-
   getGroups(): {
     loading: boolean,
     error: any,
-    groups: Array<GroupContextValue>,
+    groups: GroupContextValue[],
     me: UserContextValue
   } {
     const everyoneGroupId = window.EVERYONE_GROUP_ID;
@@ -85,13 +76,13 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
       groups.find(group => group.name === currentGroupName) :
       undefined;
     if (currentUser) {
-      currentUser.isCurrentGroupAdmin = this.checkUserIsGroupAdmin(currentGroup, currentUser);
+      currentUser.isCurrentGroupAdmin = checkUserIsGroupAdmin(currentGroup, currentUser);
     }
 
     let content;
 
     if (loading) {
-      content = <></>
+      content = <></>;
     } else if (error) {
       content = <Switch>
         <Route path={`${appPrefix}g`} exact>
@@ -105,7 +96,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
         <Route path='/'>
           <Redirect to={`${appPrefix}g`} />
         </Route>
-      </Switch>
+      </Switch>;
     } else if (groups && groups.length === 0) {
       content = <Switch>
         <Route path={`${appPrefix}g`} exact>
@@ -119,7 +110,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
         <Route path='/'>
           <Redirect to={`${appPrefix}g`} />
         </Route>
-      </Switch>
+      </Switch>;
     } else {
       content = <Switch>
         {/* Home */}

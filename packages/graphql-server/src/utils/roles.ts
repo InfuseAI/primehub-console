@@ -1,6 +1,5 @@
 import { rule } from 'graphql-shield';
 import { Context, Role } from '../resolvers/interface';
-import { get, find } from 'lodash';
 
 export const isAdmin = rule({ cache: 'contextual' })(
   async (parent, args, ctx: Context, info) => {
@@ -11,6 +10,16 @@ export const isAdmin = rule({ cache: 'contextual' })(
 export const isUser = rule({ cache: 'contextual' })(
   async (parent, args, ctx, info) => {
     return ctx.role === Role.USER;
+  },
+);
+
+export const isGroupAdmin = rule({ cache: 'contextual' })(
+  async (parent, args, ctx, info) => {
+    const groupId = args.where && args.where.id;
+    if (!groupId) return false;
+    const group = await ctx.kcAdminClient.groups.findOne({id: groupId});
+    const admins = group && group.attributes && group.attributes.admins || [];
+    return (admins.indexOf(ctx.username) >= 0);
   },
 );
 

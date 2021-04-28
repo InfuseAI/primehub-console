@@ -1,0 +1,12 @@
+#import './fragments/GroupInfo.graphql'
+query GetGroupMLflowConfig($where: GroupWhereUniqueInput!) {
+  group (where: $where) {
+    ...GroupMLflowConfig
+  }
+}
+
+mutation UpdateGroupMLflowConfig($where: GroupWhereUniqueInput!, $data: GroupUpdateInput!) {
+  updateGroup (where: $where, data: $data) {
+    ...GroupMLflowConfig
+  }
+}

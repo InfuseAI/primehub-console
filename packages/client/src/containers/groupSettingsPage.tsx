@@ -1,8 +1,7 @@
 import * as React from 'react';
-import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
-import { get, isNull } from 'lodash';
+import { get } from 'lodash';
 import { Form, Tabs, Row, Col, Card, Switch, Checkbox, Input, InputNumber, Table, Alert } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import { withRouter } from 'react-router';
@@ -38,21 +37,21 @@ class GroupSettingsPage extends React.Component<Props> {
       history.push(`../home`);
     }
 
-    const group = get(currentUser, 'me.groups', []).find(group => group.id === groupContext.id);
+    const group = get(currentUser, 'me.groups', []).find(g => g.id === groupContext.id);
 
     return (
       <>
         <PageTitle
           breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-          title={"Settings"}
+          title={'Settings'}
         />
         <PageBody style={{flex: '1 1 0%'}}>
           <Tabs style={{height: '100%'}}>
-            <Tabs.TabPane key="info" tab="Information">
+            <Tabs.TabPane key='info' tab='Information'>
               <GroupSettingsAlert />
               <GroupSettingsInfo group={group} />
             </Tabs.TabPane>
-            <Tabs.TabPane key="members" tab="Members">
+            <Tabs.TabPane key='members' tab='Members'>
               <GroupSettingsAlert />
               <GroupSettingsMembers group={group} />
             </Tabs.TabPane>
@@ -77,4 +76,4 @@ export default compose(
     name: 'currentUser',
     alias: 'withCurrentUser'
   }),
-)(GroupSettingsPage)
+)(GroupSettingsPage);
