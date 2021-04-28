@@ -3,6 +3,7 @@ import {Skeleton, Input, Alert, Button, Table, Row, Col} from 'antd';
 import Field from 'components/share/field';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
+import {get} from 'lodash';
 import {Link, withRouter} from 'react-router-dom';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
@@ -12,6 +13,7 @@ import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
 import {QueryModelVersion} from 'queries/models.graphql';
 import {formatTimestamp} from 'ee/components/modelMngt/common';
+import Metadata from 'ee/components/modelMngt/metadata';
 
 const PAGE_SIZE = 20;
 
@@ -82,8 +84,19 @@ class ModelVersionDetailContainer extends React.Component<Props> {
       </div>
       <Row gutter={36}>
         <Col span={24}>
-          <Field labelCol={4} valueCol={8} label='Registered Time' value={formatTimestamp(modelVersion.creationTimestamp)} />
-          <Field labelCol={4} valueCol={8} label='Last Modified' value={formatTimestamp(modelVersion.lastUpdatedTimestamp)} />
+          <Field labelCol={4} valueCol={20} label='Registered Time' value={formatTimestamp(modelVersion.creationTimestamp)} />
+          <Field labelCol={4} valueCol={20} label='Last Modified' value={formatTimestamp(modelVersion.lastUpdatedTimestamp)} />
+          <Field labelCol={4} valueCol={20} label='Source Run' value={<a href="#">Run {get(modelVersion, "run.info.runId")}</a>} />
+
+          <Field style={{marginBottom: 32}} labelCol={4} valueCol={12} label='Parameters'
+                 value={<Metadata metadata={get(modelVersion, "run.data.params", [])} />}
+          />
+          <Field style={{marginBottom: 32}} labelCol={4} valueCol={12} label='Metrics'
+                 value={<Metadata metadata={get(modelVersion, "run.data.metrics", [])} />}
+          />
+          <Field style={{marginBottom: 32}} labelCol={4} valueCol={12} label='Tags'
+                 value={<Metadata metadata={get(modelVersion, "run.data.tags", []).filter(tag => !tag.key.startsWith('mlflow.'))} />}
+          />
         </Col>
       </Row>
     </>;
