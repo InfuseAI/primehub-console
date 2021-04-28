@@ -18,7 +18,7 @@ import iconSettings from 'images/icon-settings.svg';
 // Components
 import ListContainer from 'containers/list';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
-import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
+import DeploymentListContainer from 'ee/containers/deploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
@@ -93,7 +93,7 @@ class Main extends React.Component {
             </Route>
             {/* Model Deployment */}
             <Route path={`${appPrefix}g/:groupName/deployments`} exact>
-              <ListContainer Com={ModelDeploymentListContainer} />
+              <ListContainer Com={DeploymentListContainer} />
             </Route>
             <Route path={`${appPrefix}g/:groupName/deployments/create`} exact>
               <DeploymentCreatePage />

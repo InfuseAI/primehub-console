@@ -9,7 +9,7 @@ import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import Header from '../components/header';
 import styled from 'styled-components';
 import {BackgroundTokenSyncer} from '../workers/backgroundTokenSyncer';
-import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
+import DeploymentListContainer from 'ee/containers/deploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
@@ -354,7 +354,7 @@ class Job extends React.Component {
                   <ApolloProvider client={client}>
                     <Switch>
                       <Route path={`${appPrefix}model-deployment`} exact>
-                        <ListContainer Com={ModelDeploymentListContainer} />
+                        <ListContainer Com={DeploymentListContainer} />
                       </Route>
                       <Route path={`${appPrefix}model-deployment/create`} exact>
                         <DeploymentCreatePage />
