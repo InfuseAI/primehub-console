@@ -298,18 +298,18 @@ class Browser extends React.Component<Props, State> {
     />
   }
 
-  private renderItemAction = (item) => {
+  private renderItemAction = item => {
     const menuItems = [];
-    const menuItemView = <Menu.Item key="view"><a target='_blank' href={`${this.getFilePath(item.name)}`}>View file</a></Menu.Item>;
-    const menuItemDownload = <Menu.Item key="download"><a href={`${this.getFilePath(item.name)}?download=1`}>Download file</a></Menu.Item>;
-    const menuItemCopyUri = <Menu.Item key="Copy Uri"><a onClick={() => {this.setState({itemCopyUri: item})}}>Copy PHFS URI</a></Menu.Item>;
-    const menuItemDelete = <Menu.Item key="delete"><a onClick={()=>{this.handleDelete(item)}}>Delete</a></Menu.Item>;
+    const menuItemView = <Menu.Item key='view'><a target='_blank' href={`${this.getFilePath(item.name)}`}>View file</a></Menu.Item>;
+    const menuItemDownload = <Menu.Item key='download'><a href={`${this.getFilePath(item.name)}?download=1`}>Download file</a></Menu.Item>;
+    const menuItemCopyUri = <Menu.Item key='Copy Uri'><a onClick={() => {this.setState({itemCopyUri: item})}}>Copy PHFS URI</a></Menu.Item>;
+    const menuItemDelete = <Menu.Item key='delete'><a onClick={() => {this.handleDelete(item)}}>Delete</a></Menu.Item>;
 
-    if (item.name.endsWith("/")) {
+    if (item.name.endsWith('/')) {
       // folder
-    } else if (item.name.endsWith("txt") ||
-        item.name.endsWith("png") ||
-        item.name.endsWith("jpg"))
+    } else if (item.name.endsWith('txt') ||
+        item.name.endsWith('png') ||
+        item.name.endsWith('jpg'))
     {
       // viewable file
       menuItems.push(menuItemView);
@@ -326,12 +326,11 @@ class Browser extends React.Component<Props, State> {
     return <Dropdown
             overlay={<Menu>{menuItems}</Menu>}
           >
-            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+            <a className='ant-dropdown-link' onClick={e => e.preventDefault()}>
               {/* <IconMore/> */}
-              <img src={iconMore} style={{width:16, height:16}}/>
+              <img src={iconMore} style={{width: 16, height: 16}}/>
             </a>
-          </Dropdown>
-    return
+          </Dropdown>;
   }
 
   private renderCopyUriModal = () => {
@@ -343,7 +342,7 @@ class Browser extends React.Component<Props, State> {
     const uri = this.getPhfsUri(itemCopyUri.name);
 
     return <Modal
-      title="Copy PHFS URI"
+      title='Copy PHFS URI'
       okText='Copy'
       visible={true}
       onOk={() => {
@@ -351,7 +350,7 @@ class Browser extends React.Component<Props, State> {
         input.select();
         document.execCommand('copy');
         notification.success({
-          message: "Copied to clipboard",
+          message: 'Copied to clipboard',
           placement: 'bottomRight'
         });
         this.setState({itemCopyUri: undefined});
@@ -360,12 +359,12 @@ class Browser extends React.Component<Props, State> {
         this.setState({itemCopyUri: undefined});
       }}
     >
-      <Form layout="vertical">
-        <Form.Item label="URI:">
-          <Input value={uri} ref={(input)=>{this.refInputPhfsUri = input}}/>
+      <Form layout='vertical'>
+        <Form.Item label='URI:'>
+          <Input value={uri} ref={input => this.refInputPhfsUri = input}/>
         </Form.Item>
       </Form>
-    </Modal>
+    </Modal>;
   }
 
   private renderUploadModal = () => {
@@ -376,21 +375,21 @@ class Browser extends React.Component<Props, State> {
     }
 
     return <Modal
-      title="Upload"
+      title='Upload'
       visible={this.state.uploading}
       footer={[
-        <Button type="primary" onClick={() => {
+        <Button type='primary' onClick={() => {
           this.setState({uploading: false});
           this.handleRefetch();
         }}>OK</Button>
       ]}
-      onCancel={()=>{
+      onCancel={() => {
         this.setState({uploading: false});
         this.handleRefetch();
       }}
     >
       <Uploader dirPath={data.files.prefix} />
-    </Modal>
+    </Modal>;
   }
 
   private renderContent = () => {
@@ -405,20 +404,20 @@ class Browser extends React.Component<Props, State> {
     }
 
     if (data.loading) {
-      return <Skeleton active />
+      return <Skeleton active />;
     }
 
-    const columns: ColumnProps<any>[] = [
+    const columns: Array<ColumnProps<any>> = [
       {
         title: 'Name',
         dataIndex: 'name',
         key: 'name',
-        render: (name, record, index)=> {
-          const iconStyle = {fontSize: '12pt', paddingRight: 16}
+        render: (name, record, index) => {
+          const iconStyle = {fontSize: '12pt', paddingRight: 16};
           if (name.endsWith('/')) {
-            return <><Icon style={iconStyle} type="folder" /><a style={{color: "rgba(0, 0, 0, 0.65)"}}onClick={() => this.handleFolderClick(name)}>{name}</a></>;
+            return <><Icon style={iconStyle} type='folder' /><a style={{color: 'rgba(0, 0, 0, 0.65)'}}onClick={() => this.handleFolderClick(name)}>{name}</a></>;
           } else {
-            return <><Icon style={iconStyle} type="file" />{name}</>;
+            return <><Icon style={iconStyle} type='file' />{name}</>;
           }
         },
         sorter: (left, right) => left.name.localeCompare(right.name),
@@ -433,8 +432,8 @@ class Browser extends React.Component<Props, State> {
           return !record.name.endsWith('/') ? humanFileSize(size, true, 1) : undefined;
         },
         sorter: (left, right) => {
-          let leftSize = left.size || 0;
-          let rightSize = right.size || 0;
+          const leftSize = left.size || 0;
+          const rightSize = right.size || 0;
           return leftSize - rightSize;
         },
       },
@@ -448,8 +447,8 @@ class Browser extends React.Component<Props, State> {
           return !record.name.endsWith('/') ? moment(lastModified).format('YYYY-MM-DD HH:mm:ss') : undefined;
         },
         sorter: (left, right) => {
-          let leftTime = Date.parse(left.lastModified) || 0;
-          let rightTime = Date.parse(right.lastModified) || 0;
+          const leftTime = Date.parse(left.lastModified) || 0;
+          const rightTime = Date.parse(right.lastModified) || 0;
           return leftTime - rightTime;
         },
       },
@@ -470,13 +469,13 @@ class Browser extends React.Component<Props, State> {
     }
 
     const pagination = {
-      hideOnSinglePage: true,
+      hideOnSinglePage: false,
       showSizeChanger: true,
       defaultPageSize: 25,
       pageSizeOptions: ['10', '25', '50', '100']
     };
 
-    return <Table style={{paddingTop: 8}}dataSource={dataSource} columns={columns} pagination={pagination}/>
+    return <Table style={{paddingTop: 8}}dataSource={dataSource} columns={columns} pagination={pagination}/>;
 
   }
 }
