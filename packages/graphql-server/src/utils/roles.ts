@@ -15,10 +15,13 @@ export const isUser = rule({ cache: 'contextual' })(
   },
 );
 
-// from phJob or jupyter client that use secret token
-export const isClient = rule({ cache: 'contextual' })(
+export const isGroupAdmin = rule({ cache: 'contextual' })(
   async (parent, args, ctx, info) => {
-    return ctx.role === Role.CLIENT;
+    const groupId = args.where && args.where.id;
+    if (!groupId) return false;
+    const group = await ctx.kcAdminClient.groups.findOne({id: groupId});
+    const admins = group && group.attributes && group.attributes.admins || [];
+    return (admins.indexOf(ctx.username) >= 0);
   },
 );
 
@@ -37,5 +40,12 @@ export const isGroupMember = rule({ cache: 'contextual' })(
     });
     const memberIds = members.map(user => user.id);
     return (memberIds.indexOf(ctx.userId) >= 0);
+  },
+);
+
+// from phJob or jupyter client that use secret token
+export const isClient = rule({ cache: 'contextual' })(
+  async (parent, args, ctx, info) => {
+    return ctx.role === Role.CLIENT;
   },
 );

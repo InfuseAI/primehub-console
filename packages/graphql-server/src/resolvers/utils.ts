@@ -304,6 +304,21 @@ export const mutateRelation = async ({
   }
 };
 
+export const serializeEnvs = list => {
+  return list.map(env => {
+    return `${env.name}=${env.value}`;
+  });
+};
+
+export const deserializeEnvs = list => {
+  return list.map(env => {
+    const temp = env.split('=');
+    return {name: temp[0], value: temp[1]};
+  });
+};
+
+export const splitByComma = (value: string) => value.split(',');
+export const joinByComma = (list: string[]) => list.join(',');
 export const stringifyDiskQuota = (quota: number) => `${quota}G`;
 export const parseDiskQuota = (quotaWithUnit: string) => {
   if (!quotaWithUnit) {

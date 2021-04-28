@@ -5,6 +5,18 @@
 # import Dataset from "dataset.graphql"
 # import ResourceStatus from "resourceStatus.graphql"
 
+type EnvVar {
+  name: String
+  value: String
+}
+
+type MLflowSetting {
+  trackingUri: String
+  uiUrl: String
+  trackingEnvs: [EnvVar]
+  artifactEnvs: [EnvVar]
+}
+
 type Group {
   id: ID!
   name: String!
@@ -34,6 +46,7 @@ type Group {
   jobDefaultActiveDeadlineSeconds: Int
   # group admin
   admins: String
+  mlflow: MLflowSetting
 }
 
 """order"""
@@ -146,6 +159,10 @@ input GroupUpdateInput {
   jobDefaultActiveDeadlineSeconds: Int
   # group admin
   admins: String
+  trackingUri: String
+  uiUrl: String
+  trackingEnvs: JSON
+  artifactEnvs: JSON
 }
 
 """Relation input"""

@@ -6,6 +6,11 @@ import {
   parseBoolean
 } from './utils';
 
+const transformEnvs = (val: string): {name: string, value: string} => {
+  const tmp = val.split('=');
+  return {name: tmp[0], value: tmp[1]};
+};
+
 export const transform = (group: any): any => {
   return {
     ...group,
@@ -25,5 +30,11 @@ export const transform = (group: any): any => {
     jobDefaultActiveDeadlineSeconds: getFromAttr('job-default-active-deadline-seconds',
                                                   group.attributes, null, parseInt),
     admins: getMultivaluedFromAttr('admins', group.attributes, []).join(','),
+    mlflow: {
+      trackingUri: getFromAttr('mlflow-tracking-uri', group.attributes, null),
+      uiUrl: getFromAttr('mlflow-ui-url', group.attributes, null),
+      trackingEnvs: getMultivaluedFromAttr('mlflow-tracking-envs', group.attributes, [], transformEnvs),
+      artifactEnvs: getMultivaluedFromAttr('mlflow-artifact-envs', group.attributes, [], transformEnvs),
+    }
   };
 };

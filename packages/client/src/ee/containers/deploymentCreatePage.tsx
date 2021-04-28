@@ -19,13 +19,13 @@ import {CurrentUser} from 'queries/User.graphql';
 const breadcrumbs = [
   {
     key: 'list',
-    matcher: /\/model-deployment/,
-    title: 'Model Deployments',
-    link: '/model-deployment?page=1'
+    matcher: /\/deployments/,
+    title: 'Deployments',
+    link: '/deployments?page=1'
   },
   {
     key: 'list',
-    matcher: /\/model-deployment\/create/,
+    matcher: /\/deployments\/create/,
     title: 'Create Deployment'
   }
 ];
@@ -123,7 +123,7 @@ export default compose(
       onCompleted: (data: any) => {
         const {history} = props;
         history.push({
-          pathname: `../model-deployment`,
+          pathname: `../deployments`,
           search: queryString.stringify({first: 8})
         });
         notification.success({
@@ -133,7 +133,7 @@ export default compose(
           description: (
             <>
               Your model has begun deploying.
-              Click <a onClick={() => history.push(`model-deployment/${data.createPhDeployment.id}`)}>here</a> to view.
+              Click <a onClick={() => history.push(`deployments/${data.createPhDeployment.id}`)}>here</a> to view.
             </>
           )
         });

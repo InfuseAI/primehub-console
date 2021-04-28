@@ -1,5 +1,6 @@
-import { mapValues, reduce, isUndefined, isNull, isEmpty, omit } from 'lodash';
+import { mapValues, reduce, isUndefined, isNull, isEmpty, isArray, omit } from 'lodash';
 
+const arrayTypeList = ['admins', 'mlflow-tracking-envs', 'mlflow-artifact-envs'];
 const noop = v => v;
 
 export enum FieldType {
@@ -78,7 +79,7 @@ export class Attributes {
       }
 
       const fieldName = (this.schema[key] && this.schema[key].rename) || key;
-      result[fieldName] = (fieldName === 'admins') ? value.split(',') : [value];
+      result[fieldName] = (isArray(value)) ? value : [value];
       return result;
     }, {});
 
@@ -107,9 +108,8 @@ export class Attributes {
       const typeTransform = transforms[value.type];
       const customTransform = value.deserialize;
       const transform = customTransform || typeTransform || noop;
-      // admins transform
-      result[key] = (fieldName === 'admins') ?
-        keycloakAttr[fieldName].join(',') : transform(keycloakAttr[fieldName][0]);
+      result[key] = (arrayTypeList.includes(fieldName)) ?
+        transform(keycloakAttr[fieldName]) : transform(keycloakAttr[fieldName][0]);
       return result;
     }, {});
 

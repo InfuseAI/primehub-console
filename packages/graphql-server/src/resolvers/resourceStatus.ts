@@ -1,6 +1,7 @@
 import { Context } from './interface';
 import { client as kubeClient } from '../crdClient/crdClientImpl';
 import * as logger from '../logger';
+import { toPrimehubLabel } from '../utils/escapism';
 const GiB = Math.pow(1024, 3);
 const MiB = Math.pow(1024, 2);
 const KiB = 1024;
@@ -12,12 +13,6 @@ const converCpuValueToFloat = (value = '0') => {
   } else {
     return parseFloat(value);
   }
-};
-
-const escapedGroupName = (groupName = '') => {
-  let result = groupName.toLowerCase();
-  result = escape(result);
-  return result.replace(/-/g, '-2d');
 };
 
 const converMemResourceToBytes = (mem = '0') => {
@@ -47,7 +42,7 @@ const labelStringify = (labels: Record<string, string>) => {
 export const query = async (group, args, context: Context) => {
   const PENDING = 'Pending';
   const RUNNING = 'Running';
-  const groupName = escapedGroupName(group.name);
+  const groupName = toPrimehubLabel(group.name);
   logger.info({
     component: logger.components.resourceStatus,
     type: 'QUERY',

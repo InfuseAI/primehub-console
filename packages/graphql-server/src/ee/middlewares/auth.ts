@@ -1,5 +1,5 @@
 import { rule, shield, and, or, not } from 'graphql-shield';
-import { isAdmin, isClient, isUser, isGroupMember } from '../../utils/roles';
+import { isAdmin, isClient, isUser, isGroupAdmin, isGroupMember } from '../../utils/roles';
 
 export const permissions = shield({
   Query: {
@@ -7,7 +7,7 @@ export const permissions = shield({
     'system': or(isAdmin, isClient),
     'me': or(isAdmin, isUser),
     'user': or(isAdmin, isClient),
-    'group': or(isAdmin, isClient),
+    'group': or(isAdmin, isGroupAdmin, isClient),
     'groups': or(isAdmin, isClient),
     'datasets': or(isAdmin, isClient),
     'secret': or(isAdmin, isUser, isClient),

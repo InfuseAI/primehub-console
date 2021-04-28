@@ -8,9 +8,11 @@ import phSchedules from './fakeData/phSchedules';
 import phDeployments from './fakeData/phDeployments';
 import phApplications from './fakeData/phApplications';
 import phAppTemplates from './fakeData/phAppTemplates';
+import groups from './fakeData/groups';
 
 export const fakeData = {
   me,
+  groups,
   secrets,
   phJobs,
   images,
@@ -25,6 +27,7 @@ export const fakeData = {
 export const schema =  {
   me: {type: 'object'},
   secrets: {type: 'array', items: {type: 'object'}},
+  groups: {type: 'array', items: {type: 'object'}},
   images: {type: 'array', items: {type: 'object'}},
   phJobs: {type: 'array', items: {type: 'object'}},
   phSchedules: {type: 'array', items: {type: 'object'}},

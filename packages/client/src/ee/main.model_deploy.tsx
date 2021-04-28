@@ -35,7 +35,7 @@ class Main extends React.Component {
     const sidebarItems: MainPageSidebarItem[] = [
       {
         title: 'Models',
-        subPath: 'model-deployment',
+        subPath: 'deployments',
         icon: iconModels,
         style: {
           width: 'auto',
@@ -92,19 +92,19 @@ class Main extends React.Component {
               <SharedFilesPage />
             </Route>
             {/* Model Deployment */}
-            <Route path={`${appPrefix}g/:groupName/model-deployment`} exact>
+            <Route path={`${appPrefix}g/:groupName/deployments`} exact>
               <ListContainer Com={ModelDeploymentListContainer} />
             </Route>
-            <Route path={`${appPrefix}g/:groupName/model-deployment/create`} exact>
+            <Route path={`${appPrefix}g/:groupName/deployments/create`} exact>
               <DeploymentCreatePage />
             </Route>
             <Route
-              path={`${appPrefix}g/:groupName/model-deployment/:deploymentId`}
+              path={`${appPrefix}g/:groupName/deployments/:deploymentId`}
               exact
               component={DeploymentDetailContainer}
             />
             <Route
-              path={`${appPrefix}g/:groupName/model-deployment/:deploymentId/edit`}
+              path={`${appPrefix}g/:groupName/deployments/:deploymentId/edit`}
               exact
             >
               <DeploymentEditPage />

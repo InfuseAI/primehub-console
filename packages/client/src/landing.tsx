@@ -80,10 +80,10 @@ class Landing extends React.Component<Props> {
                           <li>
                             <Link to='hub'>Open Jupyter Notebook</Link>
                           </li>
-                          <li>
+                          <li style={{display: (window.enableApp) ? 'inherit' : 'none'}}>
                             <Link to='apps'>Install Application</Link>
                           </li>
-                          <li>
+                          <li style={{display: (window.enablePhfs) ? 'inherit' : 'none'}}>
                             <Link to='browse'>Upload Shared Files...</Link>
                           </li>
                         </GuideList>
@@ -97,13 +97,13 @@ class Landing extends React.Component<Props> {
                           <li>
                             <Link to='job'>Create New Job</Link>
                           </li>
-                          <li>
+                          <li style={{display: (window.enableModelDeployment) ? 'inherit' : 'none'}}>
                             <Link to='model-deployment'>Deploy Model</Link>
                           </li>
-                          <li>
+                          <li style={{display: (window.enableApp) ? 'inherit' : 'none'}}>
                             <Link to='apps'>Install Application</Link>
                           </li>
-                          <li>
+                          <li style={{display: (window.enablePhfs) ? 'inherit' : 'none'}}>
                             <Link to='browse'>Upload Shared Files...</Link>
                           </li>
                         </GuideList>
