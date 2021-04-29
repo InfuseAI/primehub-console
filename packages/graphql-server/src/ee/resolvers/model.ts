@@ -27,7 +27,7 @@ const requestApi = async (trackingUri: string, endpoint: string, auth = null, pa
   const init: any = {};
   if (auth) {
     init.headers = {
-      'Authorization': auth,
+      Authorization: auth,
     };
   }
   const response = await fetch(url, init);
@@ -66,7 +66,7 @@ const getAuth = (mlflow: any) => {
     }
   }
   return null;
-}
+};
 
 const getRun = async (mlflow: any, runId: string) => {
   if (runId) {
@@ -129,7 +129,7 @@ export const queryMLflow = async (root, args, context: Context) => {
   }
 
   return mlflow;
-}
+};
 
 export const queryOne = async (root, args, context: Context) => {
   const mlflow = await queryMLflow(root, args, context);
