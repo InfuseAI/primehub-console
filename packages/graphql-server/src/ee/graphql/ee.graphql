@@ -1,4 +1,5 @@
 # import System from "../../graphql/system.graphql"
+# import MLflowSetting, MLflowSettingUniqueInput from "../../graphql/group.graphql"
 # import License from "./license.graphql"
 # import BuildImageJob, BuildImageOrderByInput, BuildImageJobConnection, BuildImageJobWhereInput, BuildImageJobWhereUniqueInput, BuildImage, BuildImageConnection, BuildImageWhereUniqueInput, BuildImageWhereInput, BuildImageCreateInput, BuildImageUpdateInput from "./buildImage.graphql"
 # import PhJob, PhJobOrderByInput, PhJobConnection, PhJobWhereUniqueInput, PhJobWhereInput, PhJobCreateInput, PhJobCancelResponse, PhJobNotifyEventInput from "./phJob.graphql"
@@ -135,6 +136,7 @@ type Query {
   ): UsageReportConnection!
 
   """Model"""
+  mlflow(where: MLflowSettingUniqueInput!): MLflowSetting
   model(where: ModelWhereUniqueInput!): Model
   models(where: ModelWhereInput!) : [Model]
   modelVersion(where: ModelVersionWhereUniqueInput!): ModelVersion
