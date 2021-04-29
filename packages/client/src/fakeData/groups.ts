@@ -1,6 +1,6 @@
-const mlflow = {
-  trackingUri: 'localhost',
-  uiUrl: 'localhost',
+export const mlflow = {
+  trackingUri: 'http://localhost:5000',
+  uiUrl: 'http://localhost:5000',
   trackingEnvs: [
     {
       name: 'FOO',

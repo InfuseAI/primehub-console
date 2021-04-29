@@ -10,7 +10,7 @@ import models from './fakeData/models';
 import modelVersions from './fakeData/modelVersions';
 import phApplications from './fakeData/phApplications';
 import phAppTemplates from './fakeData/phAppTemplates';
-import groups from './fakeData/groups';
+import {groups, mlflow} from './fakeData/groups';
 
 export const fakeData = {
   me,
@@ -19,6 +19,7 @@ export const fakeData = {
   phJobs,
   images,
   phSchedules,
+  mlflow,
   models,
   modelVersions,
   phDeployments,
@@ -36,6 +37,7 @@ export const schema =  {
   phJobs: {type: 'array', items: {type: 'object'}},
   phSchedules: {type: 'array', items: {type: 'object'}},
   phDeployments: {type: 'array', items: {type: 'object'}},
+  mlflow: {type: 'object'},
   models: {type: 'array', items: {type: 'object'}},
   modelVersions: {type: 'array', items: {type: 'object'}},
   phApplications: {type: 'array', items: {type: 'object'}},
