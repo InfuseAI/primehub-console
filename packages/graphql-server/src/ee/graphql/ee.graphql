@@ -143,18 +143,10 @@ type Query {
   modelVersions(
     where: ModelWhereUniqueInput!
     page: Int
-    before: String
-    after: String
-    first: Int
-    last: Int
   ): [ModelVersion]!
   modelVersionsConnection(
     where: ModelWhereUniqueInput!
     page: Int
-    before: String
-    after: String
-    first: Int
-    last: Int
   ): ModelVersionsConnection!
 }
 

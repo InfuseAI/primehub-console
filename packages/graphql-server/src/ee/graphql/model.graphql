@@ -21,9 +21,6 @@ type ModelVersion {
 type ModelVersionEdge {
   """The item at the end of the edge."""
   node: ModelVersion!
-
-  """A cursor for use in pagination."""
-  cursor: String!
 }
 
 type ModelVersionsConnection {
