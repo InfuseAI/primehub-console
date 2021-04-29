@@ -68,15 +68,6 @@ class ModelListContainer extends React.Component<Props, State> {
       refetch
     } = getModels;
 
-    if (error) {
-      console.log(getModels.error);
-      return 'Error';
-    }
-
-    if (!models) {
-      return <Skeleton />
-    }
-
     const breadcrumbs = [
       {
         key: 'list',
@@ -86,6 +77,41 @@ class ModelListContainer extends React.Component<Props, State> {
       }
     ];
 
+    let pageBody;
+    if (error) {
+      if (get(error, 'graphQLErrors.0.extensions.code') === 'TRACKING_URI_NOT_FOUND') {
+        pageBody = <Alert
+          message="MLflow is not configured"
+          description="MLflow settings are not configured yet. Please go to the group settings to configure it."
+          type="warning"
+          showIcon/>;
+      } else if (error.graphQLErrors) {
+        pageBody = <Alert
+          message="Tracking URI Not Reachable"
+          description={`The configured MLflow tracking URI is not reachable. Please check if the MLflow is well configured and the MLflow server is running correctly.`}
+          type="error"
+          showIcon/>;
+      } else {
+        pageBody = 'error'
+      }
+    } else if (!models) {
+      pageBody = <Skeleton />
+    } else {
+      pageBody = this.renderModels(mlflow, models, loading);
+    }
+
+    return (
+      <>
+        <PageTitle
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
+          title={"Model Management"}
+        />
+        <PageBody>{pageBody}</PageBody>
+      </>
+    );
+  }
+
+  private renderModels(mlflow: any, models: any, loading: boolean) {
     const columns = [{
       title: 'Name',
       dataIndex: 'name',
@@ -102,33 +128,24 @@ class ModelListContainer extends React.Component<Props, State> {
       title: 'Updated Time',
       dataIndex: 'lastUpdatedTimestamp',
       render: formatTimestamp,
-    }]
+    }];
 
     let pageBody = <>
-      <div style={{textAlign: 'right'}}>
-        <Button onClick={()=>{
+      <div style={{ textAlign: 'right' }}>
+        <Button onClick={() => {
           openMLflowUI(mlflow, '/#/models');
-        }}>
+        } }>
           MLflow UI
         </Button>
         <Table
-          style={{paddingTop: 8}}
+          style={{ paddingTop: 8 }}
           dataSource={models}
           columns={columns}
           rowKey="name"
-          loading={loading}
-        />
+          loading={loading} />
       </div>
     </>;
-    return (
-      <>
-        <PageTitle
-          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-          title={"Model Management"}
-        />
-        <PageBody>{pageBody}</PageBody>
-      </>
-    );
+    return pageBody;
   }
 }
 
