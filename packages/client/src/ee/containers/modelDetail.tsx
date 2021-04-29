@@ -1,16 +1,15 @@
 import * as React from 'react';
-import {Skeleton, Input, Alert, Button, Table, Row, Col} from 'antd';
+import {Skeleton, Button, Table, Row, Col} from 'antd';
 import Field from 'components/share/field';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {Link, withRouter} from 'react-router-dom';
-import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
-import {QueryModel, QueryModelVersionsConnection} from 'queries/Model.graphql';
+import {QueryModel} from 'queries/Model.graphql';
 import {formatTimestamp, compareTimestamp, openMLflowUI} from 'ee/components/modelMngt/common';
 
 const PAGE_SIZE = 200;
@@ -25,21 +24,8 @@ type Props = {
     refetch: Function;
     mlflow?: any;
     model?: any;
+    modelVersions?: any;
   };
-  getModelVersionsConnection: {
-    error?: any;
-    loading: boolean;
-    variables: {
-      where?;
-      after?: string,
-      first?: number,
-      last?: number,
-      before?: string
-    };
-    refetch: Function;
-    modelVersionsConnection?: any;
-  };
-
 } & RouteComponentProps & GroupContextComponentProps;
 
 class ModelDetailContainer extends React.Component<Props> {
@@ -50,24 +36,22 @@ class ModelDetailContainer extends React.Component<Props> {
   );
 
   render() {
-    const { groupContext, getModel, getModelVersionsConnection, match} = this.props;
+    const { groupContext, getModel, match} = this.props;
     let {modelName} = match.params as any;
     modelName = decodeURIComponent(modelName)
 
     const {
       mlflow,
       model,
+      modelVersions,
     } = getModel;
-    const {
-      modelVersionsConnection,
-    } = getModelVersionsConnection;
 
     if (getModel.error) {
       console.log(getModel.error);
       return 'Cannot load model';
     }
 
-    if (!model || !modelVersionsConnection) {
+    if (!model || !modelVersions) {
       return <Skeleton />
     }
 
@@ -82,15 +66,14 @@ class ModelDetailContainer extends React.Component<Props> {
         key: 'model',
         matcher: /\/models/,
         title: `Model: ${modelName}`,
-        onClick: () => {getModelVersionsConnection.refetch()}
+        onClick: () => {getModel.refetch()}
       }
     ];
 
-    const columns = [{
+    const columns: any = [{
       title: 'Version',
       dataIndex: 'version',
       render: this.renderVersion(modelName),
-
     }, {
       title: 'Registered At',
       dataIndex: 'creationTimestamp',
@@ -104,7 +87,7 @@ class ModelDetailContainer extends React.Component<Props> {
       title: 'Action',
       render: () => <Button>Deploy</Button>,
     }]
-    const data = modelVersionsConnection.edges.map(edge => edge.node);
+    const data = modelVersions;
 
     let pageBody = <>
         <Row gutter={36}>
@@ -128,7 +111,7 @@ class ModelDetailContainer extends React.Component<Props> {
           dataSource={data}
           columns={columns}
           rowKey="name"
-          loading={modelVersionsConnection.loading}
+          loading={getModel.loading}
       />
     </>;
     return (
@@ -162,22 +145,5 @@ export default compose(
       }
     },
     name: 'getModel'
-  }),
-  graphql(QueryModelVersionsConnection, {
-    options: (props: Props) => {
-      const {groupContext, match} = props;
-      let {modelName} = match.params as any;
-      modelName = decodeURIComponent(modelName)
-      const group = groupContext ? groupContext.name : undefined;
-
-      return {
-        variables: {
-          group,
-          name: modelName,
-        },
-        fetchPolicy: 'cache-and-network'
-      }
-    },
-    name: 'getModelVersionsConnection'
   }),
 )(ModelDetailContainer)

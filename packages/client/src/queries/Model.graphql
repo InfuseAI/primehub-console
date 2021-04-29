@@ -21,6 +21,15 @@ fragment ModelVersionInfo on ModelVersion {
   lastUpdatedTimestamp
 }
 
+query QueryModels($group: String!) {
+  mlflow (where: {group: $group}) {
+    ...MLflowSettingInfo
+  }
+  models(where: {group: $group}) {
+    ...ModelInfo
+  }
+}
+
 query QueryModel($group: String!, $name: String!) {
   mlflow (where: {group: $group}){
     ...MLflowSettingInfo
@@ -28,14 +37,8 @@ query QueryModel($group: String!, $name: String!) {
   model(where: {group: $group, name: $name}) {
     ...ModelInfo
   }
-}
-
-query QueryModels($group: String!) {
-  mlflow (where: {group: $group}) {
-    ...MLflowSettingInfo
-  }
-  models(where: {group: $group}) {
-    ...ModelInfo
+  modelVersions(where: {group: $group, name: $name}) {
+    ...ModelVersionInfo
   }
 }
 
@@ -46,18 +49,5 @@ query QueryModelVersion($group: String!, $name: String!, $version: String!) {
   modelVersion(where: {group: $group, name: $name, version: $version}) {
     ...ModelVersionInfo
     run
-  }
-}
-
-query QueryModelVersionsConnection($group: String!, $name: String!) {
-  mlflow (where: {group: $group}){
-    ...MLflowSettingInfo
-  }
-  modelVersionsConnection(where: {group: $group, name: $name}) {
-    edges {
-      node {
-        ...ModelVersionInfo
-      }
-    }
   }
 }
