@@ -77,14 +77,9 @@ class ModelVersionDetailContainer extends React.Component<Props> {
 
 
     let pageBody = <>
-      <div style={{textAlign: 'right'}}>
-        <Button>
-          MLflow UI
-        </Button>
-      </div>
       <Row gutter={36}>
-        <Col span={24}>
-          <Field labelCol={4} valueCol={20} label='Registered Time' value={formatTimestamp(modelVersion.creationTimestamp)} />
+        <Col span={20}>
+          <Field labelCol={4} valueCol={20} label='Registered At' value={formatTimestamp(modelVersion.creationTimestamp)} />
           <Field labelCol={4} valueCol={20} label='Last Modified' value={formatTimestamp(modelVersion.lastUpdatedTimestamp)} />
           <Field labelCol={4} valueCol={20} label='Source Run' value={<a href="#">Run {get(modelVersion, "run.info.runId")}</a>} />
 
@@ -97,6 +92,13 @@ class ModelVersionDetailContainer extends React.Component<Props> {
           <Field style={{marginBottom: 32}} labelCol={4} valueCol={12} label='Tags'
                  value={<Metadata metadata={get(modelVersion, "run.data.tags", []).filter(tag => !tag.key.startsWith('mlflow.'))} />}
           />
+        </Col>
+        <Col span={4}>
+          <div style={{textAlign: 'right'}}>
+            <Button>
+              MLflow UI
+            </Button>
+          </div>
         </Col>
       </Row>
     </>;
