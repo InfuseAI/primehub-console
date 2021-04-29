@@ -10,8 +10,8 @@ import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
-import {QueryModel, QueryModelVersionsConnection} from 'queries/models.graphql';
-import {formatTimestamp, compareTimestamp} from 'ee/components/modelMngt/common';
+import {QueryModel, QueryModelVersionsConnection} from 'queries/Model.graphql';
+import {formatTimestamp, compareTimestamp, openMLflowUI} from 'ee/components/modelMngt/common';
 
 const PAGE_SIZE = 200;
 
@@ -23,6 +23,7 @@ type Props = {
       where?;
     };
     refetch: Function;
+    mlflow?: any;
     model?: any;
   };
   getModelVersionsConnection: {
@@ -54,6 +55,7 @@ class ModelDetailContainer extends React.Component<Props> {
     modelName = decodeURIComponent(modelName)
 
     const {
+      mlflow,
       model,
     } = getModel;
     const {
@@ -90,13 +92,13 @@ class ModelDetailContainer extends React.Component<Props> {
       render: this.renderVersion(modelName),
 
     }, {
-      title: 'Registered at',
+      title: 'Registered At',
       dataIndex: 'creationTimestamp',
       render: formatTimestamp,
       sorter: (a, b) => compareTimestamp(a.creationTimestamp, b.creationTimestamp),
       defaultSortOrder: 'descend',
     }, {
-      title: 'Deployed by',
+      title: 'Deployed By',
       render: () => '',
     }, {
       title: 'Action',
@@ -113,7 +115,9 @@ class ModelDetailContainer extends React.Component<Props> {
           </Col>
           <Col span={4}>
             <div style={{textAlign: 'right'}}>
-              <Button>
+              <Button onClick={()=>{
+                openMLflowUI(mlflow, `/#/models/${encodeURIComponent(modelName)}`);
+              }}>
                 MLflow UI
               </Button>
             </div>

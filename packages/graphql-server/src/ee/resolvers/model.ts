@@ -108,7 +108,7 @@ export const queryMLflow = async (root, args, context: Context) => {
   }
 
   return mlflow;
-}
+};
 
 export const queryOne = async (root, args, context: Context) => {
   const where = args && args.where;

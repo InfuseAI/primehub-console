@@ -11,8 +11,8 @@ import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
-import {formatTimestamp} from 'ee/components/modelMngt/common';
-import {QueryModels} from 'queries/models.graphql';
+import {formatTimestamp, openMLflowUI} from 'ee/components/modelMngt/common';
+import {QueryModels} from 'queries/Model.graphql';
 
 const PAGE_SIZE = 20;
 
@@ -24,6 +24,7 @@ type Props = {
       where?;
     };
     refetch: Function;
+    mlflow?: any;
     models?: any;
   };
 } & RouteComponentProps & GroupContextComponentProps;
@@ -62,6 +63,7 @@ class ModelListContainer extends React.Component<Props, State> {
     const {
       error,
       loading,
+      mlflow,
       models,
       refetch
     } = getModels;
@@ -104,7 +106,9 @@ class ModelListContainer extends React.Component<Props, State> {
 
     let pageBody = <>
       <div style={{textAlign: 'right'}}>
-        <Button>
+        <Button onClick={()=>{
+          openMLflowUI(mlflow, '/#/models');
+        }}>
           MLflow UI
         </Button>
         <Table

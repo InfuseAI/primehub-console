@@ -1,3 +1,8 @@
+fragment MLflowSettingInfo on MLflowSetting{
+  trackingUri
+  uiUrl
+}
+
 fragment ModelInfo on Model {
   name
   creationTimestamp
@@ -17,18 +22,27 @@ fragment ModelVersionInfo on ModelVersion {
 }
 
 query QueryModel($where: ModelWhereUniqueInput!) {
+  mlflow {
+    ...MLflowSettingInfo
+  }
   model(where: $where) {
     ...ModelInfo
   }
 }
 
 query QueryModels($where: ModelWhereInput!) {
+  mlflow {
+    ...MLflowSettingInfo
+  }
   models(where: $where) {
     ...ModelInfo
   }
 }
 
 query QueryModelVersion($where: ModelVersionWhereUniqueInput!) {
+  mlflow {
+    ...MLflowSettingInfo
+  }
   modelVersion(where: $where) {
     ...ModelVersionInfo
     run
@@ -36,6 +50,9 @@ query QueryModelVersion($where: ModelVersionWhereUniqueInput!) {
 }
 
 query QueryModelVersionsConnection($where: ModelWhereUniqueInput!, $first: Int, $after: String, $last: Int, $before: String) {
+  mlflow {
+    ...MLflowSettingInfo
+  }
   modelVersionsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
     edges {
       node {
