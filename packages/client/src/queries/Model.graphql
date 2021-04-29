@@ -1,0 +1,63 @@
+fragment MLflowSettingInfo on MLflowSetting{
+  trackingUri
+  uiUrl
+}
+
+fragment ModelInfo on Model {
+  name
+  creationTimestamp
+  lastUpdatedTimestamp
+  description
+  latestVersions {
+    name
+    version
+  }
+}
+
+fragment ModelVersionInfo on ModelVersion {
+  name
+  version
+  creationTimestamp
+  lastUpdatedTimestamp
+}
+
+query QueryModel($group: String!, $name: String!) {
+  mlflow (where: {group: $group}){
+    ...MLflowSettingInfo
+  }
+  model(where: {group: $group, name: $name}) {
+    ...ModelInfo
+  }
+}
+
+query QueryModels($group: String!) {
+  mlflow (where: {group: $group}) {
+    ...MLflowSettingInfo
+  }
+  models(where: {group: $group}) {
+    ...ModelInfo
+  }
+}
+
+query QueryModelVersion($group: String!, $name: String!, $version: String!) {
+  mlflow (where: {group: $group}){
+    ...MLflowSettingInfo
+  }
+  modelVersion(where: {group: $group, name: $name, version: $version}) {
+    ...ModelVersionInfo
+    run
+  }
+}
+
+query QueryModelVersionsConnection($group: String!, $name: String!) {
+  mlflow (where: {group: $group}){
+    ...MLflowSettingInfo
+  }
+  modelVersionsConnection(where: {group: $group, name: $name}) {
+    edges {
+      node {
+        ...ModelVersionInfo
+      }
+    }
+  }
+}

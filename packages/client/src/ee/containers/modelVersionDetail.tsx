@@ -11,8 +11,8 @@ import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
-import {QueryModelVersion} from 'queries/models.graphql';
-import {formatTimestamp} from 'ee/components/modelMngt/common';
+import {QueryModelVersion} from 'queries/Model.graphql';
+import {formatTimestamp, openMLflowUI} from 'ee/components/modelMngt/common';
 import Metadata from 'ee/components/modelMngt/metadata';
 
 const PAGE_SIZE = 20;
@@ -25,12 +25,13 @@ type Props = {
       where?;
     };
     refetch: Function;
+    mlflow?: any;
     modelVersion?: any;
   }
 } & RouteComponentProps & GroupContextComponentProps;
 
 class ModelVersionDetailContainer extends React.Component<Props> {
-  const renderVersion = model => version => (
+  private renderVersion = model => version => (
     <Link to={`${model}/versions/${version}`}>
       {`Version ${version}`}
     </Link>
@@ -42,6 +43,7 @@ class ModelVersionDetailContainer extends React.Component<Props> {
     modelName = decodeURIComponent(modelName)
 
     const {
+      mlflow,
       modelVersion,
     } = getModelVersion;
 
@@ -95,9 +97,11 @@ class ModelVersionDetailContainer extends React.Component<Props> {
         </Col>
         <Col span={4}>
           <div style={{textAlign: 'right'}}>
-            <Button>
-              MLflow UI
-            </Button>
+              <Button onClick={()=>{
+                openMLflowUI(mlflow, `/#/models/${encodeURIComponent(modelName)}/versions/${version}`);
+              }}>
+                MLflow UI
+              </Button>
           </div>
         </Col>
       </Row>
@@ -122,17 +126,13 @@ export default compose(
       const {groupContext, match} = props;
       let {modelName, version} = match.params as any;
       modelName = decodeURIComponent(modelName)
-      const where = {
-        name: modelName,
-        version: version,
-      } as any;
-      if (groupContext) {
-        where.group = groupContext.name;
-      }
+      const group = groupContext ? groupContext.name : undefined;
 
       return {
         variables: {
-          where,
+          group,
+          name: modelName,
+          version: version,
         },
         fetchPolicy: 'cache-and-network'
       }

@@ -37,3 +37,18 @@ export function compareTimestamp(left:string, right:string) {
     return dLeft.getTime() - dRight.getTime();
   }
 }
+
+export function openMLflowUI(mlflow, path) {
+  let uiUrl = mlflow.uiUrl ? mlflow.uiUrl : mlflow.trackingUri
+  if(!uiUrl || !uiUrl.startsWith('http')) {
+    alert('Invalid MLFlow UI url: ' + uiUrl);
+    return;
+  }
+
+  if (uiUrl.endsWith('/')) {
+    uiUrl = uiUrl.slice(0, -1);
+  }
+
+  const mlflowPath = uiUrl + path;
+  window.open(mlflowPath, '_blank')
+}
