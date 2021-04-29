@@ -110,6 +110,7 @@ const eeResolvers = {
     usageReports: usageReport.query,
     usageReportsConnection: usageReport.connectionQuery,
     license: license.query,
+    mlflow: model.queryMLflow,
     model: model.queryOne,
     models: model.query,
     modelVersion: model.queryVersion,

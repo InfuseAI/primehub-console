@@ -32,6 +32,7 @@ export const permissions = shield({
     'phDeploymentsConnection': or(isAdmin, isUser),
     'license': or(isAdmin, isUser),
     'files': or(isAdmin, isUser),
+    'mlflow': or(isAdmin, isGroupMember),
     'model': or(isAdmin, isGroupMember),
     'models': or(isAdmin, isGroupMember),
     'modelVersion': or(isAdmin, isGroupMember),

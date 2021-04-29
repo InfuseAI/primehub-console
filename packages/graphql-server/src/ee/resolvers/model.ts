@@ -18,29 +18,59 @@ const API_ENDPOINT_MODEL_VERSION_GET = '/api/2.0/preview/mlflow/model-versions/g
 const API_ENDPOINT_RUN_GET = '/api/2.0/preview/mlflow/runs/get';
 
 const TRACKING_URI_NOT_FOUND = 'TRACKING_URI_NOT_FOUND';
+const MLFLOW_SETTING_NOT_FOUND = 'MLFLOW_SETTING_NOT_FOUND';
 
-const requestApi = async (trackingUri: string, endpoint: string, params = {}) => {
+const requestApi = async (trackingUri: string, endpoint: string, auth = null, params = {}) => {
   const url = new URL(`${trackingUri}${endpoint}`);
   Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
-  const response = await fetch(url);
+  const init: any = {};
+  if (auth) {
+    init.headers = {
+      Authorization: auth,
+    };
+  }
+  const response = await fetch(url, init);
   return response.json();
 };
 
-const getTrackingUri = async (groupName: string, kcAdminClient: KcAdminClient) => {
+const getMLflowSetting = async (groupName: string, kcAdminClient: KcAdminClient) => {
   const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});
   const groupData = find(groups, ['name', groupName]);
   const group = await kcAdminClient.groups.findOne({id: get(groupData, 'id', '')});
   const transformed = transformGroup(group);
-  if (transformed.mlflow && transformed.mlflow.trackingUri) {
-    return transformed.mlflow.trackingUri;
+  if (transformed) {
+    return transformed.mlflow;
   }
   return null;
 };
 
-const getRun = async (trackingUri: string, runId: string) => {
+const getTrackingUri = (mlflow: any) => {
+  if (!mlflow.trackingUri) {
+    throw new ApolloError('tracking uri not found', TRACKING_URI_NOT_FOUND);
+  }
+  return mlflow.trackingUri;
+};
+
+const getAuth = (mlflow: any) => {
+  if (mlflow && mlflow.trackingEnvs) {
+    const token = mlflow.trackingEnvs.find(env => env.name === 'MLFLOW_TRACKING_TOKEN');
+    if (token) {
+      return `Bearer ${token.value}`;
+    }
+    const username = mlflow.trackingEnvs.find(env => env.name === 'MLFLOW_TRACKING_USERNAME');
+    const password = mlflow.trackingEnvs.find(env => env.name === 'MLFLOW_TRACKING_PASSWORD');
+    if (username && password) {
+      const basic = btoa(`${username}:${password}`);
+      return `Basic ${basic}`;
+    }
+  }
+  return null;
+};
+
+const getRun = async (mlflow: any, runId: string) => {
   if (runId) {
-    const runJson = await requestApi(trackingUri, API_ENDPOINT_RUN_GET, { run_id: runId });
+    const runJson = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_RUN_GET, getAuth(mlflow), { run_id: runId });
     return runJson.run;
   }
   return null;
@@ -90,15 +120,22 @@ const transformRun = (item: any) => {
   };
 };
 
-export const queryOne = async (root, args, context: Context) => {
+export const queryMLflow = async (root, args, context: Context) => {
   const where = args && args.where;
 
-  const trackingUri = await getTrackingUri(where.group, context.kcAdminClient);
-  if (!trackingUri) {
-    throw new ApolloError('tracking uri not found', TRACKING_URI_NOT_FOUND);
+  const mlflow = await getMLflowSetting(where.group, context.kcAdminClient);
+  if (!mlflow) {
+    throw new ApolloError('mlflow setting not found', MLFLOW_SETTING_NOT_FOUND);
   }
 
-  const json = await requestApi(trackingUri, API_ENDPOINT_MODEL_GET, { name: where.name });
+  return mlflow;
+};
+
+export const queryOne = async (root, args, context: Context) => {
+  const mlflow = await queryMLflow(root, args, context);
+
+  const where = args && args.where;
+  const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_MODEL_GET, getAuth(mlflow), { name: where.name });
   if (json.registered_model) {
     return transform(json.registered_model);
   } else if (json.error_code) {
@@ -114,14 +151,10 @@ export const queryOne = async (root, args, context: Context) => {
 };
 
 export const query = async (root, args, context: Context) => {
+  const mlflow = await queryMLflow(root, args, context);
+
   const where = args && args.where;
-
-  const trackingUri = await getTrackingUri(where.group, context.kcAdminClient);
-  if (!trackingUri) {
-    throw new ApolloError('tracking uri not found', TRACKING_URI_NOT_FOUND);
-  }
-
-  const json = await requestApi(trackingUri, API_ENDPOINT_MODEL_LIST);
+  const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_MODEL_LIST, getAuth(mlflow));
   if (json.registered_models) {
     return paginate(json.registered_models.map(m => transform(m)), extractPagination(args));
   } else if (json.error_code) {
@@ -136,16 +169,12 @@ export const query = async (root, args, context: Context) => {
 };
 
 export const queryVersion = async (root, args, context: Context) => {
+  const mlflow = await queryMLflow(root, args, context);
+
   const where = args && args.where;
-
-  const trackingUri = await getTrackingUri(where.group, context.kcAdminClient);
-  if (!trackingUri) {
-    throw new ApolloError('tracking uri not found', TRACKING_URI_NOT_FOUND);
-  }
-
-  const json = await requestApi(trackingUri, API_ENDPOINT_MODEL_VERSION_GET, { name: where.name, version: where.version });
+  const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_MODEL_VERSION_GET, getAuth(mlflow), { name: where.name, version: where.version });
   if (json.model_version) {
-    json.model_version.run = await getRun(trackingUri, json.model_version.run_id);
+    json.model_version.run = await getRun(mlflow, json.model_version.run_id);
     return transformVersion(json.model_version);
   } else if (json.error_code) {
     logger.error({
@@ -159,19 +188,17 @@ export const queryVersion = async (root, args, context: Context) => {
   }
 };
 
-const listQueryVersions = async (where: any, context: Context) => {
-  const trackingUri = await getTrackingUri(where.group, context.kcAdminClient);
-  if (!trackingUri) {
-    throw new ApolloError('tracking uri not found', TRACKING_URI_NOT_FOUND);
-  }
+const listQueryVersions = async (root, args, context: Context) => {
+  const mlflow = await queryMLflow(root, args, context);
 
+  const where = args && args.where;
   const search = `name='${where.name}'`;
-  const json = await requestApi(trackingUri, API_ENDPOINT_MODEL_VERSION_SEARCH, { filter: search });
+  const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_MODEL_VERSION_SEARCH, getAuth(mlflow), { filter: search });
   if (json.model_versions) {
-    const modelVersions = json.model_versions.map(async m => {
-      m.run = await getRun(trackingUri, m.run_id);
+    const modelVersions = await Promise.all(json.model_versions.map(async m => {
+      m.run = await getRun(mlflow, m.run_id);
       return transformVersion(m);
-    });
+    }));
     return filter(modelVersions, where);
   } else if (json.error_code) {
     logger.error({
@@ -185,13 +212,11 @@ const listQueryVersions = async (where: any, context: Context) => {
 };
 
 export const queryVersions = async (root, args, context: Context) => {
-  const where = args && args.where;
-  const modelVersions = await listQueryVersions(where, context);
+  const modelVersions = await listQueryVersions(root, args, context);
   return paginate(modelVersions, extractPagination(args));
 };
 
 export const connectionQueryVersions = async (root, args, context: Context) => {
-  const where = args && args.where;
-  const modelVersions = await listQueryVersions(where, context);
+  const modelVersions = await listQueryVersions(root, args, context);
   return toRelay(modelVersions, extractPagination(args));
 };

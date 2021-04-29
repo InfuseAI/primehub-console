@@ -17,6 +17,10 @@ type MLflowSetting {
   artifactEnvs: [EnvVar]
 }
 
+input MLflowSettingUniqueInput {
+  group: String
+}
+
 type Group {
   id: ID!
   name: String!
