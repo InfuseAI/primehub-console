@@ -14,15 +14,6 @@ import Breadcrumbs from 'components/share/breadcrumb';
 import {formatTimestamp} from 'ee/components/modelMngt/common';
 import {QueryModels} from 'queries/models.graphql';
 
-const breadcrumbs = [
-  {
-    key: 'list',
-    matcher: /\/models/,
-    title: 'Models',
-    link: '/models?page=1'
-  }
-];
-
 const PAGE_SIZE = 20;
 
 type Props = {
@@ -72,7 +63,6 @@ class ModelListContainer extends React.Component<Props, State> {
       error,
       loading,
       models,
-      variables,
       refetch
     } = getModels;
 
@@ -84,6 +74,15 @@ class ModelListContainer extends React.Component<Props, State> {
     if (!models) {
       return <Skeleton />
     }
+
+    const breadcrumbs = [
+      {
+        key: 'list',
+        matcher: /\/models/,
+        title: 'Models',
+        onClick: () => {refetch()},
+      }
+    ];
 
     const columns = [{
       title: 'Name',

@@ -11,9 +11,9 @@ import PageBody from 'components/pageBody';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
 import {QueryModel, QueryModelVersionsConnection} from 'queries/models.graphql';
-import {formatTimestamp} from 'ee/components/modelMngt/common';
+import {formatTimestamp, compareTimestamp} from 'ee/components/modelMngt/common';
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 200;
 
 type Props = {
   getModel: {
@@ -80,7 +80,7 @@ class ModelDetailContainer extends React.Component<Props> {
         key: 'model',
         matcher: /\/models/,
         title: `Model: ${modelName}`,
-        link: `/models/${modelName}`
+        onClick: () => {getModelVersionsConnection.refetch()}
       }
     ];
 
@@ -88,29 +88,35 @@ class ModelDetailContainer extends React.Component<Props> {
       title: 'Version',
       dataIndex: 'version',
       render: this.renderVersion(modelName),
+
     }, {
-      title: 'Creation Time',
+      title: 'Registered at',
       dataIndex: 'creationTimestamp',
       render: formatTimestamp,
+      sorter: (a, b) => compareTimestamp(a.creationTimestamp, b.creationTimestamp),
+      defaultSortOrder: 'descend',
     }, {
-      title: 'Updated Time',
-      dataIndex: 'lastUpdatedTimestamp',
-      render: formatTimestamp,
+      title: 'Deployed by',
+      render: () => '',
+    }, {
+      title: 'Action',
+      render: () => <Button>Deploy</Button>,
     }]
     const data = modelVersionsConnection.edges.map(edge => edge.node);
 
     let pageBody = <>
-      <div style={{textAlign: 'right'}}>
-        <Button>
-          MLflow UI
-        </Button>
-      </div>
         <Row gutter={36}>
-          <Col span={12}>
+          <Col span={20}>
             <Field labelCol={4} valueCol={8} label='Created Time' value={formatTimestamp(model.creationTimestamp)} />
-          </Col>
-          <Col span={12}>
             <Field labelCol={4} valueCol={8} label='Last Modified' value={formatTimestamp(model.lastUpdatedTimestamp)} />
+            <Field labelCol={4} valueCol={8} label='Description' value={formatTimestamp(model.description)} />
+          </Col>
+          <Col span={4}>
+            <div style={{textAlign: 'right'}}>
+              <Button>
+                MLflow UI
+              </Button>
+            </div>
           </Col>
         </Row>
       <Table
