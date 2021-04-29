@@ -18,6 +18,7 @@ const API_ENDPOINT_MODEL_VERSION_GET = '/api/2.0/preview/mlflow/model-versions/g
 const API_ENDPOINT_RUN_GET = '/api/2.0/preview/mlflow/runs/get';
 
 const TRACKING_URI_NOT_FOUND = 'TRACKING_URI_NOT_FOUND';
+const MLFLOW_SETTING_NOT_FOUND = 'MLFLOW_SETTING_NOT_FOUND';
 
 const requestApi = async (trackingUri: string, endpoint: string, params = {}) => {
   const url = new URL(`${trackingUri}${endpoint}`);
@@ -27,13 +28,21 @@ const requestApi = async (trackingUri: string, endpoint: string, params = {}) =>
   return response.json();
 };
 
-const getTrackingUri = async (groupName: string, kcAdminClient: KcAdminClient) => {
+const getMLflowSetting = async (groupName: string, kcAdminClient: KcAdminClient) => {
   const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});
   const groupData = find(groups, ['name', groupName]);
   const group = await kcAdminClient.groups.findOne({id: get(groupData, 'id', '')});
   const transformed = transformGroup(group);
-  if (transformed.mlflow && transformed.mlflow.trackingUri) {
-    return transformed.mlflow.trackingUri;
+  if (transformed) {
+    return transformed.mlflow;
+  }
+  return null;
+};
+
+const getTrackingUri = async (groupName: string, kcAdminClient: KcAdminClient) => {
+  const mlflow = await getMLflowSetting(groupName, kcAdminClient);
+  if (mlflow) {
+    return mlflow.trackingUri;
   }
   return null;
 };
@@ -89,6 +98,17 @@ const transformRun = (item: any) => {
     data: item.data,
   };
 };
+
+export const queryMLflow = async (root, args, context: Context) => {
+  const where = args && args.where;
+
+  const mlflow = await getMLflowSetting(where.group, context.kcAdminClient);
+  if (!mlflow) {
+    throw new ApolloError('mlflow setting not found', MLFLOW_SETTING_NOT_FOUND);
+  }
+
+  return mlflow;
+}
 
 export const queryOne = async (root, args, context: Context) => {
   const where = args && args.where;
