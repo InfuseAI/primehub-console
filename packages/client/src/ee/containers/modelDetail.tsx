@@ -46,15 +46,6 @@ class ModelDetailContainer extends React.Component<Props> {
       modelVersions,
     } = getModel;
 
-    if (getModel.error) {
-      console.log(getModel.error);
-      return 'Cannot load model';
-    }
-
-    if (!model || !modelVersions) {
-      return <Skeleton />
-    }
-
     const breadcrumbs = [
       {
         key: 'list',
@@ -70,6 +61,27 @@ class ModelDetailContainer extends React.Component<Props> {
       }
     ];
 
+    let pageBody;
+    if (getModel.error) {
+      pageBody = 'Cannot load model';
+    } else if (!model || !modelVersions) {
+      pageBody = <Skeleton />;
+    } else {
+      pageBody = this.renderModel(modelName, modelVersions, model, mlflow, getModel);
+    }
+
+    return (
+      <>
+        <PageTitle
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
+          title={"Model Management"}
+        />
+        <PageBody>{pageBody}</PageBody>
+      </>
+    );
+  }
+
+  private renderModel(modelName: any, modelVersions: any, model: any, mlflow: any, getModel: { error?: any; loading: boolean; variables: { where?: any; }; refetch: Function; mlflow?: any; model?: any; modelVersions?: any; }) {
     const columns: any = [{
       title: 'Version',
       dataIndex: 'version',
@@ -86,43 +98,34 @@ class ModelDetailContainer extends React.Component<Props> {
     }, {
       title: 'Action',
       render: () => <Button>Deploy</Button>,
-    }]
+    }];
     const data = modelVersions;
 
     let pageBody = <>
-        <Row gutter={36}>
-          <Col span={20}>
-            <Field labelCol={4} valueCol={8} label='Created Time' value={formatTimestamp(model.creationTimestamp)} />
-            <Field labelCol={4} valueCol={8} label='Last Modified' value={formatTimestamp(model.lastUpdatedTimestamp)} />
-            <Field labelCol={4} valueCol={8} label='Description' value={formatTimestamp(model.description)} />
-          </Col>
-          <Col span={4}>
-            <div style={{textAlign: 'right'}}>
-              <Button onClick={()=>{
-                openMLflowUI(mlflow, `/#/models/${encodeURIComponent(modelName)}`);
-              }}>
-                MLflow UI
-              </Button>
-            </div>
-          </Col>
-        </Row>
+      <Row gutter={36}>
+        <Col span={20}>
+          <Field labelCol={4} valueCol={8} label='Created Time' value={formatTimestamp(model.creationTimestamp)} />
+          <Field labelCol={4} valueCol={8} label='Last Modified' value={formatTimestamp(model.lastUpdatedTimestamp)} />
+          <Field labelCol={4} valueCol={8} label='Description' value={formatTimestamp(model.description)} />
+        </Col>
+        <Col span={4}>
+          <div style={{ textAlign: 'right' }}>
+            <Button onClick={() => {
+              openMLflowUI(mlflow, `/#/models/${encodeURIComponent(modelName)}`);
+            } }>
+                         MLflow UI
+            </Button>
+          </div>
+        </Col>
+      </Row>
       <Table
-          style={{paddingTop: 8}}
-          dataSource={data}
-          columns={columns}
-          rowKey="name"
-          loading={getModel.loading}
-      />
+        style={{ paddingTop: 8 }}
+        dataSource={data}
+        columns={columns}
+        rowKey="name"
+        loading={getModel.loading} />
     </>;
-    return (
-      <>
-        <PageTitle
-          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-          title={"Model Management"}
-        />
-        <PageBody>{pageBody}</PageBody>
-      </>
-    );
+    return pageBody;
   }
 }
 
