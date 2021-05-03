@@ -18,7 +18,7 @@ const GLOBAL_DISABLE = (window as any).disableMode || false;
 const DISABLE_GROUP = (window as any).disableGroup || false;
 const StyledTable = styled(Table)`
 `
-const DISABLE_BUILD_IMAGE = !(window as any).customImageSetup || true;
+const DISABLE_BUILD_IMAGE = !(window as any).customImageSetup;
 
 @injectIntl
 export default class ArrayBreadcrumb extends Component<Props & {
