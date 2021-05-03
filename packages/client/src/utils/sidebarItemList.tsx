@@ -2,10 +2,12 @@ import iconJupyterHub from 'images/icon-jupyterhub.svg';
 import iconJobs from 'images/icon-jobs.svg';
 import iconSchedule from 'images/icon-schedule.svg';
 import iconModels from 'images/icon-models.svg';
+import iconDeployments from 'images/icon-Deployments.svg';
 import iconImages from 'images/icon-images.png';
 import iconShareFiles from 'images/icon-files.svg';
 import iconApps from 'images/icon-apps.svg';
 import iconSettings from 'images/icon-settings.svg';
+import {Icon} from 'antd';
 
 const FEATURE_CE = "CE";
 const FEATURE_EE = "EE";
@@ -58,16 +60,16 @@ const list = [
     enabledIn: [FEATURE_EE, FEATURE_DEPLOY],
     style: {
       width: 'auto',
-      height: 16,
-      marginLeft: '2px',
+      height: 18,
+      marginLeft: '1px',
       marginRight: '-2px',
-      marginTop: '-5px',
+      marginTop: '-3px',
     }
   },
   {
     title: 'Deployments',
     subPath: 'deployments',
-    icon: iconModels,
+    icon: iconDeployments,
     enabledIn: [FEATURE_EE, FEATURE_DEPLOY],
     style: {
       width: 'auto',
