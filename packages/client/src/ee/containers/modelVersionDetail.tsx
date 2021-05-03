@@ -92,12 +92,15 @@ class ModelVersionDetailContainer extends React.Component<Props> {
   }
 
   private renderVersion(mlflow: any, modelVersion: any) {
+    const runId = get(modelVersion, "run.info.runId");
+    const experimentId = get(modelVersion, "run.info.experimentId");
+
     return <>
       <Row gutter={36}>
         <Col span={20}>
           <Field labelCol={4} valueCol={20} label='Registered At' value={formatTimestamp(modelVersion.creationTimestamp)} />
           <Field labelCol={4} valueCol={20} label='Last Modified' value={formatTimestamp(modelVersion.lastUpdatedTimestamp)} />
-          <Field labelCol={4} valueCol={20} label='Source Run' value={<a href="#">Run {get(modelVersion, "run.info.runId")}</a>} />
+          <Field labelCol={4} valueCol={20} label='Source Run' value={<a href="#" onClick={() => openMLflowUI(mlflow, `/#/experiments/${experimentId}/runs/${runId}`)}>Run {runId}</a>} />
 
           <Field style={{ marginBottom: 32 }} labelCol={4} valueCol={12} label='Parameters'
             value={<Metadata metadata={get(modelVersion, "run.data.params", [])} />} />
