@@ -163,6 +163,7 @@ export default compose(
         fetchPolicy: 'cache-and-network'
       }
     },
-    name: 'getModels'
+    name: 'getModels',
+    alias: 'withGetModels',
   }),
 )(ModelListContainer)

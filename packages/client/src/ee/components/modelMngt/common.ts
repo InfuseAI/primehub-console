@@ -1,11 +1,12 @@
 import moment from 'moment';
+import isNumber from 'lodash'
 
 const parseDate = (time:string) => {
   if (!time) {
     return undefined;
   }
   const n = Number(time);
-  if (Number.isNaN(n)) {
+  if (!isNumber(n)) {
     return undefined;
   }
   const d = new Date(n);

@@ -15,7 +15,7 @@ export interface BreadcrumbItemSetup {
   matcher: RegExp;
   title: string;
   link?: string;
-  onClick?: Function;
+  onClick?: any;
 }
 
 type Props = RouteComponentProps & {
@@ -34,7 +34,7 @@ const parseBreadcrumb = (match: any, basename: string, items: BreadcrumbItemSetu
           <span style={{fontWeight: (last) ? 500 : 'initial', color: (last) ? 'rgba(0, 0, 0, 0.65)' : null}}>
             {
               !!link ? <Link style={{color: (last) ? 'rgba(0, 0, 0, 0.65)' : null}} to={`${basename}${link}`}>{title}</Link> :
-                !!onClick ? <a style={{color: (last) ? 'rgba(0, 0, 0, 0.65)' : null}} onClick={(e) => onClick()}>{title}</a> :
+                !!onClick ? <a style={{color: (last) ? 'rgba(0, 0, 0, 0.65)' : null}} onClick={onClick}>{title}</a> :
                 title
             }
           </span>
