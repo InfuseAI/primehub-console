@@ -7,11 +7,16 @@ import iconShareFiles from 'images/icon-files.svg';
 import iconApps from 'images/icon-apps.svg';
 import iconSettings from 'images/icon-settings.svg';
 
-export const listEE = [
+const FEATURE_CE = "CE";
+const FEATURE_EE = "EE";
+const FEATURE_DEPLOY = "DEPLOY";
+
+const list = [
   {
     title: 'Notebooks',
     subPath: 'hub',
     icon: iconJupyterHub,
+    enabledIn: [FEATURE_CE, FEATURE_EE],
     style: {
       width: 'auto',
       height: 22,
@@ -24,7 +29,7 @@ export const listEE = [
     title: 'Jobs',
     subPath: 'job',
     icon: iconJobs,
-    EEOnly: true,
+    enabledIn: [FEATURE_EE],
     style: {
       width: 'auto',
       height: 17,
@@ -37,7 +42,7 @@ export const listEE = [
     title: 'Schedule',
     subPath: 'schedule',
     icon: iconSchedule,
-    EEOnly: true,
+    enabledIn: [FEATURE_EE],
     style: {
       width: 'auto',
       height: 15,
@@ -50,7 +55,7 @@ export const listEE = [
     title: 'Models',
     subPath: 'models',
     icon: iconModels,
-    EEOnly: true,
+    enabledIn: [FEATURE_EE, FEATURE_DEPLOY],
     style: {
       width: 'auto',
       height: 16,
@@ -63,7 +68,7 @@ export const listEE = [
     title: 'Deployments',
     subPath: 'deployments',
     icon: iconModels,
-    EEOnly: true,
+    enabledIn: [FEATURE_EE, FEATURE_DEPLOY],
     style: {
       width: 'auto',
       height: 16,
@@ -76,6 +81,7 @@ export const listEE = [
     title: 'Shared Files',
     subPath: 'browse',
     icon: iconShareFiles,
+    enabledIn: [FEATURE_CE, FEATURE_EE, FEATURE_DEPLOY],
     style: {
       width: 'auto',
       height: 17,
@@ -85,22 +91,10 @@ export const listEE = [
     }
   },
   {
-    title: 'Images',
-    subPath: 'images',
-    icon: iconImages,
-    groupAdminOnly: true,
-    style: {
-      width: 'auto',
-      height: 17,
-      marginLeft: '1px',
-      marginRight: '-1px',
-      marginTop: '-3px',
-    },
-  },
-  {
     title: 'Apps',
     subPath: 'apps',
     icon: iconApps,
+    enabledIn: [FEATURE_CE, FEATURE_EE, FEATURE_DEPLOY],
     stage: 'beta',
     hidden: !window.enableApp,
     style: {
@@ -111,9 +105,24 @@ export const listEE = [
     },
   },
   {
+    title: 'Images',
+    subPath: 'images',
+    icon: iconImages,
+    enabledIn: [FEATURE_CE, FEATURE_EE],
+    groupAdminOnly: true,
+    style: {
+      width: 'auto',
+      height: 17,
+      marginLeft: '1px',
+      marginRight: '-1px',
+      marginTop: '-3px',
+    },
+  },
+  {
     title: 'Settings',
     subPath: 'settings',
     icon: iconSettings,
+    enabledIn: [FEATURE_CE, FEATURE_EE, FEATURE_DEPLOY],
     groupAdminOnly: true,
     style: {
       width: 'auto',
@@ -125,4 +134,6 @@ export const listEE = [
   },
 ];
 
-export const listCE = listEE.filter(item => !item.EEOnly);
+export const listEE = list.filter(item => item.enabledIn.includes(FEATURE_EE));
+export const listCE = list.filter(item => item.enabledIn.includes(FEATURE_CE));
+export const listDeploy = list.filter(item => item.enabledIn.includes(FEATURE_DEPLOY));

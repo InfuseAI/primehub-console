@@ -8,22 +8,26 @@ import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
 import { fakeData, schema } from '../fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
-
-// Icons
-import iconModels from 'images/icon-models.svg'
-import iconShareFiles from 'images/icon-files.svg';
-import iconApps from 'images/icon-apps.svg';
-import iconSettings from 'images/icon-settings.svg';
-
+import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
+import { listDeploy } from 'utils/sidebarItemList';
 // Components
 import ListContainer from 'containers/list';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
+import ModelListContainer from 'ee/containers/modelList';
+import ModelDetailContainer from 'ee/containers/modelDetail';
+import ModelVersionDetailContainer from 'ee/containers/modelVersionDetail';
 import DeploymentListContainer from 'ee/containers/deploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
+import AppListContainer from 'containers/appList';
+import AppCreate from 'containers/appCreatePage';
+import AppStore from 'containers/appStore';
+import AppDetail from 'containers/appDetail';
+import AppEdit from 'containers/appEditPage';
 import GroupSettingsPage from 'containers/groupSettingsPage';
 import GroupSettingsModels from 'ee/components/groupSettings/models';
+import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
 
 const client = createGraphqlClient({
   fakeData,
@@ -32,65 +36,37 @@ const client = createGraphqlClient({
 
 class Main extends React.Component {
   render() {
-    const sidebarItems: MainPageSidebarItem[] = [
-      {
-        title: 'Models',
-        subPath: 'deployments',
-        icon: iconModels,
-        style: {
-          width: 'auto',
-          height: 16,
-          marginLeft: '2px',
-          marginRight: '-2px',
-          marginTop: '-5px',
-        }
-      },
-      {
-        title: 'Shared Files',
-        subPath: 'browse',
-        icon: iconShareFiles,
-        style: {
-          width: 'auto',
-          height: 17,
-          marginLeft: '3px',
-          marginRight: '-1px',
-          marginTop: '-3px',
-        }
-      },
-      {
-        title: 'Apps',
-        subPath: 'apps',
-        icon: iconApps,
-        style: {
-          width: 'auto',
-          height: 20,
-          marginRight: '-4px',
-          marginTop: '-2px',
-        },
-      },
-      {
-        title: 'Settings',
-        subPath: 'settings',
-        icon: iconSettings,
-        groupAdminOnly: true,
-        style: {
-          width: 'auto',
-          height: 21,
-          marginLeft: '-1px',
-          marginRight: '-4px',
-          marginTop: '-3px',
-        }
-      },
-    ];
+    const sidebarItems: MainPageSidebarItem[] = listDeploy;
 
     return (
       <BrowserRouter>
         <ApolloProvider client={client}>
-          <MainPage sidebarItems={sidebarItems}>
+          <MainPage sidebarItems={sidebarItems} notification={<LicenseWarningBanner/>}>
             {/* Shared Files */}
             <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
               <SharedFilesPage />
             </Route>
+            {/* Group Settings */}
+            <Route path={`${appPrefix}g/:groupName/settings`}>
+              <GroupSettingsPage extraTabs={[
+                { component: GroupSettingsMLflow, key: 'mlflow', tab: 'MLflow' },
+              ]} />
+            </Route>
+            {/* Model Management */}
+            <Route path={`${appPrefix}g/:groupName/models`} exact>
+              <ListContainer Com={ModelListContainer} />
+            </Route>
+            <Route
+              path={`${appPrefix}g/:groupName/models/:modelName`}
+              exact
+              component={ModelDetailContainer}
+            />
+            <Route
+              path={`${appPrefix}g/:groupName/models/:modelName/versions/:version`}
+              exact
+              component={ModelVersionDetailContainer}
+            />
+
             {/* Model Deployment */}
             <Route path={`${appPrefix}g/:groupName/deployments`} exact>
               <ListContainer Com={DeploymentListContainer} />
@@ -110,16 +86,19 @@ class Main extends React.Component {
               <DeploymentEditPage />
             </Route>
 
-            {/* Group Settings */}
-            <Route path={`${appPrefix}g/:groupName/settings`}>
-              <GroupSettingsPage extraTabs={[
-                { component: GroupSettingsModels, key: 'models', tab: 'Models' },
-              ]} />
+            {/* Apps */}
+            <Route path={`${appPrefix}g/:groupName/apps`} exact>
+              <ListContainer Com={AppListContainer} />
             </Route>
+            <Route path={`${appPrefix}g/:groupName/apps/store`} exact component={AppStore}/>
+            <Route path={`${appPrefix}g/:groupName/apps/create`} exact component={AppCreate}/>
+            <Route path={`${appPrefix}g/:groupName/apps/create/:templateId`} exact component={AppCreate}/>
+            <Route path={`${appPrefix}g/:groupName/apps/:appId`} exact component={AppDetail}/>
+            <Route path={`${appPrefix}g/:groupName/apps/:appId/edit`} exact component={AppEdit}/>
           </MainPage>
         </ApolloProvider>
       </BrowserRouter>
-    )
+    );
   }
 }
 
@@ -159,14 +138,14 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       placement: 'bottomRight',
       duration: null,
       btn: (
-        <Button type="primary" onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
+        <Button type='primary' onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
           Login Again
         </Button>
       ),
       key: 'refreshWarning'
     });
   }
-})
+});
 tokenSyncWorker.run().catch(console.error);
 
 // render
