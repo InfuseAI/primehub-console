@@ -8,6 +8,8 @@ import { toRelay, filter, paginate, extractPagination } from '../../resolvers/ut
 import { transform as transformGroup } from '../../resolvers/groupUtils';
 import * as logger from '../../logger';
 import { ErrorCodes } from '../../errorCodes';
+import { memoize } from '../../cache/memoize';
+import { query as phDeploymentQuery } from './phDeployment';
 const { NOT_AUTH_ERROR, INTERNAL_ERROR } = ErrorCodes;
 
 // mlflow api endpoints
@@ -34,10 +36,14 @@ const requestApi = async (trackingUri: string, endpoint: string, auth = null, pa
   return response.json();
 };
 
-const getMLflowSetting = async (groupName: string, kcAdminClient: KcAdminClient) => {
+const getGroupId = async (groupName: string, kcAdminClient: KcAdminClient) => {
   const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});
   const groupData = find(groups, ['name', groupName]);
-  const group = await kcAdminClient.groups.findOne({id: get(groupData, 'id', '')});
+  return get(groupData, 'id', '');
+};
+
+const getMLflowSetting = async (groupName: string, kcAdminClient: KcAdminClient) => {
+  const group = await kcAdminClient.groups.findOne({id: await getGroupId(groupName, kcAdminClient)});
   const transformed = transformGroup(group);
   if (transformed) {
     return transformed.mlflow;
@@ -76,6 +82,22 @@ const getRun = async (mlflow: any, runId: string) => {
   return null;
 };
 
+const getModelURI = (name: string, version: string) => {
+  return 'models:/' + encodeURIComponent(name) + '/' + version;
+};
+
+const getDeployBy = async (name: string, version: string, groupId: string, context: Context, memGetPhDeployments: any) => {
+  const phdeployments = await memGetPhDeployments(null, {where: {groupId_in: [groupId]}}, context);
+  const modelURI = getModelURI(name, version);
+  const results = [];
+  phdeployments.forEach(element => {
+    if (element.modelURI === modelURI) {
+      results.push({id: element.id, name: element.name});
+    }
+  });
+  return results;
+};
+
 const transform = (item: any) => {
   return {
     name: item.name,
@@ -94,7 +116,7 @@ const transform = (item: any) => {
   };
 };
 
-const transformVersion = (item: any) => {
+const transformVersion = (item: any, groupId: string, context: Context, memGetPhDeployments: any) => {
   return {
     name: item.name,
     version: item.version,
@@ -102,6 +124,8 @@ const transformVersion = (item: any) => {
     lastUpdatedTimestamp: item.last_updated_timestamp,
     description: item.description,
     run: item.run ? transformRun(item.run) : null,
+    modelURI: getModelURI(item.name, item.version),
+    deployBy: async () => getDeployBy(item.name, item.version, groupId, context, memGetPhDeployments),
   };
 };
 
@@ -170,12 +194,14 @@ export const query = async (root, args, context: Context) => {
 
 export const queryVersion = async (root, args, context: Context) => {
   const mlflow = await queryMLflow(root, args, context);
+  const memGetPhDeployments = memoize(phDeploymentQuery, {cacheKey: () => 'phDeploymentQuery'});
+  const groupId = await getGroupId(args.where.group, context.kcAdminClient);
 
   const where = args && args.where;
   const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_MODEL_VERSION_GET, getAuth(mlflow), { name: where.name, version: where.version });
   if (json.model_version) {
     json.model_version.run = await getRun(mlflow, json.model_version.run_id);
-    return transformVersion(json.model_version);
+    return transformVersion(json.model_version, groupId, context, memGetPhDeployments);
   } else if (json.error_code) {
     logger.error({
       component: logger.components.model,
@@ -190,6 +216,8 @@ export const queryVersion = async (root, args, context: Context) => {
 
 const listQueryVersions = async (root, args, context: Context) => {
   const mlflow = await queryMLflow(root, args, context);
+  const memGetPhDeployments = memoize(phDeploymentQuery, {cacheKey: () => 'phDeploymentQuery'});
+  const groupId = await getGroupId(args.where.group, context.kcAdminClient);
 
   const where = args && args.where;
   const search = `name='${where.name}'`;
@@ -197,7 +225,7 @@ const listQueryVersions = async (root, args, context: Context) => {
   if (json.model_versions) {
     const modelVersions = await Promise.all(json.model_versions.map(async m => {
       m.run = await getRun(mlflow, m.run_id);
-      return transformVersion(m);
+      return transformVersion(m, groupId, context, memGetPhDeployments);
     }));
     return filter(modelVersions, where);
   } else if (json.error_code) {
