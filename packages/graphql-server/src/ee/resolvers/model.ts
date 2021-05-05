@@ -86,7 +86,7 @@ const getModelURI = (name: string, version: string) => {
   return 'models:/' + encodeURIComponent(name) + '/' + version;
 };
 
-const getDeployBy = async (name: string, version: string, groupId: string, context: Context, memGetPhDeployments: any) => {
+const getDeployedBy = async (name: string, version: string, groupId: string, context: Context, memGetPhDeployments: any) => {
   const phdeployments = await memGetPhDeployments(null, {where: {groupId_in: [groupId]}}, context);
   const modelURI = getModelURI(name, version);
   const results = [];
@@ -125,7 +125,7 @@ const transformVersion = (item: any, groupId: string, context: Context, memGetPh
     description: item.description,
     run: item.run ? transformRun(item.run) : null,
     modelURI: getModelURI(item.name, item.version),
-    deployBy: async () => getDeployBy(item.name, item.version, groupId, context, memGetPhDeployments),
+    deployedBy: async () => getDeployedBy(item.name, item.version, groupId, context, memGetPhDeployments),
   };
 };
 

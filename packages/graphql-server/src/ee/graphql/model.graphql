@@ -16,7 +16,7 @@ type ModelVersion {
   description: String
   run: JSON
   modelURI: String
-  deployBy: JSON
+  deployedBy: JSON
 }
 
 """An edge in a connection."""
