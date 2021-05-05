@@ -1,6 +1,5 @@
 import React from 'react';
 import {Form, Modal, Select, Table} from 'antd';
-import {find} from 'lodash';
 
 interface Props {
   modelVersion;
@@ -33,7 +32,7 @@ export class DeployDialog extends React.Component<Props, State> {
       }
     } else {
       if (onDeployExisting) {
-        const deploymentRef = find(deploymentRefs, {id: value});
+        const deploymentRef = deploymentRefs.find(deploy => deploy.id === value);
         onDeployExisting(modelVersion, deploymentRef);
       }
     }

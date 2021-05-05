@@ -25,6 +25,7 @@ export const phDeployments = [
       }
     ],
     modelImage: 'imageurl',
+    modelURI: 'phfs:///model/path',
     pods: [
       {name: 'model-deployment', logEndpoint: '/model-deployment'},
       {name: 'job', logEndpoint: '/job'},
