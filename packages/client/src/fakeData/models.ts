@@ -32,6 +32,12 @@ export const models = [
     "creationTimestamp": "1616326954991",
     "lastUpdatedTimestamp": "1617865708093"
   },
+  {
+    "group": "group2",
+    "name": "model-group2",
+    "creationTimestamp": "1616326954991",
+    "lastUpdatedTimestamp": "1617865708093"
+  },
 ]
 
 export default models;

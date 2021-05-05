@@ -47,14 +47,20 @@ export class DeployDialog extends React.Component<Props, State> {
 
   render () {
     const {
-      deploymentRefs,
-      onCancel
+      deploymentRefs
     } = this.props;
 
     const {
       value,
     } = this.state;
 
+    const optionGroups =
+      deploymentRefs.length > 0 ?
+      [<Select.OptGroup label="Update existing deployments">
+        {
+          deploymentRefs.map((item)=> <Select.Option value={item.id}>{item.name}</Select.Option>)
+        }
+      </Select.OptGroup>]: [];
 
     return <Modal
             title={`Deploy Model`}
@@ -66,15 +72,7 @@ export class DeployDialog extends React.Component<Props, State> {
             <Select defaultValue={value} style={{width: 400}} onChange={this.handleChange}>
 
               <Select.Option value="">+ Create new deployment</Select.Option>
-              {
-                deploymentRefs.length > 0 ?
-
-                <Select.OptGroup label="Update existing deployments">
-                  {
-                    deploymentRefs.map((item)=> <Select.Option value={item.id}>{item.name}</Select.Option>)
-                  }
-                </Select.OptGroup>: <></>
-              }
+              {...optionGroups}
             </Select>
             </Form.Item></Form>
           </Modal>;

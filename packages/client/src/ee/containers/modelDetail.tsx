@@ -53,6 +53,15 @@ class ModelDetailContainer extends React.Component<Props, State> {
 
   private handleDeploy = (modelVersion) => {
     const {client, groupContext} = this.props;
+
+    if (!groupContext.enabledDeployment) {
+      Modal.warn({
+        title: "Feature not available",
+        content: "Model Deployment is not enabled for this group. Please contact your administrator to enable it.",
+      });
+      return;
+    }
+
     client.query<any>({
       query: QueryModelVersionDeploy,
       variables: {
