@@ -1,5 +1,5 @@
 import moment from 'moment';
-import isNumber from 'lodash'
+import {isNumber} from 'lodash';
 
 const parseDate = (time:string) => {
   if (!time) {
