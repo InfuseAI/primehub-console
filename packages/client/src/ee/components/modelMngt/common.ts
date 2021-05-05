@@ -39,6 +39,10 @@ export function compareTimestamp(left:string, right:string) {
   }
 }
 
+export function buildModelURI(name, version) {
+  return `models:/${encodeURIComponent(name)}/${encodeURIComponent(version)}`;
+}
+
 export function openMLflowUI(mlflow, path) {
   let uiUrl = mlflow.uiUrl ? mlflow.uiUrl : mlflow.trackingUri
   if(!uiUrl || !uiUrl.startsWith('http')) {

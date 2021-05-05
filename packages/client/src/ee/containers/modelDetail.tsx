@@ -10,7 +10,7 @@ import PageBody from 'components/pageBody';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
 import {QueryModel, QueryModelVersionDeploy} from 'queries/Model.graphql';
-import {formatTimestamp, compareTimestamp, openMLflowUI} from 'ee/components/modelMngt/common';
+import {formatTimestamp, compareTimestamp, openMLflowUI, buildModelURI} from 'ee/components/modelMngt/common';
 import {DeployDialog} from 'ee/components/modelMngt/deployDialog';
 import { ApolloClient } from 'apollo-client';
 import { withApollo } from 'react-apollo';
@@ -70,10 +70,16 @@ class ModelDetailContainer extends React.Component<Props, State> {
     .catch(errorHandler);
   }
 
-  private handleDeployOk = () => {
-    this.setState({
-      deploy: null
-    });
+  private handleDeployNew = (modelVersion) => {
+    const {history} = this.props;
+    const defaultValue = {modelURI: buildModelURI(modelVersion.name, modelVersion.version)};
+    history.push(`../deployments/create?defaultValue=${encodeURIComponent(JSON.stringify(defaultValue))}`);
+  }
+
+  private handleDeployExisting = (modelVersion, deploymentRef) => {
+    const {history} = this.props;
+    const defaultValue = {modelURI: buildModelURI(modelVersion.name, modelVersion.version)};
+    history.push(`../deployments/${deploymentRef.id}/edit?defaultValue=${encodeURIComponent(JSON.stringify(defaultValue))}`);
 
   }
 
@@ -131,7 +137,9 @@ class ModelDetailContainer extends React.Component<Props, State> {
           <DeployDialog
             modelVersion={deploy.modelVersion}
             deploymentRefs={deploy.deploymentRefs}
-            onCancel={() => {this.handleDeployCancel()}}
+            onDeployNew={this.handleDeployNew}
+            onDeployExisting={this.handleDeployExisting}
+            onCancel={this.handleDeployCancel}
           /> : <></>
         }
       </>
