@@ -20,7 +20,10 @@ import JobListContainer from 'ee/containers/jobList';
 import ScheduleDetailContainer from 'ee/containers/scheduleDetail';
 import ScheduleCreatePage from 'ee/containers/scheduleCreatePage';
 import ScheduleListContainer from 'ee/containers/scheduleList';
-import ModelDeploymentListContainer from 'ee/containers/modelDeploymentList';
+import ModelListContainer from 'ee/containers/modelList';
+import ModelDetailContainer from 'ee/containers/modelDetail';
+import ModelVersionDetailContainer from 'ee/containers/modelVersionDetail';
+import DeploymentListContainer from 'ee/containers/deploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
@@ -109,9 +112,24 @@ class Main extends React.Component {
               component={ScheduleDetailContainer}
             />
 
+            {/* Model Management */}
+            <Route path={`${appPrefix}g/:groupName/models`} exact>
+              <ListContainer Com={ModelListContainer} />
+            </Route>
+            <Route
+              path={`${appPrefix}g/:groupName/models/:modelName`}
+              exact
+              component={ModelDetailContainer}
+            />
+            <Route
+              path={`${appPrefix}g/:groupName/models/:modelName/versions/:version`}
+              exact
+              component={ModelVersionDetailContainer}
+            />
+
             {/* Model Deployment */}
             <Route path={`${appPrefix}g/:groupName/deployments`} exact>
-              <ListContainer Com={ModelDeploymentListContainer} />
+              <ListContainer Com={DeploymentListContainer} />
             </Route>
             <Route path={`${appPrefix}g/:groupName/deployments/create`} exact>
               <DeploymentCreatePage />

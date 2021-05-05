@@ -15,6 +15,7 @@ export interface BreadcrumbItemSetup {
   matcher: RegExp;
   title: string;
   link?: string;
+  onClick?: any;
 }
 
 type Props = RouteComponentProps & {
@@ -26,12 +27,15 @@ const parseBreadcrumb = (match: any, basename: string, items: BreadcrumbItemSetu
   if (items) {
     items.forEach((item, index) => {
       const last = index === items.length - 1;
-      const {key, matcher, title, link} = item;
+      const {key, matcher, title, link, onClick} = item;
       if (matcher && matcher.test(match.url)) {
+
         result.push(<Breadcrumb.Item  key={key}>
           <span style={{fontWeight: (last) ? 500 : 'initial', color: (last) ? 'rgba(0, 0, 0, 0.65)' : null}}>
             {
-              !!link ? <Link style={{color: (last) ? 'rgba(0, 0, 0, 0.65)' : null}} to={`${basename}${link}`}>{title}</Link> : title
+              !!link ? <Link style={{color: (last) ? 'rgba(0, 0, 0, 0.65)' : null}} to={`${basename}${link}`}>{title}</Link> :
+                !!onClick ? <a style={{color: (last) ? 'rgba(0, 0, 0, 0.65)' : null}} onClick={onClick}>{title}</a> :
+                title
             }
           </span>
         </Breadcrumb.Item>);
