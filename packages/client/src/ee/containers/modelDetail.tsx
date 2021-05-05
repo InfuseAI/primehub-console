@@ -11,6 +11,7 @@ import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
 import {QueryModel} from 'queries/Model.graphql';
 import {formatTimestamp, compareTimestamp, openMLflowUI} from 'ee/components/modelMngt/common';
+import {Tag} from 'antd';
 
 const PAGE_SIZE = 200;
 
@@ -34,6 +35,18 @@ class ModelDetailContainer extends React.Component<Props> {
       {`Version ${version}`}
     </Link>
   );
+
+  private renderDeployedBy = deployedBy => {
+    const tags = [];
+    for (const element of deployedBy) {
+      tags.push(<Link to={`../deployments/${element.id}`}><Tag>{element.name}</Tag></Link>);
+    }
+    return (
+      <div>
+        {tags}
+      </div>
+    )
+  };
 
   render() {
     const { groupContext, getModel, match} = this.props;
@@ -94,7 +107,8 @@ class ModelDetailContainer extends React.Component<Props> {
       defaultSortOrder: 'descend',
     }, {
       title: 'Deployed By',
-      render: () => '',
+      dataIndex: 'deployedBy',
+      render: this.renderDeployedBy,
     }, {
       title: 'Action',
       render: () => <Button>Deploy</Button>,
