@@ -52,3 +52,12 @@ query QueryModelVersion($group: String!, $name: String!, $version: String!) {
     run
   }
 }
+
+query QueryModelVersionDeploy($groupId: String!) {
+  phDeployments(where: {groupId_in: [$groupId]})
+  {
+    id
+    name
+    modelURI
+  }
+}
