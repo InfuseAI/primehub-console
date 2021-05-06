@@ -13,7 +13,7 @@ resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/ee/index.model_d
 
 module.exports = {
   entry: {
-    index: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
+    cms: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
     landing: './src/landing.tsx',
     'main': devMode ? './src/ee/main.model_deploy.tsx' : ['./src/public-import.js', './src/ee/main.model_deploy.tsx'],
     'model-deployment': devMode ? './src/ee/modelDeployment.tsx' : ['./src/public-import.js', './src/ee/modelDeployment.tsx'],
