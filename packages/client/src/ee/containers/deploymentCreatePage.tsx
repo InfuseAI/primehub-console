@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import {notification} from 'antd';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
-import {get, unionBy} from 'lodash';
+import {get, unionBy, pick} from 'lodash';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {withRouter} from 'react-router-dom';
@@ -68,7 +68,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
 
   render() {
     const {selectedGroup} = this.state;
-    const {groupContext, currentUser, createPhDeploymentResult, history} = this.props;
+    const {groupContext, currentUser, createPhDeploymentResult, location} = this.props;
     const everyoneGroupId = window.EVERYONE_GROUP_ID;
     const allGroups = get(currentUser, 'me.groups', []).filter(group => group.enabledDeployment || group.id === everyoneGroupId);
     const groups = allGroups
@@ -87,6 +87,15 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       get(everyoneGroup, 'images', []),
       'id'
     );
+    const {defaultValue} = queryString.parse(location.search.replace(/^\?/, ''));
+    let initValue = {}
+    try {
+      if (defaultValue) {
+        initValue = JSON.parse(defaultValue as any);
+        initValue = pick(initValue, ["modelURI"]);
+      }
+    } catch(e) {}
+
     return (
       <React.Fragment>
         <PageTitle
@@ -102,6 +111,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
             groups={sortNameByAlphaBet(groups)}
             instanceTypes={sortNameByAlphaBet(instanceTypes)}
             images={sortNameByAlphaBet(images)}
+            initialValue={initValue}
             onSubmit={this.onSubmit}
             loading={currentUser.loading || createPhDeploymentResult.loading}
           />

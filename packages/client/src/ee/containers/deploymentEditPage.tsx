@@ -15,6 +15,7 @@ import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
 import {sortNameByAlphaBet} from 'utils/sorting';
 import {CurrentUser} from 'queries/User.graphql';
+import queryString from 'querystring';
 
 export const UPDATE_DEPLOYMENT = gql`
   mutation updatePhDeployment($where: PhDeploymentWhereUniqueInput!, $data: PhDeploymentUpdateInput!) {
@@ -84,7 +85,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
   }
 
   render() {
-    const {currentUser, updatePhDeploymentResult, history, getPhDeployment, groupContext, refetchGroup, match} = this.props;
+    const {currentUser, updatePhDeploymentResult, location, getPhDeployment, groupContext, refetchGroup, match} = this.props;
     const {params} = match;
 
     if (getPhDeployment.loading) return null;
@@ -124,6 +125,15 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       }
     ];
 
+    const {defaultValue} = queryString.parse(location.search.replace(/^\?/, ''));
+    let initValue = {}
+    try {
+      if (defaultValue) {
+        initValue = JSON.parse(defaultValue as any);
+        initValue = pick(initValue, ["modelURI"]);
+      }
+    } catch(e) {}
+
     return (
       <React.Fragment>
         <PageTitle
@@ -136,7 +146,8 @@ class DeploymentCreatePage extends React.Component<Props, State> {
             initialValue={{
               ...(getPhDeployment.phDeployment || {}),
               instanceTypeId: get(getPhDeployment, 'phDeployment.instanceType.id', ''),
-              instanceTypeName: get(getPhDeployment, 'phDeployment.instanceType.name', '')
+              instanceTypeName: get(getPhDeployment, 'phDeployment.instanceType.name', ''),
+              ...initValue,
             }}
             selectedGroup={selectedGroup}
             groups={sortNameByAlphaBet(groups)}

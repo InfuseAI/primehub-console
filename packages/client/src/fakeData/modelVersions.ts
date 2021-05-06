@@ -638,7 +638,23 @@ export const modelVersions = [
         ]
       }
     }
-  }
+  },
+  {
+    "group": "group1",
+    "name": "is/this\a$valid#model?",
+    "version": "1",
+    "description": "",
+    "creationTimestamp": "1617865867887",
+    "lastUpdatedTimestamp": "1617872757470",
+  },
+  {
+    "group": "group2",
+    "name": "model-group2",
+    "version": "1",
+    "description": "",
+    "creationTimestamp": "1617865867887",
+    "lastUpdatedTimestamp": "1617872757470",
+  },
 ];
 
 export default modelVersions;

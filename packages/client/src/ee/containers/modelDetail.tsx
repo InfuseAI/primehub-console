@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Skeleton, Button, Table, Row, Col} from 'antd';
+import {Skeleton, Button, Table, Row, Col, Tag, Modal} from 'antd';
 import Field from 'components/share/field';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -9,9 +9,12 @@ import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
-import {QueryModel} from 'queries/Model.graphql';
-import {formatTimestamp, compareTimestamp, openMLflowUI} from 'ee/components/modelMngt/common';
-import {Tag} from 'antd';
+import {QueryModel, QueryModelVersionDeploy} from 'queries/Model.graphql';
+import {formatTimestamp, compareTimestamp, openMLflowUI, buildModelURI} from 'ee/components/modelMngt/common';
+import {DeployDialog} from 'ee/components/modelMngt/deployDialog';
+import { ApolloClient } from 'apollo-client';
+import { withApollo } from 'react-apollo';
+import { errorHandler } from "utils/errorHandler";
 
 const PAGE_SIZE = 200;
 
@@ -27,9 +30,21 @@ type Props = {
     model?: any;
     modelVersions?: any;
   };
+  client: ApolloClient<any>;
 } & RouteComponentProps & GroupContextComponentProps;
 
-class ModelDetailContainer extends React.Component<Props> {
+type State = {
+  deploy: {
+    modelVersion: Object;
+    deploymentRefs: Array<any>;
+  },
+}
+
+class ModelDetailContainer extends React.Component<Props, State> {
+  state: State = {
+    deploy: null,
+  };
+
   private renderVersion = model => version => (
     <Link to={`${model}/versions/${version}`}>
       {`Version ${version}`}
@@ -48,8 +63,57 @@ class ModelDetailContainer extends React.Component<Props> {
     )
   };
 
+  private handleDeploy = (modelVersion) => {
+    const {client, groupContext} = this.props;
+
+    if (!groupContext.enabledDeployment) {
+      Modal.warn({
+        title: "Feature not available",
+        content: "Model Deployment is not enabled for this group. Please contact your administrator to enable it.",
+      });
+      return;
+    }
+
+    client.query<any>({
+      query: QueryModelVersionDeploy,
+      variables: {
+        groupId: groupContext.id
+      },
+      fetchPolicy: 'no-cache',
+    })
+    .then((result) => {
+      const deploy = {
+        modelVersion,
+        deploymentRefs: result.data.phDeployments
+      };
+      this.setState({deploy});
+    })
+    .catch(errorHandler);
+  }
+
+  private handleDeployNew = (modelVersion) => {
+    const {history} = this.props;
+    const defaultValue = {modelURI: buildModelURI(modelVersion.name, modelVersion.version)};
+    history.push(`../deployments/create?defaultValue=${encodeURIComponent(JSON.stringify(defaultValue))}`);
+  }
+
+  private handleDeployExisting = (modelVersion, deploymentRef) => {
+    const {history} = this.props;
+    const defaultValue = {modelURI: buildModelURI(modelVersion.name, modelVersion.version)};
+    history.push(`../deployments/${deploymentRef.id}/edit?defaultValue=${encodeURIComponent(JSON.stringify(defaultValue))}`);
+
+  }
+
+  private handleDeployCancel = () => {
+    this.setState({
+      deploy: null
+    });
+  }
+
+
   render() {
     const { groupContext, getModel, match} = this.props;
+    const { deploy } = this.state;
     let {modelName} = match.params as any;
     modelName = decodeURIComponent(modelName)
 
@@ -90,6 +154,15 @@ class ModelDetailContainer extends React.Component<Props> {
           title={"Model Management"}
         />
         <PageBody>{pageBody}</PageBody>
+        {this.state.deploy ?
+          <DeployDialog
+            modelVersion={deploy.modelVersion}
+            deploymentRefs={deploy.deploymentRefs}
+            onDeployNew={this.handleDeployNew}
+            onDeployExisting={this.handleDeployExisting}
+            onCancel={this.handleDeployCancel}
+          /> : <></>
+        }
       </>
     );
   }
@@ -111,7 +184,7 @@ class ModelDetailContainer extends React.Component<Props> {
       render: this.renderDeployedBy,
     }, {
       title: 'Action',
-      render: () => <Button>Deploy</Button>,
+      render: (text, modelVersion) => <Button onClick={() => {this.handleDeploy(modelVersion)}}>Deploy</Button>,
     }];
     const data = modelVersions;
 
@@ -146,6 +219,7 @@ class ModelDetailContainer extends React.Component<Props> {
 export default compose(
   withRouter,
   withGroupContext,
+  withApollo,
   graphql(QueryModel, {
     options: (props: Props) => {
       const {groupContext, match} = props;
