@@ -42,6 +42,11 @@ type PhApplication {
   rewrite: Boolean
 }
 
+"""order"""
+input PhApplicationOrderBy {
+  displayName: String
+}
+
 """An edge in a connection."""
 type PhApplicationEdge {
   """The item at the end of the edge."""
