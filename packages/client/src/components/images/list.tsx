@@ -18,7 +18,9 @@ const breadcrumbs = [
     key: 'list',
     matcher: /\/images/,
     title: 'Images',
-    link: '/images?page=1'
+    link: '/images?page=1',
+    tips: 'Group Admin can find/add/build group-specific images here.',
+    tipsLink: 'https://docs.primehub.io/docs/group-image'
   }
 ];
 

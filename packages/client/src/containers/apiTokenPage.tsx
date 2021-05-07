@@ -1,9 +1,21 @@
-import * as  React from "react";
+import * as  React from 'react';
 import { Layout, Card, Button, Row, Input, message, Modal, notification } from 'antd';
 import gql from 'graphql-tag';
+import PageTitle from 'components/pageTitle';
 import { ApolloConsumer } from 'react-apollo';
 import { ApolloClient } from 'apollo-client';
-import { errorHandler } from "utils/errorHandler";
+import { errorHandler } from 'utils/errorHandler';
+import Breadcrumbs, {BreadcrumbItemSetup} from 'components/share/breadcrumb';
+
+const breadcrumbs: BreadcrumbItemSetup[] = [
+  {
+    key: 'api-token',
+    matcher: /\/api-token/,
+    title: 'API token',
+    tips: 'A valid token is mandatory to allow 3rd-party using PrimeHub APIs.',
+    tipsLink: 'https://docs.primehub.io/docs/tasks/api-token'
+  }
+];
 
 type Props = {
   client: ApolloClient<any>;
@@ -124,38 +136,44 @@ curl -X POST \\
     </> : <></>);
 
     return (
-      <Layout style={{ margin: "16px 24px" }}>
-        <Card title="Token">
-          {Token}
+      <Layout>
+        <PageTitle
+          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
+          title={'API token'}
+        />
+        <Row style={{ margin: "16px 24px" }}>
+          <Card title="Token">
+            {Token}
 
-          <Button type="primary" onClick={this.handleRequestApiToken} >Request API Token</Button>
-        </Card>
-        <Card title="Example" style={{ margin: "16px 0" }}>
-          <Button icon="copy" onClick={() => this.copyExample()}
-            style={{
-              float: 'right',
-              top: 32,
-              marginTop: -32,
-              zIndex: 10,
-              position: 'relative',
-              color: '#ccc',
-              borderColor: '#ccc'
-            }}
-            type="ghost"
-          >
-          </Button>
-          <Input.TextArea
-            style={{
-              whiteSpace: 'nowrap',
-              background: 'black',
-              color: '#ddd',
-              fontFamily: 'monospace',
-            }}
-            ref={this.refExample}
-            rows={9}
-            value={example}
-          />
-        </Card>
+            <Button type="primary" onClick={this.handleRequestApiToken} >Request API Token</Button>
+          </Card>
+          <Card title="Example" style={{ margin: "16px 0" }}>
+            <Button icon="copy" onClick={() => this.copyExample()}
+              style={{
+                float: 'right',
+                top: 32,
+                marginTop: -32,
+                zIndex: 10,
+                position: 'relative',
+                color: '#ccc',
+                borderColor: '#ccc'
+              }}
+              type="ghost"
+            >
+            </Button>
+            <Input.TextArea
+              style={{
+                whiteSpace: 'nowrap',
+                background: 'black',
+                color: '#ddd',
+                fontFamily: 'monospace',
+              }}
+              ref={this.refExample}
+              rows={9}
+              value={example}
+            />
+          </Card>
+        </Row>
       </Layout>
     )
   }

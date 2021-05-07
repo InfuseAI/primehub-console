@@ -25,7 +25,9 @@ const breadcrumbs = [
   {
     key: 'store',
     matcher: /\/apps\/store/,
-    title: 'Store'
+    title: 'Store',
+    tips: 'The page lists all of available applications here.',
+    tipsLink: 'https://docs.primehub.io/docs/primehub-app#app-store'
   }
 ];
 

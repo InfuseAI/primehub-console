@@ -24,7 +24,9 @@ const breadcrumbs = [
     key: 'list',
     matcher: /\/deployments/,
     title: 'Deployments',
-    link: '/deployments?page=1'
+    link: '/deployments?page=1',
+    tips: 'Users can deploy and serve models as services here.',
+    tipsLink: 'https://docs.primehub.io/docs/model-deployment-feature'
   }
 ];
 

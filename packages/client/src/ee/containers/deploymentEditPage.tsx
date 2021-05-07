@@ -120,8 +120,10 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       },
       {
         key: 'update',
-        matcher: /\/deployment\/([\w-])+\/edit/,
+        matcher: /\/deployments\/([\w-])+\/edit/,
         title: 'Update Deployments',
+        tips: 'Update the settings of the deployment.',
+        tipsLink: 'https://docs.primehub.io/docs/model-deployment-feature#update'
       }
     ];
 

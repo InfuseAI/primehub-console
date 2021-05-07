@@ -26,6 +26,8 @@ const breadcrumbs = [
     key: 'create',
     matcher: /\/schedule\/create/,
     title: 'New Schedule',
+    tips: 'Create a scheduled job.',
+    tipsLink: 'https://docs.primehub.io/docs/job-scheduling-feature#create-schedule'
   }
 ];
 

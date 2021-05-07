@@ -26,7 +26,9 @@ const breadcrumbs = [
   {
     key: 'list',
     matcher: /\/deployments\/create/,
-    title: 'Create Deployment'
+    title: 'Create Deployment',
+    tips: 'Create a new deployment.',
+    tipsLink: 'https://docs.primehub.io/docs/model-deployment-feature#create'
   }
 ];
 

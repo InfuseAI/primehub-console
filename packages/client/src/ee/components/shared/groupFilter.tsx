@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Select} from 'antd';
 import {sortNameByAlphaBet} from 'utils/sorting';
 
-interface Group {
+export interface Group {
   id: string;
   displayName: string;
   name: string;

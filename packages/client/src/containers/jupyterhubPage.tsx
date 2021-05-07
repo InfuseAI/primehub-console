@@ -17,7 +17,9 @@ const breadcrumbs = [
   {
     key: 'hub',
     matcher: /\/hub/,
-    title: 'Notebooks'
+    title: 'Notebooks',
+    tips: 'Users can launch a Jupyter Notebook instance here.',
+    tipsLink: 'https://docs.primehub.io/docs/quickstart/launch-project'
   }
 ];
 

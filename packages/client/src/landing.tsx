@@ -16,6 +16,8 @@ const breadcrumbs: BreadcrumbItemSetup[] = [
     key: 'home',
     matcher: /\/home/,
     title: 'Home',
+    tips: 'Home is the landing page of User Portal where it has a group-related dashboard.',
+    tipsLink: 'https://docs.primehub.io/docs/quickstart/login-portal-user'
   }
 ];
 

@@ -14,10 +14,11 @@ const breadcrumbs = [
     key: 'browse',
     matcher: /\/browse/,
     title: 'Shared Files',
-    link: '/browse'
+    link: '/browse',
+    tips: 'Users can share files in this PHFS storage with group members.',
+    tipsLink: 'https://docs.primehub.io/docs/shared-files'
   }
 ];
-
 
 interface Props extends GroupContextComponentProps, RouteComponentProps {
 

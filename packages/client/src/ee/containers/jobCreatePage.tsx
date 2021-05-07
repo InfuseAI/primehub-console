@@ -26,6 +26,8 @@ const breadcrumbs = [
     key: 'create',
     matcher: /\/job\/create/,
     title: 'New Job',
+    tips: 'Create a new job.',
+    tipsLink: 'https://docs.primehub.io/docs/job-submission-feature#create-job'
   }
 ];
 

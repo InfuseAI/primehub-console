@@ -185,7 +185,9 @@ class ImageEditPage extends React.Component<Props, State> {
       {
         key: 'create',
         matcher: /\/images\/([\w-])+\/edit/,
-        title: `Update Images: ${image.displayName}`
+        title: `Update Images: ${image.displayName}`,
+        tips: 'Update the settings of the image.',
+        tipsLink: 'https://docs.primehub.io/docs/group-image#add-new-image'
       }
     ];
     return (
