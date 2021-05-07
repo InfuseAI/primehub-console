@@ -143,7 +143,9 @@ export default class Detail extends React.Component<Props, State> {
       {
         key: 'detail',
         matcher: /\/apps\/([\w-])+/,
-        title: `App: ${phApplication.displayName}`
+        title: `App: ${phApplication.displayName}`,
+        tips: 'View the detailed information of the application instance.',
+        tipsLink: 'https://docs.primehub.io/docs/primehub-app#installed-app-detail'
       }
     ];
 

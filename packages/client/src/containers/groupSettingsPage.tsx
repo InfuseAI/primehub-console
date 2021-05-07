@@ -26,6 +26,8 @@ const breadcrumbs = [
     matcher: /\/settings/,
     title: 'Settings',
     link: '/settings',
+    tips: 'Group Admin can view settings configured by Platform Admin of the managed group and modify the default timeout setting of Jobs to this group.',
+    tipsLink: 'https://docs.primehub.io/docs/group-setting'
   }
 ];
 

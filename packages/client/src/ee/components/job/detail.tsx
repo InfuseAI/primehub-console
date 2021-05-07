@@ -183,6 +183,8 @@ export default class Detail extends React.Component<Props> {
         key: 'detail',
         matcher: /\/job\/([\w-])+/,
         title: `Job: ${job.displayName || job.name}`,
+        tips: 'View the detailed information.',
+        tipsLink: 'https://docs.primehub.io/docs/job-submission-feature#view-job'
       }
     ];
 

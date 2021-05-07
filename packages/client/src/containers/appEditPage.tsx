@@ -82,6 +82,8 @@ class AppEditPage extends React.Component<AppEditProps> {
         key: 'update',
         matcher: /\/apps\/([\w-])+\/edit/,
         title: 'Update App',
+        tips: 'Update the setting of the installed application.',
+        tipsLink: 'https://docs.primehub.io/docs/primehub-app#installing-app'
       }
     ];
 

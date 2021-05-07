@@ -25,7 +25,9 @@ const breadcrumbs = [
   {
     key: 'create',
     matcher: /\/images\/create/,
-    title: 'New Images'
+    title: 'New Images',
+    tips: 'Create an image by adding existing one or build custom one.',
+    tipsLink: 'https://docs.primehub.io/docs/group-image#add-new-image'
   }
 ];
 

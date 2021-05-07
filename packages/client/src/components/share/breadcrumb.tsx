@@ -1,5 +1,5 @@
 import React from 'react';
-import {Breadcrumb, Icon} from 'antd';
+import {Breadcrumb, Icon, Tooltip} from 'antd';
 import {withRouter, Link} from 'react-router-dom';
 import {RouteComponentProps} from 'react-router';
 import {appPrefix} from 'utils/env';
@@ -10,12 +10,18 @@ const StyledBreadcrumb = styled(Breadcrumb)`
   font-size: 14px;
 `;
 
+const LightA = styled.a`
+  color: #839ce0;
+`;
+
 export interface BreadcrumbItemSetup {
   key: string;
   matcher: RegExp;
   title: string;
   link?: string;
   onClick?: any;
+  tips?: any;
+  tipsLink?: any;
 }
 
 type Props = RouteComponentProps & {
@@ -27,9 +33,9 @@ const parseBreadcrumb = (match: any, basename: string, items: BreadcrumbItemSetu
   if (items) {
     items.forEach((item, index) => {
       const last = index === items.length - 1;
-      const {key, matcher, title, link, onClick} = item;
+      const {key, matcher, title, link, onClick, tips, tipsLink} = item;
+      const tipTitle = <span>{tips} {tipsLink ? <LightA target='_blank' href={tipsLink}>Learn more</LightA> : <></>}</span>;
       if (matcher && matcher.test(match.url)) {
-
         result.push(<Breadcrumb.Item  key={key}>
           <span style={{fontWeight: (last) ? 500 : 'initial', color: (last) ? 'rgba(0, 0, 0, 0.65)' : null}}>
             {
@@ -38,6 +44,19 @@ const parseBreadcrumb = (match: any, basename: string, items: BreadcrumbItemSetu
                 title
             }
           </span>
+          {
+            !!tips ? (
+              <span>
+                <Tooltip title={tipTitle} placement='right'>
+                  <Icon type='question-circle' style={
+                    {
+                      marginLeft: 8,
+                    }
+                  }/>
+                </Tooltip>
+              </span>
+            ) : <></>
+          }
         </Breadcrumb.Item>);
       }
     });

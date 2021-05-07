@@ -48,13 +48,11 @@ const GET_FILES = gql`
   }
 `;
 
-const DELETE_FILES= gql`
+const DELETE_FILES = gql`
   mutation deleteFiles($where: StoreFileWhereInput!, $options: StoreFileDeleteOptionInput)  {
     deleteFiles(where:$where, options:$options)
   }
-`
-
-
+`;
 
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 const isPhfsEnabled = (): boolean => {

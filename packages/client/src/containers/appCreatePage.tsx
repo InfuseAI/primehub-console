@@ -32,7 +32,9 @@ const breadcrumbs = [
   {
     key: 'create',
     matcher: /\/apps\/create/,
-    title: 'Add App to PrimeHub'
+    title: 'Add App to PrimeHub',
+    tips: 'Set the settings of the application instance and install it.',
+    tipsLink: 'https://docs.primehub.io/docs/primehub-app#installing-app'
   }
 ];
 

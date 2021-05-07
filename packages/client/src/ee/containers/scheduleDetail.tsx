@@ -142,6 +142,8 @@ class ScheduleDetailContainer extends React.Component<Props> {
         key: 'update',
         matcher: /\/schedule\/([\w-])+/,
         title: `Schedule: ${get(getPhSchedule, 'phSchedule.displayName')}`,
+        tips: 'Update the settings of the scheduled job.',
+        tipsLink: 'https://docs.primehub.io/docs/job-scheduling-feature#create-schedule'
       }
     ];
 

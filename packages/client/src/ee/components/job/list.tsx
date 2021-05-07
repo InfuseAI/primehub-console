@@ -21,7 +21,9 @@ const breadcrumbs = [
     key: 'list',
     matcher: /\/job/,
     title: 'Jobs',
-    link: '/job?page=1'
+    link: '/job?page=1',
+    tips: 'Users can submit time-consuming tasks as jobs here.',
+    tipsLink: 'https://docs.primehub.io/docs/job-submission-feature'
   }
 ];
 

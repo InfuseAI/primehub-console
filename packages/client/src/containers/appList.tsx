@@ -23,7 +23,9 @@ const breadcrumbs: BreadcrumbItemSetup[] = [
     key: 'list',
     matcher: /\/apps/,
     title: 'Apps',
-    link: '/apps?page=1'
+    link: '/apps?page=1',
+    tips: 'Users can install 3rd-party applications.',
+    tipsLink: 'https://docs.primehub.io/docs/primehub-app'
   }
 ];
 

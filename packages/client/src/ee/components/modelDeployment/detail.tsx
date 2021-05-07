@@ -260,7 +260,9 @@ export default class Detail extends React.Component<Props, State> {
       {
         key: 'detail',
         matcher: /\/deployments\/([\w-])+/,
-        title: `Deployment: ${phDeployment.name}`
+        title: `Deployment: ${phDeployment.name}`,
+        tips: 'View the detailed information.',
+        tipsLink: 'https://docs.primehub.io/docs/model-deployment-feature#deployment-detail'
       }
     ];
 

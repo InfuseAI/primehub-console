@@ -20,7 +20,9 @@ const breadcrumbs = [
     key: 'list',
     matcher: /\/schedule/,
     title: 'Schedule',
-    link: '/schedule?page=1'
+    link: '/schedule?page=1',
+    tips: 'Users can schedule jobs routinely.',
+    tipsLink: 'https://docs.primehub.io/docs/job-scheduling-feature'
   }
 ];
 
