@@ -1,0 +1,24 @@
+import React from 'react';
+import {Tooltip, Icon} from 'antd';
+import {LightA} from 'components/share';
+
+interface Props {
+  tipText: string;
+  tipLink: string;
+  placement?: any;
+  style?: any;
+}
+
+class PHTooltip extends React.Component<Props> {
+  render() {
+    const {tipText, tipLink, placement, style} = this.props;
+    const tipTitle = <span>{tipText} <LightA href={tipLink} target='_blank'>Learn More.</LightA></span>;
+    return (
+      <Tooltip placement={placement} title={tipTitle}>
+        <Icon type='question-circle' style={style}/>
+      </Tooltip>
+    );
+  }
+}
+
+export default PHTooltip;

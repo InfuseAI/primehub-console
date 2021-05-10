@@ -8,6 +8,7 @@ import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 import {PrePackagedServers} from 'ee/components/modelDeployment/prePackagedServers';
+import PHTooltip from 'components/share/toolTip';
 
 const { Option } = Select;
 
@@ -282,7 +283,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
 
               <Row gutter={16}>
                 <Col span={12}>
-                  <Form.Item label={`Model Image`}>
+                  <Form.Item label={<span>Model Image <PHTooltip tipText='Model Image is an image integrated a model file into, which can be deployed as a service.' tipLink='https://docs.primehub.io/docs/model-deployment-language-wrapper-intro' placement='right' style={{margintLeft: 8}}/></span>}>
                     {form.getFieldDecorator('modelImage', {
                       rules: [
                         { whitespace: true, required: true, message: 'Please input a model image url!' },
@@ -312,22 +313,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                 </Col>
               </Row>
 
-              <Form.Item label={(
-                <span>
-                  Model URI&nbsp;
-                  <Tooltip title={(
-                    <React.Fragment>
-                      <div>{`Supported URIs are: `}</div>
-                      <ul>
-                        <li>{`phfs (e.g. phfs:///path/to/my/model, the path is mapped to /phfs/path/to/the/model in notebook)`}</li>
-                        <li>{`gs (e.g. gs://mybucket/path/to/my/model)`}</li>
-                      </ul>
-                    </React.Fragment>
-                  )}>
-                    <Icon type="question-circle-o" />
-                  </Tooltip>
-                </span>
-              )}>
+              <Form.Item label={(<span>Model URI <PHTooltip tipText='The location where the trained model is stored; based on this model file to deploy a model image.' tipLink='https://docs.primehub.io/docs/model-deployment-model-uri' placement='right' style={{margintLeft: 8}}/></span>)}>
                 {form.getFieldDecorator('modelURI', {
                   initialValue: modelURI,
                   rules: [
@@ -353,7 +339,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
               </Form.Item>
 
               <Divider />
-              <h3>Environment Variables { showRevealBtn == true ? revealBtn : null }</h3>
+              <h3>Environment Variables { showRevealBtn == true ? revealBtn : null } <PHTooltip tipText='Key-value pairs of variables provided to the instance as environmental variables.' tipLink='https://docs.primehub.io/docs/model-deployment-feature#environment-variables' placement='right' style={{margintLeft: 8}}/></h3>
               <Form.Item >
                 {form.getFieldDecorator('env', {
                   initialValue: env
@@ -362,7 +348,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                 )}
               </Form.Item>
               <Divider />
-              <h3>Metadata</h3>
+              <h3>Metadata <PHTooltip tipText='Key-value pairs of variables provided to the instance as metadata.' tipLink='https://docs.primehub.io/docs/model-deployment-feature#metadata' placement='right' style={{margintLeft: 8}}/></h3>
               <Form.Item >
                 {form.getFieldDecorator('metadata', {
                   initialValue: metadata
@@ -410,7 +396,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item label="Replicas">
+                  <Form.Item label={<span>Replicas <PHTooltip tipText='The amount of replicas of the running instance.' tipLink='https://docs.primehub.io/docs/model-deployment-feature#resources' placement='right' style={{margintLeft: 8}}/></span>}>
                     {form.getFieldDecorator('replicas', {
                       initialValue: replicas || 1,
                       rules: [{ required: true, message: 'Please input replicas!' }],
@@ -421,7 +407,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                 </Col>
               </Row>
               <Divider />
-              <h3>Endpoint</h3>
+              <h3>Endpoint <PHTooltip tipText='The toggle of private access of the endpoint; if enabled, there is Clients tab appearing in detail page.' tipLink='https://docs.primehub.io/docs/model-deployment-feature#endpoint' placement='right' style={{margintLeft: 8}}/></h3>
               <Form.Item label="Private Access">
                 {form.getFieldDecorator('privateAccess', {
                   initialValue: (endpointAccessType === 'private'),

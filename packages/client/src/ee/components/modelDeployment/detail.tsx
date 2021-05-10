@@ -13,6 +13,7 @@ import Message from 'components/share/message';
 import moment from 'moment';
 import ModelDeploymentClients from './client';
 import Breadcrumbs from 'components/share/breadcrumb';
+import PHTooltip from 'components/share/tooltip';
 
 const {confirm} = Modal;
 
@@ -187,7 +188,7 @@ export default class Detail extends React.Component<Props, State> {
             <Field type='vertical' label={<span>Environment Variables {revealBtn}</span>} value={<EnvList envList={phDeployment.env} valueVisibility={revealEnv} />} />
           </Col>
         </Row>
-        <Field style={{marginTop: 32}} type='vertical' label='Run an Example' value={(
+        <Field style={{marginTop: 32}} type='vertical' label={<span>Run an Example <PHTooltip tipText='Using Curl query sample to test the service; the sample varies according to Public or Private access.' tipLink='https://docs.primehub.io/docs/model-deployment-feature#information' placement='right' style={{margintLeft: 8}}/></span>} value={(
           <>
             <Button
               icon='copy'
