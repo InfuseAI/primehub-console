@@ -71,7 +71,7 @@ class Landing extends React.Component<Props> {
                       <SubContent>
                         <GuideList>
                           <li>
-                            <Link to='model-deployment'>Deploy Model</Link>
+                            <Link to='deployments'>Deploy Model</Link>
                           </li>
                         </GuideList>
                       </SubContent>
@@ -100,7 +100,7 @@ class Landing extends React.Component<Props> {
                             <Link to='job'>Create New Job</Link>
                           </li>
                           <li style={{display: (window.enableModelDeployment) ? 'inherit' : 'none'}}>
-                            <Link to='model-deployment'>Deploy Model</Link>
+                            <Link to='deployments'>Deploy Model</Link>
                           </li>
                           <li style={{display: (window.enableApp) ? 'inherit' : 'none'}}>
                             <Link to='apps'>Install Application</Link>
