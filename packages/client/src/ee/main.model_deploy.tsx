@@ -85,16 +85,6 @@ class Main extends React.Component {
             >
               <DeploymentEditPage />
             </Route>
-
-            {/* Apps */}
-            <Route path={`${appPrefix}g/:groupName/apps`} exact>
-              <ListContainer Com={AppListContainer} />
-            </Route>
-            <Route path={`${appPrefix}g/:groupName/apps/store`} exact component={AppStore}/>
-            <Route path={`${appPrefix}g/:groupName/apps/create`} exact component={AppCreate}/>
-            <Route path={`${appPrefix}g/:groupName/apps/create/:templateId`} exact component={AppCreate}/>
-            <Route path={`${appPrefix}g/:groupName/apps/:appId`} exact component={AppDetail}/>
-            <Route path={`${appPrefix}g/:groupName/apps/:appId/edit`} exact component={AppEdit}/>
           </MainPage>
         </ApolloProvider>
       </BrowserRouter>

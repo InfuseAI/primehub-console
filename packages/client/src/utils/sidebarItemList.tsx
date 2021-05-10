@@ -97,7 +97,7 @@ const list = [
     title: 'Apps',
     subPath: 'apps',
     icon: iconApps,
-    enabledIn: [FEATURE_CE, FEATURE_EE, FEATURE_DEPLOY],
+    enabledIn: [FEATURE_CE, FEATURE_EE],
     stage: 'beta',
     hidden: !window.enableApp,
     style: {
