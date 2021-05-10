@@ -7,7 +7,7 @@
 # import Dataset, DatasetOrderByInput, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretOrderByInput, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
 # import StoreFileList, StoreFileWhereInput, StoreFileListOptionInput, StoreFileDeleteOptionInput from "./store.graphql"
-# import PhApplication, PhApplicationWhereInput, PhApplicationWhereUniqueInput, PhApplicationCreateInput, PhApplicationUpdateInput from "./phApplication.graphql"
+# import PhApplication, PhApplicationWhereInput, PhApplicationWhereUniqueInput, PhApplicationCreateInput, PhApplicationUpdateInput, PhApplicationOrderBy from "./phApplication.graphql"
 # import PhAppTemplate, PhAppTemplateWhereInput, PhAppTemplateWhereUniqueInput from "./phAppTemplate.graphql"
 
 scalar JSON
@@ -193,6 +193,7 @@ type Query {
     after: String
     first: Int
     last: Int
+    orderBy: PhApplicationOrderBy
   ): [PhApplication]!
   phApplicationsConnection(
     where: PhApplicationWhereInput
@@ -200,6 +201,7 @@ type Query {
     after: String
     first: Int
     last: Int
+    orderBy: PhApplicationOrderBy
   ): PhApplicationsConnection!
 
   phAppTemplate(where: PhAppTemplateWhereUniqueInput!): PhAppTemplate

@@ -8,7 +8,7 @@ import {
 import { transform as templateTransform, PhAppTemplate } from './phAppTemplate';
 import { mapping } from './instanceType';
 import CustomResource, { Item } from '../crdClient/customResource';
-import { get, find } from 'lodash';
+import { get, find, isEmpty } from 'lodash';
 import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
 import {createConfig} from '../config';
@@ -155,7 +155,7 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
 };
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhApplicationSpec, PhApplicationStatus>, where: any, context: Context): Promise<PhApplication[]> => {
+const listQuery = async (client: CustomResource<PhApplicationSpec, PhApplicationStatus>, where: any, order: any, context: Context): Promise<PhApplication[]> => {
   const {namespace, graphqlHost, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phApplication = await client.get(where.id);
@@ -171,20 +171,21 @@ const listQuery = async (client: CustomResource<PhApplicationSpec, PhApplication
   const transformedPhApplications = await Promise.all(
     phApplications.map(item => transform(item, kcAdminClient)));
 
-  return filter(transformedPhApplications, where);
+  order = isEmpty(order) ? {displayName: 'asc'} : order;
+  return filter(transformedPhApplications, where, order);
 };
 
 export const query = async (root, args, context: Context) => {
   const {crdClient} = context;
   // tslint:disable-next-line:max-line-length
-  const phApplications = await listQuery(crdClient.phApplications, args && args.where, context);
+  const phApplications = await listQuery(crdClient.phApplications, args && args.where, args && args.orderBy, context);
   return paginate(phApplications, extractPagination(args));
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
   const {crdClient} = context;
   // tslint:disable-next-line:max-line-length
-  const phApplications = await listQuery(crdClient.phApplications, args && args.where, context);
+  const phApplications = await listQuery(crdClient.phApplications, args && args.where, args && args.orderBy, context);
   return toRelay(phApplications, extractPagination(args));
 };
 
