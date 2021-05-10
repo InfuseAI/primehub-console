@@ -74,10 +74,10 @@ const getAuth = (mlflow: any) => {
   return null;
 };
 
-const getRun = async (mlflow: any, runId: string) => {
+const getRunResolver = (mlflow: any, runId: string) => async (root, args, context) => {
   if (runId) {
     const runJson = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_RUN_GET, getAuth(mlflow), { run_id: runId });
-    return runJson.run;
+    return transformRun(runJson.run);
   }
   return null;
 };
@@ -116,14 +116,14 @@ const transform = (item: any) => {
   };
 };
 
-const transformVersion = (item: any, groupId: string, context: Context, memGetPhDeployments: any) => {
+const transformVersion = (item: any, groupId: string, context: Context, mlflow: any, memGetPhDeployments: any) => {
   return {
     name: item.name,
     version: item.version,
     creationTimestamp: item.creation_timestamp,
     lastUpdatedTimestamp: item.last_updated_timestamp,
     description: item.description,
-    run: item.run ? transformRun(item.run) : null,
+    run: getRunResolver(mlflow, item.run_id),
     modelURI: getModelURI(item.name, item.version),
     deployedBy: async () => getDeployedBy(item.name, item.version, groupId, context, memGetPhDeployments),
   };
@@ -200,8 +200,7 @@ export const queryVersion = async (root, args, context: Context) => {
   const where = args && args.where;
   const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_MODEL_VERSION_GET, getAuth(mlflow), { name: where.name, version: where.version });
   if (json.model_version) {
-    json.model_version.run = await getRun(mlflow, json.model_version.run_id);
-    return transformVersion(json.model_version, groupId, context, memGetPhDeployments);
+    return transformVersion(json.model_version, groupId, context, mlflow, memGetPhDeployments);
   } else if (json.error_code) {
     logger.error({
       component: logger.components.model,
@@ -224,8 +223,7 @@ const listQueryVersions = async (root, args, context: Context) => {
   const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_MODEL_VERSION_SEARCH, getAuth(mlflow), { filter: search });
   if (json.model_versions) {
     const modelVersions = await Promise.all(json.model_versions.map(async m => {
-      m.run = await getRun(mlflow, m.run_id);
-      return transformVersion(m, groupId, context, memGetPhDeployments);
+      return transformVersion(m, groupId, context, mlflow, memGetPhDeployments);
     }));
     return filter(modelVersions, where);
   } else if (json.error_code) {
