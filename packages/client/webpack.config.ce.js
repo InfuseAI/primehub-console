@@ -14,7 +14,6 @@ resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/index.ce.schema.
 module.exports = {
   entry: {
     cms: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
-    landing: './src/landing.tsx',
     'main': devMode ? './src/main.ce.tsx' : ['./src/public-import.js', './src/main.ce.tsx'],
   },
   output: {
@@ -32,8 +31,6 @@ module.exports = {
       rewrites: [
         { from: /^\/g/, to: '/index.html' },
         { from: /^\/app-prefix\/g/, to: '/index.html' },
-        { from: /^\/landing$/, to: '/landing.html' },
-        { from: /^\/app-prefix\/landing/, to: '/landing.html' },
         { from: /./, to: '/cms.html' }
       ]
     },
@@ -77,7 +74,7 @@ module.exports = {
         }
       }, {
         test: /\.css$/,
-        use: [devMode ? 'style-loader' : MiniCssExtractPlugin.loader, "css-loader"]
+        use: ['style-loader', "css-loader"]
       }, {
         test: /\.less$/,
         loader: 'ignore-loader'
@@ -97,11 +94,6 @@ module.exports = {
       chunks: ['cms'],
       template: 'docs/index.html',
       filename: 'cms.html'
-    }),
-    new HtmlWebPackPlugin({
-      chunks: ['landing'],
-      template: 'docs/index.html',
-      filename: 'landing.html'
     }),
     new HtmlWebPackPlugin({
       chunks: ['main'],
