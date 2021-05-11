@@ -13,10 +13,8 @@ resolve.alias['index-schema'] = path.resolve(__dirname, 'schema/ee/index.model_d
 
 module.exports = {
   entry: {
-    cms: devMode ? './src/index.tsx' : ['./src/public-import.js', './src/index.tsx'],
-    landing: './src/landing.tsx',
+    cms: devMode ? './src/ee/index.tsx' : ['./src/public-import.js', './src/ee/index.tsx'],
     'main': devMode ? './src/ee/main.model_deploy.tsx' : ['./src/public-import.js', './src/ee/main.model_deploy.tsx'],
-    'model-deployment': devMode ? './src/ee/modelDeployment.tsx' : ['./src/public-import.js', './src/ee/modelDeployment.tsx'],
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -31,14 +29,9 @@ module.exports = {
     contentBase: path.join(__dirname, 'dist'),
     historyApiFallback: {
       rewrites: [
-        { from: /^\/g/, to: '/main.html' },
-        { from: /^\/app-prefix\/g/, to: '/main.html' },
-        { from: /^\/landing$/, to: '/landing.html' },
-        { from: /^\/app-prefix\/landing/, to: '/landing.html' },
-        { from: /^\/model-deployment/, to: '/model-deployment.html' },
-        { from: /^\/app-prefix\/model-deployment/, to: '/model-deployment.html' },
-
-        { from: /./, to: '/index.html' }
+        { from: /^\/g/, to: '/index.html' },
+        { from: /^\/app-prefix\/g/, to: '/index.html' },
+        { from: /./, to: '/cms.html' }
       ]
     },
     https: false
@@ -81,7 +74,7 @@ module.exports = {
         }
       }, {
         test: /\.css$/,
-        use: [devMode ? 'style-loader' : MiniCssExtractPlugin.loader, "css-loader"]
+        use: ['style-loader', "css-loader"]
       }, {
         test: /\.less$/,
         loader: 'ignore-loader'
@@ -98,24 +91,14 @@ module.exports = {
   },
   plugins: [
     new HtmlWebPackPlugin({
-      chunks: ['index'],
+      chunks: ['cms'],
       template: 'docs/index.html',
-      filename: 'index.html'
-    }),
-    new HtmlWebPackPlugin({
-      chunks: ['landing'],
-      template: 'docs/index.html',
-      filename: 'landing.html'
+      filename: 'cms.html'
     }),
     new HtmlWebPackPlugin({
       chunks: ['main'],
       template: 'docs/index.html',
-      filename: 'main.html'
-    }),
-    new HtmlWebPackPlugin({
-      chunks: ['model-deployment'],
-      template: 'docs/index.html',
-      filename: 'model-deployment.html'
+      filename: 'index.html'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({
