@@ -9,9 +9,9 @@ import {withRouter} from 'react-router';
 import {RouteComponentProps} from 'react-router-dom';
 import withPath, { PathComponentProps } from 'ee/components/job/withPath';
 import {appPrefix} from 'utils/env';
+import PHTooltip from 'components/share/toolTip';
 
 const { Option } = Select;
-
 
 export type GroupSelectorProps = {
   groups: Array<{
@@ -73,7 +73,6 @@ class GroupSelector extends React.Component<GroupSelectorProps, State> {
   render() {
     const {groups} = this.props;
     const {currentGroupName} = this.state;
-
     return (
       <div
         style={{ lineHeight: '64px'}}
@@ -88,6 +87,7 @@ class GroupSelector extends React.Component<GroupSelectorProps, State> {
             </Option>
           )) : [] }
         </Select>
+        <PHTooltip placement='bottom' tipText='Based on the specified working group, users are able to access corresponding resources and to perform features within the group accordingly.' tipLink='https://docs.primehub.io/docs/concept#groups' style={{marginLeft: '5px'}} />
       </div>
     )
   }

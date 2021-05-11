@@ -4,14 +4,11 @@ import {withRouter, Link} from 'react-router-dom';
 import {RouteComponentProps} from 'react-router';
 import {appPrefix} from 'utils/env';
 import {compose} from 'recompose';
+import {LightA} from 'components/share';
 import styled from 'styled-components';
 
 const StyledBreadcrumb = styled(Breadcrumb)`
   font-size: 14px;
-`;
-
-const LightA = styled.a`
-  color: #839ce0;
 `;
 
 export interface BreadcrumbItemSetup {
