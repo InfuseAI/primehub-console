@@ -9,6 +9,7 @@ import {injectIntl} from 'react-intl';
 import {FormattedMessage} from "react-intl";
 import {renderValue} from '@canner/antd-locales';
 import pluralize from 'pluralize';
+import PHTooltip from 'components/share/toolTip';
 
 @injectIntl
 export default class RelationGroupUsersTable extends PureComponent {
@@ -170,7 +171,7 @@ export default class RelationGroupUsersTable extends PureComponent {
         }
         <Table
           dataSource={showValues}
-          columns={[...columnsRender, {title: intl.formatMessage({id: 'group.admin'}), render: this.renderGroupAdminCheckbox}]}
+          columns={[...columnsRender, {title: <span>{intl.formatMessage({id: 'group.admin'})} <PHTooltip tipText='Group Admin have the privilege to access features dedicated to them on User Portal; multiple members are able to be assigned Group Admin for a group.' tipLink='https://docs.primehub.io/docs/guide_manual/admin-group#members'/></span>, render: this.renderGroupAdminCheckbox}]}
           style={{marginBottom: 16}}
         />
         {

@@ -9,6 +9,7 @@ import SendEmail from '../src/cms-components/customize-object-email_form.tsx';
 import Layouts from 'canner-layouts';
 import Filter from '../src/cms-toolbar/filter';
 import {GroupRelation} from './utils.schema';
+import {GenTipsLabel} from '../src/cms-layouts/index';
 
 configure({
   visitorManager: {
@@ -188,7 +189,9 @@ export default () => (
       </Condition>
 
       <Condition match={(data, operator) => operator === 'create'} defaultMode="hidden">
-        <boolean keyName="sendEmail" title="${user.sendEmail}" />
+        <Layout component={GenTipsLabel('Send activation email', 'Sending the activation email to perform different actions.', 'https://docs.primehub.io/docs/guide_manual/admin-user#send-email')}>
+          <boolean keyName="sendEmail" />
+        </Layout>
         <Condition match={(data, operator) => data.sendEmail} defaultMode="hidden">
           <array keyName="resetActions" title="${user.resetActions}" defaultValue={() => ['VERIFY_EMAIL', 'UPDATE_PASSWORD']}
             packageName="../src/cms-components/customize-array-reset_actions"

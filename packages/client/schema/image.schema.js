@@ -4,6 +4,7 @@ import Filter from '../src/cms-toolbar/filter';
 import {Tag} from 'antd';
 import {GroupRelation, CustomizedStringImagePullSecret, CustomizedStringSelectWithCheckbox} from './utils.schema';
 import DisableModeLayout from '../src/cms-layouts/disableMode';
+import {GenTipsLabel} from '../src/cms-layouts/index';
 
 export default () => (
   <array keyName="image"
@@ -90,30 +91,33 @@ export default () => (
       </Condition>
       <string keyName="displayName" title="${displayName}" />
       <string keyName="description" title="${description}" />
-      <string keyName="type" 
-        ui="select"
-        title="${type}"
-        uiParams={{
-          options: [{
-            text: 'CPU',
-            value: 'cpu'
-          }, {
-            text: 'GPU',
-            value: 'gpu'
-          }, {
-            text: 'Universal',
-            value: 'both'
-          }]
-        }}
-        defaultValue="both"
-      />
+      <Layout component={GenTipsLabel('Type', "Specify a CPU, GPU, or Universal type for this image.", 'https://docs.primehub.io/docs/guide_manual/admin-image')}>
+        <string keyName="type" 
+          ui="select"
+          uiParams={{
+            options: [{
+              text: 'CPU',
+              value: 'cpu'
+            }, {
+              text: 'GPU',
+              value: 'gpu'
+            }, {
+              text: 'Universal',
+              value: 'both'
+            }]
+          }}
+          defaultValue="both"
+        />
+      </Layout>
       <string keyName="url" title="${imageUrl}"/>
       <Condition match={data => data.type === 'both'}>
         <CustomizedStringSelectWithCheckbox keyName="urlForGpu" title="${images.urlForGpu}" defaultValue={() => null} />
       </Condition>
       <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${images.useImagePullSecret}" />
     </Layout>
-    <boolean keyName="global" title="${global}" />
+    <Layout component={GenTipsLabel('Global', "When Global, everyone can access this Image.", 'https://docs.primehub.io/docs/guide_manual/admin-image')}>
+      <boolean keyName="global" />
+    </Layout>
     <Condition match={data => !data.global}>
       <GroupRelation />
     </Condition>

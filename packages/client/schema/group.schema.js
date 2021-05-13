@@ -4,6 +4,7 @@ import {Tag} from 'antd';
 import Filter from '../src/cms-toolbar/filter';
 import {renderRelationField, parseToStepDot5} from './utils';
 import EnableModelDeployment from '../src/cms-layouts/enableModelDeployment';
+import {GenTipsLabel} from '../src/cms-layouts/index';
 import GroupEditTab from 'cms-layouts/groupEditTab';
 
 export default () => (
@@ -122,7 +123,7 @@ export default () => (
        {/* Hidden enable EnableModelDeployment
          * because in "deploy" mode it is always enabled. */}
         <Layout component={EnableModelDeployment}>
-          <boolean keyName="enabledDeployment" title="${groups.enabledDeployment}" uiParams={{yesText: ' ', noText: ' '}} />
+          <boolean keyName="enabledDeployment" uiParams={{yesText: ' ', noText: ' '}} />
         </Layout>
       </Condition>
       <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
@@ -341,9 +342,11 @@ export default () => (
 function ShareVolumn() {
   return (
     <Default>
-      <boolean keyName="enabledSharedVolume" title="${group.enabledSharedVolume}" 
-        packageName="../src/cms-components/customize-boolean-enable_shared_volume"
-      />
+      <Layout component={GenTipsLabel('Shared Volumn', 'The shared volume is shared storage among members in the group.', 'https://docs.primehub.io/docs/guide_manual/admin-group#shared-volume')}>
+        <boolean keyName="enabledSharedVolume"
+          packageName="../src/cms-components/customize-boolean-enable_shared_volume"
+        />
+      </Layout>
       <Condition match={data => data.enabledSharedVolume} defaultMode="hidden">
         <Block title="Shared Volume">
           <Row type="flex">
