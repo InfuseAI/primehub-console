@@ -1,6 +1,5 @@
 /** @jsx builder */
 import builder, {Block, Condition, Row, Col} from 'canner-script';
-import Tag from 'antd'
 import moment from 'moment';
 import 'moment-timezone';
 

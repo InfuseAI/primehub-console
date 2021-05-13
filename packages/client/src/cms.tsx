@@ -262,7 +262,7 @@ export default class CMSPage extends React.Component<Props, State> {
         onCancel: () => undefined
       });
     } else if (dict['en'][`${key}.externalLink`] || key === 'backToUserPortal') {
-      // add this condition to keep page content not change when 
+      // add this condition to keep page content not change when
       // opening external link or backing to user portal
     } else {
       history.push(`${(window as any).APP_PREFIX}cms/${key}`);

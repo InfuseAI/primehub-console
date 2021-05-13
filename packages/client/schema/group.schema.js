@@ -1,6 +1,5 @@
 /** @jsx builder */
 import builder, {Condition, Block, Row, Tabs, Col, Default, Layout} from 'canner-script';
-import {Tag} from 'antd';
 import Filter from '../src/cms-toolbar/filter';
 import {renderRelationField, parseToStepDot5} from './utils';
 import EnableModelDeployment from '../src/cms-layouts/enableModelDeployment';

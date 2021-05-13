@@ -4,6 +4,7 @@ import {Item} from 'canner-helpers';
 import {injectIntl} from 'react-intl';
 import styled from 'styled-components';
 import {get, startCase} from 'lodash';
+import PHTooltip from 'components/share/toolTip';
 import AddButton from './addButtton';
 import {Props} from '../cms-components/types';
 
@@ -27,6 +28,40 @@ const ButtonWrapper = styled.div<{visible: boolean}>`
   display: ${props => props.visible ? undefined: 'none'};
 `;
 
+type Keys =
+  | 'group'
+  | 'instanceType'
+  | 'image'
+  | 'buildImage'
+  | 'secret';
+type BreadcrumbWithTooptip = Record<Keys, { title: string; link: string }>;
+
+const breadcrumbWithTooltip: BreadcrumbWithTooptip = {
+  group: {
+    title: 'Admin can find and manage groups here.',
+    link: 'https://docs.primehub.io/docs/guide_manual/admin-group',
+  },
+  instanceType: {
+    title:
+      'Instance type is a preset of resource allocation. Admin can find and manage instance types here.',
+    link: 'https://docs.primehub.io/docs/guide_manual/admin-instancetype',
+  },
+  image: {
+    title:
+      'Images are working environments of instances; Admin can find and manage images.',
+    link: 'https://docs.primehub.io/docs/guide_manual/admin-image',
+  },
+  buildImage: {
+    title:
+      'Image Builder where Admin can find and build custom images from base images.',
+    link: 'https://docs.primehub.io/docs/guide_manual/admin-build-image',
+  },
+  secret: {
+    title:
+      'Secrets are credentials of authorizations to certain images and datasets. Admin can find and manage secrets here.',
+    link: 'https://docs.primehub.io/docs/guide_manual/admin-secret',
+  },
+};
 
 @injectIntl
 export default class CommonBody extends React.Component<Props> {
@@ -116,13 +151,28 @@ export default class CommonBody extends React.Component<Props> {
     const key = routes[0];
     const item = schema[key];
     const groupId = get(routerParams, 'payload.backToGroup', '');
-    const breadcrumbs = [{
-      path: 'home',
-      render: () => <Icon type="home" />
-    }, {
-      path: routes[0],
-      render: () => getRouteName(routes[0])
-    }];
+
+    const breadcrumbs = [
+      {
+        path: 'home',
+        render: () => <Icon type="home" />,
+      },
+      {
+        path: routes[0],
+        render: () => (
+          <>
+            {getRouteName(routes[0])}
+            <PHTooltip
+              placement="bottom"
+              tipText={breadcrumbWithTooltip[key].title}
+              tipLink={breadcrumbWithTooltip[key].link}
+              style={{ marginLeft: '5px' }}
+            />
+          </>
+        ),
+      },
+    ];
+
     const itemRender = (route) => {
       return route.render();
     }
@@ -138,65 +188,81 @@ export default class CommonBody extends React.Component<Props> {
         />;
     }
 
-    return <div>
-      <div style={{
-        background: '#fff',
-        borderBottom: '1px solid #eee',
-        padding: '16px 24px'
-      }}>
-        <div style={{
-          marginBottom: 24
-        }}>
-          <Breadcrumb itemRender={itemRender} routes={breadcrumbs} />
-        </div>
-        <h2>{item.title || title}</h2>
-        {
-          (item.description || description) && (
-            <div style={{
-              marginTop: 8
-            }}>
-              {item.description || description}
-            </div>
-          )
-        }
-      </div>
-      {customImageAlert}
-      <div style={{
-        margin: '16px',
-        padding: '16px',
-        background: '#fff',
-      }}>
-        <Button
-          onClick={this.discard}
+    return (
+      <div>
+        <div
           style={{
-            marginBottom: 16,
-            minWidth: 99,
-            display: routerParams.operator === 'create' || routes.length > 1 ? undefined : 'none',
+            background: '#fff',
+            borderBottom: '1px solid #eee',
+            padding: '16px 24px',
           }}
         >
-          <Icon type="arrow-left" />
-          { groupId ? 
-            ` Back to group`:
-            ' Back'
-          }
-        </Button>
-        <AddButton
-          add={this.add}
-          keyName={key}
-          display={routes.length === 1 && routerParams.operator !== 'create' ? 'flex' : 'none'}
-        />
-        <Spin tip={loadingTip} spinning={loading}>
-          <Item hideBackButton hideButtons/>
-          <ButtonWrapper visible={(routes.length > 1 || routerParams.operator === 'create') && routes[0] != 'buildImage' && routes[0] != 'group'}>
-            <Button href="#" style={{marginRight: 16}} type="primary" onClick={this.deploy} data-testid="confirm-button">
-              {intl.formatMessage({id: 'hocs.route.confirmText'})}
-            </Button>
-            <Button onClick={this.reset} data-testid="reset-button">
-              {intl.formatMessage({id: 'deploy.confirm.cancel'})}
-            </Button>
-          </ButtonWrapper>
-        </Spin>
+          <div style={{ marginBottom: 24 }}>
+            <Breadcrumb itemRender={itemRender} routes={breadcrumbs} />
+          </div>
+          <h2>{item.title || title}</h2>
+          {(item.description || description) && (
+            <div style={{ marginTop: 8 }}>
+              {item.description || description}
+            </div>
+          )}
+        </div>
+        {customImageAlert}
+        <div
+          style={{
+            margin: '16px',
+            padding: '16px',
+            background: '#fff',
+          }}
+        >
+          <Button
+            onClick={this.discard}
+            style={{
+              marginBottom: 16,
+              minWidth: 99,
+              display:
+                routerParams.operator === 'create' || routes.length > 1
+                  ? undefined
+                  : 'none',
+            }}
+          >
+            <Icon type="arrow-left" />
+            {groupId ? ` Back to group` : ' Back'}
+          </Button>
+          <AddButton
+            add={this.add}
+            keyName={key}
+            display={
+              routes.length === 1 && routerParams.operator !== 'create'
+                ? 'flex'
+                : 'none'
+            }
+          />
+          <Spin tip={loadingTip} spinning={loading}>
+            <Item hideBackButton hideButtons />
+            <ButtonWrapper
+              visible={
+                (routes.length > 1 || routerParams.operator === 'create') &&
+                routes[0] != 'buildImage' &&
+                routes[0] != 'group'
+              }
+            >
+              <Button
+                href="#"
+                style={{ marginRight: 16 }}
+                type="primary"
+                onClick={this.deploy}
+                data-testid="confirm-button"
+              >
+                {intl.formatMessage({ id: 'hocs.route.confirmText' })}
+              </Button>
+              <Button onClick={this.reset} data-testid="reset-button">
+                {intl.formatMessage({ id: 'deploy.confirm.cancel' })}
+              </Button>
+            </ButtonWrapper>
+          </Spin>
+        </div>
       </div>
-    </div>;
+    );
   }
 }
