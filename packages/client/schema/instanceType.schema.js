@@ -136,7 +136,7 @@ export default () => (
                 nullable
               />
             </Layout>
-            <Layout component={GenTipsLabel('Memory Request', "When enabled, instances are guaranteed to get the amount of Memory they request. If Memory Request < Memory Limit, the system will try to overcommit Memory resources within the limit if more resources are available.", 'https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-featureas above')}>
+            <Layout component={GenTipsLabel('Memory Request', "When enabled, instances are guaranteed to get the amount of Memory they request. If Memory Request < Memory Limit, the system will try to overcommit Memory resources within the limit if more resources are available.", 'https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-feature')}>
               <number keyName="memoryRequest"
                 uiParams={{unit: ' GB', step: 1, min: 1, precision: 1, disableText: ' '}}
                 defaultValue={() => null}
