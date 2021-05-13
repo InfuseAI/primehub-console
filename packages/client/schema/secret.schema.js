@@ -1,5 +1,6 @@
 /** @jsx CannerScript */
-import CannerScript, {Condition, Default} from 'canner-script';
+import CannerScript, {Layout, Condition, Default} from 'canner-script';
+import {GenTipsLabel} from '../src/cms-layouts/index';
 
 export default () => (
   <array ui="tableRoute"
@@ -56,25 +57,26 @@ export default () => (
     </Condition>
     <string keyName="displayName" title="${displayName}" />
     <Condition match={(data, operator) => operator === 'create'} defaultMode="disabled">
-      <enum
-        keyName="type"
-        title="${secret.type}"
-        defaultValue="opaque"
-        values={['opaque', 'kubernetes']}
-        packageName="../src/cms-components/customize-string-select"
-        uiParams={{
-          options: [{
-            text: 'Opaque',
-            value: 'opaque'
-          }, {
-            text: 'kubernetes.io/dockerconfigjson',
-            value: 'kubernetes'
-          }],
-          style: {
-            width: 250
-          }
-        }}
-      />
+      <Layout component={GenTipsLabel('Type', "Specify the type of the secret; dockerconfigjson is for image-pull secret.", 'https://docs.primehub.io/docs/guide_manual/admin-secret#type-opaque')}>
+        <enum
+          keyName="type"
+          defaultValue="opaque"
+          values={['opaque', 'kubernetes']}
+          packageName="../src/cms-components/customize-string-select"
+          uiParams={{
+            options: [{
+              text: 'Opaque',
+              value: 'opaque'
+            }, {
+              text: 'kubernetes.io/dockerconfigjson',
+              value: 'kubernetes'
+            }],
+            style: {
+              width: 250
+            }
+          }}
+        />
+      </Layout>
     </Condition>
     <Condition match={data => data.type === 'opaque'}>
       <string

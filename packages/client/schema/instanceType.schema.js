@@ -8,6 +8,7 @@ import {GroupRelation} from './utils.schema';
 import TolerationLayout from '../src/cms-layouts/toleration';
 import TextBlock from '../src/cms-layouts/text-block';
 import DisableModeLayout from '../src/cms-layouts/disableMode';
+import {GenTipsLabel} from '../src/cms-layouts/index';
 
 export default () => (
   <array keyName="instanceType"
@@ -101,41 +102,53 @@ export default () => (
           </Condition>
           <string keyName="displayName" title="${displayName}" />
           <string keyName="description" title="${description}" />
-          <number keyName="cpuLimit" title="${cpuLimit}"
-            uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
-            defaultValue={1}
-            required
-            packageName="../src/cms-components/customize-number-precision"
-          />
-          <number keyName="memoryLimit" title="${memoryLimit}"
-            uiParams={{unit: ' GB', step: 1, min: 0.1, precision: 1}}
-            defaultValue={1.0}
-            required
-            packageName="../src/cms-components/customize-number-precision"
-          />
-          <number keyName="gpuLimit" title="${gpuLimit}" uiParams={{min: 0, precision: 0, step: 1}}
-            packageName="../src/cms-components/customize-number-precision"
-          />
+            <Layout component={GenTipsLabel('CPU Limit', 'Define how many CPU are allowed to use by this Instance Type. The value is also applied to CPU Request when CPU Request is disabled.', 'https://docs.primehub.io/docs/guide_manual/admin-instancetype#creating-new-instance-types')}>
+              <number keyName="cpuLimit"
+                uiParams={{min: 0.5, step: 0.5, precision: 1, parser: parseToStepDot5}}
+                defaultValue={1}
+                required
+                packageName="../src/cms-components/customize-number-precision"
+              />
+          </Layout>
+          <Layout component={GenTipsLabel('Memory Limit', 'Define how many memory are allowed to use by this Instance Type. The value also applied to Memory Request when Memory Request is disabled.', 'https://docs.primehub.io/docs/guide_manual/admin-instancetype#creating-new-instance-types')}>
+            <number keyName="memoryLimit"
+              uiParams={{unit: ' GB', step: 1, min: 0.1, precision: 1}}
+              defaultValue={1.0}
+              required
+              packageName="../src/cms-components/customize-number-precision"
+            />
+          </Layout>
+          <Layout component={GenTipsLabel('GPU Limit', 'Define how many GPU can be used by this Instance Type. GPU can only be integer.', 'https://docs.primehub.io/docs/guide_manual/admin-instancetype#creating-new-instance-types')}>
+            <number keyName="gpuLimit" uiParams={{min: 0, precision: 0, step: 1}}
+              packageName="../src/cms-components/customize-number-precision"
+            />
+          </Layout>
           <Default keyName="requestWithText"
             title="${instanceType.request.text.title}"
             description="${instanceType.request.text.description}"
             component={TextBlock}
           >
-            <number keyName="cpuRequest" title="${cpuRequest}"
-              uiParams={{step: 0.5, min: 0.5, precision: 1, parser: parseToStepDot5, disableText: ' '}}
-              defaultValue={() => null}
-              packageName="../src/cms-components/customize-number-checkbox"
-              nullable
-            />
-            <number keyName="memoryRequest" title="${memoryRequest}"
-              uiParams={{unit: ' GB', step: 1, min: 1, precision: 1, disableText: ' '}}
-              defaultValue={() => null}
-              packageName="../src/cms-components/customize-number-checkbox"
-              nullable
-            />
+            <Layout component={GenTipsLabel('CPU Request', 'When enabled, instances are guaranteed to gain the amount of CPU they request. If CPU Request < CPU Limit, the system will try to overcommit CPU resources within the limit if more resources are available.', 'https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-feature')}>
+              <number keyName="cpuRequest"
+                uiParams={{step: 0.5, min: 0.5, precision: 1, parser: parseToStepDot5, disableText: ' '}}
+                defaultValue={() => null}
+                packageName="../src/cms-components/customize-number-checkbox"
+                nullable
+              />
+            </Layout>
+            <Layout component={GenTipsLabel('Memory Request', "When enabled, instances are guaranteed to get the amount of Memory they request. If Memory Request < Memory Limit, the system will try to overcommit Memory resources within the limit if more resources are available.", 'https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-feature')}>
+              <number keyName="memoryRequest"
+                uiParams={{unit: ' GB', step: 1, min: 1, precision: 1, disableText: ' '}}
+                defaultValue={() => null}
+                packageName="../src/cms-components/customize-number-checkbox"
+                nullable
+              />
+            </Layout>
           </Default>
         </Layout>
-        <boolean keyName="global" title="${global}" />
+        <Layout component={GenTipsLabel('Global', "When Global, everyone can access this Instance Type.", 'https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-feature')}>
+          <boolean keyName="global" />
+        </Layout>
         <Condition match={data => !data.global}>
           <GroupRelation />
         </Condition>
