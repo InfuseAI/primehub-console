@@ -193,7 +193,7 @@ class ModelDetailContainer extends React.Component<Props, State> {
         <Col span={20}>
           <Field labelCol={4} valueCol={8} label='Created Time' value={formatTimestamp(model.creationTimestamp)} />
           <Field labelCol={4} valueCol={8} label='Last Modified' value={formatTimestamp(model.lastUpdatedTimestamp)} />
-          <Field labelCol={4} valueCol={8} label='Description' value={formatTimestamp(model.description)} />
+          <Field labelCol={4} valueCol={8} label='Description' value={model.description} />
         </Col>
         <Col span={4}>
           <div style={{ textAlign: 'right' }}>
