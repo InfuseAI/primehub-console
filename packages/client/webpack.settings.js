@@ -2,19 +2,23 @@ const path = require('path');
 
 module.exports = {
   externals: {
-    'react': "React",
-    'react-dom': "ReactDOM",
-    'antd': 'antd',
-    'lodash': '_',
-    'immutable': 'Immutable',
+    react: 'React',
+    'react-dom': 'ReactDOM',
+    antd: 'antd',
+    lodash: '_',
+    immutable: 'Immutable',
     'styled-components': 'styled',
     'canner-slate-editor': 'CannerSlateEditor',
-    'moment': 'moment'
+    moment: 'moment',
   },
   resolve: {
     extensions: ['.js', '.ts', '.tsx', '.graphql'],
     alias: {
-      'styled-components': path.resolve(__dirname, 'node_modules', 'styled-components'),
+      'styled-components': path.resolve(
+        __dirname,
+        'node_modules',
+        'styled-components'
+      ),
       styledShare: path.resolve(__dirname, 'src/styled_share'),
       utils: path.resolve(__dirname, 'src/utils'),
       images: path.resolve(__dirname, 'src/images'),
@@ -28,7 +32,7 @@ module.exports = {
       interfaces: path.resolve(__dirname, 'src/interfaces'),
       root: path.resolve(__dirname, 'src'),
       queries: path.resolve(__dirname, 'src/queries'),
-      schema: path.resolve(__dirname, 'schema')
-    }
-  }
-}
+      schema: path.resolve(__dirname, 'schema'),
+    },
+  },
+};
