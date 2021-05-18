@@ -1,9 +1,28 @@
 {
-  "extends": "../../tsconfig",
   "compilerOptions": {
-    "baseUrl": ".",
     "target": "es5",
+    "module": "esnext",
+    "moduleResolution": "node",
     "jsx": "react",
+    "baseUrl": "./",
+    "noEmit": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    // FIXME: It might be removed in the future
+    "experimentalDecorators":true,
+    "removeComments": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "paths": {
       "utils/*": ["./src/utils/*"],
       "images/*": ["./src/images/*"],
@@ -20,5 +39,9 @@
       "@types/*": ["./src/@types/*"],
     }
   },
-  "exclude": ["dist", "build", "node_modules"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build"
+  ]
 }
