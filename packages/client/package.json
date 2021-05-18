@@ -100,7 +100,7 @@
     "styled-components": "^3.2.6",
     "ts-import-plugin": "^1.5.5",
     "ts-loader": "^4.3.0",
-    "typescript": "^2.8.3",
+    "typescript": "^3.5.2",
     "webpack": "^4.20.2",
     "webpack-bundle-analyzer": "^2.13.1",
     "webpack-cli": "^3.1.1",
