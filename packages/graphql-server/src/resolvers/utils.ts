@@ -305,7 +305,7 @@ export const mutateRelation = async ({
 };
 
 export const serializeEnvs = list => {
-  return list.map(env => {
+  return list.filter(env => !!env.name && env.name.length > 0).map(env => {
     return `${env.name}=${env.value}`;
   });
 };
