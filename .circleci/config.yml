@@ -3,7 +3,7 @@ orbs:
   docker: circleci/docker@1.2.0
 commands:
   build_console:
-    description: "Build primehub-console images and Push to dockerhub"
+    description: Build primehub-console images and push to Docker Hub
     parameters:
       tag:
         type: string
@@ -11,24 +11,24 @@ commands:
       - docker/check
       # Build and push Primehub-console EE image
       - docker/build:
-          step-name: 'Docker build: primehub-console'
-          image: 'infuseai/primehub-console'
+          step-name: "Docker build: primehub-console"
+          image: infuseai/primehub-console
           tag: << parameters.tag >>
-          dockerfile: 'packages/admin-server/Dockerfile'
+          dockerfile: packages/admin-server/Dockerfile
       - docker/push:
-          step-name: 'Docker push: primehub-console'
-          image: 'infuseai/primehub-console'
+          step-name: "Docker push: primehub-console"
+          image: infuseai/primehub-console
           tag: << parameters.tag >>
       - run:
           name: Tag short sha1 on latest
           command: |
             docker tag infuseai/primehub-console:<<parameters.tag>> infuseai/primehub-console:${CIRCLE_SHA1:0:7}
       - docker/push:
-          step-name: 'Docker push: primehub-console:shatag'
-          image: 'infuseai/primehub-console'
+          step-name: "Docker push: primehub-console:shatag"
+          image: infuseai/primehub-console
           tag: ${CIRCLE_SHA1:0:7}
   build_console_others:
-    description: "Build primehub-console images and Push to dockerhub"
+    description: Build primehub-console images and push to Docker Hub
     parameters:
       tag:
         type: string
@@ -36,42 +36,42 @@ commands:
       - docker/check
       # Build and push Primehub-console EE(Model Deployment only version) image
       - docker/build:
-          step-name: 'Docker build: primehub-console(model-deployment only)'
-          image: 'infuseai/primehub-console-model-deploy'
+          step-name: "Docker build: primehub-console(model-deployment only)"
+          image: infuseai/primehub-console-model-deploy
           tag: << parameters.tag >>
-          dockerfile: 'packages/admin-server/overlay/model_deployment/Dockerfile'
+          dockerfile: packages/admin-server/overlay/model_deployment/Dockerfile
       - docker/push:
-          step-name: 'Docker push: primehub-console(model-deployment only)'
-          image: 'infuseai/primehub-console-model-deploy'
+          step-name: "Docker push: primehub-console(model-deployment only)"
+          image: infuseai/primehub-console-model-deploy
           tag: << parameters.tag >>
       - run:
           name: Tag short sha1 on latest
           command: |
             docker tag infuseai/primehub-console-model-deploy:<<parameters.tag>> infuseai/primehub-console-model-deploy:${CIRCLE_SHA1:0:7}
       - docker/push:
-          step-name: 'Docker push: primehub-console-model-deploy:shatag'
-          image: 'infuseai/primehub-console-model-deploy'
+          step-name: "Docker push: primehub-console-model-deploy:shatag"
+          image: infuseai/primehub-console-model-deploy
           tag: ${CIRCLE_SHA1:0:7}
       # Build and push Primehub-console CE image
       - docker/build:
-          step-name: 'Docker build: primehub-console (CE only)'
-          image: 'infuseai/primehub-console-ce'
+          step-name: "Docker build: primehub-console (CE only)"
+          image: infuseai/primehub-console-ce
           tag: << parameters.tag >>
-          dockerfile: 'packages/admin-server/overlay/ce/Dockerfile'
+          dockerfile: packages/admin-server/overlay/ce/Dockerfile
       - docker/push:
-          step-name: 'Docker push: primehub-console (CE only)'
-          image: 'infuseai/primehub-console-ce'
+          step-name: "Docker push: primehub-console (CE only)"
+          image: infuseai/primehub-console-ce
           tag: << parameters.tag >>
       - run:
           name: Tag short sha1 on latest
           command: |
             docker tag infuseai/primehub-console-ce:<<parameters.tag>> infuseai/primehub-console-ce:${CIRCLE_SHA1:0:7}
       - docker/push:
-          step-name: 'Docker push: primehub-console-ce:shatag'
-          image: 'infuseai/primehub-console-ce'
+          step-name: "Docker push: primehub-console-ce:shatag"
+          image: infuseai/primehub-console-ce
           tag: ${CIRCLE_SHA1:0:7}
   build_watcher:
-    description: "Build primehub-console-watcher images and Push to dockerhub"
+    description: Build primehub-console-watcher images and push to Docker Hub
     parameters:
       tag:
         type: string
@@ -79,30 +79,30 @@ commands:
       - docker/check
       # Build and push Primehub-console Watcher image
       - docker/build:
-          step-name: 'Docker build: primehub-console-watcher'
-          image: 'infuseai/primehub-console-watcher'
+          step-name: "Docker build: primehub-console-watcher"
+          image: infuseai/primehub-console-watcher
           tag: << parameters.tag >>
-          dockerfile: 'packages/watcher/Dockerfile'
+          dockerfile: packages/watcher/Dockerfile
       - docker/push:
-          step-name: 'Docker push: primehub-console-watcher'
-          image: 'infuseai/primehub-console-watcher'
+          step-name: "Docker push: primehub-console-watcher"
+          image: infuseai/primehub-console-watcher
           tag: << parameters.tag >>
       - run:
           name: Tag short sha1 on latest
           command: |
             docker tag infuseai/primehub-console-watcher:<<parameters.tag>> infuseai/primehub-console-watcher:${CIRCLE_SHA1:0:7}
       - docker/push:
-          step-name: 'Docker push: primehub-console-watcher:shatag'
-          image: 'infuseai/primehub-console-watcher'
+          step-name: "Docker push: primehub-console-watcher:shatag"
+          image: infuseai/primehub-console-watcher
           tag: ${CIRCLE_SHA1:0:7}
   build_graphql:
-    description: "Build primehub-console-graphql images and Push to dockerhub"
+    description: Build primehub-console-graphql images and push to Docker Hub
     parameters:
       tag:
         type: string
     steps:
       - run:
-          name: "Set the segment write key"
+          name: Set the segment write key
           command: |
             if [[ -n "${SEGMENT_WRITE_KEY}" ]]; then
               sed -i "s/const SEGMENT_WRITE_KEY.*/const SEGMENT_WRITE_KEY = \'${SEGMENT_WRITE_KEY}\';/g" \
@@ -112,39 +112,39 @@ commands:
       - docker/check
       # Build and push Primehub-console GraphQL EE image
       - docker/build:
-          step-name: 'Docker build: primehub-console-graphql'
-          image: 'infuseai/primehub-console-graphql'
+          step-name: "Docker build: primehub-console-graphql"
+          image: infuseai/primehub-console-graphql
           tag: << parameters.tag >>
-          dockerfile: 'packages/graphql-server/docker/ee/Dockerfile'
+          dockerfile: packages/graphql-server/docker/ee/Dockerfile
       - docker/push:
-          step-name: 'Docker push: primehub-console-graphql'
-          image: 'infuseai/primehub-console-graphql'
+          step-name: "Docker push: primehub-console-graphql"
+          image: infuseai/primehub-console-graphql
           tag: << parameters.tag >>
       - run:
           name: Tag short sha1 on latest
           command: |
             docker tag infuseai/primehub-console-graphql:<<parameters.tag>> infuseai/primehub-console-graphql:${CIRCLE_SHA1:0:7}
       - docker/push:
-          step-name: 'Docker push: primehub-console-graphql:shatag'
-          image: 'infuseai/primehub-console-graphql'
+          step-name: "Docker push: primehub-console-graphql:shatag"
+          image: infuseai/primehub-console-graphql
           tag: ${CIRCLE_SHA1:0:7}
       # Build and push Primehub-console GraphQL CE image
       - docker/build:
-          step-name: 'Docker build: primehub-console-graphql(CE only)'
-          image: 'infuseai/primehub-console-graphql-ce'
+          step-name: "Docker build: primehub-console-graphql(CE only)"
+          image: infuseai/primehub-console-graphql-ce
           tag: << parameters.tag >>
-          dockerfile: 'packages/graphql-server/docker/ce/Dockerfile'
+          dockerfile: packages/graphql-server/docker/ce/Dockerfile
       - docker/push:
-          step-name: 'Docker push: primehub-console-graphql(CE only)'
-          image: 'infuseai/primehub-console-graphql-ce'
+          step-name: "Docker push: primehub-console-graphql(CE only)"
+          image: infuseai/primehub-console-graphql-ce
           tag: << parameters.tag >>
       - run:
           name: Tag short sha1 on latest
           command: |
             docker tag infuseai/primehub-console-graphql-ce:<<parameters.tag>> infuseai/primehub-console-graphql-ce:${CIRCLE_SHA1:0:7}
       - docker/push:
-          step-name: 'Docker push: primehub-console-graphql:shatag'
-          image: 'infuseai/primehub-console-graphql-ce'
+          step-name: "Docker push: primehub-console-graphql:shatag"
+          image: infuseai/primehub-console-graphql-ce
           tag: ${CIRCLE_SHA1:0:7}
 
 jobs:
@@ -156,7 +156,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - build_console:
-          tag: 'latest'
+          tag: latest
   latest-console-others:
     docker:
       - image: circleci/node:lts
@@ -164,7 +164,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - build_console_others:
-          tag: 'latest'
+          tag: latest
   latest-graphql:
     docker:
       - image: circleci/node:lts
@@ -172,7 +172,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - build_graphql:
-          tag: 'latest'
+          tag: latest
   latest-watcher:
     docker:
       - image: circleci/node:lts
@@ -180,7 +180,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - build_watcher:
-          tag: 'latest'
+          tag: latest
   # Release
   release-console:
     docker:
@@ -217,7 +217,7 @@ jobs:
   # Tests
   graphql-lint:
     docker:
-      - image: circleci/node:10
+      - image: cimg/node:14.17.0
     steps:
       - checkout
       - run:
@@ -228,7 +228,7 @@ jobs:
             yarn run test:build
   graphql-unit-test:
     docker:
-      - image: circleci/node:10
+      - image: cimg/node:14.17.0
     steps:
       - checkout
       - run:
