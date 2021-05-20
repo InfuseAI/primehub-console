@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Graphql API and hosting cms pages",
   "license": "Apache-2.0",
-  "author": "InfuseAI",
+  "author": "InfuseAI <dev@infuseai.io>",
   "homepage": "https://github.com/InfuseAI/primehub-console#readme",
   "repository": {
     "type": "git",
@@ -54,7 +54,7 @@
     "*.{md,json,yml}": [
       "prettier --write"
     ],
-    "*package.json": [
+    "package.json": [
       "prettier-package-json --write"
     ]
   }

@@ -115,12 +115,6 @@
   "jest": {
     "testURL": "http://localhost/"
   },
-  "licenses": [
-    {
-      "type": "Apache-2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0"
-    }
-  ],
   "theme": {
     "menu-dark-bg": "#373d62",
     "layout-sider-background": "#373d62",
