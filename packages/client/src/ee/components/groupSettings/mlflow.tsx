@@ -60,7 +60,7 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
     return (
       <Form onSubmit={this.onSubmit}>
       <Alert
-        message={<span>You can setup a MLflow application in PrimeHub Apps to configure MLflow settings.<a href='#'>Learn more</a></span>}
+        message={<span>You can setup a MLflow application in PrimeHub Apps to configure MLflow settings. <a href='https://docs.primehub.io/docs/model-configuration'>Learn more</a></span>}
         type='info'
         closeText='Got It'
         showIcon />
