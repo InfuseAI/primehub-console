@@ -82,7 +82,7 @@ class ModelListContainer extends React.Component<Props, State> {
       if (get(error, 'graphQLErrors.0.extensions.code') === 'TRACKING_URI_NOT_FOUND') {
         pageBody = <Alert
           message="MLflow is not configured"
-          description="MLflow settings are not configured yet. Please go to the group settings to configure it."
+          description="MLflow settings are not configured yet. Please go to the group settings to configure it. <a href='https://docs.primehub.io/docs/model-configuration'>Learn more</a>"
           type="warning"
           showIcon/>;
       } else if (error.graphQLErrors) {
