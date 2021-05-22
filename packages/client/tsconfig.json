@@ -8,21 +8,18 @@
     "noEmit": true,
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     // FIXME: It might be removed in the future
-    "experimentalDecorators":true,
+    "experimentalDecorators": true,
     "removeComments": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "paths": {
       "utils/*": ["./src/utils/*"],
       "images/*": ["./src/images/*"],
@@ -36,12 +33,8 @@
       "constant/*": ["./src/constant/*"],
       "interfaces/*": ["./src/interfaces/*"],
       "queries/*": ["./src/queries/*"],
-      "@types/*": ["./src/@types/*"],
+      "@types/*": ["./src/@types/*"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "build"
-  ]
+  "exclude": ["node_modules", "dist", "build"]
 }
