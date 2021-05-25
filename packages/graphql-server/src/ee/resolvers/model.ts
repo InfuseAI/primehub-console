@@ -130,6 +130,9 @@ const transformVersion = (item: any, groupId: string, context: Context, mlflow: 
 };
 
 const transformRun = (item: any) => {
+  if (item.data && item.data.params) {
+    item.data.params.sort((a: any, b: any) => { a.key.localeCompare(b.key); });
+  }
   return {
     info: {
       runId: item.info.run_id,
