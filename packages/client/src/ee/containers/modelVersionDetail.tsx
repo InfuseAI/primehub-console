@@ -67,7 +67,9 @@ class ModelVersionDetailContainer extends React.Component<Props> {
         key: 'version',
         matcher: /\/models/,
         title: `Version: ${version}`,
-        link: `/models/${encodeURIComponent(modelName)}/versions/${version}`
+        link: `/models/${encodeURIComponent(modelName)}/versions/${version}`,
+        tips: 'View the detailed information in this model version.',
+        tipsLink: 'https://docs.primehub.io/docs/model-management#versioned-model-detail'
       },
     ];
 

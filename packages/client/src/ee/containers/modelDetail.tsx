@@ -134,6 +134,8 @@ class ModelDetailContainer extends React.Component<Props, State> {
         key: 'model',
         matcher: /\/models/,
         title: `Model: ${modelName}`,
+        tips: 'View the model information and versioned model list.',
+        tipsLink: 'https://docs.primehub.io/docs/model-management#versioned-model-list',
         onClick: () => {getModel.refetch()}
       }
     ];

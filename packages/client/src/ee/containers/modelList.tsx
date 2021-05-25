@@ -73,7 +73,9 @@ class ModelListContainer extends React.Component<Props, State> {
         key: 'list',
         matcher: /\/models/,
         title: 'Models',
-        onClick: () => {refetch()},
+        tips: 'Users can manage and version models here.',
+        tipsLink: 'https://docs.primehub.io/docs/model-management',
+        onClick: () => {refetch()}
       }
     ];
 
