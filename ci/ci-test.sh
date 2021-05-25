@@ -4,7 +4,7 @@ export K3D_VERSION=3.0.0-rc.6
 export K8S_VERSION=v1.17.7-k3s1
 export KUBECTL_VERSION=1.17.7
 export KC_VERSION=8.0.1
-export NODE_VERSION=v10
+export NODE_VERSION=14.17.0
 export CLUSTER_NAME=primehub
 
 wait_for_docker() {

@@ -1,19 +1,30 @@
 {
+  "private": true,
   "name": "@infuseai/watcher",
   "version": "1.0.0",
   "description": "",
+  "license": "Apache-2.0",
+  "author": "InfuseAI <dev@infuseai.io>",
+  "homepage": "https://github.com/InfuseAI/primehub-console#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/InfuseAI/primehub-console"
+  },
+  "bugs": {
+    "url": "https://github.com/InfuseAI/primehub-console/issues"
+  },
   "main": "index.js",
   "scripts": {
+    "build": "npm run clean && npm run lint && echo Using TypeScript && tsc --version && tsc -p ./tsconfig.json --pretty",
+    "build:prod": "npm run clean && echo Using TypeScript && tsc --version && tsc -p ./tsconfig.release.json --pretty",
+    "clean": "rimraf lib",
+    "coverage": "nyc npm run test",
+    "lint": "tslint --force --format verbose \"src/**/*.ts\" \"test/*\"",
     "start": "NODE_ENV=development ts-node src/bin/www.ts",
     "start:lib": "NODE_ENV=development node lib/bin/www",
     "start:prod": "NODE_ENV=production node lib/bin/www",
-    "clean": "rimraf lib",
-    "lint": "tslint --force --format verbose \"src/**/*.ts\" \"test/*\"",
-    "build": "npm run clean && npm run lint && echo Using TypeScript && tsc --version && tsc -p ./tsconfig.json --pretty",
-    "build:prod": "npm run clean && echo Using TypeScript && tsc --version && tsc -p ./tsconfig.release.json --pretty",
     "test": "TEST=true mocha --compilers ts:ts-node/register --exit --timeout 600000 --file \"test/setup.ts\"  --recursive \"test/**/*.spec.ts\"",
     "test:grep": "TEST=true mocha --compilers ts:ts-node/register --exit --timeout 600000 --file \"test/setup.ts\" --recursive",
-    "coverage": "nyc npm run test",
     "watch": "npm run build -- --watch",
     "watch:test": "npm run test -- --watch"
   },
@@ -71,14 +82,5 @@
     "ts-node": "^8.3.0",
     "tslint": "^5.18.0",
     "typescript": "^3.5.2"
-  },
-  "author": "InfuseAI",
-  "license": "Apache-2.0",
-  "licenses": [
-    {
-      "type": "Apache-2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0"
-    }
-  ],
-  "private": true
+  }
 }
