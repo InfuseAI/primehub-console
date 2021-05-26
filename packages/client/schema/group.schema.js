@@ -126,7 +126,7 @@ export default () => (
         </Layout>
       </Condition>
       <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
-        <ShareVolumn />
+        <ShareVolume />
       </Condition>
       <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
         <Block title="User Quota">
@@ -338,10 +338,10 @@ export default () => (
 )
 
 
-function ShareVolumn() {
+function ShareVolume() {
   return (
     <Default>
-      <Layout component={GenTipsLabel('Shared Volumn', 'The shared volume is shared storage among members in the group.', 'https://docs.primehub.io/docs/guide_manual/admin-group#shared-volume')}>
+      <Layout component={GenTipsLabel('Shared Volume', 'The shared volume is shared storage among members in the group.', 'https://docs.primehub.io/docs/guide_manual/admin-group#shared-volume')}>
         <boolean keyName="enabledSharedVolume"
           packageName="../src/cms-components/customize-boolean-enable_shared_volume"
         />
