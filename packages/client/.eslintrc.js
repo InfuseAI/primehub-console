@@ -49,10 +49,10 @@ module.exports = {
     // '@typescript-eslint/explicit-function-return-type': 'off',
     // '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-var-requires': 'off',
-    // '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
 
     'prettier/prettier': ['error', {}, { usePrettierrc: true }],
 
-    'no-console': [2, { allow: ['warn', 'error'] }],
+    'no-console': [1, { allow: ['warn', 'error'] }],
   },
 };

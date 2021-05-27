@@ -4,10 +4,8 @@
       "npmClientArgs": ["--ignore-engines"]
     }
   },
-  "packages": [
-    "packages/*"
-  ],
+  "packages": ["packages/*"],
   "npmClient": "yarn",
-  "version": "0.0.0",
+  "version": "independent",
   "useWorkspaces": true
 }
