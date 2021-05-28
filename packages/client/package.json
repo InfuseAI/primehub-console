@@ -13,9 +13,9 @@
   "bugs": {
     "url": "https://github.com/InfuseAI/primehub-console/issues"
   },
-  "main": "lib/index.js",
+  "main": "dist/main.js",
   "files": [
-    "lib"
+    "dist"
   ],
   "scripts": {
     "analyze": "webpack serve --env mode=development analyze",
