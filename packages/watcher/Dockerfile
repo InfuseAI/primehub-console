@@ -1,7 +1,5 @@
 FROM node:dubnium-slim AS build
 
-RUN npm i -g lerna
-
 # create app directory
 WORKDIR /usr/src/app
 
@@ -12,14 +10,14 @@ COPY packages/watcher packages/watcher
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
-RUN lerna bootstrap --scope=@infuseai/watcher
+RUN npx lerna bootstrap --scope=@infuseai/watcher
 
 RUN cd packages/graphql-server \
   && npm run build:prod \
   && cd ../watcher \
   && npm run build:prod
 
-RUN lerna bootstrap --scope=@infuseai/watcher -- --production
+RUN npx lerna bootstrap --scope=@infuseai/watcher -- --production
 
 # Run
 FROM node:dubnium-slim
