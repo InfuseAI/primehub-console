@@ -19,13 +19,13 @@ function getPlugins(env) {
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebPackPlugin({
       chunks: ['cms'],
-      template: 'public/index.html',
-      filename: 'cms.html',
+      template: '!!raw-loader!public/index.html',
+      filename: 'cms.ejs',
     }),
     new HtmlWebPackPlugin({
       chunks: ['main'],
-      template: 'public/index.html',
-      filename: 'index.html',
+      template: '!!raw-loader!public/index.html',
+      filename: 'index.ejs',
     }),
     new FaviconsWebpackPlugin({
       logo: './public/icon.svg',

@@ -151,9 +151,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     app.use(morgan(morganFormat));
   }
 
-  app.use(views(path.join(__dirname, './views'), {
-    extension: 'pug'
-  }));
+  app.use(views(path.resolve(__dirname, '../../client/dist'), { extension: 'ejs' }));
   const serveClientStatic = config.appPrefix
     ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../../client/dist'), {gzip: true, index: false}))
     : serve(path.resolve(__dirname, '../../client/dist'), {gzip: true, index: false});
@@ -185,7 +183,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   // main
   const homeConfig = yaml.safeLoad(fs.readFileSync(config.homeConfigPath, 'utf8'));
   rootRouter.get('/g', oidcCtrl.loggedIn, async ctx => {
-    await ctx.render('main', {
+    await ctx.render('index', {
       title: 'PrimeHub',
       staticPath,
       home: JSON.stringify({
@@ -202,7 +200,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
       ctx.cookies.set('apiToken', {path: staticPath});
     }
 
-    await ctx.render('main', {
+    await ctx.render('index', {
       title: 'PrimeHub',
       staticPath,
       home: JSON.stringify({
