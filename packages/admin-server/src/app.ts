@@ -97,6 +97,8 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     ctx.state.everyoneGroupId = config.keycloakEveryoneGroupId;
     ctx.state.jobDefaultActiveDeadlineSeconds = config.jobDefaultActiveDeadlineSeconds;
     ctx.state.primehubVersion = config.primehubVersion;
+    ctx.state.isUserAdmin = config.isUserAdmin;
+    ctx.state.newAccessToken = config.newAccessToken;
 
     // referrer
     const referrer = `${config.cmsHost}${ctx.path}`;
@@ -170,12 +172,18 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
 
   // favicon
   const serveStatic = config.appPrefix
-    ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../static'), {maxage: 86400000, index: false}))
-    : serve(path.resolve(__dirname, '../static'), {maxage: 86400000, index: false});
-  rootRouter.get('/favicon/*', serveStatic);
-  rootRouter.get('/js/*', serveStatic);
-  rootRouter.get('/font/*', serveStatic);
-  rootRouter.get('/css/*', serveStatic);
+    ? koaMount(
+        config.appPrefix,
+        serve(path.resolve(__dirname, '../clienet/dist/assets'), {
+          maxage: 86400000,
+          index: false,
+        })
+      )
+    : serve(path.resolve(__dirname, '../client/dist/assets'), {
+        maxage: 86400000,
+        index: false,
+      });
+  rootRouter.get('/assets/*', serveStatic);
 
   // oidc
   mountOidc(rootRouter, oidcCtrl);

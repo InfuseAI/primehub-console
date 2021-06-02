@@ -19,13 +19,18 @@ function getPlugins(env) {
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebPackPlugin({
       chunks: ['cms'],
-      template: '!!raw-loader!public/index.html',
-      filename: 'cms.ejs',
+      template: isDev ? 'public/index.html' : '!!raw-loader!public/index.ejs',
+      filename: isDev ? 'public/cms.html' : 'cms.ejs',
     }),
     new HtmlWebPackPlugin({
       chunks: ['main'],
-      template: '!!raw-loader!public/index.html',
-      filename: 'index.ejs',
+      template: isDev ? 'public/index.html' : '!!raw-loader!public/index.ejs',
+      filename: isDev ? 'public/main.html' : 'index.ejs',
+    }),
+    new HtmlWebPackPlugin({
+      chunks: ['login'],
+      template: '!!raw-loader!public/login.ejs',
+      filename: 'login.ejs',
     }),
     new FaviconsWebpackPlugin({
       logo: './public/icon.svg',

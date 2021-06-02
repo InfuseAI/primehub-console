@@ -76,6 +76,9 @@ export interface Config {
   jobDefaultActiveDeadlineSeconds: number;
   // primehub version
   primehubVersion: string;
+
+  isUserAdmin: boolean;
+  newAccessToken: string;
 }
 
 const defaultConfigs = {
@@ -117,7 +120,9 @@ const defaultConfigs = {
   licenseStatus: 'invalid',
   maxGroup: 999,
   jobDefaultActiveDeadlineSeconds: 86400,
-  primehubVersion: 'development'
+  primehubVersion: 'development',
+  isUserAdmin: false,
+  newAccessToken: '',
 };
 
 const prodConfigs = {

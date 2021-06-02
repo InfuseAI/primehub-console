@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>[DEV] PrimeHub</title>
+</head>
+
+<body>
+  <script>
+    if (location.pathname.startsWith('/app-prefix')) {
+      window.APP_PREFIX = '/app-prefix/';
+    } else {
+      window.APP_PREFIX = '<%= staticPath %>';
+      window.graphqlPrefix = '<%= graphqlPrefix %>';
+      window.graphqlEndpoint = '<%= graphqlEndpoint %>';
+      window.absGraphqlEndpoint = '<%= graphqlEndpoint %>';
+      window.cmsHost = '<%= cmsHost %>';
+      window.username = '<%= username %>';
+      window.thumbnail = '<%= thumbnail %>';
+      window.isUserAdmin = '<%= isUserAdmin %>';
+      window.accessTokenExp = '<%= accessTokenExp %>';
+      window.refreshTokenExp = '<%= refreshTokenExp %>';
+      window.EVERYONE_GROUP_ID = '<%= everyoneGroupId %>';
+      window.requestApiTokenEndpoint = '<%= requestApiTokenEndpoint %>';
+      window.enableLogPersistence = '<%= enableLogPersistence %>';
+      window.enableModelDeployment = '<%= enableModelDeployment %>';
+      window.jobDefaultActiveDeadlineSeconds = '<%= jobDefaultActiveDeadlineSeconds %>';
+      window.enablePhfs = '<%= enablePhfs %>';
+      window.enableJobArtifact = '<%= enableJobArtifact %>';
+      window.enableJobMonitoring = '<%= enableJobMonitoring %>';
+      window.enableApp = '<%= enableApp %>';
+      window.customImageSetup = '<%= customImageSetup %>';
+
+      if (window.newAccessToken) {
+        console.log('using new access token');
+        window.localStorage.setItem('canner.accessToken', newAccessToken);
+      }
+    }
+  </script>
+  <div id="root"></div>
+</body>
+
+</html>
