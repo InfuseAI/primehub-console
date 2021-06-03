@@ -8,8 +8,6 @@ import morgan from 'koa-morgan';
 
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import koaMount from 'koa-mount';
-import yaml from 'js-yaml';
-import fs from 'fs';
 
 // controller
 import { OidcCtrl, mount as mountOidc } from './oidc';
@@ -170,60 +168,46 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     return ctx.redirect(`${config.cmsHost}${config.appPrefix || ''}${home}`);
   });
 
-  // favicon
-  const serveStatic = config.appPrefix
-    ? koaMount(
-        config.appPrefix,
-        serve(path.resolve(__dirname, '../clienet/dist/assets'), {
-          maxage: 86400000,
-          index: false,
-        })
-      )
-    : serve(path.resolve(__dirname, '../client/dist/assets'), {
-        maxage: 86400000,
-        index: false,
-      });
-  rootRouter.get('/assets/*', serveStatic);
+  // assets
+  rootRouter.get(
+    '/assets/*',
+    serve(path.resolve(__dirname, '../client/dist/assets'), {
+      maxage: 86400000,
+      index: false,
+    })
+  );
 
   // oidc
   mountOidc(rootRouter, oidcCtrl);
 
   // main
-  const homeConfig = yaml.safeLoad(fs.readFileSync(config.homeConfigPath, 'utf8'));
   rootRouter.get('/g', oidcCtrl.loggedIn, async ctx => {
     await ctx.render('index', {
       title: 'PrimeHub',
       staticPath,
-      home: JSON.stringify({
-        services: homeConfig.services,
-        welcomeMessage: homeConfig.welcomeMessage
-      })
     });
   });
 
   rootRouter.get('/g/*', oidcCtrl.loggedIn, async ctx => {
-    const apiToken = ctx.cookies.get('apiToken', {signed: true});
+    const apiToken = ctx.cookies.get('apiToken', { signed: true });
+
     if (apiToken) {
-      ctx.state.apiToken = ctx.cookies.get('apiToken', {signed: true});
-      ctx.cookies.set('apiToken', {path: staticPath});
+      ctx.state.apiToken = ctx.cookies.get('apiToken', { signed: true });
+      ctx.cookies.set('apiToken', { path: staticPath });
     }
 
     await ctx.render('index', {
       title: 'PrimeHub',
       staticPath,
-      home: JSON.stringify({
-        services: homeConfig.services,
-        welcomeMessage: homeConfig.welcomeMessage
-      })
     });
   });
 
   // cms
   rootRouter.get('/cms', oidcCtrl.ensureAdmin, async ctx => {
-    await ctx.render('cms', {title: 'PrimeHub', staticPath});
+    await ctx.render('cms', { title: 'PrimeHub', staticPath });
   });
   rootRouter.get('/cms/*', oidcCtrl.ensureAdmin, async ctx => {
-    await ctx.render('cms', {title: 'PrimeHub', staticPath});
+    await ctx.render('cms', { title: 'PrimeHub', staticPath });
   });
 
   // proxy

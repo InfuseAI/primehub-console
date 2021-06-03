@@ -68,7 +68,6 @@
     "p-is-promise": "^2.0.0",
     "path-match": "^1.2.4",
     "pluralize": "^7.0.0",
-    "pug": "^2.0.3",
     "shortid": "^2.2.14"
   },
   "devDependencies": {
