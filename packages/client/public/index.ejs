@@ -14,6 +14,7 @@
       window.APP_PREFIX = '/app-prefix/';
     } else {
       window.APP_PREFIX = '<%= staticPath %>';
+      window.links = '<%- links %>';
       window.graphqlPrefix = '<%= graphqlPrefix %>';
       window.graphqlEndpoint = '<%= graphqlEndpoint %>';
       window.absGraphqlEndpoint = '<%= graphqlEndpoint %>';
@@ -24,6 +25,8 @@
       window.accessTokenExp = '<%= accessTokenExp %>';
       window.refreshTokenExp = '<%= refreshTokenExp %>';
       window.EVERYONE_GROUP_ID = '<%= everyoneGroupId %>';
+      window.everyoneGroupId = '<%= everyoneGroupId %>';
+      window.newAccessToken = '<%= newAccessToken %>';
       window.requestApiTokenEndpoint = '<%= requestApiTokenEndpoint %>';
       window.enableLogPersistence = '<%= enableLogPersistence %>';
       window.enableModelDeployment = '<%= enableModelDeployment %>';
@@ -33,6 +36,7 @@
       window.enableJobMonitoring = '<%= enableJobMonitoring %>';
       window.enableApp = '<%= enableApp %>';
       window.customImageSetup = '<%= customImageSetup %>';
+      window.primehubVersion = '<%= primehubVersion %>';
 
       if (window.newAccessToken) {
         console.log('using new access token');
