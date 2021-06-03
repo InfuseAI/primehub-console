@@ -20,12 +20,12 @@ function getPlugins(env) {
     new HtmlWebPackPlugin({
       chunks: ['cms'],
       template: isDev ? 'public/index.html' : '!!raw-loader!public/index.ejs',
-      filename: isDev ? 'public/cms.html' : 'cms.ejs',
+      filename: isDev ? 'cms.html' : 'cms.ejs',
     }),
     new HtmlWebPackPlugin({
       chunks: ['main'],
       template: isDev ? 'public/index.html' : '!!raw-loader!public/index.ejs',
-      filename: isDev ? 'public/main.html' : 'index.ejs',
+      filename: isDev ? 'index.html' : 'index.ejs',
     }),
     new HtmlWebPackPlugin({
       chunks: ['login'],
@@ -54,7 +54,15 @@ function getPlugins(env) {
 
   let plugins = {
     development: [...common],
-    production: [...common, new CompressionPlugin()],
+    production: [
+      ...common,
+      new HtmlWebPackPlugin({
+        chunks: ['login'],
+        template: '!!raw-loader!public/login.ejs',
+        filename: 'login.ejs',
+      }),
+      new CompressionPlugin(),
+    ],
   };
 
   if (isAnalyze) {
@@ -138,7 +146,6 @@ module.exports = (env) => {
     devServer: {
       hot: true,
       port: '8090',
-      stats: 'minimal',
       contentBase: path.join(__dirname, 'dist'),
       historyApiFallback: {
         rewrites: [
