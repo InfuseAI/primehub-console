@@ -124,6 +124,7 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
   // main
   rootRouter.get('/g', oidcCtrl.loggedIn, async ctx => {
     await ctx.render('index', {
+      title: 'PrimeHub',
       staticPath,
     });
   });
@@ -137,6 +138,7 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
     }
 
     await ctx.render('index', {
+      title: 'PrimeHub',
       staticPath,
     });
   });

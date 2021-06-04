@@ -20,11 +20,17 @@ function getPlugins(env) {
     new HtmlWebPackPlugin({
       chunks: ['cms'],
       template: isDev ? 'public/index.html' : '!!raw-loader!public/index.ejs',
+      templateParameters: {
+        title: !isDev ? '[Dev] PrimeHub' : 'PrimeHub',
+      },
       filename: isDev ? 'cms.html' : 'cms.ejs',
     }),
     new HtmlWebPackPlugin({
       chunks: ['main'],
       template: isDev ? 'public/index.html' : '!!raw-loader!public/index.ejs',
+      templateParameters: {
+        title: !isDev ? '[Dev] PrimeHub' : 'PrimeHub',
+      },
       filename: isDev ? 'index.html' : 'index.ejs',
     }),
     new HtmlWebPackPlugin({

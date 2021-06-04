@@ -19,9 +19,9 @@
   ],
   "scripts": {
     "analyze": "webpack serve --env mode=development analyze",
-    "build": "webpack --env mode=production schema=ee",
-    "build:ce": "webpack --env mode=production schema=ce",
-    "build:model_deploy": "webpack --env mode=production schema=modelDeploy",
+    "build": "npm run clean && webpack --env mode=production schema=ee",
+    "build:ce": "npm run clean && webpack --env mode=production schema=ce",
+    "build:model_deploy": "npm run clean && webpack --env mode=production schema=modelDeploy",
     "clean": "rimraf dist",
     "lint": "eslint .",
     "start": "webpack serve --env mode=development schema=ee",
