@@ -95,10 +95,7 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
     views(path.resolve(__dirname, '../../client/dist'), { extension: 'ejs' })
   );
   app.use(
-    serve(path.resolve(__dirname, '../../client/dist'), {
-      gzip: true,
-      index: false,
-    })
+    serve(path.resolve(__dirname, '../../client/dist'), { index: false })
   );
 
   // router
@@ -127,7 +124,6 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
   // main
   rootRouter.get('/g', oidcCtrl.loggedIn, async ctx => {
     await ctx.render('index', {
-      title: 'PrimeHub',
       staticPath,
     });
   });
@@ -141,17 +137,16 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
     }
 
     await ctx.render('index', {
-      title: 'PrimeHub',
       staticPath,
     });
   });
 
   // cms
   rootRouter.get('/cms', oidcCtrl.ensureAdmin, async ctx => {
-    await ctx.render('cms', { title: 'PrimeHub', staticPath });
+    await ctx.render('cms', { staticPath });
   });
   rootRouter.get('/cms/*', oidcCtrl.ensureAdmin, async ctx => {
-    await ctx.render('cms', { title: 'PrimeHub', staticPath });
+    await ctx.render('cms', { staticPath });
   });
 
   // proxy

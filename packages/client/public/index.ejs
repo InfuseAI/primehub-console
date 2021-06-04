@@ -5,7 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>[DEV] PrimeHub</title>
+  <title>PrimeHub</title>
 </head>
 
 <body>
@@ -28,15 +28,19 @@
       window.everyoneGroupId = '<%= everyoneGroupId %>';
       window.newAccessToken = '<%= newAccessToken %>';
       window.requestApiTokenEndpoint = '<%= requestApiTokenEndpoint %>';
+      window.jobDefaultActiveDeadlineSeconds = '<%= jobDefaultActiveDeadlineSeconds %>';
+      window.customImageSetup = '<%= customImageSetup %>';
+      window.primehubVersion = '<%= primehubVersion %>';
+
       window.enableLogPersistence = '<%= enableLogPersistence %>';
       window.enableModelDeployment = '<%= enableModelDeployment %>';
-      window.jobDefaultActiveDeadlineSeconds = '<%= jobDefaultActiveDeadlineSeconds %>';
       window.enablePhfs = '<%= enablePhfs %>';
       window.enableJobArtifact = '<%= enableJobArtifact %>';
       window.enableJobMonitoring = '<%= enableJobMonitoring %>';
       window.enableApp = '<%= enableApp %>';
-      window.customImageSetup = '<%= customImageSetup %>';
-      window.primehubVersion = '<%= primehubVersion %>';
+      window.enableCustomImage = '<%= enableCustomImage%>';
+      window.enableUsageReport = '<%= enableUsageReport%>';
+      window.enableGrafana = '<%= enableGrafana %>';
 
       if (window.newAccessToken) {
         console.log('using new access token');
