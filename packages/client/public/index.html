@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title><%= title %></title>
+</head>
+
+<body>
+  <script>
+    if (location.pathname.startsWith('/app-prefix')) {
+      window.APP_PREFIX = '/app-prefix/';
+    } else {
+      window.APP_PREFIX = '/';
+      window.development = true;
+      window.enableCustomImage = true;
+      window.isUserAdmin = true;
+      window.customImageSetup = true;
+      window.enableLogPersistence = true;
+      window.enableMaintenanceNotebook = true;
+      window.enableGrafana = true;
+      window.enableUsageReport = true;
+      window.enableModelDeployment = true;
+      window.enablePhfs = true;
+      window.enableApp = true;
+      window.enableJobArtifact = true;
+      window.disableMode = false;
+      window.absGraphqlEndpoint = 'http://localhost:3001/api/graphql';
+      window.requestApiTokenEndpoint =
+        'http://localhost:3000/oidc/request-api-token';
+      window.primehubVersion = 'development';
+    }
+  </script>
+  <div id="root"></div>
+</body>
+
+</html>

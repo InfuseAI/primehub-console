@@ -1,5 +1,5 @@
 module.exports = {
-  presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-flow'],
+  presets: ['@babel/preset-env', '@babel/preset-react'],
   plugins: [
     '@babel/plugin-transform-modules-commonjs',
     [
@@ -9,12 +9,6 @@ module.exports = {
       },
     ],
     '@babel/plugin-proposal-class-properties',
-    [
-      'import',
-      {
-        libraryName: 'antd',
-        style: true, // or 'css'
-      },
-    ],
+    'styled-components',
   ],
 };

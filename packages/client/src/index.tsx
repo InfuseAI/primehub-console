@@ -83,3 +83,5 @@ ReactDOM.render(
   </IntlProvider>
 , document.getElementById('root'));
 
+// @ts-ignore
+if (module.hot) module.hot.accept();

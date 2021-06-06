@@ -43,13 +43,18 @@ export interface Props extends GroupContextComponentProps {
 
 class HeaderContainer extends React.Component<Props, {}> {
   onClickMenu = (item: any) => {
-    const links = (window as any).links || {
-      userProfileLink: '',
-      changePasswordLink: '',
-      apiTokenLink: '/api-token',
-      adminPortalLink: '/cms',
-      logoutLink: '',
-    }
+    const isGlobalLinksExist = (window as any).links;
+    const links =
+      isGlobalLinksExist && typeof isGlobalLinksExist === 'string'
+        ? JSON.parse(isGlobalLinksExist)
+        : {
+            userProfileLink: '',
+            changePasswordLink: '',
+            apiTokenLink: '/api-token',
+            adminPortalLink: '/cms',
+            logoutLink: '',
+          };
+
     switch (item.key) {
       case 'userProfile': {
         (window as any).location.href = links.userProfileLink;

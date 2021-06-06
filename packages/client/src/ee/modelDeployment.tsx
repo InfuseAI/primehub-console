@@ -432,3 +432,6 @@ tokenSyncWorker.run().catch(console.error);
 ReactDOM.render(
   <Job />
 , document.getElementById('root'));
+
+// @ts-ignore
+if (module.hot) module.hot.accept();
