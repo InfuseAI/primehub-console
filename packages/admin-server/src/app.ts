@@ -6,6 +6,7 @@ import serve from 'koa-static';
 import Router from 'koa-router';
 import morgan from 'koa-morgan';
 import Agent, { HttpsAgent } from 'agentkeepalive';
+import koaMount from 'koa-mount';
 
 // controller
 import { OidcCtrl, mount as mountOidc } from './oidc';
@@ -94,9 +95,10 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
   app.use(
     views(path.resolve(__dirname, '../../client/dist'), { extension: 'ejs' })
   );
-  app.use(
-    serve(path.resolve(__dirname, '../../client/dist'), { index: false })
-  );
+  const serveClientStatic = config.appPrefix
+    ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../../client/dist'), {gzip: true, index: false}))
+    : serve(path.resolve(__dirname, '../../client/dist'), {gzip: true, index: false});
+  app.use(serveClientStatic);
 
   // router
   const rootRouter = new Router({
