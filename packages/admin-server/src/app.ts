@@ -142,10 +142,16 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
 
   // cms
   rootRouter.get('/cms', oidcCtrl.ensureAdmin, async ctx => {
-    await ctx.render('cms', { staticPath });
+    await ctx.render('cms', {
+      title: 'PrimeHub',
+      staticPath,
+    });
   });
   rootRouter.get('/cms/*', oidcCtrl.ensureAdmin, async ctx => {
-    await ctx.render('cms', { staticPath });
+    await ctx.render('cms', {
+      title: 'PrimeHub',
+      staticPath,
+    });
   });
 
   // proxy
