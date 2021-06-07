@@ -4,7 +4,6 @@ const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const tsImportPluginFactory = require('ts-import-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
-const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 const { theme } = require('./package.json');
@@ -15,22 +14,23 @@ function getPlugins(env) {
   const isDev = currentEnv === 'development';
   const isAnalyze = env.analyze || false;
 
+  const htmlWebpackPluginConfig = {
+    template: isDev ? 'public/index.html' : '!!raw-loader!public/index.ejs',
+    templateParameters: {
+      title: isDev ? '[Dev] PrimeHub' : 'PrimeHub',
+    },
+    favicon: isDev ? 'public/icon.svg' : '',
+  };
   const common = [
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebPackPlugin({
+      ...htmlWebpackPluginConfig,
       chunks: ['cms'],
-      template: isDev ? 'public/index.html' : '!!raw-loader!public/index.ejs',
-      templateParameters: {
-        title: !isDev ? '[Dev] PrimeHub' : 'PrimeHub',
-      },
       filename: isDev ? 'cms.html' : 'cms.ejs',
     }),
     new HtmlWebPackPlugin({
+      ...htmlWebpackPluginConfig,
       chunks: ['main'],
-      template: isDev ? 'public/index.html' : '!!raw-loader!public/index.ejs',
-      templateParameters: {
-        title: !isDev ? '[Dev] PrimeHub' : 'PrimeHub',
-      },
       filename: isDev ? 'index.html' : 'index.ejs',
     }),
     new HtmlWebPackPlugin({
@@ -118,7 +118,7 @@ module.exports = (env) => {
     output: {
       path: path.join(__dirname, 'dist'),
       filename: '[name].js',
-      publicPath: isDev ? '/' : '<%=staticPath%>',
+      publicPath: isDev ? '/' : '<%= staticPath %>',
     },
     resolve: {
       extensions: ['.js', 'jsx', '.ts', '.tsx', '.graphql'],
