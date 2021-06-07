@@ -10,9 +10,9 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { theme } = require('./package.json');
 
 function getPlugins(env) {
-  const { mode: currEnv } = env;
+  const { mode: currentEnv } = env;
 
-  const isDev = currEnv === 'development';
+  const isDev = currentEnv === 'development';
   const isAnalyze = env.analyze || false;
 
   const common = [
@@ -37,15 +37,6 @@ function getPlugins(env) {
       chunks: ['login'],
       template: '!!raw-loader!public/login.ejs',
       filename: 'login.ejs',
-    }),
-    new FaviconsWebpackPlugin({
-      logo: './public/icon.svg',
-      favicons: {
-        appName: 'PrimeHub',
-        appDescription:
-          'An all-in-one machine learning platform for enterprises in a single click.',
-        developerName: 'InfuseAI',
-      },
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({
@@ -78,7 +69,7 @@ function getPlugins(env) {
     ];
   }
 
-  return plugins[currEnv];
+  return plugins[currentEnv];
 }
 
 function getSchema(env) {
@@ -97,6 +88,7 @@ function getSchema(env) {
 
 module.exports = (env) => {
   const { mode: currentEnv } = env;
+  const isDev = currentEnv === 'development';
 
   const stylesLoader = [MiniCssExtractPlugin.loader, 'css-loader'];
   const configs = {
@@ -119,7 +111,6 @@ module.exports = (env) => {
   };
 
   return {
-    stats: 'minimal',
     context: path.resolve(process.cwd()),
     mode: configs[currentEnv].mode,
     devtool: configs[currentEnv].devtool,
@@ -127,7 +118,7 @@ module.exports = (env) => {
     output: {
       path: path.join(__dirname, 'dist'),
       filename: '[name].js',
-      publicPath: '/',
+      publicPath: isDev ? '/' : '<%=staticPath%>',
     },
     resolve: {
       extensions: ['.js', 'jsx', '.ts', '.tsx', '.graphql'],

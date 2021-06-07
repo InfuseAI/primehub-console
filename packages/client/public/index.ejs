@@ -13,7 +13,7 @@
     if (location.pathname.startsWith('/app-prefix')) {
       window.APP_PREFIX = '/app-prefix/';
     } else {
-      window.APP_PREFIX = '<%= staticPath %>';
+      window.APP_PREFIX = '<%= staticPath %>/';
       window.links = '<%- links %>';
       window.graphqlPrefix = '<%= graphqlPrefix %>';
       window.graphqlEndpoint = '<%= graphqlEndpoint %>';

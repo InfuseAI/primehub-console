@@ -22,7 +22,7 @@ import * as logger from './logger';
 
 export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
   const config = createConfig();
-  const staticPath = config.appPrefix ? `${config.appPrefix}/` : '/';
+  const staticPath = config.appPrefix ? config.appPrefix : '';
 
   // construct http agent
   const httpAgent = new Agent({
@@ -110,15 +110,10 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
   rootRouter.get(['/', '/landing'], async (ctx: any) => {
     return ctx.redirect(`${config.cmsHost}${config.appPrefix || ''}${home}`);
   });
-
-  // assets
-  rootRouter.get(
-    '/assets/*',
-    serve(path.resolve(__dirname, '../client/dist/assets'), {
-      maxage: 86400000,
-      index: false,
-    })
-  );
+  const serveStatic = config.appPrefix
+    ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../static'), {maxage: 86400000, index: false}))
+    : serve(path.resolve(__dirname, '../static'), {maxage: 86400000, index: false});
+  rootRouter.get('/favicon/*', serveStatic);
 
   // oidc
   mountOidc(rootRouter, oidcCtrl);
