@@ -111,9 +111,18 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
     return ctx.redirect(`${config.cmsHost}${config.appPrefix || ''}${home}`);
   });
   const serveStatic = config.appPrefix
-    ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../static'), {maxage: 86400000, index: false}))
-    : serve(path.resolve(__dirname, '../static'), {maxage: 86400000, index: false});
-  rootRouter.get('/favicon/*', serveStatic);
+    ? koaMount(
+        config.appPrefix,
+        serve(path.resolve(__dirname, '../static'), {
+          maxage: 86400000,
+          index: false,
+        })
+      )
+    : serve(path.resolve(__dirname, '../static'), {
+        maxage: 86400000,
+        index: false,
+      });
+  rootRouter.get('/assets/*', serveStatic);
 
   // oidc
   mountOidc(rootRouter, oidcCtrl);
