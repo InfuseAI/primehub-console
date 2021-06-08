@@ -102,7 +102,7 @@ module.exports = (env) => {
     },
     production: {
       mode: 'production',
-      devtool: 'none',
+      devtool: false,
       entry: {
         cms: ['./src/public-import.js', './src/ee/index.tsx'],
         main: ['./src/public-import.js', './src/ee/main.tsx'],
