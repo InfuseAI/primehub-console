@@ -113,12 +113,15 @@ module.exports = (env) => {
   return {
     context: path.resolve(process.cwd()),
     mode: configs[currentEnv].mode,
-    devtool: configs[currentEnv].devtool,
+    devtool: configs[currentEnv].devtool == 'true',
     entry: configs[currentEnv].entry,
     output: {
       path: path.join(__dirname, 'dist'),
       filename: '[name].js',
       publicPath: isDev ? '/' : '<%= staticPath %>',
+    },
+    optimization: {
+      minimize: false,
     },
     resolve: {
       extensions: ['.js', 'jsx', '.ts', '.tsx', '.graphql'],
@@ -184,7 +187,7 @@ module.exports = (env) => {
               loader: 'canner-schema-loader',
             },
             {
-              loader: 'babel-loader',
+              loader: 'babel-loader?cacheDirectory',
             },
           ],
         },
@@ -192,7 +195,7 @@ module.exports = (env) => {
           test: /\.js$/,
           exclude: /node_modules/,
           use: {
-            loader: 'babel-loader',
+            loader: 'babel-loader?cacheDirectory',
           },
         },
         {
