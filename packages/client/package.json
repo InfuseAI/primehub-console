@@ -19,16 +19,17 @@
   ],
   "scripts": {
     "analyze": "webpack serve --env mode=development analyze",
-    "build": "npm run clean && webpack --env devtool=false mode=production schema=ee --progress",
-    "build:ce": "npm run clean && webpack --env devtool=false mode=production schema=ce --progress",
-    "build:model_deploy": "npm run clean && webpack --env devtool=false mode=production schema=modelDeploy --progress",
+    "build": "npm run clean && webpack --env mode=production schema=ee --progress",
+    "build:ce": "npm run clean && webpack --env mode=production schema=ce --progress",
+    "build:model_deploy": "npm run clean && webpack --env mode=production schema=modelDeploy --progress",
     "clean": "rimraf dist",
     "lint": "eslint .",
     "start": "webpack serve --env mode=development schema=ee --progress",
     "start:ce": "webpack serve --env mode=development schema=ce --progress",
     "start:model_deploy": "webpack serve --env mode=development schema=modelDeploy --progress",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "watch": "webpack --env mode=developement schema=ee --progress --watch"
   },
   "dependencies": {
     "@uppy/core": "^1.15.0",

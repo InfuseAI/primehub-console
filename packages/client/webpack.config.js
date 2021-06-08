@@ -94,7 +94,7 @@ module.exports = (env) => {
   const configs = {
     development: {
       mode: 'development',
-      devtool: 'inline-source-map',
+      devtool: 'eval-cheap-source-map',
       entry: {
         cms: './src/ee/index.tsx',
         main: './src/ee/main.tsx',
@@ -102,7 +102,7 @@ module.exports = (env) => {
     },
     production: {
       mode: 'production',
-      devtool: 'hidden-source-map',
+      devtool: 'none',
       entry: {
         cms: ['./src/public-import.js', './src/ee/index.tsx'],
         main: ['./src/public-import.js', './src/ee/main.tsx'],
@@ -113,7 +113,7 @@ module.exports = (env) => {
   return {
     context: path.resolve(process.cwd()),
     mode: configs[currentEnv].mode,
-    devtool: configs[currentEnv].devtool == 'true',
+    devtool: configs[currentEnv].devtool,
     entry: configs[currentEnv].entry,
     output: {
       path: path.join(__dirname, 'dist'),
