@@ -94,7 +94,7 @@ module.exports = (env) => {
   const configs = {
     development: {
       mode: 'development',
-      devtool: 'inline-source-map',
+      devtool: 'eval-cheap-source-map',
       entry: {
         cms: './src/ee/index.tsx',
         main: './src/ee/main.tsx',
@@ -102,7 +102,7 @@ module.exports = (env) => {
     },
     production: {
       mode: 'production',
-      devtool: 'hidden-source-map',
+      devtool: false,
       entry: {
         cms: ['./src/public-import.js', './src/ee/index.tsx'],
         main: ['./src/public-import.js', './src/ee/main.tsx'],
@@ -119,6 +119,9 @@ module.exports = (env) => {
       path: path.join(__dirname, 'dist'),
       filename: '[name].js',
       publicPath: isDev ? '/' : '<%= staticPath %>',
+    },
+    optimization: {
+      minimize: false,
     },
     resolve: {
       extensions: ['.js', 'jsx', '.ts', '.tsx', '.graphql'],
@@ -184,7 +187,7 @@ module.exports = (env) => {
               loader: 'canner-schema-loader',
             },
             {
-              loader: 'babel-loader',
+              loader: 'babel-loader?cacheDirectory',
             },
           ],
         },
@@ -192,7 +195,7 @@ module.exports = (env) => {
           test: /\.js$/,
           exclude: /node_modules/,
           use: {
-            loader: 'babel-loader',
+            loader: 'babel-loader?cacheDirectory',
           },
         },
         {
