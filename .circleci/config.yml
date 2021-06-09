@@ -263,11 +263,11 @@ jobs:
 
 workflows:
   version: 2
-  test:
-    jobs:
-      - client-unit-test
-      - graphql-unit-test
-      - graphql-integration-test
+  #test:
+  #jobs:
+  #- client-unit-test
+  #- graphql-unit-test
+  #- graphql-integration-test
   build_and_push:
     jobs:
       - graphql-integration-test:
