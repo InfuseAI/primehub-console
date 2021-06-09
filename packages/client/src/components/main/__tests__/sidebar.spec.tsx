@@ -1,8 +1,6 @@
 import * as React from 'react';
-import { Sidebar } from 'components/main/sidebar';
-import { MemoryRouter } from 'react-router';
-
-import { render } from 'test/test-utils';
+import { Sidebar } from '../sidebar';
+import { render, screen } from 'test/test-utils';
 import { MainPageSidebarItem } from 'containers/mainPage';
 
 function setup() {
@@ -12,15 +10,65 @@ function setup() {
       subPath: 'hub',
       icon: '',
     },
+    {
+      title: 'Setting',
+      subPath: 'settings',
+      icon: '',
+      groupAdminOnly: true,
+    },
   ];
+
+  const userContext = {
+    id: '1',
+    username: 'test',
+    isCurrentGroupAdmin: false,
+  };
+
+  const routeComponentPropsMock = {
+    history: {
+      location: {
+        pathname: '/g/test-group/home',
+      },
+    } as any,
+    location: {} as any,
+    match: {
+      params: {
+        groupName: 'test-group',
+      },
+    } as any,
+  };
 
   return {
     sidebarItems,
+    userContext,
+    routeComponentPropsMock,
   };
 }
 
-describe('Sidebar', () => {
-  it('should render sidebar', () => {
-    expect(true).toBe(true);
+describe('Sidebar Component', () => {
+  it('Should render sidebar w/ sidebarItems.', () => {
+    const { sidebarItems, userContext, routeComponentPropsMock } = setup();
+    render(
+      <Sidebar
+        {...routeComponentPropsMock}
+        sidebarItems={sidebarItems}
+        userContext={userContext}
+      />
+    );
+    expect(screen.queryByText('Notebooks')).toBeInTheDocument();
+    expect(screen.queryByText('Setting')).not.toBeInTheDocument();
+  });
+
+  it('Should render admin items if user is groupAdmin', () => {
+    const { sidebarItems, userContext, routeComponentPropsMock } = setup();
+    userContext.isCurrentGroupAdmin = true;
+    render(
+      <Sidebar
+        {...routeComponentPropsMock}
+        sidebarItems={sidebarItems}
+        userContext={userContext}
+      />
+    );
+    expect(screen.queryByText('Setting')).toBeInTheDocument();
   });
 });

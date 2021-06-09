@@ -11,6 +11,7 @@
     "esModuleInterop": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "noImplicitAny": false,
     // FIXME: It might be removed in the future
     "experimentalDecorators": true,
     "removeComments": false,
@@ -18,7 +19,7 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "sourceMap": true,
-    "strict": true,
+    "strict": false,
     "lib": ["dom", "dom.iterable", "esnext"],
     "paths": {
       "utils/*": ["./src/utils/*"],
