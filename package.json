@@ -27,7 +27,7 @@
     "**/**/puppeteer": "^1.13.0",
     "**/**/elliptic": "^6.5.3",
     "**/**/serialize-javascript": "^3.1.0",
-    "**/**/yargs-parser": "^13.1.2",
+    "**/**/yargs-parser": "^20.2.7",
     "**/**/websocket-extensions": "^0.1.4",
     "**/**/canner": "2.1.7"
   },

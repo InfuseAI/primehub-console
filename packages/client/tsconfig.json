@@ -9,14 +9,13 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     // FIXME: It might be removed in the future
     "experimentalDecorators": true,
     "removeComments": false,
     "resolveJsonModule": true,
-    // FIXME:
-    "isolatedModules": false,
+    "isolatedModules": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
