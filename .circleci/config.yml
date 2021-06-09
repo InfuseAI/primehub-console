@@ -226,6 +226,18 @@ jobs:
             cd packages/graphql-server
             yarn install
             yarn run test:build
+  client-unit-test:
+    docker:
+      - image: cimg/node:14.17.0
+    steps:
+      - checkout
+      - run:
+          name: Unit tests
+          command: |
+            cd ~/project/packages/client
+            yarn install
+            yarn jest
+
   graphql-unit-test:
     docker:
       - image: cimg/node:14.17.0
@@ -253,6 +265,7 @@ workflows:
   version: 2
   test:
     jobs:
+      - client-unit-test
       - graphql-unit-test
       - graphql-integration-test
   build_and_push:
@@ -263,14 +276,14 @@ workflows:
               only: /.*/
       - latest-console:
           requires:
-            - graphql-lint
+            - client-unit-test
           filters:
             branches:
               only:
                 - master
       - latest-console-others:
           requires:
-            - graphql-lint
+            - client-unit-test
           filters:
             branches:
               only:
@@ -278,20 +291,20 @@ workflows:
       - latest-graphql:
           requires:
             - graphql-lint
+            - graphql-unit-test
+            - graphql-integration-test
           filters:
             branches:
               only:
                 - master
       - latest-watcher:
-          requires:
-            - graphql-lint
           filters:
             branches:
               only:
                 - master
       - release-console:
           requires:
-            - graphql-lint
+            - client-unit-test
           filters:
             tags:
               only: /.*/
@@ -299,7 +312,7 @@ workflows:
               ignore: /.*/
       - release-console-others:
           requires:
-            - graphql-lint
+            - client-unit-test
           filters:
             tags:
               only: /.*/
@@ -308,14 +321,14 @@ workflows:
       - release-graphql:
           requires:
             - graphql-lint
+            - graphql-unit-test
+            - graphql-integration-test
           filters:
             tags:
               only: /.*/
             branches:
               ignore: /.*/
       - release-watcher:
-          requires:
-            - graphql-lint
           filters:
             tags:
               only: /.*/
