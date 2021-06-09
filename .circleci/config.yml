@@ -243,9 +243,9 @@ jobs:
           environment:
             JEST_JUNIT_OUTPUT_DIR: ./reports/junit
       - store_test_results:
-        path: ./reports/junit/
+          path: ./reports/junit/
       - store_artifacts:
-        path: ./reports/junit
+          path: ./reports/junit
   graphql-unit-test:
     docker:
       - image: cimg/node:14.17.0
