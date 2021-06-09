@@ -409,9 +409,9 @@ class CreateForm extends React.Component<Props, State> {
                 </span>
               )} >
                 {form.getFieldDecorator('activeDeadlineSeconds', {
-                  initialValue: activeDeadlineSeconds ? activeDeadlineSeconds : defaultActiveDeadlineSeconds,
+                  initialValue: activeDeadlineSeconds ? +activeDeadlineSeconds : +defaultActiveDeadlineSeconds,
                 })(
-                  <NumberWithSelectMultipler 
+                  <NumberWithSelectMultipler
                     uiParams={{
                       options: [{
                         text: 'Minutes',
