@@ -232,12 +232,20 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Unit tests
+          name: Install JUnit coverage reporter
+          command: yarn add --dev jest-junit
+      - run:
+          name: Run Unit tests with JUnit as reporter
           command: |
             cd ~/project/packages/client
             yarn install
-            yarn jest
-
+            yarn jest -- -ci --runInBand --reporters=default --reporters=jest-junit
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: ./reports/junit
+      - store_test_results:
+        path: ./reports/junit/
+      - store_artifacts:
+        path: ./reports/junit
   graphql-unit-test:
     docker:
       - image: cimg/node:14.17.0
