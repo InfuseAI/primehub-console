@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Layout, Menu, Divider } from 'antd';
-import { BrowserRouter, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { appPrefix } from 'utils/env';
 import { withRouter, RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
@@ -128,7 +128,6 @@ export class Sidebar extends React.Component<Props> {
 
     return (
       <Layout.Sider style={{ position: 'fixed', height: '100%' }}>
-      <BrowserRouter>
         <Menu theme="dark" selectedKeys={[key]}>
           <Menu.Item key="home" style={{ marginTop: 0, paddingLeft: 26 }}>
             <Link to={group ? `${appPrefix}g/${group}/home` : `${appPrefix}g`}>
@@ -144,7 +143,6 @@ export class Sidebar extends React.Component<Props> {
             ? this.renderSidebarItems(sidebarItems, group)
             : []}
         </Menu>
-      </BrowserRouter>
       </Layout.Sider>
     );
   }
