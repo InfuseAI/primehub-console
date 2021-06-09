@@ -7,7 +7,7 @@ import {genClient} from 'canner/lib/components/index';
 import R from '@canner/history-router';
 import ContentHeader from 'components/header';
 import Error from 'components/error';
-import styled, {injectGlobal} from 'styled-components';
+import styled, {createGlobalStyle} from 'styled-components';
 import color from 'styledShare/color';
 import {RouteComponentProps} from 'react-router';
 import myLocales from './utils/locales';
@@ -48,7 +48,7 @@ export const Logo = styled.img`
   width: 100%;
 `;
 
-injectGlobal`
+const GlobalStyle = createGlobalStyle`
   .ant-menu-dark.ant-menu-submenu-popup {
     position: fixed;
   }
@@ -349,6 +349,7 @@ export default class CMSPage extends React.Component<Props, State> {
 
     return (
       <Layout style={{minHeight: '100vh'}}>
+        <GlobalStyle />
         <ContentHeader/>
         <Layout style={{marginTop: 64}}>
           <Sider style={{
