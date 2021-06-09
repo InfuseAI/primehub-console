@@ -4,7 +4,6 @@ import {FormComponentProps} from 'antd/lib/form';
 import {get, startCase} from 'lodash';
 import RecurrenceInput, {RecurrenceType, recurrenceValidator} from 'ee/components/schedule/recurrence';
 import Message from 'components/share/message';
-import styled from 'styled-components';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 import NumberWithSelectMultipler from '../../../cms-components/customize-number-with_select_multiplier';
 
@@ -12,7 +11,7 @@ const { Option } = Select;
 
 type Props = FormComponentProps & {
   showResources: boolean;
-  refetchGroup: Function;
+  refetchGroup?: Function;
   groupContext?: any;
   groups: Array<Record<string, any>>;
   onSelectGroup: Function;

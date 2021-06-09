@@ -1,4 +1,9 @@
 module.exports = {
+  globals: {
+    'ts-jest': {
+      diagnostics: false,
+    },
+  },
   moduleFileExtensions: ['js', 'ts', 'tsx'],
   moduleNameMapper: {
     '^test/(.*)': '<rootDir>/test/$1',
@@ -28,6 +33,7 @@ module.exports = {
   testPathIgnorePatterns: ['/node_modules/', '/dist/', '/schema'],
   transformIgnorePatterns: ['/node_modules/', '/dist/', '/schema'],
   transform: {
+    '\\.(gql|graphql)$': 'jest-transform-graphql',
     '\\.tsx?$': 'ts-jest',
     '\\.[j]sx?$': 'babel-jest',
   },

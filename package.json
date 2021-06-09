@@ -22,7 +22,7 @@
     "packages/*"
   ],
   "resolutions": {
-    "apollo-client": "2.4.7",
+    "apollo-client": "2.6.3",
     "apollo-boost": "0.1.22",
     "**/**/puppeteer": "^1.13.0",
     "**/**/elliptic": "^6.5.3",

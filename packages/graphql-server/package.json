@@ -138,6 +138,7 @@
     "cucumber": "^5.1.0",
     "faker": "^4.1.0",
     "imgur": "^0.3.1",
+    "jest-transform-graphql": "^2.1.0",
     "mocha": "^5.2.0",
     "nyc": "^11.6.0",
     "puppeteer": "^1.13.0",
