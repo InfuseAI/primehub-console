@@ -226,6 +226,32 @@ jobs:
             cd packages/graphql-server
             yarn install
             yarn run test:build
+  client-unit-test:
+    docker:
+      - image: cimg/node:14.17.0
+    steps:
+      - checkout
+      - run:
+          name: Prepare yarn dependencies
+          command: |
+            cd ~/project/packages/client
+            yarn install
+      - run:
+          name: Install JUnit coverage reporter
+          command: |
+            cd ~/project/packages/client
+            yarn add --dev jest-junit
+      - run:
+          name: Run Unit tests with JUnit as reporter
+          command: |
+            cd ~/project/packages/client
+            yarn jest -- -ci --runInBand --reporters=default --reporters=jest-junit
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: ./reports/junit
+      - store_test_results:
+          path: ./packages/client/reports/junit/
+      - store_artifacts:
+          path: ./packages/client/reports/junit
   graphql-unit-test:
     docker:
       - image: cimg/node:14.17.0
@@ -251,26 +277,39 @@ jobs:
 
 workflows:
   version: 2
-  test:
-    jobs:
-      - graphql-unit-test
-      - graphql-integration-test
+  #test:
+  #jobs:
+  #- client-unit-test
+  #- graphql-unit-test
+  #- graphql-integration-test
   build_and_push:
     jobs:
+      - graphql-integration-test:
+          filters:
+            tags:
+              only: /.*/
+      - graphql-unit-test:
+          filters:
+            tags:
+              only: /.*/
+      - client-unit-test:
+          filters:
+            tags:
+              only: /.*/
       - graphql-lint:
           filters:
             tags:
               only: /.*/
       - latest-console:
           requires:
-            - graphql-lint
+            - client-unit-test
           filters:
             branches:
               only:
                 - master
       - latest-console-others:
           requires:
-            - graphql-lint
+            - client-unit-test
           filters:
             branches:
               only:
@@ -278,20 +317,20 @@ workflows:
       - latest-graphql:
           requires:
             - graphql-lint
+            - graphql-unit-test
+            - graphql-integration-test
           filters:
             branches:
               only:
                 - master
       - latest-watcher:
-          requires:
-            - graphql-lint
           filters:
             branches:
               only:
                 - master
       - release-console:
           requires:
-            - graphql-lint
+            - client-unit-test
           filters:
             tags:
               only: /.*/
@@ -299,7 +338,7 @@ workflows:
               ignore: /.*/
       - release-console-others:
           requires:
-            - graphql-lint
+            - client-unit-test
           filters:
             tags:
               only: /.*/
@@ -308,14 +347,14 @@ workflows:
       - release-graphql:
           requires:
             - graphql-lint
+            - graphql-unit-test
+            - graphql-integration-test
           filters:
             tags:
               only: /.*/
             branches:
               ignore: /.*/
       - release-watcher:
-          requires:
-            - graphql-lint
           filters:
             tags:
               only: /.*/

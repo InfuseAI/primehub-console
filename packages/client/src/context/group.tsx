@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 
 export interface GroupContextValue {
   id: string;
@@ -9,7 +9,8 @@ export interface GroupContextValue {
   enabledDeployment: boolean;
 }
 
-export const GroupContext = React.createContext<GroupContextValue>(undefined);
+export const GroupContext =
+  React.createContext<GroupContextValue | undefined>(undefined);
 
 export interface GroupContextComponentProps {
   groupContext: GroupContextValue;
@@ -18,11 +19,13 @@ export interface GroupContextComponentProps {
 export function withGroupContext(Com) {
   return class ComWithGroupContext extends React.Component<any> {
     render() {
-      return (<GroupContext.Consumer>
-        {groupContext => {
-          return <Com {...this.props} groupContext={groupContext} />;
-        }}
-      </GroupContext.Consumer>);
+      return (
+        <GroupContext.Consumer>
+          {(groupContext) => {
+            return <Com {...this.props} groupContext={groupContext} />;
+          }}
+        </GroupContext.Consumer>
+      );
     }
   };
 }

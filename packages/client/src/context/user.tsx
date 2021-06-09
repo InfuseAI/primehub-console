@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from 'react';
 
 export interface UserContextValue {
   id: string;
@@ -6,20 +6,23 @@ export interface UserContextValue {
   isCurrentGroupAdmin: boolean;
 }
 
-export const UserContext = React.createContext<UserContextValue>(undefined);
+export const UserContext =
+  React.createContext<UserContextValue | undefined>(undefined);
 
 export type UserContextComponentProps = {
-  userContext: UserContextValue
-}
+  userContext: UserContextValue;
+};
 
-export  function withUserContext(Com) {
+export function withUserContext(Com) {
   return class ComWithUserContext extends React.Component<any> {
     render() {
-      return <UserContext.Consumer>
-        {(userContext) => {
-          return <Com {...this.props} userContext={userContext} />
-        }}
-      </UserContext.Consumer>
+      return (
+        <UserContext.Consumer>
+          {(userContext) => {
+            return <Com {...this.props} userContext={userContext} />;
+          }}
+        </UserContext.Consumer>
+      );
     }
-  }
+  };
 }
