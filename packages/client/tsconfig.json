@@ -15,7 +15,8 @@
     "experimentalDecorators": true,
     "removeComments": false,
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    // FIXME:
+    "isolatedModules": false,
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,

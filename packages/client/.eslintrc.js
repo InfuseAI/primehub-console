@@ -16,6 +16,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'prettier',
+    'plugin:testing-library/react',
   ],
 
   env: {
@@ -45,9 +46,9 @@ module.exports = {
   rules: {
     'react/react-in-jsx-scope': 'off',
 
-    // '@typescript-eslint/no-unused-vars': ['error'],
-    // '@typescript-eslint/explicit-function-return-type': 'off',
-    // '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/no-unused-vars': ['error'],
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
 
