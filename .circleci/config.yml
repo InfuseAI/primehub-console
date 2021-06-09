@@ -232,14 +232,16 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Prepare yarn dependencies
+          command: |
+            cd ~/project/packages/client
+            yarn install
+      - run:
           name: Install JUnit coverage reporter
           command: yarn add --dev jest-junit
       - run:
           name: Run Unit tests with JUnit as reporter
-          command: |
-            cd ~/project/packages/client
-            yarn install
-            yarn jest -- -ci --runInBand --reporters=default --reporters=jest-junit
+          command: yarn jest -- -ci --runInBand --reporters=default --reporters=jest-junit
           environment:
             JEST_JUNIT_OUTPUT_DIR: ./reports/junit
       - store_test_results:
