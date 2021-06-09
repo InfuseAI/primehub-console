@@ -1,4 +1,3 @@
-// TODO:
 module.exports = {
   moduleFileExtensions: ['js', 'ts', 'tsx'],
   moduleNameMapper: {
@@ -26,8 +25,8 @@ module.exports = {
   testEnvironment: 'jsdom',
   testURL: 'http://localhost/',
   testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
-  testPathIgnorePatterns: ['<rootDir>[/\\\\](node_modules)[/\\\\]'],
-  transformIgnorePatterns: ['/node-modules/', '/dist/'],
+  testPathIgnorePatterns: ['/node_modules/', '/dist/', '/schema'],
+  transformIgnorePatterns: ['/node_modules/', '/dist/', '/schema'],
   transform: {
     '\\.tsx?$': 'ts-jest',
     '\\.[j]sx?$': 'babel-jest',
