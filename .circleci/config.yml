@@ -245,7 +245,7 @@ jobs:
           name: Run Unit tests with JUnit as reporter
           command: |
             cd ~/project/packages/client
-            yarn jest -ci --runInBand --reporters=default --reporters=jest-junit
+            yarn jest --verbose --silent --ci --runInBand --reporters=default --reporters=jest-junit
           environment:
             JEST_JUNIT_OUTPUT_DIR: ./reports/junit
       - store_test_results:
