@@ -270,6 +270,18 @@ workflows:
       - graphql-integration-test
   build_and_push:
     jobs:
+      - graphql-integration-test:
+          filters:
+            tags:
+              only: /.*/
+      - graphql-unit-test:
+          filters:
+            tags:
+              only: /.*/
+      - client-unit-test:
+          filters:
+            tags:
+              only: /.*/
       - graphql-lint:
           filters:
             tags:
