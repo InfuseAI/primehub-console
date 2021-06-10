@@ -133,7 +133,6 @@ export default class NumberWithSelectMultipler extends PureComponent<Props, Stat
         selectedUnitOrder: i
       });
     }
-    console.log(value);
     return (
         <React.Fragment>
             <InputNumber

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {Button} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -49,12 +48,6 @@ export const GET_TIMEZONE = gql`
     }
   }
 `;
-
-const compareByAlphabetical = (prev, next) => {
-  if (prev < next) return -1;
-  if (prev > next) return 1;
-  return 0;
-};
 
 type Props = RouteComponentProps & GroupContextComponentProps & {
   currentUser: any;
@@ -118,6 +111,7 @@ class ScheduleCreatePage extends React.Component<Props, State> {
         />
         <div style={{margin: 16}}>
           <ScheduleCreateForm
+            showResources={false}
             groupContext={groupContext}
             onSelectGroup={this.onChangeGroup}
             selectedGroup={selectedGroup}
