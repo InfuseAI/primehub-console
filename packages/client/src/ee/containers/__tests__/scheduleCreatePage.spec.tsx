@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { render, screen } from 'test/test-utils';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import ScheduleCreatePage from 'ee/containers/scheduleCreatePage';
 import { GroupContext } from 'context/group';
 import { UserContext } from 'context/user';
@@ -26,7 +26,7 @@ const AllTheProviders = ({ children }) => {
     <MockedProvider>
       <GroupContext.Provider value={groupValue}>
         <UserContext.Provider value={userValue}>
-          <BrowserRouter>{children}</BrowserRouter>
+          <MemoryRouter>{children}</MemoryRouter>
         </UserContext.Provider>
       </GroupContext.Provider>
     </MockedProvider>
