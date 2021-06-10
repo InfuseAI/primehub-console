@@ -4,11 +4,11 @@ import { RouteComponentProps } from 'react-router-dom';
 import { compose } from 'recompose';
 import { withRouter } from 'react-router';
 
-import IFrame from 'components/hub/iframe';
 import PageTitle from 'components/pageTitle';
 import Log from 'components/share/log';
 import PageBody from 'components/pageBody';
 import Breadcrumbs from 'components/share/breadcrumb';
+import { IFrame } from 'components/hub/iframe';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
 
 type Props = GroupContextComponentProps & RouteComponentProps;

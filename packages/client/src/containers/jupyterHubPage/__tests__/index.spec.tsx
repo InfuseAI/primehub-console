@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import { JupyterHubContainer } from 'containers/jupyter-hub-page';
+import { JupyterHubContainer } from 'containers/jupyterHubPage';
 import { render, screen } from 'test/test-utils';
 import type { GroupContextValue } from 'context/group';
 
@@ -42,5 +42,6 @@ describe('JupyterHubContainer', () => {
     );
 
     expect(screen.getByText('Notebooks')).toBeInTheDocument();
+    expect(screen.getByTestId('iframe-component')).toBeInTheDocument();
   });
 });

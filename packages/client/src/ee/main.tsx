@@ -11,7 +11,7 @@ import { createGraphqlClient } from 'utils/graphqlClient';
 import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
 import { listEE } from 'utils/sidebarItemList';
 // Components
-import Jupyterhub from 'containers/jupyter-hub-page';
+import Jupyterhub from 'containers/jupyterHubPage';
 import ListContainer from 'containers/list';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
 import JobDetailContainer from 'ee/containers/jobDetail';
