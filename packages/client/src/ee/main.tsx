@@ -1,9 +1,9 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import {ApolloProvider} from 'react-apollo';
-import {notification, Button} from 'antd';
-import {BrowserRouter, Route} from 'react-router-dom';
-import {BackgroundTokenSyncer} from '../workers/backgroundTokenSyncer';
+import { ApolloProvider } from 'react-apollo';
+import { notification, Button } from 'antd';
+import { BrowserRouter, Route } from 'react-router-dom';
+import { BackgroundTokenSyncer } from '../workers/backgroundTokenSyncer';
 import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
 import { fakeData, schema } from '../fakeData';
@@ -11,7 +11,7 @@ import { createGraphqlClient } from 'utils/graphqlClient';
 import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
 import { listEE } from 'utils/sidebarItemList';
 // Components
-import Jupyterhub from 'containers/jupyterhubPage';
+import Jupyterhub from 'containers/jupyter-hub-page';
 import ListContainer from 'containers/list';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
 import JobDetailContainer from 'ee/containers/jobDetail';
@@ -42,7 +42,7 @@ import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
 
 const client = createGraphqlClient({
   fakeData,
-  schema
+  schema,
 });
 
 class Main extends React.Component {
@@ -52,8 +52,10 @@ class Main extends React.Component {
     return (
       <BrowserRouter>
         <ApolloProvider client={client}>
-          <MainPage sidebarItems={sidebarItems} notification={<LicenseWarningBanner/>}>
-
+          <MainPage
+            sidebarItems={sidebarItems}
+            notification={<LicenseWarningBanner />}
+          >
             {/* Jupyterhub */}
             <Route path={`${appPrefix}g/:groupName/hub`} exact>
               <Jupyterhub />
@@ -79,11 +81,21 @@ class Main extends React.Component {
 
             {/* Group Settings */}
             <Route path={`${appPrefix}g/:groupName/settings`}>
-              <GroupSettingsPage extraTabs={[
-                { component: GroupSettingsJobs, key: 'jobs', tab: 'Jobs' },
-                { component: GroupSettingsModels, key: 'models', tab: 'Models' },
-                { component: GroupSettingsMLflow, key: 'mlflow', tab: 'MLflow' },
-              ]} />
+              <GroupSettingsPage
+                extraTabs={[
+                  { component: GroupSettingsJobs, key: 'jobs', tab: 'Jobs' },
+                  {
+                    component: GroupSettingsModels,
+                    key: 'models',
+                    tab: 'Models',
+                  },
+                  {
+                    component: GroupSettingsMLflow,
+                    key: 'mlflow',
+                    tab: 'MLflow',
+                  },
+                ]}
+              />
             </Route>
 
             {/* Job Submission */}
@@ -150,12 +162,31 @@ class Main extends React.Component {
             <Route path={`${appPrefix}g/:groupName/apps`} exact>
               <ListContainer Com={AppListContainer} />
             </Route>
-            <Route path={`${appPrefix}g/:groupName/apps/store`} exact component={AppStore}/>
-            <Route path={`${appPrefix}g/:groupName/apps/create`} exact component={AppCreate}/>
-            <Route path={`${appPrefix}g/:groupName/apps/create/:templateId`} exact component={AppCreate}/>
-            <Route path={`${appPrefix}g/:groupName/apps/:appId`} exact component={AppDetail}/>
-            <Route path={`${appPrefix}g/:groupName/apps/:appId/edit`} exact component={AppEdit}/>
-
+            <Route
+              path={`${appPrefix}g/:groupName/apps/store`}
+              exact
+              component={AppStore}
+            />
+            <Route
+              path={`${appPrefix}g/:groupName/apps/create`}
+              exact
+              component={AppCreate}
+            />
+            <Route
+              path={`${appPrefix}g/:groupName/apps/create/:templateId`}
+              exact
+              component={AppCreate}
+            />
+            <Route
+              path={`${appPrefix}g/:groupName/apps/:appId`}
+              exact
+              component={AppDetail}
+            />
+            <Route
+              path={`${appPrefix}g/:groupName/apps/:appId/edit`}
+              exact
+              component={AppEdit}
+            />
           </MainPage>
         </ApolloProvider>
       </BrowserRouter>
@@ -186,30 +217,34 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
   accessTokenExp: (window as any).accessTokenExp,
   getNewTokenSet: () => {
     return fetch(`${(window as any).APP_PREFIX}oidc/refresh-token-set`, {
-      method: 'POST'
+      method: 'POST',
     })
-    .then(checkStatus)
-    .then(parseJSON);
+      .then(checkStatus)
+      .then(parseJSON);
   },
-  reLoginNotify: ({loginUrl}) => {
+  reLoginNotify: ({ loginUrl }) => {
     // notify with fixed card
     notification.warning({
       message: 'Warning',
-      description: 'In less than 1 minute, you\'re going to be redirected to login page.',
+      description:
+        "In less than 1 minute, you're going to be redirected to login page.",
       placement: 'bottomRight',
       duration: null,
       btn: (
-        <Button type='primary' onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
+        <Button
+          type="primary"
+          onClick={() =>
+            window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)
+          }
+        >
           Login Again
         </Button>
       ),
-      key: 'refreshWarning'
+      key: 'refreshWarning',
     });
-  }
+  },
 });
 tokenSyncWorker.run().catch(console.error);
 
 // render
-ReactDOM.render(
-  <Main />
-, document.getElementById('root'));
+ReactDOM.render(<Main />, document.getElementById('root'));
