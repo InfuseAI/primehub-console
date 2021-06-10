@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Sidebar } from '../sidebar';
 import { render, screen } from 'test/test-utils';
 import { MainPageSidebarItem } from 'containers/mainPage';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 
 function setup() {
   const sidebarItems: MainPageSidebarItem[] = [
@@ -50,13 +50,13 @@ describe('Sidebar Component', () => {
   it('Should render sidebar w/ sidebarItems.', () => {
     const { sidebarItems, userContext, routeComponentPropsMock } = setup();
     render(
-      <BrowserRouter>
+      <MemoryRouter>
         <Sidebar
           {...routeComponentPropsMock}
           sidebarItems={sidebarItems}
           userContext={userContext}
         />
-      </BrowserRouter>
+      </MemoryRouter>
     );
     expect(screen.queryByText('Notebooks')).toBeInTheDocument();
     expect(screen.queryByText('Setting')).not.toBeInTheDocument();
@@ -66,13 +66,13 @@ describe('Sidebar Component', () => {
     const { sidebarItems, userContext, routeComponentPropsMock } = setup();
     userContext.isCurrentGroupAdmin = true;
     render(
-      <BrowserRouter>
+      <MemoryRouter>
         <Sidebar
           {...routeComponentPropsMock}
           sidebarItems={sidebarItems}
           userContext={userContext}
         />
-      </BrowserRouter>
+      </MemoryRouter>
     );
     expect(screen.queryByText('Setting')).toBeInTheDocument();
   });

@@ -1,16 +1,16 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import {ApolloProvider} from 'react-apollo';
-import {notification, Button} from 'antd';
-import {BrowserRouter, Route, Redirect} from 'react-router-dom';
-import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
+import { ApolloProvider } from 'react-apollo';
+import { notification, Button } from 'antd';
+import { BrowserRouter, Route } from 'react-router-dom';
+import { BackgroundTokenSyncer } from './workers/backgroundTokenSyncer';
 import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
 import { fakeData, schema } from './fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
 import { listCE } from 'utils/sidebarItemList';
 // Components
-import Jupyterhub from 'containers/jupyterhubPage';
+import Jupyterhub from 'containers/jupyterHubPage';
 import ListContainer from 'containers/list';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
 import AppListContainer from 'containers/appList';
@@ -26,7 +26,7 @@ import GroupSettingsPage from 'containers/groupSettingsPage';
 
 const client = createGraphqlClient({
   fakeData,
-  schema
+  schema,
 });
 
 class Main extends React.Component {
@@ -64,17 +64,36 @@ class Main extends React.Component {
             <Route path={`${appPrefix}g/:groupName/apps`} exact>
               <ListContainer Com={AppListContainer} />
             </Route>
-            <Route path={`${appPrefix}g/:groupName/apps/store`} exact component={AppStore}/>
-            <Route path={`${appPrefix}g/:groupName/apps/create`} exact component={AppCreate}/>
-            <Route path={`${appPrefix}g/:groupName/apps/create/:templateId`} exact component={AppCreate}/>
-            <Route path={`${appPrefix}g/:groupName/apps/:appId`} exact component={AppDetail}/>
-            <Route path={`${appPrefix}g/:groupName/apps/:appId/edit`} exact component={AppEdit}/>
+            <Route
+              path={`${appPrefix}g/:groupName/apps/store`}
+              exact
+              component={AppStore}
+            />
+            <Route
+              path={`${appPrefix}g/:groupName/apps/create`}
+              exact
+              component={AppCreate}
+            />
+            <Route
+              path={`${appPrefix}g/:groupName/apps/create/:templateId`}
+              exact
+              component={AppCreate}
+            />
+            <Route
+              path={`${appPrefix}g/:groupName/apps/:appId`}
+              exact
+              component={AppDetail}
+            />
+            <Route
+              path={`${appPrefix}g/:groupName/apps/:appId/edit`}
+              exact
+              component={AppEdit}
+            />
 
             {/* Group Settings */}
             <Route path={`${appPrefix}g/:groupName/settings`}>
               <GroupSettingsPage />
             </Route>
-
           </MainPage>
         </ApolloProvider>
       </BrowserRouter>
@@ -105,31 +124,36 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
   accessTokenExp: (window as any).accessTokenExp,
   getNewTokenSet: () => {
     return fetch(`${(window as any).APP_PREFIX}oidc/refresh-token-set`, {
-      method: 'POST'
+      method: 'POST',
     })
-    .then(checkStatus)
-    .then(parseJSON);
+      .then(checkStatus)
+      .then(parseJSON);
   },
-  reLoginNotify: ({loginUrl}) => {
+  reLoginNotify: () => {
     // notify with fixed card
     notification.warning({
       message: 'Warning',
-      description: 'In less than 1 minute, you\'re going to be redirected to login page.',
+      description:
+        "In less than 1 minute, you're going to be redirected to login page.",
       placement: 'bottomRight',
       duration: null,
       btn: (
-        <Button type="primary" onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
+        // @ts-ignore
+        <Button
+          type="primary"
+          onClick={() =>
+            window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)
+          }
+        >
           Login Again
         </Button>
       ),
-      key: 'refreshWarning'
+      key: 'refreshWarning',
     });
-  }
+  },
 });
 
 /* tslint:disable:no-console */
 tokenSyncWorker.run().catch(console.error);
 
-ReactDOM.render(
-  <Main />
-, document.getElementById('root'));
+ReactDOM.render(<Main />, document.getElementById('root'));
