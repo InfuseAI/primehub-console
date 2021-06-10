@@ -5,6 +5,7 @@ import { GroupContext } from 'context/group';
 import { UserContext } from 'context/user';
 import { MockedProvider } from 'react-apollo/test-utils';
 import { GetGroupMLflowConfig } from 'queries/Group.graphql';
+import { mlflow } from '../../../../fakeData/groups';
 
 const AllTheProviders = ({ children }) => {
   const mlflowConfigMock = {
@@ -21,12 +22,7 @@ const AllTheProviders = ({ children }) => {
         group: {
           id: 'test-group',
           name: 'test-group',
-          mlflow: {
-            trackingUri: 'http://fake-tracking-uri',
-            uiUrl: 'http://fake-ui-uri',
-            trackingEnvs: [{ name: 'foo', value: 'bar' }],
-            artifactEnvs: [{ name: 'abc', value: '123' }],
-          },
+          mlflow: mlflow,
         },
       },
     },
@@ -65,8 +61,8 @@ describe('GroupSettingsMLflow Component', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(screen.queryByText('MLflow Tracking URI')).toBeInTheDocument();
-    expect(screen.queryByDisplayValue('http://fake-tracking-uri')).toBeInTheDocument();
-    expect(screen.queryByDisplayValue('foo')).toBeInTheDocument();
-    expect(screen.queryByDisplayValue('abc')).toBeInTheDocument();
+    screen.queryAllByDisplayValue('http://localhost:5000').forEach(uri => expect(uri).toBeInTheDocument());
+    expect(screen.queryByDisplayValue('FOO')).toBeInTheDocument();
+    expect(screen.queryByDisplayValue('BAR_A')).toBeInTheDocument();
   });
 });
