@@ -222,7 +222,7 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       .then(checkStatus)
       .then(parseJSON);
   },
-  reLoginNotify: ({ loginUrl }) => {
+  reLoginNotify: () => {
     // notify with fixed card
     notification.warning({
       message: 'Warning',
@@ -231,6 +231,7 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       placement: 'bottomRight',
       duration: null,
       btn: (
+        // @ts-ignore
         <Button
           type="primary"
           onClick={() =>
