@@ -1,5 +1,6 @@
 /** @jsx builder */
 import builder, {Condition, Layout, Tabs, Default, Row, Col, Block} from 'canner-script';
+import moment from 'moment';
 import Filter from '../../src/cms-toolbar/filter';
 import {Tag} from 'antd';
 import {renderCopyableText, InvalidChError} from 'schema/utils';
