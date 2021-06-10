@@ -6,7 +6,7 @@ interface Props {
 
 export function IFrame({ src }: Props) {
   return (
-    <div data-testid={name} style={{ width: '100%', height: '100%' }}>
+    <div style={{ width: '100%', height: '100%' }}>
       <iframe
         data-testid="iframe-component"
         src={src}
