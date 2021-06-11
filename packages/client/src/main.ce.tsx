@@ -11,7 +11,7 @@ import { createGraphqlClient } from 'utils/graphqlClient';
 import { listCE } from 'utils/sidebarItemList';
 // Components
 import Jupyterhub from 'containers/jupyterHubPage';
-import ListContainer from 'containers/list';
+import ListContainer from 'containers/ListContainer';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
 import AppListContainer from 'containers/appList';
 import AppCreate from 'containers/appCreatePage';
@@ -49,7 +49,14 @@ class Main extends React.Component {
 
             {/* Group Images management*/}
             <Route path={`${appPrefix}g/:groupName/images`} exact>
-              <ListContainer Com={ImageListContainer} />
+              <ListContainer
+                render={({ groups, groupContext }) => (
+                  <ImageListContainer
+                    groups={groups}
+                    groupContext={groupContext}
+                  />
+                )}
+              />
             </Route>
             <Route path={`${appPrefix}g/:groupName/images/create`} exact>
               <ImageCreatePage />
@@ -62,7 +69,14 @@ class Main extends React.Component {
 
             {/* Apps */}
             <Route path={`${appPrefix}g/:groupName/apps`} exact>
-              <ListContainer Com={AppListContainer} />
+              <ListContainer
+                render={({ groups, groupContext }) => (
+                  <AppListContainer
+                    groups={groups}
+                    groupContext={groupContext}
+                  />
+                )}
+              />
             </Route>
             <Route
               path={`${appPrefix}g/:groupName/apps/store`}

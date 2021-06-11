@@ -11,7 +11,7 @@ import { createGraphqlClient } from 'utils/graphqlClient';
 import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
 import { listDeploy } from 'utils/sidebarItemList';
 // Components
-import ListContainer from 'containers/list';
+import ListContainer from 'containers/ListContainer';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
 import ModelListContainer from 'ee/containers/modelList';
 import ModelDetailContainer from 'ee/containers/modelDetail';
@@ -54,7 +54,14 @@ class Main extends React.Component {
             </Route>
             {/* Model Management */}
             <Route path={`${appPrefix}g/:groupName/models`} exact>
-              <ListContainer Com={ModelListContainer} />
+              <ListContainer
+                render={({ groups, groupContext }) => (
+                  <ModelListContainer
+                    groups={groups}
+                    groupContext={groupContext}
+                  />
+                )}
+              />
             </Route>
             <Route
               path={`${appPrefix}g/:groupName/models/:modelName`}
@@ -69,7 +76,14 @@ class Main extends React.Component {
 
             {/* Model Deployment */}
             <Route path={`${appPrefix}g/:groupName/deployments`} exact>
-              <ListContainer Com={DeploymentListContainer} />
+              <ListContainer
+                render={({ groups, groupContext }) => (
+                  <DeploymentListContainer
+                    groups={groups}
+                    groupContext={groupContext}
+                  />
+                )}
+              />
             </Route>
             <Route path={`${appPrefix}g/:groupName/deployments/create`} exact>
               <DeploymentCreatePage />

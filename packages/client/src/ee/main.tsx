@@ -12,7 +12,7 @@ import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
 import { listEE } from 'utils/sidebarItemList';
 // Components
 import Jupyterhub from 'containers/jupyterHubPage';
-import ListContainer from 'containers/list';
+import ListContainer from 'containers/ListContainer';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
 import JobDetailContainer from 'ee/containers/jobDetail';
 import JobCreatePage from 'ee/containers/jobCreatePage';
@@ -68,7 +68,14 @@ class Main extends React.Component {
 
             {/* Group Images management*/}
             <Route path={`${appPrefix}g/:groupName/images`} exact>
-              <ListContainer Com={ImageListContainer} />
+              <ListContainer
+                render={({ groups, groupContext }) => (
+                  <ImageListContainer
+                    groups={groups}
+                    groupContext={groupContext}
+                  />
+                )}
+              />
             </Route>
             <Route path={`${appPrefix}g/:groupName/images/create`} exact>
               <ImageCreatePage />
@@ -100,7 +107,14 @@ class Main extends React.Component {
 
             {/* Job Submission */}
             <Route path={`${appPrefix}g/:groupName/job`} exact>
-              <ListContainer Com={JobListContainer} />
+              <ListContainer
+                render={({ groups, groupContext }) => (
+                  <JobListContainer
+                    groups={groups}
+                    groupContext={groupContext}
+                  />
+                )}
+              />
             </Route>
             <Route path={`${appPrefix}g/:groupName/job/create`} exact>
               <JobCreatePage />
@@ -113,7 +127,14 @@ class Main extends React.Component {
 
             {/* Job Scheduler */}
             <Route path={`${appPrefix}g/:groupName/schedule`} exact>
-              <ListContainer Com={ScheduleListContainer} />
+              <ListContainer
+                render={({ groups, groupContext }) => (
+                  <ScheduleListContainer
+                    groups={groups}
+                    groupContext={groupContext}
+                  />
+                )}
+              />
             </Route>
             <Route path={`${appPrefix}g/:groupName/schedule/create`} exact>
               <ScheduleCreatePage />
@@ -126,7 +147,14 @@ class Main extends React.Component {
 
             {/* Model Management */}
             <Route path={`${appPrefix}g/:groupName/models`} exact>
-              <ListContainer Com={ModelListContainer} />
+              <ListContainer
+                render={({ groups, groupContext }) => (
+                  <ModelListContainer
+                    groups={groups}
+                    groupContext={groupContext}
+                  />
+                )}
+              />
             </Route>
             <Route
               path={`${appPrefix}g/:groupName/models/:modelName`}
@@ -141,7 +169,14 @@ class Main extends React.Component {
 
             {/* Model Deployment */}
             <Route path={`${appPrefix}g/:groupName/deployments`} exact>
-              <ListContainer Com={DeploymentListContainer} />
+              <ListContainer
+                render={({ groups, groupContext }) => (
+                  <DeploymentListContainer
+                    groups={groups}
+                    groupContext={groupContext}
+                  />
+                )}
+              />
             </Route>
             <Route path={`${appPrefix}g/:groupName/deployments/create`} exact>
               <DeploymentCreatePage />
@@ -160,7 +195,14 @@ class Main extends React.Component {
 
             {/* Apps */}
             <Route path={`${appPrefix}g/:groupName/apps`} exact>
-              <ListContainer Com={AppListContainer} />
+              <ListContainer
+                render={({ groups, groupContext }) => (
+                  <AppListContainer
+                    groups={groups}
+                    groupContext={groupContext}
+                  />
+                )}
+              />
             </Route>
             <Route
               path={`${appPrefix}g/:groupName/apps/store`}
