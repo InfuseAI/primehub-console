@@ -1,3 +1,4 @@
+import iconHome from 'images/icon-home.svg';
 import iconJupyterHub from 'images/icon-jupyterhub.svg';
 import iconJobs from 'images/icon-jobs.svg';
 import iconSchedule from 'images/icon-schedule.svg';
@@ -7,57 +8,96 @@ import iconImages from 'images/icon-images.png';
 import iconShareFiles from 'images/icon-files.svg';
 import iconApps from 'images/icon-apps.svg';
 import iconSettings from 'images/icon-settings.svg';
-import {Icon} from 'antd';
 
-const FEATURE_CE = "CE";
-const FEATURE_EE = "EE";
-const FEATURE_DEPLOY = "DEPLOY";
+export const FEATURES = {
+  CE: 'CE',
+  EE: 'EE',
+  DEPLOY: 'DEPLOY',
+} as const;
 
-const list = [
+export const PATH_KEY_LIST = [
+  'home',
+  'hub',
+  'job',
+  'schedule',
+  'models',
+  'deployments',
+  'browse',
+  'images',
+  'apps',
+  'settings',
+] as const;
+
+export type SidebarPathList = typeof PATH_KEY_LIST[number];
+export type Feature = keyof typeof FEATURES;
+export interface SidebarItem {
+  title: string;
+  subPath: SidebarPathList;
+  icon: string;
+  enabledIn: Feature[];
+  style?: any;
+  stage?: string;
+  hidden?: boolean;
+  groupAdminOnly?: boolean;
+}
+export type SidebarList = SidebarItem[];
+
+export const sidebarList: SidebarList = [
+  {
+    title: 'Home',
+    subPath: 'home',
+    icon: iconHome,
+    enabledIn: [FEATURES.CE, FEATURES.EE, FEATURES.DEPLOY],
+    style: {
+      width: 'auto',
+      height: 16,
+      marginTop: '-4px',
+    },
+  },
   {
     title: 'Notebooks',
     subPath: 'hub',
     icon: iconJupyterHub,
-    enabledIn: [FEATURE_CE, FEATURE_EE],
+    enabledIn: [FEATURES.CE, FEATURES.EE],
     style: {
       width: 'auto',
       height: 22,
       marginRight: '-3px',
       marginLeft: '-2px',
-      marginTop: '-2px'
-    }
+      marginTop: '-2px',
+    },
   },
   {
     title: 'Jobs',
     subPath: 'job',
     icon: iconJobs,
-    enabledIn: [FEATURE_EE],
+    enabledIn: [FEATURES.EE],
     style: {
       width: 'auto',
       height: 17,
       marginLeft: '1px',
       marginRight: '-1px',
       marginTop: '-3px',
-    }
+    },
   },
   {
     title: 'Schedule',
     subPath: 'schedule',
     icon: iconSchedule,
-    enabledIn: [FEATURE_EE],
+    enabledIn: [FEATURES.EE],
     style: {
       width: 'auto',
       height: 15,
       marginLeft: '2px',
       marginRight: '-1px',
       marginTop: '-5px',
-    }
+    },
   },
   {
     title: 'Models',
     subPath: 'models',
     icon: iconModels,
-    enabledIn: [FEATURE_EE, FEATURE_DEPLOY],
+    enabledIn: [FEATURES.EE, FEATURES.DEPLOY],
     stage: 'beta',
     style: {
       width: 'auto',
@@ -65,39 +105,39 @@ const list = [
       marginLeft: '1px',
       marginRight: '-2px',
       marginTop: '-3px',
-    }
+    },
   },
   {
     title: 'Deployments',
     subPath: 'deployments',
     icon: iconDeployments,
-    enabledIn: [FEATURE_EE, FEATURE_DEPLOY],
+    enabledIn: [FEATURES.EE, FEATURES.DEPLOY],
     style: {
       width: 'auto',
       height: 16,
       marginLeft: '2px',
       marginRight: '-2px',
       marginTop: '-5px',
-    }
+    },
   },
   {
     title: 'Shared Files',
     subPath: 'browse',
     icon: iconShareFiles,
-    enabledIn: [FEATURE_CE, FEATURE_EE, FEATURE_DEPLOY],
+    enabledIn: [FEATURES.CE, FEATURES.EE, FEATURES.DEPLOY],
     style: {
       width: 'auto',
       height: 17,
       marginLeft: '3px',
       marginRight: '-1px',
       marginTop: '-3px',
-    }
+    },
   },
   {
     title: 'Apps',
     subPath: 'apps',
     icon: iconApps,
-    enabledIn: [FEATURE_CE, FEATURE_EE],
+    enabledIn: [FEATURES.CE, FEATURES.EE],
     stage: 'beta',
     hidden: !window.enableApp,
     style: {
@@ -111,7 +151,7 @@ const list = [
     title: 'Images',
     subPath: 'images',
     icon: iconImages,
-    enabledIn: [FEATURE_CE, FEATURE_EE],
+    enabledIn: [FEATURES.CE, FEATURES.EE],
     groupAdminOnly: true,
     style: {
       width: 'auto',
@@ -125,7 +165,7 @@ const list = [
     title: 'Settings',
     subPath: 'settings',
     icon: iconSettings,
-    enabledIn: [FEATURE_CE, FEATURE_EE, FEATURE_DEPLOY],
+    enabledIn: [FEATURES.CE, FEATURES.EE, FEATURES.DEPLOY],
     groupAdminOnly: true,
     style: {
       width: 'auto',
@@ -133,10 +173,18 @@ const list = [
       marginLeft: '-1px',
       marginRight: '-4px',
       marginTop: '-3px',
-    }
+    },
   },
 ];
 
-export const listEE = list.filter(item => item.enabledIn.includes(FEATURE_EE));
-export const listCE = list.filter(item => item.enabledIn.includes(FEATURE_CE));
-export const listDeploy = list.filter(item => item.enabledIn.includes(FEATURE_DEPLOY));
+export const listEE = sidebarList.filter((item) =>
+  item.enabledIn.includes(FEATURES.EE)
+);
+
+export const listCE = sidebarList.filter((item) =>
+  item.enabledIn.includes(FEATURES.CE)
+);
+
+export const listDeploy = sidebarList.filter((item) =>
+  item.enabledIn.includes(FEATURES.DEPLOY)
+);

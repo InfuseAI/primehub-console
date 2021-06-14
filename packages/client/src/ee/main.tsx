@@ -4,12 +4,13 @@ import { ApolloProvider } from 'react-apollo';
 import { notification, Button } from 'antd';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { BackgroundTokenSyncer } from '../workers/backgroundTokenSyncer';
-import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
+import MainPage from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
 import { fakeData, schema } from '../fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
 import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
-import { listEE } from 'utils/sidebarItemList';
+import { listEE } from 'utils/sidebarList';
+
 // Components
 import Jupyterhub from 'containers/JupyterHubPage';
 import ListContainer from 'containers/ListContainer';
@@ -47,13 +48,11 @@ const client = createGraphqlClient({
 
 class Main extends React.Component {
   render() {
-    const sidebarItems: MainPageSidebarItem[] = listEE;
-
     return (
       <BrowserRouter>
         <ApolloProvider client={client}>
           <MainPage
-            sidebarItems={sidebarItems}
+            sidebarItems={listEE}
             notification={<LicenseWarningBanner />}
           >
             {/* Jupyterhub */}

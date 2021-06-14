@@ -1,79 +1,43 @@
 import * as React from 'react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter, Route } from 'react-router-dom';
+
 import { Sidebar } from '../sidebar';
 import { render, screen } from 'test/test-utils';
-import { MainPageSidebarItem } from 'containers/mainPage';
-import { MemoryRouter } from 'react-router-dom';
+import { sidebarList } from 'utils/sidebarList';
 
-function setup() {
-  const sidebarItems: MainPageSidebarItem[] = [
-    {
-      title: 'Notebooks',
-      subPath: 'hub',
-      icon: '',
-    },
-    {
-      title: 'Setting',
-      subPath: 'settings',
-      icon: '',
-      groupAdminOnly: true,
-    },
-  ];
-
-  const userContext = {
-    id: '1',
-    username: 'test',
-    isCurrentGroupAdmin: false,
-  };
-
-  const routeComponentPropsMock = {
-    history: {
-      location: {
-        pathname: '/g/test-group/home',
-      },
-    } as any,
-    location: {} as any,
-    match: {
-      params: {
-        groupName: 'test-group',
-      },
-    } as any,
-  };
-
-  return {
-    sidebarItems,
-    userContext,
-    routeComponentPropsMock,
-  };
-}
+const MOCK_GROUP_NAME = 'fakeGroup';
+const MOCK_ROUTE_PATHNAME = 'home';
 
 describe('Sidebar Component', () => {
-  it('Should render sidebar w/ sidebarItems.', () => {
-    const { sidebarItems, userContext, routeComponentPropsMock } = setup();
+  it('should render home with active status', () => {
     render(
-      <MemoryRouter>
-        <Sidebar
-          {...routeComponentPropsMock}
-          sidebarItems={sidebarItems}
-          userContext={userContext}
-        />
+      <MemoryRouter
+        initialEntries={[`/g/${MOCK_GROUP_NAME}/${MOCK_ROUTE_PATHNAME}`]}
+      >
+        <Route path={`/g/:groupName/${MOCK_ROUTE_PATHNAME}`}>
+          <Sidebar sidebarItems={sidebarList} />
+        </Route>
       </MemoryRouter>
     );
-    expect(screen.queryByText('Notebooks')).toBeInTheDocument();
-    expect(screen.queryByText('Setting')).not.toBeInTheDocument();
+
+    expect(screen.getByTestId('home-active')).toBeInTheDocument();
   });
 
-  it('Should render admin items if user is groupAdmin', () => {
-    const { sidebarItems, userContext, routeComponentPropsMock } = setup();
-    userContext.isCurrentGroupAdmin = true;
+  it('should render job with active status when toggling from home', () => {
     render(
-      <MemoryRouter>
-        <Sidebar
-          {...routeComponentPropsMock}
-          sidebarItems={sidebarItems}
-          userContext={userContext}
-        />
+      <MemoryRouter
+        initialEntries={[`/g/${MOCK_GROUP_NAME}/${MOCK_ROUTE_PATHNAME}`]}
+      >
+        <Route path={`/g/:groupName/${MOCK_ROUTE_PATHNAME}`}>
+          <Sidebar sidebarItems={sidebarList} />
+        </Route>
       </MemoryRouter>
     );
-    expect(screen.queryByText('Setting')).toBeInTheDocument();
+
+    const jobItem = screen.getByTestId('job');
+    userEvent.click(jobItem);
+
+    expect(screen.getByTestId('job-active')).toBeInTheDocument();
   });
 });

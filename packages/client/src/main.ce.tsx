@@ -4,11 +4,12 @@ import { ApolloProvider } from 'react-apollo';
 import { notification, Button } from 'antd';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { BackgroundTokenSyncer } from './workers/backgroundTokenSyncer';
-import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
+import MainPage from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
 import { fakeData, schema } from './fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
-import { listCE } from 'utils/sidebarItemList';
+import { listCE } from 'utils/sidebarList';
+
 // Components
 import Jupyterhub from 'containers/JupyterHubPage';
 import ListContainer from 'containers/ListContainer';
@@ -31,12 +32,10 @@ const client = createGraphqlClient({
 
 class Main extends React.Component {
   render() {
-    const sidebarItems: MainPageSidebarItem[] = listCE;
-
     return (
       <BrowserRouter>
         <ApolloProvider client={client}>
-          <MainPage sidebarItems={sidebarItems}>
+          <MainPage sidebarItems={listCE}>
             {/* Jupyterhub */}
             <Route path={`${appPrefix}g/:groupName/hub`} exact>
               <Jupyterhub />

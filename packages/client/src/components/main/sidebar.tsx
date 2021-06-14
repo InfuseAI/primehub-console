@@ -1,14 +1,10 @@
 import * as React from 'react';
-import { Layout, Menu, Divider } from 'antd';
-import { Link } from 'react-router-dom';
-import { appPrefix } from 'utils/env';
-import { withRouter, RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
-import iconHome from 'images/icon-home.svg';
-import { get } from 'lodash';
-import { MainPageSidebarItem } from 'containers/mainPage';
-import { compose } from 'recompose';
-import { withUserContext, UserContextComponentProps } from 'context/user';
+import { Layout, Menu, Divider } from 'antd';
+import { Link, useParams } from 'react-router-dom';
+
+import { appPrefix } from 'utils/env';
+import { SidebarList, SidebarPathList } from 'utils/sidebarList';
 
 const Icon = styled.img`
   width: 25px;
@@ -36,37 +32,59 @@ const Badge = styled.span`
   }
 `;
 
-type Props = UserContextComponentProps &
-  RouteComponentProps & {
-    sidebarItems: MainPageSidebarItem[];
-  };
+interface Props {
+  sidebarItems: SidebarList;
+}
 
-export class Sidebar extends React.Component<Props> {
-  renderSidebarItem(item: MainPageSidebarItem, group: string) {
-    return (
-      <Menu.Item key={item.subPath} style={{ paddingLeft: 26 }}>
-        <Link to={`${appPrefix}g/${group}/${item.subPath}`}>
-          <Icon src={item.icon} style={item.style} />
-          <Title>{item.title}</Title>
-          {this.renderStageBadge(item)}
-        </Link>
-      </Menu.Item>
-    );
-  }
+const STATUS_BADGE = {
+  beta: <Badge>beta</Badge>,
+  alpha: <Badge>alpha</Badge>,
+};
 
-  renderSidebarItems(items: MainPageSidebarItem[], group: string) {
-    const sidebarItems = [];
-    const userItems = items.filter((item) => !item.groupAdminOnly);
-    const adminItems = items.filter(
-      (item) => item.groupAdminOnly && item.groupAdminOnly === true
-    );
+export function Sidebar({ sidebarItems }: Props) {
+  const [key, setKey] = React.useState<SidebarPathList>('home');
 
-    sidebarItems.push(
-      userItems.map((item) => this.renderSidebarItem(item, group))
-    );
-    if (adminItems.length > 0) {
-      sidebarItems.push(
-        <Menu.Item key='devide' style={{ margin: 0, height: 12 }}>
+  const { groupName } = useParams<{ groupName: string }>();
+  const { userItems, adminItems, hasAdminItems } = React.useMemo(() => {
+    let user: SidebarList = [];
+    let admin: SidebarList = [];
+
+    for (const item of sidebarItems) {
+      if (item?.groupAdminOnly) {
+        admin = [...admin, item];
+      } else {
+        user = [...user, item];
+      }
+    }
+
+    const hasAdminItems = admin.length > 0;
+
+    return {
+      userItems: user,
+      adminItems: admin,
+      hasAdminItems,
+    };
+  }, [sidebarItems]);
+
+  return (
+    <Layout.Sider style={{ position: 'fixed', height: '100%' }}>
+      <Menu theme="dark" selectedKeys={[key]} data-testid={`${key}-active`}>
+        {userItems.map((item) => (
+          <Menu.Item
+            key={item.subPath}
+            style={{ paddingLeft: 26 }}
+            data-testid={`${item.subPath}`}
+            onClick={() => setKey(item.subPath)}
+          >
+            <Link to={`${appPrefix}g/${groupName}/${item.subPath}`}>
+              <Icon src={item.icon} style={item.style} />
+              <Title>{item.title}</Title>
+              {STATUS_BADGE[item.stage]}
+            </Link>
+          </Menu.Item>
+        ))}
+
+        {hasAdminItems && (
           <Divider
             style={{
               marginTop: 5,
@@ -74,78 +92,19 @@ export class Sidebar extends React.Component<Props> {
               backgroundColor: '#555666',
             }}
           />
-        </Menu.Item>
-      );
-      sidebarItems.push(
-        adminItems.map((item) => this.renderSidebarItem(item, group))
-      );
-    }
+        )}
 
-    return sidebarItems;
-  }
-
-  renderStageBadge(item: MainPageSidebarItem) {
-    if (item.stage === 'beta') {
-      return <Badge>beta</Badge>;
-    } else if (item.stage === 'alpha') {
-      return <Badge>alpha</Badge>;
-    } else {
-      return <></>;
-    }
-  }
-
-  render() {
-    const { history, match, userContext } = this.props;
-    const pathKeyList = [
-      'home',
-      'hub',
-      'job',
-      'schedule',
-      'models',
-      'deployments',
-      'browse',
-      'images',
-      'apps',
-      'settings',
-    ];
-    let key = '';
-    pathKeyList.forEach((val) => {
-      if (history.location.pathname.split('/').includes(val)) {
-        key = val;
-      }
-    });
-    const group = get(match, 'params.groupName', '');
-
-    const sidebarItems = this.props.sidebarItems.filter((item) => {
-      if (item.groupAdminOnly) {
-        return get(userContext, 'isCurrentGroupAdmin', false);
-      }
-      if (item.hidden) {
-        return false;
-      }
-      return true;
-    });
-
-    return (
-      <Layout.Sider style={{ position: 'fixed', height: '100%' }}>
-        <Menu theme="dark" selectedKeys={[key]}>
-          <Menu.Item key="home" style={{ marginTop: 0, paddingLeft: 26 }}>
-            <Link to={group ? `${appPrefix}g/${group}/home` : `${appPrefix}g`}>
-              <Icon
-                src={iconHome}
-                style={{ width: 'auto', height: 16, marginTop: '-4px' }}
-              />
-              <Title>Home</Title>
-            </Link>
-          </Menu.Item>
-
-          {group && sidebarItems
-            ? this.renderSidebarItems(sidebarItems, group)
-            : []}
-        </Menu>
-      </Layout.Sider>
-    );
-  }
+        {hasAdminItems &&
+          adminItems.map((item) => (
+            <Menu.Item key={item.subPath} style={{ paddingLeft: 26 }}>
+              <Link to={`${appPrefix}g/${groupName}/${item.subPath}`}>
+                <Icon src={item.icon} style={item.style} />
+                <Title>{item.title}</Title>
+                {STATUS_BADGE[item.stage]}
+              </Link>
+            </Menu.Item>
+          ))}
+      </Menu>
+    </Layout.Sider>
+  );
 }
-
-export default compose(withRouter, withUserContext)(Sidebar);
