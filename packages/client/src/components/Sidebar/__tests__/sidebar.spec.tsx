@@ -2,9 +2,8 @@ import * as React from 'react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route } from 'react-router-dom';
 
-import { Sidebar } from '../sidebar';
+import { Sidebar, sidebarList } from 'components/Sidebar';
 import { render, screen } from 'test/test-utils';
-import { sidebarList } from 'utils/sidebarList';
 
 const MOCK_GROUP_NAME = 'fakeGroup';
 const MOCK_ROUTE_PATHNAME = 'home';

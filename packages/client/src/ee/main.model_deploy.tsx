@@ -9,7 +9,7 @@ import { appPrefix } from 'utils/env';
 import { fakeData, schema } from '../fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
 import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
-import { listDeploy } from 'utils/sidebarList';
+import { listDeploy } from 'components/Sidebar';
 
 // Components
 import ListContainer from 'containers/ListContainer';

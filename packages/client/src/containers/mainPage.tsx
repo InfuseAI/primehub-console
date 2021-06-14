@@ -3,7 +3,7 @@ import { Layout, Alert } from 'antd';
 import { Route, Switch, RouteComponentProps } from 'react-router-dom';
 import Header from 'components/header';
 import GroupSelector from 'components/groupSelector';
-import { Sidebar } from 'components/main/sidebar';
+import { Sidebar, SidebarList } from 'components/Sidebar';
 import { Redirect, withRouter } from 'react-router';
 import { appPrefix } from 'utils/env';
 import { graphql } from 'react-apollo';
@@ -14,7 +14,6 @@ import Landing from '../landing';
 import ApiTokenPage from 'containers/apiTokenPage';
 import { CurrentUser } from 'queries/User.graphql';
 import { checkUserIsGroupAdmin } from '../utils';
-import type { SidebarList } from 'utils/sidebarList';
 
 export type MainPageProps = {
   sidebarItems: SidebarList;

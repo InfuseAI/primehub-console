@@ -8,7 +8,7 @@ import MainPage from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
 import { fakeData, schema } from './fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
-import { listCE } from 'utils/sidebarList';
+import { listCE } from 'components/Sidebar';
 
 // Components
 import Jupyterhub from 'containers/JupyterHubPage';

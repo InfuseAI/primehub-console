@@ -4,7 +4,7 @@ import { Layout, Menu, Divider } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 
 import { appPrefix } from 'utils/env';
-import { SidebarList, SidebarPathList } from 'utils/sidebarList';
+import { SidebarList, SidebarPathList } from 'components/Sidebar';
 
 const Icon = styled.img`
   width: 25px;

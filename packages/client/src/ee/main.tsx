@@ -9,7 +9,7 @@ import { appPrefix } from 'utils/env';
 import { fakeData, schema } from '../fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
 import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
-import { listEE } from 'utils/sidebarList';
+import { listEE } from 'components/Sidebar';
 
 // Components
 import Jupyterhub from 'containers/JupyterHubPage';

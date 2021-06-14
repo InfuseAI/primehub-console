@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import iconHome from 'images/icon-home.svg';
 import iconJupyterHub from 'images/icon-jupyterhub.svg';
 import iconJobs from 'images/icon-jobs.svg';
@@ -35,7 +37,7 @@ export interface SidebarItem {
   subPath: SidebarPathList;
   icon: string;
   enabledIn: Feature[];
-  style?: any;
+  style?: React.CSSProperties;
   stage?: string;
   hidden?: boolean;
   groupAdminOnly?: boolean;
