@@ -11,14 +11,14 @@ import { createGraphqlClient } from 'utils/graphqlClient';
 import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
 import { listEE } from 'utils/sidebarItemList';
 // Components
-import Jupyterhub from 'containers/jupyterHubPage';
+import Jupyterhub from 'containers/JupyterHubPage';
 import ListContainer from 'containers/ListContainer';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
 import JobDetailContainer from 'ee/containers/jobDetail';
 import JobCreatePage from 'ee/containers/jobCreatePage';
 import JobListContainer from 'ee/containers/jobList';
 import ScheduleDetailContainer from 'ee/containers/scheduleDetail';
-import ScheduleCreatePage from 'ee/containers/scheduleCreatePage';
+import ScheduleCreatePage from 'ee/containers/ScheduleCreatePage';
 import ScheduleListContainer from 'ee/containers/scheduleList';
 import ModelListContainer from 'ee/containers/modelList';
 import ModelDetailContainer from 'ee/containers/modelDetail';
