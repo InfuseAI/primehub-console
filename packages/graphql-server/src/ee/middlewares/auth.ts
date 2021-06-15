@@ -28,6 +28,7 @@ export const permissions = shield({
     'phSchedules': or(isAdmin, isUser),
     'phSchedulesConnection': or(isAdmin, isUser),
     'phDeployment': or(isAdmin, isUser),
+    'phDeploymentAvail': or(isAdmin, isUser),
     'phDeployments': or(isAdmin, isUser),
     'phDeploymentsConnection': or(isAdmin, isUser),
     'license': or(isAdmin, isUser),
