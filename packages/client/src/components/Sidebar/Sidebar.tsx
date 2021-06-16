@@ -4,6 +4,7 @@ import { Layout, Menu, Divider } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 
 import { appPrefix } from 'utils/env';
+import { UserContext } from 'context/user';
 import { SidebarList, SidebarPathList } from 'components/Sidebar';
 
 const Icon = styled.img`
@@ -43,20 +44,16 @@ const STATUS_BADGE = {
 
 export function Sidebar({ sidebarItems }: Props) {
   const [key, setKey] = React.useState<SidebarPathList>('home');
+  const currentUser = React.useContext(UserContext);
 
   const { groupName } = useParams<{ groupName: string }>();
   const { userItems, adminItems, hasAdminItems } = React.useMemo(() => {
-    let user: SidebarList = [];
-    let admin: SidebarList = [];
-
-    for (const item of sidebarItems) {
-      if (item?.groupAdminOnly) {
-        admin = [...admin, item];
-      } else {
-        user = [...user, item];
+    const user = sidebarItems.slice(0, -2);
+    const admin = sidebarItems.filter((item) => {
+      if (item?.groupAdminOnly && currentUser.isCurrentGroupAdmin) {
+        return item;
       }
-    }
-
+    });
     const hasAdminItems = admin.length > 0;
 
     return {
