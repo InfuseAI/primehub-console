@@ -6,8 +6,7 @@ import ListContainer from 'containers/ListContainer';
 import { render, screen, waitFor } from 'test/test-utils';
 import { GroupContext, GroupContextValue } from 'context/group';
 import { CurrentUser } from 'queries/User.graphql';
-
-import { mockMeResponse } from './mockResponse';
+import { me as mockMe } from '../../../fakeData/me';
 
 function setup() {
   const mockRequests = [
@@ -17,7 +16,7 @@ function setup() {
       },
       result: {
         data: {
-          me: mockMeResponse,
+          me: mockMe,
         },
       },
     },
@@ -102,9 +101,8 @@ describe('ListContainer', () => {
 
     await waitFor(() => {
       expect(screen.getByText(mockGroup.name)).toBeInTheDocument();
-
       expect(
-        screen.getByText(mockMeResponse.groups[0].displayName)
+        screen.getByText(mockMe.groups[0].displayName)
       ).toBeInTheDocument();
     });
   });
