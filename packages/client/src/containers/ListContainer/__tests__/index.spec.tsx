@@ -1,35 +1,35 @@
 import * as React from 'react';
 import { MemoryRouter } from 'react-router-dom';
+import { MockedProvider } from 'react-apollo/test-utils';
 
-import { ListContainer } from 'containers/ListContainer';
-import { render, screen } from 'test/test-utils';
-import type { GroupContextValue } from 'context/group';
+import ListContainer from 'containers/ListContainer';
+import { render, screen, waitFor } from 'test/test-utils';
+import { GroupContext, GroupContextValue } from 'context/group';
+import { CurrentUser } from 'queries/User.graphql';
 
-import { groups as mockGroups } from '../../../fakeData/groups';
+import { mockMeResponse } from './mockResponse';
 
 function setup() {
-  const groupContextValue: GroupContextValue = {
-    id: 'test-group',
-    name: 'test-group',
-    displayName: 'test-group',
+  const mockRequests = [
+    {
+      request: {
+        query: CurrentUser,
+      },
+      result: {
+        data: {
+          me: mockMeResponse,
+        },
+      },
+    },
+  ];
+
+  const mockGroup: GroupContextValue = {
+    id: 'groupId1',
+    name: 'group1',
+    displayName: 'c-Group 1',
     admins: 'test',
     enabledSharedVolume: true,
     enabledDeployment: true,
-  };
-
-  const mockRouteProps: any = {
-    location: {},
-    pathname: {},
-    history: {},
-    match: {},
-  };
-
-  const user = {
-    loading: false,
-    error: null,
-    me: {
-      groups: mockGroups,
-    },
   };
 
   const MockComponent = ({ groups, groupContext }) => {
@@ -46,72 +46,66 @@ function setup() {
   };
 
   return {
-    user,
-    groupContextValue,
-    mockRouteProps,
+    mockRequests,
+    mockGroup,
     MockComponent,
   };
 }
 
 describe('ListContainer', () => {
-  it('should render list container', () => {
-    const { user, groupContextValue, mockRouteProps, MockComponent } = setup();
+  it('should render list container with loading status', () => {
+    const { mockRequests, mockGroup, MockComponent } = setup();
 
     render(
-      <MemoryRouter>
-        <ListContainer
-          {...mockRouteProps}
-          currentUser={user}
-          groupContext={groupContextValue}
-          render={({ groups, groupContext }) => (
-            <MockComponent groups={groups} groupContext={groupContext} />
-          )}
-        />
-      </MemoryRouter>
+      <MockedProvider mocks={mockRequests}>
+        <GroupContext.Provider value={mockGroup}>
+          <MemoryRouter>
+            <ListContainer Com={MockComponent} />
+          </MemoryRouter>
+        </GroupContext.Provider>
+      </MockedProvider>
     );
 
-    expect(screen.getByText(groupContextValue.name)).toBeInTheDocument();
-    expect(screen.getByText(mockGroups[0].displayName)).toBeInTheDocument();
+    expect(screen.getByTestId('loading')).toBeInTheDocument();
   });
 
-  it('should render null when data is fetching', () => {
-    const { user, groupContextValue, mockRouteProps, MockComponent } = setup();
+  it('should render list cotainer with error message', async () => {
+    const { mockGroup, MockComponent } = setup();
 
     render(
-      <MemoryRouter>
-        <ListContainer
-          {...mockRouteProps}
-          currentUser={{ ...user, loading: true }}
-          groupContext={groupContextValue}
-          render={({ groups, groupContext }) => (
-            <MockComponent groups={groups} groupContext={groupContext} />
-          )}
-        />
-      </MemoryRouter>
+      <MockedProvider mocks={[]}>
+        <GroupContext.Provider value={mockGroup}>
+          <MemoryRouter>
+            <ListContainer Com={MockComponent} />
+          </MemoryRouter>
+        </GroupContext.Provider>
+      </MockedProvider>
     );
 
-    expect(screen.queryByText(groupContextValue.name)).toBeNull();
-    expect(screen.queryByText(mockGroups[0].displayName)).toBeNull();
+    await waitFor(() => {
+      expect(screen.getByText('Error')).toBeInTheDocument();
+    });
   });
 
-  it('should render error message when fetching data failure', () => {
-    const { user, groupContextValue, mockRouteProps, MockComponent } = setup();
+  it('should render list container with custom component', async () => {
+    const { mockRequests, mockGroup, MockComponent } = setup();
 
     render(
-      <MemoryRouter>
-        <ListContainer
-          {...mockRouteProps}
-          currentUser={{ ...user, error: 'Error' }}
-          groupContext={groupContextValue}
-          render={({ groups, groupContext }) => (
-            <MockComponent groups={groups} groupContext={groupContext} />
-          )}
-        />
-      </MemoryRouter>
+      <MockedProvider mocks={mockRequests}>
+        <GroupContext.Provider value={mockGroup}>
+          <MemoryRouter>
+            <ListContainer Com={MockComponent} />
+          </MemoryRouter>
+        </GroupContext.Provider>
+      </MockedProvider>
     );
 
-    expect(screen.getByText('Error')).toBeInTheDocument();
-    expect(screen.queryByText(groupContextValue.name)).toBeNull();
-    expect(screen.queryByText(mockGroups[0].displayName)).toBeNull();
+    await waitFor(() => {
+      expect(screen.getByText(mockGroup.name)).toBeInTheDocument();
+
+      expect(
+        screen.getByText(mockMeResponse.groups[0].displayName)
+      ).toBeInTheDocument();
+    });
   });
 });

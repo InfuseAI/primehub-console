@@ -49,14 +49,7 @@ class Main extends React.Component {
 
             {/* Group Images management*/}
             <Route path={`${appPrefix}g/:groupName/images`} exact>
-              <ListContainer
-                render={({ groups, groupContext }) => (
-                  <ImageListContainer
-                    groups={groups}
-                    groupContext={groupContext}
-                  />
-                )}
-              />
+              <ListContainer Com={ImageListContainer} />
             </Route>
             <Route path={`${appPrefix}g/:groupName/images/create`} exact>
               <ImageCreatePage />
@@ -69,14 +62,7 @@ class Main extends React.Component {
 
             {/* Apps */}
             <Route path={`${appPrefix}g/:groupName/apps`} exact>
-              <ListContainer
-                render={({ groups, groupContext }) => (
-                  <AppListContainer
-                    groups={groups}
-                    groupContext={groupContext}
-                  />
-                )}
-              />
+              <ListContainer Com={AppListContainer} />
             </Route>
             <Route
               path={`${appPrefix}g/:groupName/apps/store`}

@@ -14,18 +14,12 @@ type Props = RouteComponentProps &
   PathComponentProps & {
     currentUser: any;
     groupContext: GroupContextComponentProps;
-    render: ({
-      groups,
-      groupContext,
-    }: {
-      groups: any;
-      groupContext: GroupContextComponentProps;
-    }) => React.ReactNode;
+    Com: React.ElementType;
   };
 
-export function ListContainer({ groupContext, currentUser, render }: Props) {
+function ListContainer({ groupContext, currentUser, Com }: Props) {
   if (currentUser.loading) {
-    return null;
+    return <div data-testid="loading" />;
   }
 
   if (currentUser.error) {
@@ -37,7 +31,7 @@ export function ListContainer({ groupContext, currentUser, render }: Props) {
     (group) => group.id !== everyoneGroupId
   );
 
-  return <div>{render({ groups, groupContext })}</div>;
+  return <Com groups={groups} groupContext={groupContext} />;
 }
 
 export default compose(

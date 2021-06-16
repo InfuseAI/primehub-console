@@ -1,9 +1,9 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import {ApolloProvider} from 'react-apollo';
-import {notification, Button} from 'antd';
-import {BrowserRouter, Route} from 'react-router-dom';
-import {BackgroundTokenSyncer} from '../workers/backgroundTokenSyncer';
+import { ApolloProvider } from 'react-apollo';
+import { notification, Button } from 'antd';
+import { BrowserRouter, Route } from 'react-router-dom';
+import { BackgroundTokenSyncer } from '../workers/backgroundTokenSyncer';
 import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
 import { fakeData, schema } from '../fakeData';
@@ -20,18 +20,12 @@ import DeploymentListContainer from 'ee/containers/deploymentList';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
-import AppListContainer from 'containers/appList';
-import AppCreate from 'containers/appCreatePage';
-import AppStore from 'containers/appStore';
-import AppDetail from 'containers/appDetail';
-import AppEdit from 'containers/appEditPage';
 import GroupSettingsPage from 'containers/groupSettingsPage';
-import GroupSettingsModels from 'ee/components/groupSettings/models';
 import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
 
 const client = createGraphqlClient({
   fakeData,
-  schema
+  schema,
 });
 
 class Main extends React.Component {
@@ -41,27 +35,29 @@ class Main extends React.Component {
     return (
       <BrowserRouter>
         <ApolloProvider client={client}>
-          <MainPage sidebarItems={sidebarItems} notification={<LicenseWarningBanner/>}>
+          <MainPage
+            sidebarItems={sidebarItems}
+            notification={<LicenseWarningBanner />}
+          >
             {/* Shared Files */}
             <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
               <SharedFilesPage />
             </Route>
             {/* Group Settings */}
             <Route path={`${appPrefix}g/:groupName/settings`}>
-              <GroupSettingsPage extraTabs={[
-                { component: GroupSettingsMLflow, key: 'mlflow', tab: 'MLflow' },
-              ]} />
+              <GroupSettingsPage
+                extraTabs={[
+                  {
+                    component: GroupSettingsMLflow,
+                    key: 'mlflow',
+                    tab: 'MLflow',
+                  },
+                ]}
+              />
             </Route>
             {/* Model Management */}
             <Route path={`${appPrefix}g/:groupName/models`} exact>
-              <ListContainer
-                render={({ groups, groupContext }) => (
-                  <ModelListContainer
-                    groups={groups}
-                    groupContext={groupContext}
-                  />
-                )}
-              />
+              <ListContainer Com={ModelListContainer} />
             </Route>
             <Route
               path={`${appPrefix}g/:groupName/models/:modelName`}
@@ -76,14 +72,7 @@ class Main extends React.Component {
 
             {/* Model Deployment */}
             <Route path={`${appPrefix}g/:groupName/deployments`} exact>
-              <ListContainer
-                render={({ groups, groupContext }) => (
-                  <DeploymentListContainer
-                    groups={groups}
-                    groupContext={groupContext}
-                  />
-                )}
-              />
+              <ListContainer Com={DeploymentListContainer} />
             </Route>
             <Route path={`${appPrefix}g/:groupName/deployments/create`} exact>
               <DeploymentCreatePage />
@@ -129,30 +118,35 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
   accessTokenExp: (window as any).accessTokenExp,
   getNewTokenSet: () => {
     return fetch(`${(window as any).APP_PREFIX}oidc/refresh-token-set`, {
-      method: 'POST'
+      method: 'POST',
     })
-    .then(checkStatus)
-    .then(parseJSON);
+      .then(checkStatus)
+      .then(parseJSON);
   },
-  reLoginNotify: ({loginUrl}) => {
+  reLoginNotify: () => {
     // notify with fixed card
     notification.warning({
       message: 'Warning',
-      description: 'In less than 1 minute, you\'re going to be redirected to login page.',
+      description:
+        "In less than 1 minute, you're going to be redirected to login page.",
       placement: 'bottomRight',
       duration: null,
       btn: (
-        <Button type='primary' onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
+        // @ts-ignore
+        <Button
+          type="primary"
+          onClick={() =>
+            window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)
+          }
+        >
           Login Again
         </Button>
       ),
-      key: 'refreshWarning'
+      key: 'refreshWarning',
     });
-  }
+  },
 });
 tokenSyncWorker.run().catch(console.error);
 
 // render
-ReactDOM.render(
-  <Main />
-, document.getElementById('root'));
+ReactDOM.render(<Main />, document.getElementById('root'));
