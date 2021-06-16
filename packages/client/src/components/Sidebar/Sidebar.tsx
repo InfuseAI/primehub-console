@@ -48,12 +48,17 @@ export function Sidebar({ sidebarItems }: Props) {
 
   const { groupName } = useParams<{ groupName: string }>();
   const { userItems, adminItems, hasAdminItems } = React.useMemo(() => {
-    const user = sidebarItems.slice(0, -2);
-    const admin = sidebarItems.filter((item) => {
-      if (item?.groupAdminOnly && currentUser.isCurrentGroupAdmin) {
-        return item;
+    const filterSidebarItems = sidebarItems.filter((item) => {
+      if (item?.hidden) {
+        return false;
       }
+      return true;
     });
+
+    const user = filterSidebarItems.filter((item) => !item?.groupAdminOnly);
+    const admin = filterSidebarItems.filter(
+      (item) => currentUser.isCurrentGroupAdmin && item?.groupAdminOnly
+    );
     const hasAdminItems = admin.length > 0;
 
     return {
@@ -61,7 +66,7 @@ export function Sidebar({ sidebarItems }: Props) {
       adminItems: admin,
       hasAdminItems,
     };
-  }, [sidebarItems]);
+  }, [currentUser.isCurrentGroupAdmin, sidebarItems]);
 
   return (
     <Layout.Sider style={{ position: 'fixed', height: '100%' }}>
