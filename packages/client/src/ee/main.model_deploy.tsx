@@ -58,17 +58,6 @@ class Main extends React.Component {
         }
       },
       {
-        title: 'Apps',
-        subPath: 'apps',
-        icon: iconApps,
-        style: {
-          width: 'auto',
-          height: 20,
-          marginRight: '-4px',
-          marginTop: '-2px',
-        },
-      },
-      {
         title: 'Settings',
         subPath: 'settings',
         icon: iconSettings,
