@@ -21,6 +21,9 @@ describe('Sidebar Component', () => {
   it('should render home with active status', () => {
     const mockUser = createMockUser();
 
+    // @ts-ignore
+    global.enableApp = true;
+
     render(
       <MemoryRouter
         initialEntries={[`/g/${MOCK_GROUP_NAME}/${MOCK_ROUTE_PATHNAME}`]}
@@ -48,6 +51,9 @@ describe('Sidebar Component', () => {
 
   it('should render images and settings when user is current group admin', () => {
     const mockUser = createMockUser({ isCurrentGroupAdmin: true });
+
+    // @ts-ignore
+    global.enableApp = true;
 
     render(
       <MemoryRouter
@@ -77,6 +83,9 @@ describe('Sidebar Component', () => {
   it('should render job with active status when toggling from home', () => {
     const mockUser = createMockUser();
 
+    // @ts-ignore
+    global.enableApp = true;
+
     render(
       <MemoryRouter
         initialEntries={[`/g/${MOCK_GROUP_NAME}/${MOCK_ROUTE_PATHNAME}`]}
@@ -103,5 +112,26 @@ describe('Sidebar Component', () => {
     expect(screen.getByText('Apps')).toBeInTheDocument();
     expect(screen.queryByText('Images')).toBeNull();
     expect(screen.queryByText('Settings')).toBeNull();
+  });
+
+  it('should not render App when item is disabled', () => {
+    const mockUser = createMockUser();
+
+    // @ts-ignore
+    global.enableApp = false;
+
+    render(
+      <MemoryRouter
+        initialEntries={[`/g/${MOCK_GROUP_NAME}/${MOCK_ROUTE_PATHNAME}`]}
+      >
+        <Route path={`/g/:groupName/${MOCK_ROUTE_PATHNAME}`}>
+          <UserContext.Provider value={mockUser}>
+            <Sidebar sidebarItems={sidebarList} />
+          </UserContext.Provider>
+        </Route>
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByText('Apps')).toBeNull();
   });
 });

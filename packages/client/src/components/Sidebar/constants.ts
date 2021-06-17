@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 import iconHome from 'images/icon-home.svg';
 import iconJupyterHub from 'images/icon-jupyterhub.svg';
 import iconJobs from 'images/icon-jobs.svg';
@@ -39,7 +37,7 @@ export interface SidebarItem {
   enabledIn: Feature[];
   style?: React.CSSProperties;
   stage?: string;
-  hidden?: boolean;
+  flag?: string;
   groupAdminOnly?: boolean;
 }
 export type SidebarList = SidebarItem[];
@@ -141,7 +139,7 @@ export const sidebarList: SidebarList = [
     icon: iconApps,
     enabledIn: [FEATURES.CE, FEATURES.EE],
     stage: 'beta',
-    hidden: !window.enableApp,
+    flag: 'enableApp',
     style: {
       width: 'auto',
       height: 20,

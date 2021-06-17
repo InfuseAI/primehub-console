@@ -5,7 +5,7 @@ import { Link, useParams } from 'react-router-dom';
 
 import { appPrefix } from 'utils/env';
 import { UserContext } from 'context/user';
-import { SidebarList, SidebarPathList } from 'components/Sidebar';
+import { SidebarList, SidebarPathList } from 'components/Sidebar/constants';
 
 const Icon = styled.img`
   width: 25px;
@@ -44,12 +44,13 @@ const STATUS_BADGE = {
 
 export function Sidebar({ sidebarItems }: Props) {
   const [key, setKey] = React.useState<SidebarPathList>('home');
+  const [enableApp, setEnableApp] = React.useState(false);
   const currentUser = React.useContext(UserContext);
 
   const { groupName } = useParams<{ groupName: string }>();
   const { userItems, adminItems, hasAdminItems } = React.useMemo(() => {
     const filterSidebarItems = sidebarItems.filter((item) => {
-      if (item?.hidden) {
+      if (item?.flag && !enableApp) {
         return false;
       }
       return true;
@@ -57,7 +58,7 @@ export function Sidebar({ sidebarItems }: Props) {
 
     const user = filterSidebarItems.filter((item) => !item?.groupAdminOnly);
     const admin = filterSidebarItems.filter(
-      (item) => currentUser.isCurrentGroupAdmin && item?.groupAdminOnly
+      (item) => currentUser?.isCurrentGroupAdmin && item?.groupAdminOnly
     );
     const hasAdminItems = admin.length > 0;
 
@@ -66,7 +67,13 @@ export function Sidebar({ sidebarItems }: Props) {
       adminItems: admin,
       hasAdminItems,
     };
-  }, [currentUser.isCurrentGroupAdmin, sidebarItems]);
+  }, [currentUser, sidebarItems, enableApp]);
+
+  React.useEffect(() => {
+    if ((window as any)?.enableApp) {
+      setEnableApp(true);
+    }
+  }, []);
 
   return (
     <Layout.Sider style={{ position: 'fixed', height: '100%' }}>
