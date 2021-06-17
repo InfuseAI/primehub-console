@@ -517,15 +517,15 @@ export const available = async (root, args, context: Context) => {
   const {crdClient} = context;
   const where = args && args.where;
   if (where) {
-    const rules = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$/
+    const rules = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$/;
     if (!rules.test(where.id)) {
       return false;
     }
     try {
       await crdClient.phDeployments.get(where.id);
     } catch (error) {
-      if (error.data && error.data.code && error.data.code == "RESOURCE_NOT_FOUND") {
-        return true
+      if (error.data && error.data.code && error.data.code === 'RESOURCE_NOT_FOUND') {
+        return true;
       }
       logger.info({
         component: logger.components.phDeployment,
