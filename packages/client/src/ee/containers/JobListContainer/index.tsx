@@ -1,19 +1,19 @@
 import * as React from 'react';
+import queryString from 'querystring';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import { withRouter } from 'react-router-dom';
-import queryString from 'querystring';
 import { RouteComponentProps } from 'react-router';
+
 import JobList from 'ee/components/job/list';
 import { errorHandler } from 'utils/errorHandler';
 import { Group } from 'ee/components/shared/groupFilter';
-import type { GroupContextComponentProps } from 'context/group';
-
 import {
   PhJobsConnection,
   rerunPhJob,
   cancelPhJob,
 } from 'queries/PhJob.graphql';
+import type { GroupContextComponentProps } from 'context/group';
 
 type Props = {
   getPhJobConnection?: any;

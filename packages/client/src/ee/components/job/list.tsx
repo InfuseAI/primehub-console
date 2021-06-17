@@ -90,7 +90,7 @@ const getCreateTimeAndFinishTime = (startTime, finishTime, phase: Phase) => {
   }
 }
 
-const renderTiming = (createTime, record) => {
+const renderTiming = (_, record) => {
   const createTime = record.createTime;
   const startTime = record.startTime;
   const finishTime = record.finishTime;
@@ -292,10 +292,10 @@ class JobList extends React.Component<Props> {
                 {action}
               </Button>
             ) : [
-              <Button onClick={() => this.handleRerun(id)} loading={loading}>
+              <Button key="re-run" onClick={() => this.handleRerun(id)} loading={loading}>
                 {action}
               </Button>,
-              <Button onClick={() => this.cloneJob(record)}>Clone</Button>
+              <Button key="clone-job" onClick={() => this.cloneJob(record)}>Clone</Button>
             ]
           }
         </Button.Group>
@@ -343,17 +343,17 @@ class JobList extends React.Component<Props> {
         />
         <PageBody>
           <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
+            {/* @ts-ignore */}
             <InfuseButton
               icon="plus"
               onClick={this.createPhJob}
-              style={{marginRight: 16, width: 120}}
+              style={{ marginRight: 16, width: 120 }}
               type="primary"
             >
               New Job
             </InfuseButton>
-            <InfuseButton onClick={this.refresh}>
-              Refresh
-            </InfuseButton>
+            {/* @ts-ignore */}
+            <InfuseButton onClick={this.refresh}>Refresh</InfuseButton>
           </div>
           <Filter
             groupContext={groupContext}
