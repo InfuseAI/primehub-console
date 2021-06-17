@@ -12,6 +12,7 @@ module.exports = {
     '^containers/(.*)': '<rootDir>/src/containers/$1',
     '^cms-layouts/(.*)': '<rootDir>/src/cms-layouts/$1',
     '^cms-components/(.*)': '<rootDir>/src/cms-components/$1',
+    '^cms-toolbar/(.*)': '<rootDir>/src/cms-toolbar/$1',
     '^styledShare/(.*)': '<rootDir>/src/styled_share/$1',
     '^context/(.*)': '<rootDir>/src/context/$1',
     '^ee/(.*)': '<rootDir>/src/ee/$1',

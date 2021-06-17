@@ -2,8 +2,8 @@ import * as React from 'react';
 import {Checkbox, Input, Col, Divider} from 'antd';
 import styled from 'styled-components';
 import GroupFilter, {Group} from 'ee/components/shared/groupFilter';
-import {FilterRow, FilterPlugins, ButtonCol} from 'root/cms-toolbar/filter';
-import {Label} from 'root/cms-toolbar/share';
+import {FilterRow, FilterPlugins, ButtonCol} from 'cms-toolbar/filter';
+import {Label} from 'cms-toolbar/share';
 
 const Search = Input.Search;
 
@@ -49,7 +49,7 @@ export default class Filter extends React.Component<Props> {
     const filterComps = []
     if( !groupContext ) {
       // Not in group context
-      filterComps.push(<Col style={{flex: 1}}>
+      filterComps.push(<Col key="no-group-ctx" style={{flex: 1}}>
         <FilterPlugins style={{marginRight: 0}}>
           <Label>Group</Label>
           <GroupFilter
@@ -60,10 +60,10 @@ export default class Filter extends React.Component<Props> {
         </FilterPlugins>
       </Col>);
       filterComps.push(
-        <div style={{borderLeft: '1px solid #d9d9d9', margin: '0px 8px 2px', height: 28}} />
+        <div key="divider" style={{borderLeft: '1px solid #d9d9d9', margin: '0px 8px 2px', height: 28}} />
       )
     } else if (searchHandler) {
-      filterComps.push(<Col style={{flex: 1}}>
+      filterComps.push(<Col key="search-handler" style={{flex: 1}}>
         <FilterPlugins style={{marginRight: '10px'}}>
           <Search
             placeholder={`Search ${resourceKey} name`}
@@ -73,7 +73,7 @@ export default class Filter extends React.Component<Props> {
       </Col>);
 
     } else {
-      filterComps.push(<Col style={{flex: 1}} />);
+      filterComps.push(<Col key="basic-col" style={{flex: 1}} />);
     }
 
     return (

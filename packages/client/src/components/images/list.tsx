@@ -11,7 +11,7 @@ import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
 import { UserContextComponentProps } from 'context/user';
-import {FilterRow, FilterPlugins, ButtonCol} from 'root/cms-toolbar/filter';
+import {FilterRow, FilterPlugins, ButtonCol} from 'cms-toolbar/filter';
 import Breadcrumbs from 'components/share/breadcrumb';
 const breadcrumbs = [
   {
