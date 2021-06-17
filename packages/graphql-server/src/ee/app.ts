@@ -105,7 +105,7 @@ const eeResolvers = {
     phSchedules: phSchedule.query,
     phSchedulesConnection: phSchedule.connectionQuery,
     phDeployment: phDeployment.queryOne,
-    phDeploymentAvail: phDeployment.avaliable,
+    phDeploymentAvail: phDeployment.available,
     phDeployments: phDeployment.query,
     phDeploymentsConnection: phDeployment.connectionQuery,
     usageReports: usageReport.query,

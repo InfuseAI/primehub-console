@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon, InputNumber, Switch, AutoComplete} from 'antd';
+import {Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon, InputNumber, Switch, AutoComplete, Checkbox} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
 import {get, snakeCase, debounce} from 'lodash';
 import DynamicFields from 'components/share/dynamicFields';
@@ -9,6 +9,9 @@ import ImagePullSecret from 'components/share/ImagePullSecret';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 import {PrePackagedServers} from 'ee/components/modelDeployment/prePackagedServers';
 import PHTooltip from 'components/share/toolTip';
+import gql from 'graphql-tag';
+import { ApolloConsumer } from 'react-apollo';
+import { ApolloClient } from 'apollo-client';
 
 const { Option } = Select;
 
@@ -28,7 +31,9 @@ type Props = FormComponentProps & {
 
 type State = {
   revealEnv: boolean;
-}
+  customizeId: boolean;
+  customizeIdState?: 'validating' | 'success' | 'error';
+};
 
 const radioStyle = {
   display: 'block',
@@ -72,13 +77,15 @@ const autoGenId = (name: string) => {
   const normalizedNAme = name.replace(/[\W_]/g, '-').toLowerCase();
   const randomString = Math.random().toString(36).substring(7).substring(0, 5);
   return `${normalizedNAme}-${randomString}`;
-}
+};
 
 class DeploymentCreateForm extends React.Component<Props, State> {
   state = {
     recurrenceError: '',
     revealEnv: false,
-    modelImageSearchText: ''
+    modelImageSearchText: '',
+    customizeId: false,
+    customizeIdState: null,
   };
 
   componentDidMount() {
@@ -158,9 +165,68 @@ class DeploymentCreateForm extends React.Component<Props, State> {
 
   }, 400)
 
+  handleIdChange = debounce(async (client: ApolloClient<any>, deploymentId) => {
+    const CHECK_DEPLOYMENT_AVAIL = gql`
+      query checkDeploymentAvail($deploymentId: ID!) {
+        phDeploymentAvail(where: {id: $deploymentId})
+      }
+    `;
+
+    const {form} = this.props;
+
+    this.setState({
+      customizeIdState: 'validating',
+    });
+
+    const result = await client.query<any>({
+      query: CHECK_DEPLOYMENT_AVAIL,
+      variables: {
+        deploymentId,
+      },
+      fetchPolicy: 'no-cache',
+    });
+    const avail = get(result, 'data.phDeploymentAvail');
+    this.setState({
+      customizeIdState: avail ? 'success' : 'error',
+    });
+  }, 400);
+
   handleSearch = modelImageSearchText => {
     this.setState({modelImageSearchText});
   }
+
+  renderDeploymentIdFormItem = (initialValue) => {
+    const {form, type} = this.props;
+
+    const { customizeId, customizeIdState } = this.state;
+    return (
+      <ApolloConsumer>
+        {client => <Form.Item
+          label={`Deployment ID`}
+          hasFeedback={customizeId}
+          validateStatus={customizeIdState}
+          required
+        >
+          {type === 'create' ? <Checkbox
+            style={{ marginRight: 8 }}
+            onChange={(e) => {
+              this.setState({
+                customizeId: e.target.checked,
+                customizeIdState: null,
+              });
+            }}
+          /> : null}
+          {form.getFieldDecorator('id')(
+            <Input
+              style={{ width: type === 'create' ? 'calc(100% - 24px)' : '100%' }}
+              disabled={!customizeId}
+              onChange={(e) => {this.handleIdChange(client, e.target.value)}}
+          />)
+          }
+        </Form.Item>}
+      </ApolloConsumer>
+    );
+  };
 
   render() {
     const {
@@ -173,7 +239,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       form,
       initialValue,
       selectedGroup,
-      type
+      type,
     } = this.props;
     const {
       groupId,
@@ -191,6 +257,10 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       metadata,
       endpointAccessType,
     } = initialValue || {};
+    const {
+      customizeId,
+      customizeIdState,
+    } = this.state;
     const { revealEnv, modelImageSearchText } = this.state;
     const showRevealBtn = !!(type === 'edit')
     const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
@@ -273,14 +343,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   <Input disabled={type === 'edit'} onChange={this.handleNameChange} />
                 )}
               </Form.Item>
-              <Form.Item label={`Deployment ID`}>
-                {form.getFieldDecorator('id', {
-                  initialValue: id
-                })(
-                  <Input disabled />
-                )}
-              </Form.Item>
-
+              {this.renderDeploymentIdFormItem(id)}
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item label={<span>Model Image <PHTooltip tipText='Model Image is an image integrated a model file into, which can be deployed as a service.' tipLink='https://docs.primehub.io/docs/model-deployment-language-wrapper-intro' placement='right' style={{margintLeft: 8}}/></span>}>
@@ -319,7 +382,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   rules: [
                     {
                       required: false,
-                      message: 'PHFS is not supported in this installation.', 
+                      message: 'PHFS is not supported in this installation.',
                       validator: (rule, value, callback) => (value && value.length > 4 && value.substring(0, 4) === 'phfs' && !(window as any).enablePhfs ? callback('PHFS is not supported in this installation.') : callback())
                     }
                   ],
