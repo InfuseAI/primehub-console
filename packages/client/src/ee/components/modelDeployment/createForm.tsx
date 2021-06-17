@@ -123,9 +123,11 @@ class DeploymentCreateForm extends React.Component<Props, State> {
 
   submit = (e) => {
     const {form, onSubmit} = this.props;
+    const {customizeIdValidateStatus} = this.state;
     e.preventDefault();
     form.validateFields(async (err, values: FormValue) => {
       if (err) return;
+      if (customizeIdValidateStatus === 'error') return;
       if (!values.metadata) values.metadata = {}
       values.endpointAccessType = values.privateAccess ? 'private' : 'public';
       delete values.privateAccess;
@@ -157,8 +159,13 @@ class DeploymentCreateForm extends React.Component<Props, State> {
   }
 
   handleNameChange = debounce(() => {
-    const {form} = this.props;
-    const values = form.getFieldsValue();
+    const { form } = this.props;
+    const { customizeId } = this.state;
+
+    if (customizeId) {
+      return;
+    }
+
     form.validateFields(['name'], (err, values) => {
       if (err) return form.setFieldsValue({ id: '' });
       const id = autoGenId(values.name);
@@ -197,14 +204,11 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       return;
     }
 
-
     const CHECK_DEPLOYMENT_AVAIL = gql`
       query checkDeploymentAvail($deploymentId: ID!) {
         phDeploymentAvail(where: {id: $deploymentId})
       }
     `;
-
-    const {form} = this.props;
 
     this.setState({
       customizeIdValidateStatus: 'validating',
@@ -222,7 +226,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
     if (avail) {
       this.setState({
         customizeIdValidateStatus: 'success',
-        customizeIdHelp: null,
+        customizeIdHelp: `${deploymentId} is avaiable`,
       });
     } else {
       this.setState({
