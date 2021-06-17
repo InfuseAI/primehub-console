@@ -34,6 +34,7 @@ const createEnvVariablesSetup = () => (ctx: Context, next: Next) => {
   ctx.state.primehubVersion = config.primehubVersion;
   ctx.state.isUserAdmin = config.isUserAdmin;
   ctx.state.newAccessToken = config.newAccessToken;
+  ctx.state.apiToken = '';
 
   // referrer
   const referrer = `${config.cmsHost}${ctx.path}`;
