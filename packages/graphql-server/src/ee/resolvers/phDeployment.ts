@@ -517,7 +517,7 @@ export const available = async (root, args, context: Context) => {
   const {crdClient} = context;
   const where = args && args.where;
   if (where) {
-    const rules = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]$/;
+    const rules = /^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/;
     if (!rules.test(where.id)) {
       return false;
     }

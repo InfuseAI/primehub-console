@@ -32,7 +32,8 @@ type Props = FormComponentProps & {
 type State = {
   revealEnv: boolean;
   customizeId: boolean;
-  customizeIdState?: 'validating' | 'success' | 'error';
+  customizeIdValidateStatus?: 'validating' | 'success' | 'error';
+  customizeIdHelp?: string;
 };
 
 const radioStyle = {
@@ -85,7 +86,8 @@ class DeploymentCreateForm extends React.Component<Props, State> {
     revealEnv: false,
     modelImageSearchText: '',
     customizeId: false,
-    customizeIdState: null,
+    customizeIdValidateStatus: null,
+    customizeIdHelp: null,
   };
 
   componentDidMount() {
@@ -162,10 +164,28 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       const id = autoGenId(values.name);
       form.setFieldsValue({ id });
     });
-
-  }, 400)
+  }, 400);
 
   handleIdChange = debounce(async (client: ApolloClient<any>, deploymentId) => {
+    const rules = /^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/;
+    if (!deploymentId) {
+      this.setState({
+        customizeIdValidateStatus: 'error',
+        customizeIdHelp: "Please input an ID",
+      });
+      return;
+    }
+
+    if (!rules.test(deploymentId)) {
+      this.setState({
+        customizeIdValidateStatus: 'error',
+        customizeIdHelp:
+          "lower case alphanumeric characters, '-', and must start and end with an alphanumeric character.",
+      });
+      return;
+    }
+
+
     const CHECK_DEPLOYMENT_AVAIL = gql`
       query checkDeploymentAvail($deploymentId: ID!) {
         phDeploymentAvail(where: {id: $deploymentId})
@@ -175,7 +195,8 @@ class DeploymentCreateForm extends React.Component<Props, State> {
     const {form} = this.props;
 
     this.setState({
-      customizeIdState: 'validating',
+      customizeIdValidateStatus: 'validating',
+      customizeIdHelp: null,
     });
 
     const result = await client.query<any>({
@@ -186,9 +207,19 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       fetchPolicy: 'no-cache',
     });
     const avail = get(result, 'data.phDeploymentAvail');
-    this.setState({
-      customizeIdState: avail ? 'success' : 'error',
-    });
+    if (avail) {
+      this.setState({
+        customizeIdValidateStatus: 'success',
+        customizeIdHelp: null,
+      });
+    } else {
+      this.setState({
+        customizeIdValidateStatus: 'error',
+        customizeIdHelp:
+          'The ID has been used by other users. Change your ID to a unique string to try again.',
+      });
+    }
+
   }, 400);
 
   handleSearch = modelImageSearchText => {
@@ -198,13 +229,14 @@ class DeploymentCreateForm extends React.Component<Props, State> {
   renderDeploymentIdFormItem = (initialValue) => {
     const {form, type} = this.props;
 
-    const { customizeId, customizeIdState } = this.state;
+    const { customizeId, customizeIdValidateStatus, customizeIdHelp } = this.state;
     return (
       <ApolloConsumer>
         {client => <Form.Item
-          label={`Deployment ID`}
+          label={<span>Deployment ID <PHTooltip tipText='Check the box to customize your Deployment ID. The ID should be unique in PrimeHub' tipLink='https://docs.primehub.io/docs/model-deployment-feature#deployment-details' placement='right' style={{margintLeft: 8}}/></span>}
           hasFeedback={customizeId}
-          validateStatus={customizeIdState}
+          validateStatus={customizeIdValidateStatus}
+          help={customizeIdHelp}
           required
         >
           {type === 'create' ? <Checkbox
@@ -212,11 +244,18 @@ class DeploymentCreateForm extends React.Component<Props, State> {
             onChange={(e) => {
               this.setState({
                 customizeId: e.target.checked,
-                customizeIdState: null,
+                customizeIdValidateStatus: null,
+                customizeIdHelp: null,
               });
+
+              if (!e.target.checked) {
+                this.handleNameChange();
+              }
             }}
+
+
           /> : null}
-          {form.getFieldDecorator('id')(
+          {form.getFieldDecorator('id', {initialValue})(
             <Input
               style={{ width: type === 'create' ? 'calc(100% - 24px)' : '100%' }}
               disabled={!customizeId}
@@ -257,10 +296,6 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       metadata,
       endpointAccessType,
     } = initialValue || {};
-    const {
-      customizeId,
-      customizeIdState,
-    } = this.state;
     const { revealEnv, modelImageSearchText } = this.state;
     const showRevealBtn = !!(type === 'edit')
     const invalidInitialGroup = groupId && selectedGroup === groupId && !groups.find(group => group.id === groupId);
