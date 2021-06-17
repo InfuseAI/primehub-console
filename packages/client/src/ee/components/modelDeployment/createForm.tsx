@@ -166,6 +166,18 @@ class DeploymentCreateForm extends React.Component<Props, State> {
     });
   }, 400);
 
+  handleDeploymentIdCheck = (e) => {
+    this.setState({
+      customizeId: e.target.checked,
+      customizeIdValidateStatus: null,
+      customizeIdHelp: null,
+    });
+
+    if (!e.target.checked) {
+      this.handleNameChange();
+    }
+  };
+
   handleIdChange = debounce(async (client: ApolloClient<any>, deploymentId) => {
     const rules = /^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/;
     if (!deploymentId) {
@@ -227,44 +239,55 @@ class DeploymentCreateForm extends React.Component<Props, State> {
   }
 
   renderDeploymentIdFormItem = (initialValue) => {
-    const {form, type} = this.props;
+    const { form, type } = this.props;
 
     const { customizeId, customizeIdValidateStatus, customizeIdHelp } = this.state;
-    return (
-      <ApolloConsumer>
-        {client => <Form.Item
-          label={<span>Deployment ID <PHTooltip tipText='Check the box to customize your Deployment ID. The ID should be unique in PrimeHub' tipLink='https://docs.primehub.io/docs/model-deployment-feature#deployment-details' placement='right' style={{margintLeft: 8}}/></span>}
+
+    const _renderItem = (client) => {
+      const formLabel = (
+        <span>
+          Deployment ID{' '}
+          <PHTooltip
+            tipText="Check the box to customize your Deployment ID. The ID should be unique in PrimeHub"
+            tipLink="https://docs.primehub.io/docs/model-deployment-feature#deployment-details"
+            placement="right"
+            style={{ margintLeft: 8 }}
+          />
+        </span>
+      );
+
+      const cbDeploymentId = (
+        <Checkbox
+          style={{ marginRight: 8 }}
+          onChange={this.handleDeploymentIdCheck}
+        />
+      );
+
+      return (
+        <Form.Item
+          label={formLabel}
           hasFeedback={customizeId}
           validateStatus={customizeIdValidateStatus}
           help={customizeIdHelp}
           required
         >
-          {type === 'create' ? <Checkbox
-            style={{ marginRight: 8 }}
-            onChange={(e) => {
-              this.setState({
-                customizeId: e.target.checked,
-                customizeIdValidateStatus: null,
-                customizeIdHelp: null,
-              });
-
-              if (!e.target.checked) {
-                this.handleNameChange();
-              }
-            }}
-
-
-          /> : null}
-          {form.getFieldDecorator('id', {initialValue})(
+          {type === 'create' ? cbDeploymentId : null}
+          {form.getFieldDecorator('id', { initialValue })(
             <Input
-              style={{ width: type === 'create' ? 'calc(100% - 24px)' : '100%' }}
+              style={{
+                width: type === 'create' ? 'calc(100% - 24px)' : '100%',
+              }}
               disabled={!customizeId}
-              onChange={(e) => {this.handleIdChange(client, e.target.value)}}
-          />)
-          }
-        </Form.Item>}
-      </ApolloConsumer>
-    );
+              onChange={(e) => {
+                this.handleIdChange(client, e.target.value);
+              }}
+            />
+          )}
+        </Form.Item>
+      );
+    };
+
+    return <ApolloConsumer>{(client) => _renderItem(client)}</ApolloConsumer>;
   };
 
   render() {
