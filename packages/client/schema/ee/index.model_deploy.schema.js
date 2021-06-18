@@ -14,6 +14,12 @@ import {dict, graphqlClient, imageStorage} from 'schema/utils';
 import CommonBody from 'cms-layouts/commonBody';
 import UserBody from 'cms-layouts/userBody';
 
+const grafana = (
+  (typeof enableGrafana !== 'undefined' && enableGrafana) ?
+    <object keyName="grafana"></object> :
+    {}
+);
+
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
     <Body component={CommonBody}>
@@ -29,6 +35,7 @@ const schema = (
       <Secret />
     </Body>
     <System/>
+    {grafana}
     {/* <Announcement /> */}
   </root>
 )
