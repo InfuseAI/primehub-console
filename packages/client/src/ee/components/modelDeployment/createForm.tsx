@@ -226,7 +226,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
     if (avail) {
       this.setState({
         customizeIdValidateStatus: 'success',
-        customizeIdHelp: `${deploymentId} is avaiable`,
+        customizeIdHelp: `Your Deployment ID is available. Uncheck the box will reset this id.`,
       });
     } else {
       this.setState({
