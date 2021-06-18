@@ -30,7 +30,7 @@ import DeploymentEditPage from 'ee/containers/deploymentEditPage';
 import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
-import AppListContainer from 'containers/appList';
+import AppListContainer from 'containers/AppListContainer';
 import AppCreate from 'containers/appCreatePage';
 import AppStore from 'containers/appStore';
 import AppDetail from 'containers/appDetail';
