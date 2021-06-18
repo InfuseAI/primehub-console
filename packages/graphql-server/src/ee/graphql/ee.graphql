@@ -100,6 +100,7 @@ type Query {
 
   """PhDeployment"""
   phDeployment(where: PhDeploymentWhereUniqueInput!): PhDeployment!
+  phDeploymentAvail(where: PhDeploymentWhereUniqueInput!): Boolean!
   phDeployments(
     where: PhDeploymentWhereInput
     before: String

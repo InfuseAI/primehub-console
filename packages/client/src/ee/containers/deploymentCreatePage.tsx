@@ -1,20 +1,19 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
-import {notification} from 'antd';
-import {graphql} from 'react-apollo';
-import {compose} from 'recompose';
-import {get, unionBy, pick} from 'lodash';
+import { notification } from 'antd';
+import { graphql } from 'react-apollo';
+import { compose } from 'recompose';
+import { get, unionBy, pick } from 'lodash';
 import queryString from 'querystring';
-import {RouteComponentProps} from 'react-router';
-import {withRouter} from 'react-router-dom';
-import {errorHandler} from 'utils/errorHandler';
+import { RouteComponentProps } from 'react-router';
+import { withRouter } from 'react-router-dom';
+import { errorHandler } from 'utils/errorHandler';
 import DeploymentCreateForm from 'ee/components/modelDeployment/createForm';
-import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
-import {GroupContextComponentProps, withGroupContext} from 'context/group';
+import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
-import {sortNameByAlphaBet} from 'utils/sorting';
-import {CurrentUser} from 'queries/User.graphql';
+import { sortNameByAlphaBet } from 'utils/sorting';
+import { CurrentUser } from 'queries/User.graphql';
 
 const breadcrumbs = [
   {
@@ -106,6 +105,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
         />
         <div style={{margin: '16px'}}>
           <DeploymentCreateForm
+            type="create"
             groupContext={groupContext}
             refetchGroup={currentUser.refetch}
             onSelectGroup={this.onChangeGroup}

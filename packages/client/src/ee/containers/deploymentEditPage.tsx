@@ -144,7 +144,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
         />
         <div style={{margin: '16px'}}>
           <DeploymentCreateForm
-            type='edit'
+            type="edit"
             initialValue={{
               ...(getPhDeployment.phDeployment || {}),
               instanceTypeId: get(getPhDeployment, 'phDeployment.instanceType.id', ''),
