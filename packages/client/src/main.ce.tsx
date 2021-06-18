@@ -14,7 +14,7 @@ import { listCE } from 'components/Sidebar';
 import Jupyterhub from 'containers/JupyterHubPage';
 import ListContainer from 'containers/ListContainer';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
-import AppListContainer from 'containers/appList';
+import AppListContainer from 'containers/AppListContainer';
 import AppCreate from 'containers/appCreatePage';
 import AppStore from 'containers/appStore';
 import AppDetail from 'containers/appDetail';
