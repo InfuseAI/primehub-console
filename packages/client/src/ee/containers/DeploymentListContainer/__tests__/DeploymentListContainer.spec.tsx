@@ -157,9 +157,12 @@ describe('DeploymentListContainer', () => {
     const { mockGroupContext } = setup();
 
     render(
-      <MockedProvider mocks={[]}>
+      <MockedProvider>
         <MemoryRouter>
-          <DeploymentListContainer groupContext={mockGroupContext} />
+          <DeploymentListContainer
+            groups={mockGroups}
+            groupContext={mockGroupContext}
+          />
         </MemoryRouter>
       </MockedProvider>
     );
@@ -171,9 +174,12 @@ describe('DeploymentListContainer', () => {
     const { mockGroupContext } = setup();
 
     render(
-      <MockedProvider mocks={[]}>
+      <MockedProvider>
         <MemoryRouter>
-          <DeploymentListContainer groupContext={mockGroupContext} />
+          <DeploymentListContainer
+            groups={mockGroups}
+            groupContext={mockGroupContext}
+          />
         </MemoryRouter>
       </MockedProvider>
     );
