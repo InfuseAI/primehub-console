@@ -4,12 +4,13 @@ import { ApolloProvider } from 'react-apollo';
 import { notification, Button } from 'antd';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { BackgroundTokenSyncer } from '../workers/backgroundTokenSyncer';
-import MainPage, { MainPageSidebarItem } from 'containers/mainPage';
+import MainPage from 'containers/mainPage';
 import { appPrefix } from 'utils/env';
 import { fakeData, schema } from '../fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
 import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
-import { listDeploy } from 'utils/sidebarItemList';
+import { listDeploy } from 'components/Sidebar';
+
 // Components
 import ListContainer from 'containers/ListContainer';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
@@ -30,13 +31,11 @@ const client = createGraphqlClient({
 
 class Main extends React.Component {
   render() {
-    const sidebarItems: MainPageSidebarItem[] = listDeploy;
-
     return (
       <BrowserRouter>
         <ApolloProvider client={client}>
           <MainPage
-            sidebarItems={sidebarItems}
+            sidebarItems={listDeploy}
             notification={<LicenseWarningBanner />}
           >
             {/* Shared Files */}
