@@ -37,7 +37,6 @@ export interface SidebarItem {
   enabledIn: Feature[];
   style?: React.CSSProperties;
   stage?: string;
-  flag?: string;
   groupAdminOnly?: boolean;
 }
 export type SidebarList = SidebarItem[];
@@ -139,7 +138,6 @@ export const sidebarList: SidebarList = [
     icon: iconApps,
     enabledIn: [FEATURES.CE, FEATURES.EE],
     stage: 'beta',
-    flag: 'enableApp',
     style: {
       width: 'auto',
       height: 20,

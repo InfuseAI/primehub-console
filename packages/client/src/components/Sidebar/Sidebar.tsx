@@ -50,7 +50,7 @@ export function Sidebar({ sidebarItems }: Props) {
   const { groupName } = useParams<{ groupName: string }>();
   const { userItems, adminItems, hasAdminItems } = React.useMemo(() => {
     const filterSidebarItems = sidebarItems.filter((item) => {
-      if (item?.flag && !enableApp) {
+      if (item.title === 'Apps' && !enableApp) {
         return false;
       }
       return true;
