@@ -24,7 +24,7 @@ import ScheduleListContainer from 'ee/containers/scheduleList';
 import ModelListContainer from 'ee/containers/modelList';
 import ModelDetailContainer from 'ee/containers/modelDetail';
 import ModelVersionDetailContainer from 'ee/containers/modelVersionDetail';
-import DeploymentListContainer from 'ee/containers/deploymentList';
+import DeploymentListContainer from 'ee/containers/DeploymentListContainer';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
 import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
