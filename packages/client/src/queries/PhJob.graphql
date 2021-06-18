@@ -40,3 +40,23 @@ query PhJobsConnection($where: PhJobWhereInput, $page: Int, $orderBy: PhJobOrder
     }
   }
 }
+
+query phJob($where: PhJobWhereUniqueInput!) {
+  phJob(where: $where) {
+    ...PhJobInfo
+  }
+}
+
+
+# Mutations
+mutation rerunPhJob($where: PhJobWhereUniqueInput!) {
+  rerunPhJob(where: $where) {
+    ...PhJobInfo
+  }
+}
+
+mutation cancelPhJob($where: PhJobWhereUniqueInput!) {
+  cancelPhJob(where: $where) {
+    id
+  }
+}

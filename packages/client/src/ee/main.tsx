@@ -16,7 +16,7 @@ import ListContainer from 'containers/list';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
 import JobDetailContainer from 'ee/containers/jobDetail';
 import JobCreatePage from 'ee/containers/jobCreatePage';
-import JobListContainer from 'ee/containers/jobList';
+import JobListContainer from 'ee/containers/JobListContainer';
 import ScheduleDetailContainer from 'ee/containers/scheduleDetail';
 import ScheduleCreatePage from 'ee/containers/scheduleCreatePage';
 import ScheduleListContainer from 'ee/containers/scheduleList';

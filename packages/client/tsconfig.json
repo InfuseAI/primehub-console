@@ -28,6 +28,7 @@
       "containers/*": ["./src/containers/*"],
       "cms-layouts/*": ["./src/cms-layouts/*"],
       "cms-components/*": ["./src/cms-components/*"],
+      "cms-toolbar/*": ["./src/cms-toolbar/*"],
       "styledShare/*": ["./src/styled_share/*"],
       "context/*": ["./src/context/*"],
       "ee/*": ["./src/ee/*"],

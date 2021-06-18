@@ -63,11 +63,11 @@ class FilterGroup extends React.Component {
 
   render() {
     const {fields, where} = this.props;
-    const filters = fields.map((val) => {
+    const filters = fields.map((val, i) => {
       switch (val.type) {
         case 'text':
         default:
-          return <TextFilter defaultValue={(where[val.key] || {}).contains || ''} onChange={cond => this.onChange(cond, val.key)} name={val.key} label={val.label} placeholder={val.placeholder} search={this.submit}/>;
+          return <TextFilter key={i} defaultValue={(where[val.key] || {}).contains || ''} onChange={cond => this.onChange(cond, val.key)} name={val.key} label={val.label} placeholder={val.placeholder} search={this.submit}/>;
       }
     });
     if (!filters.length) return null;

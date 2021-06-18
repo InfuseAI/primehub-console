@@ -133,6 +133,7 @@ module.exports = (env) => {
         containers: path.resolve(__dirname, 'src/containers'),
         'cms-layouts': path.resolve(__dirname, 'src/cms-layouts'),
         'cms-components': path.resolve(__dirname, 'src/cms-components'),
+        'cms-toolbar': path.resolve(__dirname, 'src/cms-toolbar'),
         context: path.resolve(__dirname, 'src/context'),
         ee: path.resolve(__dirname, 'src/ee'),
         constant: path.resolve(__dirname, 'src/constant'),

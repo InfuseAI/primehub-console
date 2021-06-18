@@ -1,43 +1,43 @@
 import * as React from 'react';
-import gql from 'graphql-tag';
-import {graphql} from 'react-apollo';
-import {RouteComponentProps} from 'react-router-dom';
-import {compose} from 'recompose';
+import { get } from 'lodash';
+import { graphql } from 'react-apollo';
+import { RouteComponentProps } from 'react-router-dom';
+import { compose } from 'recompose';
+
 import JobDetail from 'ee/components/job/detail';
-import {errorHandler} from 'utils/errorHandler';
-import {PhJobFragment} from './jobList';
-import {RERUN_JOB, CANCEL_JOB} from './jobList';
-import {get} from 'lodash';
-import {appPrefix} from 'utils/env';
+import { errorHandler } from 'utils/errorHandler';
+import { appPrefix } from 'utils/env';
+import { rerunPhJob, cancelPhJob, phJob } from 'queries/PhJob.graphql';
 
 type Props = {
   getPhJob: any;
-  rerunPhJob: Function;
-  cancelPhJob: Function;
+  rerunPhJob: () => void;
+  cancelPhJob: () => void;
   rerunPhJobResult: any;
   cancelPhJobResult: any;
 } & RouteComponentProps<{
   jobId: string;
 }>;
 
-export const GET_PH_JOB = gql`
-  query phJob($where: PhJobWhereUniqueInput!) {
-    phJob(where: $where) {
-      ...PhJobInfo
-    }
-  }
-  ${PhJobFragment}
-`;
-
-const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
+const getMessage = (error) =>
+  get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH'
+    ? `You're not authorized to view this page.`
+    : 'Error';
 
 class JobDetailContainer extends React.Component<Props> {
   render() {
-    const {getPhJob, history, rerunPhJob, cancelPhJob, rerunPhJobResult, cancelPhJobResult} = this.props;
+    const {
+      getPhJob,
+      history,
+      rerunPhJob,
+      cancelPhJob,
+      rerunPhJobResult,
+      cancelPhJobResult,
+    } = this.props;
     if (!getPhJob.phJob) return null;
     if (getPhJob.error) {
       return getMessage(getPhJob.error);
-    };
+    }
     return (
       <JobDetail
         refetchPhJob={getPhJob.refetch}
@@ -45,7 +45,7 @@ class JobDetailContainer extends React.Component<Props> {
         cancelPhJob={cancelPhJob}
         rerunPhJobResult={rerunPhJobResult}
         cancelPhJobResult={cancelPhJobResult}
-        job={getPhJob.phJob || {id: 'test'}}
+        job={getPhJob.phJob || { id: 'test' }}
         appPrefix={appPrefix}
         history={history}
       />
@@ -54,39 +54,43 @@ class JobDetailContainer extends React.Component<Props> {
 }
 
 export default compose(
-  graphql(GET_PH_JOB, {
+  graphql(phJob, {
     options: (props: Props) => ({
       variables: {
         where: {
-          id: props.match.params.jobId
-        }
+          id: props.match.params.jobId,
+        },
       },
       fetchPolicy: 'cache-and-network',
-      pollInterval: 2000
+      pollInterval: 2000,
     }),
-    name: 'getPhJob'
+    name: 'getPhJob',
   }),
-  graphql(RERUN_JOB, {
+  graphql(rerunPhJob, {
     options: (props: Props) => ({
-      refetchQueries: [{
-        query: GET_PH_JOB,
-        variables: {where: {id: props.match.params.jobId}}
-      }],
+      refetchQueries: [
+        {
+          query: phJob,
+          variables: { where: { id: props.match.params.jobId } },
+        },
+      ],
       onCompleted: () => {
         props.history.goBack();
       },
-      onError: errorHandler
+      onError: errorHandler,
     }),
-    name: 'rerunPhJob'
+    name: 'rerunPhJob',
   }),
-  graphql(CANCEL_JOB, {
+  graphql(cancelPhJob, {
     options: (props: Props) => ({
-      refetchQueries: [{
-        query: GET_PH_JOB,
-        variables: {where: {id: props.match.params.jobId}}
-      }],
-      onError: errorHandler
+      refetchQueries: [
+        {
+          query: phJob,
+          variables: { where: { id: props.match.params.jobId } },
+        },
+      ],
+      onError: errorHandler,
     }),
-    name: 'cancelPhJob'
+    name: 'cancelPhJob',
   })
-)(JobDetailContainer)
+)(JobDetailContainer);
