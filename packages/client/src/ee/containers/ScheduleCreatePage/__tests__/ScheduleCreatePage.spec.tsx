@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { render, screen } from 'test/test-utils';
 import { MemoryRouter } from 'react-router-dom';
-import ScheduleCreatePage from 'ee/containers/scheduleCreatePage';
+import ScheduleCreatePage from 'ee/containers/ScheduleCreatePage';
 import { GroupContext } from 'context/group';
 import { UserContext } from 'context/user';
 import { MockedProvider } from 'react-apollo/test-utils';

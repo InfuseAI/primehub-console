@@ -9,7 +9,7 @@ import ScheduleUpdateForm from 'ee/components/job/createForm';
 import Title from 'ee/components/job/title';
 import {errorHandler} from 'utils/errorHandler';
 import {PhScheduleFragment} from 'ee/containers/scheduleList';
-import {GET_TIMEZONE} from 'ee/containers/scheduleCreatePage';
+import {GET_TIMEZONE} from 'ee/containers/ScheduleCreatePage';
 import {get, unionBy, isEqual} from 'lodash';
 import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';

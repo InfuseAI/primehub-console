@@ -10,8 +10,8 @@ import { fakeData, schema } from './fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
 import { listCE } from 'utils/sidebarItemList';
 // Components
-import Jupyterhub from 'containers/jupyterHubPage';
-import ListContainer from 'containers/list';
+import Jupyterhub from 'containers/JupyterHubPage';
+import ListContainer from 'containers/ListContainer';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
 import AppListContainer from 'containers/appList';
 import AppCreate from 'containers/appCreatePage';

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import { JupyterHubContainer } from 'containers/jupyterHubPage';
+import { JupyterHubContainer } from 'containers/JupyterHubPage';
 import { render, screen } from 'test/test-utils';
 import type { GroupContextValue } from 'context/group';
 
