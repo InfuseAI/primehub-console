@@ -1,11 +1,15 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { Layout, Menu, Divider } from 'antd';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useLocation } from 'react-router-dom';
 
 import { appPrefix } from 'utils/env';
 import { UserContext } from 'context/user';
-import { SidebarList, SidebarPathList } from 'components/Sidebar/constants';
+import {
+  SidebarList,
+  SidebarPathList,
+  PATH_KEY_LIST,
+} from 'components/Sidebar/constants';
 
 const Icon = styled.img`
   width: 25px;
@@ -43,10 +47,11 @@ const STATUS_BADGE = {
 };
 
 export function Sidebar({ sidebarItems }: Props) {
-  const [key, setKey] = React.useState<SidebarPathList>('home');
+  const [path, setPath] = React.useState<SidebarPathList>('home');
   const [enableApp, setEnableApp] = React.useState(false);
   const currentUser = React.useContext(UserContext);
 
+  const location = useLocation();
   const { groupName } = useParams<{ groupName: string }>();
   const { userItems, adminItems, hasAdminItems } = React.useMemo(() => {
     const filterSidebarItems = sidebarItems.filter((item) => {
@@ -70,6 +75,16 @@ export function Sidebar({ sidebarItems }: Props) {
   }, [currentUser, sidebarItems, enableApp]);
 
   React.useEffect(() => {
+    const currentPath = location.pathname
+      .split('/')
+      .pop() as typeof PATH_KEY_LIST[number];
+
+    if (PATH_KEY_LIST.includes(currentPath)) {
+      setPath(currentPath);
+    }
+  }, [location]);
+
+  React.useEffect(() => {
     if ((window as any)?.enableApp) {
       setEnableApp(true);
     }
@@ -77,13 +92,13 @@ export function Sidebar({ sidebarItems }: Props) {
 
   return (
     <Layout.Sider style={{ position: 'fixed', height: '100%' }}>
-      <Menu theme="dark" selectedKeys={[key]} data-testid={`${key}-active`}>
+      <Menu theme="dark" selectedKeys={[path]} data-testid={`${path}-active`}>
         {userItems.map((item) => (
           <Menu.Item
             key={item.subPath}
             style={{ paddingLeft: 26 }}
             data-testid={`${item.subPath}`}
-            onClick={() => setKey(item.subPath)}
+            onClick={() => setPath(item.subPath)}
           >
             <Link to={`${appPrefix}g/${groupName}/${item.subPath}`}>
               <Icon src={item.icon} style={item.style} />
@@ -105,7 +120,11 @@ export function Sidebar({ sidebarItems }: Props) {
 
         {hasAdminItems &&
           adminItems.map((item) => (
-            <Menu.Item key={item.subPath} style={{ paddingLeft: 26 }}>
+            <Menu.Item
+              key={item.subPath}
+              style={{ paddingLeft: 26 }}
+              onClick={() => setPath(item.subPath)}
+            >
               <Link to={`${appPrefix}g/${groupName}/${item.subPath}`}>
                 <Icon src={item.icon} style={item.style} />
                 <Title>{item.title}</Title>
