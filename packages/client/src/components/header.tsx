@@ -51,7 +51,7 @@ class HeaderContainer extends React.Component<Props, {}> {
             userProfileLink: '',
             changePasswordLink: '',
             apiTokenLink: '/api-token',
-            adminPortalLink: '/cms',
+            adminPortalLink: '/admin',
             logoutLink: '',
           };
 

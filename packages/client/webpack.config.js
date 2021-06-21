@@ -9,7 +9,7 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { theme } = require('./package.json');
 
 function getPlugins(env) {
-  const { mode: currentEnv } = env;
+  const { mode: currentEnv, schema } = env;
 
   const isDev = currentEnv === 'development';
   const isAnalyze = env.analyze || false;
@@ -25,8 +25,8 @@ function getPlugins(env) {
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebPackPlugin({
       ...htmlWebpackPluginConfig,
-      chunks: ['cms'],
-      filename: isDev ? 'cms.html' : 'cms.ejs',
+      chunks: ['admin'],
+      filename: isDev ? 'admin.html' : 'admin.ejs',
     }),
     new HtmlWebPackPlugin({
       ...htmlWebpackPluginConfig,
@@ -40,8 +40,8 @@ function getPlugins(env) {
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.DefinePlugin({
-      modelDeploymentOnly: false,
-      primehubCE: false,
+      modelDeploymentOnly: schema === 'modelDeploy',
+      primehubCE: schema === 'ce',
     }),
     new MiniCssExtractPlugin({
       filename: isDev ? '[name].css' : '[name].[contenthash].css',
@@ -86,9 +86,21 @@ function getSchema(env) {
   return schemaMap[schema];
 }
 
+function getEntry(env) {
+  const version = env.schema || 'ce';
+  const entryMap = {
+    ee: path.resolve(__dirname, 'src/ee/main.tsx'),
+    ce: path.resolve(__dirname, 'src/main.ce.tsx'),
+    modelDeploy: path.resolve(__dirname, 'src/ee/main.model_deploy.tsx'),
+  }
+  return entryMap[version];
+};
+
+
 module.exports = (env) => {
   const { mode: currentEnv } = env;
   const isDev = currentEnv === 'development';
+  const entryPage = getEntry(env);
 
   const stylesLoader = [MiniCssExtractPlugin.loader, 'css-loader'];
   const configs = {
@@ -96,16 +108,16 @@ module.exports = (env) => {
       mode: 'development',
       devtool: 'eval-cheap-source-map',
       entry: {
-        cms: './src/ee/index.tsx',
-        main: './src/ee/main.tsx',
+        admin: './src/admin.tsx',
+        main: entryPage,
       },
     },
     production: {
       mode: 'production',
       devtool: false,
       entry: {
-        cms: ['./src/public-import.js', './src/ee/index.tsx'],
-        main: ['./src/public-import.js', './src/ee/main.tsx'],
+        admin: ['./src/public-import.js', './src/admin.tsx'],
+        main: ['./src/public-import.js', entryPage],
       },
     },
   };
@@ -152,7 +164,7 @@ module.exports = (env) => {
         rewrites: [
           { from: /^\/g/, to: '/index.html' },
           { from: /^\/app-prefix\/g/, to: '/index.html' },
-          { from: /./, to: '/cms.html' },
+          { from: /./, to: '/admin.html' },
         ],
       },
     },

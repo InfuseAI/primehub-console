@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import fetch from "isomorphic-fetch"
+import {ApolloProvider} from 'react-apollo';
+import { fakeData, schema as fakeDataSchema } from './fakeData';
+import { createGraphqlClient } from 'utils/graphqlClient';
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 import {IntlProvider, addLocaleData} from 'react-intl';
 import {LocaleProvider, notification, Button} from 'antd';
@@ -12,6 +14,8 @@ import CMSPage from './cms';
 import schema from 'index-schema';
 import myLocales from './utils/locales';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
+import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
+
 const firstKey = Object.keys(schema.schema)[0];
 const locales = {
   en: en_US
@@ -19,6 +23,7 @@ const locales = {
 (window as any).LOCALE = (window as any).LOCALE || 'en';
 (window as any).APP_PREFIX = (window as any).APP_PREFIX || '/';
 const locale = (window as any).LOCALE;
+
 /**
  * Background worker
  */
@@ -63,6 +68,12 @@ export const tokenSyncWorker = new BackgroundTokenSyncer({
     });
   }
 })
+
+const client = createGraphqlClient({
+  fakeData,
+  schema: fakeDataSchema
+});
+
 tokenSyncWorker.run().catch(console.error);
 /**
  * UI
@@ -74,8 +85,13 @@ ReactDOM.render(
         <React.Fragment>
           <Switch>
             {/* <Route path="/login" component={Login} /> */}
-            <Route path={`${(window as any).APP_PREFIX}cms/:activeKey`} component={(props) => <CMSPage {...props} schema={schema} />}/>
-            <Redirect to={`${(window as any).APP_PREFIX}cms/${firstKey}`}/>
+            <Route
+              path={`${(window as any).APP_PREFIX}admin/:activeKey`}
+              component={
+                (props) => <CMSPage {...props} schema={schema} notification={<ApolloProvider client={client}><LicenseWarningBanner/></ApolloProvider>} />
+              }
+            />
+            <Redirect to={`${(window as any).APP_PREFIX}admin/${firstKey}`}/>
           </Switch>
         </React.Fragment>
       </Router>

@@ -164,7 +164,7 @@ export default class CMSPage extends React.Component<Props, State> {
     const {intl, history} = this.props;
     const actionType = get(data, 'actions.0.type');
      if (actionType === 'CREATE_ARRAY') {
-      let link = `${(window as any).APP_PREFIX}cms/${data.key}/${getCreateId(data.result)}`;
+      let link = `${(window as any).APP_PREFIX}admin/${data.key}/${getCreateId(data.result)}`;
       setTimeout(() => {
         this.setState({
           deploying: false
@@ -256,7 +256,7 @@ export default class CMSPage extends React.Component<Props, State> {
             resolve();
           }).then(this.reset)
             .then(() => {
-              history.push(`${(window as any).APP_PREFIX}cms/${key}`);
+              history.push(`${(window as any).APP_PREFIX}admin/${key}`);
             });
         },
         onCancel: () => undefined
@@ -265,7 +265,7 @@ export default class CMSPage extends React.Component<Props, State> {
       // add this condition to keep page content not change when
       // opening external link or backing to user portal
     } else {
-      history.push(`${(window as any).APP_PREFIX}cms/${key}`);
+      history.push(`${(window as any).APP_PREFIX}admin/${key}`);
     }
   }
 
@@ -336,7 +336,7 @@ export default class CMSPage extends React.Component<Props, State> {
 
     const router = new R({
       history,
-      baseUrl: `${(window as any).APP_PREFIX || '/'}cms`
+      baseUrl: `${(window as any).APP_PREFIX || '/'}admin`
     });
     const routes = router.getRoutes();
     const routerParams = {
