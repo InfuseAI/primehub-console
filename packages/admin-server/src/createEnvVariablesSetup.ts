@@ -41,7 +41,7 @@ const createEnvVariablesSetup = () => (ctx: Context, next: Next) => {
   ctx.state.links = JSON.stringify({
     userProfileLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account?referrer=${config.keycloakClientId}&referrer_uri=${referrer}`,
     changePasswordLink: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/account/password?referrer=${config.keycloakClientId}&referrer_uri=${referrer}`,
-    adminPortalLink: config.appPrefix ? `${config.appPrefix}/cms` : '/cms',
+    adminPortalLink: config.appPrefix ? `${config.appPrefix}/admin` : '/admin',
     logoutLink: config.appPrefix
       ? `${config.appPrefix}/oidc/logout`
       : '/oidc/logout',
