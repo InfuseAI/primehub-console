@@ -149,15 +149,15 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
     });
   });
 
-  // cms
-  rootRouter.get('/cms', oidcCtrl.ensureAdmin, async ctx => {
-    await ctx.render('cms', {
+  // Admin Portal
+  rootRouter.get('/admin', oidcCtrl.ensureAdmin, async ctx => {
+    await ctx.render('admin', {
       title: 'PrimeHub',
       staticPath,
     });
   });
-  rootRouter.get('/cms/*', oidcCtrl.ensureAdmin, async ctx => {
-    await ctx.render('cms', {
+  rootRouter.get('/admin/*', oidcCtrl.ensureAdmin, async ctx => {
+    await ctx.render('admin', {
       title: 'PrimeHub',
       staticPath,
     });
