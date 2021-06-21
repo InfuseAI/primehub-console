@@ -17,9 +17,6 @@ fragment GroupInfo on Group {
     memUsage
     gpuUsage
   }
-  users {
-    username
-  }
   enabledDeployment
   enabledSharedVolume
   jobDefaultActiveDeadlineSeconds
