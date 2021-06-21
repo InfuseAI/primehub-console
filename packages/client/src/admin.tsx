@@ -87,7 +87,10 @@ ReactDOM.render(
             {/* <Route path="/login" component={Login} /> */}
             <Route
               path={`${(window as any).APP_PREFIX}admin/:activeKey`}
-              component={(props) => <CMSPage {...props} schema={schema} notification={ <ApolloProvider client={client}><LicenseWarningBanner/></ApolloProvider> } />} />
+              component={
+                (props) => <CMSPage {...props} schema={schema} notification={<ApolloProvider client={client}><LicenseWarningBanner/></ApolloProvider>} />
+              }
+            />
             <Redirect to={`${(window as any).APP_PREFIX}admin/${firstKey}`}/>
           </Switch>
         </React.Fragment>
