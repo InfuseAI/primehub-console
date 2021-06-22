@@ -10,10 +10,11 @@ import PageBody from 'components/pageBody';
 import Breadcrumbs from 'components/share/breadcrumb';
 import { IFrame } from 'components/hub/iframe';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
+import queryString from 'querystring';
 
 type Props = GroupContextComponentProps & RouteComponentProps;
 
-export function JupyterHubContainer({ groupContext }: Props) {
+export function JupyterHubContainer({ groupContext, location }: Props) {
   const breadcrumbs = [
     {
       key: 'hub',
@@ -24,6 +25,10 @@ export function JupyterHubContainer({ groupContext }: Props) {
     },
   ];
 
+  const params = queryString.parse(location.search.replace(/^\?/, '')) || {};
+  params.group = groupContext.name;
+  const qs = queryString.stringify(params);
+
   return (
     <>
       <PageTitle breadcrumb={<Breadcrumbs pathList={breadcrumbs} />} />
@@ -32,7 +37,7 @@ export function JupyterHubContainer({ groupContext }: Props) {
         <Tabs style={{ height: '100%' }}>
           <Tabs.TabPane key="information" tab="Notebooks">
             <div style={{ height: 'calc(100vh - 310px)' }}>
-              <IFrame src={`/hub/primehub/home?group=${groupContext.name}`} />
+              <IFrame src={`/hub/primehub/home?${qs}`} />
             </div>
           </Tabs.TabPane>
           <Tabs.TabPane key="logs" tab="Logs">
