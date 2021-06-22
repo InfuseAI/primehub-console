@@ -48,6 +48,14 @@ function setup() {
 }
 
 describe('GroupSettingsMembers Component', () => {
+  it('should render group settings members with loading status', () => {
+    const { group } = setup();
+    render(<GroupSettingsMembers group={group} />, {
+      wrapper: AllTheProviders,
+    });
+    expect(screen.getByText('loading...'));
+  });
+
   it('Should render group settings members', async () => {
     const { group } = setup();
     render(<GroupSettingsMembers group={group} />, { wrapper: AllTheProviders });
@@ -64,5 +72,4 @@ describe('GroupSettingsMembers Component', () => {
     expect(checkbox2.checked).toBe(false);
     expect(checkbox3.checked).toBe(true);
   });
-
 });
