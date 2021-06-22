@@ -1,4 +1,15 @@
 #import './fragments/GroupInfo.graphql'
+query GetGroupUsers($where: GroupWhereUniqueInput!) {
+  group (where: $where) {
+    id
+    name
+    admins
+    users {
+      username
+    }
+  }
+}
+
 query GetGroupMLflowConfig($where: GroupWhereUniqueInput!) {
   group (where: $where) {
     ...GroupMLflowConfig
