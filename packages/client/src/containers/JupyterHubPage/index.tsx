@@ -25,7 +25,10 @@ export function JupyterHubContainer({ groupContext, location }: Props) {
     },
   ];
 
-  const params = queryString.parse(location.search.replace(/^\?/, '')) || {};
+  let params:any = {};
+  if (location.search) {
+    params = queryString.parse(location.search.replace(/^\?/, ''));
+  }
   params.group = groupContext.name;
   const qs = queryString.stringify(params);
 
