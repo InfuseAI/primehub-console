@@ -9,7 +9,7 @@ import {
   SidebarList,
   SidebarPathList,
   PATH_KEY_LIST,
-} from 'components/Sidebar/constants';
+} from 'components/Sidebar/types';
 
 const Icon = styled.img`
   width: 25px;
