@@ -33,7 +33,7 @@ export class AnnCtrl {
     const kcAdminClient = this.createKcAdminClient();
     const {userId} = ctx.params;
     const {time} = ctx.request.body as any;
-    const {authorization = ''}: {authorization: string} = ctx.header;
+    const {authorization = ''}: {authorization?: string} = ctx.header;
 
     if (!userId) {
       throw Boom.badData('require userId in body');

@@ -397,7 +397,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
       let kcAdminClient: KcAdminClient;
       const keycloakClientId = config.keycloakClientId;
-      const {authorization = ''}: {authorization: string} = ctx.header;
+      const {authorization = ''}: {authorization?: string} = ctx.header;
       const useCache = ctx.headers['x-primehub-use-cache'];
       const isJobClient = ctx.headers['x-primehub-job'];
       const minioClient = mClient;
@@ -624,7 +624,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
 
   // ctrl
   const authenticateMiddleware = async (ctx: Koa.ParameterizedContext, next: any) => {
-    const {authorization = ''}: {authorization: string} = ctx.header;
+    const {authorization = ''}: {authorization?: string} = ctx.header;
 
     if (authorization.indexOf('Bearer') < 0) {
       throw Boom.forbidden('request not authorized');
