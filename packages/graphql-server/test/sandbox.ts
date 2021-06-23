@@ -10,6 +10,7 @@ import fs from 'fs';
 import path from 'path';
 import CrdClient from '../src/crdClient/crdClientImpl';
 import { createMinioClient } from '../src/utils/minioClient';
+import { GrantTypes } from 'keycloak-admin/lib/utils/auth';
 const crdClient = new CrdClient();
 (global as any).crdClient = crdClient;
 
@@ -25,7 +26,7 @@ const phDeploymentCrd = loadCrd('phDeployment');
 const masterRealmCred = {
   username: 'keycloak',
   password: 'keycloak',
-  grantType: 'password',
+  grantType: 'password' as GrantTypes,
   clientId: 'admin-cli'
 };
 
