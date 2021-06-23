@@ -418,7 +418,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
           clientSecret: config.keycloakClientSecret,
           grantType: 'password',
         });
-        const token = new Token(kcAdminClient.getAccessToken());
+        const token = new Token(await kcAdminClient.getAccessToken());
         userId = token.getContent().sub;
       } else {
         throw Boom.forbidden('request not authorized');
