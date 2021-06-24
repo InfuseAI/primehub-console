@@ -287,7 +287,53 @@ export default class CMSPage extends React.Component<Props, State> {
     } else {
       history.push(`${window.APP_PREFIX}admin/${key}`);
     }
-  };
+  }
+
+  renderMenu = () => {
+    const {match} = this.props;
+    const {activeKey} = match.params as any;
+    const navigationMenu = (
+      <Menu.Item key="backToUserPortal">
+        <a href='/'>
+          <Icon type="left"/>
+          Back to User Portal
+        </a>
+      </Menu.Item>
+    );
+
+    return (
+      <Menu
+        onClick={this.siderMenuOnClick}
+        selectedKeys={[activeKey].concat(activeKey === 'buildImageJob' ? 'buildImage' : '')}
+        theme="dark"
+        mode="vertical"
+      >
+        {navigationMenu}
+        <Menu.Item key={'group_next'}>
+          Group (New)
+        </Menu.Item>
+        {
+          Object.keys(this.schema.schema)
+            .filter(key => key !== 'buildImageJob')
+            .map(key => dict['en'][`${key}.externalLink`]?
+              (
+                <Menu.Item key={key}>
+                  <a href={dict['en'][`${key}.externalLink`]} target='_blank'>
+                    {dict['en'][`${key}.title`]}&nbsp;&nbsp;&nbsp;
+                    <img src={iconNewTab} width='10px' height='10px'/>
+                  </a>
+                </Menu.Item>
+              ):
+              (
+                <Menu.Item key={key}>
+                  {this.schema.schema[key].title}
+                </Menu.Item>
+              )
+            )
+        }
+      </Menu>
+    );
+  }
 
   replaceDatasetMutation = (mutation) => {
     if (mutation.indexOf('updateDataset') >= 0) {
