@@ -99,7 +99,7 @@ export function Sidebar({ sidebarItems }: Props) {
           <Menu.Item
             key={item.subPath}
             style={{ paddingLeft: 26 }}
-            data-testid={`${item.subPath}`}
+            data-testid={item.subPath}
             onClick={() => setPath(item.subPath)}
           >
             <Link to={`${appPrefix}g/${groupName}/${item.subPath}`}>
