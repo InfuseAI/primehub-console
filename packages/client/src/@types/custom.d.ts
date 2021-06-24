@@ -5,4 +5,3 @@ declare module '*.svg' {
 
 declare module 'recompose';
 declare module '*.graphql';
-declare module 'react-dom';
