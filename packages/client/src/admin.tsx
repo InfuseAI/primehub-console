@@ -1,28 +1,33 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {ApolloProvider} from 'react-apollo';
+import { ApolloProvider } from 'react-apollo';
 import { fakeData, schema as fakeDataSchema } from './fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
-import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
-import {IntlProvider, addLocaleData} from 'react-intl';
-import {LocaleProvider, notification, Button} from 'antd';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from 'react-router-dom';
+import { IntlProvider, addLocaleData } from 'react-intl';
+import { LocaleProvider, notification, Button } from 'antd';
 import en from 'react-intl/locale-data/en';
 import en_US from 'antd/lib/locale-provider/en_US';
 import 'moment/locale/zh-tw';
-addLocaleData([...en])
+addLocaleData([...en]);
 import CMSPage from './cms';
 import schema from 'index-schema';
 import myLocales from './utils/locales';
-import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
+import { BackgroundTokenSyncer } from './workers/backgroundTokenSyncer';
 import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
 
 const firstKey = Object.keys(schema.schema)[0];
 const locales = {
-  en: en_US
+  en: en_US,
 };
-(window as any).LOCALE = (window as any).LOCALE || 'en';
-(window as any).APP_PREFIX = (window as any).APP_PREFIX || '/';
-const locale = (window as any).LOCALE;
+window.LOCALE = window.LOCALE || 'en';
+window.APP_PREFIX = window.APP_PREFIX || '/';
+const locale = window.LOCALE;
 
 /**
  * Background worker
@@ -42,36 +47,43 @@ function parseJSON(response) {
 }
 
 export const tokenSyncWorker = new BackgroundTokenSyncer({
-  appPrefix: (window as any).APP_PREFIX,
-  refreshTokenExp: (window as any).refreshTokenExp,
-  accessTokenExp: (window as any).accessTokenExp,
+  appPrefix: window.APP_PREFIX,
+  refreshTokenExp: window.refreshTokenExp,
+  accessTokenExp: window.accessTokenExp,
   getNewTokenSet: () => {
-    return fetch(`${(window as any).APP_PREFIX}oidc/refresh-token-set`, {
-      method: 'POST'
+    return fetch(`${window.APP_PREFIX}oidc/refresh-token-set`, {
+      method: 'POST',
     })
-    .then(checkStatus)
-    .then(parseJSON);
+      .then(checkStatus)
+      .then(parseJSON);
   },
-  reLoginNotify: ({loginUrl}) => {
+  reLoginNotify: () => {
     // notify with fixed card
     notification.warning({
       message: 'Warning',
-      description: 'In less than 1 minute, you\'re going to be redirected to login page.',
+      description:
+        "In less than 1 minute, you're going to be redirected to login page.",
       placement: 'bottomRight',
       duration: null,
       btn: (
-        <Button type="primary" onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
+        // @ts-ignore
+        <Button
+          type="primary"
+          onClick={() =>
+            window.location.replace(`${window.APP_PREFIX}oidc/logout`)
+          }
+        >
           Login Again
         </Button>
       ),
-      key: 'refreshWarning'
+      key: 'refreshWarning',
     });
-  }
-})
+  },
+});
 
 const client = createGraphqlClient({
   fakeData,
-  schema: fakeDataSchema
+  schema: fakeDataSchema,
 });
 
 tokenSyncWorker.run().catch(console.error);
@@ -79,25 +91,40 @@ tokenSyncWorker.run().catch(console.error);
  * UI
  */
 ReactDOM.render(
-  <IntlProvider locale={locale} messages={{...schema.dict[locale], ...myLocales[locale]}}>
+  <IntlProvider
+    locale={locale}
+    messages={{ ...schema.dict[locale], ...myLocales[locale] }}
+  >
     <LocaleProvider locale={locales[locale]}>
       <Router>
         <React.Fragment>
           <Switch>
-            {/* <Route path="/login" component={Login} /> */}
             <Route
-              path={`${(window as any).APP_PREFIX}admin/:activeKey`}
-              component={
-                (props) => <CMSPage {...props} schema={schema} notification={<ApolloProvider client={client}><LicenseWarningBanner/></ApolloProvider>} />
-              }
+              path={`${window.APP_PREFIX}admin/:activeKey`}
+              component={(props) => (
+                <CMSPage
+                  {...props}
+                  schema={schema}
+                  notification={
+                    <ApolloProvider client={client}>
+                      <LicenseWarningBanner />
+                    </ApolloProvider>
+                  }
+                />
+              )}
             />
-            <Redirect to={`${(window as any).APP_PREFIX}admin/${firstKey}`}/>
+            <Redirect
+              exact
+              from={`${window.APP_PREFIX}admin/`}
+              to={`${window.APP_PREFIX}admin/${firstKey}`}
+            />
           </Switch>
         </React.Fragment>
       </Router>
     </LocaleProvider>
-  </IntlProvider>
-, document.getElementById('root'));
+  </IntlProvider>,
+  document.getElementById('root')
+);
 
 // @ts-ignore
 if (module.hot) module.hot.accept();
