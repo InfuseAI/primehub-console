@@ -38,8 +38,6 @@ export interface Config {
 
   // user portal
   enableUserPortal: boolean;
-  portalConfigPath: string;
-  homeConfigPath: string;
 
   // disable create/update/delete operation on instanceType/image ui
   readOnlyOnInstanceTypeAndImage?: boolean;
@@ -101,8 +99,6 @@ const defaultConfigs = {
   graphqlSvcEndpoint: 'http://localhost:3001/graphql',
   sharedGraphqlSecretKey: '',
   enableUserPortal: false,
-  portalConfigPath: resolve(__dirname, '../etc/portal-config.yaml'),
-  homeConfigPath: resolve(__dirname, '../etc/home-config.yaml'),
   readOnlyOnInstanceTypeAndImage: false,
   enableDatasetUpload: false,
   enableCustomImage: false,
@@ -172,8 +168,6 @@ export const createConfig = (): Config => {
     graphqlSvcEndpoint: process.env.GRAPHQL_SVC_ENDPOINT,
     sharedGraphqlSecretKey: process.env.SHARED_GRAPHQL_SECRET_KEY,
     enableUserPortal: process.env.PRIMEHUB_FEATURE_USER_PORTAL,
-    portalConfigPath: process.env.PORTAL_CONFIG_PATH,
-    homeConfigPath: process.env.HOME_CONFIG_PATH,
     readOnlyOnInstanceTypeAndImage: process.env.READ_ONLY_ON_INSTANCE_TYPE_AND_IMAGE,
     customImageSetup: process.env.PRIMEHUB_CUSTOM_IMAGE_REGISTRY_ENDPOINT ? true : false,
     licenseStatus: process.env.EXPIRED,
