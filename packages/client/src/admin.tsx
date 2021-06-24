@@ -15,6 +15,7 @@ import schema from 'index-schema';
 import myLocales from './utils/locales';
 import {BackgroundTokenSyncer} from './workers/backgroundTokenSyncer';
 import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
+import GroupList from 'components/admins/group/list';
 
 const firstKey = Object.keys(schema.schema)[0];
 const locales = {
@@ -84,7 +85,11 @@ ReactDOM.render(
       <Router>
         <React.Fragment>
           <Switch>
-            {/* <Route path="/login" component={Login} /> */}
+            <Route path={`${(window as any).APP_PREFIX}admin/group_next`}>
+              <ApolloProvider client={client}>
+                <GroupList />
+              </ApolloProvider>
+            </Route>
             <Route
               path={`${(window as any).APP_PREFIX}admin/:activeKey`}
               component={

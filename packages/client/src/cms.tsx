@@ -289,6 +289,9 @@ export default class CMSPage extends React.Component<Props, State> {
         mode="vertical"
       >
         {navigationMenu}
+        <Menu.Item key={'group_next'}>
+          Group (New)
+        </Menu.Item>
         {
           Object.keys(this.schema.schema)
             .filter(key => key !== 'buildImageJob')
@@ -350,17 +353,8 @@ export default class CMSPage extends React.Component<Props, State> {
     return (
       <Layout style={{minHeight: '100vh'}}>
         <GlobalStyle />
-        <ContentHeader/>
-        <Layout style={{marginTop: 64}}>
-          <Sider style={{
-              position: "fixed",
-              height: "100%",
-              overflow: "auto"
-            }}
-          >
-            {this.renderMenu()}
-          </Sider>
-          <Content style={{marginLeft: 200}}>
+        <Layout>
+          <Content>
             {this.notification}
             <Canner
               schema={this.schema}
