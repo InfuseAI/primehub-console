@@ -34,9 +34,9 @@ type Keys =
   | 'image'
   | 'buildImage'
   | 'secret';
-type BreadcrumbWithTooptip = Record<Keys, { title: string; link: string }>;
+type BreadcrumbWithTooltip = Record<Keys, { title: string; link: string }>;
 
-const breadcrumbWithTooltip: BreadcrumbWithTooptip = {
+const breadcrumbWithTooltip: BreadcrumbWithTooltip = {
   group: {
     title: 'Admin can find and manage groups here.',
     link: 'https://docs.primehub.io/docs/guide_manual/admin-group',
@@ -190,23 +190,6 @@ export default class CommonBody extends React.Component<Props> {
 
     return (
       <div>
-        <div
-          style={{
-            background: '#fff',
-            borderBottom: '1px solid #eee',
-            padding: '16px 24px',
-          }}
-        >
-          <div style={{ marginBottom: 24 }}>
-            <Breadcrumb itemRender={itemRender} routes={breadcrumbs} />
-          </div>
-          <h2>{item.title || title}</h2>
-          {(item.description || description) && (
-            <div style={{ marginTop: 8 }}>
-              {item.description || description}
-            </div>
-          )}
-        </div>
         {customImageAlert}
         <div
           style={{
