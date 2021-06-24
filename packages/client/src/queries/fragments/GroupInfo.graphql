@@ -1,3 +1,16 @@
+fragment GroupBasicInfo on Group {
+  id
+  displayName
+  name
+  admins
+  quotaCpu
+  quotaGpu
+  quotaMemory
+  projectQuotaCpu
+  projectQuotaGpu
+  projectQuotaMemory
+}
+
 fragment GroupInfo on Group {
   id
   displayName
