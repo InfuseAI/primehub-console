@@ -21,3 +21,19 @@ mutation UpdateGroupMLflowConfig($where: GroupWhereUniqueInput!, $data: GroupUpd
     ...GroupMLflowConfig
   }
 }
+
+query GroupsConnection($groupPage: Int, $groupOrderBy: GroupOrderByInput, $groupWhere: GroupWhereInput) {
+  group: groupsConnection(page: $groupPage, orderBy: $groupOrderBy, where: $groupWhere) {
+    edges {
+      cursor
+      node {
+        ...GroupBasicInfo
+      }
+    }
+    pageInfo {
+      currentPage
+      totalPage
+    }
+  }
+}
+

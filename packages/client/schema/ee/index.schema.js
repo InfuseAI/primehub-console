@@ -46,8 +46,6 @@ const usageReport = (
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
     <Body component={CommonBody}>
-      {/* <Idp/> */}
-      {/* <UserFederation/> */}
       <Group/>
     </Body>
     <Body component={UserBody}>
