@@ -39,7 +39,7 @@ export function JupyterHubContainer({ groupContext, location }: Props) {
       <PageBody style={{ flex: '1 1 0%' }}>
         <Tabs style={{ height: '100%' }}>
           <Tabs.TabPane key="information" tab="Notebooks">
-            <div style={{ height: 'calc(100vh - 310px)' }}>
+            <div style={{ height: 'calc(100vh - 245px)' }}>
               <IFrame src={`/hub/primehub/home?${qs}`} />
             </div>
           </Tabs.TabPane>
