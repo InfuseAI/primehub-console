@@ -5,7 +5,7 @@ import {RouteComponentProps} from 'react-router';
 import {List} from '../list';
 import PageTitle from 'components/pageTitle';
 import Breadcrumbs from 'components/share/breadcrumb';
-import { GroupsConnection } from 'queries/group.graphql';
+import { GroupsConnection } from 'queries/Group.graphql';
 import queryString from 'querystring';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
