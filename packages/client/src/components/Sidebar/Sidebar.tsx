@@ -72,7 +72,7 @@ export function Sidebar({ sidebarItems }: Props) {
       adminItems: admin,
       hasAdminItems,
     };
-  }, [currentUser, sidebarItems, enableApp]);
+  }, [currentUser?.isCurrentGroupAdmin, sidebarItems, enableApp]);
 
   React.useEffect(() => {
     // Split by `/g/` => [prefix, routes]
