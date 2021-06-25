@@ -72,12 +72,14 @@ export function Sidebar({ sidebarItems }: Props) {
       adminItems: admin,
       hasAdminItems,
     };
-  }, [currentUser, sidebarItems, enableApp]);
+  }, [currentUser?.isCurrentGroupAdmin, sidebarItems, enableApp]);
 
   React.useEffect(() => {
-    const currentPath = location.pathname
-      .split('/')
-      .pop() as typeof PATH_KEY_LIST[number];
+    // Split by `/g/` => [prefix, routes]
+    const routes = location.pathname.split('/g/')[1];
+
+    // Get parent path
+    const currentPath = routes.split('/')[1] as typeof PATH_KEY_LIST[number];
 
     if (PATH_KEY_LIST.includes(currentPath)) {
       setPath(currentPath);
@@ -85,7 +87,7 @@ export function Sidebar({ sidebarItems }: Props) {
   }, [location]);
 
   React.useEffect(() => {
-    if ((window as any)?.enableApp) {
+    if (window?.enableApp) {
       setEnableApp(true);
     }
   }, []);
