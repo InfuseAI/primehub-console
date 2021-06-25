@@ -1,20 +1,26 @@
 import * as React from 'react';
-import { Layout, Button } from 'antd';
+import { Input, Col, Layout, Button } from 'antd';
 import { withRouter } from 'react-router-dom';
 import {RouteComponentProps} from 'react-router';
 import {List} from '../list';
 import PageTitle from 'components/pageTitle';
+import PageBody from 'components/pageBody';
 import Breadcrumbs from 'components/share/breadcrumb';
 import { GroupsConnection } from 'queries/Group.graphql';
 import queryString from 'querystring';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
+import InfuseButton from 'components/infuseButton';
+import { FilterRow, FilterPlugins, ButtonCol } from 'components/share';
+
+const Search = Input.Search;
 
 const ButtonGroup = Button.Group;
 
 interface Props {
   dataSource: any;
   loading?: boolean;
+  getGroupsConnection?: any;
 };
 
 export function GroupList(props: Props) {
@@ -113,17 +119,49 @@ export function GroupList(props: Props) {
     }
   ];
 
+  const searchHandler = () => {};
+
   return (
     <Layout>
       <PageTitle
         breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
         title={"Groups"}
       />
-      <List
-        loading={props.loading}
-        dataSource={props.dataSource}
-        columns={columns}
-      />
+      <PageBody>
+        <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
+          {/* @ts-ignore */}
+          <InfuseButton
+            icon="plus"
+            onClick={() => {}}
+            style={{ marginRight: 16, width: 120 }}
+            type="primary"
+          >
+            Add Group
+          </InfuseButton>
+        </div>
+        <FilterRow
+          type="flex"
+          justify="space-between"
+          align="bottom"
+          style={{ marginBottom: 16, marginTop: 16 }}
+        >
+        <Col key="search-handler" style={{ flex: 1 }}>
+          <FilterPlugins style={{ marginRight: '10px' }}>
+            <Search
+              placeholder={`Search Group`}
+              onSearch={searchHandler}
+            />
+          </FilterPlugins>
+        </Col>
+          <ButtonCol>
+          </ButtonCol>
+        </FilterRow>
+        <List
+          loading={props.loading}
+          dataSource={props.dataSource}
+          columns={columns}
+        />
+      </PageBody>
     </Layout>
   );
 }
@@ -151,7 +189,9 @@ export default compose(
   const dataSource = group ? group.edges.map((edge) => edge.node) : [];
   return (
     <React.Fragment>
-      <GroupList dataSource={dataSource} loading={loading}/>
+      <GroupList
+        dataSource={dataSource}
+        loading={loading} />
     </React.Fragment>
   )
 });
