@@ -330,8 +330,8 @@ export default class Logs extends React.Component<Props, State> {
           itemCount={listItems.length}
           itemSize={LINE_HEIGHT}
         >
-          {({index, val}) => <div key={index} style={{
-            ...val,
+          {({index, style}) => <div key={index} style={{
+            ...style,
             padding: '0px 12px',
             overflow: 'visible',
             whiteSpace: 'nowrap'
