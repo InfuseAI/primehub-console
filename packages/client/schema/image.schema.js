@@ -111,7 +111,7 @@ export default () => (
       </Layout>
       <string keyName="url" title="${imageUrl}"/>
       <Condition match={data => data.type === 'both'}>
-        <CustomizedStringSelectWithCheckbox keyName="urlForGpu" title="${images.urlForGpu}" defaultValue={() => null} />
+        <CustomizedStringSelectWithCheckbox keyName="urlForGpu" title="${images.urlForGpu}" /*defaultValue={() => null}*/ />
       </Condition>
       <CustomizedStringImagePullSecret keyName="useImagePullSecret" title="${images.useImagePullSecret}" />
     </Layout>
