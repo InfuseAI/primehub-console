@@ -292,6 +292,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       config,
       createKcAdminClient,
       getAccessToken: () => tokenSyncer.getAccessToken(),
+      crdClient,
     });
     telemetry.addTraitMiddleware(middleware);
     telemetry.start();
