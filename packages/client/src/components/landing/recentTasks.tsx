@@ -2,6 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import {groupBy} from 'lodash';
 import {Tag, Divider, Typography, Layout, Row, Col, Card, notification, Button} from 'antd';
+import {Link} from 'react-router-dom';
 import {PhJobsConnection} from 'queries/PhJob.graphql';
 import {PhDeploymentsConnection} from 'queries/PhDeployment.graphql';
 import {withGroupContext, GroupContextComponentProps} from 'context/group';
@@ -76,7 +77,7 @@ class RecentTasks extends React.Component<Props> {
         type: 'Model',
         name: d.node.name,
         id: d.node.id,
-        link: `model-deployment/${d.node.id}`,
+        link: `deployments/${d.node.id}`,
         status: d.node.status,
         statusColor: d.node.status === 'Deployed' ? 'green' : 'red',
         time: moment(d.node.lastUpdatedTime)
@@ -95,7 +96,7 @@ class RecentTasks extends React.Component<Props> {
                 {groupedTasks[k].map(t => {
                   return (
                     <li>
-                      <a href={t.link}>[{t.type}] {t.name}</a> <Tag color={t.statusColor}>{t.status}</Tag>
+                      <Link to={t.link}>[{t.type}] {t.name}</Link> <Tag color={t.statusColor}>{t.status}</Tag>
                       <br/>
                       <Text type='secondary'>{t.time.isValid() ? t.time.format('YYYY-MM-DD HH:mm:ss') : ''}</Text>
                     </li>
