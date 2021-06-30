@@ -74,7 +74,7 @@ class RecentTasks extends React.Component<Props> {
       };
     }).concat(recentPhDeployments.map(d => {
       return {
-        type: 'Model',
+        type: 'Deployment',
         name: d.node.name,
         id: d.node.id,
         link: `deployments/${d.node.id}`,

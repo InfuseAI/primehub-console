@@ -15,7 +15,7 @@ interface State {
   group: any;
 }
 
-class GroupSettingsModels extends React.Component<Props, State> {
+class GroupSettingsDeployments extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
@@ -69,4 +69,4 @@ class GroupSettingsModels extends React.Component<Props, State> {
 }
 
 
-export default Form.create<Props>()(GroupSettingsModels);
+export default Form.create<Props>()(GroupSettingsDeployments);

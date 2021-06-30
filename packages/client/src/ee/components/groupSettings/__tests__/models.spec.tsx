@@ -1,5 +1,5 @@
 import * as React from 'react';
-import GroupSettingsModels from '../models';
+import GroupSettingsDeployments from '../deployments';
 import { render, screen } from 'test/test-utils';
 import { MockedProvider } from 'react-apollo/test-utils';
 
@@ -31,12 +31,12 @@ function setup() {
   };
 }
 
-describe('GroupSettingsModels Component', () => {
+describe('GroupSettingsDeployments Component', () => {
   it('Should render group settings models', () => {
     const { group, user, currentUser } = setup();
     render(
       <MockedProvider>
-        <GroupSettingsModels currentUser={currentUser} groupContext={group} userContext={user} />
+        <GroupSettingsDeployments currentUser={currentUser} groupContext={group} userContext={user} />
       </MockedProvider>
     );
     expect(screen.queryByText('Model Deployment')).toBeInTheDocument();
