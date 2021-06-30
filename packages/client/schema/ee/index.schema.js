@@ -36,10 +36,10 @@ const grafana = (
     {}
 );
 const usageReport = (
-  (typeof enableUsageReport !== 'undefined' && enableUsageReport) ? 
+  (typeof enableUsageReport !== 'undefined' && enableUsageReport) ?
     <Body component={UsageReportBody}>
       <UsageReport />
-    </Body> : 
+    </Body> :
     {}
 );
 
@@ -71,7 +71,6 @@ const schema = (
       <Jupyterhub />
     </Body>
     {usageReport}
-    <System/>
     {maintenance}
     {grafana}
     {/* <Announcement /> */}

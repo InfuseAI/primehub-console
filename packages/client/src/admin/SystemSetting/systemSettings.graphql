@@ -1,0 +1,76 @@
+query GetSystemSetting {
+  system {
+    license {
+      licensedTo
+      licenseStatus
+      startedAt
+      expiredAt
+      maxGroup
+      maxNode
+      maxModelDeploy
+
+      usage {
+        maxGroup
+        maxNode
+        maxModelDeploy
+      }
+    }
+
+    org {
+      name
+      logo {
+        url
+      }
+    }
+
+    defaultUserVolumeCapacity
+
+    timezone {
+      name
+      offset
+    }
+
+    smtp {
+      host
+      port
+      fromDisplayName
+      from
+      replyToDisplayName
+      replyTo
+      envelopeFrom
+      enableSSL
+      enableStartTLS
+      enableAuth
+      username
+      password
+    }
+  }
+}
+
+mutation UpdateSystemSetting($payload: SystemUpdateInput!) {
+  updateSystem(data: $payload) {
+    timezone {
+      name
+      offset
+    }
+
+    org {
+      name
+    }
+
+    smtp {
+      host
+      port
+      fromDisplayName
+      from
+      replyToDisplayName
+      replyTo
+      envelopeFrom
+      enableSSL
+      enableStartTLS
+      enableAuth
+      username
+      password
+    }
+  }
+}

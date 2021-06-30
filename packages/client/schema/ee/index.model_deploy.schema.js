@@ -1,6 +1,5 @@
 /** @jsx builder */
 import builder, {Body} from 'canner-script';
-import System from 'schema/system.schema';
 import Idp from 'schema/idp/identityProvider.schema';
 import UserFederation from 'schema/userFederation.schema';
 import User from 'schema/user.schema';
@@ -34,7 +33,6 @@ const schema = (
       <InstanceType/>
       <Secret />
     </Body>
-    <System/>
     {grafana}
     {/* <Announcement /> */}
   </root>

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Route, RouteProps } from 'react-router-dom';
 
 import { GroupNext, GroupNextItem } from '../GroupNext';
+import { SystemSetting } from '../SystemSetting';
 
 export const ROUTES = [
   'group',
@@ -99,6 +100,6 @@ export const routes = [
     key: 'system',
     path: '/admin/system',
     name: 'System Settings',
-    component: () => <div>System Settings</div>,
+    component: SystemSetting,
   },
 ] as RouteTypes[];
