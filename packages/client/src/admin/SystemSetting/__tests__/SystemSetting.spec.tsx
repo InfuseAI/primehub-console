@@ -8,6 +8,10 @@ import { render, screen, waitFor } from 'test/test-utils';
 import { SystemSetting } from '..';
 import { GetSystemSetting } from '../systemSettings.graphql';
 
+jest.mock('moment', () => () => ({
+  format: () => '2021/12/31 20:59',
+}));
+
 function setup() {
   const mockRequests = [
     {
