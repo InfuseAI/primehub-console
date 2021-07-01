@@ -330,6 +330,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
       config,
       createKcAdminClient,
       getAccessToken: () => tokenSyncer.getAccessToken(),
+      crdClient,
     });
     const eeMiddleware = createEETraitMiddleware({
       config,
