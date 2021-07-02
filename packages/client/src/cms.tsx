@@ -1,21 +1,21 @@
 import * as React from 'react';
-import {injectIntl, FormattedMessage} from 'react-intl';
-import {Layout, Menu, Icon, notification, Modal, Button} from 'antd';
+import { Layout, notification, Modal, Button } from 'antd';
 import Canner from 'canner';
 import gql from 'graphql-tag';
-import {genClient} from 'canner/lib/components/index';
 import R from '@canner/history-router';
 import ContentHeader from 'components/header';
 import Error from 'components/error';
-import styled, {createGlobalStyle} from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import color from 'styledShare/color';
-import {RouteComponentProps} from 'react-router';
+import { RouteComponentProps } from 'react-router';
 import myLocales from './utils/locales';
 import get from 'lodash.get';
-import update from 'lodash/update';
-import {dict} from 'schema/utils';
-import iconNewTab from 'images/icon-new-tab.svg'
-const {Sider, Content} = Layout;
+import { dict } from 'schema/utils';
+
+import { AdminSidebar } from './admin/AdminSidebar';
+// import { RouteWithSubRoutes, routes } from './admin/routes';
+
+const { Content } = Layout;
 const confirm = Modal.confirm;
 
 const updateDatasetMutation = `
@@ -62,10 +62,9 @@ export interface State {
   prepare: boolean;
   hasError: boolean;
   deploying: boolean;
-  dataChanged: Object
+  dataChanged: Object;
 }
 
-@injectIntl
 export default class CMSPage extends React.Component<Props, State> {
   schema = null;
   notification = null;
@@ -74,7 +73,7 @@ export default class CMSPage extends React.Component<Props, State> {
     prepare: false,
     hasError: false,
     deploying: false,
-    dataChanged: {}
+    dataChanged: {},
   };
 
   cannerRef: any;
@@ -91,14 +90,17 @@ export default class CMSPage extends React.Component<Props, State> {
       delete schema.schema.buildImageJob;
     }
     return schema;
-  }
+  };
 
   componentDidUpdate(prevProps: Props) {
     const prevPathname = prevProps.location.pathname;
     const prevSearch = prevProps.location.search;
     const pathname = this.props.location.pathname;
     const search = this.props.location.search;
-    if (prevPathname !== pathname || (prevSearch === '' && search === '?operator=create')) {
+    if (
+      prevPathname !== pathname ||
+      (prevSearch === '' && search === '?operator=create')
+    ) {
       notification.destroy();
     }
   }
@@ -111,18 +113,20 @@ export default class CMSPage extends React.Component<Props, State> {
 
   dataDidChange = (dataChanged: object) => {
     this.setState({
-      dataChanged
+      dataChanged,
     });
-  }
+  };
 
-  beforeFetch = (key, {client, query, variables}) => {
+  beforeFetch = (key, { client, query, variables }) => {
     // refetch the buildImage list after update
-    if (key === "buildImage" && !query) {
+    if (key === 'buildImage' && !query) {
       try {
-        const query = gql`${this.schema.schema.buildImage.graphql}`;
+        const query = gql`
+          ${this.schema.schema.buildImage.graphql}
+        `;
         const data = client.readQuery({
           query,
-          variables: variables
+          variables: variables,
         });
         // if cached, clean it
         if (data) client.clearStore();
@@ -131,11 +135,11 @@ export default class CMSPage extends React.Component<Props, State> {
 
     return {
       query,
-      variables: variables
+      variables: variables,
     };
-  }
+  };
 
-  beforeDeploy = (key, {mutation, variables}) => {
+  beforeDeploy = (key, { mutation, variables }) => {
     if (key === 'dataset') {
       // we replace the mutation since there will be a external field `uploadServerSecret`
       mutation = this.replaceDatasetMutation(mutation);
@@ -149,170 +153,131 @@ export default class CMSPage extends React.Component<Props, State> {
       // update or delete
       return {
         mutation,
-        variables: variables
+        variables: variables,
       };
     } else {
       // create
       return {
         mutation,
-        variables: variables
+        variables: variables,
       };
     }
-  }
+  };
 
   afterDeploy = (data) => {
-    const {intl, history} = this.props;
+    const { intl, history } = this.props;
     const actionType = get(data, 'actions.0.type');
-     if (actionType === 'CREATE_ARRAY') {
-      let link = `${(window as any).APP_PREFIX}admin/${data.key}/${getCreateId(data.result)}`;
+    if (actionType === 'CREATE_ARRAY') {
+      const link = `${(window as any).APP_PREFIX}admin/${
+        data.key
+      }/${getCreateId(data.result)}`;
       setTimeout(() => {
         this.setState({
-          deploying: false
+          deploying: false,
         });
         notification.success({
           message: intl.formatMessage({
             id: 'deploy.success.message',
-            defaultMessage: 'Save successfully!'
+            defaultMessage: 'Save successfully!',
           }),
           description: (
             <div>
-            {
-              intl.formatMessage({
+              {intl.formatMessage({
                 id: 'deploy.success.create.description1',
-                defaultMessage: 'Your changes have been saved. Click'
-              })
-            }
-            <a href="javascript:;" onClick={() => history.push(link)} style={{margin: '0 8px'}}>
-            {
-              intl.formatMessage({
-                id: 'deploy.success.create.description2',
-                defaultMessage: 'here'
-              })
-            }
-            </a>
-            {
-              intl.formatMessage({
+                defaultMessage: 'Your changes have been saved. Click',
+              })}
+              <a
+                href="javascript:;"
+                onClick={() => history.push(link)}
+                style={{ margin: '0 8px' }}
+              >
+                {intl.formatMessage({
+                  id: 'deploy.success.create.description2',
+                  defaultMessage: 'here',
+                })}
+              </a>
+              {intl.formatMessage({
                 id: 'deploy.success.create.description3',
-                defaultMessage: 'to edit.'
-              })
-            }
+                defaultMessage: 'to edit.',
+              })}
             </div>
           ),
           duration: 10,
-          placement: 'bottomRight'
+          placement: 'bottomRight',
         });
       }, 400);
-      return ;
+      return;
     }
     setTimeout(() => {
       this.setState({
-        deploying: false
+        deploying: false,
       });
       notification.success({
         message: intl.formatMessage({
           id: 'deploy.success.message',
-          defaultMessage: 'Save successfully!'
+          defaultMessage: 'Save successfully!',
         }),
         description: intl.formatMessage({
           id: 'deploy.success.description',
-          defaultMessage: 'Your changes have been saved.'
+          defaultMessage: 'Your changes have been saved.',
         }),
-        placement: 'bottomRight'
+        placement: 'bottomRight',
       });
     }, 400);
-  }
+  };
 
   reset = () => {
     if (this.cannerRef) {
       return this.cannerRef.reset();
     }
     return Promise.resolve();
-  }
+  };
 
-  siderMenuOnClick = (menuItem: {key: string}) => {
-    const {history, intl} = this.props;
-    const {dataChanged} = this.state;
-    const {key} = menuItem;
+  siderMenuOnClick = (menuItem: { key: string }) => {
+    const { history, intl } = this.props;
+    const { dataChanged } = this.state;
+    const { key } = menuItem;
     if (dataChanged && Object.keys(dataChanged).length > 0) {
       confirm({
         title: intl.formatMessage({
           id: 'deploy.confirm.title',
-          defaultMessage: 'Do you want to discard the changes?'
+          defaultMessage: 'Do you want to discard the changes?',
         }),
         content: intl.formatMessage({
           id: 'deploy.confirm.content',
-          defaultMessage: `Your changes will be lost. Are you sure?`
+          defaultMessage: `Your changes will be lost. Are you sure?`,
         }),
         okText: intl.formatMessage({
           id: 'deploy.confirm.ok',
-          defaultMessage: `Discard`
+          defaultMessage: `Discard`,
         }),
         cancelText: intl.formatMessage({
           id: 'deploy.confirm.cancel',
-          defaultMessage: `Cancel`
+          defaultMessage: `Cancel`,
         }),
         onOk: () => {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve) => {
             resolve();
-          }).then(this.reset)
+          })
+            .then(this.reset)
             .then(() => {
-              history.push(`${(window as any).APP_PREFIX}admin/${key}`);
+              history.push(`${window.APP_PREFIX}admin/${key}`);
             });
         },
-        onCancel: () => undefined
+        onCancel: () => undefined,
       });
-    } else if (dict['en'][`${key}.externalLink`] || key === 'backToUserPortal') {
+    } else if (
+      dict['en'][`${key}.externalLink`] ||
+      key === 'backToUserPortal'
+    ) {
       // add this condition to keep page content not change when
       // opening external link or backing to user portal
     } else {
-      history.push(`${(window as any).APP_PREFIX}admin/${key}`);
+      history.push(`${window.APP_PREFIX}admin/${key}`);
     }
-  }
+  };
 
-  renderMenu = () => {
-    const {match} = this.props;
-    const {activeKey} = match.params as any;
-    const navigationMenu = (
-      <Menu.Item key="backToUserPortal">
-        <a href='/'>
-          <Icon type="left"/>
-          Back to User Portal
-        </a>
-      </Menu.Item>
-    );
-
-    return (
-      <Menu
-        onClick={this.siderMenuOnClick}
-        selectedKeys={[activeKey].concat(activeKey === 'buildImageJob' ? 'buildImage' : '')}
-        theme="dark"
-        mode="vertical"
-      >
-        {navigationMenu}
-        {
-          Object.keys(this.schema.schema)
-            .filter(key => key !== 'buildImageJob')
-            .map(key => dict['en'][`${key}.externalLink`]?
-              (
-                <Menu.Item key={key}>
-                  <a href={dict['en'][`${key}.externalLink`]} target='_blank'>
-                    {dict['en'][`${key}.title`]}&nbsp;&nbsp;&nbsp;
-                    <img src={iconNewTab} width='10px' height='10px'/>
-                  </a>
-                </Menu.Item>
-              ):
-              (
-                <Menu.Item key={key}>
-                  {this.schema.schema[key].title}
-                </Menu.Item>
-              )
-            )
-        }
-      </Menu>
-    );
-  }
-
-  replaceDatasetMutation = mutation => {
+  replaceDatasetMutation = (mutation) => {
     if (mutation.indexOf('updateDataset') >= 0) {
       return updateDatasetMutation;
     }
@@ -320,23 +285,23 @@ export default class CMSPage extends React.Component<Props, State> {
       return createDatasetMutation;
     }
     return mutation;
-  }
+  };
 
-  removeBuildImageJobs = variables => {
+  removeBuildImageJobs = (variables) => {
     delete variables.payload.buildImageJobs;
     return variables;
-  }
+  };
 
   render() {
-    const {history} = this.props;
-    const {hasError} = this.state;
+    const { history } = this.props;
+    const { hasError } = this.state;
     if (hasError) {
-      return <Error/>;
+      return <Error />;
     }
 
     const router = new R({
       history,
-      baseUrl: `${(window as any).APP_PREFIX || '/'}admin`
+      baseUrl: `${window.APP_PREFIX || '/'}admin`,
     });
     const routes = router.getRoutes();
     const routerParams = {
@@ -344,29 +309,33 @@ export default class CMSPage extends React.Component<Props, State> {
       payload: router.getPayload(),
       where: router.getWhere(),
       sort: router.getSort(),
-      pagination: router.getPagination()
+      pagination: router.getPagination(),
     };
 
     return (
-      <Layout style={{minHeight: '100vh'}}>
+      <Layout style={{ minHeight: '100vh' }}>
         <GlobalStyle />
-        <ContentHeader/>
-        <Layout style={{marginTop: 64}}>
-          <Sider style={{
-              position: "fixed",
-              height: "100%",
-              overflow: "auto"
-            }}
-          >
-            {this.renderMenu()}
-          </Sider>
-          <Content style={{marginLeft: 200}}>
+        <ContentHeader />
+        <Layout style={{ marginTop: 64 }}>
+          <AdminSidebar />
+
+          {/* TODO: After drop canner we can use this way */}
+          {/* If want to test this, remove line 16 comment */}
+          {/* <Content style={{ marginLeft: '200px' }}>
+            <Switch>
+              {routes.map((route) => (
+                <RouteWithSubRoutes key={route.key} {...route} />
+              ))}
+            </Switch>
+          </Content> */}
+
+          <Content style={{ marginLeft: 200 }}>
             {this.notification}
             <Canner
               schema={this.schema}
               goTo={router.goTo}
               routes={routes}
-              ref={canner => this.cannerRef = canner}
+              ref={(canner) => (this.cannerRef = canner)}
               routerParams={routerParams}
               dataDidChange={this.dataDidChange}
               afterDeploy={this.afterDeploy}
@@ -374,11 +343,11 @@ export default class CMSPage extends React.Component<Props, State> {
               intl={{
                 locale: (window as any).LOCALE,
                 messages: {
-                  ...myLocales
-                }
+                  ...myLocales,
+                },
               }}
               beforeFetch={this.beforeFetch}
-              errorHandler={e => {
+              errorHandler={(e) => {
                 console.dir(e);
                 // default message and description
                 let message = e.message || 'Error';
@@ -391,7 +360,10 @@ export default class CMSPage extends React.Component<Props, State> {
                 let errorCode;
                 // from networkError
                 if (e.networkError) {
-                  errorCode = get(e, 'networkError.result.errors.0.extensions.code');
+                  errorCode = get(
+                    e,
+                    'networkError.result.errors.0.extensions.code'
+                  );
                 } else {
                   // from graphQLErrors
                   errorCode = get(e, 'graphQLErrors.0.extensions.code');
@@ -427,12 +399,18 @@ export default class CMSPage extends React.Component<Props, State> {
                     // show notification with button
                     message = 'Token Expired or Invalid';
                     description = 'Please login again';
-                    const loginUrl = get(e, 'networkError.result.errors.0.loginUrl');
+                    const loginUrl = get(
+                      e,
+                      'networkError.result.errors.0.loginUrl'
+                    );
                     // add current location to redirect_uri
                     duration = 20;
                     key = 'REFRESH_TOKEN_EXPIRED';
                     btn = (
-                      <Button type="primary" onClick={() => window.location.replace(loginUrl)}>
+                      <Button
+                        type="primary"
+                        onClick={() => window.location.replace(loginUrl)}
+                      >
                         Login
                       </Button>
                     );
@@ -444,7 +422,7 @@ export default class CMSPage extends React.Component<Props, State> {
                   placement: 'bottomRight',
                   duration,
                   btn,
-                  key
+                  key,
                 });
               }}
             />

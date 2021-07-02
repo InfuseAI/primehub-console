@@ -92,10 +92,10 @@ function getEntry(env) {
     ee: path.resolve(__dirname, 'src/ee/main.tsx'),
     ce: path.resolve(__dirname, 'src/main.ce.tsx'),
     modelDeploy: path.resolve(__dirname, 'src/ee/main.model_deploy.tsx'),
-  }
-  return entryMap[version];
-};
+  };
 
+  return entryMap[version];
+}
 
 module.exports = (env) => {
   const { mode: currentEnv } = env;

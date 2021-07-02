@@ -9,7 +9,7 @@ import {
   SidebarList,
   SidebarPathList,
   PATH_KEY_LIST,
-} from 'components/Sidebar/constants';
+} from 'components/Sidebar/types';
 
 const Icon = styled.img`
   width: 25px;
@@ -99,7 +99,7 @@ export function Sidebar({ sidebarItems }: Props) {
           <Menu.Item
             key={item.subPath}
             style={{ paddingLeft: 26 }}
-            data-testid={`${item.subPath}`}
+            data-testid={item.subPath}
             onClick={() => setPath(item.subPath)}
           >
             <Link to={`${appPrefix}g/${groupName}/${item.subPath}`}>
