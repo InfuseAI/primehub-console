@@ -9,6 +9,7 @@
 # import StoreFileList, StoreFileWhereInput, StoreFileListOptionInput, StoreFileDeleteOptionInput from "./store.graphql"
 # import PhApplication, PhApplicationWhereInput, PhApplicationWhereUniqueInput, PhApplicationCreateInput, PhApplicationUpdateInput, PhApplicationOrderBy from "./phApplication.graphql"
 # import PhAppTemplate, PhAppTemplateWhereInput, PhAppTemplateWhereUniqueInput from "./phAppTemplate.graphql"
+# import NotebookNotifyEventInput from "./notebook.graphql"
 
 scalar JSON
 
@@ -272,4 +273,7 @@ type Mutation {
   deletePhApplication(where: PhApplicationWhereUniqueInput!): PhApplication
   startPhApplication(where: PhApplicationWhereUniqueInput!): PhApplication
   stopPhApplication(where: PhApplicationWhereUniqueInput!): PhApplication
+
+  """Notebook"""
+  notifyNotebookEvent(data: NotebookNotifyEventInput!): Int
 }
