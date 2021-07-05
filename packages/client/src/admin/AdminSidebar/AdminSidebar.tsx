@@ -43,9 +43,8 @@ export function AdminSidebar() {
   const location = useLocation();
 
   React.useEffect(() => {
-    if (window?.APP_PREFIX && window.APP_PREFIX !== '/') {
-      setAppPrefix(window.APP_PREFIX);
-    }
+    const prefix = window?.APP_PREFIX ? window.APP_PREFIX : '/';
+    setAppPrefix(prefix);
 
     if (window?.enableUsageReport) {
       setVisible((prev) => ({
