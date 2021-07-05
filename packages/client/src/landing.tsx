@@ -94,6 +94,12 @@ class Landing extends React.Component<Props> {
                       <SubContent>
                         <GuideList>
                           <li>
+                            <Link to='hub?path=primehub-examples/tensorflow2/tensorflow2.ipynb&instancetype=cpu-1&image=tf-2&autolaunch=1'>Open TensorFlow 2 Getting-Started Notebook</Link>
+                          </li>
+                          <li>
+                            <Link to='hub?instancetype=cpu-1&image=pytorch-1&autolaunch=1'>Open PyTorch Getting-Started Notebook</Link>
+                          </li>
+                          <li>
                             <Link to='hub'>Open Jupyter Notebook</Link>
                           </li>
                           <li>
