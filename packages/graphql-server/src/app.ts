@@ -21,6 +21,7 @@ import * as secret from './resolvers/secret';
 import * as store from './resolvers/store';
 import * as phApplication from './resolvers/phApplication';
 import * as phAppTemplate from './resolvers/phAppTemplate';
+import * as notebook from './resolvers/notebook';
 import { crd as instanceType} from './resolvers/instanceType';
 import { crd as dataset, regenerateUploadSecret} from './resolvers/dataset';
 import { crd as image} from './resolvers/image';
@@ -125,6 +126,7 @@ export const resolvers = {
     deletePhApplication: phApplication.destroy,
     startPhApplication: phApplication.start,
     stopPhApplication: phApplication.stop,
+    notifyNotebookEvent: notebook.notifyNotebookEvent,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation(),

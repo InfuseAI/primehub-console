@@ -1,0 +1,6 @@
+input NotebookNotifyEventInput {
+  notebookStartedAt: String
+  notebookGpu: Boolean
+  notebookStatus: String
+  notebookDuration: Float
+}

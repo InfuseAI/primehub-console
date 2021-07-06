@@ -68,6 +68,7 @@ export const permissions = shield({
     'deletePhApplication': or(isAdmin, isUser),
     'startPhApplication': or(isAdmin, isUser),
     'stopPhApplication': or(isAdmin, isUser),
+    'notifyNotebookEvent': or(isClient),
   },
 }, {
   allowExternalErrors: true
