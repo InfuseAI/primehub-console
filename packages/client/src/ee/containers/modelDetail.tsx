@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Skeleton, Button, Table, Row, Col, Tag, Modal} from 'antd';
+import {Skeleton, Button, Table, Row, Col, Tag, Modal,Icon} from 'antd';
 import Field from 'components/share/field';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
@@ -191,14 +191,18 @@ class ModelDetailContainer extends React.Component<Props, State> {
     const data = modelVersions;
 
     let pageBody = <>
-      <Row gutter={36}>
-        <Col span={20}>
+      <Row>
+        <Col span={19}>
           <Field labelCol={4} valueCol={8} label='Created Time' value={formatTimestamp(model.creationTimestamp)} />
           <Field labelCol={4} valueCol={8} label='Last Modified' value={formatTimestamp(model.lastUpdatedTimestamp)} />
           <Field labelCol={4} valueCol={8} label='Description' value={model.description} />
         </Col>
-        <Col span={4}>
-          <div style={{ textAlign: 'right' }}>
+        <Col span={5}>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Button>
+              <Icon type="setting" />
+              Columns
+            </Button>
             <Button onClick={() => {
               openMLflowUI(mlflow, `/#/models/${encodeURIComponent(modelName)}`);
             } }>
