@@ -20,44 +20,7 @@ import {
 } from 'ee/components/modelMngt/common';
 import { DeployDialog } from 'ee/components/modelMngt/deployDialog';
 import { errorHandler } from 'utils/errorHandler';
-
-type ModelVersion = {
-  name: string;
-  version: string;
-  creationTimestamp: string;
-  lastUpdatedTimestamp: string;
-  deployedBy: {
-    id: string;
-    name: string;
-  }[];
-  run: {
-    info: {
-      runId: string;
-      experimentId: string;
-      status: string;
-      startTime: string;
-      endTime: string;
-      artifactUri: string;
-      lifecycleStage: string;
-    };
-    data: {
-      params: {
-        key: string;
-        value: string;
-      }[];
-      metricts: {
-        key: string;
-        value: string;
-        timestamp: string;
-        step: string;
-      }[];
-      tags: {
-        key: string;
-        value: string;
-      }[];
-    };
-  };
-};
+import type { ModelVersion, Deployment } from 'ee/components/modelMngt/types';
 
 interface Props {
   client: any;
@@ -84,7 +47,15 @@ interface Props {
 }
 
 function ModelDetailContainer({ getModel, ...props }: Props) {
-  const [deploy, setDeploy] = React.useState(null);
+  const [deploy, setDeploy] = React.useState<{
+    visible: boolean;
+    phDeployments: Deployment[];
+    modelVersion: ModelVersion;
+  }>({
+    visible: false,
+    phDeployments: [],
+    modelVersion: null,
+  });
   const groupContext = React.useContext(GroupContext);
   const { modelName } = useParams<{ modelName: string }>();
   const history = useHistory();
@@ -129,11 +100,11 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
         fetchPolicy: 'no-cache',
       })
       .then((result) => {
-        const deploy = {
+        setDeploy({
+          visible: true,
+          phDeployments: result.data.phDeployments,
           modelVersion,
-          deploymentRefs: result.data.phDeployments,
-        };
-        setDeploy(deploy);
+        });
       })
       .catch(errorHandler);
   }
@@ -162,7 +133,11 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
   }
 
   function handleDeployCancel() {
-    setDeploy(null);
+    setDeploy({
+      visible: false,
+      phDeployments: [],
+      modelVersion: null,
+    });
   }
 
   const columns = [
@@ -206,7 +181,6 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
       render: (text, modelVersion: ModelVersion) => (
         <Button
           onClick={() => {
-            console.log(modelVersion);
             handleDeploy(modelVersion);
           }}
         >
@@ -274,15 +248,15 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
           loading={getModel.loading}
         />
       </PageBody>
-      {deploy && (
-        <DeployDialog
-          modelVersion={deploy.modelVersion}
-          deploymentRefs={deploy.deploymentRefs}
-          onDeployNew={handleDeployNew}
-          onDeployExisting={handleDeployExisting}
-          onCancel={handleDeployCancel}
-        />
-      )}
+
+      <DeployDialog
+        visible={deploy.visible}
+        modelVersion={deploy.modelVersion}
+        deploymentRefs={deploy.phDeployments}
+        onDeployNew={handleDeployNew}
+        onDeployExisting={handleDeployExisting}
+        onCancel={handleDeployCancel}
+      />
     </>
   );
 }
