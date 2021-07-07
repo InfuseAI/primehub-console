@@ -13,7 +13,7 @@ import { fakeData, schema as fakeDataSchema } from './fakeData';
 import color from 'styledShare/color';
 import { RouteComponentProps } from 'react-router';
 import myLocales from './utils/locales';
-import get from 'lodash.get';
+import get from 'lodash/get';
 import { dict } from 'schema/utils';
 import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
 
