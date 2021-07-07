@@ -1,5 +1,18 @@
 import * as React from 'react';
-import { Button, Table, Row, Col, Tag, Modal, Icon } from 'antd';
+import uniqBy from 'lodash/uniqBy';
+import get from 'lodash/get';
+import styled from 'styled-components';
+import {
+  Button,
+  Table,
+  Row,
+  Col,
+  Tag,
+  Modal,
+  Icon,
+  Collapse,
+  Checkbox,
+} from 'antd';
 import { SortOrder } from 'antd/lib/table';
 import Field from 'components/share/field';
 import { graphql } from 'react-apollo';
@@ -21,6 +34,25 @@ import {
 import { DeployDialog } from 'ee/components/modelMngt/deployDialog';
 import { errorHandler } from 'utils/errorHandler';
 import type { ModelVersion, Deployment } from 'ee/components/modelMngt/types';
+
+const CustomCheckboxGroup = styled(Checkbox.Group)`
+  &:before {
+    position: absolute;
+    content: ' ';
+    height: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    left: 4px;
+  }
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+
+  .ant-checkbox-group-item {
+    margin-left: 36px;
+  }
+`;
 
 interface Props {
   client: any;
@@ -56,6 +88,8 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
     phDeployments: [],
     modelVersion: null,
   });
+  const [columnsModalVisible, setColumnsModalVisible] = React.useState(false);
+
   const groupContext = React.useContext(GroupContext);
   const { modelName } = useParams<{ modelName: string }>();
   const history = useHistory();
@@ -140,6 +174,14 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
     });
   }
 
+  function handleColumnsModalOk() {
+    setColumnsModalVisible(true);
+  }
+
+  function handleColumnsModalCancel() {
+    setColumnsModalVisible(false);
+  }
+
   const columns = [
     {
       key: 'Version',
@@ -190,6 +232,36 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
     },
   ];
 
+  const { modelParameters, modelMetrics } = React.useMemo(() => {
+    if (getModel?.modelVersions) {
+      const data = getModel.modelVersions.map((m) => get(m, 'run.data'));
+
+      const modelParameters = uniqBy(
+        data.map((d) => get(d, 'params')).flat(),
+        'key'
+      )
+        .map(({ key }) => key)
+        .sort((a, b) => (a > b ? 1 : -1));
+
+      const modelMetrics = uniqBy(
+        data.map((d) => get(d, 'metrics')).flat(),
+        'key'
+      )
+        .map(({ key }) => key)
+        .sort((a, b) => (a > b ? 1 : -1));
+
+      return {
+        modelParameters,
+        modelMetrics,
+      };
+    }
+
+    return {
+      modelParameters: [],
+      modelMetrics: [],
+    };
+  }, [getModel]);
+
   if (getModel.error) {
     return <div>Can not not load model.</div>;
   }
@@ -226,8 +298,11 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
               value={formatTimestamp(getModel.model.description)}
             />
           </Col>
-          <Col span={5} style={{ display: 'flex', gap: '8px' }}>
-            <Button>
+          <Col
+            span={5}
+            style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}
+          >
+            <Button onClick={handleColumnsModalOk}>
               <Icon type="setting" />
               Columns
             </Button>
@@ -238,6 +313,76 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
             >
               MLflow UI
             </Button>
+
+            <Modal
+              title="Select Columns"
+              visible={columnsModalVisible}
+              onOk={handleColumnsModalOk}
+              onCancel={handleColumnsModalCancel}
+            >
+              <p
+                style={{
+                  color: '#365abd',
+                  fontWeight: 700,
+                  lineHeight: '12px',
+                  fontSize: '14px',
+                }}
+              >
+                You are starting Tensorflow with the following settings:
+              </p>
+
+              <Collapse
+                bordered={false}
+                expandIcon={({ isActive }) => (
+                  <Icon type="caret-right" rotate={isActive ? 90 : 0} />
+                )}
+              >
+                <Collapse.Panel
+                  key="1"
+                  style={{ borderBottom: '0px' }}
+                  header={
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '8px',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Checkbox />
+                      Parameters
+                    </div>
+                  }
+                >
+                  <CustomCheckboxGroup options={modelParameters} />
+                </Collapse.Panel>
+              </Collapse>
+
+              <Collapse
+                bordered={false}
+                expandIcon={({ isActive }) => (
+                  <Icon type="caret-right" rotate={isActive ? 90 : 0} />
+                )}
+              >
+                <Collapse.Panel
+                  key="1"
+                  style={{ borderBottom: '0px' }}
+                  header={
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '8px',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Checkbox />
+                      Metrics
+                    </div>
+                  }
+                >
+                  <CustomCheckboxGroup options={modelMetrics} />
+                </Collapse.Panel>
+              </Collapse>
+            </Modal>
           </Col>
         </Row>
         <Table
