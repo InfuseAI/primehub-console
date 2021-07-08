@@ -43,8 +43,12 @@ export function AdminSidebar() {
   const location = useLocation();
 
   React.useEffect(() => {
-    const prefix = window?.APP_PREFIX ? window.APP_PREFIX : '/';
-    setAppPrefix(prefix);
+    if (window?.APP_PREFIX && window.APP_PREFIX !== '/') {
+      // `APP_PREFIX` likes `/console/`, but in the react-router path
+      // needs prefix `/` the result will be like `/PREFIX//path`, it's not correct.
+      // In here, replace the `APP_PREFIX` last slash to the empty.
+      setAppPrefix(window.APP_PREFIX.replace(/\/$/, ''));
+    }
 
     if (window?.enableUsageReport) {
       setVisible((prev) => ({

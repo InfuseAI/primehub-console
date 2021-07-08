@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Route, RouteProps } from 'react-router-dom';
 
-import { GroupNext, GroupNextItem } from '../GroupNext';
+// import { GroupNext, GroupNextItem } from '../GroupNext';
 import { SystemSetting } from '../SystemSetting';
 
 export const ROUTES = [
@@ -36,69 +36,69 @@ export function RouteWithSubRoutes(route) {
 export const routes = [
   {
     key: 'group',
-    path: 'admin/group',
+    path: '/admin/group',
     name: 'Groups',
-    component: GroupNext,
+    component: () => <div />,
     // FIXME: demo for nested routes
     routes: [
       {
         key: 'group-next',
-        path: 'admin/group/:id',
-        component: GroupNextItem,
+        path: '/admin/group/:id',
+        component: () => <div />,
       },
     ],
   },
   {
     key: 'user',
-    path: 'admin/user',
+    path: '/admin/user',
     name: 'Users',
-    component: () => <div>Users</div>,
+    component: () => <div />,
   },
   {
     key: 'instanceType',
-    path: 'admin/instanceType',
+    path: '/admin/instanceType',
     name: 'Instance Types',
-    component: () => <div>Instance Types</div>,
+    component: () => <div />,
   },
   {
     key: 'image',
-    path: 'admin/image',
+    path: '/admin/image',
     name: 'Images',
-    component: () => <div>Images</div>,
+    component: () => <div />,
   },
   {
     key: 'buildImage',
-    path: 'admin/buildImage',
+    path: '/admin/buildImage',
     name: 'Image Builder',
-    component: () => <div>Image Builder</div>,
+    component: () => <div />,
   },
   {
     key: 'dataset',
-    path: 'admin/dataset',
+    path: '/admin/dataset',
     name: 'Datasets',
-    component: () => <div>Datasets</div>,
+    component: () => <div />,
   },
   {
     key: 'secret',
-    path: 'admin/secret',
+    path: '/admin/secret',
     name: 'Secrets',
-    component: () => <div>Secrets</div>,
+    component: () => <div />,
   },
   {
     key: 'jupyterhub',
     path: 'admin/jupyterhub',
     name: 'Notebooks Admin',
-    component: () => <div>Notebooks Admin</div>,
+    component: () => <div />,
   },
   {
     key: 'usageReport',
-    path: 'admin/usageReport',
+    path: '/admin/usageReport',
     name: 'Usage Reports',
-    component: () => <div>Usage Reports</div>,
+    component: () => <div />,
   },
   {
     key: 'system',
-    path: 'admin/system',
+    path: '/admin/system',
     name: 'System Settings',
     component: SystemSetting,
   },
