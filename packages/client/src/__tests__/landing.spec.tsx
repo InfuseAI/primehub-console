@@ -55,7 +55,7 @@ describe('Landing Page', () => {
     // @ts-ignore
     global.primehubCE = false;
     render(<Landing />, { wrapper: AllTheProviders });
-    expect(screen.queryByText('Getting Started')).toBeInTheDocument();
+    expect(screen.queryByText('User Guide')).toBeInTheDocument();
     expect(screen.queryByText('Create New Job')).toBeInTheDocument();
   });
 
@@ -65,7 +65,7 @@ describe('Landing Page', () => {
     // @ts-ignore
     global.primehubCE = false;
     render(<Landing />, { wrapper: AllTheProviders });
-    expect(screen.queryByText('Getting Started')).toBeInTheDocument();
+    expect(screen.queryByText('User Guide')).toBeInTheDocument();
     expect(screen.queryByText('Deploy Model')).toBeInTheDocument();
     expect(screen.queryByText('Open Jupyter Notebook')).not.toBeInTheDocument();
   });
@@ -76,7 +76,7 @@ describe('Landing Page', () => {
     // @ts-ignore
     global.primehubCE = true;
     render(<Landing />, { wrapper: AllTheProviders });
-    expect(screen.queryByText('Getting Started')).toBeInTheDocument();
+    expect(screen.queryByText('User Guide')).toBeInTheDocument();
     expect(screen.queryByText('Open Jupyter Notebook')).toBeInTheDocument();
     expect(screen.queryByText('Create New Job')).not.toBeInTheDocument();
   });
