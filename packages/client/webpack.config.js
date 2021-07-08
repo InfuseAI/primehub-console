@@ -153,6 +153,7 @@ module.exports = (env) => {
         root: path.resolve(__dirname, 'src'),
         queries: path.resolve(__dirname, 'src/queries'),
         schema: path.resolve(__dirname, 'schema'),
+        hooks: path.resolve(__dirname, 'src/hooks'),
         'index-schema': getSchema(env),
       },
     },

@@ -19,6 +19,7 @@ import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import { Link, useParams, useHistory, withRouter } from 'react-router-dom';
 import { withApollo } from 'react-apollo';
+import type { CheckboxValueType } from 'antd/lib/checkbox/Group';
 
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
@@ -33,6 +34,7 @@ import {
 } from 'ee/components/modelMngt/common';
 import { DeployDialog } from 'ee/components/modelMngt/deployDialog';
 import { errorHandler } from 'utils/errorHandler';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 import type { ModelVersion, Deployment } from 'ee/components/modelMngt/types';
 
 const CustomCheckboxGroup = styled(Checkbox.Group)`
@@ -78,21 +80,35 @@ interface Props {
   };
 }
 
+interface DeployModelInfo {
+  visible: boolean;
+  phDeployments: Deployment[];
+  modelVersion: ModelVersion;
+}
+
+interface ModelAttributesInfo {
+  checkAll: boolean;
+  indeterminate: boolean;
+  options: CheckboxValueType[];
+}
+
 function ModelDetailContainer({ getModel, ...props }: Props) {
-  const [deploy, setDeploy] = React.useState<{
-    visible: boolean;
-    phDeployments: Deployment[];
-    modelVersion: ModelVersion;
-  }>({
+  const groupContext = React.useContext(GroupContext);
+  const [columnsModalVisible, setColumnsModalVisible] = React.useState(false);
+  const [deploy, setDeploy] = React.useState<DeployModelInfo>({
     visible: false,
     phDeployments: [],
     modelVersion: null,
   });
-  const [columnsModalVisible, setColumnsModalVisible] = React.useState(false);
 
-  const groupContext = React.useContext(GroupContext);
   const { modelName } = useParams<{ modelName: string }>();
   const history = useHistory();
+  const [defaultModelParams, setModelParams] = useLocalStorage<
+    CheckboxValueType[]
+  >('primehub-model-params', []);
+  const [defaultModelMetrics, setModelMetrics] = useLocalStorage<
+    CheckboxValueType[]
+  >('primehub-model-metrics', []);
 
   const decodeModelName = decodeURIComponent(modelName);
   const breadcrumbs = [
@@ -114,74 +130,6 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
       },
     },
   ];
-
-  function handleDeploy(modelVersion: ModelVersion) {
-    if (!groupContext.enabledDeployment) {
-      Modal.warn({
-        title: 'Feature not available',
-        content:
-          'Model Deployment is not enabled for this group. Please contact your administrator to enable it.',
-      });
-      return;
-    }
-
-    props.client
-      .query({
-        query: QueryModelVersionDeploy,
-        variables: {
-          groupId: groupContext.id,
-        },
-        fetchPolicy: 'no-cache',
-      })
-      .then((result) => {
-        setDeploy({
-          visible: true,
-          phDeployments: result.data.phDeployments,
-          modelVersion,
-        });
-      })
-      .catch(errorHandler);
-  }
-
-  function handleDeployNew(modelVersion) {
-    const defaultValue = {
-      modelURI: buildModelURI(modelVersion.name, modelVersion.version),
-    };
-
-    history.push(
-      `../deployments/create?defaultValue=${encodeURIComponent(
-        JSON.stringify(defaultValue)
-      )}`
-    );
-  }
-
-  function handleDeployExisting(modelVersion, deploymentRef) {
-    const defaultValue = {
-      modelURI: buildModelURI(modelVersion.name, modelVersion.version),
-    };
-    history.push(
-      `../deployments/${
-        deploymentRef.id
-      }/edit?defaultValue=${encodeURIComponent(JSON.stringify(defaultValue))}`
-    );
-  }
-
-  function handleDeployCancel() {
-    setDeploy({
-      visible: false,
-      phDeployments: [],
-      modelVersion: null,
-    });
-  }
-
-  function handleColumnsModalOk() {
-    setColumnsModalVisible(true);
-  }
-
-  function handleColumnsModalCancel() {
-    setColumnsModalVisible(false);
-  }
-
   const columns = [
     {
       key: 'Version',
@@ -236,14 +184,14 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
     if (getModel?.modelVersions) {
       const data = getModel.modelVersions.map((m) => get(m, 'run.data'));
 
-      const modelParameters = uniqBy(
+      const modelParameters: string[] = uniqBy(
         data.map((d) => get(d, 'params')).flat(),
         'key'
       )
         .map(({ key }) => key)
         .sort((a, b) => (a > b ? 1 : -1));
 
-      const modelMetrics = uniqBy(
+      const modelMetrics: string[] = uniqBy(
         data.map((d) => get(d, 'metrics')).flat(),
         'key'
       )
@@ -261,6 +209,108 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
       modelMetrics: [],
     };
   }, [getModel]);
+
+  const [currentModelParams, setCurrentModelParams] =
+    React.useState<ModelAttributesInfo>({
+      checkAll: false,
+      options: defaultModelParams,
+      indeterminate: false,
+    });
+
+  const [currentModelMetrics, setCurrentModelMetrics] =
+    React.useState<ModelAttributesInfo>({
+      checkAll: false,
+      indeterminate: false,
+      options: defaultModelMetrics,
+    });
+
+  function handleDeploy(modelVersion: ModelVersion) {
+    if (!groupContext.enabledDeployment) {
+      Modal.warn({
+        title: 'Feature not available',
+        content:
+          'Model Deployment is not enabled for this group. Please contact your administrator to enable it.',
+      });
+      return;
+    }
+
+    props.client
+      .query({
+        query: QueryModelVersionDeploy,
+        variables: {
+          groupId: groupContext.id,
+        },
+        fetchPolicy: 'no-cache',
+      })
+      .then((result) => {
+        setDeploy({
+          visible: true,
+          phDeployments: result.data.phDeployments,
+          modelVersion,
+        });
+      })
+      .catch(errorHandler);
+  }
+
+  function handleDeployNew(modelVersion) {
+    const defaultValue = {
+      modelURI: buildModelURI(modelVersion.name, modelVersion.version),
+    };
+
+    history.push(
+      `../deployments/create?defaultValue=${encodeURIComponent(
+        JSON.stringify(defaultValue)
+      )}`
+    );
+  }
+
+  function handleDeployExisting(modelVersion, deploymentRef) {
+    const defaultValue = {
+      modelURI: buildModelURI(modelVersion.name, modelVersion.version),
+    };
+
+    history.push(
+      `../deployments/${
+        deploymentRef.id
+      }/edit?defaultValue=${encodeURIComponent(JSON.stringify(defaultValue))}`
+    );
+  }
+
+  function handleDeployCancel() {
+    setDeploy({
+      visible: false,
+      phDeployments: [],
+      modelVersion: null,
+    });
+  }
+
+  function handleColumnsModalOk() {
+    setColumnsModalVisible((visible) => !visible);
+  }
+
+  function handleSaveModelMetrics() {
+    setModelParams(currentModelParams.options);
+    setModelMetrics(currentModelMetrics.options);
+  }
+
+  React.useEffect(() => {
+    // update checkgroup status after fetch data
+    setCurrentModelParams((params) => ({
+      ...params,
+      checkAll: defaultModelParams?.length === modelParameters?.length,
+      indeterminate:
+        defaultModelParams?.length !== 0 &&
+        defaultModelParams?.length < modelParameters?.length,
+    }));
+
+    setCurrentModelMetrics((metrics) => ({
+      ...metrics,
+      checkAll: defaultModelMetrics?.length === modelMetrics?.length,
+      indeterminate:
+        defaultModelMetrics?.length !== 0 &&
+        defaultModelMetrics?.length < modelMetrics?.length,
+    }));
+  }, [defaultModelMetrics, defaultModelParams, modelParameters, modelMetrics]);
 
   if (getModel.error) {
     return <div>Can not not load model.</div>;
@@ -317,8 +367,20 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
             <Modal
               title="Select Columns"
               visible={columnsModalVisible}
-              onOk={handleColumnsModalOk}
-              onCancel={handleColumnsModalCancel}
+              onCancel={() => {
+                setColumnsModalVisible(false);
+                setCurrentModelParams((prev) => ({
+                  ...prev,
+                  options: defaultModelParams,
+                  checkAll:
+                    defaultModelParams?.length === modelParameters?.length,
+                  indeterminate: defaultModelParams?.length !== 0,
+                }));
+              }}
+              onOk={() => {
+                handleColumnsModalOk();
+                handleSaveModelMetrics();
+              }}
             >
               <p
                 style={{
@@ -348,12 +410,45 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
                         alignItems: 'center',
                       }}
                     >
-                      <Checkbox />
+                      <Checkbox
+                        indeterminate={currentModelParams.indeterminate}
+                        checked={currentModelParams.checkAll}
+                        onChange={(event) => {
+                          if (event.target.checked) {
+                            setCurrentModelParams((params) => ({
+                              ...params,
+                              checkAll: true,
+                              indeterminate: false,
+                              options: modelParameters,
+                            }));
+                          } else {
+                            setCurrentModelParams((params) => ({
+                              ...params,
+                              checkAll: false,
+                              indeterminate: false,
+                              options: [],
+                            }));
+                          }
+                        }}
+                      />
                       Parameters
                     </div>
                   }
                 >
-                  <CustomCheckboxGroup options={modelParameters} />
+                  <CustomCheckboxGroup
+                    options={modelParameters}
+                    value={currentModelParams.options as CheckboxValueType[]}
+                    onChange={(checkedList) => {
+                      setCurrentModelParams((params) => ({
+                        ...params,
+                        options: checkedList,
+                        indeterminate:
+                          checkedList.length < modelParameters?.length,
+                        checkAll:
+                          checkedList.length === modelParameters?.length,
+                      }));
+                    }}
+                  />
                 </Collapse.Panel>
               </Collapse>
 
@@ -374,12 +469,44 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
                         alignItems: 'center',
                       }}
                     >
-                      <Checkbox />
+                      <Checkbox
+                        indeterminate={currentModelMetrics.indeterminate}
+                        checked={currentModelMetrics.checkAll}
+                        onChange={(event) => {
+                          if (event.target.checked) {
+                            setCurrentModelMetrics((metrics) => ({
+                              ...metrics,
+                              checkAll: true,
+                              indeterminate: false,
+                              options: modelMetrics,
+                            }));
+                          } else {
+                            setCurrentModelMetrics((metrics) => ({
+                              ...metrics,
+                              checkAll: false,
+                              indeterminate: false,
+                              options: [],
+                            }));
+                          }
+                        }}
+                      />
                       Metrics
                     </div>
                   }
                 >
-                  <CustomCheckboxGroup options={modelMetrics} />
+                  <CustomCheckboxGroup
+                    options={modelMetrics}
+                    value={currentModelMetrics.options as CheckboxValueType[]}
+                    onChange={(checkedList) => {
+                      setCurrentModelMetrics((metrics) => ({
+                        ...metrics,
+                        options: checkedList,
+                        indeterminate:
+                          checkedList.length < modelMetrics?.length,
+                        checkAll: checkedList.length === modelMetrics?.length,
+                      }));
+                    }}
+                  />
                 </Collapse.Panel>
               </Collapse>
             </Modal>
