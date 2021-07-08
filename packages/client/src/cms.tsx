@@ -15,6 +15,7 @@ import { RouteComponentProps } from 'react-router';
 import myLocales from './utils/locales';
 import get from 'lodash.get';
 import { dict } from 'schema/utils';
+import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
 
 import { AdminSidebar } from './admin/AdminSidebar';
 import { RouteWithSubRoutes, routes as adminRoutes } from './admin/routes';
@@ -341,6 +342,7 @@ export default class CMSPage extends React.Component<Props, State> {
           <Content style={{ marginLeft: 200 }}>
             <Switch>
               <ApolloProvider client={client}>
+                <LicenseWarningBanner />
                 {adminRoutes.map((route) => (
                   <RouteWithSubRoutes key={route.key} {...route} />
                 ))}

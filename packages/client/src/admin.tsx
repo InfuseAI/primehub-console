@@ -19,7 +19,6 @@ import CMSPage from './cms';
 import schema from 'index-schema';
 import myLocales from './utils/locales';
 import { BackgroundTokenSyncer } from './workers/backgroundTokenSyncer';
-import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
 
 const firstKey = Object.keys(schema.schema)[0];
 const locales = {
@@ -106,9 +105,7 @@ ReactDOM.render(
                   {...props}
                   schema={schema}
                   notification={
-                    <ApolloProvider client={client}>
-                      <LicenseWarningBanner />
-                    </ApolloProvider>
+                    <ApolloProvider client={client} {...props} />
                   }
                 />
               )}

@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Layout, Menu, Icon } from 'antd';
 
 import ExternalLinkIcon from 'images/icon-new-tab.svg';
+import { appPrefix } from 'utils/env';
 
 import { ROUTES, ROUTE_KEYS, routes } from '../routes';
 
@@ -35,7 +36,6 @@ const EXTERNAL_LINKS = {
 };
 
 export function AdminSidebar() {
-  const [appPrefix, setAppPrefix] = React.useState(undefined);
   const [activeRoute, setActiveRoute] = React.useState<ROUTE_KEYS>('group');
   const [visible, setVisible] = React.useState(VISIBLE_ITEMS);
   const [externalVisible, setExternalVisisble] = React.useState(EXTERNAL_LINKS);
@@ -43,13 +43,6 @@ export function AdminSidebar() {
   const location = useLocation();
 
   React.useEffect(() => {
-    if (window?.APP_PREFIX && window.APP_PREFIX !== '/') {
-      // `APP_PREFIX` likes `/console/`, but in the react-router path
-      // needs prefix `/` the result will be like `/PREFIX//path`, it's not correct.
-      // In here, replace the `APP_PREFIX` last slash to the empty.
-      setAppPrefix(window.APP_PREFIX.replace(/\/$/, ''));
-    }
-
     if (window?.enableUsageReport) {
       setVisible((prev) => ({
         ...prev,
@@ -112,11 +105,7 @@ export function AdminSidebar() {
                 data-testid={route.key}
                 onClick={() => setActiveRoute(route.key)}
               >
-                <Link
-                  to={appPrefix ? `${appPrefix}${route.path}` : `${route.path}`}
-                >
-                  {route.name}
-                </Link>
+                <Link to={`${appPrefix}${route.path}`}>{route.name}</Link>
               </Menu.Item>
             )
         )}
