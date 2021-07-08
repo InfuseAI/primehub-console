@@ -2,21 +2,31 @@ import * as React from 'react';
 import { Layout, notification, Modal, Button } from 'antd';
 import Canner from 'canner';
 import gql from 'graphql-tag';
+import { Switch } from 'react-router-dom';
 import R from '@canner/history-router';
 import ContentHeader from 'components/header';
 import Error from 'components/error';
 import styled, { createGlobalStyle } from 'styled-components';
+import { ApolloProvider } from 'react-apollo';
+import { createGraphqlClient } from 'utils/graphqlClient';
+import { fakeData, schema as fakeDataSchema } from './fakeData';
 import color from 'styledShare/color';
 import { RouteComponentProps } from 'react-router';
 import myLocales from './utils/locales';
 import get from 'lodash.get';
 import { dict } from 'schema/utils';
+import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
 
 import { AdminSidebar } from './admin/AdminSidebar';
-// import { RouteWithSubRoutes, routes } from './admin/routes';
+import { RouteWithSubRoutes, routes as adminRoutes } from './admin/routes';
 
 const { Content } = Layout;
 const confirm = Modal.confirm;
+
+const client = createGraphqlClient({
+  fakeData,
+  schema: fakeDataSchema,
+});
 
 const updateDatasetMutation = `
   mutation($payload: DatasetUpdateInput!, $where: DatasetWhereUniqueInput!){
@@ -330,6 +340,14 @@ export default class CMSPage extends React.Component<Props, State> {
           </Content> */}
 
           <Content style={{ marginLeft: 200 }}>
+            <Switch>
+              <ApolloProvider client={client}>
+                <LicenseWarningBanner />
+                {adminRoutes.map((route) => (
+                  <RouteWithSubRoutes key={route.key} {...route} />
+                ))}
+              </ApolloProvider>
+            </Switch>
             {this.notification}
             <Canner
               schema={this.schema}

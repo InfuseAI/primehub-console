@@ -1,6 +1,5 @@
 /** @jsx builder */
 import builder, {Body} from 'canner-script';
-import System from './system.schema';
 import Idp from './idp/identityProvider.schema';
 import UserFederation from './userFederation.schema';
 import User from './user.schema';
@@ -40,7 +39,6 @@ const schema = (
     <Body component={CommonBody}>
       <Secret />
     </Body>
-    <System/>
     <Body component={JupyterhubBody}>
       <Jupyterhub />
     </Body>
