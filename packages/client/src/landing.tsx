@@ -47,7 +47,7 @@ class Landing extends React.Component<Props> {
             }>
               <Row>
                 <Col span={12}>
-                  <ThinTitle level={2}>Getting Started</ThinTitle>
+                  <ThinTitle level={2}>User Guide</ThinTitle>
                   <SubContent>
                     <GuideList>
                       <li>
@@ -64,7 +64,7 @@ class Landing extends React.Component<Props> {
                   </SubContent>
                 </Col>
                 <Col span={12}>
-                  <ThinTitle level={2}>Open</ThinTitle>
+                  <ThinTitle level={2}>Quickstart</ThinTitle>
                   {
                     // @ts-ignore
                     (modelDeploymentOnly) ? (
@@ -82,6 +82,12 @@ class Landing extends React.Component<Props> {
                           <li>
                             <Link to='hub'>Open Jupyter Notebook</Link>
                           </li>
+                          <li>
+                            <Link to='hub?path=primehub-examples/tensorflow2/tensorflow2.ipynb&instancetype=cpu-1&image=tf-2&autolaunch=1'>Open TensorFlow Notebook</Link>
+                          </li>
+                          <li>
+                            <Link to='hub?path=primehub-examples/pytorch/pytorch.ipynb&instancetype=cpu-1&image=pytorch-1&autolaunch=1'>Open PyTorch Notebook</Link>
+                          </li>
                           <li style={{display: (window.enableApp) ? 'inherit' : 'none'}}>
                             <Link to='apps'>Install Application</Link>
                           </li>
@@ -94,13 +100,13 @@ class Landing extends React.Component<Props> {
                       <SubContent>
                         <GuideList>
                           <li>
-                            <Link to='hub?path=primehub-examples/tensorflow2/tensorflow2.ipynb&instancetype=cpu-1&image=tf-2&autolaunch=1'>Open TensorFlow 2 Getting-Started Notebook</Link>
-                          </li>
-                          <li>
-                            <Link to='hub?path=primehub-examples/pytorch/pytorch.ipynb&instancetype=cpu-1&image=pytorch-1&autolaunch=1'>Open PyTorch Getting-Started Notebook</Link>
-                          </li>
-                          <li>
                             <Link to='hub'>Open Jupyter Notebook</Link>
+                          </li>
+                          <li>
+                            <Link to='hub?path=primehub-examples/tensorflow2/tensorflow2.ipynb&instancetype=cpu-1&image=tf-2&autolaunch=1'>Open TensorFlow Notebook</Link>
+                          </li>
+                          <li>
+                            <Link to='hub?path=primehub-examples/pytorch/pytorch.ipynb&instancetype=cpu-1&image=pytorch-1&autolaunch=1'>Open PyTorch Notebook</Link>
                           </li>
                           <li>
                             <Link to='job'>Create New Job</Link>
