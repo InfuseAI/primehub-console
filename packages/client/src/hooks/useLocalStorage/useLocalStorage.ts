@@ -1,9 +1,6 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 
-export function useLocalStorage<T>(
-  key: string,
-  initialValue: T | (() => T)
-): [T, Dispatch<SetStateAction<T>>] {
+export function useLocalStorage<T>(key: string, initialValue: T | (() => T)) {
   function readValue() {
     if (typeof window === 'undefined') {
       return initialValue;
@@ -57,5 +54,5 @@ export function useLocalStorage<T>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return [storedValue, setValue];
+  return [storedValue, setValue] as const;
 }

@@ -58,6 +58,7 @@ const CustomCheckboxGroup = styled(Checkbox.Group)`
 
 interface Props {
   client: any;
+  defaultOpenCollapse?: boolean;
   getModel: {
     error?: Error;
     loading: boolean;
@@ -92,7 +93,11 @@ interface ModelAttributesInfo {
   options: CheckboxValueType[];
 }
 
-function ModelDetailContainer({ getModel, ...props }: Props) {
+function ModelDetail({
+  getModel,
+  defaultOpenCollapse = false,
+  ...props
+}: Props) {
   const groupContext = React.useContext(GroupContext);
   const [columnsModalVisible, setColumnsModalVisible] = React.useState(false);
   const [deploy, setDeploy] = React.useState<DeployModelInfo>({
@@ -368,6 +373,7 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
   ];
 
   if (getModel.error) {
+    console.log(getModel.error);
     return <div>Can not not load model.</div>;
   }
 
@@ -407,7 +413,10 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
             span={5}
             style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}
           >
-            <Button onClick={handleColumnsModalOk}>
+            <Button
+              data-testid="setting-columns"
+              onClick={handleColumnsModalOk}
+            >
               <Icon type="setting" />
               Columns
             </Button>
@@ -424,12 +433,21 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
               visible={columnsModalVisible}
               onCancel={() => {
                 setColumnsModalVisible(false);
-                setCurrentModelParams((prev) => ({
-                  ...prev,
+
+                // reset to the original options
+                setCurrentModelParams((params) => ({
+                  ...params,
                   options: defaultModelParams,
                   checkAll:
                     defaultModelParams?.length === modelParameters?.length,
                   indeterminate: defaultModelParams?.length !== 0,
+                }));
+                setCurrentModelMetrics((metrics) => ({
+                  ...metrics,
+                  options: defaultModelMetrics,
+                  checkAll:
+                    defaultModelMetrics?.length === modelMetrics?.length,
+                  indeterminate: defaultModelMetrics?.length !== 0,
                 }));
               }}
               onOk={() => {
@@ -450,6 +468,7 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
 
               <Collapse
                 bordered={false}
+                defaultActiveKey={defaultOpenCollapse && ['1']}
                 expandIcon={({ isActive }) => (
                   <Icon type="caret-right" rotate={isActive ? 90 : 0} />
                 )}
@@ -466,6 +485,7 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
                       }}
                     >
                       <Checkbox
+                        data-testid="params-checkbox"
                         indeterminate={currentModelParams.indeterminate}
                         checked={currentModelParams.checkAll}
                         onChange={(event) => {
@@ -510,6 +530,7 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
 
               <Collapse
                 bordered={false}
+                defaultActiveKey={defaultOpenCollapse && ['1']}
                 expandIcon={({ isActive }) => (
                   <Icon type="caret-right" rotate={isActive ? 90 : 0} />
                 )}
@@ -526,6 +547,7 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
                       }}
                     >
                       <Checkbox
+                        data-testid="metrics-checkbox"
                         indeterminate={currentModelMetrics.indeterminate}
                         checked={currentModelMetrics.checkAll}
                         onChange={(event) => {
@@ -570,6 +592,7 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
           </Col>
         </Row>
         <Table
+          bordered
           scroll={{ x: 'calc(100% - 248px)' }}
           style={{ paddingTop: 8 }}
           dataSource={getModel.modelVersions}
@@ -599,6 +622,7 @@ export default compose(
     options: (props: any) => {
       const { groupContext, match } = props;
       let { modelName } = match.params as any;
+
       modelName = decodeURIComponent(modelName);
       const group = groupContext ? groupContext.name : undefined;
 
@@ -613,4 +637,4 @@ export default compose(
     name: 'getModel',
     alias: 'withGetModel',
   })
-)(ModelDetailContainer);
+)(ModelDetail);
