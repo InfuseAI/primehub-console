@@ -13,7 +13,7 @@ import {
   Collapse,
   Checkbox,
 } from 'antd';
-import { SortOrder } from 'antd/lib/table';
+import { SortOrder, ColumnProps } from 'antd/lib/table';
 import Field from 'components/share/field';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -103,6 +103,7 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
 
   const { modelName } = useParams<{ modelName: string }>();
   const history = useHistory();
+
   const [defaultModelParams, setModelParams] = useLocalStorage<
     CheckboxValueType[]
   >('primehub-model-params', []);
@@ -111,74 +112,6 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
   >('primehub-model-metrics', []);
 
   const decodeModelName = decodeURIComponent(modelName);
-  const breadcrumbs = [
-    {
-      key: 'list',
-      matcher: /\/models/,
-      title: 'Models',
-      link: '/models?page=1',
-    },
-    {
-      key: 'model',
-      matcher: /\/models/,
-      title: `Model: ${decodeModelName}`,
-      tips: 'View the model information and versioned model list.',
-      tipsLink:
-        'https://docs.primehub.io/docs/model-management#versioned-model-list',
-      onClick: () => {
-        getModel.refetch();
-      },
-    },
-  ];
-  const columns = [
-    {
-      key: 'Version',
-      title: 'Version',
-      dataIndex: 'version',
-      render: (version: ModelVersion['version']) => (
-        <Link
-          to={`${decodeModelName}/versions/${version}`}
-        >{`Version ${version}`}</Link>
-      ),
-    },
-    {
-      key: 'Registered At',
-      title: 'Registered At',
-      dataIndex: 'creationTimestamp',
-      render: formatTimestamp,
-      sorter: (a, b) =>
-        compareTimestamp(a.creationTimestamp, b.creationTimestamp),
-      defaultSortOrder: 'descend' as SortOrder,
-    },
-    {
-      key: 'Deployed By',
-      title: 'Deployed By',
-      dataIndex: 'deployedBy',
-      render: (deployedBy: ModelVersion['deployedBy']) => {
-        const tags = deployedBy.map((deploy, id) => (
-          <Link key={id} to={`../deployments/${deploy.id}`}>
-            <Tag>{deploy.name}</Tag>
-          </Link>
-        ));
-
-        return tags;
-      },
-    },
-    {
-      key: 'Action',
-      title: 'Action',
-      dataIndex: '',
-      render: (text, modelVersion: ModelVersion) => (
-        <Button
-          onClick={() => {
-            handleDeploy(modelVersion);
-          }}
-        >
-          Deploy
-        </Button>
-      ),
-    },
-  ];
 
   const { modelParameters, modelMetrics } = React.useMemo(() => {
     if (getModel?.modelVersions) {
@@ -299,7 +232,7 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
       ...params,
       checkAll: defaultModelParams?.length === modelParameters?.length,
       indeterminate:
-        defaultModelParams?.length !== 0 &&
+        defaultModelParams?.length > 0 &&
         defaultModelParams?.length < modelParameters?.length,
     }));
 
@@ -307,10 +240,132 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
       ...metrics,
       checkAll: defaultModelMetrics?.length === modelMetrics?.length,
       indeterminate:
-        defaultModelMetrics?.length !== 0 &&
+        defaultModelMetrics?.length > 0 &&
         defaultModelMetrics?.length < modelMetrics?.length,
     }));
   }, [defaultModelMetrics, defaultModelParams, modelParameters, modelMetrics]);
+
+  const breadcrumbs = [
+    {
+      key: 'list',
+      matcher: /\/models/,
+      title: 'Models',
+      link: '/models?page=1',
+    },
+    {
+      key: 'model',
+      matcher: /\/models/,
+      title: `Model: ${decodeModelName}`,
+      tips: 'View the model information and versioned model list.',
+      tipsLink:
+        'https://docs.primehub.io/docs/model-management#versioned-model-list',
+      onClick: () => {
+        getModel.refetch();
+      },
+    },
+  ];
+
+  const columns: ColumnProps<ModelVersion>[] = [
+    {
+      key: 'Version',
+      title: 'Version',
+      dataIndex: 'version',
+      width: '200px',
+      align: 'center',
+      render: (version: ModelVersion['version']) => (
+        <Link
+          to={`${decodeModelName}/versions/${version}`}
+        >{`Version ${version}`}</Link>
+      ),
+    },
+    {
+      key: 'Registered At',
+      title: 'Registered At',
+      dataIndex: 'creationTimestamp',
+      width: '200px',
+      align: 'center',
+      render: formatTimestamp,
+      sorter: (a, b) =>
+        compareTimestamp(a.creationTimestamp, b.creationTimestamp),
+      defaultSortOrder: 'descend' as SortOrder,
+    },
+    {
+      key: 'Deployed By',
+      title: 'Deployed By',
+      dataIndex: 'deployedBy',
+      align: 'center',
+      render: (deployedBy: ModelVersion['deployedBy']) => {
+        const tags = deployedBy.map((deploy, id) => (
+          <Link key={id} to={`../deployments/${deploy.id}`}>
+            <Tag>{deploy.name}</Tag>
+          </Link>
+        ));
+
+        return tags;
+      },
+    },
+    {
+      key: 'Parameters',
+      title: 'Parameters',
+      align: 'center',
+      width: '120px',
+      render: () => ' - ',
+      children:
+        currentModelParams.options.length === 0
+          ? null
+          : currentModelParams.options.map((param, i) => ({
+              key: param as string,
+              title: param,
+              width: '120px',
+              render: (value: ModelVersion) => {
+                const data = value.run.data.params.sort((a, b) =>
+                  a.key > b.key ? 1 : -1
+                );
+
+                return data[i] ? data[i].value : ' - ';
+              },
+            })),
+    },
+    {
+      key: 'Metrics',
+      title: 'Metrics',
+      align: 'center',
+      width: '120px',
+      render: () => ' - ',
+      children:
+        currentModelMetrics.options.length === 0
+          ? null
+          : currentModelMetrics.options.map((metrics, i) => ({
+              key: metrics as string,
+              title: metrics,
+              width: '120px',
+              render: (value: ModelVersion) => {
+                const data = value.run.data.metrics.sort((a, b) =>
+                  a.key > b.key ? 1 : -1
+                );
+
+                return data[i] ? data[i].value.toFixed(3) : ' - ';
+              },
+            })),
+    },
+    {
+      key: 'Action',
+      title: 'Action',
+      align: 'center',
+      width: '80px',
+      dataIndex: '',
+      fixed: 'right',
+      render: (text, modelVersion: ModelVersion) => (
+        <Button
+          onClick={() => {
+            handleDeploy(modelVersion);
+          }}
+        >
+          Deploy
+        </Button>
+      ),
+    },
+  ];
 
   if (getModel.error) {
     return <div>Can not not load model.</div>;
@@ -443,6 +498,7 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
                         ...params,
                         options: checkedList,
                         indeterminate:
+                          checkedList.length > 0 &&
                           checkedList.length < modelParameters?.length,
                         checkAll:
                           checkedList.length === modelParameters?.length,
@@ -502,6 +558,7 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
                         ...metrics,
                         options: checkedList,
                         indeterminate:
+                          checkedList.length > 0 &&
                           checkedList.length < modelMetrics?.length,
                         checkAll: checkedList.length === modelMetrics?.length,
                       }));
@@ -513,10 +570,11 @@ function ModelDetailContainer({ getModel, ...props }: Props) {
           </Col>
         </Row>
         <Table
+          scroll={{ x: 'calc(100% - 248px)' }}
           style={{ paddingTop: 8 }}
           dataSource={getModel.modelVersions}
           columns={columns}
-          rowKey="name"
+          rowKey={(record) => record.version}
           loading={getModel.loading}
         />
       </PageBody>

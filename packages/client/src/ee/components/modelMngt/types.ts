@@ -24,9 +24,9 @@ export type ModelVersion = {
         key: string;
         value: string;
       }[];
-      metricts: {
+      metrics: {
         key: string;
-        value: string;
+        value: number;
         timestamp: string;
         step: string;
       }[];
