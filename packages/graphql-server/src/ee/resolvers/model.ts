@@ -55,7 +55,7 @@ const getTrackingUri = (mlflow: any) => {
   if (!mlflow.trackingUri) {
     throw new ApolloError('tracking uri not found', TRACKING_URI_NOT_FOUND);
   }
-  return mlflow.trackingUri;
+  return mlflow.trackingUri.replace(/\/$/, '');
 };
 
 const getAuth = (mlflow: any) => {

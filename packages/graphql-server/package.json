@@ -140,6 +140,7 @@
     "imgur": "^0.3.1",
     "jest-transform-graphql": "^2.1.0",
     "mocha": "^5.2.0",
+    "nodemon": "^2.0.9",
     "nyc": "^11.6.0",
     "puppeteer": "^1.13.0",
     "puppeteer-to-istanbul": "^1.2.2",
