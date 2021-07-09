@@ -68,8 +68,12 @@ export default class Detail extends React.Component<Props, State> {
   handleStop = () => {
     const {phDeployment, stopPhDeployment} = this.props;
     confirm({
-      title: `Stop`,
-      content: `Do you want to stop '${phDeployment.name}'?`,
+      title: 'Stop',
+      content: (
+        <span>
+          Do you want to stop "<b>{phDeployment.name}</b>"?
+        </span>
+      ),
       iconType: 'info-circle',
       okText: 'Yes',
       okType: 'danger',
