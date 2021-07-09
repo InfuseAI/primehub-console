@@ -358,7 +358,7 @@ function _SystemSetting({ data, ...props }: Props) {
 
                       // reset to the origin url
                       reset({
-                        logo: watchedURL,
+                        logo: data.system.org.logo?.url,
                       });
                     }}
                     onOk={() => {
