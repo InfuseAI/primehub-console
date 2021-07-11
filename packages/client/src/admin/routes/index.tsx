@@ -2,9 +2,11 @@ import * as React from 'react';
 import { Route, RouteProps } from 'react-router-dom';
 
 import { SystemSetting } from '../SystemSetting';
+import { UserList } from '../User';
 import { appPrefix } from 'utils/env';
 
 export const ROUTES = [
+  'user_next',
   'group',
   'user',
   'instanceType',
@@ -54,6 +56,12 @@ export const routes = [
     key: 'user',
     path: 'admin/user',
     name: 'Users',
+  },
+  {
+    key: 'users_next',
+    path: 'admin/users_next',
+    name: 'Users Next',
+    component: UserList
   },
   {
     key: 'instanceType',
