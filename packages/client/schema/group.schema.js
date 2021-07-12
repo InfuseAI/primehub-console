@@ -118,7 +118,7 @@ export default () => (
       </Condition>
 
       <string keyName="displayName" title="${displayName}" />
-      <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
+      <Condition match={() => !modelDeploymentOnly && !primehubCE} defaultMode="hidden">
        {/* Hidden enable EnableModelDeployment
          * because in "deploy" mode it is always enabled. */}
         <Layout component={EnableModelDeployment}>
