@@ -46,6 +46,7 @@ module.exports = {
 
   rules: {
     'react/react-in-jsx-scope': 'off',
+    'react/no-unescaped-entities': 'warn',
 
     '@typescript-eslint/no-unused-vars': ['error'],
     '@typescript-eslint/explicit-function-return-type': 'off',

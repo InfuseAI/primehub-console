@@ -143,8 +143,12 @@ class AppListContainer extends React.Component<Props, State> {
     const { stopApp } = this.props;
 
     confirm({
-      title: `Stop App`,
-      content: <span>Do you want to stop {`<b>${appName}</b>`}?</span>,
+      title: 'Stop App',
+      content: (
+        <span>
+          Do you want to stop "<b>${appName}</b>"
+        </span>
+      ),
       iconType: 'info-circle',
       okText: 'Yes',
       okType: 'danger',

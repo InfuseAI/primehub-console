@@ -74,8 +74,12 @@ export default class Detail extends React.Component<Props, State> {
   handleStop = () => {
     const {phApplication, stopApp} = this.props;
     confirm({
-      title: `Stop App`,
-      content: <span>Do you want to stop "<b>{phApplication.displayName}</b>"?</span>,
+      title: 'Stop App',
+      content: (
+        <span>
+          Do you want to stop "<b>${phApplication.displayName}</b>"?
+        </span>
+      ),
       iconType: 'info-circle',
       okText: 'Yes',
       okType: 'danger',
