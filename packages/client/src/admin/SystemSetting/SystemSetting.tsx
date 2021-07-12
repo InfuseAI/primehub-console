@@ -197,7 +197,7 @@ function _SystemSetting({ data, ...props }: Props) {
     if (data?.system) {
       reset({
         systemName: data.system.org.name,
-        logo: data.system.org.logo.url,
+        logo: data.system.org.logo?.url,
         defaultUserVolumeCapacity: data.system.defaultUserVolumeCapacity,
         timezone: data.system.timezone,
         smtpHost: data.system.smtp.host,
@@ -358,7 +358,7 @@ function _SystemSetting({ data, ...props }: Props) {
 
                       // reset to the origin url
                       reset({
-                        logo: watchedURL,
+                        logo: data.system.org.logo?.url,
                       });
                     }}
                     onOk={() => {
