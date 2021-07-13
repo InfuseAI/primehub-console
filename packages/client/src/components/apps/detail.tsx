@@ -94,7 +94,11 @@ export default class Detail extends React.Component<Props, State> {
     const {phApplication, startApp} = this.props;
     confirm({
       title: `Start App`,
-      content: <span>Do you want to start "<b>{phApplication.displayName}</b>"?</span>,
+      content: (
+        <span>
+          Do you want to start "<b>${phApplication.displayName}</b>"?
+        </span>
+      ),
       iconType: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
