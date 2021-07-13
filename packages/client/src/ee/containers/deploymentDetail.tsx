@@ -11,11 +11,11 @@ import {get} from 'lodash';
 
 type Props = {
   getPhDeployment: any;
-  stopPhDeployment: Function;
-  deletePhDeployment: Function;
-  deployPhDeployment: Function;
-  createPhDeploymentClient: Function
-  deletePhDeploymentClient: Function;
+  stopPhDeployment: (variables: any) => void;
+  deletePhDeployment: (variables: any) => void;
+  deployPhDeployment: (variables: any) => void;
+  createPhDeploymentClient: (variables: any) => Promise<void>;
+  deletePhDeploymentClient: (variables: any) => Promise<void>;
   stopPhDeploymentResult: any;
   deletePhDeploymentResult: any;
   deployPhDeploymentResult: any;
@@ -84,7 +84,7 @@ export const getMessage = error => get(error, 'graphQLErrors.0.extensions.code')
 
 class DeploymentDetailContainer extends React.Component<Props> {
   render() {
-    const {getPhDeployment, history} = this.props;
+    const {getPhDeployment} = this.props;
     const {stopPhDeployment, stopPhDeploymentResult} = this.props;
     const {deletePhDeployment, deletePhDeploymentResult} = this.props;
     const {deployPhDeployment, deployPhDeploymentResult} = this.props;
@@ -98,7 +98,6 @@ class DeploymentDetailContainer extends React.Component<Props> {
     };
     return (
       <DeploymentDetail
-        history={history}
         refetchPhDeployment={getPhDeployment.refetch}
         stopPhDeployment={stopPhDeployment}
         stopPhDeploymentResult={stopPhDeploymentResult}
