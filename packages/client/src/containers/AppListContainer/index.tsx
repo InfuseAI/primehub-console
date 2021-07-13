@@ -129,7 +129,11 @@ class AppListContainer extends React.Component<Props, State> {
 
     confirm({
       title: `Start App`,
-      content: <span>Do you want to start {`<b>${appName}</b>`}?</span>,
+      content: (
+        <span>
+          Do you want to start "<b>${appName}</b>"?
+        </span>
+      ),
       iconType: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
