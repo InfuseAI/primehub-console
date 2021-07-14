@@ -150,7 +150,7 @@ class AppListContainer extends React.Component<Props, State> {
       title: 'Stop App',
       content: (
         <span>
-          Do you want to stop "<b>${appName}</b>"
+          Do you want to stop "<b>{appName}</b>"
         </span>
       ),
       iconType: 'info-circle',

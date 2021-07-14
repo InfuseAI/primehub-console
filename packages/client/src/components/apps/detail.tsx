@@ -96,7 +96,7 @@ export default class Detail extends React.Component<Props, State> {
       title: `Start App`,
       content: (
         <span>
-          Do you want to start "<b>${phApplication.displayName}</b>"?
+          Do you want to start "<b>{phApplication.displayName}</b>"?
         </span>
       ),
       iconType: 'info-circle',
