@@ -105,24 +105,26 @@ function UserList(props: Props) {
       />
       <PageBody>
         <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
-          {/* @ts-ignore */}
-          <InfuseButton
-            icon="email"
-            onClick={() => {setEmailFormVisible(true)}}
-            style={{ marginRight: 16, width: 120 }}
-            disabled={selectedRows?.length <= 0}
-          >
-            Send Mail
-          </InfuseButton>
-          {/* @ts-ignore */}
-          <InfuseButton
-            icon="plus"
-            onClick={() => {}}
-            style={{ marginRight: 16, width: 120 }}
-            type="primary"
-          >
-            Add
-          </InfuseButton>
+          <Button.Group>
+            {/* @ts-ignore */}
+            <InfuseButton
+              icon="email"
+              onClick={() => {setEmailFormVisible(true)}}
+              style={{ width: 120 }}
+              disabled={selectedRows?.length <= 0}
+            >
+              Send Mail
+            </InfuseButton>
+            {/* @ts-ignore */}
+            <InfuseButton
+              icon="plus"
+              onClick={() => {}}
+              style={{ width: 120 }}
+              type="primary"
+            >
+              Add
+            </InfuseButton>
+          </Button.Group>
         </div>
         <FilterRow
           type="flex"
