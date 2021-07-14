@@ -26,6 +26,7 @@ type Props = {
     refetch: Function;
     mlflow?: any;
     models?: any;
+    networkStatus: number;
   };
 } & RouteComponentProps & GroupContextComponentProps;
 
@@ -56,6 +57,17 @@ class ModelListContainer extends React.Component<Props, State> {
     return <Link to={`models/${encodeURIComponent(model.name)}/versions/${latestVersion}`}>
       {`Version ${latestVersion}`}
     </Link>
+  }
+
+  shouldComponentUpdate(nextProps) {
+    if (
+      this.props.getModels.networkStatus === 7 &&
+      nextProps.getModels.networkStatus === 7
+    ) {
+      return false;
+    }
+
+    return true;
   }
 
   render() {
@@ -96,8 +108,6 @@ class ModelListContainer extends React.Component<Props, State> {
       } else {
         pageBody = 'error'
       }
-    } else if (!models) {
-      pageBody = <Skeleton />
     } else {
       pageBody = this.renderModels(mlflow, models, loading);
     }
