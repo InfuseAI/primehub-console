@@ -15,6 +15,16 @@ import { system } from './fakeData/system';
 
 export const fakeData = {
   me,
+  users: [
+    {
+      username: 'test',
+      email: 'test@test.local',
+      firstName: 'Test',
+      lastName: 'Demo',
+      enabled: true,
+      isAdmin: true
+    }
+  ],
   groups,
   secrets,
   phJobs,
@@ -33,6 +43,7 @@ export const fakeData = {
 
 export const schema = {
   me: { type: 'object' },
+  users: {type: 'array', items: { type: 'object' } },
   secrets: { type: 'array', items: { type: 'object' } },
   groups: { type: 'array', items: { type: 'object' } },
   images: { type: 'array', items: { type: 'object' } },

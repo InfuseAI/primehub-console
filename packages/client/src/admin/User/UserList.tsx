@@ -19,10 +19,10 @@ const ButtonGroup = Button.Group;
 interface Props {
   dataSource: any;
   loading?: boolean;
-  getUserList?: any;
+  getUsersConnection?: any;
 };
 
-export function UserList(props: Props) {
+function UserList(props: Props) {
   const breadcrumbs = [
     {
       key: 'list',
@@ -81,6 +81,8 @@ export function UserList(props: Props) {
   ];
 
   const searchHandler = () => {};
+
+  console.log(222222, props);
 
   return (
     <Layout>
@@ -155,7 +157,9 @@ export default compose(
   }),
 )((props) => {
   const { getUsersConnection} = props;
+  console.log(11111, getUsersConnection);
   const { users, loading } = getUsersConnection;
+  console.log(users, 111111);
   const dataSource = users ? users.edges.map((edge) => edge.node) : [];
   return (
     <React.Fragment>

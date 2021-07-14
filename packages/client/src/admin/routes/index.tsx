@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Route, RouteProps } from 'react-router-dom';
 
 import { SystemSetting } from '../SystemSetting';
-import { UserList } from '../User';
+import UserList from '../User';
 import { appPrefix } from 'utils/env';
 
 export const ROUTES = [
