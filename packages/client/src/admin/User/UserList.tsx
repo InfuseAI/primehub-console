@@ -45,7 +45,7 @@ function UserList(props: Props) {
   const remove = (record) => {
     const {id, username} = record;
     confirm({
-      title: `Delete Userp`,
+      title: `Delete User`,
       content: <span>Do you really want to delete user: "<b>{username}</b>"?</span>,
       iconType: 'info-circle',
       okText: 'Yes',
