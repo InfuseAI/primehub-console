@@ -40,6 +40,7 @@ query QueryModel($group: String!, $name: String!) {
   }
   modelVersions(where: {group: $group, name: $name}) {
     ...ModelVersionInfo
+    run
   }
 }
 

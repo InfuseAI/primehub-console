@@ -35,6 +35,7 @@
       "constant/*": ["./src/constant/*"],
       "interfaces/*": ["./src/interfaces/*"],
       "queries/*": ["./src/queries/*"],
+      "hooks/*": ["./src/hooks/*"],
       "@types/*": ["./src/@types/*"]
     }
   },

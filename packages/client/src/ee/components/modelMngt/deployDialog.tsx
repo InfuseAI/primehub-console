@@ -1,81 +1,77 @@
-import React from 'react';
-import {Form, Modal, Select, Table} from 'antd';
+import * as React from 'react';
+import { Form, Modal, Select } from 'antd';
 
+import { ModelVersion, Deployment } from './types';
 interface Props {
+  visible: boolean;
   modelVersion;
-  deploymentRefs;
-  onDeployNew?: (modelVersion: Object) => void;
-  onDeployExisting?: (modelVersion: Object, deploymentRef: Object) => void;
+  deploymentRefs: Deployment[];
+  onDeployNew?: (modelVersion: ModelVersion) => void;
+  onDeployExisting?: (
+    modelVersion: ModelVersion,
+    deploymentRef: Deployment
+  ) => void;
   onCancel?: () => void;
-};
-
-interface State {
-  value: string;
 }
 
-export class DeployDialog extends React.Component<Props, State> {
-  state = {
-    value: "",
-  }
+export function DeployDialog({ visible = false, ...props }: Props) {
+  const [value, setValue] = React.useState('');
 
-  private handleChange = (value) => {
-    this.setState({value});
-  };
+  function handleOK() {
+    const { modelVersion, deploymentRefs } = props;
 
-  private handleOk = () => {
-    const {modelVersion, deploymentRefs, onDeployNew, onDeployExisting} = this.props;
-    const {value} = this.state;
-
-    if (value === "") {
-      if (onDeployNew) {
-        onDeployNew(modelVersion);
+    if (value === '') {
+      if (props?.onDeployNew) {
+        props.onDeployNew(modelVersion);
       }
     } else {
-      if (onDeployExisting) {
-        const deploymentRef = deploymentRefs.find(deploy => deploy.id === value);
-        onDeployExisting(modelVersion, deploymentRef);
+      if (props?.onDeployExisting) {
+        const deploymentRef = deploymentRefs.find(
+          (deploy) => deploy.id === value
+        );
+        props.onDeployExisting(modelVersion, deploymentRef);
       }
     }
   }
 
-  private handleCancel = () => {
-    const {onCancel} = this.props;
-    if (onCancel) {
-      onCancel();
+  function handleCancel() {
+    if (props?.onCancel) {
+      props.onCancel();
     }
   }
 
-  render () {
-    const {
-      deploymentRefs
-    } = this.props;
-
-    const {
-      value,
-    } = this.state;
-
-    const optionGroups =
-      deploymentRefs.length > 0 ?
-      [<Select.OptGroup label="Update existing deployments">
-        {
-          deploymentRefs.map((item)=> <Select.Option value={item.id}>{item.name}</Select.Option>)
-        }
-      </Select.OptGroup>]: [];
-
-    return <Modal
-            title={`Deploy Model`}
-            visible={true}
-            onOk={this.handleOk}
-            onCancel={this.handleCancel}
+  return (
+    <Modal
+      title="Deploy Model"
+      visible={visible}
+      onOk={handleOK}
+      onCancel={handleCancel}
+    >
+      <Form>
+        <Form.Item label="Deployment" required={true}>
+          <Select
+            defaultValue="create-new-deployment"
+            style={{ width: 400 }}
+            onChange={(v: string) => {
+              setValue(v);
+            }}
           >
-            <Form><Form.Item label="Deployment" required={true}>
-            <Select defaultValue={value} style={{width: 400}} onChange={this.handleChange}>
+            <Select.Option value="create-new-deployment">
+              + Create new deployment
+            </Select.Option>
 
-              <Select.Option value="">+ Create new deployment</Select.Option>
-              {...optionGroups}
-            </Select>
-            </Form.Item></Form>
-          </Modal>;
-  }
+            {props.deploymentRefs.length && (
+              <Select.OptGroup label="Update existing deployments">
+                {props.deploymentRefs.map((item) => (
+                  <Select.Option key={item.id} value={item.id}>
+                    {item.name}
+                  </Select.Option>
+                ))}
+              </Select.OptGroup>
+            )}
+          </Select>
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
 }
-

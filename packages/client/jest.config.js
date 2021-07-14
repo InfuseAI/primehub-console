@@ -8,6 +8,7 @@ module.exports = {
   moduleFileExtensions: ['js', 'ts', 'tsx'],
   moduleNameMapper: {
     '^test/(.*)': '<rootDir>/test/$1',
+    '^hooks/(.*)': '<rootDir>/src/hooks/$1',
     '^utils/(.*)': '<rootDir>/src/utils/$1',
     '^components/(.*)': '<rootDir>/src/components/$1',
     '^containers/(.*)': '<rootDir>/src/containers/$1',

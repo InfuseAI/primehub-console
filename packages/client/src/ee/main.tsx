@@ -22,7 +22,7 @@ import ScheduleDetailContainer from 'ee/containers/scheduleDetail';
 import ScheduleCreatePage from 'ee/containers/ScheduleCreatePage';
 import ScheduleListContainer from 'ee/containers/scheduleList';
 import ModelListContainer from 'ee/containers/modelList';
-import ModelDetailContainer from 'ee/containers/modelDetail';
+import ModelDetail from 'ee/containers/ModelDetail';
 import ModelVersionDetailContainer from 'ee/containers/modelVersionDetail';
 import DeploymentListContainer from 'ee/containers/DeploymentListContainer';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
@@ -130,7 +130,7 @@ class Main extends React.Component {
             <Route
               path={`${appPrefix}g/:groupName/models/:modelName`}
               exact
-              component={ModelDetailContainer}
+              component={ModelDetail}
             />
             <Route
               path={`${appPrefix}g/:groupName/models/:modelName/versions/:version`}

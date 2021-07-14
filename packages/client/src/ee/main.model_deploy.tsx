@@ -15,7 +15,7 @@ import { listDeploy } from 'components/Sidebar';
 import ListContainer from 'containers/ListContainer';
 import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
 import ModelListContainer from 'ee/containers/modelList';
-import ModelDetailContainer from 'ee/containers/modelDetail';
+import ModelDetail from 'ee/containers/ModelDetail';
 import ModelVersionDetailContainer from 'ee/containers/modelVersionDetail';
 import DeploymentListContainer from 'ee/containers/DeploymentListContainer';
 import DeploymentDetailContainer from 'ee/containers/deploymentDetail';
@@ -61,7 +61,7 @@ class Main extends React.Component {
             <Route
               path={`${appPrefix}g/:groupName/models/:modelName`}
               exact
-              component={ModelDetailContainer}
+              component={ModelDetail}
             />
             <Route
               path={`${appPrefix}g/:groupName/models/:modelName/versions/:version`}
