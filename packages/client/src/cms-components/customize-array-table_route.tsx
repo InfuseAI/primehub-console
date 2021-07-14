@@ -116,7 +116,6 @@ export default class ArrayBreadcrumb extends Component<Props & {
         });
       }
     });
-    
   }
 
   send = (index) => {

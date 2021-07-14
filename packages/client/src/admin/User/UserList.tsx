@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { Table, Input, Col, Layout, Button } from 'antd';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Table, Input, Col, Layout, Button, Icon, Modal } from 'antd';
 import { withRouter } from 'react-router-dom';
 import {RouteComponentProps} from 'react-router';
 import PageTitle from 'components/pageTitle';
@@ -10,10 +10,10 @@ import queryString from 'querystring';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import InfuseButton from 'components/infuseButton';
+import EmailForm from 'cms-toolbar/sendEmailModal';
 import { FilterRow, FilterPlugins, ButtonCol } from 'components/share';
 
 const Search = Input.Search;
-
 const ButtonGroup = Button.Group;
 
 interface Props {
@@ -23,6 +23,8 @@ interface Props {
 };
 
 function UserList(props: Props) {
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [emailFormVisible, setEmailFormVisible] = useState(false);
   const breadcrumbs = [
     {
       key: 'list',
@@ -53,6 +55,8 @@ function UserList(props: Props) {
     );
   };
 
+  const renderEnable = (value) => value ? <Icon type="check" /> : <Icon type="close" />;
+
   const columns = [
     {
       title: 'Username',
@@ -68,9 +72,11 @@ function UserList(props: Props) {
     }, {
       title: 'Enabled',
       dataIndex: 'enabled',
+      render: renderEnable,
     }, {
       title: 'Is Admin',
       dataIndex: 'isAdmin',
+      render: renderEnable,
     }, {
       title: 'Action',
       dataIndex: 'id',
@@ -82,7 +88,14 @@ function UserList(props: Props) {
 
   const searchHandler = () => {};
 
-  console.log(222222, props);
+  const onSelectChange = useCallback((selectedRowKeys) => {
+    setSelectedRows(selectedRowKeys);
+  }, [selectedRows]);
+
+  const rowSelection = {
+    selectedRows,
+    onChange: onSelectChange
+  }
 
   return (
     <Layout>
@@ -95,8 +108,9 @@ function UserList(props: Props) {
           {/* @ts-ignore */}
           <InfuseButton
             icon="email"
-            onClick={() => {}}
+            onClick={() => {setEmailFormVisible(true)}}
             style={{ marginRight: 16, width: 120 }}
+            disabled={selectedRows?.length <= 0}
           >
             Send Mail
           </InfuseButton>
@@ -128,11 +142,26 @@ function UserList(props: Props) {
           </ButtonCol>
         </FilterRow>
         <Table
+          rowSelection={rowSelection}
           loading={props.loading}
           dataSource={props.dataSource}
           columns={columns}
           rowKey={(record, index) => record.id}
         />
+        <Modal
+          closable
+          footer={null}
+          onCancel={() => setEmailFormVisible(false)}
+          visible={emailFormVisible}
+          width={600}
+          title="Send Email Form"
+          destroyOnClose
+        >
+          <EmailForm
+            ids={selectedRows}
+            closeModal={() => setEmailFormVisible(false)}
+          />
+        </Modal>
       </PageBody>
     </Layout>
   );
@@ -157,9 +186,7 @@ export default compose(
   }),
 )((props) => {
   const { getUsersConnection} = props;
-  console.log(11111, getUsersConnection);
   const { users, loading } = getUsersConnection;
-  console.log(users, 111111);
   const dataSource = users ? users.edges.map((edge) => edge.node) : [];
   return (
     <React.Fragment>

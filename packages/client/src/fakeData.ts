@@ -17,12 +17,22 @@ export const fakeData = {
   me,
   users: [
     {
+      id: '12',
       username: 'test',
       email: 'test@test.local',
       firstName: 'Test',
       lastName: 'Demo',
       enabled: true,
       isAdmin: true
+    },
+    {
+      id: '13',
+      username: 'test2',
+      email: 'test2@test.local',
+      firstName: 'Test2',
+      lastName: 'Demo',
+      enabled: true,
+      isAdmin: false
     }
   ],
   groups,
