@@ -42,6 +42,7 @@ function getPlugins(env) {
     new webpack.DefinePlugin({
       modelDeploymentOnly: schema === 'modelDeploy',
       primehubCE: schema === 'ce',
+      __ENV__: JSON.stringify(schema),
     }),
     new MiniCssExtractPlugin({
       filename: isDev ? '[name].css' : '[name].[contenthash].css',

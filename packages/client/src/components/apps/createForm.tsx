@@ -219,11 +219,28 @@ class AppCreateForm extends React.Component<Props, State> {
       scope,
       env,
     } = initialValue || this.state.preloadApp || {};
+
+    // @ts-ignore
+    const primehubVersion = __ENV__;
+    const isEEVersion = primehubVersion === 'ee';
+
     const { revealEnv, appSearchText, showRevealBtn } = this.state;
     const scopeList = [
-      {label: 'Group members only', value: PhAppScope.GroupOnly},
-      {label: 'PrimeHub users only', value: PhAppScope.PrimeHubUserOnly},
-      {label: 'Public', value: PhAppScope.Public},
+      {
+        disabled: !isEEVersion,
+        label: isEEVersion
+          ? 'Group members only'
+          : 'Group members only (Enterprise Edition Only)',
+        value: PhAppScope.GroupOnly,
+      },
+      {
+        disabled: !isEEVersion,
+        label: isEEVersion
+          ? 'PrimeHub users only'
+          : 'PrimeHub users only (Enterprise Edition Only)',
+        value: PhAppScope.PrimeHubUserOnly,
+      },
+      { disabled: false, label: 'Public', value: PhAppScope.Public },
     ];
     const invalidInitialInstanceType = instanceType &&
       !form.getFieldValue('instanceType') &&
@@ -451,19 +468,23 @@ class AppCreateForm extends React.Component<Props, State> {
                     )}
                   </Form.Item>
                   <Form.Item label={`Access Scope`}>
-                    {form.getFieldDecorator('scope', {
-                      initialValue: scope || PhAppScope.GroupOnly
-                    })(
-                      <Select>
-                        {
-                          scopeList.map(item => {
-                            return (
-                              <Option value={item.value}>{item.label}</Option>
-                            );
-                          })
-                        }
-                      </Select>
-                    )}
+                  <Select
+                      defaultValue={
+                        isEEVersion ? PhAppScope.GroupOnly : PhAppScope.Public
+                      }
+                    >
+                      {scopeList.map((item) => {
+                        return (
+                          <Option
+                            key={item.value}
+                            disabled={item.disabled}
+                            value={item.value}
+                          >
+                            {item.label}
+                          </Option>
+                        );
+                      })}
+                    </Select>
                   </Form.Item>
                 </Col>
               </Row>
