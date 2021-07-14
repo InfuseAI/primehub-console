@@ -5,24 +5,29 @@ import {RouteComponentProps} from 'react-router';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import Breadcrumbs from 'components/share/breadcrumb';
-import { UsersConnection } from 'queries/User.graphql';
 import queryString from 'querystring';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import InfuseButton from 'components/infuseButton';
 import EmailForm from 'cms-toolbar/sendEmailModal';
 import { FilterRow, FilterPlugins, ButtonCol } from 'components/share';
+import {errorHandler} from 'utils/errorHandler';
+// graphql
+import { UsersConnection, DeleteUser } from 'queries/User.graphql';
+
 
 const Search = Input.Search;
 const ButtonGroup = Button.Group;
+const {confirm} = Modal;
 
 interface Props {
   dataSource: any;
   loading?: boolean;
-  getUsersConnection?: any;
+  deleteUser: any;
 };
 
 function UserList(props: Props) {
+  const { deleteUser } = props;
   const [selectedRows, setSelectedRows] = useState([]);
   const [emailFormVisible, setEmailFormVisible] = useState(false);
   const breadcrumbs = [
@@ -37,19 +42,32 @@ function UserList(props: Props) {
   ];
 
   const edit = (id) => {};
-  const remove = (index) => {};
+  const remove = (record) => {
+    const {id, username} = record;
+    confirm({
+      title: `Delete Userp`,
+      content: <span>Do you really want to delete user: "<b>{username}</b>"?</span>,
+      iconType: 'info-circle',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        return deleteUser({variables: {where: {id}}});
+      },
+    });
+  };
 
   const renderAction = (id, record) => {
     return (
       <ButtonGroup>
         <Button icon={"edit"}
           data-testid="edit-button"
-          onClick={() => this.edit(record.id)}
+          onClick={() => edit(record.id)}
         >
         </Button>
         <Button icon="delete"
           data-testid="delete-button"
-          onClick={() => this.remove(record.__index)}
+          onClick={() => remove(record)}
         />
       </ButtonGroup>
     );
@@ -185,14 +203,27 @@ export default compose(
       };
     },
     name: 'getUsersConnection',
+    alias: 'withGetUserConnection',
   }),
+  graphql(DeleteUser, {
+    options: (props: any) => ({
+      refetchQueries: [{
+        query: UsersConnection,
+        variables: props.getUsersConnection.variables
+      }],
+      onError: errorHandler
+    }),
+    name: 'deleteUser',
+    alias: 'withDeleteUser',
+  })
 )((props) => {
-  const { getUsersConnection} = props;
+  const { getUsersConnection, deleteUser} = props;
   const { users, loading } = getUsersConnection;
   const dataSource = users ? users.edges.map((edge) => edge.node) : [];
   return (
     <React.Fragment>
       <UserList
+        deleteUser={deleteUser}
         dataSource={dataSource}
         loading={loading} />
     </React.Fragment>
