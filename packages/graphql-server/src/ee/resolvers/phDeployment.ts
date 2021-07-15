@@ -182,7 +182,7 @@ const createDeployment = async (context: Context, data: PhDeploymentMutationInpu
   const group = await kcAdminClient.groups.findOne({id: data.groupId});
   const maxDeploy = get(group.attributes, 'max-deploy', UNLIMITED);
   const deployments = await crdClient.phDeployments.list() || [];
-  const deployCount = deployments.filter((d) => d.spec.groupId == data.groupId).length;
+  const deployCount = deployments.filter(d => d.spec.groupId === data.groupId).length;
   if (maxDeploy !== UNLIMITED && deployCount >= maxDeploy) {
     throw new ApolloError('Group Maximum Deployments exceeded', EXCEED_QUOTA_ERROR);
   }
