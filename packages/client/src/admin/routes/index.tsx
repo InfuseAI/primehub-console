@@ -1,12 +1,27 @@
 import * as React from 'react';
 import { Route, RouteProps } from 'react-router-dom';
-
 import { SystemSetting } from '../SystemSetting';
-import UserList from '../User';
+import { UserList, UserDetail } from '../User';
 import { appPrefix } from 'utils/env';
+import styled from 'styled-components';
+const Badge = styled.span`
+  position: absolute;
+  top: 12px;
+  left: 140px;
+  border-radius: 2px;
+  padding: 0px 5px;
+  line-height: 15px;
+  background: none;
+  border: 1px rgb(255, 255, 255, 0.5) solid;
+  font-size: 10px;
+
+  .ant-menu-item:hover &,
+  .ant-menu-item-selected & {
+    border-color: #fff;
+  }
+`;
 
 export const ROUTES = [
-  'user_next',
   'group',
   'user',
   'instanceType',
@@ -53,15 +68,21 @@ export const routes = [
     ],
   },
   {
+    key: 'users_next',
+    path: 'admin/users_next',
+    name: <span>Users <Badge>next</Badge></span>,
+    component: UserList
+  },
+  {
+    key: 'user_next',
+    name: 'User',
+    path: 'admin/user_next/:id',
+    component: UserDetail
+  },
+  {
     key: 'user',
     path: 'admin/user',
     name: 'Users',
-  },
-  {
-    key: 'users_next',
-    path: 'admin/users_next',
-    name: 'Users Next',
-    component: UserList
   },
   {
     key: 'instanceType',

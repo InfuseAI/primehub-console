@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Input, Col, Layout, Button, Icon, Modal } from 'antd';
-import { withRouter } from 'react-router-dom';
+import { withRouter, useHistory } from 'react-router-dom';
 import {RouteComponentProps} from 'react-router';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
@@ -26,8 +26,9 @@ interface Props {
   deleteUser: any;
 };
 
-function UserList(props: Props) {
+function List(props: Props) {
   const { deleteUser } = props;
+  const history = useHistory();
   const [selectedRows, setSelectedRows] = useState([]);
   const [emailFormVisible, setEmailFormVisible] = useState(false);
   const breadcrumbs = [
@@ -41,7 +42,13 @@ function UserList(props: Props) {
     }
   ];
 
-  const edit = (id) => {};
+  const add = () => {
+    history.push(`user_next/add`)
+  }
+
+  const edit = (id) => {
+    history.push(`user_next/${id}`);
+  };
   const remove = (record) => {
     const {id, username} = record;
     confirm({
@@ -136,7 +143,7 @@ function UserList(props: Props) {
             {/* @ts-ignore */}
             <InfuseButton
               icon="plus"
-              onClick={() => {}}
+              onClick={add}
               style={{ width: 120 }}
               type="primary"
             >
@@ -187,7 +194,7 @@ function UserList(props: Props) {
   );
 }
 
-export default compose(
+export const UserList = compose(
   withRouter,
   graphql(UsersConnection, {
     options: (props: RouteComponentProps) => {
@@ -222,7 +229,7 @@ export default compose(
   const dataSource = users ? users.edges.map((edge) => edge.node) : [];
   return (
     <React.Fragment>
-      <UserList
+      <List
         deleteUser={deleteUser}
         dataSource={dataSource}
         loading={loading} />
