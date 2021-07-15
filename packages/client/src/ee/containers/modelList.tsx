@@ -96,8 +96,10 @@ class ModelListContainer extends React.Component<Props, State> {
       } else {
         pageBody = 'error'
       }
-    } else if (!models) {
+    } else if (loading) {
       pageBody = <Skeleton />
+    } else if (!models) {
+      refetch();
     } else {
       pageBody = this.renderModels(mlflow, models, loading);
     }
