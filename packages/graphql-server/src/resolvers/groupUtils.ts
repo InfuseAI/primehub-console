@@ -26,6 +26,7 @@ export const transform = (group: any): any => {
     homeSymlink: getFromAttr('home-symlink', group.attributes, null, parseBoolean),
     launchGroupOnly: getFromAttr('launch-group-only', group.attributes, null, parseBoolean),
     enabledDeployment: getFromAttr('enabled-deployment', group.attributes, null, parseBoolean),
+    maxDeploy: getFromAttr('max-deploy', group.attributes, null, parseInt),
     displayName: getFromAttr('displayName', group.attributes, null),
     jobDefaultActiveDeadlineSeconds: getFromAttr('job-default-active-deadline-seconds',
                                                   group.attributes, null, parseInt),

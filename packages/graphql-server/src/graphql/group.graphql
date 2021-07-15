@@ -47,6 +47,7 @@ type Group {
   launchGroupOnly: Boolean
   # enabledDeployment
   enabledDeployment: Boolean
+  maxDeploy: Int
   jobDefaultActiveDeadlineSeconds: Int
   # group admin
   admins: String
@@ -130,6 +131,7 @@ input GroupCreateInput {
   instanceTypes: InstancePlaceHolder
   # enabledDeployment
   enabledDeployment: Boolean
+  maxDeploy: Int
   jobDefaultActiveDeadlineSeconds: Int
   # group admin
   admins: String
@@ -160,6 +162,7 @@ input GroupUpdateInput {
   instanceTypes: InstancePlaceHolder
   # enabledDeployment
   enabledDeployment: Boolean
+  maxDeploy: Int
   jobDefaultActiveDeadlineSeconds: Int
   # group admin
   admins: String

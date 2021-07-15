@@ -20,6 +20,7 @@ import md5 = require('apache-md5');
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 const NOT_AUTH_ERROR = 'NOT_AUTH';
 const ILLEGAL_ENV_NAME = 'ILLEGAL_ENV_NAME';
+const UNLIMITED = -1;
 
 interface EnvVar {
   name: string;
@@ -179,6 +180,12 @@ export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>
 const createDeployment = async (context: Context, data: PhDeploymentMutationInput) => {
   const {crdClient, kcAdminClient, userId, username} = context;
   const group = await kcAdminClient.groups.findOne({id: data.groupId});
+  const maxDeploy = get(group.attributes, 'max-deploy', UNLIMITED);
+  const deployments = await crdClient.phDeployments.list() || [];
+  const deployCount = deployments.filter((d) => d.spec.groupId == data.groupId).length;
+  if (maxDeploy !== UNLIMITED && deployCount >= maxDeploy) {
+    throw new ApolloError('Group Maximum Deployments exceeded', EXCEED_QUOTA_ERROR);
+  }
   const metadata = {
     name: data.id.toLowerCase(),
   };
