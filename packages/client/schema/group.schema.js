@@ -79,6 +79,7 @@ export default () => (
               projectQuotaCpu
               projectQuotaGpu
               sharedVolumeCapacity
+              maxDeploy
               admins
             }
           }
@@ -124,6 +125,13 @@ export default () => (
         <Layout component={EnableModelDeployment}>
           <boolean keyName="enabledDeployment" uiParams={{yesText: ' ', noText: ' '}} />
         </Layout>
+        <number keyName="maxDeploy"
+          uiParams={{min: 0, step: 1, precision: 0}}
+          defaultValue={() => null}
+          title="Maximum Deployment"
+          packageName="../src/cms-components/customize-number-checkbox"
+          nullable
+        />
       </Condition>
       <Condition match={() => !modelDeploymentOnly} defaultMode="hidden">
         <ShareVolume />
