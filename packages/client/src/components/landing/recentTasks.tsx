@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import moment from 'moment';
 import {groupBy} from 'lodash';
 import {Tag, Divider, Typography, Layout, Row, Col, Card, notification, Button} from 'antd';
@@ -9,7 +9,7 @@ import {withGroupContext, GroupContextComponentProps} from 'context/group';
 import styled from 'styled-components';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
-const {Fragment} = React;
+import type { Phase } from 'ee/components/job/phase';
 
 const {Title, Text} = Typography;
 
@@ -44,6 +44,16 @@ type Props = {
   getPhDeploymentsConnection: any;
 } & GroupContextComponentProps;
 
+const JOB_PHASE_COLOR: Partial<Record<Phase, string>> = {
+  Running: 'blue',
+  Succeeded: 'green',
+  Failed: 'red',
+  Cancelled: 'gold',
+  Preparing: 'geekblue',
+  Pending: '',
+  Unknown: '',
+};
+
 class RecentTasks extends React.Component<Props> {
   getRecentPhJobs() {
     const {getPhJobsConnection} = this.props;
@@ -70,7 +80,7 @@ class RecentTasks extends React.Component<Props> {
         name: j.node.displayName,
         status: j.node.phase,
         time: moment(j.node.createTime),
-        statusColor: j.node.phase === 'Succeeded' ? 'green' : 'red'
+          statusColor: JOB_PHASE_COLOR[j.node.phase],
       };
     }).concat(recentPhDeployments.map(d => {
       return {
@@ -86,11 +96,11 @@ class RecentTasks extends React.Component<Props> {
 
     const groupedTasks = groupBy(recentTasks, t => t.time.clone().startOf('minute').fromNow());
     return (
-      <Fragment>
+      <>
         <ThinTitle level={2}>Recent</ThinTitle>
         <SubContent>
           {Object.keys(groupedTasks).map((k, i) => {
-            return (<React.Fragment>
+            return (<>
               <ThinTitle level={3} style={{marginTop: i > 0 ? '0.5em' : ''}}>{k}</ThinTitle>
               <GuideList>
                 {groupedTasks[k].map(t => {
@@ -103,10 +113,10 @@ class RecentTasks extends React.Component<Props> {
                   );
                 })}
               </GuideList>
-            </React.Fragment>);
+            </>);
           })}
         </SubContent>
-      </Fragment>
+      </>
     );
   }
 }
