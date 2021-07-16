@@ -223,7 +223,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
             <label htmlFor="delete-deployment">
               Are you sure you want to <b>permanently</b> delete this
               deployment? It will also be deleted from any other collaborators
-              in the group. Please type <b>{phDeployment.name}</b> to confirm
+              in the group. <br /> Please type <b>{phDeployment.name}</b> to confirm
               this action.
             </label>
             <Input
