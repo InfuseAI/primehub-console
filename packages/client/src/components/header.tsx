@@ -36,7 +36,6 @@ const Header = styled<Props & LayoutProps>(Layout.Header)`
 
 export interface Props extends GroupContextComponentProps {
   onSelectGroup?: Function;
-  pagePadding?: number;
   GroupSelectorCom?: any;
   groupSelectorProps?: any;
 }
@@ -81,11 +80,11 @@ class HeaderContainer extends React.Component<Props, {}> {
   }
 
   render() {
-    const {groupContext, pagePadding, GroupSelectorCom, groupSelectorProps} = this.props;
+    const {groupContext, GroupSelectorCom, groupSelectorProps} = this.props;
     const thumbnail = (window as any).thumbnail;
     const isUserAdmin = (window as any).isUserAdmin;
     return (
-      <Header pagePadding={pagePadding}>
+      <Header>
         <a href="/" style={{display: "flex", marginRight: "auto", position: "relative"}}>
           <Logo />
         </a>

@@ -1,9 +1,20 @@
-import React from 'react';
-import { Icon, Modal, Card, Divider, Row, Col, Tabs, Input, Button, message} from 'antd';
+import * as React from 'react';
+import {
+  Icon,
+  Modal,
+  Card,
+  Divider,
+  Row,
+  Col,
+  Tabs,
+  Input,
+  Button,
+  notification,
+} from 'antd';
 import { DeploymentInfo, Status, ClientResult } from './common';
 import PageTitle from 'components/pageTitle';
 import InfuseButton from 'components/infuseButton';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Field from 'components/share/field';
 import ModelDeploymentLogs from 'ee/components/modelDeployment/logs';
 import ModelDeploymentHistory from 'ee/components/modelDeployment/history';
@@ -14,59 +25,102 @@ import moment from 'moment';
 import ModelDeploymentClients from './client';
 import Breadcrumbs from 'components/share/breadcrumb';
 import PHTooltip from 'components/share/toolTip';
+import { useClipboard } from 'hooks/useClipboard';
 
-const {confirm} = Modal;
+const { confirm } = Modal;
 
 interface Props {
-  stopPhDeployment: ({}) => void;
+  stopPhDeployment: (variables: any) => void;
   stopPhDeploymentResult: any;
-  deletePhDeployment: ({}) => void;
+  deletePhDeployment: (variables: any) => void;
   deletePhDeploymentResult: any;
-  deployPhDeployment: ({}) => void;
+  deployPhDeployment: (variables: any) => void;
   deployPhDeploymentResult: any;
-  createPhDeploymentClient: ({}) => void;
+  createPhDeploymentClient: (variables: any) => Promise<any>;
   createPhDeploymentClientResult: any;
-  deletePhDeploymentClient: ({}) => void;
+  deletePhDeploymentClient: (variables: any) => Promise<any>;
   deletePhDeploymentClientResult: any;
-  refetchPhDeployment: ({}) => void;
+  refetchPhDeployment: (variables: any) => void;
   phDeployment: DeploymentInfo;
-  history: any;
 }
 
-interface State {
-  clientAdded: ClientResult;
-  revealEnv: boolean;
-}
+export default function Detail({ phDeployment, ...props }: Props) {
+  const [toggleEnvVisible, setToggleEnvVisible] = React.useState(false);
+  const [deleteModal, setDeleteModal] = React.useState({
+    visible: false,
+    deleteable: false,
+  });
+  const [clientAdded, setClientAdded] = React.useState<ClientResult>({
+    name: '',
+    plainTextToken: '',
+  });
 
-export default class Detail extends React.Component<Props, State> {
-  textArea: React.RefObject<any> = React.createRef();
+  const example = getExampleCURL(phDeployment);
+  const [status, copyExample] = useClipboard({ text: example });
 
-  copyClipBoard = () => {
-    if (this.textArea && this.textArea.current) {
-      this.textArea.current.textAreaRef.select();
-      document.execCommand('copy');
-      message.success('copied');
-      this.textArea.current.textAreaRef.blur();
+  React.useEffect(() => {
+    if (status === 'copied') {
+      notification.success({
+        message: 'Copied Successfully!',
+        placement: 'bottomRight',
+      });
     }
+  }, [status]);
+
+  function handleRemoveClient(client: string) {
+    const where = {
+      deploymentId: phDeployment.id,
+      name: client,
+    };
+
+    props
+      .deletePhDeploymentClient({ variables: { where } })
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 
-  handleDelete = () => {
-    const {phDeployment, deletePhDeployment} = this.props;
+  function handleAddClient(client: string) {
+    const data = {
+      deploymentId: phDeployment.id,
+      name: client,
+    };
+
+    props
+      .createPhDeploymentClient({ variables: { data } })
+      .then((result) => {
+        const { data } = result;
+        const { name, plainTextToken } = data.createPhDeploymentClient;
+
+        setClientAdded({
+          name,
+          plainTextToken,
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  function handleDeploy() {
     confirm({
-      title: `Delete`,
-      content: `Do you want to delete '${phDeployment.name}'?`,
-      iconType: 'info-circle',
+      title: 'Deploy',
+      content: `Do you want to deploy '${phDeployment.name}'?`,
+      icon: 'info-circle',
       okText: 'Yes',
-      okType: 'danger',
       cancelText: 'No',
       onOk() {
-        return deletePhDeployment({variables: {where: {id: phDeployment.id}}});
+        return props.deployPhDeployment({
+          variables: { where: { id: phDeployment.id } },
+        });
       },
     });
   }
 
-  handleStop = () => {
-    const {phDeployment, stopPhDeployment} = this.props;
+  function handleStop() {
     confirm({
       title: 'Stop',
       content: (
@@ -74,254 +128,333 @@ export default class Detail extends React.Component<Props, State> {
           Do you want to stop "<b>{phDeployment.name}</b>"?
         </span>
       ),
-      iconType: 'info-circle',
+      icon: 'info-circle',
       okText: 'Yes',
       okType: 'danger',
       cancelText: 'No',
       onOk() {
-        return stopPhDeployment({variables: {where: {id: phDeployment.id}}});
+        return props.stopPhDeployment({
+          variables: { where: { id: phDeployment.id } },
+        });
       },
     });
   }
 
-  handleDeploy = () => {
-    const {phDeployment, deployPhDeployment} = this.props;
-    confirm({
-      title: `Deploy`,
-      content: `Do you want to deploy '${phDeployment.name}'?`,
-      iconType: 'info-circle',
-      okText: 'Yes',
-      cancelText: 'No',
-      onOk() {
-        return deployPhDeployment({variables: {where: {id: phDeployment.id}}});
-      },
-    });
-  }
+  const breadcrumbs = [
+    {
+      key: 'list',
+      matcher: /\/deployments/,
+      title: 'Deployments',
+      link: '/deployments?page=1',
+    },
+    {
+      key: 'detail',
+      matcher: /\/deployments\/([\w-])+/,
+      title: `Deployment: ${phDeployment.name}`,
+      tips: 'View the detailed information.',
+      tipsLink:
+        'https://docs.primehub.io/docs/model-deployment-feature#deployment-detail',
+    },
+  ];
 
-  handleAddClient = (client: string) => {
-    const {phDeployment, createPhDeploymentClient} = this.props;
-    const data = {
-      deploymentId: phDeployment.id,
-      name: client
-    };
-
-    createPhDeploymentClient({variables: {data}})
-    .then((result) => {
-      const {data} = result;
-      const {name, plainTextToken} = data.createPhDeploymentClient;
-
-      this.setState({
-        clientAdded: {
-          name,
-          plainTextToken,
+  return (
+    <>
+      <PageTitle
+        title={`Deployment: ${phDeployment.name}`}
+        breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
+      />
+      <Card
+        style={{ margin: '16px 16px' }}
+        loading={
+          props.stopPhDeploymentResult.loading ||
+          props.deletePhDeploymentResult.loading ||
+          props.deployPhDeploymentResult.loading
         }
-      });
-    });
-  }
-
-  handleRemoveClient = (client: string) => {
-    const {phDeployment, deletePhDeploymentClient} = this.props;
-    const where = {
-      deploymentId: phDeployment.id,
-      name: client
-    };
-
-    deletePhDeploymentClient({variables: {where}})
-    .then((result) => {
-      console.log(result);
-    });
-  }
-
-  toggleEnvVisibilty = () => {
-    const revealEnv = !this.state.revealEnv;
-    this.setState({revealEnv});
-  }
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      clientAdded: null,
-      revealEnv: false
-    };
-  }
-
-  renderInformation = () => {
-    const {revealEnv} = this.state;
-    const {phDeployment} = this.props;
-    const example = `curl -X POST \\\n` +
-    (phDeployment.endpointAccessType === 'private' ?
-    `    -u <client-name>:<client-token> \\\n` : '') +
-    "    -d '${YOUR_DATA}' \\\n" +
-    `    -H "Content-Type: application/json" \\\n` +
-    `    ${phDeployment.endpoint || '<endpoint>'}`;
-    const revealBtn = (
-      <span onClick={this.toggleEnvVisibilty} style={{cursor: 'pointer', verticalAlign: '-0.05em'}}>
-      { revealEnv ? <Icon type='eye' title='Hide value' /> : <Icon type='eye-invisible' title='Show value' /> }
-      </span>
-    );
-
-    return (
-      <div style={{padding: '16px 36px'}}>
-        <Row gutter={36}>
-          <Col span={24}>
-            <Field labelCol={4} valueCol={20} label='Status' value={<strong>{phDeployment.status}</strong>} />
-            <Field labelCol={4} valueCol={20} label='Message' value={getMessage(phDeployment)} />
-            <Field labelCol={4} valueCol={20} label='Endpoint' value={phDeployment.status === Status.Deployed ? phDeployment.endpoint : '-'} />
-            <Field labelCol={4} valueCol={20} label='Creation Time' value={renderTime(phDeployment.creationTime)} />
-            <Field labelCol={4} valueCol={20} label='Last Updated' value={renderTime(phDeployment.lastUpdatedTime)} />
-          </Col>
-        </Row>
-        <Divider />
-        <Row gutter={36}>
-          <Col span={12}>
-            <Field label='Model Image' value={phDeployment.status !== Status.Stopped ? phDeployment.modelImage : '-'} />
-            <Field label='Image Pull Secret' value={phDeployment.imagePullSecret ? phDeployment.imagePullSecret : '-'} />
-            <Field label='Model URI' value={(phDeployment.status !== Status.Stopped && phDeployment.modelURI) ? phDeployment.modelURI : '-'} />
-            <Field label='Description' value={(
-              <div style={{whiteSpace: 'pre-line'}}>
-                {phDeployment.description || '-'}
-              </div>
-            )} />
-            <Field label='Instance Type' value={phDeployment.status !== Status.Stopped ? renderInstanceType(phDeployment.instanceType || {}) : '-'} />
-            <Field label='Replicas' value={`${(phDeployment.availableReplicas || 0)}/${phDeployment.replicas}`} />
-            <Field label='Access Type' value={phDeployment.endpointAccessType === 'private' ? 'private' : 'public'} />
-          </Col>
-          <Col span={12}>
-            <Field type='vertical' label='Metadata' value={<Metadata metadata={phDeployment.metadata} />} />
-            <Field type='vertical' label={<span>Environment Variables {revealBtn}</span>} value={<EnvList envList={phDeployment.env} valueVisibility={revealEnv} />} />
-          </Col>
-        </Row>
-        <Field style={{marginTop: 32}} type='vertical' label={<span>Run an Example <PHTooltip tipText='Using Curl query sample to test the service; the sample varies according to Public or Private access.' tipLink='https://docs.primehub.io/docs/model-deployment-feature#information' placement='right' style={{margintLeft: 8}}/></span>} value={(
-          <>
-            <Button
-              icon='copy'
-              ghost={true}
-              size='small'
-              style={{
-                float: 'right',
-                top: 35,
-                right: 3,
-                marginTop: -32,
-                zIndex: 10,
-                position: 'relative',
-                color: '#ccc',
-                borderColor: '#ccc'
-              }}
-              onClick={() => this.copyClipBoard()}
-            >
-              Copy
-            </Button>
-            <Input.TextArea
-              ref={this.textArea}
-              style={{
-                background: 'black',
-                color: '#ddd',
-                fontFamily: 'monospace',
-              }}
-              rows={5}
-              value={example}
-            />
-          </>
-        )} />
-      </div>
-    )
-  }
-
-  renderLogs = () => {
-    const {phDeployment, refetchPhDeployment} = this.props;
-    return <ModelDeploymentLogs
-      refetchPhDeployment={() => refetchPhDeployment({where: {id: phDeployment.id}})}
-      pods={phDeployment.pods}
-    />;
-  }
-
-  renderHistory = () => {
-    const {phDeployment} = this.props;
-    return <ModelDeploymentHistory history={phDeployment.history}/>;
-  }
-
-  renderClients = () => {
-    const {phDeployment} = this.props;
-    const clients = phDeployment.endpointClients || [];
-    const {clientAdded} = this.state;
-    return <ModelDeploymentClients
-      clients={clients}
-      addClient={this.handleAddClient}
-      removeClient={this.handleRemoveClient}
-      clientAdded={clientAdded}
-    />;
-  }
-
-  render() {
-    const {phDeployment, stopPhDeploymentResult, deletePhDeploymentResult, deployPhDeploymentResult, history} = this.props;
-    const breadcrumbs = [
-      {
-        key: 'list',
-        matcher: /\/deployments/,
-        title: 'Deployments',
-        link: '/deployments?page=1'
-      },
-      {
-        key: 'detail',
-        matcher: /\/deployments\/([\w-])+/,
-        title: `Deployment: ${phDeployment.name}`,
-        tips: 'View the detailed information.',
-        tipsLink: 'https://docs.primehub.io/docs/model-deployment-feature#deployment-detail'
-      }
-    ];
-
-    return (
-      <>
-        <PageTitle
-          title={`Deployment: ${phDeployment.name}`}
-          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-        />
-        <Card style={{margin: '16px 16px'}} loading={stopPhDeploymentResult.loading || deletePhDeploymentResult.loading || deployPhDeploymentResult.loading}>
-          <div style={{marginBottom: 16, textAlign: 'right'}}>
-            <InfuseButton onClick={this.handleDelete} style={{marginRight: 16}}>
-              Delete
+      >
+        <div style={{ marginBottom: 16, textAlign: 'right' }}>
+          <InfuseButton
+            onClick={() => {
+              setDeleteModal((prevState) => ({
+                ...prevState,
+                visible: true,
+              }));
+            }}
+            style={{ marginRight: 16 }}
+          >
+            Delete
+          </InfuseButton>
+          {phDeployment.status === Status.Stopped ||
+          phDeployment.status === Status.Stopping ? (
+            <InfuseButton onClick={handleDeploy} style={{ marginRight: 16 }}>
+              Start
             </InfuseButton>
-            {
-              (phDeployment.status === Status.Stopped || phDeployment.status === Status.Stopping) ? (
-                <InfuseButton onClick={this.handleDeploy} style={{marginRight: 16}}>
-                  Start
-                </InfuseButton>
-              ):(
-                <InfuseButton onClick={this.handleStop} style={{marginRight: 16}}>
-                  Stop
-                </InfuseButton>
-              )
-            }
-            {
-              <InfuseButton>
-                <Link to={`${phDeployment.id}/edit`}>
-                  Update
-                </Link>
-              </InfuseButton>
-            }
-          </div>
-          <Tabs defaultActiveKey="information">
-            <Tabs.TabPane key="information" tab="Information">
-              {this.renderInformation()}
+          ) : (
+            <InfuseButton onClick={handleStop} style={{ marginRight: 16 }}>
+              Stop
+            </InfuseButton>
+          )}
+          {
+            <InfuseButton>
+              <Link to={`${phDeployment.id}/edit`}>Update</Link>
+            </InfuseButton>
+          }
+          <Modal
+            title="Permanently delete deployment?"
+            visible={deleteModal.visible}
+            okButtonProps={{
+              // @ts-ignore
+              type: 'danger',
+              ghost: true,
+              disabled: !deleteModal.deleteable,
+            }}
+            okText="Delete"
+            onOk={() => {
+              props.deletePhDeployment({
+                variables: { where: { id: phDeployment.id } },
+              });
+            }}
+            onCancel={() => {
+              setDeleteModal((prevState) => ({
+                ...prevState,
+                visible: false,
+              }));
+            }}
+          >
+            <label htmlFor="delete-deployment">
+              Are you sure you want to <b>permanently</b> delete this
+              deployment? It will also be deleted from any other collaborators
+              in the group. <br /> Please type <b>{phDeployment.name}</b> to confirm
+              this action.
+            </label>
+            <Input
+              id="delete-deployment"
+              style={{ marginTop: '1rem' }}
+              onChange={(event) => {
+                if (event.currentTarget.value === phDeployment?.name) {
+                  setDeleteModal((prevState) => ({
+                    ...prevState,
+                    deleteable: true,
+                  }));
+                } else {
+                  setDeleteModal((prevState) => ({
+                    ...prevState,
+                    deleteable: false,
+                  }));
+                }
+              }}
+            />
+          </Modal>
+        </div>
+        <Tabs defaultActiveKey="information">
+          <Tabs.TabPane key="information" tab="Information">
+            <div style={{ padding: '16px 36px' }}>
+              <Row gutter={36}>
+                <Col span={24}>
+                  <Field
+                    labelCol={4}
+                    valueCol={20}
+                    label="Status"
+                    value={<strong>{phDeployment.status}</strong>}
+                  />
+                  <Field
+                    labelCol={4}
+                    valueCol={20}
+                    label="Message"
+                    value={getMessage(phDeployment)}
+                  />
+                  <Field
+                    labelCol={4}
+                    valueCol={20}
+                    label="Endpoint"
+                    value={
+                      phDeployment.status === Status.Deployed
+                        ? phDeployment.endpoint
+                        : '-'
+                    }
+                  />
+                  <Field
+                    labelCol={4}
+                    valueCol={20}
+                    label="Creation Time"
+                    value={renderTime(phDeployment.creationTime)}
+                  />
+                  <Field
+                    labelCol={4}
+                    valueCol={20}
+                    label="Last Updated"
+                    value={renderTime(phDeployment.lastUpdatedTime)}
+                  />
+                </Col>
+              </Row>
+              <Divider />
+              <Row gutter={36}>
+                <Col span={12}>
+                  <Field
+                    label="Model Image"
+                    value={
+                      phDeployment.status !== Status.Stopped
+                        ? phDeployment.modelImage
+                        : '-'
+                    }
+                  />
+                  <Field
+                    label="Image Pull Secret"
+                    value={
+                      phDeployment.imagePullSecret
+                        ? phDeployment.imagePullSecret
+                        : '-'
+                    }
+                  />
+                  <Field
+                    label="Model URI"
+                    value={
+                      phDeployment.status !== Status.Stopped &&
+                      phDeployment.modelURI
+                        ? phDeployment.modelURI
+                        : '-'
+                    }
+                  />
+                  <Field
+                    label="Description"
+                    value={
+                      <div style={{ whiteSpace: 'pre-line' }}>
+                        {phDeployment.description || '-'}
+                      </div>
+                    }
+                  />
+                  <Field
+                    label="Instance Type"
+                    value={
+                      phDeployment.status !== Status.Stopped
+                        ? renderInstanceType(phDeployment.instanceType || {})
+                        : '-'
+                    }
+                  />
+                  <Field
+                    label="Replicas"
+                    value={`${phDeployment.availableReplicas || 0}/${
+                      phDeployment.replicas
+                    }`}
+                  />
+                  <Field
+                    label="Access Type"
+                    value={
+                      phDeployment.endpointAccessType === 'private'
+                        ? 'private'
+                        : 'public'
+                    }
+                  />
+                </Col>
+                <Col span={12}>
+                  <Field
+                    type="vertical"
+                    label="Metadata"
+                    value={<Metadata metadata={phDeployment.metadata} />}
+                  />
+                  <Field
+                    type="vertical"
+                    label={
+                      <div>
+                        Environment Variables{' '}
+                        <span
+                          onClick={() =>
+                            setToggleEnvVisible((status) => !status)
+                          }
+                          style={{
+                            cursor: 'pointer',
+                            verticalAlign: '-0.05em',
+                          }}
+                        >
+                          {toggleEnvVisible ? (
+                            <Icon type="eye" title="Hide value" />
+                          ) : (
+                            <Icon type="eye-invisible" title="Show value" />
+                          )}
+                        </span>
+                      </div>
+                    }
+                    value={
+                      <EnvList
+                        envList={phDeployment.env}
+                        valueVisibility={toggleEnvVisible}
+                      />
+                    }
+                  />
+                </Col>
+              </Row>
+              <Field
+                style={{ marginTop: 32 }}
+                type="vertical"
+                label={
+                  <span>
+                    Run an Example{' '}
+                    <PHTooltip
+                      tipText="Using Curl query sample to test the service; the sample varies according to Public or Private access."
+                      tipLink="https://docs.primehub.io/docs/model-deployment-feature#information"
+                      placement="right"
+                      style={{ margintLeft: 8 }}
+                    />
+                  </span>
+                }
+                value={
+                  <>
+                    <Button
+                      icon="copy"
+                      ghost={true}
+                      size="small"
+                      style={{
+                        float: 'right',
+                        top: 35,
+                        right: 3,
+                        marginTop: -32,
+                        zIndex: 10,
+                        position: 'relative',
+                        color: '#ccc',
+                        borderColor: '#ccc',
+                      }}
+                      onClick={copyExample}
+                    >
+                      Copy
+                    </Button>
+                    <Input.TextArea
+                      style={{
+                        background: 'black',
+                        color: '#ddd',
+                        fontFamily: 'monospace',
+                      }}
+                      rows={5}
+                      value={example}
+                    />
+                  </>
+                }
+              />
+            </div>
+          </Tabs.TabPane>
+          <Tabs.TabPane key="logs" tab="Logs">
+            <ModelDeploymentLogs
+              refetchPhDeployment={() =>
+                props.refetchPhDeployment({ where: { id: phDeployment.id } })
+              }
+              pods={phDeployment.pods}
+            />
+          </Tabs.TabPane>
+          <Tabs.TabPane key="history" tab="History">
+            <ModelDeploymentHistory history={phDeployment.history} />
+          </Tabs.TabPane>
+          {phDeployment.endpointAccessType === 'private' && (
+            <Tabs.TabPane key="clients" tab="Clients">
+              <ModelDeploymentClients
+                clients={phDeployment.endpointClients || []}
+                addClient={handleAddClient}
+                removeClient={handleRemoveClient}
+                clientAdded={clientAdded}
+              />
             </Tabs.TabPane>
-            <Tabs.TabPane key="logs" tab="Logs">
-              {this.renderLogs()}
-            </Tabs.TabPane>
-            <Tabs.TabPane key="history" tab="History">
-              {this.renderHistory()}
-            </Tabs.TabPane>
-            {phDeployment.endpointAccessType === 'private'
-              ? <Tabs.TabPane key="clients" tab="Clients">
-                  {this.renderClients()}
-                </Tabs.TabPane>
-              : <></>
-            }
-          </Tabs>
-        </Card>
-      </>
-    )
-  }
+          )}
+        </Tabs>
+      </Card>
+    </>
+  );
 }
 
 function getMessage(deployment: DeploymentInfo) {
@@ -333,19 +466,37 @@ function getMessage(deployment: DeploymentInfo) {
     case Status.Deploying:
     case Status.Stopped:
     default:
-      return deployment.message ? <Message style={{marginTop: 0}} text={deployment.message} /> : '-';
+      return deployment.message ? (
+        <Message style={{ marginTop: 0 }} text={deployment.message} />
+      ) : (
+        '-'
+      );
   }
 }
-const dashOrNumber = value => value === null ? '-' : value;
+
+const dashOrNumber = (value) => (value === null ? '-' : value);
+const getExampleCURL = ({ endpointAccessType, endpoint }: DeploymentInfo) => {
+  return (
+    `curl -X POST \\\n` +
+    (endpointAccessType === 'private'
+      ? `    -u <client-name>:<client-token> \\\n`
+      : '') +
+    "    -d '${YOUR_DATA}' \\\n" +
+    `    -H "Content-Type: application/json" \\\n` +
+    `    ${endpoint || '<endpoint>'}`
+  );
+};
 
 export function renderInstanceType(instanceType) {
   return (
     <div>
       {instanceType.displayName || instanceType.name}
       <br />
-      (CPU: {dashOrNumber(instanceType.cpuLimit)} / Memory: {dashOrNumber(instanceType.memoryLimit)} G / GPU: {dashOrNumber(instanceType.gpuLimit)})
+      (CPU: {dashOrNumber(instanceType.cpuLimit)} / Memory:{' '}
+      {dashOrNumber(instanceType.memoryLimit)} G / GPU:{' '}
+      {dashOrNumber(instanceType.gpuLimit)})
     </div>
-  )
+  );
 }
 
 export function renderTime(time: string) {
