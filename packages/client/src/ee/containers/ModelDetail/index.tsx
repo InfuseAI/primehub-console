@@ -463,7 +463,7 @@ function ModelDetail({
                   fontSize: '14px',
                 }}
               >
-                You are starting Tensorflow with the following settings:
+                You are starting {modelName} with the following settings:
               </p>
 
               <Collapse
@@ -482,6 +482,9 @@ function ModelDetail({
                         display: 'flex',
                         gap: '8px',
                         alignItems: 'center',
+                      }}
+                      onClick={(event) => {
+                        event.stopPropagation();
                       }}
                     >
                       <Checkbox
@@ -506,7 +509,7 @@ function ModelDetail({
                           }
                         }}
                       />
-                      Parameters
+                      <div style={{ cursor: 'auto' }}>Parameters</div>
                     </div>
                   }
                 >
@@ -545,6 +548,9 @@ function ModelDetail({
                         gap: '8px',
                         alignItems: 'center',
                       }}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                      }}
                     >
                       <Checkbox
                         data-testid="metrics-checkbox"
@@ -568,7 +574,7 @@ function ModelDetail({
                           }
                         }}
                       />
-                      Metrics
+                      <div style={{ cursor: 'auto' }}>Metrics</div>
                     </div>
                   }
                 >
