@@ -13,6 +13,7 @@ export const query = async (root, args, context: Context) => {
   const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});
   const nodes = await kubeClient.api.v1.nodes.get();
   const deploys = await crdClient.phDeployments.list();
+  const deployed = deploys.filter(d => d.spec.stop === false);
 
   const license = {
     licensedTo: config.licensedTo,
@@ -26,7 +27,7 @@ export const query = async (root, args, context: Context) => {
       // all groups minus 'everyone'
       maxGroup: groups.length - 1,
       maxNode: nodes.body.items.length,
-      maxModelDeploy: deploys.length,
+      maxModelDeploy: deployed.length,
     }
   };
 

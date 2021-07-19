@@ -414,6 +414,7 @@ export const create = async (root, args, context: Context) => {
 
 export const update = async (root, args, context: Context) => {
   const {crdClient, userId, username} = context;
+  await validateModelDeployQuota(context);
   const data: Partial<PhDeploymentMutationInput> = args.data;
   const phDeployment = await crdClient.phDeployments.get(args.where.id);
   // group is immutable
@@ -466,6 +467,7 @@ export const update = async (root, args, context: Context) => {
 
 export const deploy = async (root, args, context: Context) => {
   const {crdClient, userId, username} = context;
+  await validateModelDeployQuota(context);
   const {id} = args.where;
   const phDeployment = await crdClient.phDeployments.get(id);
   const groupId = phDeployment.spec.groupId;
