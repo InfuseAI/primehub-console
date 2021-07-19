@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Route, RouteProps } from 'react-router-dom';
 import { SystemSetting } from '../SystemSetting';
-import { UserList, UserDetail } from '../User';
+import { UserList, UserDetail, UserAdd } from '../User';
 import { appPrefix } from 'utils/env';
 import styled from 'styled-components';
 const Badge = styled.span`
@@ -43,12 +43,13 @@ export interface RouteTypes extends RouteProps {
 
 export function RouteWithSubRoutes(route) {
   if (!route.component) {
-    return <></>;
+    return ;
   }
 
   return (
     <Route
       path={`${appPrefix}${route.path}`}
+      exact
       render={(props) => <route.component {...props} routes={route.routes} />}
     />
   );
@@ -74,8 +75,12 @@ export const routes = [
     component: UserList
   },
   {
+    key: 'user_next_add',
+    path: 'admin/user_next/add',
+    component: UserAdd
+  },
+  {
     key: 'user_next',
-    name: 'User',
     path: 'admin/user_next/:id',
     component: UserDetail
   },

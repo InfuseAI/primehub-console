@@ -10,7 +10,7 @@ import { graphql } from 'react-apollo';
 const { TabPane } = Tabs;
 
 
-function DetailPage(props: any) {
+function AddPage(props: any) {
   const breadcrumbs = [
     {
       key: 'list',
@@ -19,26 +19,24 @@ function DetailPage(props: any) {
       link: 'admin/users_next?page=1',
     },
     {
-      key: 'detail',
-      matcher: /\/user_next\/([\w-])+/,
-      title: `User`,
+      key: 'add',
+      matcher: /\/user_next\/add/,
+      title: `Add User`,
     }
   ];
   return (
     <Layout>
       <PageTitle
         breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-        title={"Users"}
+        title={"Add User"}
       />
       <PageBody>
         <Tabs>
           <TabPane key='info' tab='Basic Info'>Basic Info</TabPane>
-          <TabPane key='send-email' tab='Send Email'>Send Email</TabPane>
-          <TabPane key='rese-pwd' tab='Reset Password'>Reset Password</TabPane>
         </Tabs>
       </PageBody>
     </Layout>
   );
 }
 
-export const UserDetail = compose()(DetailPage);
+export const UserAdd = compose()(AddPage);
