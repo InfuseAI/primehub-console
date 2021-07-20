@@ -469,9 +469,11 @@ class AppCreateForm extends React.Component<Props, State> {
                   </Form.Item>
                   <Form.Item label={`Access Scope`}>
                     {form.getFieldDecorator('scope', {
-                      initialValue: isEEVersion
-                        ? PhAppScope.GroupOnly
-                        : PhAppScope.Public,
+                      initialValue: !isEEVersion
+                        ? PhAppScope.Public
+                        : scope
+                        ? scope
+                        : PhAppScope.GroupOnly,
                     })(
                       <Select>
                         {scopeList.map((item) => (
