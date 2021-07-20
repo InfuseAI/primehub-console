@@ -28,7 +28,8 @@ export const validateModelDeployQuota = async (context: Context) => {
 
   const {crdClient} = context;
   const deploys = await crdClient.phDeployments.list();
-  if (deploys.length >= Math.ceil(1.1 * config.maxModelDeploy)) {
-    throw new ApolloError('Model deploy quota exceeded', LICENSE_QUOTA_EXCEEDED);
+  const deployed = deploys.filter(d => d.spec.stop === false);
+  if (deployed.length >= Math.ceil(1.1 * config.maxModelDeploy)) {
+    throw new ApolloError('Number of running model deployments exceeds license limitation', LICENSE_QUOTA_EXCEEDED);
   }
 };
