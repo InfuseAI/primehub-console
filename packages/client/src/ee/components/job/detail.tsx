@@ -158,7 +158,7 @@ export default class Detail extends React.Component<Props> {
     const finishTime = job.finishTime ? moment(job.finishTime) : '';
     const action = getActionByPhase(job.phase);
     const allowPersistLog = () => {
-      let enableLogPersistence = (window as any).enableLogPersistence || false;
+      const enableLogPersistence = window.enableLogPersistence || false;
       if (!enableLogPersistence) {
         return false;
       }

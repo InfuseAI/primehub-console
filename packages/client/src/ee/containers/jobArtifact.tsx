@@ -30,7 +30,7 @@ export const GET_PH_JOB_ARTIFACT = gql`
 
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 const isArtifactEnabled = (): boolean => {
-  return (window as any).enablePhfs && (window as any).enableJobArtifact;
+  return window.enablePhfs && window.enableJobArtifact;
 };
 
 // Ref: https://stackoverflow.com/a/14919494/563353

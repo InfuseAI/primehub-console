@@ -46,7 +46,9 @@ export const GET_PH_JOB_MONITORING = gql`
 
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 const isMonitoringEnabled = (): boolean => {
-  return (window as any).enablePhfs && (window as any).enableJobArtifact && (window as any).enableJobMonitoring;
+  return (
+    window.enablePhfs && window.enableJobArtifact && window.enableJobMonitoring
+  );
 };
 const convertToMB = (value: number) => {
   return Math.round(value / 1024 / 1024 * 100) / 100;

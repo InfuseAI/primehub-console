@@ -24,9 +24,8 @@ const firstKey = Object.keys(schema.schema)[0];
 const locales = {
   en: en_US,
 };
-window.LOCALE = window.LOCALE || 'en';
-window.APP_PREFIX = window.APP_PREFIX || '/';
-const locale = window.LOCALE;
+const locale = window.LOCALE || 'en';
+const appPrefix = window.APP_PREFIX || '/';
 
 /**
  * Background worker
@@ -46,11 +45,11 @@ function parseJSON(response) {
 }
 
 export const tokenSyncWorker = new BackgroundTokenSyncer({
-  appPrefix: window.APP_PREFIX,
+  appPrefix,
   refreshTokenExp: window.refreshTokenExp,
   accessTokenExp: window.accessTokenExp,
   getNewTokenSet: () => {
-    return fetch(`${window.APP_PREFIX}oidc/refresh-token-set`, {
+    return fetch(`${appPrefix}oidc/refresh-token-set`, {
       method: 'POST',
     })
       .then(checkStatus)
@@ -68,9 +67,7 @@ export const tokenSyncWorker = new BackgroundTokenSyncer({
         // @ts-ignore
         <Button
           type="primary"
-          onClick={() =>
-            window.location.replace(`${window.APP_PREFIX}oidc/logout`)
-          }
+          onClick={() => window.location.replace(`${appPrefix}oidc/logout`)}
         >
           Login Again
         </Button>
@@ -99,21 +96,19 @@ ReactDOM.render(
         <React.Fragment>
           <Switch>
             <Route
-              path={`${window.APP_PREFIX}admin/:activeKey`}
+              path={`${appPrefix}admin/:activeKey`}
               component={(props) => (
                 <CMSPage
                   {...props}
                   schema={schema}
-                  notification={
-                    <ApolloProvider client={client} {...props} />
-                  }
+                  notification={<ApolloProvider client={client} {...props} />}
                 />
               )}
             />
             <Redirect
               exact
-              from={`${window.APP_PREFIX}admin/`}
-              to={`${window.APP_PREFIX}admin/${firstKey}`}
+              from={`${appPrefix}admin/`}
+              to={`${appPrefix}admin/${firstKey}`}
             />
           </Switch>
         </React.Fragment>

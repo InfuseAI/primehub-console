@@ -22,8 +22,7 @@ import {IntlProvider, addLocaleData} from 'react-intl';
 addLocaleData([...en])
 import myLocales from '../utils/locales';
 import { GroupContextValue, GroupContext } from 'context/group';
-const locale = (window as any).LOCALE || 'en';
-
+const locale = window.LOCALE || 'en';
 
 const HEADER_HEIGHT = 64;
 
@@ -34,7 +33,7 @@ const Content = styled(Layout.Content)`
 `;
 
 const graphqlClient = new GraphqlClient({
-  uri: (window as any).graphqlEndpoint,
+  uri: window.graphqlEndpoint,
   fetch: (uri, options) => {
     const token = window.localStorage.getItem('canner.accessToken');
     options.headers = {
@@ -400,11 +399,11 @@ function parseJSON(response) {
 }
 
 const tokenSyncWorker = new BackgroundTokenSyncer({
-  appPrefix: (window as any).APP_PREFIX,
-  refreshTokenExp: (window as any).refreshTokenExp,
-  accessTokenExp: (window as any).accessTokenExp,
+  appPrefix: window.APP_PREFIX,
+  refreshTokenExp: window.refreshTokenExp,
+  accessTokenExp: window.accessTokenExp,
   getNewTokenSet: () => {
-    return fetch(`${(window as any).APP_PREFIX}oidc/refresh-token-set`, {
+    return fetch(`${window.APP_PREFIX}oidc/refresh-token-set`, {
       method: 'POST'
     })
     .then(checkStatus)
@@ -418,7 +417,7 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       placement: 'bottomRight',
       duration: null,
       btn: (
-        <Button type="primary" onClick={() => window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)}>
+        <Button type="primary" onClick={() => window.location.replace(`${window.APP_PREFIX}oidc/logout`)}>
           Login Again
         </Button>
       ),

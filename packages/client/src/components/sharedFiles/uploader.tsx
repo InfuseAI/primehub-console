@@ -12,9 +12,9 @@ interface Props {
 
 export default (props: Props) => {
   const { dirPath } = props;
-  let graphqlEndpoint = ((window as any).absGraphqlEndpoint) ?
-    ((window as any).absGraphqlEndpoint) :
-    ((window as any).graphqlEndpoint);
+  let graphqlEndpoint = window.absGraphqlEndpoint
+    ? window.absGraphqlEndpoint
+    : window.graphqlEndpoint;
   const endpoint = graphqlEndpoint.replace('/graphql', '/tus')
 
   const headers = {

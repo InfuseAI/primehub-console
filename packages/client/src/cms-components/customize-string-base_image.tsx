@@ -41,7 +41,6 @@ query images($where: ImageWhereInput!) {
   }
 }
 `
-const appPrefix = (window as any).APP_PREFIX || '/';
 
 const url_dict: { [key: string]: string; } = {};
 
