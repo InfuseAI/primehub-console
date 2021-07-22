@@ -318,16 +318,16 @@ function ModelDetail({
       children:
         currentModelParams.options.length === 0
           ? null
-          : currentModelParams.options.map((param, i) => ({
+          : currentModelParams.options.map((param) => ({
               key: param as string,
               title: param,
               width: '120px',
               render: (value: ModelVersion) => {
-                const data = value.run.data.params.sort((a, b) =>
-                  a.key > b.key ? 1 : -1
-                );
+                const [paramValue] = value.run.data.params
+                  .sort((a, b) => (a.key > b.key ? 1 : -1))
+                  .filter(({ key }) => key === param);
 
-                return data[i] ? data[i].value : ' - ';
+                return paramValue ? paramValue.value : ' - ';
               },
             })),
     },
@@ -340,16 +340,16 @@ function ModelDetail({
       children:
         currentModelMetrics.options.length === 0
           ? null
-          : currentModelMetrics.options.map((metrics, i) => ({
-              key: metrics as string,
-              title: metrics,
+          : currentModelMetrics.options.map((metric) => ({
+              key: metric as string,
+              title: metric,
               width: '120px',
               render: (value: ModelVersion) => {
-                const data = value.run.data.metrics.sort((a, b) =>
-                  a.key > b.key ? 1 : -1
-                );
+                const [metricValue] = value.run.data.metrics
+                  .sort((a, b) => (a.key > b.key ? 1 : -1))
+                  .filter(({ key }) => key === metric);
 
-                return data[i] ? data[i].value.toFixed(3) : ' - ';
+                return metricValue ? metricValue.value.toFixed(3) : ' - ';
               },
             })),
     },
