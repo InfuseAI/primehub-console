@@ -340,12 +340,10 @@ export default class CMSPage extends React.Component<Props, State> {
           </Content> */}
 
           <Content style={{ marginLeft: 200 }}>
-              <ApolloProvider client={client}>
-                <LicenseWarningBanner />
-                <Switch>
-                  {adminRoutes.map(RouteWithSubRoutes)}
-                </Switch>
-              </ApolloProvider>
+            <ApolloProvider client={client}>
+              <LicenseWarningBanner />
+              <Switch>{adminRoutes.map(RouteWithSubRoutes)}</Switch>
+            </ApolloProvider>
             {this.notification}
             <Canner
               schema={this.schema}
