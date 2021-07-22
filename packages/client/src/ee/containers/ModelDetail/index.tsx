@@ -349,7 +349,7 @@ function ModelDetail({
                   .sort((a, b) => (a.key > b.key ? 1 : -1))
                   .filter(({ key }) => key === metric);
 
-                return metricValue ? metricValue.value : ' - ';
+                return metricValue ? metricValue.value.toFixed(3) : ' - ';
               },
             })),
     },
