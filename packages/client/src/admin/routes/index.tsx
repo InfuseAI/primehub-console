@@ -1,9 +1,12 @@
 import * as React from 'react';
+import styled from 'styled-components';
 import { Route, RouteProps } from 'react-router-dom';
+
 import { SystemSetting } from '../SystemSetting';
 import { UserList, UserDetail, UserAdd } from '../User';
+import { Secrets, SecretInfo } from '../Secrets';
 import { appPrefix } from 'utils/env';
-import styled from 'styled-components';
+
 const Badge = styled.span`
   position: absolute;
   top: 12px;
@@ -38,19 +41,18 @@ export type ROUTE_KEYS = typeof ROUTES[number];
 export interface RouteTypes extends RouteProps {
   key: ROUTE_KEYS;
   name: string;
-  routes?: RouteTypes[];
 }
 
 export function RouteWithSubRoutes(route) {
   if (!route.component) {
-    return ;
+    return;
   }
 
   return (
     <Route
       path={`${appPrefix}${route.path}`}
       exact
-      render={(props) => <route.component {...props} routes={route.routes} />}
+      render={(props) => <route.component {...props} />}
     />
   );
 }
@@ -60,29 +62,26 @@ export const routes = [
     key: 'group',
     path: 'admin/group',
     name: 'Groups',
-    // FIXME: demo for nested routes
-    routes: [
-      {
-        key: 'group-next',
-        path: 'admin/group/:id',
-      },
-    ],
   },
   {
     key: 'users_next',
     path: 'admin/users_next',
-    name: <span>Users <Badge>next</Badge></span>,
-    component: UserList
+    name: (
+      <span>
+        Users <Badge>next</Badge>
+      </span>
+    ),
+    component: UserList,
   },
   {
     key: 'user_next_add',
     path: 'admin/user_next/add',
-    component: UserAdd
+    component: UserAdd,
   },
   {
     key: 'user_next',
     path: 'admin/user_next/:id',
-    component: UserDetail
+    component: UserDetail,
   },
   {
     key: 'user',
@@ -113,6 +112,14 @@ export const routes = [
     key: 'secret',
     path: 'admin/secret',
     name: 'Secrets',
+    exact: true,
+    component: Secrets,
+  },
+  {
+    key: 'secret-id',
+    name: 'Secret',
+    path: 'admin/secret/:id',
+    component: SecretInfo,
   },
   {
     key: 'jupyterhub',
