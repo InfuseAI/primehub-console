@@ -323,9 +323,9 @@ function ModelDetail({
               title: param,
               width: '120px',
               render: (value: ModelVersion) => {
-                const [paramValue] = value.run.data.params
-                  .sort((a, b) => (a.key > b.key ? 1 : -1))
-                  .filter(({ key }) => key === param);
+                const [paramValue] = value.run.data.params.filter(
+                  ({ key }) => key === param
+                );
 
                 return paramValue ? paramValue.value : ' - ';
               },
@@ -345,9 +345,9 @@ function ModelDetail({
               title: metric,
               width: '120px',
               render: (value: ModelVersion) => {
-                const [metricValue] = value.run.data.metrics
-                  .sort((a, b) => (a.key > b.key ? 1 : -1))
-                  .filter(({ key }) => key === metric);
+                const [metricValue] = value.run.data.metrics.filter(
+                  ({ key }) => key === metric
+                );
 
                 return metricValue ? metricValue.value.toFixed(3) : ' - ';
               },
