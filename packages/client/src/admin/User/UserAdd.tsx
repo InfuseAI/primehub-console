@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { notification, Form, Tabs, Table, Input, Switch, Row, Col, Layout, Button, Modal, Icon } from 'antd';
+import { get } from 'lodash';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import { compose } from 'recompose';
@@ -10,18 +11,20 @@ import { errorHandler } from 'utils/errorHandler';
 import { CreateUser } from 'queries/User.graphql';
 import InfuseButton from 'components/infuseButton';
 import PHTooltip from 'components/share/toolTip';
-import { withRouter, useHistory } from 'react-router-dom';
+import { withRouter, useHistory, useLocation } from 'react-router-dom';
 
 const { TabPane } = Tabs;
 
 function AddPage(props: any) {
   const { form } = props;
+  const history = useHistory();
+  const location = useLocation();
   const breadcrumbs = [
     {
       key: 'list',
       matcher: /\/user_next/,
       title: 'Users',
-      link: 'admin/users_next?page=1',
+      link: 'admin/users_next',
     },
     {
       key: 'add',
@@ -29,6 +32,7 @@ function AddPage(props: any) {
       title: `Add User`,
     },
   ];
+
   const onSubmit = (e) => {
     const { createUser } = props;
     e.preventDefault();
@@ -41,7 +45,16 @@ function AddPage(props: any) {
       });
     });
   };
-  const onCancel = () => {};
+
+  const onCancel = () => {
+    const pathname = get(location, 'state.prevPathname');
+    const search = get(location, 'state.prevSearch');
+    if (pathname) {
+      return history.push(`${pathname}${search}`);
+    }
+    history.push(`../users_next`);
+  };
+
   return (
     <Layout>
       <PageTitle
@@ -104,8 +117,7 @@ function AddPage(props: any) {
                 <InfuseButton onClick={onCancel}>
                   Cancel
                 </InfuseButton>
-            </Form.Item>
-
+              </Form.Item>
             </Form>
           </TabPane>
         </Tabs>
