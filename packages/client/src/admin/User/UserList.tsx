@@ -255,14 +255,7 @@ export const UserList = compose(
   withRouter,
   graphql(UsersConnection, {
     options: (props: RouteComponentProps) => {
-      const params = queryString.parse(
-        props.location.search.replace(/^\?/, '')
-      );
       return {
-        variables: {
-          orderBy: JSON.parse((params.orderBy as string) || '{}'),
-          page: Number(params.page || 1),
-        },
         fetchPolicy: 'cache-and-network',
       };
     },

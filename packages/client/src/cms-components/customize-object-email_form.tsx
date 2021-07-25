@@ -1,6 +1,5 @@
 import React from 'react';
 import {Select, Input, Button, Form, notification} from 'antd';
-import {Item} from 'canner-helpers';
 import {get} from 'lodash';
 import gql from "graphql-tag";
 import { Mutation } from "react-apollo";
@@ -29,6 +28,7 @@ interface Props {
   form: any;
   rootValue: any;
   refId: any;
+  id?: string;
 }
 
 class EmailForm extends React.Component<Props> {
@@ -49,7 +49,6 @@ class EmailForm extends React.Component<Props> {
   }
 
   onError = (e) => {
-    console.log(e);
     setTimeout(() => {
       notification.error({
         message: 'Send email failed!',
@@ -62,8 +61,8 @@ class EmailForm extends React.Component<Props> {
   }
 
   onClick = (sendEmail) => {
-    const {rootValue, refId} = this.props;
-    const id = getIdFromRootValue({
+    const {rootValue, refId, id} = this.props;
+    const userId = id || getIdFromRootValue({
       rootValue,
       refId
     });
@@ -77,7 +76,7 @@ class EmailForm extends React.Component<Props> {
         sendEmail({variables: {
           resetActions: values.resetActions,
           expiresIn,
-          id
+          id: userId
         }})
       }
     });

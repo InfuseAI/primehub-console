@@ -1,7 +1,6 @@
 import React from 'react';
 import {Switch, Input, Button, Form, Alert, notification} from 'antd';
 import {get} from 'lodash';
-import {Item} from 'canner-helpers';
 import gql from "graphql-tag";
 import { Mutation } from "react-apollo";
 import styled from 'styled-components';
@@ -55,8 +54,8 @@ export default class EmailForm extends React.Component {
   }
 
   onClick = (resetPassword) => {
-    const {rootValue, refId} = this.props;
-    const id = getIdFromRootValue({
+    const {rootValue, refId, id} = this.props;
+    const userId = id || getIdFromRootValue({
       rootValue,
       refId
     });
@@ -68,7 +67,7 @@ export default class EmailForm extends React.Component {
         resetPassword({variables: {
           temporary: values.temporary,
           password: values.password,
-          id
+          id: userId
         }})
       }
     })
