@@ -45,6 +45,13 @@ query User($where: UserWhereUniqueInput!) {
     totp
     isAdmin
     volumeCapacity
+    groups {
+      id
+      name
+      displayName
+      quotaCpu
+      quotaGpu
+    }
   }
 }
 
