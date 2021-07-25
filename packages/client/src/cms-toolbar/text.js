@@ -22,7 +22,8 @@ export default class TextFilter extends Component {
       onChange({
         [name]: {
           contains: value
-        }
+        },
+        [name]: value
       });
     }
   }

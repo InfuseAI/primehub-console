@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Input, Col, Layout, Button, Icon, Modal } from 'antd';
 import { withRouter, useHistory } from 'react-router-dom';
-import { get } from 'lodash';
+import { get, pick } from 'lodash';
 import {RouteComponentProps} from 'react-router';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
@@ -13,12 +13,12 @@ import { compose } from 'recompose';
 import InfuseButton from 'components/infuseButton';
 import EmailForm from 'cms-toolbar/sendEmailModal';
 import { FilterRow, FilterPlugins, ButtonCol } from 'components/share';
+import Filter from 'cms-toolbar/filter';
 import {errorHandler} from 'utils/errorHandler';
 // graphql
 import { UsersConnection, DeleteUser } from 'queries/User.graphql';
 
 const PAGE_SIZE = 10;
-const Search = Input.Search;
 const ButtonGroup = Button.Group;
 const {confirm} = Modal;
 
@@ -114,15 +114,15 @@ function List(props: Props) {
     }
   ];
 
-  const searchHandler = (searchText) => {
+  const searchHandler = (searchDict) => {
     const { listUser } = props;
     const { variables, refetch } = listUser;
+    const pickedCond = pick(searchDict, ['username_contains', 'email_contains']);
     const newVariables = {
       ...variables,
       where: {
         ...variables.where,
-        username_contains: searchText,
-        email_contains: searchText
+        ...pickedCond,
       }
     }
     refetch(newVariables);
@@ -200,9 +200,18 @@ function List(props: Props) {
         >
         <Col key="search-handler" style={{ flex: 1 }}>
           <FilterPlugins style={{ marginRight: '10px' }}>
-            <Search
-              placeholder={`Search Username / Email`}
-              onSearch={searchHandler}
+            <Filter
+              changeFilter={searchHandler}
+              where={props.listUser?.variables.where || {}}
+              fields={[{
+                type: 'text',
+                label: 'Username',
+                key: 'username_contains'
+              }, {
+                type: 'text',
+                label: 'Email',
+                key: 'email_contains'
+              }]}
             />
           </FilterPlugins>
         </Col>
