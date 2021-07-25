@@ -34,8 +34,8 @@ query CurrentUser {
   }
 }
 
-query UsersConnection($userAfter: String, $userBefore: String, $userLast: Int,$userFirst: Int, $userWhere: UserWhereInput, $userOrderBy: UsersOrderBy) {
-  users: usersConnection(after: $userAfter, before: $userBefore, last: $userLast, first: $userFirst,where: $userWhere, userOrderBy: $userOrderBy) {
+query UsersConnection($userAfter: String, $userBefore: String, $userLast: Int,$userFirst: Int, $where: UserWhereInput, $userOrderBy: UsersOrderBy) {
+  users: usersConnection(after: $userAfter, before: $userBefore, last: $userLast, first: $userFirst,where: $where, userOrderBy: $userOrderBy) {
     edges {
       cursor
       node {
@@ -61,5 +61,12 @@ query UsersConnection($userAfter: String, $userBefore: String, $userLast: Int,$u
 mutation DeleteUser($where: UserWhereUniqueInput!) {
   deleteUser(where: $where) {
     id
+  }
+}
+
+mutation CreateUser($payload: UserCreateInput!) {
+  createUser(data: $payload) {
+    id
+    username
   }
 }

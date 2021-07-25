@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Input, Col, Layout, Button, Icon, Modal } from 'antd';
 import { withRouter, useHistory } from 'react-router-dom';
+import { get } from 'lodash';
 import {RouteComponentProps} from 'react-router';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
+import Pagination from 'components/share/pagination';
 import Breadcrumbs from 'components/share/breadcrumb';
 import queryString from 'querystring';
 import { graphql } from 'react-apollo';
@@ -15,7 +17,7 @@ import {errorHandler} from 'utils/errorHandler';
 // graphql
 import { UsersConnection, DeleteUser } from 'queries/User.graphql';
 
-
+const PAGE_SIZE = 10;
 const Search = Input.Search;
 const ButtonGroup = Button.Group;
 const {confirm} = Modal;
@@ -23,11 +25,11 @@ const {confirm} = Modal;
 interface Props {
   dataSource: any;
   loading?: boolean;
+  listUser: any;
   deleteUser: any;
 };
 
 function List(props: Props) {
-  const { deleteUser } = props;
   const history = useHistory();
   const [selectedRows, setSelectedRows] = useState([]);
   const [emailFormVisible, setEmailFormVisible] = useState(false);
@@ -50,6 +52,7 @@ function List(props: Props) {
     history.push(`user_next/${id}`);
   };
   const remove = (record) => {
+    const { deleteUser } = props;
     const {id, username} = record;
     confirm({
       title: `Delete User`,
@@ -111,7 +114,45 @@ function List(props: Props) {
     }
   ];
 
-  const searchHandler = () => {};
+  const searchHandler = (searchText) => {
+    const { listUser } = props;
+    const { variables, refetch } = listUser;
+    const newVariables = {
+      ...variables,
+      where: {
+        ...variables.where,
+        username_contains: searchText,
+        email_contains: searchText
+      }
+    }
+    refetch(newVariables);
+  };
+
+  const nextPage = () => {
+    const { listUser } = props;
+    const { users, refetch } = listUser;
+    const after = users.pageInfo.endCursor;
+    const newVariables = {
+      userAfter: after,
+      userFirst: PAGE_SIZE,
+      userLast: undefined,
+      userBefore: undefined,
+    };
+    refetch(newVariables);
+  }
+
+  const prevPage = () => {
+    const { listUser } = props;
+    const { users, refetch } = listUser;
+    const before = users.pageInfo.startCursor;
+    const newVariables = {
+      userBefore: before,
+      userFirst: PAGE_SIZE,
+      userLast: undefined,
+      userAfter: undefined,
+    };
+    refetch(newVariables);
+  }
 
   const onSelectChange = useCallback((selectedRowKeys) => {
     setSelectedRows(selectedRowKeys);
@@ -174,6 +215,13 @@ function List(props: Props) {
           dataSource={props.dataSource}
           columns={columns}
           rowKey={(record, index) => record.id}
+          pagination={false}
+        />
+        <Pagination
+          hasNextPage={props.listUser.users?.pageInfo.hasNextPage}
+          hasPreviousPage={props.listUser.users?.pageInfo.hasPreviousPage}
+          nextPage={nextPage}
+          previousPage={prevPage}
         />
         <Modal
           closable
@@ -209,14 +257,14 @@ export const UserList = compose(
         fetchPolicy: 'cache-and-network',
       };
     },
-    name: 'getUsersConnection',
-    alias: 'withGetUserConnection',
+    name: 'listUser',
+    alias: 'withListUser',
   }),
   graphql(DeleteUser, {
     options: (props: any) => ({
       refetchQueries: [{
         query: UsersConnection,
-        variables: props.getUsersConnection.variables
+        variables: props.listUser.variables
       }],
       onError: errorHandler
     }),
@@ -224,13 +272,14 @@ export const UserList = compose(
     alias: 'withDeleteUser',
   })
 )((props) => {
-  const { getUsersConnection, deleteUser} = props;
-  const { users, loading } = getUsersConnection;
+  const { listUser, deleteUser} = props;
+  const { users, loading } = listUser;
   const dataSource = users ? users.edges.map((edge) => edge.node) : [];
   return (
     <React.Fragment>
       <List
         deleteUser={deleteUser}
+        listUser={listUser}
         dataSource={dataSource}
         loading={loading} />
     </React.Fragment>
