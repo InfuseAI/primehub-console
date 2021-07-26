@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Layout, notification, Modal, Button } from 'antd';
+import {injectIntl, FormattedMessage} from 'react-intl'
 import Canner from 'canner';
 import gql from 'graphql-tag';
 import { Switch } from 'react-router-dom';
@@ -75,6 +76,7 @@ export interface State {
   dataChanged: Object;
 }
 
+@injectIntl
 export default class CMSPage extends React.Component<Props, State> {
   schema = null;
   notification = null;
