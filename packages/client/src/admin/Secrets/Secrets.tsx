@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import { Button, Table, Icon, Modal, notification } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { useForm } from 'react-hook-form';
@@ -19,6 +19,15 @@ interface SecretNode {
   cursor: string;
   node: Pick<Secret, 'id' | 'name' | 'displayName' | 'type'>;
 }
+
+const styles: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '16px',
+  margin: '16px',
+  padding: '32px',
+  backgroundColor: '#fff',
+};
 
 interface Props {
   secretQuery: {
@@ -52,8 +61,10 @@ function _Secrets({
   createSecretMutation,
   deleteSecretMutation,
 }: Props) {
-  const [visible, setVisible] = React.useState(false);
   const history = useHistory();
+  const location = useLocation();
+  const querystring = new URLSearchParams(location.search);
+
   const formMethods = useForm({
     mode: 'onChange',
     defaultValues: {
@@ -158,8 +169,10 @@ function _Secrets({
         },
       });
 
+      formMethods.reset();
+      history.push('/admin/secret');
+
       await secretQuery.refetch();
-      setVisible(false);
       notification.success({
         duration: 5,
         placement: 'bottomRight',
@@ -192,26 +205,27 @@ function _Secrets({
     return <div>Failure to load secrets.</div>;
   }
 
+  if (querystring && querystring.get('operator') === 'create') {
+    return (
+      <SecretLayout>
+        <div style={styles}>
+          <SecretForm {...formMethods} onSubmit={onSubmit} />
+        </div>
+      </SecretLayout>
+    );
+  }
+
   return (
     <>
       <SecretLayout>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px',
-            margin: '16px',
-            padding: '32px',
-            backgroundColor: '#fff',
-          }}
-        >
+        <div style={styles}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
               type="primary"
               icon="plus"
               // @ts-ignore
               disabled={secretQuery.loading}
-              onClick={() => setVisible(true)}
+              onClick={() => history.push('/admin/secret?operator=create')}
             >
               Add
             </Button>
@@ -224,27 +238,6 @@ function _Secrets({
             dataSource={secretQuery?.secretsConnection?.edges}
           />
         </div>
-
-        <Modal
-          title="Create A Secret"
-          visible={visible}
-          footer={[
-            <Button key="cancel" onClick={() => setVisible(false)}>
-              Cancel
-            </Button>,
-            // @ts-ignore
-            <Button
-              key="create"
-              type="primary"
-              loading={secretQuery.loading}
-              onClick={onSubmit}
-            >
-              Create
-            </Button>,
-          ]}
-        >
-          <SecretForm {...formMethods} />
-        </Modal>
       </SecretLayout>
     </>
   );

@@ -2,11 +2,10 @@ import * as React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { MockedProvider } from 'react-apollo/test-utils';
 
-import { render, screen, waitFor } from 'test/test-utils';
+import { render, screen } from 'test/test-utils';
 
 import { Secrets } from '../Secrets';
 import { GetSecrets } from '../secrets.graphql';
-import userEvent from '@testing-library/user-event';
 
 function setup() {
   const mockRequests = [
@@ -100,24 +99,5 @@ describe('Secrets', () => {
     expect(await screen.findByText('csr-foobar')).toBeInTheDocument();
     expect(await screen.findByText('csr-foobar2')).toBeInTheDocument();
     expect(await screen.findByText('csr-foobar3')).toBeInTheDocument();
-  });
-
-  it('should render secret with create a new secret modal', async () => {
-    const { TestProvider, mockRequests } = setup();
-
-    render(
-      <TestProvider>
-        <MockedProvider mocks={mockRequests}>
-          <Secrets />
-        </MockedProvider>
-      </TestProvider>
-    );
-
-    const addSecretButton = await screen.findByText('Add');
-    userEvent.click(addSecretButton);
-
-    await waitFor(() => {
-      expect(screen.getByText('Create A Secret')).toBeInTheDocument();
-    });
   });
 });
