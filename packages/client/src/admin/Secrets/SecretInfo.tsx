@@ -1,12 +1,7 @@
 import * as React from 'react';
 import { compose } from 'recompose';
-import {
-  Link,
-  useHistory,
-  withRouter,
-  RouteComponentProps,
-} from 'react-router-dom';
-import { Button, notification } from 'antd';
+import { useHistory, withRouter, RouteComponentProps } from 'react-router-dom';
+import { notification } from 'antd';
 import { useForm } from 'react-hook-form';
 import { graphql } from 'react-apollo';
 
@@ -105,29 +100,7 @@ function _SecretInfo({ secretQuery, updateSecretMutation }: Props) {
           backgroundColor: '#fff',
         }}
       >
-        <SecretForm
-          {...formMethods}
-          disabledName
-          onSubmit={onSubmit}
-          footer={
-            <div
-              style={{
-                display: 'flex',
-                gap: '16px',
-                justifyContent: 'flex-end',
-              }}
-            >
-              <Button>
-                <Link to="/admin/secret">Cancel</Link>
-              </Button>
-
-              {/* @ts-ignore */}
-              <Button type="primary" htmlType="submit">
-                Save
-              </Button>
-            </div>
-          }
-        />
+        <SecretForm {...formMethods} disabledName onSubmit={onSubmit} />
       </div>
     </SecretLayout>
   );

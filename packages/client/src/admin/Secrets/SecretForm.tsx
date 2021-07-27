@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Select, Input, Typography, Tooltip, Icon } from 'antd';
+import { Link } from 'react-router-dom';
+import { Button, Select, Input, Typography, Tooltip, Icon } from 'antd';
 import { Controller, UseFormReturn } from 'react-hook-form';
 
 import type { Secret } from './types';
@@ -41,7 +42,6 @@ export const initialFormState: Secret = {
 interface SecretFormProps extends Omit<UseFormReturn<Secret>, 'reset'> {
   onSubmit?: (data: Partial<Secret>) => Promise<void>;
   disabledName?: boolean;
-  footer?: React.ReactNode;
 }
 
 export function SecretForm(props: SecretFormProps) {
@@ -59,6 +59,11 @@ export function SecretForm(props: SecretFormProps) {
       onSubmit={props?.onSubmit && handleSubmit(props.onSubmit)}
     >
       <div>
+        {!props?.disabledName && (
+          <>
+            <span style={{ color: '#ff7875' }}>*</span>{' '}
+          </>
+        )}
         <label htmlFor="secret-name">Name</label>
         <Controller
           control={control}
@@ -212,7 +217,22 @@ export function SecretForm(props: SecretFormProps) {
         </>
       )}
 
-      {props?.footer}
+      <div
+        style={{
+          display: 'flex',
+          gap: '16px',
+          justifyContent: 'flex-end',
+        }}
+      >
+        <Button>
+          <Link to="/admin/secret">Cancel</Link>
+        </Button>
+
+        {/* @ts-ignore */}
+        <Button type="primary" htmlType="submit">
+          Save
+        </Button>
+      </div>
     </form>
   );
 }
