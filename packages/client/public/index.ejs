@@ -122,7 +122,9 @@
     if (location.pathname.startsWith('/app-prefix')) {
       window.APP_PREFIX = '/app-prefix/';
     } else {
+      window.LOCALE = '<%= locale %>';
       window.APP_PREFIX = '<%= staticPath %>/';
+      window.EVERYONE_GROUP_ID = '<%= everyoneGroupId %>';
       window.links = '<%- links %>';
       window.graphqlPrefix = '<%= graphqlPrefix %>';
       window.graphqlEndpoint = '<%= graphqlEndpoint %>';
@@ -133,7 +135,6 @@
       window.isUserAdmin = <%= isUserAdmin %>;
       window.accessTokenExp = <%= accessTokenExp %>;
       window.refreshTokenExp = <%= refreshTokenExp %>;
-      window.EVERYONE_GROUP_ID = '<%= everyoneGroupId %>';
       window.everyoneGroupId = '<%= everyoneGroupId %>';
       window.newAccessToken = '<%= newAccessToken %>';
       window.requestApiTokenEndpoint = '<%= requestApiTokenEndpoint %>';
@@ -141,8 +142,11 @@
       window.customImageSetup = '<%= customImageSetup %>';
       window.primehubVersion = '<%= primehubVersion %>';
       window.apiToken = '<%= apiToken %>';
+      window.disableMode = <%= disableMode %>;
+      window.disableGroup = <%= disableGroup %>;
 
       window.enableLogPersistence = <%= enableLogPersistence %>;
+      window.enableUploadServer = <%= enableDatasetUpload %>;
       window.enableModelDeployment = <%= enableModelDeployment %>;
       window.enablePhfs = <%= enablePhfs %>;
       window.enableJobArtifact = <%= enableJobArtifact %>;

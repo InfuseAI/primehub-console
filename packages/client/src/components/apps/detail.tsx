@@ -77,7 +77,7 @@ export default class Detail extends React.Component<Props, State> {
       title: 'Stop App',
       content: (
         <span>
-          Do you want to stop "<b>${phApplication.displayName}</b>"?
+          Do you want to stop "<b>{phApplication.displayName}</b>"?
         </span>
       ),
       iconType: 'info-circle',

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Layout, notification, Modal, Button } from 'antd';
+import {injectIntl, FormattedMessage} from 'react-intl'
 import Canner from 'canner';
 import gql from 'graphql-tag';
 import { Switch } from 'react-router-dom';
@@ -75,6 +76,7 @@ export interface State {
   dataChanged: Object;
 }
 
+@injectIntl
 export default class CMSPage extends React.Component<Props, State> {
   schema = null;
   notification = null;
@@ -333,21 +335,17 @@ export default class CMSPage extends React.Component<Props, State> {
           {/* If want to test this, remove line 16 comment */}
           {/* <Content style={{ marginLeft: '200px' }}>
             <Switch>
-              {routes.map((route) => (
-                <RouteWithSubRoutes key={route.key} {...route} />
-              ))}
+              {routes.map(RouteWithSubRoutes)}
             </Switch>
           </Content> */}
 
           <Content style={{ marginLeft: 200 }}>
-            <Switch>
               <ApolloProvider client={client}>
                 <LicenseWarningBanner />
-                {adminRoutes.map((route) => (
-                  <RouteWithSubRoutes key={route.key} {...route} />
-                ))}
+                <Switch>
+                  {adminRoutes.map(RouteWithSubRoutes)}
+                </Switch>
               </ApolloProvider>
-            </Switch>
             {this.notification}
             <Canner
               schema={this.schema}

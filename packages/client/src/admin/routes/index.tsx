@@ -1,8 +1,25 @@
 import * as React from 'react';
 import { Route, RouteProps } from 'react-router-dom';
-
 import { SystemSetting } from '../SystemSetting';
+import { UserList, UserDetail, UserAdd } from '../User';
 import { appPrefix } from 'utils/env';
+import styled from 'styled-components';
+const Badge = styled.span`
+  position: absolute;
+  top: 12px;
+  left: 140px;
+  border-radius: 2px;
+  padding: 0px 5px;
+  line-height: 15px;
+  background: none;
+  border: 1px rgb(255, 255, 255, 0.5) solid;
+  font-size: 10px;
+
+  .ant-menu-item:hover &,
+  .ant-menu-item-selected & {
+    border-color: #fff;
+  }
+`;
 
 export const ROUTES = [
   'group',
@@ -26,12 +43,13 @@ export interface RouteTypes extends RouteProps {
 
 export function RouteWithSubRoutes(route) {
   if (!route.component) {
-    return <></>;
+    return ;
   }
 
   return (
     <Route
       path={`${appPrefix}${route.path}`}
+      exact
       render={(props) => <route.component {...props} routes={route.routes} />}
     />
   );
@@ -49,6 +67,22 @@ export const routes = [
         path: 'admin/group/:id',
       },
     ],
+  },
+  {
+    key: 'users_next',
+    path: 'admin/users_next',
+    name: <span>Users <Badge>next</Badge></span>,
+    component: UserList
+  },
+  {
+    key: 'user_next_add',
+    path: 'admin/user_next/add',
+    component: UserAdd
+  },
+  {
+    key: 'user_next',
+    path: 'admin/user_next/:id',
+    component: UserDetail
   },
   {
     key: 'user',
