@@ -85,7 +85,7 @@ function _Secrets({
       },
     },
     {
-      key: 'actioins',
+      key: 'actions',
       title: 'Actions',
       width: '200px',
       render: function RenderActions(secret: SecretNode) {
@@ -188,6 +188,10 @@ function _Secrets({
     }
   }
 
+  if (secretQuery.error) {
+    return <div>Failure to load secrets.</div>;
+  }
+
   return (
     <>
       <SecretLayout>
@@ -213,6 +217,7 @@ function _Secrets({
             </Button>
           </div>
           <Table
+            rowKey={(data) => data.node.id}
             style={{ paddingTop: 8 }}
             columns={columns}
             loading={secretQuery.loading}
