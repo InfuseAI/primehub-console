@@ -472,7 +472,7 @@ export const update = async (root, args, context: Context) => {
 };
 
 export const deploy = async (root, args, context: Context) => {
-  const {kcAdminClient, crdClient, userId, username} = context;
+  const {crdClient, userId, username} = context;
   const {id} = args.where;
   const phDeployment = await crdClient.phDeployments.get(id);
   const groupId = phDeployment.spec.groupId;
