@@ -14,7 +14,7 @@ export default class EnableSharedVolume extends React.Component<Props> {
     // if the origin value is true, the field can't change anymore,
     // so we have window.disableEnableSharedVolume to check
     // NOTE: `window.disableEnableSharedVolume` will also be used in sharedVolumeCapacity component
-    (window as any).disableEnableSharedVolume = value === true;
+    window.disableEnableSharedVolume = value === true;
     this.sharedVolumeCapacity = recordValue.sharedVolumeCapacity || 1;
     this.launchGroupOnly = recordValue.launchGroupOnly || false;
     if (routerParams.operator === 'create') {
@@ -32,7 +32,7 @@ export default class EnableSharedVolume extends React.Component<Props> {
 
   onChange = (checked) => {
     const {onChange, refId, routerParams} = this.props;
-    if ((window as any).disableEnableSharedVolume) {
+    if (window.disableEnableSharedVolume) {
       return;
     }
 
@@ -47,7 +47,7 @@ export default class EnableSharedVolume extends React.Component<Props> {
 
   componentDidMount() {
     const {value, routerParams} = this.props;
-    if ((window as any).disableEnableSharedVolume) {
+    if (window.disableEnableSharedVolume) {
       return;
     }
     if (routerParams.operator === 'create' && value === false) {
@@ -72,7 +72,7 @@ export default class EnableSharedVolume extends React.Component<Props> {
   render() {
     const {value} = this.props;
     return (
-      <Switch onChange={this.onChange} checked={value} disabled={(window as any).disableEnableSharedVolume} />
+      <Switch onChange={this.onChange} checked={value} disabled={window.disableEnableSharedVolume} />
     );
   }
 }

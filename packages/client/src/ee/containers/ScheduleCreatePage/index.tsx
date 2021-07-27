@@ -101,7 +101,7 @@ class ScheduleCreatePage extends React.Component<Props, State> {
       'id'
     );
 
-    const jobActiveDeadlineSeconds = get(group, 'jobDefaultActiveDeadlineSeconds', null) || (window as any).jobDefaultActiveDeadlineSeconds;
+    const jobActiveDeadlineSeconds = get(group, 'jobDefaultActiveDeadlineSeconds', null) || window.jobDefaultActiveDeadlineSeconds;
 
     return (
       <React.Fragment>

@@ -56,33 +56,33 @@ class HeaderContainer extends React.Component<Props, {}> {
 
     switch (item.key) {
       case 'userProfile': {
-        (window as any).location.href = links.userProfileLink;
+        window.location.href = links.userProfileLink;
         break;
       }
       case 'changePassword': {
-        (window as any).location.href = links.changePasswordLink;
+        window.location.href = links.changePasswordLink;
         break;
       }
       case 'apiToken': {
         const {groupContext} = this.props;
         const link = `${appPrefix}g/${groupContext.name}/api-token`;
-        (window as any).location.href = link;
+        window.location.href = link;
         break;
       }
       case 'adminPortal': {
-        (window as any).location.href = links.adminPortalLink;
+        window.location.href = links.adminPortalLink;
         break;
       }
       case 'logout': {
-        (window as any).location.href = links.logoutLink;
+        window.location.href = links.logoutLink;
       }
     }
   }
 
   render() {
     const {groupContext, GroupSelectorCom, groupSelectorProps} = this.props;
-    const thumbnail = (window as any).thumbnail;
-    const isUserAdmin = (window as any).isUserAdmin;
+    const thumbnail = window.thumbnail;
+    const isUserAdmin = window.isUserAdmin;
     return (
       <Header>
         <a href="/" style={{display: "flex", marginRight: "auto", position: "relative"}}>
@@ -128,7 +128,7 @@ class HeaderContainer extends React.Component<Props, {}> {
                 cursor: 'default',
                 color: '#999 !important'
             }}>
-              version: {(window as any).primehubVersion}
+              version: {window.primehubVersion}
             </Menu.Item>
           </Menu.SubMenu>
         </Menu>

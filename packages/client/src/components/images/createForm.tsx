@@ -22,7 +22,7 @@ const StyledFormItem = styled(Form.Item)`
   }
 `;
 
-const DISABLE_BUILD_IMAGE = !(window as any).customImageSetup;
+const DISABLE_BUILD_IMAGE = !window.customImageSetup;
 
 enum FormType {
   Edit = 'edit',

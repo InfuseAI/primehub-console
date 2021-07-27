@@ -44,7 +44,7 @@ export default class EnableUploadServer extends React.Component<Props> {
     const disabled = routerParams.op === 'create' || !initialValue || !value;
     return (
       <React.Fragment>
-        <Switch onChange={this.onChange} checked={value} disabled={(window as any).disableEnableSharedVolume} />
+        <Switch onChange={this.onChange} checked={value} disabled={window.disableEnableSharedVolume} />
         <Mutation
           mutation={REGENERATE_UPLOAD_SERVER_SECRET}
           variables={{
@@ -83,7 +83,7 @@ export default class EnableUploadServer extends React.Component<Props> {
                 disabled={disabled}
               >
                 Regenerate Secret
-              </Button> 
+              </Button>
             );
           }}
         </Mutation>

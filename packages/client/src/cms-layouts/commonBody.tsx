@@ -10,7 +10,7 @@ import {Props} from '../cms-components/types';
 
 const confirm = Modal.confirm;
 
-const DISABLE_BUILD_IMAGE = !(window as any).customImageSetup;
+const DISABLE_BUILD_IMAGE = !window.customImageSetup;
 
 function getRouteName(key) {
   switch (key) {

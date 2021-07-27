@@ -56,7 +56,7 @@ const DELETE_FILES = gql`
 
 const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
 const isPhfsEnabled = (): boolean => {
-  return (window as any).enablePhfs;
+  return window.enablePhfs;
 };
 
 // Ref: https://stackoverflow.com/a/14919494/563353

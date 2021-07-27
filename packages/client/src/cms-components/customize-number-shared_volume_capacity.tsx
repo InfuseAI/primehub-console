@@ -13,7 +13,7 @@ export default class Input extends PureComponent<Props> {
 
   onChange = (val) => {
     const {onChange, refId, uiParams: {min}} = this.props;
-    if ((window as any).disableEnableSharedVolume) {
+    if (window.disableEnableSharedVolume) {
       return;
     }
     if (val >= min) {
@@ -27,7 +27,7 @@ export default class Input extends PureComponent<Props> {
     return (
       <InputNumber
         style={{width: 'auto'}}
-        disabled={disabled || (window as any).disableEnableSharedVolume}
+        disabled={disabled || window.disableEnableSharedVolume}
         min={uiParams && uiParams.min}
         max={uiParams && uiParams.max}
         step={uiParams && uiParams.step}

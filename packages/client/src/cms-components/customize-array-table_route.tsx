@@ -14,11 +14,11 @@ import moment from 'moment';
 const ButtonGroup = Button.Group;
 const confirm = Modal.confirm;
 const warning = Modal.warning;
-const GLOBAL_DISABLE = (window as any).disableMode || false;
-const DISABLE_GROUP = (window as any).disableGroup || false;
+const GLOBAL_DISABLE = window.disableMode || false;
+const DISABLE_GROUP = window.disableGroup || false;
 const StyledTable = styled(Table)`
 `
-const DISABLE_BUILD_IMAGE = !(window as any).customImageSetup;
+const DISABLE_BUILD_IMAGE = !window.customImageSetup;
 
 @injectIntl
 export default class ArrayBreadcrumb extends Component<Props & {
@@ -247,7 +247,7 @@ export default class ArrayBreadcrumb extends Component<Props & {
     });
 
     const newColumnsRender = renderValue(columns, items.items, this.props);
-    if (keyName === 'dataset' && (window as any).enableUploadServer) {
+    if (keyName === 'dataset' && window.enableUploadServer) {
       newColumnsRender.push({
         title: intl.formatMessage({ id: 'uploadServerLink' }),
         dataIndex: 'uploadServerLink',
