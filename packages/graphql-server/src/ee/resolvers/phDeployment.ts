@@ -182,7 +182,7 @@ const createDeployment = async (context: Context, data: PhDeploymentMutationInpu
   const group = await kcAdminClient.groups.findOne({id: data.groupId});
   const maxDeploy = get(group.attributes, 'max-deploy', UNLIMITED);
   const deployments = await crdClient.phDeployments.list() || [];
-  const deployCount = deployments.filter(d => d.spec.groupId === data.groupId).length;
+  const deployCount = deployments.filter(d => d.spec.groupId === data.groupId && d.spec.stop === false).length;
   if (maxDeploy !== UNLIMITED && deployCount >= maxDeploy) {
     throw new ApolloError('Group Maximum Deployments exceeded', EXCEED_QUOTA_ERROR);
   }
@@ -466,7 +466,7 @@ export const update = async (root, args, context: Context) => {
 };
 
 export const deploy = async (root, args, context: Context) => {
-  const {crdClient, userId, username} = context;
+  const {kcAdminClient, crdClient, userId, username} = context;
   await validateModelDeployQuota(context);
   const {id} = args.where;
   const phDeployment = await crdClient.phDeployments.get(id);
@@ -474,6 +474,14 @@ export const deploy = async (root, args, context: Context) => {
   const mutable = await canUserMutate(userId, groupId, context);
   if (!mutable) {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
+  // Check max-deploy when restart the deployment.
+  const group = await kcAdminClient.groups.findOne({id: groupId});
+  const maxDeploy = get(group.attributes, 'max-deploy', UNLIMITED);
+  const deployments = await crdClient.phDeployments.list() || [];
+  const deployCount = deployments.filter(d => d.spec.groupId === groupId && d.spec.stop === false).length;
+  if (maxDeploy !== UNLIMITED && deployCount >= maxDeploy) {
+    throw new ApolloError('Group Maximum Deployments exceeded', EXCEED_QUOTA_ERROR);
   }
 
   const spec = {
