@@ -1,4 +1,5 @@
 import * as React from 'react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { MockedProvider } from 'react-apollo/test-utils';
 
@@ -99,5 +100,22 @@ describe('Secrets', () => {
     expect(await screen.findByText('csr-foobar')).toBeInTheDocument();
     expect(await screen.findByText('csr-foobar2')).toBeInTheDocument();
     expect(await screen.findByText('csr-foobar3')).toBeInTheDocument();
+  });
+
+  it('should render secrent and toggle to create a secret form', async () => {
+    const { TestProvider, mockRequests } = setup();
+
+    render(
+      <TestProvider>
+        <MockedProvider mocks={mockRequests}>
+          <Secrets />
+        </MockedProvider>
+      </TestProvider>
+    );
+
+    const addSecretButton = await screen.findByText('Add');
+    userEvent.click(addSecretButton);
+
+    expect(screen.getByText('Save')).toBeInTheDocument();
   });
 });

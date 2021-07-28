@@ -11,6 +11,7 @@ import { SecretLayout } from './Layout';
 import { SecretForm, initialFormState } from './SecretForm';
 import { SecretQuery, UpdateSecretMutation } from './secrets.graphql';
 import type { Secret } from './types';
+
 interface Props {
   secretQuery: {
     error: Error | undefined;
@@ -37,14 +38,17 @@ function _SecretInfo({ secretQuery, updateSecretMutation }: Props) {
 
   React.useEffect(() => {
     if (secretQuery?.secret) {
+      const { id, name, displayName, type, registryHost, username, password } =
+        secretQuery.secret;
+
       reset({
-        id: secretQuery.secret.id,
-        name: secretQuery.secret.name,
-        displayName: secretQuery.secret.displayName,
-        type: secretQuery.secret.type,
-        registryHost: secretQuery.secret.registryHost,
-        username: secretQuery.secret.username,
-        password: secretQuery.secret.password,
+        id,
+        name,
+        displayName,
+        type,
+        registryHost,
+        username,
+        password,
       });
     }
   }, [secretQuery, reset]);
@@ -110,8 +114,8 @@ export const SecretInfo = compose(
   withRouter,
   graphql(SecretQuery, {
     name: 'secretQuery',
-    options: ({ match }: RouteComponentProps) => {
-      const secretId = (match.params as any).id;
+    options: ({ match }: RouteComponentProps<{ id: string }>) => {
+      const secretId = match.params.id;
 
       return {
         variables: {

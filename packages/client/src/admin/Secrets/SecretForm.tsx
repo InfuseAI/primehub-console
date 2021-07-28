@@ -5,7 +5,7 @@ import { Controller, UseFormReturn } from 'react-hook-form';
 
 import type { Secret } from './types';
 
-function TypeTooltip() {
+function SecretTypeTip() {
   return (
     <Tooltip
       placement="bottom"
@@ -82,7 +82,9 @@ export function SecretForm(props: SecretFormProps) {
           )}
         />
         {!props?.disabledName && formState.errors.name && (
-          <Typography.Text type="danger">Name is required</Typography.Text>
+          <Typography.Text type="danger">
+            Secret name is required
+          </Typography.Text>
         )}
       </div>
 
@@ -104,7 +106,7 @@ export function SecretForm(props: SecretFormProps) {
 
       <div>
         <label htmlFor="secret-type">
-          Type <TypeTooltip />
+          Type <SecretTypeTip />
         </label>
         <Controller
           control={control}
