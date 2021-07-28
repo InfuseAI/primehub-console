@@ -13,12 +13,7 @@ import {
 } from './secrets.graphql';
 import { SecretLayout } from './Layout';
 import { SecretForm, initialFormState } from './SecretForm';
-import type { Secret, SecretType } from './types';
-
-interface SecretNode {
-  cursor: string;
-  node: Pick<Secret, 'id' | 'name' | 'displayName' | 'type'>;
-}
+import type { TSecret, SecretType } from './types';
 
 const styles: React.CSSProperties = {
   display: 'flex',
@@ -27,6 +22,11 @@ const styles: React.CSSProperties = {
   margin: '16px',
   padding: '32px',
   backgroundColor: '#fff',
+};
+
+type SecretNode = {
+  cursor: string;
+  node: Pick<TSecret, 'id' | 'name' | 'displayName' | 'type'>;
 };
 
 interface Props {
@@ -42,7 +42,7 @@ interface Props {
     variables,
   }: {
     variables: {
-      payload: Partial<Secret>;
+      payload: Partial<TSecret>;
     };
   }) => Promise<{ data: { createSecret: { id: string } } }>;
   deleteSecretMutation: ({

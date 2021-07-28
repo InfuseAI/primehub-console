@@ -1,6 +1,6 @@
 export type SecretType = 'opaque' | 'dockerconfigjson' | undefined;
 
-export type Secret = {
+export type TSecret = {
   id: string;
   name: string;
   displayName: string;

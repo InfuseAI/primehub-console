@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Breadcrumb, Icon, Tooltip, Layout } from 'antd';
+import { Breadcrumb, Icon, Tooltip } from 'antd';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 function SecretTooltip() {
@@ -29,8 +29,9 @@ function SecretTooltip() {
 
 export function SecretLayout({ children }: { children: React.ReactNode }) {
   const { appPrefix } = useRoutePrefix();
+
   return (
-    <Layout>
+    <>
       <div
         style={{
           background: '#fff',
@@ -57,6 +58,6 @@ export function SecretLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {children}
-    </Layout>
+    </>
   );
 }
