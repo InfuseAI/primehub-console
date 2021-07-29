@@ -6,6 +6,8 @@ import { useForm } from 'react-hook-form';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 
+import { useRoutePrefix } from 'hooks/useRoutePrefix';
+
 import {
   GetSecrets,
   CreateSecretMutation,
@@ -61,6 +63,7 @@ function _Secrets({
   createSecretMutation,
   deleteSecretMutation,
 }: Props) {
+  const { appPrefix } = useRoutePrefix();
   const history = useHistory();
   const location = useLocation();
   const querystring = new URLSearchParams(location.search);
@@ -103,7 +106,7 @@ function _Secrets({
         return (
           <Button.Group>
             <Button>
-              <Link to={`/admin/secret/${secret.node.id}`}>
+              <Link to={`${appPrefix}admin/secret/${secret.node.id}`}>
                 <Icon type="edit" />
               </Link>
             </Button>
@@ -170,7 +173,7 @@ function _Secrets({
       });
 
       formMethods.reset();
-      history.push('/admin/secret');
+      history.push(`${appPrefix}admin/secret`);
 
       await secretQuery.refetch();
       notification.success({
@@ -182,7 +185,7 @@ function _Secrets({
             Your changes have been saved. Click{' '}
             <span
               style={{ color: '#365abd', cursor: 'pointer' }}
-              onClick={() => history.push(`/admin/secret/${id}`)}
+              onClick={() => history.push(`${appPrefix}admin/secret/${id}`)}
             >
               here
             </span>{' '}
@@ -225,7 +228,9 @@ function _Secrets({
               icon="plus"
               // @ts-ignore
               disabled={secretQuery.loading}
-              onClick={() => history.push('/admin/secret?operator=create')}
+              onClick={() =>
+                history.push(`${appPrefix}admin/secret?operator=create`)
+              }
             >
               Add
             </Button>

@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import { Button, Select, Input, Typography, Tooltip, Icon } from 'antd';
 import { Controller, UseFormReturn } from 'react-hook-form';
 
-import type { Secret } from './types';
+import { useRoutePrefix } from 'hooks/useRoutePrefix';
+
+import type { TSecret } from './types';
 
 function SecretTypeTip() {
   return (
@@ -28,7 +30,7 @@ function SecretTypeTip() {
   );
 }
 
-export const initialFormState: Secret = {
+export const initialFormState: TSecret = {
   id: '',
   name: '',
   displayName: '',
@@ -39,12 +41,13 @@ export const initialFormState: Secret = {
   secret: '',
 };
 
-interface SecretFormProps extends Omit<UseFormReturn<Secret>, 'reset'> {
-  onSubmit?: (data: Partial<Secret>) => Promise<void>;
+interface SecretFormProps extends Omit<UseFormReturn<TSecret>, 'reset'> {
+  onSubmit?: (data: Partial<TSecret>) => Promise<void>;
   disabledName?: boolean;
 }
 
 export function SecretForm(props: SecretFormProps) {
+  const { appPrefix } = useRoutePrefix();
   const { control, watch, formState, handleSubmit } = props;
   const watchedSecretType = watch('type');
 
@@ -227,7 +230,7 @@ export function SecretForm(props: SecretFormProps) {
         }}
       >
         <Button>
-          <Link to="/admin/secret">Cancel</Link>
+          <Link to={`${appPrefix}admin/secret`}>Cancel</Link>
         </Button>
 
         {/* @ts-ignore */}
