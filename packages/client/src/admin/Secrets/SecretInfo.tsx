@@ -10,20 +10,20 @@ import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { SecretLayout } from './Layout';
 import { SecretForm, initialFormState } from './SecretForm';
 import { SecretQuery, UpdateSecretMutation } from './secrets.graphql';
-import type { Secret } from './types';
+import type { TSecret } from './types';
 
 interface Props {
   secretQuery: {
     error: Error | undefined;
     loading: boolean;
-    secret?: Secret;
+    secret?: TSecret;
   };
   updateSecretMutation: ({
     variables,
   }: {
     variables: {
-      payload: Partial<Secret>;
-      where: Pick<Secret, 'id'>;
+      payload: Partial<TSecret>;
+      where: Pick<TSecret, 'id'>;
     };
   }) => Promise<void>;
 }
