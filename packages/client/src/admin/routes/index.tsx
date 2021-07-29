@@ -1,9 +1,12 @@
 import * as React from 'react';
+import styled from 'styled-components';
 import { Route, RouteProps } from 'react-router-dom';
+
 import { SystemSetting } from '../SystemSetting';
 import { UserList, UserDetail, UserAdd } from '../User';
 import { appPrefix } from 'utils/env';
-import styled from 'styled-components';
+import { UsageReport } from '../UsageReport';
+
 const Badge = styled.span`
   position: absolute;
   top: 12px;
@@ -39,11 +42,12 @@ export interface RouteTypes extends RouteProps {
   key: ROUTE_KEYS;
   name: string;
   routes?: RouteTypes[];
+  visible?: boolean;
 }
 
 export function RouteWithSubRoutes(route) {
-  if (!route.component) {
-    return ;
+  if (!route.component || !route.visible) {
+    return;
   }
 
   return (
@@ -71,18 +75,22 @@ export const routes = [
   {
     key: 'users_next',
     path: 'admin/users_next',
-    name: <span>Users <Badge>next</Badge></span>,
-    component: UserList
+    name: (
+      <span>
+        Users <Badge>next</Badge>
+      </span>
+    ),
+    component: UserList,
   },
   {
     key: 'user_next_add',
     path: 'admin/user_next/add',
-    component: UserAdd
+    component: UserAdd,
   },
   {
     key: 'user_next',
     path: 'admin/user_next/:id',
-    component: UserDetail
+    component: UserDetail,
   },
   {
     key: 'user',
@@ -123,6 +131,8 @@ export const routes = [
     key: 'usageReport',
     path: 'admin/usageReport',
     name: 'Usage Reports',
+    component: UsageReport,
+    visible: window.enableUsageReport,
   },
   {
     key: 'system',

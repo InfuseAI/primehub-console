@@ -1,68 +1,57 @@
 /** @jsx builder */
-import builder, {Body} from 'canner-script';
-import System from 'schema/system.schema';
-import Idp from 'schema/idp/identityProvider.schema';
-import UserFederation from 'schema/userFederation.schema';
+import builder, { Body } from 'canner-script';
 import User from 'schema/user.schema';
 import Group from 'schema/group.schema';
 import InstanceType from 'schema/instanceType.schema';
 import Image from 'schema/image.schema';
 import Dataset from 'schema/dataset.schema';
-import Announcement from 'schema/announcement.schema';
 import Secret from 'schema/secret.schema';
 import Jupyterhub from 'schema/jupyterhub.schema';
 import BuildImage from 'schema/ee/buildImage.schema';
 import BuildImageJob from 'schema/ee/buildImageJob.schema';
-import UsageReport from 'schema/ee/usageReport.schema';
-import {LocalStorageConnector} from 'canner-graphql-interface';
-import {createFakeData} from 'canner-helpers';
-import {dict, graphqlClient, imageStorage} from 'schema/utils';
+import { LocalStorageConnector } from 'canner-graphql-interface';
+import { createFakeData } from 'canner-helpers';
+import { dict, graphqlClient, imageStorage } from 'schema/utils';
 import BuildImageJobBody from 'cms-layouts/buildImageJobBody';
 import DatasetBody from 'cms-layouts/datasetBody';
 import CommonBody from 'cms-layouts/commonBody';
 import UserBody from 'cms-layouts/userBody';
 import JupyterhubBody from 'cms-layouts/jupyterhubBody';
-import UsageReportBody from 'cms-layouts/usageReportBody';
-import {isArray} from 'lodash';
 
-const maintenance = (
-  (typeof enableMaintenanceNotebook !== 'undefined' && enableMaintenanceNotebook) ?
-    <object keyName="maintenance"></object> :
+const maintenance =
+  typeof enableMaintenanceNotebook !== 'undefined' &&
+  enableMaintenanceNotebook ? (
+    <object keyName="maintenance"></object>
+  ) : (
     {}
-);
-const grafana = (
-  (typeof enableGrafana !== 'undefined' && enableGrafana) ?
-    <object keyName="grafana"></object> :
+  );
+const grafana =
+  typeof enableGrafana !== 'undefined' && enableGrafana ? (
+    <object keyName="grafana"></object>
+  ) : (
     {}
-);
-const usageReport = (
-  (typeof enableUsageReport !== 'undefined' && enableUsageReport) ?
-    <Body component={UsageReportBody}>
-      <UsageReport />
-    </Body> :
-    {}
-);
+  );
 
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
     <Body component={CommonBody}>
       {/* <Idp/> */}
       {/* <UserFederation/> */}
-      <Group/>
+      <Group />
     </Body>
     <Body component={UserBody}>
-      <User/>
+      <User />
     </Body>
     <Body component={CommonBody}>
-      <InstanceType/>
-      <Image/>
+      <InstanceType />
+      <Image />
       <BuildImage />
     </Body>
     <Body component={BuildImageJobBody}>
       <BuildImageJob />
     </Body>
     <Body component={DatasetBody}>
-      <Dataset/>
+      <Dataset />
     </Body>
     <Body component={CommonBody}>
       <Secret />
@@ -70,12 +59,12 @@ const schema = (
     <Body component={JupyterhubBody}>
       <Jupyterhub />
     </Body>
-    {usageReport}
+
     {maintenance}
     {grafana}
     {/* <Announcement /> */}
   </root>
-)
+);
 if (process.env.NODE_ENV === 'production') {
   schema.graphqlClient = graphqlClient;
 } else {
@@ -83,8 +72,8 @@ if (process.env.NODE_ENV === 'production') {
 
   schema.connector = new LocalStorageConnector({
     defaultData: fakeData,
-    localStorageKey: 'infuse'
-  })
+    localStorageKey: 'infuse',
+  });
 }
 
-export default schema
+export default schema;
