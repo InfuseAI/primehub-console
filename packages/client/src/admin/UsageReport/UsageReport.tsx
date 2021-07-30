@@ -17,31 +17,29 @@ function useReportDownload() {
   const downloadReport = React.useCallback(
     ({ URL, fileName }: { URL: string; fileName: string }) => {
       setLoading(true);
-      setTimeout(() => {
-        fetch(URL, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      fetch(URL, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => {
+          setLoading(false);
+          return res.blob();
         })
-          .then((res) => {
-            setLoading(false);
-            return res.blob();
-          })
-          .then((blob) => {
-            const url = window.URL.createObjectURL(new Blob([blob]));
-            const link = document.createElement('a');
+        .then((blob) => {
+          const url = window.URL.createObjectURL(new Blob([blob]));
+          const link = document.createElement('a');
 
-            link.href = url;
-            link.setAttribute('download', fileName);
+          link.href = url;
+          link.setAttribute('download', fileName);
 
-            document.body.appendChild(link);
+          document.body.appendChild(link);
 
-            link.click();
-            link.parentNode.removeChild(link);
-            window.URL.revokeObjectURL(url);
-          });
-      }, 10000);
+          link.click();
+          link.parentNode.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        });
     },
     [token]
   );
@@ -154,6 +152,10 @@ function _UsageReport({ usageReportQuery }: Props) {
       },
     },
   ];
+
+  if (usageReportQuery.error) {
+    return <div>Failure to load usage report data.</div>;
+  }
 
   return (
     <div
