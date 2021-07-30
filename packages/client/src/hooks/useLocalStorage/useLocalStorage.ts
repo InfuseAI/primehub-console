@@ -6,12 +6,19 @@ export function useLocalStorage<T>(key: string, initialValue: T | (() => T)) {
       return initialValue;
     }
 
+    let item;
     try {
-      const item = window.localStorage.getItem(key);
+      item = window.localStorage.getItem(key);
 
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       console.warn(`Error reading localStorage key “${key}”:`, error);
+
+      // Due to legacy code to set value without `JSON.stringify`,
+      // but still has value so return it, otherwise return initial value.
+      if (item) {
+        return item;
+      }
 
       return initialValue;
     }
