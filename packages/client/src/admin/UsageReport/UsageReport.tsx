@@ -209,6 +209,7 @@ function _UsageReport({ usageReportQuery }: Props) {
         </Button>
         <Input.Search
           enterButton
+          data-testid="search-input"
           placeholder="e.g. 2021/01"
           style={{ width: '160px' }}
           disabled={usageReportQuery.loading}
