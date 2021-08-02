@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Layout, notification, Modal, Button } from 'antd';
-import {injectIntl, FormattedMessage} from 'react-intl'
+import { injectIntl, FormattedMessage } from 'react-intl';
 import Canner from 'canner';
 import gql from 'graphql-tag';
 import { Switch } from 'react-router-dom';
@@ -340,12 +340,10 @@ export default class CMSPage extends React.Component<Props, State> {
           </Content> */}
 
           <Content style={{ marginLeft: 200 }}>
-              <ApolloProvider client={client}>
-                <LicenseWarningBanner />
-                <Switch>
-                  {adminRoutes.map(RouteWithSubRoutes)}
-                </Switch>
-              </ApolloProvider>
+            <ApolloProvider client={client}>
+              {window.enableLicenseCheck && <LicenseWarningBanner />}
+              <Switch>{adminRoutes.map(RouteWithSubRoutes)}</Switch>
+            </ApolloProvider>
             {this.notification}
             <Canner
               schema={this.schema}
