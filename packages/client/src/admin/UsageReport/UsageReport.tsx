@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Breadcrumb, Icon, Table, Tooltip, Input } from 'antd';
+import { Button, Table, Input } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 
-import { useRoutePrefix } from 'hooks/useRoutePrefix';
+import Breadcrumbs from 'components/share/breadcrumb';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { UsageReportQuery } from './usageReport.graphql';
 import type { TUsageReport } from './types';
@@ -47,30 +46,6 @@ function useReportDownload() {
   return [loading, downloadReport] as const;
 }
 
-function UsageReportTooltip() {
-  return (
-    <Tooltip
-      placement="bottom"
-      title={
-        <div>
-          Admin can download Detailed/Summary reports here to have the insight
-          into the usage here.{' '}
-          <a
-            href="https://docs.primehub.io/docs/guide_manual/admin-report"
-            target="_blank"
-            rel="noopener"
-            style={{ color: '#839ce0' }}
-          >
-            Learn More.
-          </a>
-        </div>
-      }
-    >
-      <Icon type="question-circle" />
-    </Tooltip>
-  );
-}
-
 type UsageReportNode = {
   cursor: string;
   node: TUsageReport;
@@ -100,7 +75,6 @@ interface Props {
 
 function _UsageReport({ usageReportQuery }: Props) {
   const [date, setDate] = React.useState('');
-  const { appPrefix } = useRoutePrefix();
   const [isDownloadReport, downloadReport] = useReportDownload();
   const [isDownloadSummary, downloadSummary] = useReportDownload();
 
@@ -170,16 +144,18 @@ function _UsageReport({ usageReportQuery }: Props) {
           marginBottom: 24,
         }}
       >
-        <Breadcrumb>
-          <Breadcrumb.Item>
-            <Link to={`${appPrefix}admin/group`}>
-              <Icon type="home" />
-            </Link>
-          </Breadcrumb.Item>
-          <Breadcrumb.Item>
-            Usage Report <UsageReportTooltip />
-          </Breadcrumb.Item>
-        </Breadcrumb>
+        <Breadcrumbs
+          pathList={[
+            {
+              key: 'usageReport',
+              matcher: /\/usageReport/,
+              title: 'Usage Report',
+              tips: 'Admin can download Detailed/Summary reports here to have the insight into the usage here.',
+              tipsLink:
+                'https://docs.primehub.io/docs/guide_manual/admin-report',
+            },
+          ]}
+        />
       </div>
 
       <div
@@ -209,6 +185,7 @@ function _UsageReport({ usageReportQuery }: Props) {
         </Button>
         <Input.Search
           enterButton
+          data-testid="search-input"
           placeholder="e.g. 2021/01"
           style={{ width: '160px' }}
           disabled={usageReportQuery.loading}
