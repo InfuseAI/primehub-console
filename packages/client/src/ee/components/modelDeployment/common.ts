@@ -45,13 +45,13 @@ export interface ClientResult {
 
 export interface DeploymentInfo {
   id: string;
-  user: {name: string};
+  userName: string;
   status: Status;
   message: string;
   name: string;
   description: string;
   updateMessage: string;
-  env: Array<{name: string, value: string}>;
+  env: Array<{ name: string; value: string }>;
   metadata: object;
   groupId: string;
   groupName: string;
@@ -82,74 +82,74 @@ export interface DeploymentInfo {
 }
 
 export const PhDeploymentFragment = gql`
-fragment PhDeploymentInfo on PhDeployment {
-  id
-  status
-  message
-  name
-  description
-  updateMessage
-  env {
-    name
-    value
-  }
-  metadata
-  groupId
-  groupName
-  creationTime
-  lastUpdatedTime
-  endpoint
-  endpointAccessType
-  endpointClients {
-    name
-  }
-  modelImage
-  modelURI
-  pods {
-    name
-    logEndpoint
-  }
-  availableReplicas
-  replicas
-  imagePullSecret
-  instanceType {
+  fragment PhDeploymentInfo on PhDeployment {
     id
+    status
+    message
     name
-    displayName
-    cpuLimit
-    memoryLimit
-    gpuLimit
-  }
-  history {
-    deployment {
-      id
-      userName
-      stop
-      modelImage
-      modelURI
-      replicas
-      groupName
-      description
-      updateMessage
-      metadata
-      env {
-        name
-        value
-      }
-      endpointClients {
-        name
-      }
-      endpointAccessType
-      instanceType {
-        id
-        name
-        displayName
-        cpuLimit
-        memoryLimit
-        gpuLimit
-      }
+    description
+    updateMessage
+    env {
+      name
+      value
     }
-    time
+    metadata
+    groupId
+    groupName
+    creationTime
+    lastUpdatedTime
+    endpoint
+    endpointAccessType
+    endpointClients {
+      name
+    }
+    modelImage
+    modelURI
+    pods {
+      name
+      logEndpoint
+    }
+    availableReplicas
+    replicas
+    imagePullSecret
+    instanceType {
+      id
+      name
+      displayName
+      cpuLimit
+      memoryLimit
+      gpuLimit
+    }
+    history {
+      deployment {
+        id
+        userName
+        stop
+        modelImage
+        modelURI
+        replicas
+        groupName
+        description
+        updateMessage
+        metadata
+        env {
+          name
+          value
+        }
+        endpointClients {
+          name
+        }
+        endpointAccessType
+        instanceType {
+          id
+          name
+          displayName
+          cpuLimit
+          memoryLimit
+          gpuLimit
+        }
+      }
+      time
+    }
   }
-}
-`
+`;

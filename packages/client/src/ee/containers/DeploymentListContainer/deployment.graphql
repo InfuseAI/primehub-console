@@ -1,0 +1,46 @@
+fragment PhDeploymentInfo on PhDeployment {
+  id
+  status
+  name
+  lastUpdatedTime
+  endpoint
+  history {
+    deployment {
+      id
+      userName
+    }
+    time
+  }
+}
+
+query PhDeploymentsConnection($where: PhDeploymentWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
+  phDeploymentsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
+    edges {
+      cursor
+      node {
+        id
+        ...PhDeploymentInfo
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}
+
+mutation startPhDeploymentMutation($where: PhDeploymentWhereUniqueInput!) {
+  deployPhDeployment(where: $where) {
+    id
+    ...PhDeploymentInfo
+  }
+}
+
+mutation stopPhDeploymentMutation($where: PhDeploymentWhereUniqueInput!) {
+  stopPhDeployment(where: $where) {
+    id
+    ...PhDeploymentInfo
+  }
+}
