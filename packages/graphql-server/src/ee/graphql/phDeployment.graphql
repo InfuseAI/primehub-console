@@ -47,6 +47,35 @@ type PhDeployment {
   imagePullSecret: String
   instanceType: InstanceType
   creationTime: String
+  pods: [Pod]
+  history: [HistoryItem]
+  env: [EnvVar]
+  endpointAccessType: String
+  endpointClients: [PhDeploymentClient]
+}
+
+type PhDeploymentNode {
+  id: ID!
+  status: String
+  message: String
+  name: String
+  description: String
+  updateMessage: String
+  metadata: JSON
+  stop: Boolean
+  userId: String
+  userName: String
+  groupId: String
+  groupName: String
+  endpoint: String
+  modelImage: String
+  modelURI: String
+  replicas: Int
+  availableReplicas: Int
+  imagePullSecret: String
+  instanceType: InstanceType
+  creationTime: String
+  lastExecutor: String
   lastUpdatedTime: String
   pods: [Pod]
   history: [HistoryItem]
@@ -58,7 +87,7 @@ type PhDeployment {
 """An edge in a connection."""
 type PhDeploymentEdge {
   """The item at the end of the edge."""
-  node: PhDeployment!
+  node: PhDeploymentNode!
 
   """A cursor for use in pagination."""
   cursor: String!

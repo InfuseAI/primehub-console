@@ -49,6 +49,7 @@ export interface PhDeployment {
   imagePullSecret: string;
   instanceType: string;
   creationTime: string;
+  lastExecutor: string;
   lastUpdatedTime: string;
   history: Array<{time: string, deployment: any}>;
   endpointAccessType: string;
@@ -94,6 +95,7 @@ const transformSpec = (id: string, time: string, groupName: string, spec: any) =
     };
   });
   const endpointAccessType = get(spec, 'endpoint.accessType', 'public');
+
   return {
     id: `${id}-${time}`,
     name: spec.displayName,
@@ -104,7 +106,6 @@ const transformSpec = (id: string, time: string, groupName: string, spec: any) =
     groupName,
     groupId: spec.groupId,
     stop: isUndefined(spec.stop) ? false : spec.stop,
-    lastUpdatedTime: spec.updateTime,
     env: spec.env,
 
     endpointClients,
@@ -167,6 +168,7 @@ export const transform = async (item: Item<PhDeploymentSpec, PhDeploymentStatus>
 
     // times
     creationTime: item.metadata.creationTimestamp,
+    lastExecutor: item.spec.userName,
     lastUpdatedTime: item.spec.updateTime,
 
     // history

@@ -13,6 +13,7 @@ fragment PhDeploymentInfo on PhDeployment {
   groupId
   groupName
   creationTime
+  lastExecutor
   lastUpdatedTime
   endpoint
   endpointAccessType
