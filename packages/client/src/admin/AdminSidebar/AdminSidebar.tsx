@@ -7,19 +7,22 @@ import { appPrefix } from 'utils/env';
 
 import { ROUTES, ROUTE_KEYS, routes } from '../routes';
 
+// @ts-ignore;
+const GLOBAL_ENV = __ENV__;
+
 const VISIBLE_ITEMS = {
   group: true,
   users_next: false,
   user: true,
   instanceType: true,
-  image: true,
-  buildImage: true,
-  dataset: true,
   secret: true,
-  jupyterhub: true,
   system: true,
 
-  // Control by global variable
+  // Control by global or tier variable
+  image: false,
+  buildImage: false,
+  dataset: false,
+  jupyterhub: false,
   usageReport: false,
 };
 
@@ -44,13 +47,6 @@ export function AdminSidebar() {
   const location = useLocation();
 
   React.useEffect(() => {
-    if (window?.enableUsageReport) {
-      setVisible((prev) => ({
-        ...prev,
-        usageReport: true,
-      }));
-    }
-
     if (window?.enableMaintenanceNotebook) {
       setExternalVisisble((prev) => ({
         ...prev,
@@ -68,6 +64,26 @@ export function AdminSidebar() {
           ...prev.grafana,
           enable: true,
         },
+      }));
+    }
+
+    if (GLOBAL_ENV === 'ee') {
+      setVisible((prev) => ({
+        ...prev,
+        image: true,
+        buildImage: true,
+        dataset: true,
+        jupyterhub: true,
+        usageReport: true,
+      }));
+    }
+
+    if (GLOBAL_ENV === 'ce') {
+      setVisible((prev) => ({
+        ...prev,
+        image: true,
+        dataset: true,
+        jupyterhub: true,
       }));
     }
   }, []);
