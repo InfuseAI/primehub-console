@@ -9,6 +9,9 @@ const MOCK_ROUTE_PATHNAME = 'group';
 
 describe('AdminSidebar', () => {
   it('should render AdminSidebar with default items', () => {
+    // @ts-ignore
+    global.__ENV__ = 'ee';
+
     render(
       <MemoryRouter initialEntries={[`/admin/${MOCK_ROUTE_PATHNAME}`]}>
         <AdminSidebar />
@@ -29,6 +32,8 @@ describe('AdminSidebar', () => {
 
   it('should render AdminSidebar with usage reports', () => {
     // @ts-ignore
+    global.__ENV__ = 'ee';
+    // @ts-ignore
     global.enableUsageReport = true;
 
     render(
@@ -41,6 +46,8 @@ describe('AdminSidebar', () => {
   });
 
   it('should render AdminSidebar with maintenance', () => {
+    // @ts-ignore
+    global.__ENV__ = 'ee';
     // @ts-ignore
     global.enableMaintenanceNotebook = true;
 
@@ -55,6 +62,8 @@ describe('AdminSidebar', () => {
 
   it('should render AdminSidebar with grafana', () => {
     // @ts-ignore
+    global.__ENV__ = 'ee';
+    // @ts-ignore
     global.enableGrafana = true;
 
     render(
@@ -67,6 +76,9 @@ describe('AdminSidebar', () => {
   });
 
   it('should navigate from group to user page', () => {
+    // @ts-ignore
+    global.__ENV__ = 'ee';
+
     render(
       <MemoryRouter initialEntries={[`/admin/${MOCK_ROUTE_PATHNAME}`]}>
         <AdminSidebar />

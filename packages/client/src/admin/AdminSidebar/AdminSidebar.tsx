@@ -7,9 +7,6 @@ import { appPrefix } from 'utils/env';
 
 import { ROUTES, ROUTE_KEYS, routes } from '../routes';
 
-// @ts-ignore;
-const GLOBAL_ENV = __ENV__;
-
 const VISIBLE_ITEMS = {
   group: true,
   users_next: false,
@@ -40,6 +37,9 @@ const EXTERNAL_LINKS = {
 };
 
 export function AdminSidebar() {
+  // @ts-ignore;
+  const GLOBAL_ENV = __ENV__;
+
   const [activeRoute, setActiveRoute] = React.useState<ROUTE_KEYS>('group');
   const [visible, setVisible] = React.useState(VISIBLE_ITEMS);
   const [externalVisible, setExternalVisisble] = React.useState(EXTERNAL_LINKS);
@@ -86,6 +86,7 @@ export function AdminSidebar() {
         jupyterhub: true,
       }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   React.useEffect(() => {
