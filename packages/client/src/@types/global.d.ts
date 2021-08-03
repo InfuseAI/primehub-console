@@ -4,6 +4,7 @@ declare global {
     enablePhfs?: boolean;
     development: boolean;
     enableApp: boolean;
+    enableLicenseCheck: boolean;
     enableModelDeployment: boolean;
     enableMaintenanceNotebook?: boolean;
     enableGrafana?: boolean;
