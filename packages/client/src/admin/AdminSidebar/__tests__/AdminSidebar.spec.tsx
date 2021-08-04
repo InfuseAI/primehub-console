@@ -90,4 +90,33 @@ describe('AdminSidebar', () => {
 
     expect(screen.getByTestId('user-active')).toBeInTheDocument();
   });
+
+  it('should not render image builder when version is CE', async () => {
+    // @ts-ignore
+    global.__ENV__ = 'ce';
+
+    render(
+      <MemoryRouter initialEntries={[`/admin/${MOCK_ROUTE_PATHNAME}`]}>
+        <AdminSidebar />
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByText('Image Builder')).not.toBeInTheDocument();
+  });
+
+  it('should not render dataset, image, image builder and notebook when version is Deployment', async () => {
+    // @ts-ignore
+    global.__ENV__ = 'modelDeploy';
+
+    render(
+      <MemoryRouter initialEntries={[`/admin/${MOCK_ROUTE_PATHNAME}`]}>
+        <AdminSidebar />
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByText('Image')).not.toBeInTheDocument();
+    expect(screen.queryByText('Image Builder')).not.toBeInTheDocument();
+    expect(screen.queryByText('Datasets')).not.toBeInTheDocument();
+    expect(screen.queryByText('Notebooks Admin')).not.toBeInTheDocument();
+  });
 });
