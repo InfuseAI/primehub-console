@@ -133,12 +133,13 @@ export function SecretForm(props: SecretFormProps) {
       {watchedSecretType === undefined ? null : watchedSecretType ===
         'opaque' ? (
         <div>
-          <label htmlFor="Secret">Secret</label>
+          <label htmlFor="secret">Secret</label>
           <Controller
             control={control}
             name="secret"
             render={({ field: { value, onChange } }) => (
               <Input.TextArea
+                id="secret"
                 rows={4}
                 value={value}
                 onChange={onChange}
@@ -151,7 +152,7 @@ export function SecretForm(props: SecretFormProps) {
         <>
           <div>
             <span style={{ color: '#ff7875' }}>*</span>{' '}
-            <label htmlFor="RegistryHost">Registry Host</label>
+            <label htmlFor="registry-host">Registry Host</label>
             <Controller
               control={control}
               name="registryHost"
@@ -160,6 +161,7 @@ export function SecretForm(props: SecretFormProps) {
               }}
               render={({ field: { value, onChange } }) => (
                 <Input
+                  id="registry-host"
                   value={value}
                   onChange={onChange}
                   style={{ marginTop: '8px' }}
@@ -174,7 +176,7 @@ export function SecretForm(props: SecretFormProps) {
           </div>
           <div>
             <span style={{ color: '#ff7875' }}>*</span>{' '}
-            <label htmlFor="Username">Username</label>
+            <label htmlFor="username">Username</label>
             <Controller
               control={control}
               name="username"
@@ -183,6 +185,7 @@ export function SecretForm(props: SecretFormProps) {
               }}
               render={({ field: { value, onChange } }) => (
                 <Input
+                  id="username"
                   value={value}
                   onChange={onChange}
                   style={{ marginTop: '8px' }}
@@ -197,7 +200,7 @@ export function SecretForm(props: SecretFormProps) {
           </div>
           <div>
             <span style={{ color: '#ff7875' }}>*</span>{' '}
-            <label htmlFor="Password">Password</label>
+            <label htmlFor="password">Password</label>
             <Controller
               control={control}
               name="password"
@@ -206,6 +209,7 @@ export function SecretForm(props: SecretFormProps) {
               }}
               render={({ field: { value, onChange } }) => (
                 <Input
+                  id="password"
                   type="password"
                   value={value}
                   onChange={onChange}
