@@ -3,13 +3,13 @@ import styled from 'styled-components';
 import { Layout, Menu, Divider } from 'antd';
 import { Link, useParams, useLocation } from 'react-router-dom';
 
-import { appPrefix } from 'utils/env';
 import { UserContext } from 'context/user';
 import {
   SidebarList,
   SidebarPathList,
   PATH_KEY_LIST,
 } from 'components/Sidebar/types';
+import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 const Icon = styled.img`
   width: 25px;
@@ -52,6 +52,7 @@ export function Sidebar({ sidebarItems }: Props) {
   const currentUser = React.useContext(UserContext);
 
   const location = useLocation();
+  const { appPrefix } = useRoutePrefix();
   const { groupName } = useParams<{ groupName: string }>();
   const { userItems, adminItems, hasAdminItems } = React.useMemo(() => {
     const filterSidebarItems = sidebarItems.filter((item) => {

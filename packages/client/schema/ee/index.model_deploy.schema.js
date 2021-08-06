@@ -1,12 +1,8 @@
 /** @jsx builder */
 import builder, {Body} from 'canner-script';
-import Idp from 'schema/idp/identityProvider.schema';
-import UserFederation from 'schema/userFederation.schema';
 import User from 'schema/user.schema';
 import Group from 'schema/group.schema';
 import InstanceType from 'schema/instanceType.schema';
-import Announcement from 'schema/announcement.schema';
-import Secret from 'schema/secret.schema';
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {createFakeData} from 'canner-helpers';
 import {dict, graphqlClient, imageStorage} from 'schema/utils';
@@ -28,10 +24,6 @@ const schema = (
     </Body>
     <Body component={UserBody}>
       <User/>
-    </Body>
-    <Body component={CommonBody}>
-      <InstanceType/>
-      <Secret />
     </Body>
     {grafana}
     {/* <Announcement /> */}

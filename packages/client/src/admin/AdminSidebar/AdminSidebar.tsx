@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Layout, Menu, Icon } from 'antd';
 
 import ExternalLinkIcon from 'images/icon-new-tab.svg';
-import { appPrefix } from 'utils/env';
+import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 import { ROUTES, ROUTE_KEYS, routes } from '../routes';
 
@@ -45,6 +45,7 @@ export function AdminSidebar() {
   const [externalVisible, setExternalVisisble] = React.useState(EXTERNAL_LINKS);
 
   const location = useLocation();
+  const { appPrefix } = useRoutePrefix();
 
   React.useEffect(() => {
     if (window?.enableMaintenanceNotebook) {
@@ -134,7 +135,7 @@ export function AdminSidebar() {
               <Menu.Item key={ex}>
                 <a
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener"
                   href={externalVisible[ex].link}
                 >
                   {externalVisible[ex].name}
