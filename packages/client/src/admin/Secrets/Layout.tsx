@@ -1,35 +1,7 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
-import { Breadcrumb, Icon, Tooltip } from 'antd';
-import { useRoutePrefix } from 'hooks/useRoutePrefix';
-
-function SecretTooltip() {
-  return (
-    <Tooltip
-      placement="bottom"
-      title={
-        <div>
-          Secrets are credentials of authorizations to certain images and
-          datasets. Admin can find and manage secrets here.{' '}
-          <a
-            href="https://docs.primehub.io/docs/guide_manual/admin-secret"
-            target="_blank"
-            rel="noopener"
-            style={{ color: '#839ce0' }}
-          >
-            Learn More.
-          </a>
-        </div>
-      }
-    >
-      <Icon type="question-circle" />
-    </Tooltip>
-  );
-}
+import Breadcrumbs from 'components/share/breadcrumb';
 
 export function SecretLayout({ children }: { children: React.ReactNode }) {
-  const { appPrefix } = useRoutePrefix();
-
   return (
     <>
       <div
@@ -44,16 +16,19 @@ export function SecretLayout({ children }: { children: React.ReactNode }) {
             marginBottom: 24,
           }}
         >
-          <Breadcrumb>
-            <Breadcrumb.Item>
-              <Link to={`${appPrefix}admin/group`}>
-                <Icon type="home" />
-              </Link>
-            </Breadcrumb.Item>
-            <Breadcrumb.Item>
-              Secrets <SecretTooltip />
-            </Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumbs
+            pathList={[
+              {
+                key: 'secret',
+                matcher: /\/secret/,
+                title: 'Secret',
+                link: 'admin/secret',
+                tips: 'Secrets are credentials of authorizations to certain images anddatasets. Admin can find and manage secrets here.',
+                tipsLink:
+                  'https://docs.primehub.io/docs/guide_manual/admin-secret',
+              },
+            ]}
+          />
         </div>
       </div>
 
