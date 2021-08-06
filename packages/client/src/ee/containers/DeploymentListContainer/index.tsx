@@ -30,7 +30,7 @@ import { errorHandler } from 'utils/errorHandler';
 
 import { DeploymentCard } from './DeploymentCard';
 import {
-  PhDeploymentsConnection,
+  DeploymentsQuery,
   startPhDeploymentMutation,
   stopPhDeploymentMutation,
 } from './deployment.graphql';
@@ -90,14 +90,14 @@ function CommonPageTitle() {
   );
 }
 
-function DeploymentListContainer({ groups, ...props }: Props) {
+function DeploymentListContainer({ groups, phDeployments, ...props }: Props) {
   const groupContext = React.useContext(GroupContext);
   const [keyword, setKeyword] = React.useState('');
   const [isDeployedByMe, setIsDeployedByme] = React.useState(false);
   const history = useHistory();
 
   function getPreviousPage() {
-    const { phDeploymentsConnection, refetch } = props.phDeployments;
+    const { phDeploymentsConnection, refetch } = phDeployments;
     const before = phDeploymentsConnection.pageInfo.startCursor;
 
     refetch({
@@ -109,7 +109,7 @@ function DeploymentListContainer({ groups, ...props }: Props) {
   }
 
   function getNextPage() {
-    const { phDeploymentsConnection, refetch } = props.phDeployments;
+    const { phDeploymentsConnection, refetch } = phDeployments;
     const after = phDeploymentsConnection.pageInfo.endCursor;
 
     refetch({
@@ -121,7 +121,7 @@ function DeploymentListContainer({ groups, ...props }: Props) {
   }
 
   function searchHandler(keyword: string) {
-    const { refetch, variables } = props.phDeployments;
+    const { refetch, variables } = phDeployments;
 
     refetch({
       ...variables,
@@ -168,7 +168,7 @@ function DeploymentListContainer({ groups, ...props }: Props) {
     }
   }
 
-  if (props.phDeployments.error) {
+  if (phDeployments.error) {
     return <div>Failure to load deployments.</div>;
   }
 
@@ -187,13 +187,13 @@ function DeploymentListContainer({ groups, ...props }: Props) {
           }}
         >
           <Checkbox
-            disabled={props.phDeployments.loading}
+            disabled={phDeployments.loading}
             checked={isDeployedByMe}
             onChange={(event) => {
               const isChecked = event.target.checked;
               setIsDeployedByme(isChecked);
 
-              const { refetch, variables } = props.phDeployments;
+              const { refetch, variables } = phDeployments;
 
               if (isChecked) {
                 refetch({
@@ -223,8 +223,8 @@ function DeploymentListContainer({ groups, ...props }: Props) {
           />
 
           <InfuseButton
-            disabled={props.phDeployments.loading}
-            onClick={() => props.phDeployments.refetch()}
+            disabled={phDeployments.loading}
+            onClick={() => phDeployments.refetch()}
           >
             Refresh
           </InfuseButton>
@@ -253,17 +253,17 @@ function DeploymentListContainer({ groups, ...props }: Props) {
             onSearch={searchHandler}
           />
           <InfuseButton
-            disabled={props.phDeployments.loading}
+            disabled={phDeployments.loading}
             onClick={() => searchHandler(keyword)}
           >
             Search
           </InfuseButton>
           <InfuseButton
-            disabled={props.phDeployments.loading}
+            disabled={phDeployments.loading}
             onClick={() => {
               setKeyword('');
 
-              const { refetch, variables } = props.phDeployments;
+              const { refetch, variables } = phDeployments;
 
               refetch({
                 ...variables,
@@ -279,10 +279,10 @@ function DeploymentListContainer({ groups, ...props }: Props) {
         </div>
       </PageBody>
 
-      <Spin spinning={props.phDeployments.loading}>
+      <Spin spinning={phDeployments.loading}>
         <div style={{ padding: '16px' }}>
           <Row gutter={24} type="flex">
-            {props.phDeployments?.phDeploymentsConnection?.edges.map((edge) => {
+            {phDeployments?.phDeploymentsConnection?.edges.map((edge) => {
               return (
                 <Col
                   xs={24}
@@ -312,11 +312,10 @@ function DeploymentListContainer({ groups, ...props }: Props) {
 
           <Pagination
             hasNextPage={
-              props.phDeployments?.phDeploymentsConnection?.pageInfo.hasNextPage
+              phDeployments?.phDeploymentsConnection?.pageInfo.hasNextPage
             }
             hasPreviousPage={
-              props.phDeployments?.phDeploymentsConnection?.pageInfo
-                .hasPreviousPage
+              phDeployments?.phDeploymentsConnection?.pageInfo.hasPreviousPage
             }
             nextPage={getNextPage}
             previousPage={getPreviousPage}
@@ -330,7 +329,7 @@ function DeploymentListContainer({ groups, ...props }: Props) {
 export default compose(
   withRouter,
   withGroupContext,
-  graphql(PhDeploymentsConnection, {
+  graphql(DeploymentsQuery, {
     options: (props: Props) => {
       const params = queryString.parse(
         props.location.search.replace(/^\?/, '')

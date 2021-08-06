@@ -1,4 +1,4 @@
-fragment PhDeploymentInfo on PhDeployment {
+fragment DeploymentInfo on PhDeployment {
   id
   status
   name
@@ -13,13 +13,25 @@ fragment PhDeploymentInfo on PhDeployment {
   }
 }
 
-query PhDeploymentsConnection($where: PhDeploymentWhereInput, $first: Int, $after: String, $last: Int, $before: String) {
-  phDeploymentsConnection(where: $where, first: $first, after: $after, last: $last, before: $before) {
+query DeploymentsQuery(
+  $where: PhDeploymentWhereInput
+  $first: Int
+  $after: String
+  $last: Int
+  $before: String
+) {
+  phDeploymentsConnection(
+    where: $where
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+  ) {
     edges {
       cursor
       node {
         id
-        ...PhDeploymentInfo
+        ...DeploymentInfo
       }
     }
     pageInfo {
@@ -34,13 +46,13 @@ query PhDeploymentsConnection($where: PhDeploymentWhereInput, $first: Int, $afte
 mutation startPhDeploymentMutation($where: PhDeploymentWhereUniqueInput!) {
   deployPhDeployment(where: $where) {
     id
-    ...PhDeploymentInfo
+    ...DeploymentInfo
   }
 }
 
 mutation stopPhDeploymentMutation($where: PhDeploymentWhereUniqueInput!) {
   stopPhDeployment(where: $where) {
     id
-    ...PhDeploymentInfo
+    ...DeploymentInfo
   }
 }

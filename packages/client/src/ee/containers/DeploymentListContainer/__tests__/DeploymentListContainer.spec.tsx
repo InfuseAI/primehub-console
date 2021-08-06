@@ -5,8 +5,8 @@ import { MockedProvider } from 'react-apollo/test-utils';
 import DeploymentListContainer from '..';
 import { GroupContextValue, GroupContext } from 'context/group';
 import { render, screen } from 'test/test-utils';
-import { PhDeploymentsConnection } from 'queries/PhDeployment.graphql';
 
+import { DeploymentsQuery } from '../deployment.graphql';
 import { groups as mockGroups } from '../../../../fakeData/groups';
 
 function setup() {
@@ -22,7 +22,7 @@ function setup() {
   const mockRequests = [
     {
       request: {
-        query: PhDeploymentsConnection,
+        query: DeploymentsQuery,
         variables: {
           first: 12,
           where: {
