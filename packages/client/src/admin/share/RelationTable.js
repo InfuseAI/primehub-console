@@ -1,17 +1,14 @@
-import React, { PureComponent } from "react";
+import React, { PureComponent } from 'react';
 import { Tag, Tooltip, Icon, Table, Button } from "antd";
 import template from 'lodash/template';
 import { remove } from 'lodash';
 import difference from "lodash/difference";
 import get from 'lodash/get';
-import Picker from './relation-picker';
-import {injectIntl} from 'react-intl';
 import {FormattedMessage} from 'react-intl';
-import {renderValue} from '@canner/antd-locales';
 import pluralize from 'pluralize';
+import RelationPicker from './RelationPicker';
 
-@injectIntl
-export default class RelationTable extends PureComponent {
+class RelationTable extends PureComponent {
   constructor(props) {
     super(props);
     this.isOnComposition = false;
@@ -36,8 +33,8 @@ export default class RelationTable extends PureComponent {
     const currentIds = value.map(v => v.id);
     const idsShouldCreate = difference(queue, currentIds);
     const idsShouldRemove = difference(currentIds, queue);
-    const createActions = idsShouldCreate.map(id => ({refId, type: "connect", value: originData.find(data => data.id === id)}));
-    const delActions = idsShouldRemove.map(id => ({refId, type: "disconnect", value: originData.find(data => data.id === id)}));
+    const createActions = idsShouldCreate.map(id => ({type: "connect", value: originData.find(data => data.id === id)}));
+    const delActions = idsShouldRemove.map(id => ({type: "disconnect", value: originData.find(data => data.id === id)}));
     onChange([...createActions, ...delActions]);
     this.handleCancel();
   }
@@ -56,18 +53,12 @@ export default class RelationTable extends PureComponent {
     updateRelationQuery([relation.to], defaultQuery)
   }
 
-  handleClose = (index) => {
-    const {onChange, refId, value} = this.props;
-    onChange(refId, 'disconnect', value[index]);
-  }
-
   render() {
-    const TYPE_GROUPS = 'groups';
+    const TYPE_GROUPS = 'group';
     const { modalVisible } = this.state;
     let showValues = [];
     let { disabled, value = [], uiParams = {}, refId, relation,
-      fetch, fetchRelation, updateQuery, subscribe, intl, toolbar,
-      schema, Toolbar, relationValue, goTo, rootValue, title, isRelationFetching,
+      toolbar, Toolbar, relationValue, title,
       relationArgs, updateRelationQuery, keyName,
     } = this.props;
     let { columns, pickerColumns } = uiParams;
@@ -81,21 +72,13 @@ export default class RelationTable extends PureComponent {
     });
 
     // Hide everyone group in group relationship.
-    if (keyName === TYPE_GROUPS) {
+    if (relation.to === TYPE_GROUPS) {
       const everyoneGroupId = window.everyoneGroupId;
       showValues = value.filter( v => v.id !== everyoneGroupId );
     } else {
       showValues = value;
     }
 
-    const columnsRender = renderValue(columns, schema[relation.to].items.items, this.props);
-    const pickerColumnsRender = renderValue(pickerColumns || uiParams.columns, schema[relation.to].items.items, this.props);
-    const recordValue = getRecordValue(rootValue, refId);
-    // hack
-    const isHidden = uiParams.isHidden ? uiParams.isHidden(recordValue) : false;
-    if (isHidden) {
-      return null;
-    }
     return (
       <div>
         {
@@ -110,31 +93,27 @@ export default class RelationTable extends PureComponent {
                 defaultMessage="edit "
               />
               <span style={{marginLeft: 4, textTransform: 'capitalize'}}>
-                {pluralize.plural(schema[relation.to].keyName)}
+                {pluralize.plural(relation.to)}
               </span>
             </Button>
           </div>
         }
         <Table
           dataSource={showValues}
-          columns={columnsRender}
+          columns={columns}
           style={{marginBottom: 16}}
         />
         {
-          (!disabled && modalVisible) && <Picker
+          (!disabled && modalVisible) && <RelationPicker
             visible={modalVisible}
             onOk={this.handleOk}
             onCancel={this.handleCancel}
             // $FlowFixMe
             pickedIds={value.map(v => v.id)}
-            columns={pickerColumnsRender}
+            columns={pickerColumns}
             refId={refId}
             relation={relation}
             relationValue={relationValue}
-            fetch={fetch}
-            subscribe={subscribe}
-            updateQuery={updateQuery}
-            fetchRelation={fetchRelation}
             Toolbar={Toolbar}
             relationArgs={relationArgs}
             toolbar={toolbar}
@@ -146,7 +125,4 @@ export default class RelationTable extends PureComponent {
   }
 }
 
-function getRecordValue(rootValue, refId) {
-  const targetRefId = refId.remove();
-  return get(rootValue, targetRefId.getPathArr(), {});
-}
+export default RelationTable;

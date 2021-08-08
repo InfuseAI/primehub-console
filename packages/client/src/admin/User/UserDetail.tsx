@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Switch, Skeleton, Tabs, Table, Input, Col, Layout, Button, Icon, Modal } from 'antd';
-import { withRouter, useParams } from 'react-router-dom';
-import { get } from 'lodash';
+import {notification, Form, Switch, Skeleton, Tabs, Table, Input, Col, Layout, Button, Icon, Modal } from 'antd';
+import { withRouter, useParams, useLocation, useHistory } from 'react-router-dom';
+import { get, isArray, sortBy } from 'lodash';
 import { RouteComponentProps } from 'react-router';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
@@ -14,15 +14,78 @@ import PHTooltip from 'components/share/toolTip';
 import SendEmail from 'cms-components/customize-object-email_form';
 import ResetPassword from 'cms-components/customize-object-password_form';
 import CheckableInputNumber from 'cms-components/customize-number-checkbox';
-import { User } from 'queries/User.graphql';
+import CustomRelationTable from '../share/RelationTable';
+import { User, UpdateUser, UserGroups } from 'queries/User.graphql';
 import { errorHandler } from 'utils/errorHandler';
 
 const { TabPane } = Tabs;
 
+const groupColumns = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    render: (text, record, cannerProps) => {
+      const onClick = () => {
+        // /group/record.id
+      }
+      return <a onClick={onClick}>{text}</a>;
+    }
+  }, {
+    title: 'Display Name',
+    dataIndex: 'displayName'
+  }, {
+    title: 'CPU Quota',
+    dataIndex: 'quotaCpu',
+    render: text => {
+      return text === null ? '∞' : text;
+    },
+    // @ts-ignore
+    visible: !modelDeploymentOnly
+  }, {
+    title: 'GPU Quota',
+    dataIndex: 'quotaGpu',
+    render: text => {
+      return text === null ? '∞' : text;
+    },
+    // @ts-ignore
+    visible: !modelDeploymentOnly
+  }
+];
+
+const groupPickerColumns =  [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    sorter: true,
+  },
+  ...groupColumns.slice(1),
+];
+
 function DetailPage(props: any) {
-  const { form, queryUser } = props;
+  const { form, queryUser, queryUserGroups } = props;
   const { id } = useParams<{id: string}>();
+  const location = useLocation();
+  const history = useHistory();
+  const [connections, setConnections] = useState({connect: [], disconnect: []});
   const user = get(queryUser, 'user', {});
+  const userGroups = get(queryUserGroups, 'groups', []);
+  const [relateGroups, setRelateGroups] = useState([]);
+  // Effect for original user data
+  useEffect(() => {
+    setRelateGroups(get(user, 'groups', []))
+  }, [user]);
+  // Effect when connection changed
+  useEffect(() => {
+    if (connections.connect.length > 0 || connections.disconnect.length > 0) {
+      const allGroups = userGroups.edges.map((edge) => edge.node);
+      const {connect, disconnect} = connections;
+      const resultIds = [
+        ...relateGroups.filter((g) => !disconnect.map((d) => d.id).includes(g.id)).map((g) => g.id),
+        ...connect.map((c) => c.id)
+      ]
+      setRelateGroups(sortBy(allGroups.filter((g) => resultIds.includes(g.id)), [(o) => o.name.toLowerCase()]));
+    }
+  }, [connections])
   const breadcrumbs = [
     {
       key: 'list',
@@ -34,25 +97,60 @@ function DetailPage(props: any) {
       key: 'detail',
       matcher: /\/user_next\/([\w-])+/,
       title: `User: ${get(user, 'username', '')}`,
-    }
+    },
   ];
 
-  const onSubmit = () => {
-
+  const handleRelationQueryUpdate = (none, newVariables) => {
+    const { refetch, variables } = queryUserGroups;
+    refetch({
+      ...variables,
+      ...newVariables
+    });
   }
+
+  const handleRelationConnection = (actions) => {
+    if (isArray(actions) && actions.length > 0) {
+      const disconnect = actions.filter((action) => action.type === 'disconnect').map((d) => { return {id: d.value.id}});
+      const connect = actions.filter((action) => action.type === 'connect').map((c) => { return {id: c.value.id}});
+      setConnections({disconnect, connect});
+    }
+  }
+
+  const onSubmit = (e) => {
+    const { updateUser } = props;
+    e.preventDefault();
+    form.validateFields(async (err, values) => {
+      if (err) return;
+      updateUser({
+        variables: {
+          payload: {
+            ...values,
+            groups: connections
+          }
+        }
+      });
+    });
+  };
+
   const onCancel = () => {
+    const pathname = get(location, 'state.prevPathname');
+    const search = get(location, 'state.prevSearch');
+    if (pathname) {
+      return history.push(`${pathname}${search}`);
+    }
+    history.push(`../users_next`);
+  };
 
-  }
   return (
     <Layout>
       <PageTitle
         breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-        title={"Users"}
+        title={'Users'}
       />
       <PageBody>
           <Tabs>
             <TabPane key='info' tab='Basic Info'>
-              <Skeleton loading={queryUser.loading}>
+              <Skeleton loading={queryUser.loading || queryUserGroups.loading}>
                 <Form onSubmit={onSubmit}>
                   <Form.Item label={'Username'}>
                     {form.getFieldDecorator('username', {
@@ -119,6 +217,23 @@ function DetailPage(props: any) {
                       />
                     )}
                   </Form.Item>
+                  <Form.Item label={'Groups'}>
+                    <CustomRelationTable
+                      onChange={handleRelationConnection}
+                      value={relateGroups}
+                      relationValue={userGroups}
+                      relation={{
+                        to: 'group',
+                        type: 'toMany',
+                        fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu']
+                      }}
+                      uiParams={{
+                        columns: groupColumns,
+                        pickerColumns: groupPickerColumns,
+                      }}
+                      updateRelationQuery={handleRelationQueryUpdate}
+                    />
+                  </Form.Item>
                   <Form.Item style={{textAlign: 'right', marginTop: 12}}>
                     <InfuseButton
                       type='primary'
@@ -163,5 +278,38 @@ export const UserDetail = compose(
     },
     name: 'queryUser',
     alias: 'withQueryUser',
+  }),
+  graphql(UpdateUser, {
+    name: 'updateUser',
+    alias: 'withUpdateUser',
+    options: (props: any) => ({
+      variables: {
+        where: {
+          id: props.match.params.id,
+        },
+      },
+      onCompleted: (data: any) => {
+        const {history} = props;
+        history.push({
+          pathname: `../users_next`,
+        });
+        notification.success({
+          duration: 10,
+          placement: 'bottomRight',
+          message: 'Success!',
+          description: (
+            <>
+              User {data.updateUser.username} updated.
+              Click <a onClick={() => history.push(`user_next/${data.updateUser.id}`)}>here</a> to view.
+            </>
+          )
+        });
+      },
+      onError: errorHandler
+    }),
+  }),
+  graphql(UserGroups, {
+    name: 'queryUserGroups',
+    alias: 'withQueryUserGroups',
   }),
 )(DetailPage);

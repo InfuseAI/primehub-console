@@ -137,7 +137,7 @@ module.exports = (env) => {
       minimize: false,
     },
     resolve: {
-      extensions: ['.js', 'jsx', '.ts', '.tsx', '.graphql'],
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.graphql'],
       alias: {
         styledShare: path.resolve(__dirname, 'src/styled_share'),
         utils: path.resolve(__dirname, 'src/utils'),

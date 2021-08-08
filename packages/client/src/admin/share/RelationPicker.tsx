@@ -1,8 +1,6 @@
 import * as React from 'react';
 import {Modal, Table} from 'antd';
 import {isEqual, get, mapValues} from 'lodash';
-import SyncToolbar from '@canner/antd-share-toolbar';
-import styled from 'styled-components';
 
 type Props = {
   title: string,
@@ -48,8 +46,9 @@ type State = {
 export default class Picker extends React.PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
+    const list = props.relationValue.edges.map(edge => edge.node);
     this.state = {
-      totalValue: [],
+      totalValue: list || [],
       selectedRowKeys: props.pickedIds || [],
       sorter: {},
     };
@@ -98,8 +97,6 @@ export default class Picker extends React.PureComponent<Props, State> {
   handleTableChange = (pagination, filters, sorter) => {
     const {relationArgs, updateRelationQuery, relation, toolbar} = this.props;
     const defaultArgs: any = {};
-    console.log(sorter);
-    if (!get(toolbar, 'async')) return;
     if (get(toolbar, 'pagination.number', false)) {
       defaultArgs.page = 1
     } else {
@@ -125,8 +122,7 @@ export default class Picker extends React.PureComponent<Props, State> {
       Toolbar, toolbar, rootValue, refId,
       items, keyName, request, deploy, relationArgs
     } = this.props;
-    const { selectedRowKeys, sorter } = this.state;
-    const recordValue = get(rootValue, refId.remove().getPathArr());
+    const { selectedRowKeys, totalValue, sorter } = this.state;
     if (toolbar && toolbar.actions) {
       // not support export import in relation
       delete toolbar.actions.export;
@@ -138,48 +134,25 @@ export default class Picker extends React.PureComponent<Props, State> {
       onCancel={this.handleCancel}
       visible={visible}
     >
-      <Toolbar>
-        {
-          dataSource => (
-            <SyncToolbar
-              dataSource={dataSource}
-              toolbar={toolbar}
-              recordValue={recordValue}
-              selectedValue={[]}
-              items={items}
-              keyName={keyName}
-              request={request}
-              deploy={deploy}
-            >
-              {
-                ({value, showPagination}) => (
-                  <Table
-                    style={{marginBottom: 16}}
-                    rowSelection={{
-                      type: (pickOne) ? "radio" : "checkbox",
-                      onChange: this.rowSelectOnChange,
-                      selectedRowKeys: selectedRowKeys
-                    }}
-                    onChange={this.handleTableChange}
-                    size="small"
-                    columns={columns.map((column: Record<string, any>) => {
-                      if (column.sorter && column.dataIndex === sorter.field) {
-                        column.sortOrder = sorter.order;
-                      } else {
-                        column.sortOrder = false;
-                      }
-                      return column;
-                    })}
-                    // $FlowFixMe
-                    dataSource={value.map(v => ({...v, key: v.id}))}
-                    pagination={showPagination}
-                  />
-                )
-              }
-            </SyncToolbar>
-          )
-        }
-      </Toolbar>
+      <Table
+        style={{marginBottom: 16}}
+        rowSelection={{
+          type: (pickOne) ? "radio" : "checkbox",
+          onChange: this.rowSelectOnChange,
+          selectedRowKeys: selectedRowKeys
+        }}
+        onChange={this.handleTableChange}
+        columns={columns.map((column: Record<string, any>) => {
+          if (column.sorter && column.dataIndex === sorter.field) {
+            column.sortOrder = sorter.order;
+          } else {
+            column.sortOrder = false;
+          }
+          return column;
+        })}
+        // $FlowFixMe
+        dataSource={totalValue.map(v => ({...v, key: v.id}))}
+      />
     </Modal>
   }
 }

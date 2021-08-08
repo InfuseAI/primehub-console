@@ -79,9 +79,37 @@ query UsersConnection($userAfter: String, $userBefore: String, $userLast: Int,$u
   }
 }
 
+query UserGroups($page: Int, $where: GroupWhereInput, $orderBy: GroupOrderByInput) {
+  groups: groupsConnection(page: $page, where: $where, orderBy: $orderBy) {
+    edges {
+      cursor
+      node {
+        id
+        name
+        displayName
+        quotaCpu
+        quotaGpu
+      }
+    }
+    pageInfo {
+      currentPage
+      totalPage
+    }
+  }
+}
+
+
+mutation UpdateUser($payload: UserUpdateInput!, $where: UserWhereUniqueInput!) {
+  updateUser(data: $payload, where: $where) {
+    id
+    username
+  }
+}
+
 mutation DeleteUser($where: UserWhereUniqueInput!) {
   deleteUser(where: $where) {
     id
+    username
   }
 }
 

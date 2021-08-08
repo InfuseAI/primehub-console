@@ -144,7 +144,7 @@ export const UserAdd = compose(
           message: 'Success!',
           description: (
             <>
-              User {data.createUser.username} Created
+              User {data.createUser.username} Created.
               Click <a onClick={() => history.push(`user_next/${data.createUser.id}`)}>here</a> to view.
             </>
           )
