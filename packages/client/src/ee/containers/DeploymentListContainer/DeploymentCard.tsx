@@ -161,11 +161,11 @@ export function DeploymentCard({ endpoint, ...props }: Props) {
             setIsLoading(true);
 
             Modal.confirm({
-              title: 'Deploy',
+              title: isStoppted ? 'Deploy Start' : 'Deploy Stop',
               content: (
                 <p>
-                  Are you sure you want to {isStoppted ? 'start' : 'stop'}{' '}
-                  deploying "<b>{props.name}</b>"?
+                  Do you want to {isStoppted ? 'start' : 'stop'} "
+                  <b>{props.name}</b>"?
                 </p>
               ),
               onOk: () => {
