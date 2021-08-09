@@ -6,6 +6,7 @@ import { SystemSetting } from '../SystemSetting';
 import { UserList, UserDetail, UserAdd } from '../User';
 import { Datasets, DatasetInfo } from '../Datasets';
 import { Secrets, SecretInfo } from '../Secrets';
+import { InstanceTypes, InstanceTypeInfo } from '../InstanceTypes';
 import { appPrefix } from 'utils/env';
 import UsageReport from '../UsageReport';
 
@@ -90,6 +91,13 @@ export const routes = [
     key: 'instanceType',
     path: 'admin/instanceType',
     name: 'Instance Types',
+    component: InstanceTypes,
+  },
+  {
+    key: 'instanceType-id',
+    path: 'admin/instanceType/:id',
+    name: 'Instance Type',
+    component: InstanceTypeInfo,
   },
   {
     key: 'image',

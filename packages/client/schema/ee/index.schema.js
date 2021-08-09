@@ -1,7 +1,6 @@
 /** @jsx builder */
 import builder, {Body} from 'canner-script';
 import Group from 'schema/group.schema';
-import InstanceType from 'schema/instanceType.schema';
 import Image from 'schema/image.schema';
 import Jupyterhub from 'schema/jupyterhub.schema';
 import BuildImage from 'schema/ee/buildImage.schema';
@@ -36,7 +35,6 @@ const schema = (
       <Group />
     </Body>
     <Body component={CommonBody}>
-      <InstanceType />
       <Image />
       <BuildImage />
     </Body>
