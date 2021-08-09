@@ -51,16 +51,23 @@ type UsageReportNode = {
   node: TUsageReport;
 };
 
+type QueryVariables = {
+  usageReportPage: number;
+  usageReportWhere?: {
+    id_contains: string;
+  };
+};
+
 interface Props {
   usageReportQuery: {
     error: Error | undefined;
     loading: boolean;
-    refetch: (variables: any) => void;
+    refetch: (variables: QueryVariables) => void;
     fetchMore: ({
       variables,
       updateQuery,
     }: {
-      variables: any;
+      variables: QueryVariables;
       updateQuery: any;
     }) => void;
     usageReport?: {
@@ -139,24 +146,17 @@ function _UsageReport({ usageReportQuery }: Props) {
         padding: '16px 24px',
       }}
     >
-      <div
-        style={{
-          marginBottom: 24,
-        }}
-      >
-        <Breadcrumbs
-          pathList={[
-            {
-              key: 'usageReport',
-              matcher: /\/usageReport/,
-              title: 'Usage Report',
-              tips: 'Admin can download Detailed/Summary reports here to have the insight into the usage here.',
-              tipsLink:
-                'https://docs.primehub.io/docs/guide_manual/admin-report',
-            },
-          ]}
-        />
-      </div>
+      <Breadcrumbs
+        pathList={[
+          {
+            key: 'usageReport',
+            matcher: /\/usageReport/,
+            title: 'Usage Reports',
+            tips: 'Admin can download Detailed/Summary reports here to have the insight into the usage here.',
+            tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-report',
+          },
+        ]}
+      />
 
       <div
         style={{
