@@ -51,8 +51,8 @@ export interface DeploymentInfo {
   name: string;
   description: string;
   updateMessage: string;
-  env: Array<{ name: string; value: string }>;
-  metadata: object;
+  env: { name: string; value: string }[];
+  metadata: Record<string, unknown>;
   groupId: string;
   groupName: string;
   creationTime: string;
@@ -62,11 +62,11 @@ export interface DeploymentInfo {
   endpointClients: ClientItem[];
   modelImage: string;
   modelURI: string;
-  pods: Array<{
+  pods: {
     name: string;
     logEndpoint: string;
     phase: Phase;
-  }>;
+  }[];
   availableReplicas: number;
   replicas: number;
   imagePullSecret: string;
