@@ -122,14 +122,24 @@ function _Secrets({
                   ),
                   okText: 'Yes',
                   onOk: async () => {
-                    await deleteSecretMutation({
-                      variables: {
-                        where: {
-                          id: secret.node.id,
+                    try {
+                      await deleteSecretMutation({
+                        variables: {
+                          where: {
+                            id: secret.node.id,
+                          },
                         },
-                      },
-                    });
-                    await secretQuery.refetch();
+                      });
+                      await secretQuery.refetch();
+                    } catch (err) {
+                      console.error(err);
+                      notification.error({
+                        duration: 5,
+                        placement: 'bottomRight',
+                        message: 'Failure',
+                        description: 'Failure to delete, try again later.',
+                      });
+                    }
                   },
                 });
               }}
@@ -235,6 +245,7 @@ function _Secrets({
               Add
             </Button>
           </div>
+
           <Table
             rowKey={(data) => data.node.id}
             style={{ paddingTop: 8 }}
