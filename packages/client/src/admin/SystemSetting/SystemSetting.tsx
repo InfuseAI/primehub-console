@@ -234,23 +234,15 @@ function _SystemSetting({ data, ...props }: Props) {
           padding: '16px 24px',
         }}
       >
-        <div
-          style={{
-            marginBottom: 24,
-          }}
-        >
-          <Breadcrumbs
-            pathList={[
-              {
-                key: 'system',
-                matcher: /\/system/,
-                title: 'System Settings',
-              },
-            ]}
-          />
-        </div>
-
-        <h2>System Settings</h2>
+        <Breadcrumbs
+          pathList={[
+            {
+              key: 'system',
+              matcher: /\/system/,
+              title: 'System Settings',
+            },
+          ]}
+        />
       </div>
 
       <div
