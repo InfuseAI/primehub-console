@@ -108,15 +108,18 @@ export function DeploymentCard({ endpoint, ...props }: Props) {
         style={{
           display: 'flex',
           flexDirection: 'column',
-          padding: '16px 24px',
+          padding: '16px 24px 0px',
           gap: '0.5rem',
+          height: '85px',
         }}
       >
         <div style={{ display: 'flex' }}>
           <div style={{ width: '40%', fontSize: '14px', lineHeight: '20px' }}>
             Endpoint:
           </div>{' '}
-          <a onClick={() => copyEndpoint()}>Copy URL</a>
+          <a onClick={() => copyEndpoint()} style={{ lineHeight: '20px' }}>
+            Copy URL
+          </a>
         </div>
 
         <div style={{ display: 'flex' }}>
@@ -128,6 +131,7 @@ export function DeploymentCard({ endpoint, ...props }: Props) {
               width: '60%',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              lineHeight: '20px',
             }}
           >
             {moment(latest.time).fromNow()} by{' '}
@@ -161,7 +165,7 @@ export function DeploymentCard({ endpoint, ...props }: Props) {
             setIsLoading(true);
 
             Modal.confirm({
-              title: isStoppted ? 'Deploy Start' : 'Deploy Stop',
+              title: isStoppted ? 'Start Deploy' : 'Stop Deploy',
               content: (
                 <p>
                   Do you want to {isStoppted ? 'start' : 'stop'} "
