@@ -126,7 +126,7 @@ export default () => (
           <boolean keyName="enabledDeployment" uiParams={{yesText: ' ', noText: ' '}} />
         </Layout>
       </Condition>
-      <Condition match={() => !primehubCE} defaultMode="hidden">
+      <Condition match={(data) => !primehubCE && data.enabledDeployment} defaultMode="hidden">
         <number keyName="maxDeploy"
           uiParams={{min: 0, step: 1, precision: 0}}
           defaultValue={() => null}
