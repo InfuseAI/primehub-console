@@ -151,7 +151,7 @@ describe('SystemSetting', () => {
     expect(await screen.findByTestId('settings-systemName')).toHaveValue(
       'InfuseAI'
     );
-    expect(await screen.findByTestId('settings-capacity')).toHaveValue('20 GB');
+    expect(await screen.findByTestId('settings-capacity')).toHaveValue('20GB');
     expect(await screen.findByTestId('timezone-select')).toBeInTheDocument();
   });
 

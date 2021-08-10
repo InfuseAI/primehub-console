@@ -423,7 +423,8 @@ function _SystemSetting({ data, ...props }: Props) {
                   <InputNumber
                     data-testid="settings-capacity"
                     defaultValue={defaultUserVolumeCapacity}
-                    formatter={(value) => `${value} GB`}
+                    formatter={(value) => `${value}GB`}
+                    parser={(value) => value.replace(/([A-Z]+.*)/, '')}
                     precision={0}
                     min={1}
                     step={1}
