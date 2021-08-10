@@ -22,6 +22,8 @@ function setup() {
 describe('GroupSettingsInfo Component', () => {
   it('Should render group settings info', () => {
     const { group } = setup();
+    // @ts-ignore
+    global.__ENV__ = 'ee';
     render(
       <GroupSettingsInfo group={group} />
     );
