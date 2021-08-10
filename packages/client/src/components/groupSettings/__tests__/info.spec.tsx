@@ -35,4 +35,18 @@ describe('GroupSettingsInfo Component', () => {
     expect(screen.queryByDisplayValue('2')).toBeInTheDocument();
     expect(screen.queryByDisplayValue('3.0 GB')).toBeInTheDocument();
   });
+  it('Should not render sharedVolumeCapacity in group settings info when env modelDeploy', () => {
+    const { group } = setup();
+    // @ts-ignore
+    global.__ENV__ = 'modelDeploy';
+    render(
+      <GroupSettingsInfo group={group} />
+    );
+    expect(screen.queryByText('Shared Volume Capacity')).not.toBeInTheDocument();
+    expect(screen.queryByDisplayValue('Test Group')).toBeInTheDocument();
+    expect(screen.queryByDisplayValue('1.0')).toBeInTheDocument();
+    expect(screen.queryByDisplayValue('unlimited')).toBeInTheDocument();
+    expect(screen.queryByDisplayValue('2')).toBeInTheDocument();
+    expect(screen.queryByDisplayValue('3.0 GB')).toBeInTheDocument();
+  });
 });
