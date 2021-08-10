@@ -125,10 +125,12 @@ export default () => (
         <Layout component={EnableModelDeployment}>
           <boolean keyName="enabledDeployment" uiParams={{yesText: ' ', noText: ' '}} />
         </Layout>
+      </Condition>
+      <Condition match={() => !primehubCE} defaultMode="hidden">
         <number keyName="maxDeploy"
           uiParams={{min: 0, step: 1, precision: 0}}
           defaultValue={() => null}
-          title="Maximum Deployment"
+          title="Maximum Deployments"
           packageName="../src/cms-components/customize-number-checkbox"
           nullable
         />
