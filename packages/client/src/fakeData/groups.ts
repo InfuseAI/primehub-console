@@ -30,6 +30,7 @@ export const groups = [{
   mlflow,
   displayName: 'c-Group 1',
   enabledDeployment: true,
+  maxDeploy: 10,
   enabledSharedVolume: true,
   instanceTypes: [
     {

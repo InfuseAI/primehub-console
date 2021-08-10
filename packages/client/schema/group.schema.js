@@ -130,7 +130,7 @@ export default () => (
         <number keyName="maxDeploy"
           uiParams={{min: 0, step: 1, precision: 0}}
           defaultValue={() => null}
-          title="Maximum Deployments"
+          title="Maximum Deployment(s)"
           packageName="../src/cms-components/customize-number-checkbox"
           nullable
         />
