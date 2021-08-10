@@ -1,5 +1,6 @@
 import me from './fakeData/me';
 import images from './fakeData/images';
+import datasets from './fakeData/datasets';
 import files from './fakeData/files';
 import license from './fakeData/license';
 import secrets from './fakeData/secrets';
@@ -49,6 +50,7 @@ export const fakeData = {
   license,
   files,
   system,
+  datasets,
 };
 
 export const schema = {
@@ -57,6 +59,7 @@ export const schema = {
   secrets: { type: 'array', items: { type: 'object' } },
   groups: { type: 'array', items: { type: 'object' } },
   images: { type: 'array', items: { type: 'object' } },
+  datasets: { type: 'array', items: { type: 'object' } },
   phJobs: { type: 'array', items: { type: 'object' } },
   phSchedules: { type: 'array', items: { type: 'object' } },
   phDeployments: { type: 'array', items: { type: 'object' } },

@@ -24,9 +24,6 @@ const schema = (
       <InstanceType />
       <Image />
     </Body>
-    <Body component={DatasetBody}>
-      <Dataset />
-    </Body>
     <Body component={JupyterhubBody}>
       <Jupyterhub />
     </Body>

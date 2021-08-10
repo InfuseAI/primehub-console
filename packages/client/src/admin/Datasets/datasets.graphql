@@ -1,0 +1,101 @@
+query GetDatasets($page: Int, $orderBy: DatasetOrderByInput, $where: DatasetWhereInput) {
+  datasetsConnection(
+    page: $page
+    orderBy: $orderBy
+    where: $where
+  ) {
+    edges {
+      cursor
+      node {
+        id
+        name
+        displayName
+        description
+        type
+        uploadServerLink
+      }
+    }
+    pageInfo {
+      currentPage
+      totalPage
+    }
+  }
+}
+
+query DatasetQuery($where: DatasetWhereUniqueInput!) {
+  dataset(where: $where) {
+    id
+    name
+    displayName
+    description
+    type
+
+    # Persistence Volume
+    pvProvisioning
+    volumeName
+    volumeSize
+
+    # Env
+    variables
+
+    # NFS
+    nfsServer
+    nfsPath
+
+    # Hostpath
+    hostPath
+
+    # GitSync
+    url
+    secret {
+      id
+    }
+
+    # Mountable Volumes
+    mountRoot
+    enableUploadServer
+    uploadServerLink
+
+    # Group Association
+    global
+    groups {
+      id
+      name
+      displayName
+      writable
+    }
+  }
+}
+
+mutation UpdateDatasetMutation($payload: DatasetUpdateInput!, $where: DatasetWhereUniqueInput!) {
+  updateDataset(data: $payload, where: $where) {
+    id
+    uploadServerSecret {
+      username
+      password
+    }
+  }
+}
+
+mutation CreateDatasetMutation($payload: DatasetCreateInput!) {
+  createDataset(data: $payload) {
+    id
+  }
+}
+
+mutation DeleteDatasetMutation($where: DatasetWhereUniqueInput!) {
+  deleteDataset(where: $where) {
+    id
+  }
+}
+
+
+mutation RegenerateUploadServerSecretMutation ($where: DatasetWhereUniqueInput!) {
+  regenerateUploadServerSecret(where: $where) {
+    id
+    uploadServerSecret {
+      username
+      password
+    }
+  }
+}

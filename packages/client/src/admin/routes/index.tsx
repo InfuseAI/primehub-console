@@ -4,6 +4,7 @@ import { Route, RouteProps } from 'react-router-dom';
 
 import { SystemSetting } from '../SystemSetting';
 import { UserList, UserDetail, UserAdd } from '../User';
+import { Datasets, DatasetInfo } from '../Datasets';
 import { Secrets, SecretInfo } from '../Secrets';
 import { appPrefix } from 'utils/env';
 import UsageReport from '../UsageReport';
@@ -104,6 +105,14 @@ export const routes = [
     key: 'dataset',
     path: 'admin/dataset',
     name: 'Datasets',
+    exact: true,
+    component: Datasets,
+  },
+  {
+    key: 'dataset-id',
+    path: 'admin/dataset/:id',
+    name: 'Datasets',
+    component: DatasetInfo,
   },
   {
     key: 'secret',
