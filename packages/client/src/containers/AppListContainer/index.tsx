@@ -131,7 +131,7 @@ class AppListContainer extends React.Component<Props, State> {
       title: `Start App`,
       content: (
         <span>
-          Do you want to start "<b>${appName}</b>"?
+          Do you want to start "<b>{appName}</b>"?
         </span>
       ),
       iconType: 'info-circle',
