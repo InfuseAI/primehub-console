@@ -273,6 +273,7 @@ export interface PhApplicationSpec {
   svcTemplate: any;
   httpPort: number;
   rewrite?: boolean;
+  appRoot?: string;
 }
 
 export interface PhApplicationStatus {
@@ -299,6 +300,7 @@ export interface PhAppTemplateSpec {
       svcTemplate: any;
       httpPort: number;
       rewrite?: boolean;
+      appRoot?: string;
     }
   };
 }
