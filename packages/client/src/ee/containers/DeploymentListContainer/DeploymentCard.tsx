@@ -89,7 +89,7 @@ export function DeploymentCard({ endpoint, ...props }: Props) {
   }, [status]);
 
   return (
-    <Card>
+    <Card id={props.id}>
       <div
         style={{
           display: 'flex',
@@ -143,6 +143,7 @@ export function DeploymentCard({ endpoint, ...props }: Props) {
       <Divider style={{ margin: '24px 0px 0px' }} />
 
       <div
+        className="deployment-actions"
         style={{
           display: 'flex',
           justifyContent: 'space-evenly',
