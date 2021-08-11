@@ -10,7 +10,6 @@ type Props = {
   visible: boolean,
   pickedIds: string[],
   pickOne?: boolean,
-  refId: any,
   relation: {
     to: string,
     type: string,
@@ -30,7 +29,6 @@ type Props = {
   keyName: string,
   request: Function,
   deploy: Function,
-  relationArgs: Record<string, any>,
   updateRelationQuery: Function,
 };
 
@@ -70,17 +68,7 @@ export default class Picker extends React.PureComponent<Props, State> {
   }
 
   updateData = (data: any) => {
-    let {totalValue} = this.state;
-
-    const list = data.edges.map(edge => edge.node);
-    list.forEach(item => {
-      const index = totalValue.findIndex(v => v.id === item.id);
-      if (index === -1) {
-        totalValue.push(item);
-      } else {
-        totalValue[index] = item;
-      }
-    });
+    const totalValue = data.edges.map(edge => edge.node);
     this.setState({
       totalValue
     });
@@ -95,20 +83,21 @@ export default class Picker extends React.PureComponent<Props, State> {
   }
 
   handleTableChange = (pagination, filters, sorter) => {
-    const {relationArgs, updateRelationQuery, relation, toolbar} = this.props;
+    const {updateRelationQuery, relation, toolbar} = this.props;
     const defaultArgs: any = {};
     if (get(toolbar, 'pagination.number', false)) {
       defaultArgs.page = 1
     } else {
       defaultArgs.first = 10;
     }
-    this.setState({ sorter });
-    updateRelationQuery([relation.to], {
-      ...relationArgs,
-      orderBy:sorter.field ? {
-        [sorter.field]: get(sorter, 'order') === 'ascend' ? 'asc' : 'desc'
-      } : {}
-    });
+    if (!isEqual(this.state.sorter, sorter)) {
+      this.setState({ sorter });
+      updateRelationQuery({
+        orderBy:sorter.field ? {
+          [sorter.field]: get(sorter, 'order') === 'ascend' ? 'asc' : 'desc'
+        } : {}
+      });
+    }
   }
 
   rowSelectOnChange = (selectedRowKeys: Array<string>) => {
@@ -119,8 +108,8 @@ export default class Picker extends React.PureComponent<Props, State> {
 
   render() {
     const { visible, columns, pickOne = false,
-      Toolbar, toolbar, rootValue, refId,
-      items, keyName, request, deploy, relationArgs
+      Toolbar, toolbar, rootValue,
+      items, keyName, request, deploy, loading
     } = this.props;
     const { selectedRowKeys, totalValue, sorter } = this.state;
     if (toolbar && toolbar.actions) {
@@ -136,6 +125,7 @@ export default class Picker extends React.PureComponent<Props, State> {
     >
       <Table
         style={{marginBottom: 16}}
+        loading={loading}
         rowSelection={{
           type: (pickOne) ? "radio" : "checkbox",
           onChange: this.rowSelectOnChange,
@@ -144,7 +134,7 @@ export default class Picker extends React.PureComponent<Props, State> {
         onChange={this.handleTableChange}
         columns={columns.map((column: Record<string, any>) => {
           if (column.sorter && column.dataIndex === sorter.field) {
-            column.sortOrder = sorter.order;
+            column.sortOrder = sorter.order || 'ascend';
           } else {
             column.sortOrder = false;
           }

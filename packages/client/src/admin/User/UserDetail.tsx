@@ -57,9 +57,46 @@ const groupPickerColumns =  [
     title: 'Name',
     dataIndex: 'name',
     sorter: true,
+    sortDirections: ['descend', 'ascend'],
   },
   ...groupColumns.slice(1),
 ];
+
+const GroupsRelationTable = compose(
+  graphql(UserGroups, {
+    name: 'queryUserGroups',
+    alias: 'withQueryUserGroups',
+  }),
+)((props: any) => {
+  const {onChange, value, queryUserGroups} = props;
+  const userGroups = get(queryUserGroups, 'groups', []);
+  const relationRefetch = (newVariables) => {
+    const { refetch, variables } = queryUserGroups;
+    refetch({
+      ...variables,
+      ...newVariables
+    });
+  }
+
+  return (
+    <CustomRelationTable
+      onChange={onChange}
+      loading={queryUserGroups.loading}
+      value={value}
+      relationValue={userGroups}
+      relation={{
+        to: 'group',
+          type: 'toMany',
+          fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu']
+      }}
+      uiParams={{
+        columns: groupColumns,
+        pickerColumns: groupPickerColumns,
+      }}
+      relationRefetch={relationRefetch}
+    />
+  );
+});
 
 function DetailPage(props: any) {
   const { form, queryUser, queryUserGroups } = props;
@@ -99,14 +136,6 @@ function DetailPage(props: any) {
       title: `User: ${get(user, 'username', '')}`,
     },
   ];
-
-  const handleRelationQueryUpdate = (none, newVariables) => {
-    const { refetch, variables } = queryUserGroups;
-    refetch({
-      ...variables,
-      ...newVariables
-    });
-  }
 
   const handleRelationConnection = (actions) => {
     if (isArray(actions) && actions.length > 0) {
@@ -218,20 +247,9 @@ function DetailPage(props: any) {
                     )}
                   </Form.Item>
                   <Form.Item label={'Groups'}>
-                    <CustomRelationTable
+                    <GroupsRelationTable
                       onChange={handleRelationConnection}
                       value={relateGroups}
-                      relationValue={userGroups}
-                      relation={{
-                        to: 'group',
-                        type: 'toMany',
-                        fields: ['name', 'displayName', 'quotaCpu', 'quotaGpu']
-                      }}
-                      uiParams={{
-                        columns: groupColumns,
-                        pickerColumns: groupPickerColumns,
-                      }}
-                      updateRelationQuery={handleRelationQueryUpdate}
                     />
                   </Form.Item>
                   <Form.Item style={{textAlign: 'right', marginTop: 12}}>
@@ -311,5 +329,10 @@ export const UserDetail = compose(
   graphql(UserGroups, {
     name: 'queryUserGroups',
     alias: 'withQueryUserGroups',
+    options: (props: any) => {
+      return {
+        fetchPolicy: 'cache-and-network'
+      }
+    }
   }),
 )(DetailPage);

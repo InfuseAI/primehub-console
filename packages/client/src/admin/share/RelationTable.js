@@ -40,26 +40,17 @@ class RelationTable extends PureComponent {
   }
 
   handleCancel = () => {
-    const {updateRelationQuery, relationArgs, relation, toolbar} = this.props;
     this.setState({
       modalVisible: false
     });
-    const defaultQuery = {where: {}};
-    if (get(toolbar, 'async') && get(toolbar, 'pagination.number')) {
-      defaultQuery.page = 1;
-    } else {
-      defaultQuery.first = 10;
-    }
-    updateRelationQuery([relation.to], defaultQuery)
   }
 
   render() {
     const TYPE_GROUPS = 'group';
     const { modalVisible } = this.state;
     let showValues = [];
-    let { disabled, value = [], uiParams = {}, refId, relation,
-      toolbar, Toolbar, relationValue, title,
-      relationArgs, updateRelationQuery, keyName,
+    let { disabled, value = [], uiParams = {}, relation,
+      toolbar, Toolbar, relationValue, title, loading, relationRefetch, keyName,
     } = this.props;
     let { columns, pickerColumns } = uiParams;
 
@@ -111,13 +102,12 @@ class RelationTable extends PureComponent {
             // $FlowFixMe
             pickedIds={value.map(v => v.id)}
             columns={pickerColumns}
-            refId={refId}
             relation={relation}
             relationValue={relationValue}
             Toolbar={Toolbar}
-            relationArgs={relationArgs}
             toolbar={toolbar}
-            updateRelationQuery={updateRelationQuery}
+            updateRelationQuery={relationRefetch}
+            loading={loading}
           />
         }
       </div>
