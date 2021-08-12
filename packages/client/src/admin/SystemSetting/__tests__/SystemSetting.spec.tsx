@@ -83,20 +83,6 @@ function setup() {
 }
 
 describe('SystemSetting', () => {
-  it('should render system setting with loading status', () => {
-    const { mockRequests } = setup();
-
-    render(
-      <MemoryRouter>
-        <MockedProvider mocks={mockRequests}>
-          <SystemSetting />
-        </MockedProvider>
-      </MemoryRouter>
-    );
-
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
-  });
-
   it('should render system setting with failure status', async () => {
     render(
       <MemoryRouter>
