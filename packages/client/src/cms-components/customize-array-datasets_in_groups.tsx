@@ -63,7 +63,7 @@ export default class ArrayBreadcrumb extends Component<Props> {
           id: routes[1]
         },
         everyoneGroupWhere: {
-          id: (window as any).everyoneGroupId
+          id: window.everyoneGroupId
         }
       },
       fetchPolicy: 'network-only',

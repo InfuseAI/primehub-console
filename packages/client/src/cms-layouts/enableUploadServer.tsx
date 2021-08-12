@@ -3,6 +3,6 @@ import {Item} from 'canner-helpers';
 
 export default () => {
   return (
-    <Item hidden={!((window as any).enableUploadServer)}/>
+    <Item hidden={!(window.enableUploadServer)}/>
   )
 }

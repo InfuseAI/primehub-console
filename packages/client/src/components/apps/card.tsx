@@ -79,8 +79,8 @@ class AppCard extends React.Component<Props> {
             {application.displayName}
           </h2>
           <div>
-            <Tag color={getCardColor(application)}>{application.status}</Tag>
-            <Tag>{appName}:{appVersion}</Tag>
+            <Tag color={getCardColor(application)} style={{ cursor: 'auto' }}>{application.status}</Tag>
+            <Tag style={{ cursor: 'auto' }}>{appName}:{appVersion}</Tag>
           </div>
         </div>
       </Card>

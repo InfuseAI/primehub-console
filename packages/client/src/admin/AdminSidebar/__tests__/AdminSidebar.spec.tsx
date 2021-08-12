@@ -11,6 +11,9 @@ global.modelDeploymentOnly = false;
 
 describe('AdminSidebar', () => {
   it('should render AdminSidebar with default items', () => {
+    // @ts-ignore
+    global.__ENV__ = 'ee';
+
     render(
       <MemoryRouter initialEntries={[`/admin/${MOCK_ROUTE_PATHNAME}`]}>
         <AdminSidebar />
@@ -31,6 +34,8 @@ describe('AdminSidebar', () => {
 
   it('should render AdminSidebar with usage reports', () => {
     // @ts-ignore
+    global.__ENV__ = 'ee';
+    // @ts-ignore
     global.enableUsageReport = true;
 
     render(
@@ -43,6 +48,8 @@ describe('AdminSidebar', () => {
   });
 
   it('should render AdminSidebar with maintenance', () => {
+    // @ts-ignore
+    global.__ENV__ = 'ee';
     // @ts-ignore
     global.enableMaintenanceNotebook = true;
 
@@ -57,6 +64,8 @@ describe('AdminSidebar', () => {
 
   it('should render AdminSidebar with grafana', () => {
     // @ts-ignore
+    global.__ENV__ = 'ee';
+    // @ts-ignore
     global.enableGrafana = true;
 
     render(
@@ -69,6 +78,9 @@ describe('AdminSidebar', () => {
   });
 
   it('should navigate from group to user page', () => {
+    // @ts-ignore
+    global.__ENV__ = 'ee';
+
     render(
       <MemoryRouter initialEntries={[`/admin/${MOCK_ROUTE_PATHNAME}`]}>
         <AdminSidebar />
@@ -79,5 +91,34 @@ describe('AdminSidebar', () => {
     userEvent.click(navgiateToUserPage);
 
     expect(screen.getByTestId('user-active')).toBeInTheDocument();
+  });
+
+  it('should not render image builder when version is CE', async () => {
+    // @ts-ignore
+    global.__ENV__ = 'ce';
+
+    render(
+      <MemoryRouter initialEntries={[`/admin/${MOCK_ROUTE_PATHNAME}`]}>
+        <AdminSidebar />
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByText('Image Builder')).not.toBeInTheDocument();
+  });
+
+  it('should not render dataset, image, image builder and notebook when version is Deployment', async () => {
+    // @ts-ignore
+    global.__ENV__ = 'modelDeploy';
+
+    render(
+      <MemoryRouter initialEntries={[`/admin/${MOCK_ROUTE_PATHNAME}`]}>
+        <AdminSidebar />
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByText('Image')).not.toBeInTheDocument();
+    expect(screen.queryByText('Image Builder')).not.toBeInTheDocument();
+    expect(screen.queryByText('Datasets')).not.toBeInTheDocument();
+    expect(screen.queryByText('Notebooks Admin')).not.toBeInTheDocument();
   });
 });

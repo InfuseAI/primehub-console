@@ -55,9 +55,9 @@ class ApiTokenPage extends React.Component<Props, State> {
   constructor(props) {
     super(props)
 
-    this.graphqlEndpoint = (window as any).absGraphqlEndpoint;
-    this.apiToken = (window as any).apiToken;
-    this.requestApiTokenEndpoint = (window as any).requestApiTokenEndpoint;
+    this.graphqlEndpoint = window.absGraphqlEndpoint;
+    this.apiToken = window.apiToken;
+    this.requestApiTokenEndpoint = window.requestApiTokenEndpoint;
   }
 
   handleRequestApiToken = () => {
@@ -87,7 +87,7 @@ class ApiTokenPage extends React.Component<Props, State> {
     client.mutate({mutation: REVOKE_API_TOKEN})
     .then(() => {
       const backUrl = encodeURIComponent(window.location.pathname);
-      (window as any).location.href = `${this.requestApiTokenEndpoint}?backUrl=${backUrl}`;
+      window.location.href = `${this.requestApiTokenEndpoint}?backUrl=${backUrl}`;
     })
     .catch(errorHandler);
   }

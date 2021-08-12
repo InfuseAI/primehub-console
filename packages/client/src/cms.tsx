@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Layout, notification, Modal, Button } from 'antd';
-import {injectIntl, FormattedMessage} from 'react-intl'
+import { injectIntl, FormattedMessage } from 'react-intl';
 import Canner from 'canner';
 import gql from 'graphql-tag';
 import { Switch } from 'react-router-dom';
@@ -97,7 +97,7 @@ export default class CMSPage extends React.Component<Props, State> {
   }
 
   process = (schema) => {
-    if (!(window as any).enableCustomImage) {
+    if (!window.enableCustomImage) {
       delete schema.schema.buildImage;
       delete schema.schema.buildImageJob;
     }
@@ -180,9 +180,9 @@ export default class CMSPage extends React.Component<Props, State> {
     const { intl, history } = this.props;
     const actionType = get(data, 'actions.0.type');
     if (actionType === 'CREATE_ARRAY') {
-      const link = `${(window as any).APP_PREFIX}admin/${
-        data.key
-      }/${getCreateId(data.result)}`;
+      const link = `${window.APP_PREFIX}admin/${data.key}/${getCreateId(
+        data.result
+      )}`;
       setTimeout(() => {
         this.setState({
           deploying: false,
@@ -340,12 +340,10 @@ export default class CMSPage extends React.Component<Props, State> {
           </Content> */}
 
           <Content style={{ marginLeft: 200 }}>
-              <ApolloProvider client={client}>
-                <LicenseWarningBanner />
-                <Switch>
-                  {adminRoutes.map(RouteWithSubRoutes)}
-                </Switch>
-              </ApolloProvider>
+            <ApolloProvider client={client}>
+              {window.enableLicenseCheck && <LicenseWarningBanner />}
+              <Switch>{adminRoutes.map(RouteWithSubRoutes)}</Switch>
+            </ApolloProvider>
             {this.notification}
             <Canner
               schema={this.schema}
@@ -357,7 +355,7 @@ export default class CMSPage extends React.Component<Props, State> {
               afterDeploy={this.afterDeploy}
               beforeDeploy={this.beforeDeploy}
               intl={{
-                locale: (window as any).LOCALE,
+                locale: window.LOCALE,
                 messages: {
                   ...myLocales,
                 },
@@ -423,6 +421,7 @@ export default class CMSPage extends React.Component<Props, State> {
                     duration = 20;
                     key = 'REFRESH_TOKEN_EXPIRED';
                     btn = (
+                      // @ts-ignore
                       <Button
                         type="primary"
                         onClick={() => window.location.replace(loginUrl)}

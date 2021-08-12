@@ -211,11 +211,11 @@ function parseJSON(response) {
 }
 
 const tokenSyncWorker = new BackgroundTokenSyncer({
-  appPrefix: (window as any).APP_PREFIX,
-  refreshTokenExp: (window as any).refreshTokenExp,
-  accessTokenExp: (window as any).accessTokenExp,
+  appPrefix: window.APP_PREFIX,
+  refreshTokenExp: window.refreshTokenExp,
+  accessTokenExp: window.accessTokenExp,
   getNewTokenSet: () => {
-    return fetch(`${(window as any).APP_PREFIX}oidc/refresh-token-set`, {
+    return fetch(`${window.APP_PREFIX}oidc/refresh-token-set`, {
       method: 'POST',
     })
       .then(checkStatus)
@@ -234,7 +234,7 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
         <Button
           type="primary"
           onClick={() =>
-            window.location.replace(`${(window as any).APP_PREFIX}oidc/logout`)
+            window.location.replace(`${window.APP_PREFIX}oidc/logout`)
           }
         >
           Login Again

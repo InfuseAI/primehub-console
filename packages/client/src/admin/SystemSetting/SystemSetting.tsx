@@ -1,8 +1,6 @@
 import * as React from 'react';
 import moment from 'moment';
-import { Link } from 'react-router-dom';
 import {
-  Breadcrumb,
   Icon,
   Layout,
   Card,
@@ -20,6 +18,8 @@ import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import { Controller, useForm } from 'react-hook-form';
 import { timezones } from 'react-timezone';
+
+import Breadcrumbs from 'components/share/breadcrumb';
 
 import { TimeZone } from './Timezone';
 import { LicenseStatus, LicenseTag } from './LicenseStatus';
@@ -131,7 +131,6 @@ interface Props {
 }
 
 function _SystemSetting({ data, ...props }: Props) {
-  const [appPrefix, setAppPrefix] = React.useState('/');
   const [addImageButtonVisible, setAddImageButtonVisible] =
     React.useState(false);
   const [pasteImageModalVisible, setPasteImageModalVisible] =
@@ -216,12 +215,6 @@ function _SystemSetting({ data, ...props }: Props) {
     }
   }, [data, reset]);
 
-  React.useEffect(() => {
-    if (window?.APP_PREFIX) {
-      setAppPrefix(window.APP_PREFIX);
-    }
-  }, []);
-
   if (data.error) {
     return <div>Error</div>;
   }
@@ -241,22 +234,15 @@ function _SystemSetting({ data, ...props }: Props) {
           padding: '16px 24px',
         }}
       >
-        <div
-          style={{
-            marginBottom: 24,
-          }}
-        >
-          <Breadcrumb>
-            <Breadcrumb.Item>
-              <Link to={`${appPrefix}admin/group`}>
-                <Icon type="home" />
-              </Link>
-            </Breadcrumb.Item>
-            <Breadcrumb.Item>System Settings</Breadcrumb.Item>
-          </Breadcrumb>
-        </div>
-
-        <h2>System Settings</h2>
+        <Breadcrumbs
+          pathList={[
+            {
+              key: 'system',
+              matcher: /\/system/,
+              title: 'System Settings',
+            },
+          ]}
+        />
       </div>
 
       <div

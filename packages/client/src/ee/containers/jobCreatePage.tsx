@@ -75,7 +75,7 @@ class JobCreatePage extends React.Component<Props, State> {
     const {selectedGroup} = this.state;
     const {groupContext, currentUser, createPhJobResult, defaultValue} = this.props;
     const everyoneGroupId = window.EVERYONE_GROUP_ID;
-    const jobDefaultActiveDeadlineSeconds = (window as any).jobDefaultActiveDeadlineSeconds;
+    const jobDefaultActiveDeadlineSeconds = window.jobDefaultActiveDeadlineSeconds;
     const allGroups = get(currentUser, 'me.groups', []);
     const groups = allGroups
       .filter(group => group.id !== everyoneGroupId)

@@ -445,7 +445,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                     {
                       required: false,
                       message: 'PHFS is not supported in this installation.',
-                      validator: (rule, value, callback) => (value && value.length > 4 && value.substring(0, 4) === 'phfs' && !(window as any).enablePhfs ? callback('PHFS is not supported in this installation.') : callback())
+                      validator: (rule, value, callback) => (value && value.length > 4 && value.substring(0, 4) === 'phfs' && !window.enablePhfs ? callback('PHFS is not supported in this installation.') : callback())
                     }
                   ],
                 })(

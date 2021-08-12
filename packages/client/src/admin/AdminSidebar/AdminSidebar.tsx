@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Layout, Menu, Icon } from 'antd';
 
 import ExternalLinkIcon from 'images/icon-new-tab.svg';
-import { appPrefix } from 'utils/env';
+import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 import { ROUTES, ROUTE_KEYS, routes } from '../routes';
 
@@ -11,14 +11,14 @@ const VISIBLE_ITEMS = {
   group: true,
   user: true,
   instanceType: true,
-  image: true,
-  buildImage: true,
-  dataset: true,
   secret: true,
-  jupyterhub: true,
   system: true,
 
-  // Control by global variable
+  // Control by global or tier variable
+  image: false,
+  buildImage: false,
+  dataset: false,
+  jupyterhub: false,
   usageReport: false,
 };
 
@@ -36,20 +36,17 @@ const EXTERNAL_LINKS = {
 };
 
 export function AdminSidebar() {
+  // @ts-ignore;
+  const GLOBAL_ENV = __ENV__;
+
   const [activeRoute, setActiveRoute] = React.useState<ROUTE_KEYS>('group');
   const [visible, setVisible] = React.useState(VISIBLE_ITEMS);
   const [externalVisible, setExternalVisisble] = React.useState(EXTERNAL_LINKS);
 
   const location = useLocation();
+  const { appPrefix } = useRoutePrefix();
 
   React.useEffect(() => {
-    if (window?.enableUsageReport) {
-      setVisible((prev) => ({
-        ...prev,
-        usageReport: true,
-      }));
-    }
-
     if (window?.enableMaintenanceNotebook) {
       setExternalVisisble((prev) => ({
         ...prev,
@@ -69,6 +66,27 @@ export function AdminSidebar() {
         },
       }));
     }
+
+    if (GLOBAL_ENV === 'ee') {
+      setVisible((prev) => ({
+        ...prev,
+        image: true,
+        buildImage: true,
+        dataset: true,
+        jupyterhub: true,
+        usageReport: true,
+      }));
+    }
+
+    if (GLOBAL_ENV === 'ce') {
+      setVisible((prev) => ({
+        ...prev,
+        image: true,
+        dataset: true,
+        jupyterhub: true,
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   React.useEffect(() => {
@@ -116,7 +134,7 @@ export function AdminSidebar() {
               <Menu.Item key={ex}>
                 <a
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener"
                   href={externalVisible[ex].link}
                 >
                   {externalVisible[ex].name}

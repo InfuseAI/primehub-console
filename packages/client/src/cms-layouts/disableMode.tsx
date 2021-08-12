@@ -3,6 +3,6 @@ import {Item} from 'canner-helpers';
 
 export default () => {
   return (
-    <Item disabled={(window as any).disableMode || false}/>
+    <Item disabled={window.disableMode || false}/>
   )
 }

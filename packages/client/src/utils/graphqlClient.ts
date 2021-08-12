@@ -7,7 +7,7 @@ export const createGraphqlClient = (options: {
   schema: any;
 }) => {
   const graphqlClient = new GraphqlClient({
-    uri: (window as any).graphqlEndpoint,
+    uri: window.graphqlEndpoint,
     fetch: (uri, options) => {
       const token = window.localStorage.getItem('canner.accessToken');
       options.headers = {
