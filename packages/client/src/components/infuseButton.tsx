@@ -4,6 +4,7 @@ import { ButtonProps } from 'antd/lib/button';
 
 type Props = {
   style?: React.CSSProperties;
+  htmlType?: 'submit' | 'button' | 'reset';
 } & ButtonProps;
 
 export default function InfuseButton(props: Props) {

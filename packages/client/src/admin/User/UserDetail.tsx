@@ -94,6 +94,7 @@ const GroupsRelationTable = compose(
 
   return (
     <CustomRelationTable
+      title={'Edit Groups'}
       onChange={onChange}
       loading={queryUserGroups.loading}
       value={value}
@@ -230,7 +231,7 @@ function DetailPage(props: any) {
                     rules: [
                       {
                         pattern:
-                          /(([^<>()[]\\.,;:\s@"]+(\.[^<>()[]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                          /(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                         message: `Please fill a valid email address format.`,
                       },
                     ],
@@ -294,7 +295,7 @@ function DetailPage(props: any) {
                 <Form.Item style={{ textAlign: 'right', marginTop: 12 }}>
                   <InfuseButton
                     type='primary'
-                    htmlType='submit'
+                    htmlType={'submit'}
                     style={{ marginRight: 16 }}
                   >
                     Update
