@@ -13,6 +13,7 @@ import {
   Modal,
   Typography,
   notification,
+  Skeleton,
 } from 'antd';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -219,32 +220,48 @@ function _SystemSetting({ data, ...props }: Props) {
     return <div>Error</div>;
   }
 
+  const PageHead = () => (
+    <div
+      style={{
+        background: '#fff',
+        borderBottom: '1px solid #eee',
+        padding: '16px 24px',
+      }}
+    >
+      <Breadcrumbs
+        pathList={[
+          {
+            key: 'system',
+            matcher: /\/system/,
+            title: 'System Settings',
+          },
+        ]}
+      />
+    </div>
+  );
+
   if (data.loading) {
-    return <div>Loading...</div>;
+    return (
+      <Layout>
+        <PageHead />
+        <div
+          style={{
+            margin: '16px',
+            padding: '32px',
+            backgroundColor: '#fff',
+          }}
+        >
+          <Skeleton active />
+        </div>
+      </Layout>
+    );
   }
 
   const { license, defaultUserVolumeCapacity, smtp } = data.system;
 
   return (
     <Layout>
-      <div
-        style={{
-          background: '#fff',
-          borderBottom: '1px solid #eee',
-          padding: '16px 24px',
-        }}
-      >
-        <Breadcrumbs
-          pathList={[
-            {
-              key: 'system',
-              matcher: /\/system/,
-              title: 'System Settings',
-            },
-          ]}
-        />
-      </div>
-
+      <PageHead />
       <div
         style={{
           margin: '16px',
