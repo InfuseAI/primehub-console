@@ -306,7 +306,8 @@ function _SystemSetting({ data, ...props }: Props) {
                 <div>
                   <CustomLabel>Utilized Nodes</CustomLabel>
                   <div data-testid="license-maxNode">
-                    {license.usage.maxNode}/{license.maxNode}
+                    {license.usage.maxNode}/
+                    {Number(license.maxNode) === -1 ? '∞' : license.maxNode}
                   </div>
                 </div>
               </Col>
@@ -314,7 +315,10 @@ function _SystemSetting({ data, ...props }: Props) {
                 <div>
                   <CustomLabel>Deployed Models</CustomLabel>
                   <div data-testid="license-maxDeploy">
-                    {license.usage.maxModelDeploy}/{license.maxModelDeploy}
+                    {license.usage.maxModelDeploy}/
+                    {Number(license.maxModelDeploy) === -1
+                      ? '∞'
+                      : license.maxModelDeploy}
                   </div>
                 </div>
               </Col>
@@ -441,7 +445,7 @@ function _SystemSetting({ data, ...props }: Props) {
                     data-testid="settings-capacity"
                     defaultValue={defaultUserVolumeCapacity}
                     formatter={(value) => `${value} GB`}
-                    parser={value => value.replace(/[^0-9\.]/g, '')}
+                    parser={(value) => value.replace(/[^0-9\.]/g, '')}
                     precision={0}
                     min={1}
                     step={1}
