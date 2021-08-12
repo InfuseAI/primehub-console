@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Button, Table, Input } from 'antd';
+import moment from 'moment';
+import { Button, Table, Input, Tooltip, Icon } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -89,8 +90,27 @@ function _UsageReport({ usageReportQuery }: Props) {
     {
       key: 'date',
       title: 'Date',
-      dataIndex: 'node.id',
       align: 'center',
+      render: function DownloadDetailReport(report: UsageReportNode) {
+        if (
+          moment(new Date().toISOString()).format('YYYY/MM') === report.node.id
+        ) {
+          return (
+            <>
+              {report.node.id}
+              <Tooltip title="This report only includes usage up until today, as this month is not over yet.">
+                <Icon
+                  type="info-circle"
+                  theme="filled"
+                  style={{ marginLeft: 8 }}
+                />
+              </Tooltip>
+            </>
+          );
+        }
+
+        return report.node.id;
+      },
     },
     {
       key: 'detailed-report',
