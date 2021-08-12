@@ -77,7 +77,7 @@ function AddPage(props: any) {
     <Layout>
       <PageTitle
         breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-        title={'Add User'}
+        title='Add User'
       />
       <PageBody>
         <Row>

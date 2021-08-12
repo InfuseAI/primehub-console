@@ -158,7 +158,6 @@ export default class Picker extends React.PureComponent<Props, State> {
                 : false;
             return column;
           })}
-          // $FlowFixMe
           dataSource={totalValue.map(v => ({ ...v, key: v.id }))}
         />
       </Modal>
