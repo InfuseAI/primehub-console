@@ -33,49 +33,6 @@ import { errorHandler } from 'utils/errorHandler';
 
 const { TabPane } = Tabs;
 
-const groupColumns = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    // eslint-disable-next-line react/display-name
-    render: (text, record) => {
-      return <Link to={`../group/${record.id}`}>{text}</Link>;
-    },
-  },
-  {
-    title: 'Display Name',
-    dataIndex: 'displayName',
-  },
-  {
-    title: 'CPU Quota',
-    dataIndex: 'quotaCpu',
-    render: text => {
-      return text === null ? '∞' : text;
-    },
-    // @ts-ignore
-    visible: !modelDeploymentOnly,
-  },
-  {
-    title: 'GPU Quota',
-    dataIndex: 'quotaGpu',
-    render: text => {
-      return text === null ? '∞' : text;
-    },
-    // @ts-ignore
-    visible: !modelDeploymentOnly,
-  },
-];
-
-const groupPickerColumns = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    sorter: true,
-    sortDirections: ['descend', 'ascend'],
-  },
-  ...groupColumns.slice(1),
-];
-
 const GroupsRelationTable = compose(
   graphql(UserGroups, {
     name: 'queryUserGroups',
@@ -91,6 +48,49 @@ const GroupsRelationTable = compose(
       ...newVariables,
     });
   };
+
+  const groupColumns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      // eslint-disable-next-line react/display-name
+      render: (text, record) => {
+        return <Link to={`../group/${record.id}`}>{text}</Link>;
+      },
+    },
+    {
+      title: 'Display Name',
+      dataIndex: 'displayName',
+    },
+    {
+      title: 'CPU Quota',
+      dataIndex: 'quotaCpu',
+      render: text => {
+        return text === null ? '∞' : text;
+      },
+      // @ts-ignore
+      visible: !modelDeploymentOnly,
+    },
+    {
+      title: 'GPU Quota',
+      dataIndex: 'quotaGpu',
+      render: text => {
+        return text === null ? '∞' : text;
+      },
+      // @ts-ignore
+      visible: !modelDeploymentOnly,
+    },
+  ];
+
+  const groupPickerColumns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      sorter: true,
+      sortDirections: ['descend', 'ascend'],
+    },
+    ...groupColumns.slice(1),
+  ];
 
   return (
     <CustomRelationTable
