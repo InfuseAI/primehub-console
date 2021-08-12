@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Input, Col, Layout, Button, Icon, Modal } from 'antd';
 import { withRouter, useHistory } from 'react-router-dom';
 import { get, pick } from 'lodash';
-import {RouteComponentProps} from 'react-router';
+import { RouteComponentProps } from 'react-router';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import Pagination from 'components/share/pagination';
@@ -14,20 +14,20 @@ import InfuseButton from 'components/infuseButton';
 import EmailForm from 'cms-toolbar/sendEmailModal';
 import { FilterRow, FilterPlugins, ButtonCol } from 'components/share';
 import Filter from 'cms-toolbar/filter';
-import {errorHandler} from 'utils/errorHandler';
+import { errorHandler } from 'utils/errorHandler';
 // graphql
 import { UsersConnection, DeleteUser } from 'queries/User.graphql';
 
 const PAGE_SIZE = 10;
 const ButtonGroup = Button.Group;
-const {confirm} = Modal;
+const { confirm } = Modal;
 
 interface Props {
   dataSource: any;
   loading?: boolean;
   listUser: any;
   deleteUser: any;
-};
+}
 
 function List(props: Props) {
   const history = useHistory();
@@ -36,33 +36,37 @@ function List(props: Props) {
   const breadcrumbs = [
     {
       key: 'list',
-      matcher: /\/users_next/,
+      matcher: /\/user/,
       title: 'Users',
-      link: '/users_next?page=1',
+      link: '/user?page=1',
       tips: 'Admin can find and manage user accounts here.',
-      tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-user'
-    }
+      tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-user',
+    },
   ];
 
   const add = () => {
-    history.push(`user_next/add`)
-  }
-
-  const edit = (id) => {
-    history.push(`user_next/${id}`);
+    history.push(`user/add`);
   };
-  const remove = (record) => {
+
+  const edit = id => {
+    history.push(`user/${id}`);
+  };
+  const remove = record => {
     const { deleteUser } = props;
-    const {id, username} = record;
+    const { id, username } = record;
     confirm({
       title: `Delete User`,
-      content: <span>Do you really want to delete user: "<b>{username}</b>"?</span>,
+      content: (
+        <span>
+          Do you really want to delete user: "<b>{username}</b>"?
+        </span>
+      ),
       iconType: 'info-circle',
       okText: 'Yes',
       okType: 'danger',
       cancelText: 'No',
       onOk() {
-        return deleteUser({variables: {where: {id}}});
+        return deleteUser({ variables: { where: { id } } });
       },
     });
   };
@@ -70,61 +74,71 @@ function List(props: Props) {
   const renderAction = (id, record) => {
     return (
       <ButtonGroup>
-        <Button icon={"edit"}
-          data-testid="edit-button"
+        <Button
+          icon={'edit'}
+          data-testid='edit-button'
           onClick={() => edit(record.id)}
-        >
-        </Button>
-        <Button icon="delete"
-          data-testid="delete-button"
+        ></Button>
+        <Button
+          icon='delete'
+          data-testid='delete-button'
           onClick={() => remove(record)}
         />
       </ButtonGroup>
     );
   };
 
-  const renderEnable = (value) => value ? <Icon type="check" /> : <Icon type="close" />;
+  const renderEnable = value =>
+    value ? <Icon type='check' /> : <Icon type='close' />;
 
   const columns = [
     {
       title: 'Username',
       dataIndex: 'username',
       key: 'username',
-    }, {
+    },
+    {
       title: 'Email',
       dataIndex: 'email',
-    }, {
+    },
+    {
       title: 'Name',
       dataIndex: 'firstName',
-      render: (value, record) => `${value} ${record.lastName}`
-    }, {
+      render: (value, record) => `${value} ${record.lastName}`,
+    },
+    {
       title: 'Enabled',
       dataIndex: 'enabled',
       render: renderEnable,
-    }, {
+    },
+    {
       title: 'Is Admin',
       dataIndex: 'isAdmin',
       render: renderEnable,
-    }, {
+    },
+    {
       title: 'Action',
       dataIndex: 'id',
       key: 'action',
       render: renderAction,
-      width: 200
-    }
+      width: 200,
+    },
   ];
 
-  const searchHandler = (searchDict) => {
+  const searchHandler = searchDict => {
     const { listUser } = props;
     const { variables, refetch } = listUser;
-    const pickedCond = pick(searchDict, ['username_contains', 'email_contains']);
+    const pickedCond = pick(searchDict, [
+      'username_contains',
+      'email_contains',
+    ]);
     const newVariables = {
       ...variables,
       where: {
         ...variables.where,
         ...pickedCond,
-      }
-    }
+      },
+    };
     refetch(newVariables);
   };
 
@@ -139,7 +153,7 @@ function List(props: Props) {
       userBefore: undefined,
     };
     refetch(newVariables);
-  }
+  };
 
   const prevPage = () => {
     const { listUser } = props;
@@ -152,30 +166,41 @@ function List(props: Props) {
       userAfter: undefined,
     };
     refetch(newVariables);
-  }
+  };
 
-  const onSelectChange = useCallback((selectedRowKeys) => {
-    setSelectedRows(selectedRowKeys);
-  }, [selectedRows]);
+  const onSelectChange = useCallback(
+    selectedRowKeys => {
+      setSelectedRows(selectedRowKeys);
+    },
+    [selectedRows]
+  );
 
   const rowSelection = {
     selectedRows,
-    onChange: onSelectChange
-  }
+    onChange: onSelectChange,
+  };
 
   return (
     <Layout>
       <PageTitle
         breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-        title={"Users"}
+        title={'Users'}
       />
       <PageBody>
-        <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'flex-end',
+          }}
+        >
           <Button.Group>
             {/* @ts-ignore */}
             <InfuseButton
-              icon="email"
-              onClick={() => {setEmailFormVisible(true)}}
+              icon='email'
+              onClick={() => {
+                setEmailFormVisible(true);
+              }}
               style={{ width: 120 }}
               disabled={selectedRows?.length <= 0}
             >
@@ -183,40 +208,42 @@ function List(props: Props) {
             </InfuseButton>
             {/* @ts-ignore */}
             <InfuseButton
-              icon="plus"
+              icon='plus'
               onClick={add}
               style={{ width: 120 }}
-              type="primary"
+              type='primary'
             >
               Add
             </InfuseButton>
           </Button.Group>
         </div>
         <FilterRow
-          type="flex"
-          justify="space-between"
-          align="bottom"
+          type='flex'
+          justify='space-between'
+          align='bottom'
           style={{ marginBottom: 16, marginTop: 16 }}
         >
-        <Col key="search-handler" style={{ flex: 1 }}>
-          <FilterPlugins style={{ marginRight: '10px' }}>
-            <Filter
-              changeFilter={searchHandler}
-              where={props.listUser?.variables.where || {}}
-              fields={[{
-                type: 'text',
-                label: 'Username',
-                key: 'username_contains'
-              }, {
-                type: 'text',
-                label: 'Email',
-                key: 'email_contains'
-              }]}
-            />
-          </FilterPlugins>
-        </Col>
-          <ButtonCol>
-          </ButtonCol>
+          <Col key='search-handler' style={{ flex: 1 }}>
+            <FilterPlugins style={{ marginRight: '10px' }}>
+              <Filter
+                changeFilter={searchHandler}
+                where={props.listUser?.variables.where || {}}
+                fields={[
+                  {
+                    type: 'text',
+                    label: 'Username',
+                    key: 'username_contains',
+                  },
+                  {
+                    type: 'text',
+                    label: 'Email',
+                    key: 'email_contains',
+                  },
+                ]}
+              />
+            </FilterPlugins>
+          </Col>
+          <ButtonCol></ButtonCol>
         </FilterRow>
         <Table
           rowSelection={rowSelection}
@@ -238,7 +265,7 @@ function List(props: Props) {
           onCancel={() => setEmailFormVisible(false)}
           visible={emailFormVisible}
           width={600}
-          title="Send Email Form"
+          title='Send Email Form'
           destroyOnClose
         >
           <EmailForm
@@ -264,27 +291,29 @@ export const UserList = compose(
   }),
   graphql(DeleteUser, {
     options: (props: any) => ({
-      refetchQueries: [{
-        query: UsersConnection,
-        variables: props.listUser.variables
-      }],
-      onError: errorHandler
+      refetchQueries: [
+        {
+          query: UsersConnection,
+          variables: props.listUser.variables,
+        },
+      ],
+      onError: errorHandler,
     }),
     name: 'deleteUser',
     alias: 'withDeleteUser',
   })
-)((props) => {
-  const { listUser, deleteUser} = props;
+)(props => {
+  const { listUser, deleteUser } = props;
   const { users, loading } = listUser;
-  const dataSource = users ? users.edges.map((edge) => edge.node) : [];
+  const dataSource = users ? users.edges.map(edge => edge.node) : [];
   return (
     <React.Fragment>
       <List
         deleteUser={deleteUser}
         listUser={listUser}
         dataSource={dataSource}
-        loading={loading} />
+        loading={loading}
+      />
     </React.Fragment>
-  )
+  );
 });
-

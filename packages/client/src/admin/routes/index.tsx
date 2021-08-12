@@ -43,14 +43,14 @@ export interface RouteTypes extends RouteProps {
 
 export function RouteWithSubRoutes(route) {
   if (!route.component) {
-    return ;
+    return;
   }
 
   return (
     <Route
       path={`${appPrefix}${route.path}`}
       exact
-      render={(props) => <route.component {...props} routes={route.routes} />}
+      render={props => <route.component {...props} routes={route.routes} />}
     />
   );
 }
@@ -69,25 +69,20 @@ export const routes = [
     ],
   },
   {
-    key: 'users_next',
-    path: 'admin/users_next',
-    name: <span>Users <Badge>next</Badge></span>,
-    component: UserList
-  },
-  {
-    key: 'user_next_add',
-    path: 'admin/user_next/add',
-    component: UserAdd
-  },
-  {
-    key: 'user_next',
-    path: 'admin/user_next/:id',
-    component: UserDetail
-  },
-  {
     key: 'user',
     path: 'admin/user',
     name: 'Users',
+    component: UserList,
+  },
+  {
+    key: 'user_add',
+    path: 'admin/user/add',
+    component: UserAdd,
+  },
+  {
+    key: 'user_detail',
+    path: 'admin/user/:id',
+    component: UserDetail,
   },
   {
     key: 'instanceType',

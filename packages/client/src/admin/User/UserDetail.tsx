@@ -151,13 +151,13 @@ function DetailPage(props: any) {
   const breadcrumbs = [
     {
       key: 'list',
-      matcher: /\/user_next/,
+      matcher: /\/user/,
       title: 'Users',
-      link: 'admin/users_next',
+      link: 'admin/user',
     },
     {
       key: 'detail',
-      matcher: /\/user_next\/([\w-])+/,
+      matcher: /\/user\/([\w-])+/,
       title: `User: ${get(user, 'username', '')}`,
     },
   ];
@@ -200,7 +200,7 @@ function DetailPage(props: any) {
     if (pathname) {
       return history.push(`${pathname}${search}`);
     }
-    history.push(`../users_next`);
+    history.push(`../user`);
   };
 
   return (
@@ -347,7 +347,7 @@ export const UserDetail = compose(
       onCompleted: (data: any) => {
         const { history } = props;
         history.push({
-          pathname: `../users_next`,
+          pathname: `../user`,
         });
         notification.success({
           duration: 10,
@@ -357,7 +357,7 @@ export const UserDetail = compose(
             <>
               User {data.updateUser.username} updated. Click{' '}
               <a
-                onClick={() => history.push(`user_next/${data.updateUser.id}`)}
+                onClick={() => history.push(`user/${data.updateUser.id}`)}
               >
                 here
               </a>{' '}

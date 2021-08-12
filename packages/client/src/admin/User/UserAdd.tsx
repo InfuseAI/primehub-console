@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { notification, Form, Tabs, Table, Input, Switch, Row, Col, Layout, Button, Modal, Icon } from 'antd';
+import {
+  notification,
+  Form,
+  Tabs,
+  Table,
+  Input,
+  Switch,
+  Row,
+  Col,
+  Layout,
+  Button,
+  Modal,
+  Icon,
+} from 'antd';
 import { get } from 'lodash';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
@@ -22,28 +35,33 @@ function AddPage(props: any) {
   const breadcrumbs = [
     {
       key: 'list',
-      matcher: /\/user_next/,
+      matcher: /\/user/,
       title: 'Users',
-      link: 'admin/users_next',
+      link: 'admin/user',
     },
     {
       key: 'add',
-      matcher: /\/user_next\/add/,
+      matcher: /\/user\/add/,
       title: `Add User`,
     },
   ];
 
-  const onSubmit = (e) => {
+  const onSubmit = e => {
     const { createUser } = props;
     e.preventDefault();
-    form.validateFields(async (err, values: {username: string, email: string, sendEmail: boolean}) => {
-      if (err) return;
-      createUser({
-        variables: {
-          payload: values
-        }
-      });
-    });
+    form.validateFields(
+      async (
+        err,
+        values: { username: string; email: string; sendEmail: boolean }
+      ) => {
+        if (err) return;
+        createUser({
+          variables: {
+            payload: values,
+          },
+        });
+      }
+    );
   };
 
   const onCancel = () => {
@@ -52,7 +70,7 @@ function AddPage(props: any) {
     if (pathname) {
       return history.push(`${pathname}${search}`);
     }
-    history.push(`../users_next`);
+    history.push(`../user`);
   };
 
   return (
@@ -65,11 +83,11 @@ function AddPage(props: any) {
         <Row>
           <Col>
             <InfuseButton onClick={onCancel}>
-              <Icon type='arrow-left'/> Back
+              <Icon type='arrow-left' /> Back
             </InfuseButton>
           </Col>
         </Row>
-        <Tabs style={{marginTop: 24}}>
+        <Tabs style={{ marginTop: 24 }}>
           <TabPane key='info' tab='Basic Info'>
             <Form onSubmit={onSubmit}>
               <Form.Item label={'Username'}>
@@ -88,35 +106,46 @@ function AddPage(props: any) {
                 {form.getFieldDecorator('email', {
                   rules: [
                     {
-                      pattern: /(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                      message: `Please fill a valid email address format.`
+                      pattern:
+                        /(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                      message: `Please fill a valid email address format.`,
                     },
                   ],
                   initialValue: '',
                 })(<Input />)}
               </Form.Item>
-              <Form.Item label={(<span>Send Activation Email <PHTooltip tipText='Sending the activation email to perform different actions.' tipLink='https://docs.primehub.io/docs/guide_manual/admin-user#send-email' placement='right' style={{margintLeft: 8}}/></span>)}>
+              <Form.Item
+                label={
+                  <span>
+                    Send Activation Email{' '}
+                    <PHTooltip
+                      tipText='Sending the activation email to perform different actions.'
+                      tipLink='https://docs.primehub.io/docs/guide_manual/admin-user#send-email'
+                      placement='right'
+                      style={{ margintLeft: 8 }}
+                    />
+                  </span>
+                }
+              >
                 {form.getFieldDecorator('sendEmail', {
                   initialValue: false,
-                  valuePropName: 'checked'
+                  valuePropName: 'checked',
                 })(
-                <Switch
-                  checkedChildren={<Icon type='check' />}
-                  unCheckedChildren={<Icon type='close' />}
-                />
-              )}
+                  <Switch
+                    checkedChildren={<Icon type='check' />}
+                    unCheckedChildren={<Icon type='close' />}
+                  />
+                )}
               </Form.Item>
-              <Form.Item style={{textAlign: 'right', marginTop: 12}}>
+              <Form.Item style={{ textAlign: 'right', marginTop: 12 }}>
                 <InfuseButton
                   type='primary'
                   htmlType='submit'
-                  style={{marginRight: 16}}
+                  style={{ marginRight: 16 }}
                 >
                   Create
                 </InfuseButton>
-                <InfuseButton onClick={onCancel}>
-                  Cancel
-                </InfuseButton>
+                <InfuseButton onClick={onCancel}>Cancel</InfuseButton>
               </Form.Item>
             </Form>
           </TabPane>
@@ -134,9 +163,9 @@ export const UserAdd = compose(
     alias: 'withCreateUser',
     options: (props: any) => ({
       onCompleted: (data: any) => {
-        const {history} = props;
+        const { history } = props;
         history.push({
-          pathname: `../users_next`,
+          pathname: `../user`,
         });
         notification.success({
           duration: 10,
@@ -144,13 +173,16 @@ export const UserAdd = compose(
           message: 'Success!',
           description: (
             <>
-              User {data.createUser.username} Created.
-              Click <a onClick={() => history.push(`user_next/${data.createUser.id}`)}>here</a> to view.
+              User {data.createUser.username} Created. Click{' '}
+              <a onClick={() => history.push(`user/${data.createUser.id}`)}>
+                here
+              </a>{' '}
+              to view.
             </>
-          )
+          ),
         });
       },
-      onError: errorHandler
+      onError: errorHandler,
     }),
   })
 )(AddPage);
