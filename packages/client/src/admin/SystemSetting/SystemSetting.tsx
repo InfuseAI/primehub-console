@@ -445,7 +445,7 @@ function _SystemSetting({ data, ...props }: Props) {
                     data-testid="settings-capacity"
                     defaultValue={defaultUserVolumeCapacity}
                     formatter={(value) => `${value} GB`}
-                    parser={(value) => value.replace(/[^0-9\.]/g, '')}
+                    parser={(value) => value.replace(/[^0-9.]/g, '')}
                     precision={0}
                     min={1}
                     step={1}
@@ -740,5 +740,11 @@ export const SystemSetting = compose(
       },
     }),
   }),
-  graphql(GetSystemSetting)
+  graphql(GetSystemSetting, {
+    options: () => {
+      return {
+        fetchPolicy: 'cache-and-network',
+      };
+    },
+  })
 )(_SystemSetting);
