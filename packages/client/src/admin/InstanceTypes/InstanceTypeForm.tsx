@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Controller, UseFormReturn } from 'react-hook-form';
 import {
   Button,
   Checkbox,
+  Form,
   Input,
   InputNumber,
   Icon,
@@ -13,6 +13,7 @@ import {
   Tabs,
   Tooltip,
 } from 'antd';
+import { FormComponentProps } from 'antd/lib/form';
 
 import { TolerationModalForm } from './TolerationModalForm';
 import type { TInstanceType, TToleration } from './types';
@@ -77,7 +78,7 @@ function Tips({
   );
 }
 
-type FormState = Pick<
+export type InstanceTypeFormState = Pick<
   TInstanceType,
   | 'id'
   | 'name'
@@ -93,7 +94,7 @@ type FormState = Pick<
   | 'nodeSelector'
 >;
 
-export const initialFormState: FormState = {
+export const initialFormState: InstanceTypeFormState = {
   id: '',
   name: '',
   displayName: '',
@@ -108,12 +109,12 @@ export const initialFormState: FormState = {
   nodeSelector: null,
 };
 
-interface InstanceTypeFormProps
-  extends Omit<UseFormReturn<FormState>, 'reset'> {
-  onSubmit?: (data: Partial<FormState>) => Promise<void>;
+type InstanceTypeFormProps = FormComponentProps<InstanceTypeFormState> & {
+  onSubmit?: (data: InstanceTypeFormState) => void;
   disableName?: boolean;
   loading?: boolean;
-}
+  data?: TInstanceType;
+};
 
 type AdvanceFeatureState = {
   enableCpuRequest: boolean;
@@ -124,8 +125,10 @@ type AdvanceFeatureAction =
   | { type: 'cpu'; value: boolean }
   | { type: 'memory'; value: boolean };
 
-export function InstanceTypeForm({
+export function _InstanceTypeForm({
   loading = false,
+  form,
+  data,
   ...props
 }: InstanceTypeFormProps) {
   const [activePanel, setActivePanel] = React.useState('1');
@@ -150,41 +153,53 @@ export function InstanceTypeForm({
     }
   );
 
+  const [tolerations, setTolerations] = React.useState([]);
   const [editModalVisible, setEditModalVisible] = React.useState(false);
   const [editToleration, setEditToleration] = React.useState<TToleration>(null);
   const [tolerModalFormAction, setTolerModalFormAction] =
     React.useState<'create' | 'update'>(null);
 
-  const { control, getValues, setValue } = props;
+  React.useEffect(() => {
+    if (data?.tolerations.length > 0) {
+      setTolerations(data?.tolerations);
+    }
+  }, [data]);
 
   function onUpdateToleration() {
-    const currentTolerations = getValues('tolerations');
-
-    const nextTolerations = currentTolerations.map((toleraction, id) => {
+    const nextTolerations = tolerations.map((toleraction, id) => {
       if (editToleration.id === id) {
         return editToleration;
       }
       return toleraction;
     });
 
-    setValue('tolerations', nextTolerations);
+    setTolerations(nextTolerations);
     setEditToleration(null);
     setTolerModalFormAction(null);
     setEditModalVisible(false);
   }
 
   function onCreateToleration() {
-    const currentTolerations = getValues('tolerations');
-    const nextTolerations = [...currentTolerations, editToleration];
+    const nextTolerations = [...tolerations, editToleration];
 
-    setValue('tolerations', nextTolerations);
+    setTolerations(nextTolerations);
     setEditToleration(null);
     setTolerModalFormAction(null);
     setEditModalVisible(false);
   }
 
   return (
-    <form style={{ backgroundColor: '#ffffff' }}>
+    <Form
+      style={{ backgroundColor: '#ffffff' }}
+      onSubmit={(event) => {
+        event.preventDefault();
+
+        form.validateFields((err, values: InstanceTypeFormState) => {
+          if (err) return;
+          props?.onSubmit(values);
+        });
+      }}
+    >
       <Tabs activeKey={activePanel} onTabClick={(tab) => setActivePanel(tab)}>
         <Tabs.TabPane tab="Basic Info" key="1">
           <Spin spinning={loading}>
@@ -195,125 +210,107 @@ export function InstanceTypeForm({
                 style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
               >
                 <label htmlFor="instance-type-name">Name</label>
-                <Controller
-                  control={control}
-                  name="name"
-                  render={({ field: { onChange, value } }) => (
-                    <Input
-                      id="instance-type-name"
-                      value={value}
-                      onChange={onChange}
-                      disabled={props?.disableName || false}
-                    />
-                  )}
-                />
+                {form.getFieldDecorator('name', {
+                  initialValue: data?.name,
+                })(
+                  <Input
+                    id="instance-type-name"
+                    disabled={props?.disableName || false}
+                  />
+                )}
               </div>
 
               <div
                 style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
               >
                 <label htmlFor="instance-type-display-name">Display Name</label>
-                <Controller
-                  control={control}
-                  name="displayName"
-                  render={({ field: { onChange, value } }) => (
-                    <Input
-                      id="instance-type-display-name"
-                      value={value}
-                      onChange={onChange}
-                    />
-                  )}
-                />
+                {form.getFieldDecorator('displayName', {
+                  initialValue: data?.displayName,
+                })(<Input id="instance-type-display-name" />)}
               </div>
 
               <div
                 style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
               >
                 <label htmlFor="instance-type-description">Description</label>
-                <Controller
-                  control={control}
-                  name="description"
-                  render={({ field: { onChange, value } }) => (
-                    <Input
-                      id="instance-type-description"
-                      value={value}
-                      onChange={onChange}
-                    />
-                  )}
-                />
+                {form.getFieldDecorator('description', {
+                  initialValue: data?.description,
+                })(<Input id="instance-type-description" />)}
               </div>
 
               <div
-                style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
               >
                 <label htmlFor="instance-type-cpu-limit">
                   CPU Limit <Tips type="cpuLimit" />
                 </label>
-                <Controller
-                  control={control}
-                  name="cpuLimit"
-                  render={({ field: { onChange, value } }) => (
-                    <InputNumber
-                      id="instance-type-cpu-limit"
-                      min={0}
-                      precision={1}
-                      step={0.5}
-                      formatter={(value) => `${value}GB`}
-                      parser={(value) => value.replace(/([A-Z]+.*)/, '')}
-                      value={value}
-                      onChange={onChange}
-                      style={{ width: '105px' }}
-                    />
-                  )}
-                />
+
+                {form.getFieldDecorator('cpuLimit', {
+                  initialValue: data?.cpuLimit,
+                })(
+                  <InputNumber
+                    min={0}
+                    precision={1}
+                    step={0.5}
+                    formatter={(value) => `${value} GB`}
+                    parser={(value) => value.replace(/[^0-9.]/g, '')}
+                    style={{ width: '105px' }}
+                  />
+                )}
               </div>
 
               <div
-                style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
               >
                 <label htmlFor="instance-type-memory-limit">
                   Memory Limit <Tips type="memoryLimit" />
                 </label>
-                <Controller
-                  control={control}
-                  name="memoryLimit"
-                  render={({ field: { onChange, value } }) => (
-                    <InputNumber
-                      id="instance-type-memory-limit"
-                      min={0}
-                      precision={1}
-                      step={0.5}
-                      formatter={(value) => `${value}GB`}
-                      parser={(value) => value.replace(/([A-Z]+.*)/, '')}
-                      value={value}
-                      onChange={onChange}
-                      style={{ width: '105px' }}
-                    />
-                  )}
-                />
+
+                {form.getFieldDecorator('memoryLimit', {
+                  initialValue: data?.memoryLimit,
+                })(
+                  <InputNumber
+                    id="instance-type-memory-limit"
+                    min={0}
+                    precision={1}
+                    step={0.5}
+                    formatter={(value) => `${value} GB`}
+                    parser={(value) => value.replace(/[^0-9.]/g, '')}
+                    style={{ width: '105px' }}
+                  />
+                )}
               </div>
 
               <div
-                style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
               >
                 <label htmlFor="instance-type-gpu-limit">
                   GPU Limit <Tips type="gpuLimit" />
                 </label>
-                <Controller
-                  control={control}
-                  name="gpuLimit"
-                  render={({ field: { onChange, value } }) => (
-                    <InputNumber
-                      id="instance-type-gpu-limit"
-                      min={0}
-                      precision={1}
-                      step={0.5}
-                      value={value}
-                      onChange={onChange}
-                      style={{ width: '105px' }}
-                    />
-                  )}
-                />
+
+                {form.getFieldDecorator('gpuLimit', {
+                  initialValue: data?.gpuLimit,
+                })(
+                  <InputNumber
+                    id="instance-type-gpu-limit"
+                    min={0}
+                    precision={1}
+                    step={0.5}
+                    style={{ width: '105px' }}
+                  />
+                )}
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -347,21 +344,18 @@ export function InstanceTypeForm({
                       })
                     }
                   />
-                  <Controller
-                    control={control}
-                    name="cpuRequest"
-                    render={({ field: { onChange } }) => (
-                      <InputNumber
-                        id="instance-type-cpu-request"
-                        min={0}
-                        step={0.5}
-                        defaultValue={0}
-                        onChange={onChange}
-                        disabled={!advanceFeature.enableCpuRequest}
-                        style={{ marginLeft: '8px', width: '130px' }}
-                      />
-                    )}
-                  />
+                  {form.getFieldDecorator('cpuRequest', {
+                    initialValue: data?.cpuRequest,
+                  })(
+                    <InputNumber
+                      id="instance-type-cpu-request"
+                      min={0}
+                      step={0.5}
+                      defaultValue={0}
+                      disabled={!advanceFeature.enableCpuRequest}
+                      style={{ marginLeft: '8px', width: '130px' }}
+                    />
+                  )}
                 </div>
               </div>
 
@@ -381,28 +375,29 @@ export function InstanceTypeForm({
                       })
                     }
                   />
-                  <Controller
-                    control={control}
-                    name="memoryRequest"
-                    render={({ field: { onChange } }) => (
-                      <InputNumber
-                        id="instance-type-memory-request"
-                        min={0}
-                        precision={1}
-                        defaultValue={0}
-                        step={0.5}
-                        formatter={(value) =>
-                          value || advanceFeature.enableMemoryRequest
-                            ? `${value}GB`
-                            : null
+                  {form.getFieldDecorator('memoryRequest', {
+                    initialValue: data?.memoryRequest,
+                  })(
+                    <InputNumber
+                      id="instance-type-memory-request"
+                      min={0}
+                      precision={1}
+                      step={0.5}
+                      formatter={(value) => {
+                        if (advanceFeature.enableMemoryRequest) {
+                          if (value === '') {
+                            return '0 GB';
+                          }
+                          return `${value} GB`;
                         }
-                        parser={(value) => value.replace(/([A-Z]+.*)/, '')}
-                        onChange={onChange}
-                        disabled={!advanceFeature.enableMemoryRequest}
-                        style={{ marginLeft: '8px', width: '130px' }}
-                      />
-                    )}
-                  />
+
+                        return null;
+                      }}
+                      parser={(value) => value.replace(/[^0-9.]/g, '')}
+                      disabled={!advanceFeature.enableMemoryRequest}
+                      style={{ marginLeft: '8px', width: '130px' }}
+                    />
+                  )}
                 </div>
               </div>
 
@@ -412,19 +407,16 @@ export function InstanceTypeForm({
                 <label htmlFor="instance-type-global">
                   Global <Tips type="global" />
                 </label>
-                <Controller
-                  control={control}
-                  name="global"
-                  render={({ field: { onChange, value } }) => (
-                    <Switch
-                      defaultChecked={value}
-                      onChange={onChange}
-                      checkedChildren="Yes"
-                      unCheckedChildren="No"
-                      style={{ width: '60px' }}
-                    />
-                  )}
-                />
+                {form.getFieldDecorator('global', {
+                  valuePropName: 'checked',
+                  initialValue: data?.global,
+                })(
+                  <Switch
+                    checkedChildren="Yes"
+                    unCheckedChildren="No"
+                    style={{ width: '60px' }}
+                  />
+                )}
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -461,86 +453,82 @@ export function InstanceTypeForm({
             </Button>
           </div>
 
-          <Controller
-            control={control}
-            name="tolerations"
-            render={({ field: { value: tolerations, onChange } }) => (
-              <Table
-                loading={loading}
-                pagination={false}
-                rowKey={(data) => data.key}
-                dataSource={tolerations}
-                columns={[
-                  {
-                    key: 'key',
-                    title: 'Key',
-                    dataIndex: 'key',
-                  },
-                  {
-                    key: 'value',
-                    title: 'Value',
-                    render: (value) => value.value ?? '-',
-                  },
-                  {
-                    key: 'operator',
-                    title: 'Operator',
-                    dataIndex: 'operator',
-                  },
-                  {
-                    key: 'effect',
-                    title: 'Effect',
-                    dataIndex: 'effect',
-                  },
-                  {
-                    key: 'actions',
-                    title: 'Actions',
-                    render: function Actions(_, value, id) {
-                      return (
-                        <Button.Group>
-                          <Button
-                            onClick={() => {
-                              setTolerModalFormAction('update');
-                              setEditModalVisible(true);
-                              setEditToleration({
-                                ...value,
-                                id,
-                              });
-                            }}
-                          >
-                            <Icon type="edit" />
-                          </Button>
-                          <Popconfirm
-                            title="Are you sure delete this task?"
-                            onConfirm={() => {
-                              const currentTolerations =
-                                getValues('tolerations');
-                              const nextTolerations = currentTolerations.filter(
-                                (_, id) => id !== editToleration.id
-                              );
+          <Table
+            loading={loading}
+            pagination={false}
+            rowKey={(data) => data.key}
+            dataSource={tolerations}
+            columns={[
+              {
+                key: 'key',
+                title: 'Key',
+                dataIndex: 'key',
+              },
+              {
+                key: 'value',
+                title: 'Value',
+                render: (value) => value.value ?? '-',
+              },
+              {
+                key: 'operator',
+                title: 'Operator',
+                dataIndex: 'operator',
+              },
+              {
+                key: 'effect',
+                title: 'Effect',
+                dataIndex: 'effect',
+              },
+              {
+                key: 'actions',
+                title: 'Actions',
+                render: function Actions(_, value, id) {
+                  return (
+                    <Button.Group>
+                      <Button
+                        onClick={() => {
+                          setTolerModalFormAction('update');
+                          setEditModalVisible(true);
+                          setEditToleration({
+                            ...value,
+                            id,
+                          });
+                        }}
+                      >
+                        <Icon type="edit" />
+                      </Button>
+                      <Popconfirm
+                        title="Are you sure delete this task?"
+                        onConfirm={() => {
+                          const nextTolerations = tolerations.filter(
+                            (_, id) => id !== editToleration.id
+                          );
 
-                              onChange(nextTolerations);
-                              setEditToleration(null);
-                            }}
-                          >
-                            <Button
-                              onClick={() => {
-                                setEditToleration({
-                                  ...value,
-                                  id,
-                                });
-                              }}
-                            >
-                              <Icon type="delete" />
-                            </Button>
-                          </Popconfirm>
-                        </Button.Group>
-                      );
-                    },
-                  },
-                ]}
-              />
-            )}
+                          setTolerations(nextTolerations);
+                          setEditToleration(null);
+                        }}
+                      >
+                        <Button
+                          onClick={() => {
+                            setEditToleration({
+                              ...value,
+                              id,
+                            });
+                          }}
+                        >
+                          <Icon type="delete" />
+                        </Button>
+                      </Popconfirm>
+                    </Button.Group>
+                  );
+                },
+              },
+            ]}
           />
+
+          {form.getFieldDecorator('tolerations', {
+            initialValue: tolerations,
+          })(<Input type="hidden" />)}
 
           <div
             style={{
@@ -571,7 +559,9 @@ export function InstanceTypeForm({
             style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}
           >
             <Button>Cancel</Button>
-            <Button type="primary">Save</Button>
+            <Button type="primary" htmlType="submit">
+              Save
+            </Button>
           </div>
         </Tabs.TabPane>
       </Tabs>
@@ -596,6 +586,10 @@ export function InstanceTypeForm({
           setEditModalVisible(false);
         }}
       />
-    </form>
+    </Form>
   );
 }
+
+export const InstanceTypeForm = Form.create<InstanceTypeFormProps>({
+  name: 'instance-type-form',
+})(_InstanceTypeForm);
