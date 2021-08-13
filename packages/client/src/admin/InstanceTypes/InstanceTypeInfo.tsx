@@ -1,12 +1,11 @@
 import * as React from 'react';
 import { compose } from 'recompose';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
 import { graphql } from 'react-apollo';
 import { notification } from 'antd';
 
 import { InstanceTypesLayout } from './Layout';
-import { InstanceTypeForm, initialFormState } from './InstanceTypeForm';
+import { InstanceTypeForm, InstanceTypeFormState } from './InstanceTypeForm';
 import { InstanceTypeInfoQuery } from './instanceTypes.graphql';
 import type { TInstanceType } from './types';
 
@@ -19,30 +18,6 @@ interface Props {
 }
 
 function _InstanceTypeInfo({ data }: Props) {
-  const { reset, ...formMethods } = useForm({
-    defaultValues: initialFormState,
-    mode: 'onChange',
-  });
-
-  React.useEffect(() => {
-    if (data?.instanceType) {
-      reset({
-        id: data.instanceType.id,
-        name: data.instanceType.name,
-        displayName: data.instanceType.displayName,
-        description: data.instanceType.description,
-        cpuLimit: data.instanceType.cpuLimit,
-        gpuLimit: data.instanceType.gpuLimit,
-        memoryLimit: data.instanceType.memoryLimit,
-        cpuRequest: data.instanceType.cpuRequest,
-        memoryRequest: data.instanceType.memoryRequest,
-        global: data.instanceType.global,
-        tolerations: data.instanceType.tolerations,
-        nodeSelector: data.instanceType.nodeSelector,
-      });
-    }
-  }, [data, reset]);
-
   return (
     <InstanceTypesLayout>
       <div
@@ -52,7 +27,14 @@ function _InstanceTypeInfo({ data }: Props) {
           backgroundColor: '#fff',
         }}
       >
-        <InstanceTypeForm disableName loading={data.loading} {...formMethods} />
+        <InstanceTypeForm
+          disableName
+          data={data?.instanceType}
+          loading={data.loading}
+          onSubmit={(data: InstanceTypeFormState) => {
+            console.log(data);
+          }}
+        />
       </div>
     </InstanceTypesLayout>
   );
