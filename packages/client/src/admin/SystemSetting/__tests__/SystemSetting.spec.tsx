@@ -84,6 +84,9 @@ function setup() {
 
 describe('SystemSetting', () => {
   it('should render system setting with failure status', async () => {
+    // @ts-ignore
+    global.__ENV__ = 'ee';
+
     render(
       <MemoryRouter>
         <MockedProvider>
@@ -97,6 +100,9 @@ describe('SystemSetting', () => {
 
   it('[License Block] should render system setting with fetched data', async () => {
     const { mockRequests } = setup();
+
+    // @ts-ignore
+    global.__ENV__ = 'ee';
 
     render(
       <MemoryRouter>
@@ -125,6 +131,9 @@ describe('SystemSetting', () => {
 
   it('[Settings] should render system setting with fetched data', async () => {
     const { mockRequests } = setup();
+
+    // @ts-ignore
+    global.__ENV__ = 'ee';
 
     render(
       <MemoryRouter>
@@ -176,6 +185,9 @@ describe('SystemSetting', () => {
   it('should render system setting with change system name', async () => {
     const { mockRequests } = setup();
 
+    // @ts-ignore
+    global.__ENV__ = 'ee';
+
     render(
       <MemoryRouter>
         <MockedProvider mocks={mockRequests}>
@@ -196,6 +208,9 @@ describe('SystemSetting', () => {
   it('should render system setting with visible add image button', async () => {
     const { mockRequests } = setup();
 
+    // @ts-ignore
+    global.__ENV__ = 'ee';
+
     render(
       <MemoryRouter>
         <MockedProvider mocks={mockRequests}>
@@ -211,6 +226,9 @@ describe('SystemSetting', () => {
 
   it('should render system setting with update logo modal', async () => {
     const { mockRequests } = setup();
+
+    // @ts-ignore
+    global.__ENV__ = 'ee';
 
     render(
       <MemoryRouter>
@@ -235,6 +253,9 @@ describe('SystemSetting', () => {
   it('should render system setting with close or ok button in modal', async () => {
     const { mockRequests } = setup();
 
+    // @ts-ignore
+    global.__ENV__ = 'ee';
+
     render(
       <MemoryRouter>
         <MockedProvider mocks={mockRequests}>
@@ -258,6 +279,9 @@ describe('SystemSetting', () => {
 
   it('should render system setting with invalid email message', async () => {
     const { mockRequests } = setup();
+
+    // @ts-ignore
+    global.__ENV__ = 'ee';
 
     render(
       <MemoryRouter>
@@ -285,6 +309,25 @@ describe('SystemSetting', () => {
       expect(screen.getByTestId('invalid-smtp-reply')).toHaveTextContent(
         'Invalid Email'
       );
+    });
+  });
+
+  it('should not render system setting license status when license is CE', async () => {
+    const { mockRequests } = setup();
+
+    // @ts-ignore
+    global.__ENV__ = 'ce';
+
+    render(
+      <MemoryRouter>
+        <MockedProvider mocks={mockRequests}>
+          <SystemSetting />
+        </MockedProvider>
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText('License Status')).toBeNull();
     });
   });
 });
