@@ -52,6 +52,7 @@ export const InstanceTypeInfo = compose(
             id,
           },
         },
+        fetchPolicy: 'cache-and-network',
         onError: () => {
           notification.error({
             duration: 5,

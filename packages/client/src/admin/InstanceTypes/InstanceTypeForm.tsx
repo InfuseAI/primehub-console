@@ -13,8 +13,12 @@ import {
   Tabs,
   Tooltip,
 } from 'antd';
-import { FormComponentProps } from 'antd/lib/form';
+import { useHistory } from 'react-router-dom';
+import type { FormComponentProps } from 'antd/lib/form';
 
+import { useRoutePrefix } from 'hooks/useRoutePrefix';
+
+import { NodeSelectorList } from './NodeSelectorList';
 import { TolerationModalForm } from './TolerationModalForm';
 import type { TInstanceType, TToleration } from './types';
 
@@ -154,14 +158,22 @@ export function _InstanceTypeForm({
   );
 
   const [tolerations, setTolerations] = React.useState([]);
+  const [nodeList, setNodeList] = React.useState<string[][]>([]);
   const [editModalVisible, setEditModalVisible] = React.useState(false);
   const [editToleration, setEditToleration] = React.useState<TToleration>(null);
   const [tolerModalFormAction, setTolerModalFormAction] =
     React.useState<'create' | 'update'>(null);
 
+  const history = useHistory();
+  const { appPrefix } = useRoutePrefix();
+
   React.useEffect(() => {
     if (data?.tolerations.length > 0) {
-      setTolerations(data?.tolerations);
+      setTolerations(data.tolerations);
+    }
+
+    if (data?.nodeSelector) {
+      setNodeList(Object.entries(data.nodeSelector));
     }
   }, [data]);
 
@@ -187,6 +199,13 @@ export function _InstanceTypeForm({
     setTolerModalFormAction(null);
     setEditModalVisible(false);
   }
+
+  form.getFieldDecorator('tolerations', {
+    initialValue: tolerations,
+  });
+  form.getFieldDecorator('nodeSelectorList', {
+    initialValue: nodeList,
+  });
 
   return (
     <Form
@@ -257,6 +276,7 @@ export function _InstanceTypeForm({
                     precision={1}
                     step={0.5}
                     formatter={(value) => `${value} GB`}
+                    // @ts-ignore
                     parser={(value) => value.replace(/[^0-9.]/g, '')}
                     style={{ width: '105px' }}
                   />
@@ -283,6 +303,7 @@ export function _InstanceTypeForm({
                     precision={1}
                     step={0.5}
                     formatter={(value) => `${value} GB`}
+                    // @ts-ignore
                     parser={(value) => value.replace(/[^0-9.]/g, '')}
                     style={{ width: '105px' }}
                   />
@@ -393,6 +414,7 @@ export function _InstanceTypeForm({
 
                         return null;
                       }}
+                      // @ts-ignore
                       parser={(value) => value.replace(/[^0-9.]/g, '')}
                       disabled={!advanceFeature.enableMemoryRequest}
                       style={{ marginLeft: '8px', width: '130px' }}
@@ -441,6 +463,7 @@ export function _InstanceTypeForm({
               marginBottom: '16px',
             }}
           >
+            {/* @ts-ignore */}
             <Button
               type="primary"
               icon="plus"
@@ -526,10 +549,6 @@ export function _InstanceTypeForm({
             ]}
           />
 
-          {form.getFieldDecorator('tolerations', {
-            initialValue: tolerations,
-          })(<Input type="hidden" />)}
-
           <div
             style={{
               display: 'flex',
@@ -554,11 +573,117 @@ export function _InstanceTypeForm({
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="Node Selector" key="3">
-          C
+          {/* {nodeList?.map((node, i) => {
+            return (
+              <div key={i} style={{ display: 'flex', gap: '36px' }}>
+                <Form.Item
+                  label="Key"
+                  labelCol={{
+                    sm: { span: 3 },
+                  }}
+                  style={{ display: 'flex', width: '42%' }}
+                >
+                  {form.getFieldDecorator(`nodeList[${i}][0]`, {
+                    validateTrigger: ['onBlur'],
+                    rules: [
+                      {
+                        required: true,
+                        validator: (_, value, callabck) => {
+                          if (value.length < 3 || value.length > 63) {
+                            return callabck(
+                              '🔸 Must be between 3 and 63 characters'
+                            );
+                          }
+                          if (
+                            !value.match(
+                              /^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/
+                            )
+                          ) {
+                            return callabck(`🔸 Must be alphanumeric characters, '_', '.', '/' or
+                            '-', and start and end with an alphanumeric
+                            character.`);
+                          }
+                        },
+                      },
+                    ],
+                    initialValue: node[0],
+                  })(<Input style={{ width: '415px' }} />)}
+                </Form.Item>
+                <Form.Item
+                  label="Value"
+                  labelCol={{
+                    sm: { span: 3 },
+                  }}
+                  style={{ display: 'flex', width: '42%' }}
+                >
+                  {form.getFieldDecorator(`nodeList[${i}][1]`, {
+                    validateTrigger: ['onBlur'],
+                    rules: [
+                      {
+                        required: true,
+                        validator: (_, value, callabck) => {
+                          if (value.length < 3 || value.length > 63) {
+                            return callabck(
+                              'Must be between 3 and 63 characters'
+                            );
+                          }
+                          if (
+                            !value.match(
+                              /^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/
+                            )
+                          ) {
+                            return callabck(`Must be alphanumeric characters, '_', '.', '/' or
+                            '-', and start and end with an alphanumeric
+                            character.`);
+                          }
+                        },
+                      },
+                    ],
+                    initialValue: node[1],
+                  })(<Input style={{ width: '415px' }} />)}
+                </Form.Item>
+                <Icon
+                  type="close-circle"
+                  theme="twoTone"
+                  style={{
+                    cursor: 'pointer',
+                    height: '16px',
+                    marginTop: '12px',
+                  }}
+                  onClick={() => {
+                    form.resetFields();
+                    setNodeList((prev) => {
+                      const nextNodes = prev.filter((node, id) => id !== i);
+                      return nextNodes;
+                    });
+                  }}
+                />
+              </div>
+            );
+          })} */}
+
+          <NodeSelectorList
+            nodes={nodeList}
+            onChange={setNodeList}
+            form={form}
+          />
+
           <div
-            style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}
+            style={{
+              display: 'flex',
+              marginTop: '24px',
+              justifyContent: 'flex-end',
+              gap: '8px',
+            }}
           >
-            <Button>Cancel</Button>
+            <Button
+              onClick={() => {
+                history.push(`${appPrefix}admin/instanceType`);
+              }}
+            >
+              Cancel
+            </Button>
+            {/* @ts-ignore */}
             <Button type="primary" htmlType="submit">
               Save
             </Button>

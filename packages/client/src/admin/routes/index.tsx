@@ -91,12 +91,14 @@ export const routes = [
     key: 'instanceType',
     path: 'admin/instanceType',
     name: 'Instance Types',
+    enabled: true,
     component: InstanceTypes,
   },
   {
     key: 'instanceType-id',
     path: 'admin/instanceType/:id',
     name: 'Instance Type',
+    enabled: true,
     component: InstanceTypeInfo,
   },
   {
