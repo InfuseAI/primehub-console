@@ -94,7 +94,8 @@ const GroupsRelationTable = compose(
 
   return (
     <CustomRelationTable
-      title={'Edit Groups'}
+      title='Edit Groups'
+      searchPlaceholder='Search group name'
       onChange={onChange}
       loading={queryUserGroups.loading}
       value={value}

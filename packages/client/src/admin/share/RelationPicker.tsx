@@ -13,6 +13,7 @@ export const FilterRow = styled(Row)`
 `;
 
 interface Props {
+  searchPlaceholder: string;
   title: string;
   onOk: Function;
   onCancel: Function;
@@ -32,7 +33,6 @@ interface Props {
   }>;
   showPagination: boolean;
   updateRelationQuery: Function;
-  title: string;
 }
 
 interface State {
@@ -122,7 +122,14 @@ export default class Picker extends React.PureComponent<Props, State> {
   };
 
   render() {
-    const { visible, columns, pickOne = false, loading, title } = this.props;
+    const {
+      visible,
+      columns,
+      pickOne = false,
+      loading,
+      title,
+      searchPlaceholder = '',
+    } = this.props;
     const { selectedRowKeys, totalValue, sorter } = this.state;
     return (
       <Modal
@@ -135,7 +142,7 @@ export default class Picker extends React.PureComponent<Props, State> {
         <FilterRow style={{ marginBottom: 12 }}>
           <Col span={12}>
             <Search
-              placeholder={'Search group name'}
+              placeholder={searchPlaceholder}
               onSearch={this.handleSearch}
               enterButton
             />

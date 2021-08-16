@@ -65,6 +65,7 @@ class RelationTable extends PureComponent {
       loading,
       relationRefetch,
       keyName,
+      searchPlaceholder,
     } = this.props;
     let { columns, pickerColumns } = uiParams;
 
@@ -114,6 +115,7 @@ class RelationTable extends PureComponent {
         />
         {!disabled && modalVisible && (
           <RelationPicker
+            searchPlaceholder={searchPlaceholder}
             visible={modalVisible}
             onOk={this.handleOk}
             onCancel={this.handleCancel}

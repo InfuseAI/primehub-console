@@ -164,9 +164,7 @@ export const UserAdd = compose(
     options: (props: any) => ({
       onCompleted: (data: any) => {
         const { history } = props;
-        history.push({
-          pathname: `../user`,
-        });
+        history.push(`../user`);
         notification.success({
           duration: 10,
           placement: 'bottomRight',
