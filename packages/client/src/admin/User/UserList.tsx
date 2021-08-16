@@ -78,7 +78,7 @@ function List(props: Props) {
           icon={'edit'}
           data-testid='edit-button'
           onClick={() => edit(record.id)}
-        ></Button>
+        />
         <Button
           icon='delete'
           data-testid='delete-button'

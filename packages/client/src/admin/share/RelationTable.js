@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Icon, Table, Button } from 'antd';
-import { remove } from 'lodash';
-import difference from 'lodash/difference';
+import { remove, difference } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import pluralize from 'pluralize';
 import RelationPicker from './RelationPicker';
@@ -26,8 +25,7 @@ class RelationTable extends PureComponent {
   };
 
   handleOk = (queue, originData) => {
-    let { onChange, refId, value = [] } = this.props;
-    // $FlowFixMe
+    let { onChange, value = [] } = this.props;
     const currentIds = value.map(v => v.id);
     const idsShouldCreate = difference(queue, currentIds);
     const idsShouldRemove = difference(currentIds, queue);
