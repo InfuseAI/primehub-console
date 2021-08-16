@@ -1,6 +1,6 @@
 import React, { PureComponent, useState } from 'react';
 import { compose } from 'recompose';
-import { Icon, Table, Button } from 'antd';
+import { Icon, Table, Button, Form } from 'antd';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { difference } from 'lodash';
@@ -38,6 +38,7 @@ interface Props {
   groups: TDatasetGroups;
   value: TDatasetFormGroups;
   onChange: (TDatasetFormGroups) => void;
+  allowReadOnly: boolean;
   allowWritable: boolean;
   groupsQuery: {
     error: Error | undefined;
@@ -48,7 +49,7 @@ interface Props {
 }
 
 function _DatasetGroupsRelationTable(props: Props) {
-  const {groups,allowWritable = true, groupsQuery, onChange} = props;
+  const {groups = [],allowWritable = false, allowReadOnly = false, groupsQuery, onChange} = props;
 
   const [modalVisible, setModalVisible] = useState(false);
   const [writable, setWritable] = useState(false);
@@ -102,6 +103,11 @@ function _DatasetGroupsRelationTable(props: Props) {
         }),
     };
 
+    if ( newValue.connect.length == 0)
+      delete newValue["connect"];
+    if ( newValue.disconnect.length == 0)
+      delete newValue["disconnect"];
+
     setUpdatedGroups(newUpdatedGroups);
     onChange(newValue);
     setModalVisible(false);
@@ -125,76 +131,78 @@ function _DatasetGroupsRelationTable(props: Props) {
     },
   ];
 
+  const pickerColumns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      sorter: true,
+    },
+    {
+      title: 'Display Name',
+      dataIndex: 'displayName',
+    },
+  ];
+
   const readOnlyGroups = updatedGroups.filter(item => !item.writable);
   const writableGroups = updatedGroups.filter(item => item.writable);
   const pickIds = !writable ? readOnlyGroups.map(v => v.id) : writableGroups.map(v => v.id)
 
   return (
     <div>
-      <Title>
-        <FormattedMessage
-          id="readOnlyGroups"
-          defaultMessage="Readonly Groups"
-        />
-      </Title>
-      <div>
-        <Button data-testid="connect-button" onClick={() => showModal({writable: false})} style={{margin: '16px 8px 16px 0'}}>
-          <Icon type="link"/>
-          <FormattedMessage
-            id="relation.multipleSelect.connect"
-            defaultMessage="edit "
-          />
-          <span style={{marginLeft: 4, textTransform: 'capitalize'}}>
-            Groups
-          </span>
-        </Button>
-      </div>
-      <Table
-        dataSource={readOnlyGroups}
-        columns={columns}
-        size="small"
-        style={{marginBottom: 16}}
-      />
-      {groupsQuery.groups && <RelationPicker
-            visible={modalVisible}
-            onOk={handleOk}
-            onCancel={handleCancel}
-            pickedIds={pickIds}
-            columns={columns}
-            relationValue={groupsQuery.groups}
-            title={"Groups"}
-            updateRelationQuery={groupsQuery.refetch}
-            loading={groupsQuery?.loading}
-          />}
-
-      {
-        allowWritable && (
-          <>
-            <Title>
+      {allowReadOnly &&
+        <Form.Item label={`Readonly Groups`}>
+          <div>
+            <Button data-testid="connect-button" onClick={() => showModal({writable: false})} style={{margin: '16px 8px 16px 0'}}>
+              <Icon type="link"/>
               <FormattedMessage
-                id="writableGroups"
-                defaultMessage="Writable Groups"
+                id="relation.multipleSelect.connect"
+                defaultMessage="edit "
               />
-            </Title>
-            <div>
-              <Button onClick={() => showModal({writable: true})} style={{margin: '16px 8px 16px 0'}}>
-                <Icon type="link"/>
-                <FormattedMessage
-                  id="relation.multipleSelect.connect"
-                  defaultMessage="edit "
-                />
-                <span style={{marginLeft: 4, textTransform: 'capitalize'}}>Writable Groups</span>
-              </Button>
-            </div>
-            <Table
-              dataSource={writableGroups}
-              columns={columns}
-              style={{marginBottom: 16}}
-              size="small"
-            />
-          </>
-        )
+              <span style={{marginLeft: 4, textTransform: 'capitalize'}}>
+                Groups
+              </span>
+            </Button>
+          </div>
+          <Table
+            dataSource={readOnlyGroups}
+            columns={columns}
+            size="small"
+            style={{marginBottom: 16}}
+          />
+        </Form.Item>
       }
+      {allowWritable && (
+        <Form.Item label={`Writable Groups`}>
+          <div>
+            <Button onClick={() => showModal({writable: true})} style={{margin: '16px 8px 16px 0'}}>
+              <Icon type="link"/>
+              <FormattedMessage
+                id="relation.multipleSelect.connect"
+                defaultMessage="edit "
+              />
+              <span style={{marginLeft: 4, textTransform: 'capitalize'}}>Groups</span>
+            </Button>
+          </div>
+          <Table
+            dataSource={writableGroups}
+            columns={columns}
+            style={{marginBottom: 16}}
+            size="small"
+          />
+        </Form.Item>
+      )
+      }
+      {groupsQuery.groups && <RelationPicker
+      visible={modalVisible}
+      onOk={handleOk}
+      onCancel={handleCancel}
+      pickedIds={pickIds}
+      columns={pickerColumns}
+      relationValue={groupsQuery.groups}
+      title={"Groups"}
+      updateRelationQuery={groupsQuery.refetch}
+      loading={groupsQuery?.loading}
+    />}
     </div>
   );
 }

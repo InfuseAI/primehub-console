@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Select, Input, Tooltip, Icon, Divider, InputNumber, Form, Row, Card, Col } from 'antd';
+import { Select, Input, Tooltip, Icon, Divider, InputNumber, Form, Row, Card, Col, Switch } from 'antd';
 import { appPrefix } from 'utils/env';
 
 import { DatasetPvProvisioning, DatasetType, TDataset, TDatasetForm } from './types';
@@ -108,7 +108,7 @@ function _DatasetForm(props: Props) {
             })(
             <InputNumber
                 disabled={editMode}
-                style={{ width: 250 }}
+                style={{ width: 150 }}
                 formatter={(value) => (value == -1 ? `-` : `${value} GB`)}
                 parser={(value) => value.replace(/[^0-9\.]/g, '')}
                 step={1}
@@ -242,15 +242,23 @@ function _DatasetForm(props: Props) {
       </>);
   }
 
-  const type = form.getFieldValue('type') || initialValue?.type || 'pv';
+  const type = form.getFieldValue('type') || initialValue?.type;
+  const global =
+    form.getFieldValue('global') != undefined ?
+      form.getFieldValue('global') :
+      initialValue?.global;
 
   let typeSepcificItems = null;
+  let allowWritable = false;
   if (type === DatasetType.PV) {
     typeSepcificItems = renderPvDataset();
+    allowWritable = true;
   } else if (type === DatasetType.NFS) {
     typeSepcificItems = renderNfsDataset();
+    allowWritable = true;
   } else if (type === DatasetType.HOSTPATH) {
     typeSepcificItems = renderHostPathDataset();
+    allowWritable = true;
   } else if (type === DatasetType.GIT) {
     typeSepcificItems = renderGitDataset();
   } else if (type === DatasetType.ENV) {
@@ -283,10 +291,16 @@ function _DatasetForm(props: Props) {
               initialValue: initialValue?.description,
             })(<Input />)}
           </Form.Item>
-          <Divider />
+          <Form.Item label={`Global`}>
+            {form.getFieldDecorator('global', {
+              initialValue: initialValue?.global,
+              valuePropName: 'checked',
+            })(<Switch />)
+          }
+          </Form.Item>
           <Form.Item label='Type'>
             {form.getFieldDecorator('type', {
-              initialValue: initialValue?.type || 'pv',
+              initialValue: initialValue?.type,
               rules: [
                 {
                   required: true,
@@ -294,7 +308,7 @@ function _DatasetForm(props: Props) {
                 },
               ],
             })(
-              <Select disabled={editMode} style={{width: '200px'}} >
+              <Select disabled={editMode} style={{width: '200px'}} placeholder='Select an item'>
                 <Select.Option value="pv">Persistent Volume</Select.Option>
                 <Select.Option value="nfs">NFS</Select.Option>
                 <Select.Option value="hostPath">Host Path</Select.Option>
@@ -304,11 +318,15 @@ function _DatasetForm(props: Props) {
             )}
           </Form.Item>
           {typeSepcificItems}
-          <Form.Item label={`Groups`}>
-            {form.getFieldDecorator('groups', {
-              initialValue: {},
-            })(<DatasetGroupsRelationTable groups={initialValue?.groups} />)}
-          </Form.Item>
+          {form.getFieldDecorator('groups', {
+            initialValue: {},
+          })(
+            <DatasetGroupsRelationTable
+              groups={initialValue?.groups}
+              allowWritable={allowWritable}
+              allowReadOnly={!global}
+            />
+          )}
           <Form.Item style={{textAlign: 'right', marginTop: 12}}>
             <InfuseButton
               type='primary'
