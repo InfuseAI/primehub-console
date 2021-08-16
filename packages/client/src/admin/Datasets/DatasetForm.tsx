@@ -9,16 +9,21 @@ import { FormComponentProps } from 'antd/lib/form/Form';
 import InfuseButton from 'components/infuseButton';
 import EnableUploadServer from './EnableUploadServer';
 import { GitSecret } from './GitSecret';
+import { useEffect, useState } from 'react';
+import { get } from 'lodash';
+import { DatasetGroupsRelationTable } from './DatasetGroupsRelationTable';
 
-interface DatasetFormProps extends FormComponentProps {
+interface Props extends FormComponentProps {
   onSubmit?: (data: Partial<TDatasetForm>) => Promise<void>;
   initialValue: TDataset;
   editMode?: boolean;
 }
 
-class _DatasetForm extends React.Component<DatasetFormProps> {
-  submit = (e) => {
-    const { form, onSubmit, editMode } = this.props;
+function _DatasetForm(props: Props) {
+  const { editMode, initialValue, form } = props;
+
+  const handleSubmit = async (e) => {
+    const { form, onSubmit, editMode } = props;
     e.preventDefault();
 
     form.validateFields(async (err, values: Partial<TDatasetForm>) => {
@@ -36,6 +41,8 @@ class _DatasetForm extends React.Component<DatasetFormProps> {
         data.enableUploadServer = values.enableUploadServer;
       if (form.isFieldTouched('global'))
         data.global = values.global;
+        if (form.isFieldTouched('groups'))
+        data.groups = values.groups;
 
       if (values.type === 'pv') {
         if (!editMode) {
@@ -59,91 +66,7 @@ class _DatasetForm extends React.Component<DatasetFormProps> {
     });
   }
 
-  render() {
-    const { editMode, initialValue, form } = this.props;
-
-    const type = form.getFieldValue('type') || initialValue?.type || 'pv';
-
-    let typeSepcificItems = null;
-    if (type === DatasetType.PV) {
-      typeSepcificItems = this.renderPvDataset();
-    } else if (type === DatasetType.NFS) {
-      typeSepcificItems = this.renderNfsDataset();
-    } else if (type === DatasetType.HOSTPATH) {
-      typeSepcificItems = this.renderHostPathDataset();
-    } else if (type === DatasetType.GIT) {
-      typeSepcificItems = this.renderGitDataset();
-    } else if (type === DatasetType.ENV) {
-      typeSepcificItems = this.renderEnvDataset();
-    }
-
-    return (
-      <Form onSubmit={this.submit}>
-        <Row>
-          <Col>
-            <Form.Item label={`Name`}>
-              {form.getFieldDecorator('name', {
-                initialValue: initialValue?.name,
-                rules: [
-                  {
-                    required: true,
-                    pattern: /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
-                    message: `lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`,
-                  }
-                ],
-              })(<Input disabled={editMode} />)}
-            </Form.Item>
-            <Form.Item label={`Display Name`}>
-              {form.getFieldDecorator('displayName', {
-                initialValue: initialValue?.displayName,
-              })(<Input />)}
-            </Form.Item>
-            <Form.Item label='Description'>
-              {form.getFieldDecorator('description', {
-                initialValue: initialValue?.description,
-              })(<Input />)}
-            </Form.Item>
-            <Divider />
-            <Form.Item label='Type'>
-              {form.getFieldDecorator('type', {
-                initialValue: initialValue?.type || 'pv',
-                rules: [
-                  {
-                    required: true,
-                    message: 'Please select a type.',
-                  },
-                ],
-              })(
-                <Select disabled={editMode} style={{width: '200px'}} >
-                  <Select.Option value="pv">Persistent Volume</Select.Option>
-                  <Select.Option value="nfs">NFS</Select.Option>
-                  <Select.Option value="hostPath">Host Path</Select.Option>
-                  <Select.Option value="git">Git</Select.Option>
-                  <Select.Option value="env">Env</Select.Option>
-                </Select>
-              )}
-            </Form.Item>
-            {typeSepcificItems}
-            <Form.Item style={{textAlign: 'right', marginTop: 12}}>
-              <InfuseButton
-                type='primary'
-                htmlType='submit'
-                style={{marginRight: 16}}
-              >
-                Confirm
-              </InfuseButton>
-              <InfuseButton>
-              <Link to={`${appPrefix}admin/dataset`}>Cancel</Link>
-              </InfuseButton>
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
-    );
-  }
-
-  renderPvDataset() {
-    const { initialValue, form, editMode } = this.props;
+  const renderPvDataset = () => {
     const name = form.getFieldValue('name') || initialValue?.name;
     const pvProvisioning = form.getFieldValue('pvProvisioning') || initialValue?.pvProvisioning;
 
@@ -207,9 +130,7 @@ class _DatasetForm extends React.Component<DatasetFormProps> {
       </>);
   }
 
-  renderNfsDataset() {
-    const { form, initialValue } = this.props;
-
+  const renderNfsDataset = () => {
     return (
       <>
         <Form.Item label={`NFS Server`}>
@@ -250,9 +171,7 @@ class _DatasetForm extends React.Component<DatasetFormProps> {
       </>);
   }
 
-  renderHostPathDataset() {
-    const { form, initialValue } = this.props;
-
+  const renderHostPathDataset = () => {
     return (
       <>
         <Form.Item label={`Host Path`}>
@@ -277,9 +196,7 @@ class _DatasetForm extends React.Component<DatasetFormProps> {
       </>);
   }
 
-  renderGitDataset() {
-    const { form, initialValue } = this.props;
-
+  const renderGitDataset = () => {
     return (
       <>
         <Form.Item label={`URL`}>
@@ -301,9 +218,7 @@ class _DatasetForm extends React.Component<DatasetFormProps> {
       </>);
   }
 
-  renderEnvDataset() {
-    const { form, initialValue } = this.props;
-
+  const renderEnvDataset = () => {
     return (
       <>
         <Form.Item label={`Variables`}>
@@ -326,6 +241,90 @@ class _DatasetForm extends React.Component<DatasetFormProps> {
         </Form.Item>
       </>);
   }
+
+  const type = form.getFieldValue('type') || initialValue?.type || 'pv';
+
+  let typeSepcificItems = null;
+  if (type === DatasetType.PV) {
+    typeSepcificItems = renderPvDataset();
+  } else if (type === DatasetType.NFS) {
+    typeSepcificItems = renderNfsDataset();
+  } else if (type === DatasetType.HOSTPATH) {
+    typeSepcificItems = renderHostPathDataset();
+  } else if (type === DatasetType.GIT) {
+    typeSepcificItems = renderGitDataset();
+  } else if (type === DatasetType.ENV) {
+    typeSepcificItems = renderEnvDataset();
+  }
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Row>
+        <Col>
+          <Form.Item label={`Name`}>
+            {form.getFieldDecorator('name', {
+              initialValue: initialValue?.name,
+              rules: [
+                {
+                  required: true,
+                  pattern: /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
+                  message: `lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`,
+                }
+              ],
+            })(<Input disabled={editMode} />)}
+          </Form.Item>
+          <Form.Item label={`Display Name`}>
+            {form.getFieldDecorator('displayName', {
+              initialValue: initialValue?.displayName,
+            })(<Input />)}
+          </Form.Item>
+          <Form.Item label='Description'>
+            {form.getFieldDecorator('description', {
+              initialValue: initialValue?.description,
+            })(<Input />)}
+          </Form.Item>
+          <Divider />
+          <Form.Item label='Type'>
+            {form.getFieldDecorator('type', {
+              initialValue: initialValue?.type || 'pv',
+              rules: [
+                {
+                  required: true,
+                  message: 'Please select a type.',
+                },
+              ],
+            })(
+              <Select disabled={editMode} style={{width: '200px'}} >
+                <Select.Option value="pv">Persistent Volume</Select.Option>
+                <Select.Option value="nfs">NFS</Select.Option>
+                <Select.Option value="hostPath">Host Path</Select.Option>
+                <Select.Option value="git">Git</Select.Option>
+                <Select.Option value="env">Env</Select.Option>
+              </Select>
+            )}
+          </Form.Item>
+          {typeSepcificItems}
+          <Form.Item label={`Groups`}>
+            {form.getFieldDecorator('groups', {
+              initialValue: {},
+            })(<DatasetGroupsRelationTable groups={initialValue?.groups} />)}
+          </Form.Item>
+          <Form.Item style={{textAlign: 'right', marginTop: 12}}>
+            <InfuseButton
+              type='primary'
+              htmlType='submit'
+              style={{marginRight: 16}}
+            >
+              Confirm
+            </InfuseButton>
+            <InfuseButton>
+            <Link to={`${appPrefix}admin/dataset`}>Cancel</Link>
+            </InfuseButton>
+          </Form.Item>
+        </Col>
+      </Row>
+    </Form>
+  );
 }
 
-export const DatasetForm =  Form.create<DatasetFormProps>()(_DatasetForm);
+export const DatasetForm =  Form.create<Props>()(_DatasetForm);

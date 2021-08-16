@@ -43,6 +43,13 @@ type _DatasetBase = {
 };
 
 // Dataset query response
+export type TDatasetGroups = {
+  id: string;
+  name: string;
+  displayName: string;
+  writable: boolean;
+}[];
+
 export type TDataset = _DatasetBase & {
   // GitSync
   secret: {
@@ -50,12 +57,7 @@ export type TDataset = _DatasetBase & {
   };
 
   // Group Association
-  groups: {
-    id: string;
-    name: string;
-    displayName: string;
-    writable: boolean;
-  };
+  groups: TDatasetGroups;
 }
 
 // Used for query
@@ -74,25 +76,26 @@ export type TDatasetWhereInput = {
 };
 
 // Mutation
-export type TDatasetForm = _DatasetBase & {
-  // GitSync
-  secret: {
-    connect: {
-      id: string;
-    };
-    disconnect: boolean;
+export type TDatasetFormSecret = {
+  connect: {
+    id: string;
   };
+  disconnect: boolean;
+}
 
-  // Group Association
-  groups: {
-    connect: {
-      id: string;
-      writable: string;
-    };
-    disconnect: {
-      id: string;
-    };
-  };
+export type TDatasetFormGroups = {
+  connect: {
+    id: string;
+    writable: string;
+  }[];
+  disconnect: {
+    id: string;
+  }[];
+}
+
+export type TDatasetForm = _DatasetBase & {
+  secret: TDatasetFormSecret;
+  groups: TDatasetFormGroups;
 };
 
 export type DatasetMutationResponse = {
