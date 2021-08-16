@@ -18,6 +18,7 @@ fragment GroupInfo on Group {
     gpuUsage
   }
   enabledDeployment
+  maxDeploy
   enabledSharedVolume
   jobDefaultActiveDeadlineSeconds
   sharedVolumeCapacity

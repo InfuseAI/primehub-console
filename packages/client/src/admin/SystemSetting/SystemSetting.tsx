@@ -1,5 +1,6 @@
 import * as React from 'react';
 import moment from 'moment';
+import { get } from 'lodash';
 import {
   Icon,
   Layout,
@@ -13,6 +14,7 @@ import {
   Modal,
   Typography,
   notification,
+  Skeleton,
 } from 'antd';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -70,7 +72,7 @@ const initialState = {
 };
 
 interface SystemInfo {
-  license: {
+  license?: {
     startedAt: Date;
     expiredAt: Date;
     maxGroup: number;
@@ -219,32 +221,48 @@ function _SystemSetting({ data, ...props }: Props) {
     return <div>Error</div>;
   }
 
+  const PageHead = () => (
+    <div
+      style={{
+        background: '#fff',
+        borderBottom: '1px solid #eee',
+        padding: '16px 24px',
+      }}
+    >
+      <Breadcrumbs
+        pathList={[
+          {
+            key: 'system',
+            matcher: /\/system/,
+            title: 'System Settings',
+          },
+        ]}
+      />
+    </div>
+  );
+
   if (data.loading) {
-    return <div>Loading...</div>;
+    return (
+      <Layout>
+        <PageHead />
+        <div
+          style={{
+            margin: '16px',
+            padding: '32px',
+            backgroundColor: '#fff',
+          }}
+        >
+          <Skeleton active />
+        </div>
+      </Layout>
+    );
   }
 
   const { license, defaultUserVolumeCapacity, smtp } = data.system;
 
   return (
     <Layout>
-      <div
-        style={{
-          background: '#fff',
-          borderBottom: '1px solid #eee',
-          padding: '16px 24px',
-        }}
-      >
-        <Breadcrumbs
-          pathList={[
-            {
-              key: 'system',
-              matcher: /\/system/,
-              title: 'System Settings',
-            },
-          ]}
-        />
-      </div>
-
+      <PageHead />
       <div
         style={{
           margin: '16px',
@@ -262,47 +280,56 @@ function _SystemSetting({ data, ...props }: Props) {
             backgroundColor: '#fff',
           }}
         >
-          <Card title="PrimeHub License">
-            <Row type="flex">
-              <Col sm={5} xs={24}>
-                <div>
-                  <CustomLabel>License Status</CustomLabel>
-                  <LicenseTag
-                    data-testid="license-status"
-                    status={license.licenseStatus}
-                  />
-                </div>
+          {/* @ts-ignore */}
+          {__ENV__ === 'ce' ? (
+            <></>
+          ) : (
+            <Card title="PrimeHub License">
+              <Row type="flex">
+                <Col sm={5} xs={24}>
+                  <div>
+                    <CustomLabel>License Status</CustomLabel>
+                    <LicenseTag
+                      data-testid="license-status"
+                      status={license.licenseStatus}
+                    />
+                  </div>
 
-                <div style={{ marginTop: '24px' }}>
-                  <CustomLabel>Expiration Date</CustomLabel>
-                  <div data-testid="license-expiredAt">
-                    {moment(license.expiredAt).format('YYYY/MM/DD HH:mm')}
+                  <div style={{ marginTop: '24px' }}>
+                    <CustomLabel>Expiration Date</CustomLabel>
+                    <div data-testid="license-expiredAt">
+                      {moment(license.expiredAt).format('YYYY/MM/DD HH:mm')}
+                    </div>
                   </div>
-                </div>
 
-                <div style={{ marginTop: '24px' }}>
-                  <CustomLabel>Licensed To</CustomLabel>
-                  <div data-testid="license-to">{license.licensedTo}</div>
-                </div>
-              </Col>
-              <Col sm={5} xs={24}>
-                <div>
-                  <CustomLabel>Utilized Nodes</CustomLabel>
-                  <div data-testid="license-maxNode">
-                    {license.usage.maxNode}/{license.maxNode}
+                  <div style={{ marginTop: '24px' }}>
+                    <CustomLabel>Licensed To</CustomLabel>
+                    <div data-testid="license-to">{license.licensedTo}</div>
                   </div>
-                </div>
-              </Col>
-              <Col sm={5} xs={24}>
-                <div>
-                  <CustomLabel>Deployed Models</CustomLabel>
-                  <div data-testid="license-maxDeploy">
-                    {license.usage.maxModelDeploy}/{license.maxModelDeploy}
+                </Col>
+                <Col sm={5} xs={24}>
+                  <div>
+                    <CustomLabel>Utilized Nodes</CustomLabel>
+                    <div data-testid="license-maxNode">
+                      {get(license, 'usage.maxNode', 0)}/
+                      {Number(license.maxNode) === -1 ? '∞' : license.maxNode}
+                    </div>
                   </div>
-                </div>
-              </Col>
-            </Row>
-          </Card>
+                </Col>
+                <Col sm={5} xs={24}>
+                  <div>
+                    <CustomLabel>Deployed Models</CustomLabel>
+                    <div data-testid="license-maxDeploy">
+                      {get(license, 'usage.maxModelDeploy', 0)}/
+                      {Number(license.maxModelDeploy) === -1
+                        ? '∞'
+                        : license.maxModelDeploy}
+                    </div>
+                  </div>
+                </Col>
+              </Row>
+            </Card>
+          )}
 
           <Card title="System Settings">
             <div style={{ width: '300px' }}>
@@ -424,6 +451,7 @@ function _SystemSetting({ data, ...props }: Props) {
                     data-testid="settings-capacity"
                     defaultValue={defaultUserVolumeCapacity}
                     formatter={(value) => `${value} GB`}
+                    parser={(value) => value.replace(/[^0-9.]/g, '')}
                     precision={0}
                     min={1}
                     step={1}
@@ -718,5 +746,11 @@ export const SystemSetting = compose(
       },
     }),
   }),
-  graphql(GetSystemSetting)
+  graphql(GetSystemSetting, {
+    options: () => {
+      return {
+        fetchPolicy: 'cache-and-network',
+      };
+    },
+  })
 )(_SystemSetting);

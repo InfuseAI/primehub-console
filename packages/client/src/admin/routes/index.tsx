@@ -6,6 +6,7 @@ import { SystemSetting } from '../SystemSetting';
 import { UserList, UserDetail, UserAdd } from '../User';
 import { Secrets, SecretInfo } from '../Secrets';
 import { appPrefix } from 'utils/env';
+import UsageReport from '../UsageReport';
 
 const Badge = styled.span`
   position: absolute;
@@ -41,10 +42,12 @@ export type ROUTE_KEYS = typeof ROUTES[number];
 export interface RouteTypes extends RouteProps {
   key: ROUTE_KEYS;
   name: string;
+  routes?: RouteTypes[];
+  visible?: boolean;
 }
 
 export function RouteWithSubRoutes(route) {
-  if (!route.component) {
+  if (!route.component || !route.visible) {
     return;
   }
 
@@ -121,6 +124,8 @@ export const routes = [
     key: 'usageReport',
     path: 'admin/usageReport',
     name: 'Usage Reports',
+    component: UsageReport,
+    visible: window.enableUsageReport,
   },
   {
     key: 'system',

@@ -13,6 +13,7 @@ export const me = {
       projectQuotaCpu: null,
       projectQuotaGpu: null,
       projectQuotaMemory: null,
+      maxDeploy: 10,
       datasets: [],
       resourceStatus: {
         cpuUsage: 0,
@@ -81,6 +82,7 @@ export const me = {
       projectQuotaCpu: null,
       projectQuotaGpu: null,
       projectQuotaMemory: null,
+      maxDeploy: 10,
       datasets: null,
       resourceStatus: {
         cpuUsage: 1,
@@ -137,6 +139,7 @@ export const me = {
       projectQuotaCpu: null,
       projectQuotaGpu: null,
       projectQuotaMemory: null,
+      maxDeploy: 10,
       datasets: null,
       resourceStatus: null,
       enabledDeployment: null,

@@ -255,6 +255,7 @@ const createApplication = async (context: Context, data: PhApplicationMutationIn
   const svcTemplate = appTemplate.spec.template.spec && appTemplate.spec.template.spec.svcTemplate;
   let httpPort = null;
   let rewrite = false;
+  let appRoot = null;
 
   // Append env to pod template
   if (podTemplate.spec.containers && podTemplate.spec.containers.length > 0) {
@@ -269,6 +270,10 @@ const createApplication = async (context: Context, data: PhApplicationMutationIn
     rewrite = appTemplate.spec.template.spec.rewrite;
   }
 
+  if (appTemplate.spec.template.spec && appTemplate.spec.template.spec.appRoot) {
+    appRoot = appTemplate.spec.template.spec.appRoot;
+  }
+
   const spec = {
     stop: false,
     displayName: data.displayName,
@@ -279,6 +284,7 @@ const createApplication = async (context: Context, data: PhApplicationMutationIn
     svcTemplate,
     httpPort,
     rewrite,
+    appRoot,
   };
   return crdClient.phApplications.create(metadata, spec);
 };
