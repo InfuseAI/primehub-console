@@ -70,7 +70,7 @@ export const routes = [
   {
     key: 'user',
     path: 'admin/user',
-    name: 'Users', 
+    name: 'Users',
     enabled: true,
     component: UserList,
   },
@@ -104,6 +104,7 @@ export const routes = [
   {
     key: 'dataset',
     path: 'admin/dataset',
+    enabled: true,
     name: 'Datasets',
     exact: true,
     component: Datasets,
@@ -111,6 +112,7 @@ export const routes = [
   {
     key: 'dataset-id',
     path: 'admin/dataset/:id',
+    enabled: true,
     name: 'Datasets',
     component: DatasetInfo,
   },
