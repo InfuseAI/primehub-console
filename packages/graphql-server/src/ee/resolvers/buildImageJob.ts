@@ -25,6 +25,11 @@ export interface BuildImageJob {
 
 // tslint:disable-next-line:max-line-length
 export const transform = (item: Item<ImageSpecJobSpec, ImageSpecJobStatus>, namespace: string, graphqlHost: string, jobLogCtrl: JobLogCtrl): BuildImageJob => {
+  let targetImage = item.spec.targetImage;
+  if (item.spec.repoPrefix && item.spec.repoPrefix.length > 0) {
+    targetImage = `${item.spec.repoPrefix}/${targetImage}`;
+  }
+
   return {
     id: item.metadata.name,
     name: item.metadata.name,
@@ -32,7 +37,7 @@ export const transform = (item: Item<ImageSpecJobSpec, ImageSpecJobStatus>, name
     baseImage: item.spec.baseImage,
     // tslint:disable-next-line:max-line-length
     imageRevision: `${get(item, ['metadata', 'labels', IMAGE_SPEC_JOB_NAME_LABEL])}:${get(item, ['metadata', 'annotations', IMAGE_SPEC_JOB_HASH_ANNOTATION])}`,
-    targetImage: `${item.spec.repoPrefix}/${item.spec.targetImage}`,
+    targetImage,
     useImagePullSecret: item.spec.pullSecret,
     packages: {
       apt: stringifyPackageField(get(item, 'spec.packages.apt')),
