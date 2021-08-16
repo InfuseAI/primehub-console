@@ -43,11 +43,11 @@ export interface RouteTypes extends RouteProps {
   key: ROUTE_KEYS;
   name: string;
   routes?: RouteTypes[];
-  visible?: boolean;
+  enabled?: boolean;
 }
 
 export function RouteWithSubRoutes(route) {
-  if (!route.component || !route.visible) {
+  if (!route.component || !route.enabled) {
     return;
   }
 
@@ -74,16 +74,19 @@ export const routes = [
         Users <Badge>next</Badge>
       </span>
     ),
+    enabled: true,
     component: UserList,
   },
   {
     key: 'user_next_add',
     path: 'admin/user_next/add',
+    enabled: true,
     component: UserAdd,
   },
   {
     key: 'user_next',
     path: 'admin/user_next/:id',
+    enabled: true,
     component: UserDetail,
   },
   {
@@ -116,12 +119,14 @@ export const routes = [
     path: 'admin/secret',
     name: 'Secrets',
     exact: true,
+    enabled: true,
     component: Secrets,
   },
   {
     key: 'secret-id',
     name: 'Secret',
     path: 'admin/secret/:id',
+    enabled: true,
     component: SecretInfo,
   },
   {
@@ -134,12 +139,13 @@ export const routes = [
     path: 'admin/usageReport',
     name: 'Usage Reports',
     component: UsageReport,
-    visible: window.enableUsageReport,
+    enabled: window.enableUsageReport,
   },
   {
     key: 'system',
     path: 'admin/system',
     name: 'System Settings',
+    enabled: true,
     component: SystemSetting,
   },
 ] as RouteTypes[];
