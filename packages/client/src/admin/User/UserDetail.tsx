@@ -347,9 +347,7 @@ export const UserDetail = compose(
       },
       onCompleted: (data: any) => {
         const { history } = props;
-        history.push({
-          pathname: `../user`,
-        });
+        history.push(`../user`);
         notification.success({
           duration: 10,
           placement: 'bottomRight',
@@ -357,9 +355,7 @@ export const UserDetail = compose(
           description: (
             <>
               User {data.updateUser.username} updated. Click{' '}
-              <a
-                onClick={() => history.push(`user/${data.updateUser.id}`)}
-              >
+              <a onClick={() => history.push(`user/${data.updateUser.id}`)}>
                 here
               </a>{' '}
               to view.
@@ -373,7 +369,7 @@ export const UserDetail = compose(
   graphql(UserGroups, {
     name: 'queryUserGroups',
     alias: 'withQueryUserGroups',
-    options: (props: any) => {
+    options: () => {
       return {
         fetchPolicy: 'cache-and-network',
       };
