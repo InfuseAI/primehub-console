@@ -451,6 +451,7 @@ function _SystemSetting({ data, ...props }: Props) {
                     data-testid="settings-capacity"
                     defaultValue={defaultUserVolumeCapacity}
                     formatter={(value) => `${value} GB`}
+                    // @ts-ignore
                     parser={(value) => value.replace(/[^0-9.]/g, '')}
                     precision={0}
                     min={1}
@@ -489,6 +490,9 @@ function _SystemSetting({ data, ...props }: Props) {
               <Controller
                 control={control}
                 name="smtpHost"
+                rules={{
+                  required: true,
+                }}
                 render={({ field: { onChange, value } }) => (
                   <Input
                     value={value}
@@ -497,6 +501,13 @@ function _SystemSetting({ data, ...props }: Props) {
                   />
                 )}
               />
+              {formState.errors.smtpHost && (
+                <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
+                  <Typography.Text type="danger">
+                    SMTP Host is required!
+                  </Typography.Text>
+                </CustomLabel>
+              )}
             </div>
 
             <div style={{ width: '300px', marginTop: '32px' }}>
@@ -682,7 +693,6 @@ function _SystemSetting({ data, ...props }: Props) {
               <Controller
                 control={control}
                 name="smtpUsername"
-                // TODO: field validation
                 rules={{
                   required: true,
                 }}
@@ -693,8 +703,13 @@ function _SystemSetting({ data, ...props }: Props) {
                       value={value}
                       onChange={onChange}
                     />
-                    {/* TODO: field validation */}
-                    {/* {formState.errors.username && 'Usearname is required!'} */}
+                    {formState.errors.smtpUsername && (
+                      <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
+                        <Typography.Text type="danger">
+                          Username is required!
+                        </Typography.Text>
+                      </CustomLabel>
+                    )}
                   </>
                 )}
               />
@@ -706,10 +721,20 @@ function _SystemSetting({ data, ...props }: Props) {
               <Controller
                 control={control}
                 name="smtpPassword"
+                rules={{
+                  required: true,
+                }}
                 render={({ field: { onChange, value } }) => (
                   <Input type="password" value={value} onChange={onChange} />
                 )}
               />
+              {formState.errors.smtpPassword && (
+                <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
+                  <Typography.Text type="danger">
+                    Password is required!
+                  </Typography.Text>
+                </CustomLabel>
+              )}
             </div>
           </Card>
         </form>
@@ -721,7 +746,14 @@ function _SystemSetting({ data, ...props }: Props) {
             justifyContent: 'flex-end',
           }}
         >
-          <Button style={{ marginRight: '16px' }}>Reset</Button>
+          <Button
+            onClick={() => {
+              reset();
+            }}
+            style={{ marginRight: '16px' }}
+          >
+            Reset
+          </Button>
           {/* @ts-ignore */}
           <Button type="primary" htmlType="submit" form="system-settings">
             Confirm
@@ -742,6 +774,14 @@ export const SystemSetting = compose(
           placement: 'bottomRight',
           message: 'Save successfully!',
           description: 'Your changes have been saved.',
+        });
+      },
+      onError: () => {
+        notification.error({
+          duration: 5,
+          placement: 'bottomRight',
+          message: 'Update failure!',
+          description: 'Update failure, try again later.',
         });
       },
     }),

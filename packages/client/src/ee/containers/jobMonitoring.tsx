@@ -18,20 +18,20 @@ const Charts = styled.div`
     display: none;
   }
   .chart-row-header {
-    text-align: center
+    text-align: center;
     margin-top: 25px;
-    margin-bottom: 0
+    margin-bottom: 0;
   }
   .chart-row {
-    display: flex
-    justify-content: center
+    display: flex;
+    justify-content: center;
   }
   .chart {
-    display: block
-    width: 500px
-    height: 400px
-    margin: 0 10px
-    padding: 5px 10px 20px 10px
+    display: block;
+    width: 500px;
+    height: 400px;
+    margin: 0 10px;
+    padding: 5px 10px 20px 10px;
   }
 `
 
