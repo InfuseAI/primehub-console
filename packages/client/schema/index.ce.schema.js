@@ -1,6 +1,5 @@
 /** @jsx builder */
 import builder, { Body } from 'canner-script';
-import User from './user.schema';
 import Group from './group.schema';
 import InstanceType from './instanceType.schema';
 import Image from './image.schema';
@@ -20,9 +19,6 @@ const schema = (
       {/* <Idp/> */}
       {/* <UserFederation/> */}
       <Group />
-    </Body>
-    <Body component={UserBody}>
-      <User />
     </Body>
     <Body component={CommonBody}>
       <InstanceType />

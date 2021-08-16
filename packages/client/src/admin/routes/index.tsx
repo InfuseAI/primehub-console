@@ -67,32 +67,23 @@ export const routes = [
     name: 'Groups',
   },
   {
-    key: 'users_next',
-    path: 'admin/users_next',
-    name: (
-      <span>
-        Users <Badge>next</Badge>
-      </span>
-    ),
+    key: 'user',
+    path: 'admin/user',
+    name: 'Users', 
     enabled: true,
     component: UserList,
   },
   {
-    key: 'user_next_add',
-    path: 'admin/user_next/add',
+    key: 'user_add',
+    path: 'admin/user/add',
     enabled: true,
     component: UserAdd,
   },
   {
-    key: 'user_next',
-    path: 'admin/user_next/:id',
+    key: 'user_detail',
+    path: 'admin/user/:id',
     enabled: true,
     component: UserDetail,
-  },
-  {
-    key: 'user',
-    path: 'admin/user',
-    name: 'Users',
   },
   {
     key: 'instanceType',

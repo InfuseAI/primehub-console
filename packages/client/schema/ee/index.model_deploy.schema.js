@@ -1,6 +1,5 @@
 /** @jsx builder */
 import builder, {Body} from 'canner-script';
-import User from 'schema/user.schema';
 import Group from 'schema/group.schema';
 import InstanceType from 'schema/instanceType.schema';
 import {LocalStorageConnector} from 'canner-graphql-interface';
@@ -22,8 +21,8 @@ const schema = (
       {/* <UserFederation/> */}
       <Group/>
     </Body>
-    <Body component={UserBody}>
-      <User/>
+    <Body component={CommonBody}>
+      <InstanceType/>
     </Body>
     {grafana}
     {/* <Announcement /> */}

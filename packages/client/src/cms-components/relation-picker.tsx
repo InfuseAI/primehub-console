@@ -17,8 +17,6 @@ type Props = {
     to: string,
     type: string,
   },
-  updateQuery: Function,
-  fetch: Function,
   relationValue: any,
   columns: Array<{
     title: string,
@@ -26,7 +24,6 @@ type Props = {
     datIndex: string
   }>,
   showPagination: boolean,
-  subscribe: Function,
   rootValue: Object,
   Toolbar: React.ComponentType,
   toolbar: Record<string, any>,
@@ -48,9 +45,6 @@ type State = {
   }
 };
 
-const StyledTable = styled(Table)`
-`
-
 export default class Picker extends React.PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -60,7 +54,7 @@ export default class Picker extends React.PureComponent<Props, State> {
       sorter: {},
     };
   }
-  
+
   componentWillReceiveProps(nextProps: Props) {
     const {relationValue, pickedIds} = nextProps;
     if (!isEqual(pickedIds, this.props.pickedIds)) {
@@ -159,7 +153,7 @@ export default class Picker extends React.PureComponent<Props, State> {
             >
               {
                 ({value, showPagination}) => (
-                  <StyledTable
+                  <Table
                     style={{marginBottom: 16}}
                     rowSelection={{
                       type: (pickOne) ? "radio" : "checkbox",

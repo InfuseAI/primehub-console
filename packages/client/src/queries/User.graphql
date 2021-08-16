@@ -34,8 +34,29 @@ query CurrentUser {
   }
 }
 
-query UsersConnection($userAfter: String, $userBefore: String, $userLast: Int,$userFirst: Int, $userWhere: UserWhereInput, $userOrderBy: UsersOrderBy) {
-  users: usersConnection(after: $userAfter, before: $userBefore, last: $userLast, first: $userFirst,where: $userWhere, userOrderBy: $userOrderBy) {
+query User($where: UserWhereUniqueInput!) {
+  user(where: $where) {
+    id
+    username
+    email
+    firstName
+    lastName
+    enabled
+    totp
+    isAdmin
+    volumeCapacity
+    groups {
+      id
+      name
+      displayName
+      quotaCpu
+      quotaGpu
+    }
+  }
+}
+
+query UsersConnection($userAfter: String, $userBefore: String, $userLast: Int,$userFirst: Int, $where: UserWhereInput, $userOrderBy: UsersOrderBy) {
+  users: usersConnection(after: $userAfter, before: $userBefore, last: $userLast, first: $userFirst,where: $where, userOrderBy: $userOrderBy) {
     edges {
       cursor
       node {
@@ -58,8 +79,43 @@ query UsersConnection($userAfter: String, $userBefore: String, $userLast: Int,$u
   }
 }
 
+query UserGroups($page: Int, $where: GroupWhereInput, $orderBy: GroupOrderByInput) {
+  groups: groupsConnection(page: $page, where: $where, orderBy: $orderBy) {
+    edges {
+      cursor
+      node {
+        id
+        name
+        displayName
+        quotaCpu
+        quotaGpu
+      }
+    }
+    pageInfo {
+      currentPage
+      totalPage
+    }
+  }
+}
+
+
+mutation UpdateUser($payload: UserUpdateInput!, $where: UserWhereUniqueInput!) {
+  updateUser(data: $payload, where: $where) {
+    id
+    username
+  }
+}
+
 mutation DeleteUser($where: UserWhereUniqueInput!) {
   deleteUser(where: $where) {
     id
+    username
+  }
+}
+
+mutation CreateUser($payload: UserCreateInput!) {
+  createUser(data: $payload) {
+    id
+    username
   }
 }

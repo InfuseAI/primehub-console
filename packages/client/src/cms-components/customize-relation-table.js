@@ -6,7 +6,7 @@ import difference from "lodash/difference";
 import get from 'lodash/get';
 import Picker from './relation-picker';
 import {injectIntl} from 'react-intl';
-import {FormattedMessage} from "react-intl";
+import {FormattedMessage} from 'react-intl';
 import {renderValue} from '@canner/antd-locales';
 import pluralize from 'pluralize';
 

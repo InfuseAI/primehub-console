@@ -9,7 +9,6 @@ import { ROUTES, ROUTE_KEYS, routes } from '../routes';
 
 const VISIBLE_ITEMS = {
   group: true,
-  users_next: false,
   user: true,
   instanceType: true,
   secret: true,
