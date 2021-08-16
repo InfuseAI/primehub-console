@@ -4,7 +4,7 @@ import { MockedProvider } from 'react-apollo/test-utils';
 
 import { render, screen, waitFor } from 'test/test-utils';
 
-import { UsageReport } from '../UsageReport';
+import UsageReport from '../UsageReport';
 import { UsageReportQuery } from '../usageReport.graphql';
 
 function setup() {

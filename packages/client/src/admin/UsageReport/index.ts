@@ -1,2 +1,3 @@
-export * from './UsageReport';
-export * from './types';
+import UsageReport from './UsageReport';
+
+export default UsageReport;

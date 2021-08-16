@@ -1,25 +1,24 @@
 query UsageReportQuery(
-  $usageReportPage: Int,
-  $usageReportOrderBy: UsageReportOrderByInput,
+  $usageReportPage: Int
+  $usageReportOrderBy: UsageReportOrderByInput
   $usageReportWhere: UsageReportWhereInput
 ) {
-  usageReport:
-  	usageReportsConnection(
-      page: $usageReportPage,
-      orderBy: $usageReportOrderBy,
-      where: $usageReportWhere
-    ) {
-    	edges {
-        cursor
-        node {
-          id
-          summaryUrl
-          detailedUrl
-        }
+  usageReport: usageReportsConnection(
+    page: $usageReportPage
+    orderBy: $usageReportOrderBy
+    where: $usageReportWhere
+  ) {
+    edges {
+      cursor
+      node {
+        id
+        summaryUrl
+        detailedUrl
       }
-    	pageInfo {
-      	currentPage
-      	totalPage
-    	}
-  	}
-	}
+    }
+    pageInfo {
+      currentPage
+      totalPage
+    }
+  }
+}

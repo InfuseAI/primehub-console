@@ -8,7 +8,6 @@ import { compose } from 'recompose';
 import Breadcrumbs from 'components/share/breadcrumb';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { UsageReportQuery } from './usageReport.graphql';
-import type { TUsageReport } from './types';
 
 function useReportDownload() {
   const [loading, setLoading] = React.useState(false);
@@ -47,17 +46,23 @@ function useReportDownload() {
   return [loading, downloadReport] as const;
 }
 
-type UsageReportNode = {
+interface TUsageReport {
+  id: string;
+  summaryUrl: string;
+  detailedUrl: string;
+}
+
+interface UsageReportNode {
   cursor: string;
   node: TUsageReport;
-};
+}
 
-type QueryVariables = {
+interface QueryVariables {
   usageReportPage: number;
   usageReportWhere?: {
     id_contains: string;
   };
-};
+}
 
 interface Props {
   usageReportQuery: {
@@ -81,7 +86,7 @@ interface Props {
   };
 }
 
-function _UsageReport({ usageReportQuery }: Props) {
+function UsageReport({ usageReportQuery }: Props) {
   const [date, setDate] = React.useState('');
   const [isDownloadReport, downloadReport] = useReportDownload();
   const [isDownloadSummary, downloadSummary] = useReportDownload();
@@ -260,15 +265,16 @@ function _UsageReport({ usageReportQuery }: Props) {
   );
 }
 
-export const UsageReport = compose(
+export default compose(
   graphql(UsageReportQuery, {
     name: 'usageReportQuery',
     options: () => {
       return {
+        fetchPolicy: 'cache-and-network',
         variables: {
           usageReportPage: 1,
         },
       };
     },
   })
-)(_UsageReport);
+)(UsageReport);

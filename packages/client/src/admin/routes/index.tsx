@@ -6,7 +6,7 @@ import { SystemSetting } from '../SystemSetting';
 import { UserList, UserDetail, UserAdd } from '../User';
 import { Secrets, SecretInfo } from '../Secrets';
 import { appPrefix } from 'utils/env';
-import { UsageReport } from '../UsageReport';
+import UsageReport from '../UsageReport';
 
 const Badge = styled.span`
   position: absolute;
