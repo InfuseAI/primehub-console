@@ -232,12 +232,12 @@ function List(props: Props) {
                   {
                     type: 'text',
                     label: 'Username',
-                    key: 'username_contains',
+                    key: 'username',
                   },
                   {
                     type: 'text',
                     label: 'Email',
-                    key: 'email_contains',
+                    key: 'email',
                   },
                 ]}
               />
