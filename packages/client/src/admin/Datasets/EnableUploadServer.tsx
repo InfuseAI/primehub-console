@@ -3,7 +3,7 @@ import { Switch, Button, Modal } from 'antd';
 import { Mutation } from 'react-apollo';
 import { injectIntl } from 'react-intl';
 import { get, isPlainObject } from 'lodash';
-import uploadServerSecretModal from './uploadServerSecretModal';
+import uploadServerSecretModal from './UploadServerSecretModal';
 import { RegenerateUploadServerSecretMutation } from './datasets.graphql';
 
 interface Props {
