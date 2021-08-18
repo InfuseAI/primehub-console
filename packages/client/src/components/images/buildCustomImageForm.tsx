@@ -34,7 +34,6 @@ export default class BuildCustomImageForm extends React.Component<Props> {
 
   renderPackageFields() {
     const {form, packages} = this.props;
-    const placeholder = `one package per line. e.g. \npackage1\npackage2\n`;
     return this.packagesLabelList.map(data => {
       const key = (get(data, 'fieldName', '').split('.'))[2];
       return (
@@ -43,7 +42,7 @@ export default class BuildCustomImageForm extends React.Component<Props> {
             {form.getFieldDecorator(data.fieldName, {
               initialValue: get(packages, key),
             })(
-              <TextArea rows={4} placeholder={placeholder}/>
+              <TextArea rows={4}/>
             )}
           </Form.Item>
         </Col>
