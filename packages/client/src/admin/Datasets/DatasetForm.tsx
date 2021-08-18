@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Select, Input, Tooltip, Icon, Divider, InputNumber, Form, Row, Card, Col, Switch } from 'antd';
+import { Select, Input, Icon, InputNumber, Form, Row, Col, Switch } from 'antd';
 import { appPrefix } from 'utils/env';
 
 import { DatasetPvProvisioning, DatasetType, TDataset, TDatasetForm } from './types';
@@ -286,6 +286,9 @@ function _DatasetForm(props: Props) {
 
   return (
     <div data-testid='dataset'>
+      <InfuseButton>
+        <Link to={`${appPrefix}admin/dataset`}><Icon type='arrow-left' /> Back</Link>
+      </InfuseButton>
       <Form onSubmit={handleSubmit}>
         <Row>
           <Col>
