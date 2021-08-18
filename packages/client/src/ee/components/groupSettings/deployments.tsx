@@ -62,6 +62,15 @@ class GroupSettingsDeployments extends React.Component<Props, State> {
               </Form.Item>
             </Col>
           </Row>
+          <Row>
+            <Col>
+              {this.renderInfoQuotaFormItem(
+                'Maximum Deployment(s)',
+                group.maxDeploy,
+                { min: 0, step: 1, percision: 1 }
+              )}
+            </Col>
+          </Row>
         </Form>
       </>
     );

@@ -110,32 +110,6 @@ export default class GroupSettingsInfo extends React.Component<Props> {
           ) : (
             <Row>
               <Col>
-                <Form.Item
-                  label={`Model Deployment`}
-                  style={{ marginBottom: 20 }}
-                >
-                  <Switch disabled checked={group.enabledDeployment} />
-                </Form.Item>
-              </Col>
-            </Row>
-          )
-        }
-        <Row>
-          <Col>
-            {this.renderInfoQuotaFormItem(
-              'Maximum Deployment(s)',
-              group.maxDeploy,
-              { min: 0, step: 1, percision: 1 }
-            )}
-          </Col>
-        </Row>
-        {
-          // @ts-ignore
-          __ENV__ === 'modelDeploy' ? (
-            <></>
-          ) : (
-            <Row>
-              <Col>
                 <Form.Item label={`Shared Volume`} style={{ marginBottom: 20 }}>
                   <Switch disabled checked={group.enabledSharedVolume} />
                   {group.enabledSharedVolume ? (
