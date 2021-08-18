@@ -160,7 +160,7 @@ function _GitSecret(props: Props) {
           style={{ background: '#fff', borderStyle: 'dashed' }}
         >
           <Icon
-            type="plus"
+            type="edit"
           />{' '}
           Change
         </Tag>

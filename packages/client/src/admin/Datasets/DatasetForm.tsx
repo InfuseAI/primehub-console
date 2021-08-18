@@ -9,8 +9,6 @@ import { FormComponentProps } from 'antd/lib/form/Form';
 import InfuseButton from 'components/infuseButton';
 import EnableUploadServer from './EnableUploadServer';
 import { GitSecret } from './GitSecret';
-import { useEffect, useState } from 'react';
-import { get } from 'lodash';
 import { DatasetGroupsRelationTable } from './DatasetGroupsRelationTable';
 
 interface Props extends FormComponentProps {
@@ -72,33 +70,10 @@ function _DatasetForm(props: Props) {
 
     return (
       <>
-        <Form.Item label='Provisioning'>
-          {form.getFieldDecorator('pvProvisioning', {
-            initialValue: initialValue?.pvProvisioning,
-            rules: [
-              {
-                required: true,
-                message: 'Please select a provising type.',
-              },
-            ],
-          })(
-            <Select disabled={editMode} style={{width: '200px'}} >
-              <Select.Option value="auto">auto</Select.Option>
-              <Select.Option value="manual">manual</Select.Option>
-            </Select>
-          )}
-        </Form.Item>
-
-        {!editMode ? null : (
-          <Form.Item label='Volume Name'>
-            <Input disabled value={name} />
-          </Form.Item>)
-        }
-
-        {pvProvisioning !== DatasetPvProvisioning.AUTO ? null : (
-          <Form.Item label='Volume Size'>
-            {form.getFieldDecorator('volumeSize', {
-              initialValue: initialValue?.volumeSize || 1,
+        <div data-testid='dataset/pvProvisioning'>
+          <Form.Item label='Provisioning'>
+            {form.getFieldDecorator('pvProvisioning', {
+              initialValue: initialValue?.pvProvisioning,
               rules: [
                 {
                   required: true,
@@ -106,26 +81,57 @@ function _DatasetForm(props: Props) {
                 },
               ],
             })(
-            <InputNumber
-                disabled={editMode}
-                style={{ width: 150 }}
-                formatter={(value) => (value == -1 ? `-` : `${value} GB`)}
-                parser={(value) => value.replace(/[^0-9\.]/g, '')}
-                step={1}
-                min={1}
-              />
+              <Select disabled={editMode} style={{width: '200px'}} >
+                <Select.Option value="auto">auto</Select.Option>
+                <Select.Option value="manual">manual</Select.Option>
+              </Select>
             )}
-          </Form.Item>)
+          </Form.Item>
+        </div>
+
+        {!editMode ? null : (
+          <div data-testid='dataset/volumeName'>
+            <Form.Item label='Volume Name'>
+              <Input disabled value={name} />
+            </Form.Item>
+          </div>)
+        }
+
+        {pvProvisioning !== DatasetPvProvisioning.AUTO ? null : (
+          <div data-testid='dataset/volumeSize'>
+            <Form.Item label='Volume Size'>
+              {form.getFieldDecorator('volumeSize', {
+                initialValue: initialValue?.volumeSize || 1,
+                rules: [
+                  {
+                    required: true,
+                    message: 'Please select a provising type.',
+                  },
+                ],
+              })(
+              <InputNumber
+                  disabled={editMode}
+                  style={{ width: 150 }}
+                  formatter={(value) => (value == -1 ? `-` : `${value} GB`)}
+                  parser={(value) => value.replace(/[^0-9\.]/g, '')}
+                  step={1}
+                  min={1}
+                />
+              )}
+            </Form.Item>
+          </div>)
         }
 
         {!editMode ? null :
-          <Form.Item label='Enable Upload Server'>
-            {form.getFieldDecorator('enableUploadServer', {
-              initialValue: initialValue?.enableUploadServer || false,
-            })(
-              <EnableUploadServer name={name} allowRegenerateSecret={initialValue?.enableUploadServer} />
-            )}
-          </Form.Item>
+          <div data-testid='dataset/enableUploadServer'>
+            <Form.Item label='Enable Upload Server'>
+              {form.getFieldDecorator('enableUploadServer', {
+                initialValue: initialValue?.enableUploadServer || false,
+              })(
+                <EnableUploadServer name={name} allowRegenerateSecret={initialValue?.enableUploadServer} />
+              )}
+            </Form.Item>
+          </div>
         }
       </>);
   }
@@ -133,112 +139,125 @@ function _DatasetForm(props: Props) {
   const renderNfsDataset = () => {
     return (
       <>
-        <Form.Item label={`NFS Server`}>
-          {form.getFieldDecorator('nfsServer', {
-            initialValue: initialValue?.nfsServer,
-            rules: [
-              {
-                required: true,
-                validator: (rule, value, cb) => {
-                  if (!value.match(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/)) {
-                    cb(`please provide a domain or an ip.`);
-                  } else {
-                    cb();
-                  }
-                },
-              }
-            ],
-          })(<Input placeholder='1.2.3.4'/>)}
-        </Form.Item>
+        <div data-testid='dataset/nfsServer'>
+          <Form.Item label={`NFS Server`}>
+            {form.getFieldDecorator('nfsServer', {
+              initialValue: initialValue?.nfsServer,
+              rules: [
+                {
+                  required: true,
+                  validator: (rule, value, cb) => {
+                    if (!value.match(/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/)) {
+                      cb(`please provide a domain or an ip.`);
+                    } else {
+                      cb();
+                    }
+                  },
+                }
+              ],
+            })(<Input placeholder='1.2.3.4'/>)}
+          </Form.Item>
+        </div>
 
-        <Form.Item label={`NFS Path`}>
-          {form.getFieldDecorator('nfsPath', {
-            initialValue: initialValue?.nfsPath,
-            rules: [
-              {
-                required: true,
-                validator: (rule, value, cb) => {
-                  if (!value.match(/^\/|\/\/|(\/[\w-]+)+$/)) {
-                    cb(`please provide a correct path string.`);
-                  } else {
-                    cb();
-                  }
-                },
-              }
-            ],
-          })(<Input placeholder='/data'/>)}
-        </Form.Item>
+        <div data-testid='dataset/nfsPath'>
+          <Form.Item label={`NFS Path`}>
+            {form.getFieldDecorator('nfsPath', {
+              initialValue: initialValue?.nfsPath,
+              rules: [
+                {
+                  required: true,
+                  validator: (rule, value, cb) => {
+                    if (!value.match(/^\/|\/\/|(\/[\w-]+)+$/)) {
+                      cb(`please provide a correct path string.`);
+                    } else {
+                      cb();
+                    }
+                  },
+                }
+              ],
+            })(<Input placeholder='/data'/>)}
+          </Form.Item>
+        </div>
       </>);
   }
 
   const renderHostPathDataset = () => {
     return (
       <>
-        <Form.Item label={`Host Path`}>
-          {form.getFieldDecorator('hostPath', {
-            initialValue: initialValue?.hostPath,
-            rules: [
-              {
-                required: true,
-                validator: (rule, value, cb) => {
-                  if (!value) {
-                    cb(`please provide a correct path string.`);
-                  }
-                  if (!value.match(/^\/|\/\/|(\/[\w-]+)+$/)) {
-                    cb(`please provide a correct path string.`);
-                  }
-                  cb();
+        <div data-testid='dataset/hostPath'>
+          <Form.Item label={`Host Path`}>
+            {form.getFieldDecorator('hostPath', {
+              initialValue: initialValue?.hostPath,
+              rules: [
+                {
+                  required: true,
+                  validator: (rule, value, cb) => {
+                    if (!value) {
+                      cb(`please provide a correct path string.`);
+                    }
+                    if (!value.match(/^\/|\/\/|(\/[\w-]+)+$/)) {
+                      cb(`please provide a correct path string.`);
+                    }
+                    cb();
+                  },
                 },
-              },
-            ],
-          })(<Input placeholder='/data'/>)}
-        </Form.Item>
+              ],
+            })(<Input placeholder='/data'/>)}
+          </Form.Item>
+        </div>
       </>);
   }
 
   const renderGitDataset = () => {
     return (
       <>
-        <Form.Item label={`URL`}>
-          {form.getFieldDecorator('url', {
-            initialValue: initialValue?.url,
-            rules: [
-              {
-                required: true,
-                message: 'Please input the git repository url!',
-              },
-            ],
-          })(<Input />)}
-        </Form.Item>
-        <Form.Item label={`Secret`}>
-          {form.getFieldDecorator('secret', {
-            initialValue: {},
-          })(<GitSecret initialValue={initialValue?.secret} />)}
-        </Form.Item>
+        <div data-testid='dataset/url'>
+          <Form.Item label={`URL`}>
+            {form.getFieldDecorator('url', {
+              initialValue: initialValue?.url,
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input the git repository url!',
+                },
+              ],
+            })(<Input />)}
+          </Form.Item>
+        </div>
+
+        <div data-testid='dataset/secret'>
+          <Form.Item label={`Secret`}>
+            {form.getFieldDecorator('secret', {
+              initialValue: {},
+            })(<GitSecret initialValue={initialValue?.secret} />)}
+          </Form.Item>
+        </div>
       </>);
   }
 
   const renderEnvDataset = () => {
     return (
       <>
-        <Form.Item label={`Variables`}>
-          {form.getFieldDecorator('variables', {
-            initialValue: initialValue?.variables || {},
-            rules: [
-              {
-                validator: (rule, value, cb) => {
-                  Object.keys(value).forEach((key) => {
-                    console.log(key);
-                    if (!key.match(/^[a-zA-Z_]+[a-zA-Z0-9_]*$/)) {
-                      cb(`The key should be alphanumeric charcter, '_', and must start with a letter.`);
-                    }
-                  });
-                  cb();
+        <div data-testid='dataset/variables'>
+          <Form.Item label={`Variables`}>
+            {form.getFieldDecorator('variables', {
+              initialValue: initialValue?.variables || {},
+              rules: [
+                {
+                  validator: (rule, value, cb) => {
+                    Object.keys(value).forEach((key) => {
+                      console.log(key);
+                      if (!key.match(/^[a-zA-Z_]+[a-zA-Z0-9_]*$/)) {
+                        cb(`The key should be alphanumeric charcter, '_', and must start with a letter.`);
+                      }
+                    });
+                    cb();
+                  },
                 },
-              },
-            ],
-          })(<EnvVariables />)}
-        </Form.Item>
+              ],
+            })(<EnvVariables />)}
+          </Form.Item>
+        </div>
       </>);
   }
 
@@ -266,82 +285,98 @@ function _DatasetForm(props: Props) {
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Row>
-        <Col>
-          <Form.Item label={`Name`}>
-            {form.getFieldDecorator('name', {
-              initialValue: initialValue?.name,
-              rules: [
-                {
-                  required: true,
-                  pattern: /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
-                  message: `lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`,
-                }
-              ],
-            })(<Input disabled={editMode} />)}
-          </Form.Item>
-          <Form.Item label={`Display Name`}>
-            {form.getFieldDecorator('displayName', {
-              initialValue: initialValue?.displayName,
-            })(<Input />)}
-          </Form.Item>
-          <Form.Item label='Description'>
-            {form.getFieldDecorator('description', {
-              initialValue: initialValue?.description,
-            })(<Input />)}
-          </Form.Item>
-          <Form.Item label={`Global`}>
-            {form.getFieldDecorator('global', {
-              initialValue: initialValue?.global,
-              valuePropName: 'checked',
-            })(<Switch />)
-          }
-          </Form.Item>
-          <Form.Item label='Type'>
-            {form.getFieldDecorator('type', {
-              initialValue: initialValue?.type,
-              rules: [
-                {
-                  required: true,
-                  message: 'Please select a type.',
-                },
-              ],
+    <div data-testid='dataset'>
+      <Form onSubmit={handleSubmit}>
+        <Row>
+          <Col>
+            <div data-testid='dataset/name'>
+              <Form.Item label={`Name`}>
+                {form.getFieldDecorator('name', {
+                  initialValue: initialValue?.name,
+                  rules: [
+                    {
+                      required: true,
+                      pattern: /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
+                      message: `lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`,
+                    }
+                  ],
+                })(<Input disabled={editMode} />)}
+              </Form.Item>
+            </div>
+
+            <div data-testid='dataset/displayName'></div>
+            <Form.Item label={`Display Name`}>
+              {form.getFieldDecorator('displayName', {
+                initialValue: initialValue?.displayName,
+              })(<Input />)}
+            </Form.Item>
+
+            <div data-testid='dataset/displayName'></div>
+            <Form.Item label='Description'>
+              {form.getFieldDecorator('description', {
+                initialValue: initialValue?.description,
+              })(<Input />)}
+            </Form.Item>
+
+            <div data-testid='dataset/displayName'></div>
+            <Form.Item label={`Global`}>
+              {form.getFieldDecorator('global', {
+                initialValue: initialValue?.global,
+                valuePropName: 'checked',
+              })(<Switch />)
+            }
+            </Form.Item>
+
+            <div data-testid='dataset/displayName'></div>
+            <Form.Item label='Type'>
+              {form.getFieldDecorator('type', {
+                initialValue: initialValue?.type,
+                rules: [
+                  {
+                    required: true,
+                    message: 'Please select a type.',
+                  },
+                ],
+              })(
+                <Select disabled={editMode} style={{width: '200px'}} placeholder='Select an item'>
+                  <Select.Option value="pv">Persistent Volume</Select.Option>
+                  <Select.Option value="nfs">NFS</Select.Option>
+                  <Select.Option value="hostPath">Host Path</Select.Option>
+                  <Select.Option value="git">Git</Select.Option>
+                  <Select.Option value="env">Env</Select.Option>
+                </Select>
+              )}
+            </Form.Item>
+            {typeSepcificItems}
+
+            <div data-testid='dataset/groups'></div>
+            {form.getFieldDecorator('groups', {
+              initialValue: {},
             })(
-              <Select disabled={editMode} style={{width: '200px'}} placeholder='Select an item'>
-                <Select.Option value="pv">Persistent Volume</Select.Option>
-                <Select.Option value="nfs">NFS</Select.Option>
-                <Select.Option value="hostPath">Host Path</Select.Option>
-                <Select.Option value="git">Git</Select.Option>
-                <Select.Option value="env">Env</Select.Option>
-              </Select>
+              <DatasetGroupsRelationTable
+                groups={initialValue?.groups}
+                allowWritable={allowWritable}
+                allowReadOnly={!global}
+              />
             )}
-          </Form.Item>
-          {typeSepcificItems}
-          {form.getFieldDecorator('groups', {
-            initialValue: {},
-          })(
-            <DatasetGroupsRelationTable
-              groups={initialValue?.groups}
-              allowWritable={allowWritable}
-              allowReadOnly={!global}
-            />
-          )}
-          <Form.Item style={{textAlign: 'right', marginTop: 12}}>
-            <InfuseButton
-              type='primary'
-              htmlType='submit'
-              style={{marginRight: 16}}
-            >
-              Confirm
-            </InfuseButton>
-            <InfuseButton>
-            <Link to={`${appPrefix}admin/dataset`}>Cancel</Link>
-            </InfuseButton>
-          </Form.Item>
-        </Col>
-      </Row>
-    </Form>
+
+            <Form.Item style={{textAlign: 'right', marginTop: 12}}>
+              <InfuseButton
+                data-testid='confirm-button'
+                type='primary'
+                htmlType='submit'
+                style={{marginRight: 16}}
+              >
+                Confirm
+              </InfuseButton>
+              <InfuseButton data-testid='reset-button'>
+              <Link to={`${appPrefix}admin/dataset`}>Cancel</Link>
+              </InfuseButton>
+            </Form.Item>
+          </Col>
+        </Row>
+      </Form>
+    </div>
   );
 }
 

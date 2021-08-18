@@ -142,6 +142,7 @@ export default class Picker extends React.PureComponent<Props, State> {
         <FilterRow style={{ marginBottom: 12 }}>
           <Col span={12}>
             <Search
+              data-testid='text-filter'
               placeholder={searchPlaceholder}
               onSearch={this.handleSearch}
               enterButton

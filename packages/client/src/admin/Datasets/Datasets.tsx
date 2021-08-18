@@ -241,12 +241,14 @@ function _Datasets({
         return (
           <Button.Group>
             <Button
+              data-testid='edit-button'
               icon="edit"
               onClick={() => {
                 history.push(`${appPrefix}admin/dataset/${dataset.node.id}`);
               }}
             ></Button>
             <Button
+              data-testid='delete-button'
               icon="delete"
               onClick={() => {
                 Modal.confirm({
@@ -282,10 +284,11 @@ function _Datasets({
   return (
     <>
       <DatasetLayout page="list">
-        <div style={styles}>
+        <div data-testid='dataset' style={styles}>
           <FilterRow align="bottom" style={{marginBottom: 16, marginTop: 16}}>
             <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
               <InfuseButton
+                data-testid='add-button'
                 icon="plus"
                 onClick={handleAdd}
                 style={{marginRight: 16, width: 120}}
@@ -298,6 +301,7 @@ function _Datasets({
               <Col>
                 <FilterPlugins style={{marginRight: '10px'}}>
                   <Search
+                    data-testid='text-filter'
                     placeholder={`Search Dataset`}
                     onSearch={handleSearch}
                   />
