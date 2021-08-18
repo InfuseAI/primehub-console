@@ -99,7 +99,6 @@ function _GitSecret(props: Props) {
         };
       }
     }
-    console.log('onChange', initialValue, updatedValue);
     onChange(updatedValue);
   };
 

@@ -19,7 +19,7 @@ import { errorHandler } from 'utils/errorHandler';
 import InfuseButton from 'components/infuseButton';
 import { FilterRow, FilterPlugins, ButtonCol } from 'cms-toolbar/filter';
 import Search from 'antd/lib/input/Search';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const styles: React.CSSProperties = {
   display: 'flex',
@@ -86,8 +86,19 @@ function _Datasets({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [state, setState] = useState<State>({ page: 1 });
 
+  useEffect(() => {
+    if (datasetQuery.error) {
+      errorHandler(datasetQuery.error);
+    }
+  }, [datasetQuery.error]);
+
+  if (datasetQuery.error) {
+    if (!datasetQuery?.datasetsConnection) {
+      return <div>Failure to load datasets.</div>;
+    }
+  }
+
   async function handleSearch(searchString) {
-    console.log(searchString);
     const variables = {
       ...state,
       where: {
@@ -116,7 +127,6 @@ function _Datasets({
   }
 
   async function handleSubmit(data) {
-    console.log("submit", data);
     try {
       const {
         data: {
@@ -160,13 +170,6 @@ function _Datasets({
         </div>
       </DatasetLayout>
     );
-  }
-
-  if (datasetQuery.error) {
-    errorHandler(datasetQuery.error);
-    if (!datasetQuery?.datasetsConnection) {
-      return <div>Failure to load datasets.</div>;
-    }
   }
 
   if (datasetQuery.loading && !datasetQuery?.datasetsConnection) {

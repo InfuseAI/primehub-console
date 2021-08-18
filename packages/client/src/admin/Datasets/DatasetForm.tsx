@@ -246,7 +246,6 @@ function _DatasetForm(props: Props) {
                 {
                   validator: (rule, value, cb) => {
                     Object.keys(value).forEach((key) => {
-                      console.log(key);
                       if (!key.match(/^[a-zA-Z_]+[a-zA-Z0-9_]*$/)) {
                         cb(`The key should be alphanumeric charcter, '_', and must start with a letter.`);
                       }
@@ -303,7 +302,7 @@ function _DatasetForm(props: Props) {
                       message: `lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`,
                     }
                   ],
-                })(<Input disabled={editMode} />)}
+                })(<Input data-testid='dataset/input-name' disabled={editMode} />)}
               </Form.Item>
             </div>
 
@@ -311,17 +310,17 @@ function _DatasetForm(props: Props) {
             <Form.Item label={`Display Name`}>
               {form.getFieldDecorator('displayName', {
                 initialValue: initialValue?.displayName,
-              })(<Input />)}
+              })(<Input data-testid='dataset/input-displayName' />)}
             </Form.Item>
 
-            <div data-testid='dataset/displayName'></div>
+            <div data-testid='dataset/description'></div>
             <Form.Item label='Description'>
               {form.getFieldDecorator('description', {
                 initialValue: initialValue?.description,
-              })(<Input />)}
+              })(<Input data-testid='dataset/input-description' />)}
             </Form.Item>
 
-            <div data-testid='dataset/displayName'></div>
+            <div data-testid='dataset/global'></div>
             <Form.Item label={`Global`}>
               {form.getFieldDecorator('global', {
                 initialValue: initialValue?.global,
