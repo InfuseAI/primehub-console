@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Select, Input, Typography, Tooltip, Icon } from 'antd';
-import { Controller, UseFormReturn } from 'react-hook-form';
+import { Button, Form, Select, Input, Tooltip, Icon } from 'antd';
+import type { FormComponentProps } from 'antd/lib/form';
 
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
-import type { TSecret } from './types';
+import type { SecretType, TSecret } from './types';
 
 function SecretTypeTip() {
   return (
@@ -30,7 +30,19 @@ function SecretTypeTip() {
   );
 }
 
-export const initialFormState: TSecret = {
+type SecretFormState = Pick<
+  TSecret,
+  | 'id'
+  | 'name'
+  | 'displayName'
+  | 'type'
+  | 'registryHost'
+  | 'username'
+  | 'password'
+  | 'secret'
+>;
+
+export const initialFormState: SecretFormState = {
   id: '',
   name: '',
   displayName: '',
@@ -41,193 +53,144 @@ export const initialFormState: TSecret = {
   secret: '',
 };
 
-interface SecretFormProps extends Omit<UseFormReturn<TSecret>, 'reset'> {
-  onSubmit?: (data: Partial<TSecret>) => Promise<void>;
+type SecretFormProps = FormComponentProps<SecretFormState> & {
+  onSubmit?: (data: Partial<SecretFormState>) => void;
   disabledName?: boolean;
-}
+  data?: SecretFormState;
+};
 
-export function SecretForm(props: SecretFormProps) {
+export function _SecretForm({ form, data, ...props }: SecretFormProps) {
+  const [secretType, setSecretType] = React.useState<SecretType>(null);
   const { appPrefix } = useRoutePrefix();
-  const { control, watch, formState, handleSubmit } = props;
-  const watchedSecretType = watch('type');
+
+  React.useEffect(() => {
+    if (data?.type) {
+      setSecretType(data.type);
+    } else {
+      setSecretType('opaque');
+    }
+  }, [data]);
 
   return (
-    <form
+    <Form
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '24px',
         backgroundColor: '#fff',
       }}
-      onSubmit={props?.onSubmit && handleSubmit(props.onSubmit)}
+      onSubmit={event => {
+        event.preventDefault();
+
+        form.validateFields((err, values: SecretFormState) => {
+          if (err) {
+            console.error(err);
+            return;
+          }
+
+          if (props?.onSubmit) {
+            props.onSubmit(values);
+          }
+        });
+      }}
     >
-      <div>
-        {!props?.disabledName && (
-          <>
-            <span style={{ color: '#ff7875' }}>*</span>{' '}
-          </>
-        )}
-        <label htmlFor='secret-name'>Name</label>
-        <Controller
-          control={control}
-          name='name'
-          rules={{
-            required: true,
-            pattern:
-              /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
-          }}
-          render={({ field: { value, onChange } }) => (
-            <Input
-              id='secret-name'
-              disabled={props?.disabledName || false}
-              value={value}
-              onChange={onChange}
-              style={{ marginTop: '8px' }}
-            />
-          )}
-        />
-        {!props?.disabledName && formState.errors.name && (
-          <Typography.Text type='danger'>
-            lower case alphanumeric characters, '-' or '.', and must start and
-            end with an alphanumeric character.
-          </Typography.Text>
-        )}
-      </div>
+      <Form.Item label='Name'>
+        {form.getFieldDecorator('name', {
+          initialValue: data?.name || '',
+          validateTrigger: ['onChange', 'onBlur'],
+          rules: [
+            {
+              required: !props?.disabledName || false,
+              validator: (_, value, callback) => {
+                if (
+                  !value.match(
+                    /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/
+                  )
+                ) {
+                  return callback(`lower case alphanumeric characters, '-' or '.', and must start and
+                  end with an alphanumeric character.`);
+                }
+                return true;
+              },
+            },
+          ],
+        })(<Input disabled={props?.disabledName || false} />)}
+      </Form.Item>
 
-      <div>
-        <label htmlFor='secret-display-name'>Display Name</label>
-        <Controller
-          control={control}
-          name='displayName'
-          render={({ field: { onChange, value } }) => (
-            <Input
-              id='secret-display-name'
-              value={value}
-              onChange={onChange}
-              style={{ marginTop: '8px' }}
-            />
-          )}
-        />
-      </div>
+      <Form.Item label='Display Name'>
+        {form.getFieldDecorator('displayName', {
+          initialValue: data?.displayName || '',
+        })(<Input />)}
+      </Form.Item>
 
-      <div>
-        <label htmlFor='secret-type'>
-          Type <SecretTypeTip />
+      <Form.Item>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          Type <SecretTypeTip />:
         </label>
-        <Controller
-          control={control}
-          name='type'
-          render={({ field: { onChange, value } }) => {
-            return (
-              <Select
-                data-testid='secret-type'
-                value={value}
-                onChange={onChange}
-                style={{ marginTop: '8px' }}
-              >
-                <Select.Option value='opaque'>Git Dataset</Select.Option>
-                <Select.Option value='kubernetes'>Image Pull</Select.Option>
-              </Select>
-            );
-          }}
-        />
-      </div>
 
-      {watchedSecretType === undefined ? null : watchedSecretType ===
-        'opaque' ? (
-        <div>
-          <label htmlFor='secret'>Secret</label>
-          <Controller
-            control={control}
-            name='secret'
-            render={({ field: { value, onChange } }) => (
-              <Input.TextArea
-                id='secret'
-                rows={4}
-                value={value}
-                onChange={onChange}
-                style={{ marginTop: '8px' }}
-              />
-            )}
-          />
-        </div>
+        {form.getFieldDecorator('type', {
+          initialValue: data?.type || 'opaque',
+        })(
+          <Select
+            data-testid='secret-type'
+            onChange={value => setSecretType(value as SecretType)}
+          >
+            <Select.Option value='opaque'>Git Dataset</Select.Option>
+            <Select.Option value='kubernetes'>Image Pull</Select.Option>
+          </Select>
+        )}
+      </Form.Item>
+
+      {secretType === 'opaque' ? (
+        <Form.Item label='Secret'>
+          {form.getFieldDecorator('secret', {
+            initialValue: data?.secret || '',
+          })(<Input.TextArea rows={4} />)}
+        </Form.Item>
       ) : (
         <>
-          <div>
-            <span style={{ color: '#ff7875' }}>*</span>{' '}
-            <label htmlFor='registry-host'>Registry Host</label>
-            <Controller
-              control={control}
-              name='registryHost'
-              rules={{
-                required: true,
-              }}
-              render={({ field: { value, onChange } }) => (
-                <Input
-                  id='registry-host'
-                  value={value}
-                  onChange={onChange}
-                  style={{ marginTop: '8px' }}
-                />
-              )}
-            />
-            {formState.errors.registryHost && (
-              <Typography.Text type='danger'>
-                Registry Host is required
-              </Typography.Text>
-            )}
-          </div>
-          <div>
-            <span style={{ color: '#ff7875' }}>*</span>{' '}
-            <label htmlFor='username'>Username</label>
-            <Controller
-              control={control}
-              name='username'
-              rules={{
-                required: true,
-              }}
-              render={({ field: { value, onChange } }) => (
-                <Input
-                  id='username'
-                  value={value}
-                  onChange={onChange}
-                  style={{ marginTop: '8px' }}
-                />
-              )}
-            />
-            {formState.errors.username && (
-              <Typography.Text type='danger'>
-                Username is required
-              </Typography.Text>
-            )}
-          </div>
-          <div>
-            <span style={{ color: '#ff7875' }}>*</span>{' '}
-            <label htmlFor='password'>Password</label>
-            <Controller
-              control={control}
-              name='password'
-              rules={{
-                required: true,
-              }}
-              render={({ field: { value, onChange } }) => (
-                <Input
-                  id='password'
-                  type='password'
-                  value={value}
-                  onChange={onChange}
-                  style={{ marginTop: '8px' }}
-                />
-              )}
-            />
-            {formState.errors.password && (
-              <Typography.Text type='danger'>
-                Password is required
-              </Typography.Text>
-            )}
-          </div>
+          <Form.Item label='Registry Host'>
+            {form.getFieldDecorator('registryHost', {
+              initialValue: data?.registryHost || '',
+              validateTrigger: ['onChange', 'onBlur'],
+              rules: [
+                {
+                  required: true,
+                },
+              ],
+            })(<Input />)}
+          </Form.Item>
+
+          <Form.Item label='Username'>
+            {form.getFieldDecorator('username', {
+              initialValue: data?.username || '',
+              validateTrigger: ['onChange', 'onBlur'],
+              rules: [
+                {
+                  required: true,
+                },
+              ],
+            })(<Input />)}
+          </Form.Item>
+
+          <Form.Item label='Password'>
+            {form.getFieldDecorator('password', {
+              initialValue: data?.password || '',
+              validateTrigger: ['onChange', 'onBlur'],
+              rules: [
+                {
+                  required: true,
+                },
+              ],
+            })(<Input type='password' />)}
+          </Form.Item>
         </>
       )}
+
+      <Form.Item>
+        {form.getFieldDecorator('id', {
+          initialValue: data?.id || '',
+        })(<Input type='hidden' />)}
+      </Form.Item>
 
       <div
         style={{
@@ -245,6 +208,10 @@ export function SecretForm(props: SecretFormProps) {
           Save
         </Button>
       </div>
-    </form>
+    </Form>
   );
 }
+
+export const SecretForm = Form.create({
+  name: 'secret-form',
+})(_SecretForm);
