@@ -9,25 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { TDatasetFormGroups, TDatasetGroups } from './types';
 import { Link } from 'react-router-dom';
-
-const QUERY_GROUPS = gql`
-  query QueryGroups($page: Int, $where: GroupWhereInput, $orderBy: GroupOrderByInput) {
-    groups: groupsConnection(page: $page, where: $where, orderBy: $orderBy) {
-      edges {
-        cursor
-        node {
-          id
-          name
-          displayName
-        }
-      }
-      pageInfo {
-        currentPage
-        totalPage
-      }
-    }
-  }
-`;
+import { GetGroups } from 'queries/Datasets.graphql';
 
 const Title = styled.div`
   color: rgba(0, 0, 0, 0.85);
@@ -209,7 +191,7 @@ function _DatasetGroupsRelationTable(props: Props) {
 
 
 export const DatasetGroupsRelationTable = compose(
-  graphql(QUERY_GROUPS, {
+  graphql(GetGroups, {
     name: 'groupsQuery',
     options: () => {
       return {

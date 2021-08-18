@@ -4,7 +4,7 @@ import { Mutation } from 'react-apollo';
 import { injectIntl } from 'react-intl';
 import { get, isPlainObject } from 'lodash';
 import uploadServerSecretModal from './UploadServerSecretModal';
-import { RegenerateUploadServerSecretMutation } from './datasets.graphql';
+import { RegenerateUploadServerSecretMutation } from 'queries/Datasets.graphql';
 
 interface Props {
   intl: any;

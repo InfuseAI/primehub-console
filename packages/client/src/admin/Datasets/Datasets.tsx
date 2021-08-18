@@ -11,7 +11,7 @@ import {
   GetDatasets,
   CreateDatasetMutation,
   DeleteDatasetMutation,
-} from './datasets.graphql';
+} from 'queries/Datasets.graphql';
 import { DatasetLayout } from './Layout';
 import { DatasetForm } from './DatasetForm';
 import type { TDataset, TDatasetForm } from './types';

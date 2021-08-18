@@ -99,3 +99,29 @@ mutation RegenerateUploadServerSecretMutation ($where: DatasetWhereUniqueInput!)
     }
   }
 }
+
+query GetSecrets{
+  secrets {
+    id
+    name
+    displayName
+    type
+  }
+}
+
+query GetGroups($page: Int, $where: GroupWhereInput, $orderBy: GroupOrderByInput) {
+  groups: groupsConnection(page: $page, where: $where, orderBy: $orderBy) {
+    edges {
+      cursor
+      node {
+        id
+        name
+        displayName
+      }
+    }
+    pageInfo {
+      currentPage
+      totalPage
+    }
+  }
+}

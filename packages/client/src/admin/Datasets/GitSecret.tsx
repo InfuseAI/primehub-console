@@ -7,17 +7,7 @@ import { errorHandler } from 'utils/errorHandler';
 import { Icon, Modal, Table, Tag } from 'antd';
 import { useState } from 'react';
 import { find, isEmpty } from 'lodash';
-
-const QUERY_SECRETS = gql`
-  query {
-    secrets {
-      id
-      name
-      displayName
-      type
-    }
-  }
-`;
+import { GetSecrets } from 'queries/Datasets.graphql';
 
 interface TSecret {
   id: string;
@@ -192,7 +182,7 @@ function _GitSecret(props: Props) {
 }
 
 export const GitSecret = compose(
-  graphql(QUERY_SECRETS, {
+  graphql(GetSecrets, {
     name: 'secretsQuery',
     options: () => {
       return {

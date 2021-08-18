@@ -9,7 +9,7 @@ import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 import { DatasetLayout } from './Layout';
 import { DatasetForm, initialFormState } from './DatasetForm';
-import { DatasetQuery, UpdateDatasetMutation } from './datasets.graphql';
+import { DatasetQuery, UpdateDatasetMutation } from 'queries/Datasets.graphql';
 import type { TDataset } from './types';
 import { pick } from 'lodash';
 import uploadServerSecretModal from 'cms-components/uploadServerSecretModal';
