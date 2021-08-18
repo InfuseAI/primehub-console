@@ -25,7 +25,6 @@ export const mlflow = {
 
 export const groups = [
   {
-    __typename: 'Group',
     id: 'groupId1',
     name: 'group1',
     mlflow,
@@ -48,7 +47,6 @@ export const groups = [
         gpuLimit: 0,
         memoryLimit: 4,
         cpuLimit: 0.5,
-        __typename: null,
       },
       {
         id: 'g-it2',
@@ -60,7 +58,6 @@ export const groups = [
         gpuLimit: 0,
         memoryLimit: 4,
         cpuLimit: 0.5,
-        __typename: null,
       },
     ],
     images: [
@@ -77,7 +74,6 @@ export const groups = [
         spec: null,
         global: null,
         type: 'cpu',
-        __typename: null,
       },
     ],
   },
@@ -97,7 +93,6 @@ export const groups = [
       cpuUsage: 1,
       memUsage: 0,
       gpuUsage: 0,
-      __typename: null,
     },
     users: null,
     enabledDeployment: null,
@@ -105,7 +100,6 @@ export const groups = [
     jobDefaultActiveDeadlineSeconds: null,
     sharedVolumeCapacity: null,
     launchGroupOnly: null,
-    __typename: 'Group',
     instanceTypes: [
       {
         id: 'ggit1',
@@ -117,7 +111,6 @@ export const groups = [
         gpuLimit: null,
         memoryLimit: null,
         cpuLimit: null,
-        __typename: null,
       },
     ],
     images: [
@@ -134,7 +127,6 @@ export const groups = [
         spec: null,
         global: null,
         type: null,
-        __typename: null,
       },
     ],
   },
@@ -157,7 +149,6 @@ export const groups = [
     jobDefaultActiveDeadlineSeconds: null,
     sharedVolumeCapacity: null,
     launchGroupOnly: null,
-    __typename: 'Group',
     instanceTypes: [
       {
         id: 'everyone-it',
@@ -169,7 +160,6 @@ export const groups = [
         gpuLimit: 0,
         memoryLimit: 4,
         cpuLimit: 0.5,
-        __typename: null,
       },
       {
         id: 'everyone-it2',
@@ -181,7 +171,6 @@ export const groups = [
         gpuLimit: 1,
         memoryLimit: null,
         cpuLimit: null,
-        __typename: null,
       },
     ],
     images: [
@@ -198,7 +187,6 @@ export const groups = [
         spec: null,
         global: null,
         type: 'cpu',
-        __typename: null,
       },
       {
         id: 'everyone-image2',
@@ -213,22 +201,6 @@ export const groups = [
         spec: null,
         global: null,
         type: 'gpu',
-        __typename: null,
-      },
-      {
-        id: 'everyone-image3',
-        name: 'c-img',
-        displayName: 'c-img',
-        description: null,
-        groupName: null,
-        isReady: null,
-        url: null,
-        urlForGpu: null,
-        useImagePullSecret: null,
-        spec: null,
-        global: null,
-        type: 'both',
-        __typename: null,
       },
     ],
   },
