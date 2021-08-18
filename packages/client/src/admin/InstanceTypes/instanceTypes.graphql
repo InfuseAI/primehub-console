@@ -53,3 +53,25 @@ query InstanceTypeInfoQuery($where: InstanceTypeWhereUniqueInput!) {
     ...InstanceTypeInfo
   }
 }
+
+mutation CreateInstanceTypeMutation($payload: InstanceTypeCreateInput!) {
+  createInstanceType(data: $payload) {
+    id
+  }
+}
+
+mutation UpdateInstanceTypeMutation(
+  $payload: InstanceTypeUpdateInput!
+  $where: InstanceTypeWhereUniqueInput!
+) {
+  updateInstanceType(data: $payload, where: $where) {
+    id
+    nodeSelector
+  }
+}
+
+mutation DeleteInstanceTypeMutation($where: InstanceTypeWhereUniqueInput!) {
+  deleteInstanceType(where: $where) {
+    id
+  }
+}
