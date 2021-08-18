@@ -10,14 +10,14 @@ import type { TSecret } from './types';
 function SecretTypeTip() {
   return (
     <Tooltip
-      placement="bottom"
+      placement='bottom'
       title={
         <div>
           Specify the type of the secret.{' '}
           <a
-            href="https://docs.primehub.io/docs/guide_manual/admin-secret#type-opaque"
-            target="_blank"
-            rel="noopener"
+            href='https://docs.primehub.io/docs/guide_manual/admin-secret#type-opaque'
+            target='_blank'
+            rel='noopener'
             style={{ color: '#839ce0' }}
           >
             Learn More.
@@ -25,7 +25,7 @@ function SecretTypeTip() {
         </div>
       }
     >
-      <Icon type="question-circle" />
+      <Icon type='question-circle' />
     </Tooltip>
   );
 }
@@ -67,16 +67,18 @@ export function SecretForm(props: SecretFormProps) {
             <span style={{ color: '#ff7875' }}>*</span>{' '}
           </>
         )}
-        <label htmlFor="secret-name">Name</label>
+        <label htmlFor='secret-name'>Name</label>
         <Controller
           control={control}
-          name="name"
+          name='name'
           rules={{
             required: true,
+            pattern:
+              /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
           }}
           render={({ field: { value, onChange } }) => (
             <Input
-              id="secret-name"
+              id='secret-name'
               disabled={props?.disabledName || false}
               value={value}
               onChange={onChange}
@@ -85,20 +87,21 @@ export function SecretForm(props: SecretFormProps) {
           )}
         />
         {!props?.disabledName && formState.errors.name && (
-          <Typography.Text type="danger">
-            Secret name is required
+          <Typography.Text type='danger'>
+            lower case alphanumeric characters, '-' or '.', and must start and
+            end with an alphanumeric character.
           </Typography.Text>
         )}
       </div>
 
       <div>
-        <label htmlFor="secret-display-name">Display Name</label>
+        <label htmlFor='secret-display-name'>Display Name</label>
         <Controller
           control={control}
-          name="displayName"
+          name='displayName'
           render={({ field: { onChange, value } }) => (
             <Input
-              id="secret-display-name"
+              id='secret-display-name'
               value={value}
               onChange={onChange}
               style={{ marginTop: '8px' }}
@@ -108,22 +111,22 @@ export function SecretForm(props: SecretFormProps) {
       </div>
 
       <div>
-        <label htmlFor="secret-type">
+        <label htmlFor='secret-type'>
           Type <SecretTypeTip />
         </label>
         <Controller
           control={control}
-          name="type"
+          name='type'
           render={({ field: { onChange, value } }) => {
             return (
               <Select
-                data-testid="secret-type"
+                data-testid='secret-type'
                 value={value}
                 onChange={onChange}
                 style={{ marginTop: '8px' }}
               >
-                <Select.Option value="opaque">Git Dataset</Select.Option>
-                <Select.Option value="kubernetes">Image Pull</Select.Option>
+                <Select.Option value='opaque'>Git Dataset</Select.Option>
+                <Select.Option value='kubernetes'>Image Pull</Select.Option>
               </Select>
             );
           }}
@@ -133,13 +136,13 @@ export function SecretForm(props: SecretFormProps) {
       {watchedSecretType === undefined ? null : watchedSecretType ===
         'opaque' ? (
         <div>
-          <label htmlFor="secret">Secret</label>
+          <label htmlFor='secret'>Secret</label>
           <Controller
             control={control}
-            name="secret"
+            name='secret'
             render={({ field: { value, onChange } }) => (
               <Input.TextArea
-                id="secret"
+                id='secret'
                 rows={4}
                 value={value}
                 onChange={onChange}
@@ -152,16 +155,16 @@ export function SecretForm(props: SecretFormProps) {
         <>
           <div>
             <span style={{ color: '#ff7875' }}>*</span>{' '}
-            <label htmlFor="registry-host">Registry Host</label>
+            <label htmlFor='registry-host'>Registry Host</label>
             <Controller
               control={control}
-              name="registryHost"
+              name='registryHost'
               rules={{
                 required: true,
               }}
               render={({ field: { value, onChange } }) => (
                 <Input
-                  id="registry-host"
+                  id='registry-host'
                   value={value}
                   onChange={onChange}
                   style={{ marginTop: '8px' }}
@@ -169,23 +172,23 @@ export function SecretForm(props: SecretFormProps) {
               )}
             />
             {formState.errors.registryHost && (
-              <Typography.Text type="danger">
+              <Typography.Text type='danger'>
                 Registry Host is required
               </Typography.Text>
             )}
           </div>
           <div>
             <span style={{ color: '#ff7875' }}>*</span>{' '}
-            <label htmlFor="username">Username</label>
+            <label htmlFor='username'>Username</label>
             <Controller
               control={control}
-              name="username"
+              name='username'
               rules={{
                 required: true,
               }}
               render={({ field: { value, onChange } }) => (
                 <Input
-                  id="username"
+                  id='username'
                   value={value}
                   onChange={onChange}
                   style={{ marginTop: '8px' }}
@@ -193,24 +196,24 @@ export function SecretForm(props: SecretFormProps) {
               )}
             />
             {formState.errors.username && (
-              <Typography.Text type="danger">
+              <Typography.Text type='danger'>
                 Username is required
               </Typography.Text>
             )}
           </div>
           <div>
             <span style={{ color: '#ff7875' }}>*</span>{' '}
-            <label htmlFor="password">Password</label>
+            <label htmlFor='password'>Password</label>
             <Controller
               control={control}
-              name="password"
+              name='password'
               rules={{
                 required: true,
               }}
               render={({ field: { value, onChange } }) => (
                 <Input
-                  id="password"
-                  type="password"
+                  id='password'
+                  type='password'
                   value={value}
                   onChange={onChange}
                   style={{ marginTop: '8px' }}
@@ -218,7 +221,7 @@ export function SecretForm(props: SecretFormProps) {
               )}
             />
             {formState.errors.password && (
-              <Typography.Text type="danger">
+              <Typography.Text type='danger'>
                 Password is required
               </Typography.Text>
             )}
@@ -238,7 +241,7 @@ export function SecretForm(props: SecretFormProps) {
         </Button>
 
         {/* @ts-ignore */}
-        <Button type="primary" htmlType="submit">
+        <Button type='primary' htmlType='submit'>
           Save
         </Button>
       </div>

@@ -107,7 +107,7 @@ function _Secrets({
           <Button.Group>
             <Button>
               <Link to={`${appPrefix}admin/secret/${secret.node.id}`}>
-                <Icon type="edit" />
+                <Icon type='edit' />
               </Link>
             </Button>
             <Button
@@ -134,7 +134,7 @@ function _Secrets({
                 });
               }}
             >
-              <Icon type="delete" />
+              <Icon type='delete' />
             </Button>
           </Button.Group>
         );
@@ -224,8 +224,8 @@ function _Secrets({
         <div style={styles}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
-              type="primary"
-              icon="plus"
+              type='primary'
+              icon='plus'
               // @ts-ignore
               disabled={secretQuery.loading}
               onClick={() =>
@@ -236,7 +236,7 @@ function _Secrets({
             </Button>
           </div>
           <Table
-            rowKey={(data) => data.node.id}
+            rowKey={data => data.node.id}
             style={{ paddingTop: 8 }}
             columns={columns}
             loading={secretQuery.loading}
