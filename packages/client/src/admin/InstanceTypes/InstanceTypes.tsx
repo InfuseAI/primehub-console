@@ -1,15 +1,21 @@
 import * as React from 'react';
-import { Link, useHistory } from 'react-router-dom';
-import { Button, Table, Input, Icon } from 'antd';
+import { Link, useHistory, useLocation } from 'react-router-dom';
+import { Button, Table, Input, Icon, Modal, notification } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
+import { omit } from 'lodash';
 
 import InfuseButton from 'components/infuseButton';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 import { InstanceTypesLayout } from './Layout';
-import { InstanceTypesQuery } from './instanceTypes.graphql';
+import { InstanceTypeForm, InstanceTypeFormState } from './InstanceTypeForm';
+import {
+  InstanceTypesQuery,
+  CreateInstanceTypeMutation,
+  DeleteInstanceTypeMutation,
+} from './instanceTypes.graphql';
 import type { TInstanceType } from './types';
 
 const styles: React.CSSProperties = {
@@ -21,7 +27,7 @@ const styles: React.CSSProperties = {
   backgroundColor: '#fff',
 };
 
-type InstanceTypeNode = {
+interface InstanceTypeNode {
   cursor: string;
   node: Pick<
     TInstanceType,
@@ -33,26 +39,26 @@ type InstanceTypeNode = {
     | 'gpuLimit'
     | 'memoryLimit'
   >;
-};
+}
 
-type InstanceTypeEdges = {
+interface InstanceTypeEdges {
   edges: InstanceTypeNode[];
   pageInfo: {
     currentPage: number;
     totalPage: number;
   };
-};
+}
 
-type QueryVariables = {
+interface QueryVariables {
   page: number;
   where?: {
     name_contains: string;
   };
-};
+}
 
 interface Props {
   data: {
-    refetch: (variables: QueryVariables) => Promise<void>;
+    refetch: (variables?: QueryVariables) => Promise<void>;
     error: Error | undefined;
     loading: boolean;
     variables: QueryVariables;
@@ -68,12 +74,36 @@ interface Props {
       ) => void;
     }) => void;
   };
+
+  createInstanceTypeMutation: ({
+    variables,
+  }: {
+    variables: {
+      payload: InstanceTypeFormState;
+    };
+  }) => Promise<{ data: { createSecret: { id: string } } }>;
+
+  deleteInstanceTypeMutation: ({
+    variables,
+  }: {
+    variables: {
+      where: {
+        id: string;
+      };
+    };
+  }) => Promise<void>;
 }
 
-export function _InstanceTypes({ data }: Props) {
+export function _InstanceTypes({
+  data,
+  createInstanceTypeMutation,
+  deleteInstanceTypeMutation,
+}: Props) {
   const [keyword, setKeyword] = React.useState('');
 
   const history = useHistory();
+  const location = useLocation();
+  const querystring = new URLSearchParams(location.search);
   const { appPrefix } = useRoutePrefix();
 
   const columns: ColumnProps<InstanceTypeNode>[] = [
@@ -116,11 +146,44 @@ export function _InstanceTypes({ data }: Props) {
           <Button.Group>
             <Button>
               <Link to={`${appPrefix}admin/instanceType/${instance.node.id}`}>
-                <Icon type="edit" />
+                <Icon type='edit' />
               </Link>
             </Button>
-            <Button onClick={() => ({})}>
-              <Icon type="delete" />
+            <Button
+              onClick={() => {
+                Modal.confirm({
+                  title: 'Delete Instance',
+                  content: (
+                    <>
+                      Are you sure to delete <strong>{instance.node.id}</strong>
+                      ?
+                    </>
+                  ),
+                  okText: 'Yes',
+                  onOk: async () => {
+                    try {
+                      await deleteInstanceTypeMutation({
+                        variables: {
+                          where: {
+                            id: instance.node.id,
+                          },
+                        },
+                      });
+                      await data.refetch();
+                    } catch (err) {
+                      console.error(err);
+                      notification.error({
+                        duration: 5,
+                        placement: 'bottomRight',
+                        message: 'Failure',
+                        description: 'Failure to delete, try again later.',
+                      });
+                    }
+                  },
+                });
+              }}
+            >
+              <Icon type='delete' />
             </Button>
           </Button.Group>
         );
@@ -141,6 +204,58 @@ export function _InstanceTypes({ data }: Props) {
     });
   }
 
+  async function onSubmit(
+    formData: InstanceTypeFormState & { nodeList?: string[][] }
+  ) {
+    const { tolerations, ...rest } = formData;
+    const nextTolerations =
+      tolerations.length === 0
+        ? []
+        : tolerations.map(toleration => omit(toleration, ['id', '__typename']));
+
+    let nextNodeSelector: Record<string, string> = {};
+    if (formData?.nodeList) {
+      nextNodeSelector = formData.nodeList.reduce((acc, v) => {
+        const key = v[0];
+        const value = v[1];
+
+        acc[key] = value;
+
+        return acc;
+      }, {});
+    }
+
+    try {
+      await createInstanceTypeMutation({
+        variables: {
+          payload: {
+            // `id` just be used in the frontend
+            ...omit(rest, ['id', 'nodeList', 'tolerations']),
+            tolerations: {
+              // @ts-ignore Due to API have a `set` field
+              set: nextTolerations,
+            },
+            nodeSelector: nextNodeSelector,
+          },
+        },
+      });
+
+      history.push(`${appPrefix}admin/instanceType`);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  if (querystring && querystring.get('operator') === 'create') {
+    return (
+      <InstanceTypesLayout>
+        <div style={styles}>
+          <InstanceTypeForm disableName={false} onSubmit={onSubmit} />
+        </div>
+      </InstanceTypesLayout>
+    );
+  }
+
   return (
     <InstanceTypesLayout>
       <div style={styles}>
@@ -148,8 +263,8 @@ export function _InstanceTypes({ data }: Props) {
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             {/* @ts-ignore */}
             <Button
-              type="primary"
-              icon="plus"
+              type='primary'
+              icon='plus'
               onClick={() =>
                 history.push(`${appPrefix}admin/instanceType?operator=create`)
               }
@@ -166,10 +281,10 @@ export function _InstanceTypes({ data }: Props) {
             }}
           >
             <Input.Search
-              placeholder="Search by display name"
+              placeholder='Search by display name'
               style={{ width: 295 }}
               value={keyword}
-              onChange={(event) => setKeyword(event.currentTarget.value)}
+              onChange={event => setKeyword(event.currentTarget.value)}
               onSearch={onSearch}
             />
             <InfuseButton disabled={data.loading} onClick={onSearch}>
@@ -193,7 +308,7 @@ export function _InstanceTypes({ data }: Props) {
         </div>
 
         <Table
-          rowKey={(data) => data.node.id}
+          rowKey={data => data.node.id}
           style={{ paddingTop: 8 }}
           columns={columns}
           loading={data.loading}
@@ -202,7 +317,7 @@ export function _InstanceTypes({ data }: Props) {
             current: data?.instanceTypesConnection?.pageInfo.currentPage,
             total: data?.instanceTypesConnection?.pageInfo.totalPage * 10,
 
-            onChange: (page) => {
+            onChange: page => {
               data.fetchMore({
                 variables: {
                   page,
@@ -233,5 +348,11 @@ export const InstanceTypes = compose(
         fetchPolicy: 'cache-and-network',
       };
     },
+  }),
+  graphql(CreateInstanceTypeMutation, {
+    name: 'createInstanceTypeMutation',
+  }),
+  graphql(DeleteInstanceTypeMutation, {
+    name: 'deleteInstanceTypeMutation',
   })
 )(_InstanceTypes);
