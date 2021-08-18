@@ -95,8 +95,6 @@ const radioGroupStyle = {
   border: '1px solid #e8e8e8',
 };
 
-const packagesPlaceHolder = `one package per line. e.g. \npackage1\npackage2\n`;
-
 const dashOrNumber = value => value === null ? '-' : value;
 
 const autoGenId = (name: string) => {
@@ -494,7 +492,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                             {form.getFieldDecorator('imageSpec.packages.apt', {
                               initialValue: get(packages, 'apt', []).join('\n'),
                             })(
-                              <TextArea disabled={!imageReady} rows={4} placeholder={packagesPlaceHolder}/>
+                              <TextArea disabled={!imageReady} rows={4}/>
                             )}
                           </Form.Item>
                         </Col>
@@ -503,7 +501,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                             {form.getFieldDecorator('imageSpec.packages.conda', {
                               initialValue: get(packages, 'conda', []).join('\n'),
                             })(
-                              <TextArea disabled={!imageReady} rows={4} placeholder={packagesPlaceHolder}/>
+                              <TextArea disabled={!imageReady} rows={4}/>
                             )}
                           </Form.Item>
                         </Col>
@@ -512,7 +510,7 @@ class ImageCreateForm extends React.Component<Props, State> {
                             {form.getFieldDecorator('imageSpec.packages.pip', {
                               initialValue: get(packages, 'pip', []).join('\n'),
                             })(
-                              <TextArea disabled={!imageReady} rows={4} placeholder={packagesPlaceHolder}/>
+                              <TextArea disabled={!imageReady} rows={4}/>
                             )}
                           </Form.Item>
                         </Col>
