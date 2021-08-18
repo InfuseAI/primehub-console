@@ -23,32 +23,20 @@ export const mlflow = {
   ]
 };
 
-export const groups = [{
-  __typename: 'Group',
-  id: 'groupId1',
-  name: 'group1',
-  mlflow,
-  displayName: 'c-Group 1',
-  enabledDeployment: true,
-  maxDeploy: 10,
-  enabledSharedVolume: true,
-  instanceTypes: [
-    {
-      id: 'g-it1',
-      name: 'IT1',
-      displayName: 'group1 it',
-      description: 'Basic instance.',
-      gpuLimit: 0,
-      cpuLimit: 0.5,
-      memoryLimit: 4,
-    },
-    users: null,
+export const groups = [
+  {
+    __typename: 'Group',
+    id: 'groupId1',
+    name: 'group1',
+    mlflow,
+    displayName: 'c-Group 1',
     enabledDeployment: true,
+    maxDeploy: 10,
     enabledSharedVolume: true,
+    users: null,
     jobDefaultActiveDeadlineSeconds: 86400,
     sharedVolumeCapacity: null,
     launchGroupOnly: null,
-    __typename: 'Group',
     instanceTypes: [
       {
         id: 'g-it1',
