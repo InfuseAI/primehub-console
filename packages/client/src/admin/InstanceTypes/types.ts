@@ -14,6 +14,9 @@ export type TInstanceType = {
 };
 
 export type TToleration = {
+  /**
+   * id is given by the upstream to represent each toleration
+   */
   id?: number | string;
   key: string;
   value: string;

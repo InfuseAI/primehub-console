@@ -14,6 +14,7 @@ import {
   Tooltip,
 } from 'antd';
 import { useHistory } from 'react-router-dom';
+import { omit } from 'lodash';
 import type { FormComponentProps } from 'antd/lib/form';
 
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
@@ -62,14 +63,14 @@ function Tips({
 
   return (
     <Tooltip
-      placement="right"
+      placement='right'
       title={
         <div>
           {instructions[type].text}{' '}
           <a
             href={instructions[type].link}
-            target="_blank"
-            rel="noopener"
+            target='_blank'
+            rel='noopener'
             style={{ color: '#839ce0' }}
           >
             Learn More.
@@ -77,7 +78,7 @@ function Tips({
         </div>
       }
     >
-      <Icon type="question-circle" />
+      <Icon type='question-circle' />
     </Tooltip>
   );
 }
@@ -169,7 +170,8 @@ export function _InstanceTypeForm({
 
   React.useEffect(() => {
     if (data?.tolerations.length > 0) {
-      setTolerations(data.tolerations);
+      const tolerations = data.tolerations.map(t => omit(t, ['__typename']));
+      setTolerations(tolerations);
     }
 
     if (data?.nodeSelector) {
@@ -200,139 +202,107 @@ export function _InstanceTypeForm({
     setEditModalVisible(false);
   }
 
-  form.getFieldDecorator('tolerations', {
-    initialValue: tolerations,
-  });
-  form.getFieldDecorator('nodeSelectorList', {
-    initialValue: nodeList,
-  });
-
   return (
     <Form
       style={{ backgroundColor: '#ffffff' }}
-      onSubmit={(event) => {
+      onSubmit={event => {
         event.preventDefault();
 
         form.validateFields((err, values: InstanceTypeFormState) => {
-          if (err) return;
-          props?.onSubmit(values);
+          if (err) {
+            console.error(err);
+            return;
+          }
+
+          if (props?.onSubmit) {
+            props.onSubmit(values);
+          }
         });
       }}
     >
-      <Tabs activeKey={activePanel} onTabClick={(tab) => setActivePanel(tab)}>
-        <Tabs.TabPane tab="Basic Info" key="1">
+      <Tabs activeKey={activePanel} onTabClick={tab => setActivePanel(tab)}>
+        {/* Basic */}
+        <Tabs.TabPane tab='Basic Info' key='1'>
           <Spin spinning={loading}>
-            <div
-              style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
-            >
-              <div
-                style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
-              >
-                <label htmlFor="instance-type-name">Name</label>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <Form.Item label='Name'>
                 {form.getFieldDecorator('name', {
                   initialValue: data?.name,
-                })(
-                  <Input
-                    id="instance-type-name"
-                    disabled={props?.disableName || false}
-                  />
-                )}
-              </div>
+                  rules: [
+                    {
+                      required: !props?.disableName || false,
+                      message: 'Name is required',
+                    },
+                  ],
+                })(<Input disabled={props?.disableName || false} />)}
+              </Form.Item>
 
-              <div
-                style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
-              >
-                <label htmlFor="instance-type-display-name">Display Name</label>
+              <Form.Item label='Display Name'>
                 {form.getFieldDecorator('displayName', {
-                  initialValue: data?.displayName,
-                })(<Input id="instance-type-display-name" />)}
-              </div>
+                  initialValue: data?.displayName || '',
+                })(<Input />)}
+              </Form.Item>
 
-              <div
-                style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
-              >
-                <label htmlFor="instance-type-description">Description</label>
+              <Form.Item label='Decription'>
                 {form.getFieldDecorator('description', {
-                  initialValue: data?.description,
-                })(<Input id="instance-type-description" />)}
-              </div>
+                  initialValue: data?.description || '',
+                })(<Input />)}
+              </Form.Item>
 
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                }}
-              >
-                <label htmlFor="instance-type-cpu-limit">
-                  CPU Limit <Tips type="cpuLimit" />
+              <Form.Item>
+                <label
+                  style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                >
+                  CPU Limit <Tips type='cpuLimit' />
                 </label>
 
                 {form.getFieldDecorator('cpuLimit', {
-                  initialValue: data?.cpuLimit,
+                  initialValue: data?.cpuLimit || 1,
                 })(
                   <InputNumber
                     min={0}
                     precision={1}
                     step={0.5}
-                    formatter={(value) => `${value} GB`}
                     // @ts-ignore
-                    parser={(value) => value.replace(/[^0-9.]/g, '')}
+                    parser={value => value.replace(/[^0-9.]/g, '')}
                     style={{ width: '105px' }}
                   />
                 )}
-              </div>
+              </Form.Item>
 
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                }}
-              >
-                <label htmlFor="instance-type-memory-limit">
-                  Memory Limit <Tips type="memoryLimit" />
+              <Form.Item>
+                <label
+                  style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                >
+                  Memory Limit <Tips type='memoryLimit' />
                 </label>
 
                 {form.getFieldDecorator('memoryLimit', {
-                  initialValue: data?.memoryLimit,
+                  initialValue: data?.memoryLimit || 1,
                 })(
                   <InputNumber
-                    id="instance-type-memory-limit"
                     min={0}
                     precision={1}
                     step={0.5}
-                    formatter={(value) => `${value} GB`}
+                    formatter={value => `${value} GB`}
                     // @ts-ignore
-                    parser={(value) => value.replace(/[^0-9.]/g, '')}
+                    parser={value => value.replace(/[^0-9.]/g, '')}
                     style={{ width: '105px' }}
                   />
                 )}
-              </div>
+              </Form.Item>
 
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                }}
-              >
-                <label htmlFor="instance-type-gpu-limit">
-                  GPU Limit <Tips type="gpuLimit" />
+              <Form.Item>
+                <label
+                  style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                >
+                  GPU Limit <Tips type='gpuLimit' />
                 </label>
 
                 {form.getFieldDecorator('gpuLimit', {
-                  initialValue: data?.gpuLimit,
-                })(
-                  <InputNumber
-                    id="instance-type-gpu-limit"
-                    min={0}
-                    precision={1}
-                    step={0.5}
-                    style={{ width: '105px' }}
-                  />
-                )}
-              </div>
+                  initialValue: data?.gpuLimit || 0,
+                })(<InputNumber min={0} step={1} style={{ width: '105px' }} />)}
+              </Form.Item>
 
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <h4>Overcommitting (advanced feature)</h4>
@@ -340,20 +310,20 @@ export function _InstanceTypeForm({
                   If you want to overcommit computing resources, you can use
                   this feature.{' '}
                   <a
-                    href="https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-feature"
-                    target="_blank"
-                    rel="noopener"
+                    href='https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-feature'
+                    target='_blank'
+                    rel='noopener'
                   >
                     More Info
                   </a>
                 </p>
               </div>
 
-              <div
-                style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
-              >
-                <label htmlFor="instance-type-cpu-request">
-                  CPU Request <Tips type="cpuRequest" />
+              <Form.Item>
+                <label
+                  style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                >
+                  CPU Request <Tips type='cpuRequest' />
                 </label>
                 <div>
                   <Checkbox
@@ -366,25 +336,33 @@ export function _InstanceTypeForm({
                     }
                   />
                   {form.getFieldDecorator('cpuRequest', {
-                    initialValue: data?.cpuRequest,
+                    initialValue: data?.cpuRequest || 0.5,
                   })(
                     <InputNumber
-                      id="instance-type-cpu-request"
                       min={0}
                       step={0.5}
-                      defaultValue={0}
                       disabled={!advanceFeature.enableCpuRequest}
+                      formatter={value => {
+                        if (advanceFeature.enableCpuRequest) {
+                          if (value === '') {
+                            return '0';
+                          }
+                          return String(value);
+                        }
+
+                        return null;
+                      }}
                       style={{ marginLeft: '8px', width: '130px' }}
                     />
                   )}
                 </div>
-              </div>
+              </Form.Item>
 
-              <div
-                style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
-              >
-                <label htmlFor="instance-type-memory-request">
-                  Memory Request <Tips type="memoryRequest" />
+              <Form.Item>
+                <label
+                  style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                >
+                  Memory Request <Tips type='memoryRequest' />
                 </label>
                 <div>
                   <Checkbox
@@ -397,14 +375,14 @@ export function _InstanceTypeForm({
                     }
                   />
                   {form.getFieldDecorator('memoryRequest', {
-                    initialValue: data?.memoryRequest,
+                    initialValue: data?.memoryRequest || 1,
                   })(
                     <InputNumber
-                      id="instance-type-memory-request"
+                      id='instance-type-memory-request'
                       min={0}
                       precision={1}
                       step={0.5}
-                      formatter={(value) => {
+                      formatter={value => {
                         if (advanceFeature.enableMemoryRequest) {
                           if (value === '') {
                             return '0 GB';
@@ -415,37 +393,37 @@ export function _InstanceTypeForm({
                         return null;
                       }}
                       // @ts-ignore
-                      parser={(value) => value.replace(/[^0-9.]/g, '')}
+                      parser={value => value.replace(/[^0-9.]/g, '')}
                       disabled={!advanceFeature.enableMemoryRequest}
                       style={{ marginLeft: '8px', width: '130px' }}
                     />
                   )}
                 </div>
-              </div>
+              </Form.Item>
 
-              <div
-                style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
-              >
-                <label htmlFor="instance-type-global">
-                  Global <Tips type="global" />
+              <Form.Item>
+                <label
+                  style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                >
+                  Global <Tips type='global' />
                 </label>
                 {form.getFieldDecorator('global', {
                   valuePropName: 'checked',
                   initialValue: data?.global,
                 })(
                   <Switch
-                    checkedChildren="Yes"
-                    unCheckedChildren="No"
+                    checkedChildren='Yes'
+                    unCheckedChildren='No'
                     style={{ width: '60px' }}
                   />
                 )}
-              </div>
+              </Form.Item>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button
-                  icon="arrow-right"
+                  icon='arrow-right'
                   onClick={() =>
-                    setActivePanel((prev) => String(Number(prev) + 1))
+                    setActivePanel(prev => String(Number(prev) + 1))
                   }
                 >
                   Next
@@ -455,7 +433,8 @@ export function _InstanceTypeForm({
           </Spin>
         </Tabs.TabPane>
 
-        <Tabs.TabPane tab="Tolerations" key="2">
+        {/* Tolerations */}
+        <Tabs.TabPane tab='Tolerations' key='2'>
           <div
             style={{
               display: 'flex',
@@ -465,8 +444,8 @@ export function _InstanceTypeForm({
           >
             {/* @ts-ignore */}
             <Button
-              type="primary"
-              icon="plus"
+              type='primary'
+              icon='plus'
               onClick={() => {
                 setTolerModalFormAction('create');
                 setEditModalVisible(true);
@@ -476,78 +455,82 @@ export function _InstanceTypeForm({
             </Button>
           </div>
 
-          <Table
-            loading={loading}
-            pagination={false}
-            rowKey={(data) => data.key}
-            dataSource={tolerations}
-            columns={[
-              {
-                key: 'key',
-                title: 'Key',
-                dataIndex: 'key',
-              },
-              {
-                key: 'value',
-                title: 'Value',
-                render: (value) => value.value ?? '-',
-              },
-              {
-                key: 'operator',
-                title: 'Operator',
-                dataIndex: 'operator',
-              },
-              {
-                key: 'effect',
-                title: 'Effect',
-                dataIndex: 'effect',
-              },
-              {
-                key: 'actions',
-                title: 'Actions',
-                render: function Actions(_, value, id) {
-                  return (
-                    <Button.Group>
-                      <Button
-                        onClick={() => {
-                          setTolerModalFormAction('update');
-                          setEditModalVisible(true);
-                          setEditToleration({
-                            ...value,
-                            id,
-                          });
-                        }}
-                      >
-                        <Icon type="edit" />
-                      </Button>
-                      <Popconfirm
-                        title="Are you sure delete this task?"
-                        onConfirm={() => {
-                          const nextTolerations = tolerations.filter(
-                            (_, id) => id !== editToleration.id
-                          );
-
-                          setTolerations(nextTolerations);
-                          setEditToleration(null);
-                        }}
-                      >
+          {form.getFieldDecorator('tolerations', {
+            initialValue: tolerations,
+          })(
+            <Table
+              loading={loading}
+              pagination={false}
+              rowKey={data => data.key}
+              dataSource={tolerations}
+              columns={[
+                {
+                  key: 'key',
+                  title: 'Key',
+                  dataIndex: 'key',
+                },
+                {
+                  key: 'value',
+                  title: 'Value',
+                  render: value => value.value ?? '-',
+                },
+                {
+                  key: 'operator',
+                  title: 'Operator',
+                  dataIndex: 'operator',
+                },
+                {
+                  key: 'effect',
+                  title: 'Effect',
+                  dataIndex: 'effect',
+                },
+                {
+                  key: 'actions',
+                  title: 'Actions',
+                  render: function Actions(_, value, id) {
+                    return (
+                      <Button.Group>
                         <Button
                           onClick={() => {
+                            setTolerModalFormAction('update');
+                            setEditModalVisible(true);
                             setEditToleration({
                               ...value,
                               id,
                             });
                           }}
                         >
-                          <Icon type="delete" />
+                          <Icon type='edit' />
                         </Button>
-                      </Popconfirm>
-                    </Button.Group>
-                  );
+                        <Popconfirm
+                          title='Are you sure delete this task?'
+                          onConfirm={() => {
+                            const nextTolerations = tolerations.filter(
+                              (_, id) => id !== editToleration.id
+                            );
+
+                            setTolerations(nextTolerations);
+                            setEditToleration(null);
+                          }}
+                        >
+                          <Button
+                            onClick={() => {
+                              setEditToleration({
+                                ...value,
+                                id,
+                              });
+                            }}
+                          >
+                            <Icon type='delete' />
+                          </Button>
+                        </Popconfirm>
+                      </Button.Group>
+                    );
+                  },
                 },
-              },
-            ]}
-          />
+              ]}
+            />
+          )}
 
           <div
             style={{
@@ -558,141 +541,70 @@ export function _InstanceTypeForm({
             }}
           >
             <Button
-              icon="arrow-left"
-              onClick={() => setActivePanel((prev) => String(Number(prev) - 1))}
+              icon='arrow-left'
+              onClick={() => setActivePanel(prev => String(Number(prev) - 1))}
             >
               Back
             </Button>
             <Button
-              icon="arrow-right"
-              onClick={() => setActivePanel((prev) => String(Number(prev) + 1))}
+              icon='arrow-right'
+              onClick={() => setActivePanel(prev => String(Number(prev) + 1))}
             >
               Next
             </Button>
           </div>
         </Tabs.TabPane>
 
-        <Tabs.TabPane tab="Node Selector" key="3">
-          {/* {nodeList?.map((node, i) => {
-            return (
-              <div key={i} style={{ display: 'flex', gap: '36px' }}>
-                <Form.Item
-                  label="Key"
-                  labelCol={{
-                    sm: { span: 3 },
-                  }}
-                  style={{ display: 'flex', width: '42%' }}
-                >
-                  {form.getFieldDecorator(`nodeList[${i}][0]`, {
-                    validateTrigger: ['onBlur'],
-                    rules: [
-                      {
-                        required: true,
-                        validator: (_, value, callabck) => {
-                          if (value.length < 3 || value.length > 63) {
-                            return callabck(
-                              '🔸 Must be between 3 and 63 characters'
-                            );
-                          }
-                          if (
-                            !value.match(
-                              /^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/
-                            )
-                          ) {
-                            return callabck(`🔸 Must be alphanumeric characters, '_', '.', '/' or
-                            '-', and start and end with an alphanumeric
-                            character.`);
-                          }
-                        },
-                      },
-                    ],
-                    initialValue: node[0],
-                  })(<Input style={{ width: '415px' }} />)}
-                </Form.Item>
-                <Form.Item
-                  label="Value"
-                  labelCol={{
-                    sm: { span: 3 },
-                  }}
-                  style={{ display: 'flex', width: '42%' }}
-                >
-                  {form.getFieldDecorator(`nodeList[${i}][1]`, {
-                    validateTrigger: ['onBlur'],
-                    rules: [
-                      {
-                        required: true,
-                        validator: (_, value, callabck) => {
-                          if (value.length < 3 || value.length > 63) {
-                            return callabck(
-                              'Must be between 3 and 63 characters'
-                            );
-                          }
-                          if (
-                            !value.match(
-                              /^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/
-                            )
-                          ) {
-                            return callabck(`Must be alphanumeric characters, '_', '.', '/' or
-                            '-', and start and end with an alphanumeric
-                            character.`);
-                          }
-                        },
-                      },
-                    ],
-                    initialValue: node[1],
-                  })(<Input style={{ width: '415px' }} />)}
-                </Form.Item>
-                <Icon
-                  type="close-circle"
-                  theme="twoTone"
-                  style={{
-                    cursor: 'pointer',
-                    height: '16px',
-                    marginTop: '12px',
-                  }}
-                  onClick={() => {
-                    form.resetFields();
-                    setNodeList((prev) => {
-                      const nextNodes = prev.filter((node, id) => id !== i);
-                      return nextNodes;
-                    });
-                  }}
-                />
-              </div>
-            );
-          })} */}
-
-          <NodeSelectorList
-            nodes={nodeList}
-            onChange={setNodeList}
-            form={form}
-          />
+        {/* Node Selector */}
+        <Tabs.TabPane tab='Node Selector' key='3'>
+          {form.getFieldDecorator('nodeSelector', {
+            initialValue: nodeList,
+          })(
+            <NodeSelectorList
+              nodes={nodeList}
+              form={form}
+              onChange={setNodeList}
+            />
+          )}
 
           <div
             style={{
               display: 'flex',
               marginTop: '24px',
-              justifyContent: 'flex-end',
+              justifyContent: 'space-between',
               gap: '8px',
             }}
           >
             <Button
-              onClick={() => {
-                history.push(`${appPrefix}admin/instanceType`);
-              }}
+              icon='arrow-left'
+              onClick={() => setActivePanel(prev => String(Number(prev) - 1))}
             >
-              Cancel
+              Back
             </Button>
-            {/* @ts-ignore */}
-            <Button type="primary" htmlType="submit">
-              Save
-            </Button>
+
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <Button
+                onClick={() => {
+                  history.push(`${appPrefix}admin/instanceType`);
+                }}
+              >
+                Cancel
+              </Button>
+              {/* @ts-ignore */}
+              <Button type='primary' htmlType='submit'>
+                Save
+              </Button>
+            </div>
           </div>
         </Tabs.TabPane>
+
+        {form.getFieldDecorator('id', {
+          initialValue: data?.id,
+        })(<Input type='hidden' />)}
       </Tabs>
 
       <TolerationModalForm
-        type="update"
+        type={tolerModalFormAction}
         visible={editModalVisible}
         currentToleration={editToleration}
         setToleration={setEditToleration}
