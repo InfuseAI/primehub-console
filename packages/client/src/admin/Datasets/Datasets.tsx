@@ -66,7 +66,7 @@ interface Props {
   }) => Promise<void>;
 }
 
-interface State {
+interface QueryVariables {
   page: number;
   orderBy?: {};
   where?: {
@@ -84,7 +84,7 @@ function _Datasets({
   const location = useLocation();
   const querystring = new URLSearchParams(location.search);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [state, setState] = useState<State>({ page: 1 });
+  const [queryVariables, setQueryVariables] = useState<QueryVariables>({ page: 1 });
 
   useEffect(() => {
     if (datasetQuery.error) {
@@ -100,12 +100,13 @@ function _Datasets({
 
   async function handleSearch(searchString) {
     const variables = {
-      ...state,
+      ...queryVariables,
+      page: 1,
       where: {
         displayName_contains: searchString,
       },
     };
-    setState(variables);
+    setQueryVariables(variables);
     datasetQuery.refetch(variables);
   }
 
@@ -122,7 +123,7 @@ function _Datasets({
         [sorter.columnKey]: sorter.order === 'ascend' ? 'asc' : 'desc',
       },
     };
-    setState(variables);
+    setQueryVariables(variables);
     datasetQuery.refetch(variables);
   }
 
