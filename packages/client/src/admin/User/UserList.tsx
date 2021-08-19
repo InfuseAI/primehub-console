@@ -127,7 +127,7 @@ function List(props: Props) {
 
   const searchHandler = searchDict => {
     const { listUser } = props;
-    const { variables, refetch } = listUser;
+    const { refetch } = listUser;
     const pickedCond = pick(searchDict, ['username', 'email']);
     const reducedCond = reduce(
       pickedCond,
@@ -138,7 +138,10 @@ function List(props: Props) {
       {}
     );
     const newVariables = {
-      ...variables,
+      userAfter: undefined,
+      userFirst: PAGE_SIZE,
+      userLast: undefined,
+      userBefore: '0',
       where: {
         ...reducedCond,
       },
