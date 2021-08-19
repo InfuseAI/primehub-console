@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Input, Col, Layout, Button } from 'antd';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { List } from './list';
-import { reduce } from 'lodash';
+import { reduce, get } from 'lodash';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import Breadcrumbs from 'components/share/breadcrumb';
@@ -26,6 +26,7 @@ type Props = {
 } & RouteComponentProps;
 
 export function GroupList(props: Props) {
+  const { history } = props;
   const DISABLE_GROUP = (window as any).disableGroup || false;
   const breadcrumbs = [
     {
@@ -37,6 +38,26 @@ export function GroupList(props: Props) {
       tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-group',
     },
   ];
+  const params = queryString.parse(history.location.search.replace(/^\?/, ''));
+  const [currentPage, setCurrentPage] = useState(get(params, 'page', 1));
+  const [search, setSearch] = useState(get(params, 's', null));
+  const [orderBy, setOrderBy] = useState(get(params, 'orderBy', null));
+
+  useEffect(() => {
+    const paramsResult = [];
+    if (search) {
+      paramsResult.push(`s=${search}`);
+    }
+    if (orderBy) {
+      paramsResult.push(`orderBy=${orderBy}`);
+    }
+    if (currentPage) {
+      paramsResult.push(`page=${currentPage}`);
+    }
+    history.replace({
+      search: `?${paramsResult.join('&')}`,
+    });
+  }, [currentPage, search, orderBy, history]);
 
   const edit = id => {};
   const remove = (id, record) => {
@@ -77,18 +98,14 @@ export function GroupList(props: Props) {
     );
   };
 
-  const params = queryString.parse(
-    props.history.location.search.replace(/^\?/, '')
-  );
-  let orderBy = {};
+  let parsedOrderBy = {};
   try {
-    orderBy = JSON.parse((params.orderBy as string) || '{}');
+    parsedOrderBy = JSON.parse((orderBy as string) || '{}');
   } catch (e) {
     console.error(e);
   }
-  const { page } = params;
   const paginationData = {
-    current: +page,
+    current: +currentPage,
   };
   const reducedOrderBy: {
     name?: string;
@@ -99,7 +116,7 @@ export function GroupList(props: Props) {
     projectQuotaCpu?: string;
     projectQuotaGpu?: string;
   } = reduce(
-    orderBy,
+    parsedOrderBy,
     (result, value, key) => {
       result[key] = `${value}end`;
       return result;
@@ -183,21 +200,24 @@ export function GroupList(props: Props) {
     },
   ];
 
-  const searchHandler = () => {};
+  const searchHandler = keyword => {
+    setSearch(keyword);
+    setCurrentPage(null);
+  };
+
   const tableChangeHandler = (pagination, filters, sorter) => {
-    const { history } = props;
     const { field, order } = sorter;
-    const search = [];
     const sequence = order === 'ascend' ? 'asc' : 'desc';
     if (field) {
-      search.push(`orderBy={"${field}":"${sequence}"}`);
+      setOrderBy(`{"${field}":"${sequence}"}`);
+    } else {
+      setOrderBy(null);
     }
     if (pagination.current) {
-      search.push(`page=${pagination.current}`);
+      setCurrentPage(`${pagination.current}`);
+    } else {
+      setCurrentPage(null);
     }
-    history.replace({
-      search: `?${search.join('&')}`,
-    });
   };
 
   return (
@@ -232,7 +252,11 @@ export function GroupList(props: Props) {
         >
           <Col key='search-handler' style={{ flex: 1 }}>
             <FilterPlugins style={{ marginRight: '10px' }}>
-              <Search placeholder={`Search Group`} onSearch={searchHandler} />
+              <Search
+                placeholder={`Search Group`}
+                defaultValue={search}
+                onSearch={searchHandler}
+              />
             </FilterPlugins>
           </Col>
           <ButtonCol></ButtonCol>
@@ -254,13 +278,18 @@ export default compose(
   graphql(GroupsConnection, {
     options: (props: RouteComponentProps) => {
       try {
-        const params = queryString.parse(
+        const params: { orderBy?: string; s?: string } = queryString.parse(
           props.location.search.replace(/^\?/, '')
         );
         const orderBy = JSON.parse((params.orderBy as string) || '{}');
+        const where: { name_contains?: string } = {};
+        if (params.s) {
+          where.name_contains = params.s;
+        }
         return {
           variables: {
             orderBy,
+            where,
           },
           fetchPolicy: 'cache-and-network',
         };
