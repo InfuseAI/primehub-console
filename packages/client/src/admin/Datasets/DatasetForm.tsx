@@ -132,18 +132,6 @@ function _DatasetForm(props: Props) {
             </Form.Item>
           </div>)
         }
-
-        {!editMode ? null :
-          <div data-testid='dataset/enableUploadServer'>
-            <Form.Item label='Enable Upload Server'>
-              {form.getFieldDecorator('enableUploadServer', {
-                initialValue: initialValue?.enableUploadServer || false,
-              })(
-                <EnableUploadServer name={name} allowRegenerateSecret={initialValue?.enableUploadServer} />
-              )}
-            </Form.Item>
-          </div>
-        }
       </>);
   }
 
@@ -281,18 +269,22 @@ function _DatasetForm(props: Props) {
   let typeSepcificItems = null;
   let allowWritable = false;
   let mountRootVisible = false;
+  let enableUpdateServerVisible = false;
   if (type === DatasetType.PV) {
     typeSepcificItems = renderPvDataset();
     allowWritable = true;
     mountRootVisible = true;
+    enableUpdateServerVisible = true;
   } else if (type === DatasetType.NFS) {
     typeSepcificItems = renderNfsDataset();
     allowWritable = true;
     mountRootVisible = true;
+    enableUpdateServerVisible = true;
   } else if (type === DatasetType.HOSTPATH) {
     typeSepcificItems = renderHostPathDataset();
     allowWritable = true;
     mountRootVisible = true;
+    enableUpdateServerVisible = true;
   } else if (type === DatasetType.GIT) {
     typeSepcificItems = renderGitDataset();
   } else if (type === DatasetType.ENV) {
@@ -378,6 +370,18 @@ function _DatasetForm(props: Props) {
               </Form.Item>
             </div>
             {typeSepcificItems}
+
+            {editMode && enableUpdateServerVisible &&
+              <div data-testid='dataset/enableUploadServer'>
+                <Form.Item label='Enable Upload Server'>
+                  {form.getFieldDecorator('enableUploadServer', {
+                    initialValue: initialValue?.enableUploadServer || false,
+                  })(
+                    <EnableUploadServer name={name} allowRegenerateSecret={initialValue?.enableUploadServer} />
+                  )}
+                </Form.Item>
+              </div>
+            }
 
             <div data-testid='dataset/groups'>
               {form.getFieldDecorator('groups', {
