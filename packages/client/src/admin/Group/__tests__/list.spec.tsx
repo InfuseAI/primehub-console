@@ -4,7 +4,7 @@ import { Route, MemoryRouter } from 'react-router-dom';
 import ImageCreatePage from 'containers/imageCreatePage';
 import { MockedProvider } from 'react-apollo/test-utils';
 import { List } from '../list';
-import { GroupList } from '../group/list';
+import { GroupList } from '../GroupList';
 import groupsFakeData from '../../../fakeData/groups';
 
 describe('Admin Portal - List Component', () => {

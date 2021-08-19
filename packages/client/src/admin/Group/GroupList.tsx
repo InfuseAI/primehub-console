@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Input, Col, Layout, Button } from 'antd';
 import { withRouter } from 'react-router-dom';
 import {RouteComponentProps} from 'react-router';
-import {List} from '../list';
+import {List} from './list';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import Breadcrumbs from 'components/share/breadcrumb';
