@@ -255,7 +255,7 @@ const createApplication = async (context: Context, data: PhApplicationMutationIn
   const svcTemplate = appTemplate.spec.template.spec && appTemplate.spec.template.spec.svcTemplate;
   let httpPort = null;
   let rewrite = false;
-  let appRoot = null;
+  let appRoot = '';
 
   // Append env to pod template
   if (podTemplate.spec.containers && podTemplate.spec.containers.length > 0) {
