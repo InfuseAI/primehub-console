@@ -10,12 +10,23 @@ import InfuseButton from 'components/infuseButton';
 import EnableUploadServer from './EnableUploadServer';
 import { GitSecret } from './GitSecret';
 import { DatasetGroupsRelationTable } from './DatasetGroupsRelationTable';
+import { MountRoot } from './MountRoot';
+import styled from 'styled-components';
 
 interface Props extends FormComponentProps {
   onSubmit?: (data: Partial<TDatasetForm>) => Promise<void>;
   initialValue: TDataset;
   editMode?: boolean;
 }
+
+const StyledForm = styled(Form)`
+  .ant-form-item-label {
+    margin-bottom: -4px;
+  }
+  .ant-form-item {
+    margin-bottom: 10px;
+  }
+`;
 
 function _DatasetForm(props: Props) {
   const { editMode, initialValue, form } = props;
@@ -261,6 +272,7 @@ function _DatasetForm(props: Props) {
   }
 
   const type = form.getFieldValue('type') || initialValue?.type;
+  const name = form.getFieldValue('name') || initialValue?.name;
   const global =
     form.getFieldValue('global') != undefined ?
       form.getFieldValue('global') :
@@ -268,15 +280,19 @@ function _DatasetForm(props: Props) {
 
   let typeSepcificItems = null;
   let allowWritable = false;
+  let mountRootVisible = false;
   if (type === DatasetType.PV) {
     typeSepcificItems = renderPvDataset();
     allowWritable = true;
+    mountRootVisible = true;
   } else if (type === DatasetType.NFS) {
     typeSepcificItems = renderNfsDataset();
     allowWritable = true;
+    mountRootVisible = true;
   } else if (type === DatasetType.HOSTPATH) {
     typeSepcificItems = renderHostPathDataset();
     allowWritable = true;
+    mountRootVisible = true;
   } else if (type === DatasetType.GIT) {
     typeSepcificItems = renderGitDataset();
   } else if (type === DatasetType.ENV) {
@@ -288,11 +304,11 @@ function _DatasetForm(props: Props) {
       <InfuseButton>
         <Link to={`${appPrefix}admin/dataset`}><Icon type='arrow-left' /> Back</Link>
       </InfuseButton>
-      <Form onSubmit={handleSubmit}>
+      <StyledForm onSubmit={handleSubmit}>
         <Row>
           <Col>
             <div data-testid='dataset/name'>
-              <Form.Item label={`Name`}>
+              <Form.Item label='Name'>
                 {form.getFieldDecorator('name', {
                   initialValue: initialValue?.name,
                   rules: [
@@ -306,61 +322,74 @@ function _DatasetForm(props: Props) {
               </Form.Item>
             </div>
 
-            <div data-testid='dataset/displayName'></div>
-            <Form.Item label={`Display Name`}>
-              {form.getFieldDecorator('displayName', {
-                initialValue: initialValue?.displayName,
-              })(<Input data-testid='dataset/input-displayName' />)}
-            </Form.Item>
+            <div data-testid='dataset/displayName'>
+              <Form.Item label={`Display Name`}>
+                {form.getFieldDecorator('displayName', {
+                  initialValue: initialValue?.displayName,
+                })(<Input data-testid='dataset/input-displayName' />)}
+              </Form.Item>
+            </div>
 
-            <div data-testid='dataset/description'></div>
-            <Form.Item label='Description'>
-              {form.getFieldDecorator('description', {
-                initialValue: initialValue?.description,
-              })(<Input data-testid='dataset/input-description' />)}
-            </Form.Item>
+            <div data-testid='dataset/description'>
+              <Form.Item label='Description'>
+                {form.getFieldDecorator('description', {
+                  initialValue: initialValue?.description,
+                })(<Input data-testid='dataset/input-description' />)}
+              </Form.Item>
+            </div>
 
-            <div data-testid='dataset/global'></div>
-            <Form.Item label={`Global`}>
-              {form.getFieldDecorator('global', {
-                initialValue: initialValue?.global,
-                valuePropName: 'checked',
-              })(<Switch />)
+            { editMode && mountRootVisible &&
+              <div data-testid='dataset/mountRoot'>
+                <Form.Item label='Mount Root'>
+                  <MountRoot name={name} />
+                </Form.Item>
+              </div>
             }
-            </Form.Item>
 
-            <div data-testid='dataset/displayName'></div>
-            <Form.Item label='Type'>
-              {form.getFieldDecorator('type', {
-                initialValue: initialValue?.type,
-                rules: [
-                  {
-                    required: true,
-                    message: 'Please select a type.',
-                  },
-                ],
-              })(
-                <Select disabled={editMode} style={{width: '200px'}} placeholder='Select an item'>
-                  <Select.Option value="pv">Persistent Volume</Select.Option>
-                  <Select.Option value="nfs">NFS</Select.Option>
-                  <Select.Option value="hostPath">Host Path</Select.Option>
-                  <Select.Option value="git">Git</Select.Option>
-                  <Select.Option value="env">Env</Select.Option>
-                </Select>
-              )}
-            </Form.Item>
+            <div data-testid='dataset/global'>
+              <Form.Item label={`Global`}>
+                {form.getFieldDecorator('global', {
+                  initialValue: initialValue?.global,
+                  valuePropName: 'checked',
+                })(<Switch />)
+              }
+              </Form.Item>
+            </div>
+
+            <div data-testid='dataset/displayName'>
+              <Form.Item label='Type'>
+                {form.getFieldDecorator('type', {
+                  initialValue: initialValue?.type,
+                  rules: [
+                    {
+                      required: true,
+                      message: 'Please select a type.',
+                    },
+                  ],
+                })(
+                  <Select disabled={editMode} style={{width: '200px'}} placeholder='Select an item'>
+                    <Select.Option value="pv">Persistent Volume</Select.Option>
+                    <Select.Option value="nfs">NFS</Select.Option>
+                    <Select.Option value="hostPath">Host Path</Select.Option>
+                    <Select.Option value="git">Git</Select.Option>
+                    <Select.Option value="env">Env</Select.Option>
+                  </Select>
+                )}
+              </Form.Item>
+            </div>
             {typeSepcificItems}
 
-            <div data-testid='dataset/groups'></div>
-            {form.getFieldDecorator('groups', {
-              initialValue: {},
-            })(
-              <DatasetGroupsRelationTable
-                groups={initialValue?.groups}
-                allowWritable={allowWritable}
-                allowReadOnly={!global}
-              />
-            )}
+            <div data-testid='dataset/groups'>
+              {form.getFieldDecorator('groups', {
+                initialValue: {},
+              })(
+                <DatasetGroupsRelationTable
+                  groups={initialValue?.groups}
+                  allowWritable={allowWritable}
+                  allowReadOnly={!global}
+                />
+              )}
+            </div>
 
             <Form.Item style={{textAlign: 'right', marginTop: 12}}>
               <InfuseButton
@@ -377,7 +406,7 @@ function _DatasetForm(props: Props) {
             </Form.Item>
           </Col>
         </Row>
-      </Form>
+      </StyledForm>
     </div>
   );
 }
