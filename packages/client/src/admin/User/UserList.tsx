@@ -128,15 +128,19 @@ function List(props: Props) {
   const searchHandler = searchDict => {
     const { listUser } = props;
     const { variables, refetch } = listUser;
-    const pickedCond = pick(searchDict, [
-      'username_contains',
-      'email_contains',
-    ]);
-    const reducedCond = reduce(pickedCond, (result, value, key) => {result[key] = value.contains; return result;}, {});
+    const pickedCond = pick(searchDict, ['username', 'email']);
+    const reducedCond = reduce(
+      pickedCond,
+      (result, value, key) => {
+        result[`${key}_contains`] = value.contains;
+        return result;
+      },
+      {}
+    );
     const newVariables = {
       ...variables,
       where: {
-        ...reducedCond
+        ...reducedCond,
       },
     };
     refetch(newVariables);
