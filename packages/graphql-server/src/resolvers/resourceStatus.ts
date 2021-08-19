@@ -65,9 +65,9 @@ export const query = async (group, args, context: Context) => {
     });
     if (current.status.phase === PENDING || current.status.phase === RUNNING) {
       (current.spec.containers || []).forEach(container => {
-        acc.cpuUsage += converCpuValueToFloat(container.resources.requests.cpu);
-        acc.gpuUsage += converCpuValueToFloat(container.resources.requests['nvidia.com/gpu']);
-        acc.memUsage += converMemResourceToBytes(container.resources.requests.memory);
+        acc.cpuUsage += converCpuValueToFloat(container.resources.limits.cpu);
+        acc.gpuUsage += converCpuValueToFloat(container.resources.limits['nvidia.com/gpu']);
+        acc.memUsage += converMemResourceToBytes(container.resources.limits.memory);
       });
     }
     return acc;
