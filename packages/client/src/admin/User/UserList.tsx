@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Input, Col, Layout, Button, Icon, Modal } from 'antd';
 import { withRouter, useHistory } from 'react-router-dom';
-import { get, pick } from 'lodash';
+import { reduce, get, pick } from 'lodash';
 import { RouteComponentProps } from 'react-router';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
@@ -38,7 +38,7 @@ function List(props: Props) {
       key: 'list',
       matcher: /\/user/,
       title: 'Users',
-      link: '/user?page=1',
+      link: 'admin/user',
       tips: 'Admin can find and manage user accounts here.',
       tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-user',
     },
@@ -132,11 +132,11 @@ function List(props: Props) {
       'username_contains',
       'email_contains',
     ]);
+    const reducedCond = reduce(pickedCond, (result, value, key) => {result[key] = value.contains; return result;}, {});
     const newVariables = {
       ...variables,
       where: {
-        ...variables.where,
-        ...pickedCond,
+        ...reducedCond
       },
     };
     refetch(newVariables);
