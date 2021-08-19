@@ -22,8 +22,8 @@ mutation UpdateGroupMLflowConfig($where: GroupWhereUniqueInput!, $data: GroupUpd
   }
 }
 
-query GroupsConnection($groupPage: Int, $groupOrderBy: GroupOrderByInput, $groupWhere: GroupWhereInput) {
-  group: groupsConnection(page: $groupPage, orderBy: $groupOrderBy, where: $groupWhere) {
+query GroupsConnection($page: Int, $orderBy: GroupOrderByInput, $where: GroupWhereInput) {
+  group: groupsConnection(page: $page, orderBy: $orderBy, where: $where) {
     edges {
       cursor
       node {
@@ -37,3 +37,8 @@ query GroupsConnection($groupPage: Int, $groupOrderBy: GroupOrderByInput, $group
   }
 }
 
+mutation DeleteGroup($where: GroupWhereUniqueInput!) {
+  deleteGroup(where: $where) {
+    id
+  }
+}

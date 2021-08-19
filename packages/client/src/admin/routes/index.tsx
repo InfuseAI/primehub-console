@@ -1,5 +1,4 @@
 import * as React from 'react';
-import styled from 'styled-components';
 import { Route, RouteProps } from 'react-router-dom';
 import { SystemSetting } from '../SystemSetting';
 import { UserList, UserDetail, UserAdd } from '../User';
@@ -8,22 +7,6 @@ import GroupList from '../Group/GroupList';
 import { Secrets, SecretInfo } from '../Secrets';
 import { appPrefix } from 'utils/env';
 import UsageReport from '../UsageReport';
-
-const Badge = styled.span`
-  position: absolute;
-  top: 12px;
-  left: 140px;
-  border-radius: 2px;
-  padding: 0px 5px;
-  line-height: 15px;
-  background: none;
-  border: 1px rgb(255, 255, 255, 0.5) solid;
-  font-size: 10px;
-  .ant-menu-item:hover &,
-  .ant-menu-item-selected & {
-    border-color: #fff;
-  }
-`;
 
 export const ROUTES = [
   'group',
@@ -56,7 +39,7 @@ export function RouteWithSubRoutes(route) {
     <Route
       path={`${appPrefix}${route.path}`}
       exact
-      render={(props) => <route.component {...props} />}
+      render={props => <route.component {...props} />}
     />
   );
 }
@@ -70,7 +53,7 @@ export const routes = [
   {
     key: 'group_next',
     path: 'admin/group_next',
-    name: 'Groups',
+    name: 'Groups (Next)',
     enabled: true,
     component: GroupList,
   },
