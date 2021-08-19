@@ -29,7 +29,11 @@ const StyledForm = styled(Form)`
 `;
 
 function _DatasetForm(props: Props) {
-  const { editMode, initialValue, form } = props;
+  const { editMode, form } = props;
+  const initialValue = {
+    description: '',
+    ...props.initialValue,
+  };
 
   const handleSubmit = async (e) => {
     const { form, onSubmit, editMode } = props;
@@ -42,7 +46,7 @@ function _DatasetForm(props: Props) {
       data.name = values.name;
       if (form.isFieldTouched('displayName'))
         data.displayName = values.displayName;
-      if (form.isFieldTouched('description'))
+      if (!editMode || form.isFieldTouched('description'))
         data.description = values.description;
       if (form.isFieldTouched('type'))
         data.type = values.type;
@@ -50,7 +54,7 @@ function _DatasetForm(props: Props) {
         data.enableUploadServer = values.enableUploadServer;
       if (form.isFieldTouched('global'))
         data.global = values.global;
-        if (form.isFieldTouched('groups'))
+      if (form.isFieldTouched('groups'))
         data.groups = values.groups;
 
       if (values.type === 'pv') {

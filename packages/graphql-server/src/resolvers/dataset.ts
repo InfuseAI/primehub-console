@@ -133,7 +133,7 @@ export const createMapping = (data: any) => {
     },
     spec: {
       displayName: data.displayName || data.name,
-      description: data.description,
+      description: data.description || '',
       type: data.type,
       url: data.url,
       variables: data.variables,
