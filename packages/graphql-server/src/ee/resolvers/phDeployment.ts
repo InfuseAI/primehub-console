@@ -214,10 +214,10 @@ const createDeployment = async (context: Context, data: PhDeploymentMutationInpu
 const validateGroupDeployQuota = async (context: Context, groupId) => {
   const {crdClient, kcAdminClient, userId, username} = context;
   const group = await kcAdminClient.groups.findOne({id: groupId});
-  const maxDeploy = get(group.attributes, 'max-deploy', UNLIMITED);
+  const maxDeploy = get(group.attributes, 'max-deploy[0]', UNLIMITED);
   const deployments = await crdClient.phDeployments.list() || [];
   const deployCount = deployments.filter(d => d.spec.groupId === groupId && d.spec.stop === false).length;
-  if (maxDeploy !== UNLIMITED && deployCount >= maxDeploy) {
+  if (maxDeploy !== UNLIMITED && deployCount >= +maxDeploy) {
     throw new ApolloError('Group Maximum Deployments exceeded', EXCEED_QUOTA_ERROR);
   }
 };
@@ -425,6 +425,7 @@ export const update = async (root, args, context: Context) => {
   const phDeployment = await crdClient.phDeployments.get(args.where.id);
   // group is immutable
   const groupId = phDeployment.spec.groupId;
+  await validateGroupDeployQuota(context, groupId);
   const instanceType = data.instanceType || phDeployment.spec.predictors[0].instanceType;
   await validateQuota(context, groupId, instanceType);
   if (data.env && data.env.length > 0) {
