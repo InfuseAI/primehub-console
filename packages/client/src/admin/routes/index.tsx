@@ -1,10 +1,10 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { Route, RouteProps } from 'react-router-dom';
-
 import { SystemSetting } from '../SystemSetting';
 import { UserList, UserDetail, UserAdd } from '../User';
 import { Datasets, DatasetInfo } from '../Datasets';
+import GroupList from '../Group/GroupList';
 import { Secrets, SecretInfo } from '../Secrets';
 import { InstanceTypes, InstanceTypeInfo } from '../InstanceTypes';
 import { appPrefix } from 'utils/env';
@@ -20,7 +20,6 @@ const Badge = styled.span`
   background: none;
   border: 1px rgb(255, 255, 255, 0.5) solid;
   font-size: 10px;
-
   .ant-menu-item:hover &,
   .ant-menu-item-selected & {
     border-color: #fff;
@@ -29,6 +28,7 @@ const Badge = styled.span`
 
 export const ROUTES = [
   'group',
+  'group_next',
   'user',
   'instanceType',
   'image',
@@ -67,6 +67,13 @@ export const routes = [
     key: 'group',
     path: 'admin/group',
     name: 'Groups',
+  },
+  {
+    key: 'group_next',
+    path: 'admin/group_next',
+    name: 'Groups',
+    enabled: true,
+    component: GroupList,
   },
   {
     key: 'user',
