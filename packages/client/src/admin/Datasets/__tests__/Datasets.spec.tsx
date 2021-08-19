@@ -6,7 +6,7 @@ import { MockedProvider } from 'react-apollo/test-utils';
 import { render, screen } from 'test/test-utils';
 
 import { Datasets } from '../Datasets';
-import { GetDatasets } from 'queries/datasets.graphql';
+import { GetDatasets } from 'queries/Datasets.graphql';
 import { IntlProvider } from 'react-intl';
 
 function setup() {
