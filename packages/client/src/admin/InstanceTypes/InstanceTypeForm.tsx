@@ -12,9 +12,10 @@ import {
   Table,
   Tabs,
   Tooltip,
+  notification,
 } from 'antd';
 import { useHistory } from 'react-router-dom';
-import { omit } from 'lodash';
+import { omit, get } from 'lodash';
 import type { FormComponentProps } from 'antd/lib/form';
 
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
@@ -210,7 +211,18 @@ export function _InstanceTypeForm({
 
         form.validateFields((err, values: InstanceTypeFormState) => {
           if (err) {
-            console.error(err);
+            let errorMessage = '';
+            Object.keys(err).map(key => {
+              errorMessage += `${get(err, `${key}.errors[0].message`)}\n`;
+            });
+
+            notification.error({
+              duration: 5,
+              placement: 'bottomRight',
+              message: `Failure`,
+              description: errorMessage,
+            });
+
             return;
           }
 
