@@ -2,7 +2,6 @@ import * as React from 'react';
 import { compose } from 'recompose';
 import { useHistory, withRouter, RouteComponentProps } from 'react-router-dom';
 import { notification } from 'antd';
-import { useForm } from 'react-hook-form';
 import { graphql } from 'react-apollo';
 
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
@@ -31,27 +30,6 @@ interface Props {
 function _SecretInfo({ secretQuery, updateSecretMutation }: Props) {
   const history = useHistory();
   const { appPrefix } = useRoutePrefix();
-  const { reset, ...formMethods } = useForm({
-    defaultValues: initialFormState,
-    mode: 'onChange',
-  });
-
-  React.useEffect(() => {
-    if (secretQuery?.secret) {
-      const { id, name, displayName, type, registryHost, username, password } =
-        secretQuery.secret;
-
-      reset({
-        id,
-        name,
-        displayName,
-        type,
-        registryHost,
-        username,
-        password,
-      });
-    }
-  }, [secretQuery, reset]);
 
   if (secretQuery.error) {
     return <div>Failure to load secrets.</div>;
@@ -104,7 +82,11 @@ function _SecretInfo({ secretQuery, updateSecretMutation }: Props) {
           backgroundColor: '#fff',
         }}
       >
-        <SecretForm {...formMethods} disabledName onSubmit={onSubmit} />
+        <SecretForm
+          disabledName
+          data={secretQuery?.secret}
+          onSubmit={onSubmit}
+        />
       </div>
     </SecretLayout>
   );

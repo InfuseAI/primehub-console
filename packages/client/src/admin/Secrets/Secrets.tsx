@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { Button, Table, Icon, Modal, notification } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
-import { useForm } from 'react-hook-form';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 
@@ -15,7 +14,7 @@ import {
 } from './secrets.graphql';
 import { SecretLayout } from './Layout';
 import { SecretForm, initialFormState } from './SecretForm';
-import type { TSecret, SecretType } from './types';
+import type { TSecret } from './types';
 
 const styles: React.CSSProperties = {
   display: 'flex',
@@ -26,10 +25,10 @@ const styles: React.CSSProperties = {
   backgroundColor: '#fff',
 };
 
-type SecretNode = {
+interface SecretNode {
   cursor: string;
   node: Pick<TSecret, 'id' | 'name' | 'displayName' | 'type'>;
-};
+}
 
 interface Props {
   secretQuery: {
@@ -68,13 +67,6 @@ function _Secrets({
   const location = useLocation();
   const querystring = new URLSearchParams(location.search);
 
-  const formMethods = useForm({
-    mode: 'onChange',
-    defaultValues: {
-      ...initialFormState,
-      type: 'opaque' as SecretType,
-    },
-  });
   const columns: ColumnProps<SecretNode>[] = [
     {
       key: 'name',
@@ -107,7 +99,7 @@ function _Secrets({
           <Button.Group>
             <Button>
               <Link to={`${appPrefix}admin/secret/${secret.node.id}`}>
-                <Icon type="edit" />
+                <Icon type='edit' />
               </Link>
             </Button>
             <Button
@@ -134,7 +126,7 @@ function _Secrets({
                 });
               }}
             >
-              <Icon type="delete" />
+              <Icon type='delete' />
             </Button>
           </Button.Group>
         );
@@ -142,8 +134,8 @@ function _Secrets({
     },
   ];
 
-  async function onSubmit() {
-    const { name, displayName, ...values } = formMethods.getValues();
+  async function onSubmit(data: typeof initialFormState) {
+    const { name, displayName, ...values } = data;
 
     const payloads = {
       opaque: {
@@ -172,7 +164,6 @@ function _Secrets({
         },
       });
 
-      formMethods.reset();
       history.push(`${appPrefix}admin/secret`);
 
       await secretQuery.refetch();
@@ -212,7 +203,7 @@ function _Secrets({
     return (
       <SecretLayout>
         <div style={styles}>
-          <SecretForm {...formMethods} onSubmit={onSubmit} />
+          <SecretForm onSubmit={onSubmit} />
         </div>
       </SecretLayout>
     );
@@ -224,8 +215,8 @@ function _Secrets({
         <div style={styles}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
-              type="primary"
-              icon="plus"
+              type='primary'
+              icon='plus'
               // @ts-ignore
               disabled={secretQuery.loading}
               onClick={() =>
@@ -236,7 +227,7 @@ function _Secrets({
             </Button>
           </div>
           <Table
-            rowKey={(data) => data.node.id}
+            rowKey={data => data.node.id}
             style={{ paddingTop: 8 }}
             columns={columns}
             loading={secretQuery.loading}
