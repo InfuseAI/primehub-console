@@ -33,7 +33,6 @@ export function GroupList(props: Props) {
       key: 'list',
       matcher: /\/group_next/,
       title: 'Groups',
-      link: '/groups?page=1',
       tips: 'Admin can find and manage groups here.',
       tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-group',
     },
@@ -59,6 +58,9 @@ export function GroupList(props: Props) {
     });
   }, [currentPage, search, orderBy, history]);
 
+  const add = () => {
+    history.push('group_next/add');
+  };
   const edit = id => {};
   const remove = (id, record) => {
     const { deleteGroup } = props;
@@ -237,7 +239,7 @@ export function GroupList(props: Props) {
           {/* @ts-ignore */}
           <InfuseButton
             icon='plus'
-            onClick={() => {}}
+            onClick={add}
             style={{ marginRight: 16, width: 120 }}
             type='primary'
           >
