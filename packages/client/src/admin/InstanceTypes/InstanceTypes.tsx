@@ -84,7 +84,7 @@ interface Props {
     variables: {
       payload: InstanceTypeFormState;
     };
-  }) => Promise<{ data: { createSecret: { id: string } } }>;
+  }) => Promise<{ data: { createInstanceType: { id: string } } }>;
 
   deleteInstanceTypeMutation: ({
     variables,
@@ -179,6 +179,12 @@ export function _InstanceTypes({
                         },
                       });
                       await data.refetch();
+
+                      notification.success({
+                        duration: 5,
+                        placement: 'bottomRight',
+                        message: 'Delete successfully!',
+                      });
                     } catch (err) {
                       console.error(err);
                       notification.error({
@@ -222,6 +228,7 @@ export function _InstanceTypes({
         ? []
         : tolerations.map(toleration => omit(toleration, ['id', '__typename']));
 
+    // if have `nodeList`, transform `nodeList` to `{ key, value }` format
     let nextNodeSelector: Record<string, string> = {};
     if (formData?.nodeList) {
       nextNodeSelector = formData.nodeList.reduce((acc, v) => {
@@ -235,7 +242,9 @@ export function _InstanceTypes({
     }
 
     try {
-      await createInstanceTypeMutation({
+      const {
+        data: { createInstanceType },
+      } = await createInstanceTypeMutation({
         variables: {
           payload: {
             // `id` just be used in the frontend
@@ -250,9 +259,43 @@ export function _InstanceTypes({
       });
 
       history.push(`${appPrefix}admin/instanceType`);
+
+      await data.refetch();
+      notification.success({
+        duration: 5,
+        placement: 'bottomRight',
+        message: 'Save successfully!',
+        description: (
+          <>
+            Your changes have been saved. Click{' '}
+            <span
+              style={{ color: '#365abd', cursor: 'pointer' }}
+              onClick={() =>
+                history.push(
+                  `${appPrefix}admin/instanceType/${createInstanceType.id}`
+                )
+              }
+            >
+              here
+            </span>{' '}
+            to edit.
+          </>
+        ),
+      });
     } catch (err) {
       console.error(err);
+      notification.error({
+        duration: 5,
+        placement: 'bottomRight',
+        message: 'Failure!',
+        description:
+          'Please try again later and check resources already exist or not.',
+      });
     }
+  }
+
+  if (data.error) {
+    return <div>Failure to load instances.</div>;
   }
 
   if (querystring && querystring.get('operator') === 'create') {
@@ -278,7 +321,7 @@ export function _InstanceTypes({
                 history.push(`${appPrefix}admin/instanceType?operator=create`)
               }
             >
-              Create Instance
+              Add
             </Button>
           </div>
 
