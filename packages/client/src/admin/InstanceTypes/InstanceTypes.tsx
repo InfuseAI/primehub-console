@@ -54,6 +54,9 @@ interface QueryVariables {
   where?: {
     name_contains: string;
   };
+  orderBy?: {
+    [key: string]: 'asc' | 'desc';
+  };
 }
 
 interface Props {
@@ -111,31 +114,37 @@ export function _InstanceTypes({
       key: 'name',
       title: 'Name',
       dataIndex: 'node.name',
+      sorter: true,
     },
     {
       key: 'display-name',
       title: 'Display Name',
       dataIndex: 'node.displayName',
+      sorter: true,
     },
     {
       key: 'description',
       title: 'Description',
       dataIndex: 'node.description',
+      sorter: true,
     },
     {
-      key: 'cpu-limit',
+      key: 'cpuLimit',
       title: 'CPU Limit',
       dataIndex: 'node.cpuLimit',
+      sorter: true,
     },
     {
-      key: 'gpu-limit',
+      key: 'gpuLimit',
       title: 'GPU Limit',
       dataIndex: 'node.gpuLimit',
+      sorter: true,
     },
     {
-      key: 'memory-limit',
+      key: 'memoryLimit',
       title: 'Memory Limit',
       dataIndex: 'node.memoryLimit',
+      sorter: true,
     },
     {
       key: 'actions',
@@ -313,6 +322,31 @@ export function _InstanceTypes({
           columns={columns}
           loading={data.loading}
           dataSource={data?.instanceTypesConnection?.edges}
+          onChange={(pagination, filters, sorter) => {
+            const { refetch, variables } = data;
+
+            if (sorter?.columnKey) {
+              const { columnKey, order } = sorter;
+              const sortType = {
+                ascend: 'asc',
+                descend: 'desc',
+              } as const;
+
+              refetch({
+                ...variables,
+                page: pagination.current,
+                orderBy: {
+                  [columnKey]: sortType[order],
+                },
+              });
+            } else {
+              refetch({
+                ...variables,
+                page: pagination.current,
+                orderBy: null,
+              });
+            }
+          }}
           pagination={{
             current: data?.instanceTypesConnection?.pageInfo.currentPage,
             total: data?.instanceTypesConnection?.pageInfo.totalPage * 10,

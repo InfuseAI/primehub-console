@@ -10,10 +10,12 @@ fragment InstanceTypeInfo on InstanceType {
 query InstanceTypesQuery(
   $page: Int
   $where: InstanceTypeWhereInput
+  $orderBy: InstanceTypeOrderByInput
 ) {
   instanceTypesConnection(
     page: $page
     where: $where
+    orderBy: $orderBy
   ) {
     edges {
       cursor
