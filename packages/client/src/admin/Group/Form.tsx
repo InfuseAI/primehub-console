@@ -1,15 +1,34 @@
 import React from 'react';
 import { compose } from 'recompose';
-import { Row, Col, Form, Input, Switch, Icon, Card, InputNumber } from 'antd';
-import { WrappedFormUtils } from 'antd/es/form';
+import { graphql } from 'react-apollo';
+import {
+  Skeleton,
+  Row,
+  Col,
+  Form,
+  Input,
+  Switch,
+  Icon,
+  Card,
+  InputNumber,
+} from 'antd';
+import { FormComponentProps } from 'antd/es/form';
 import PHTooltip from 'components/share/toolTip';
 import Feature, { FeatureEE } from 'components/share/feature';
 import CheckableInputNumber from 'cms-components/customize-number-checkbox';
 import InfuseButton from 'components/infuseButton';
+import { UsersConnection } from 'queries/User.graphql';
+import CustomRelationTable from '../share/RelationTable';
+
+interface User {
+  id: string;
+  username: string;
+}
 
 export interface GroupInput {
   name: string;
   displayName: string;
+  admins: string;
   enabledSharedVolume: boolean;
   enabledDeployment: boolean;
   launchGroupOnly: boolean;
@@ -21,11 +40,13 @@ export interface GroupInput {
   projectQuotaCpu: number;
   projectQuotaGpu: number;
   projectQuotaMemory: number;
+  users: User[];
 }
 
 const defaultGroupValue: GroupInput = {
   name: '',
   displayName: '',
+  admins: '',
   enabledSharedVolume: false,
   enabledDeployment: false,
   launchGroupOnly: false,
@@ -37,14 +58,60 @@ const defaultGroupValue: GroupInput = {
   projectQuotaCpu: null,
   projectQuotaGpu: null,
   projectQuotaMemory: null,
+  users: [],
 };
 
-interface Props {
+interface Props extends FormComponentProps {
   onSubmit: (data: GroupInput) => void;
   onCancel: () => void;
   initialValue?: GroupInput;
-  form: WrappedFormUtils;
 }
+
+const UsersRelationTable = compose(
+  graphql(UsersConnection, {
+    name: 'queryUsers',
+    alias: 'withQueryUsers',
+  })
+)((props: any) => {
+  const { value, queryUsers, onChange = () => undefined } = props;
+  const { users, loading } = queryUsers;
+  if (loading) return <Skeleton active />;
+  const columns = [
+    {
+      title: 'Username',
+      dataIndex: 'username',
+    },
+    {
+      title: 'Group Admin',
+      dataIndex: 'username',
+      render: val => val,
+    },
+  ];
+  const pickerColumns = [
+    {
+      title: 'Username',
+      dataIndex: 'username',
+    },
+  ];
+  return (
+    <CustomRelationTable
+      title='Edit Users'
+      searchPlaceholder='Search username'
+      onChange={onChange}
+      loading={queryUsers.loading}
+      value={value}
+      relationValue={users}
+      relation={{
+        to: 'user',
+        type: 'toMany',
+      }}
+      uiParams={{
+        columns,
+        pickerColumns,
+      }}
+    />
+  );
+});
 
 function GroupForm(props: Props) {
   const { form, onSubmit, onCancel } = props;
@@ -260,6 +327,9 @@ function GroupForm(props: Props) {
             </Form.Item>
           </Col>
         </Row>
+      </Card>
+      <Card title={'Members'}>
+        <UsersRelationTable value={initialValue.users} />
       </Card>
       <Form.Item style={{ textAlign: 'right', marginTop: 12 }}>
         <InfuseButton
