@@ -239,7 +239,7 @@ export function _InstanceTypeForm({
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <Form.Item label='Name'>
                 {form.getFieldDecorator('name', {
-                  initialValue: data?.name,
+                  initialValue: data?.name || '',
                   rules: [
                     {
                       required: !props?.disableName || false,
@@ -255,7 +255,7 @@ export function _InstanceTypeForm({
                 })(<Input />)}
               </Form.Item>
 
-              <Form.Item label='Decription'>
+              <Form.Item label='Description'>
                 {form.getFieldDecorator('description', {
                   initialValue: data?.description || '',
                 })(<Input />)}
@@ -272,6 +272,7 @@ export function _InstanceTypeForm({
                   initialValue: data?.cpuLimit || 1,
                 })(
                   <InputNumber
+                    data-testid='CPU Limit'
                     min={0}
                     precision={1}
                     step={0.5}
@@ -293,6 +294,7 @@ export function _InstanceTypeForm({
                   initialValue: data?.memoryLimit || 1,
                 })(
                   <InputNumber
+                    data-testid='Memory Limit'
                     min={0}
                     precision={1}
                     step={0.5}
@@ -313,7 +315,14 @@ export function _InstanceTypeForm({
 
                 {form.getFieldDecorator('gpuLimit', {
                   initialValue: data?.gpuLimit || 0,
-                })(<InputNumber min={0} step={1} style={{ width: '105px' }} />)}
+                })(
+                  <InputNumber
+                    data-testid='GPU Limit'
+                    min={0}
+                    step={1}
+                    style={{ width: '105px' }}
+                  />
+                )}
               </Form.Item>
 
               <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -339,6 +348,7 @@ export function _InstanceTypeForm({
                 </label>
                 <div>
                   <Checkbox
+                    data-testid='enabled-cpuRequest'
                     checked={advanceFeature.enableCpuRequest}
                     onChange={() =>
                       dispatch({
@@ -378,6 +388,7 @@ export function _InstanceTypeForm({
                 </label>
                 <div>
                   <Checkbox
+                    data-testid='enabled-memoryRequest'
                     checked={advanceFeature.enableMemoryRequest}
                     onChange={() =>
                       dispatch({
@@ -390,7 +401,6 @@ export function _InstanceTypeForm({
                     initialValue: data?.memoryRequest || 1,
                   })(
                     <InputNumber
-                      id='instance-type-memory-request'
                       min={0}
                       precision={1}
                       step={0.5}
@@ -424,6 +434,7 @@ export function _InstanceTypeForm({
                   initialValue: data?.global,
                 })(
                   <Switch
+                    data-testid='Global'
                     checkedChildren='Yes'
                     unCheckedChildren='No'
                     style={{ width: '60px' }}
@@ -595,16 +606,16 @@ export function _InstanceTypeForm({
             </Button>
 
             <div style={{ display: 'flex', gap: '16px' }}>
+              {/* @ts-ignore */}
+              <Button type='primary' htmlType='submit'>
+                Confirm
+              </Button>
               <Button
                 onClick={() => {
                   history.push(`${appPrefix}admin/instanceType`);
                 }}
               >
                 Cancel
-              </Button>
-              {/* @ts-ignore */}
-              <Button type='primary' htmlType='submit'>
-                Save
               </Button>
             </div>
           </div>

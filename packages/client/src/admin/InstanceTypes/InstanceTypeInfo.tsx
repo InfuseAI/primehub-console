@@ -75,6 +75,13 @@ function _InstanceTypeInfo({ data, ...props }: Props) {
       });
 
       history.push(`${appPrefix}admin/instanceType`);
+
+      notification.success({
+        duration: 5,
+        placement: 'bottomRight',
+        message: 'Save successfully!',
+        description: 'Your changes have been saved.',
+      });
     } catch (err) {
       console.error(err);
 
