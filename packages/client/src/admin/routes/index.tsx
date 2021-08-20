@@ -4,6 +4,7 @@ import { SystemSetting } from '../SystemSetting';
 import { UserList, UserDetail, UserAdd } from '../User';
 import { Datasets, DatasetInfo } from '../Datasets';
 import GroupList from '../Group/GroupList';
+import GroupAdd from '../Group/GroupAdd';
 import { Secrets, SecretInfo } from '../Secrets';
 import { InstanceTypes, InstanceTypeInfo } from '../InstanceTypes';
 import { appPrefix } from 'utils/env';
@@ -57,6 +58,12 @@ export const routes = [
     name: 'Groups (Next)',
     enabled: true,
     component: GroupList,
+  },
+  {
+    key: 'group_next_add',
+    path: 'admin/group_next/add',
+    enabled: true,
+    component: GroupAdd,
   },
   {
     key: 'user',

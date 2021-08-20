@@ -1,4 +1,5 @@
 export {};
+declare const __ENV__: string;
 declare global {
   interface Window {
     enablePhfs?: boolean;
@@ -31,7 +32,6 @@ declare global {
     requestApiTokenEndpoint?: string;
     LOCALE?: string;
     APP_PREFIX?: string;
-
     refreshTokenExp?: number;
     accessTokenExp?: number;
   }
