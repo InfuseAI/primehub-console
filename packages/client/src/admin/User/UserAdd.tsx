@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   notification,
   Form,
   Tabs,
-  Table,
   Input,
   Switch,
   Row,
   Col,
   Layout,
-  Button,
-  Modal,
   Icon,
 } from 'antd';
 import { get } from 'lodash';
@@ -18,7 +15,6 @@ import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import { compose } from 'recompose';
 import Breadcrumbs from 'components/share/breadcrumb';
-import queryString from 'querystring';
 import { graphql } from 'react-apollo';
 import { errorHandler } from 'utils/errorHandler';
 import { CreateUser } from 'queries/User.graphql';

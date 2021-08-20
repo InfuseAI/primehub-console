@@ -42,3 +42,9 @@ mutation DeleteGroup($where: GroupWhereUniqueInput!) {
     id
   }
 }
+
+mutation CreateGroup($data: GroupCreateInput!) {
+  createGroup(data: $data) {
+    ...GroupBasicInfo
+  }
+}
