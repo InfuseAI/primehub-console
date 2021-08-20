@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { Input, Modal, Table, Button, Row, Col } from 'antd';
-import { isEqual, get } from 'lodash';
+import { isEqual, get, keys } from 'lodash';
 
 const { Search } = Input;
 
@@ -15,8 +15,8 @@ export const FilterRow = styled(Row)`
 interface Props {
   searchPlaceholder: string;
   title: string;
-  onOk: Function;
-  onCancel: Function;
+  onOk: (selectedRowKeys: any[], totalValue: any[]) => void;
+  onCancel: () => void;
   loading: boolean;
   visible: boolean;
   pickedIds: string[];
@@ -32,7 +32,7 @@ interface Props {
     datIndex: string;
   }>;
   showPagination: boolean;
-  updateRelationQuery: Function;
+  updateRelationQuery: (query: any) => void;
 }
 
 interface State {
@@ -129,7 +129,12 @@ export default class Picker extends React.PureComponent<Props, State> {
       loading,
       title,
       searchPlaceholder = '',
+      relationValue,
     } = this.props;
+
+    const { pageInfo } = relationValue;
+    const pageInfoKeys = keys(pageInfo);
+    const switchPagination = pageInfoKeys.includes('hasNextPage');
     const { selectedRowKeys, totalValue, sorter } = this.state;
     return (
       <Modal
@@ -151,7 +156,7 @@ export default class Picker extends React.PureComponent<Props, State> {
         </FilterRow>
         <Table
           size={'small'}
-          pagination={{ size: 'default' }}
+          pagination={switchPagination ? false : { size: 'default' }}
           loading={loading}
           rowSelection={{
             type: pickOne ? 'radio' : 'checkbox',
