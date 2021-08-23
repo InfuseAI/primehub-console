@@ -46,7 +46,7 @@ interface Props {
       pageInfo: {
         currentPage: number;
         totalPage: number;
-      }
+      };
     };
   };
   createDatasetMutation: ({
@@ -71,7 +71,7 @@ interface QueryVariables {
   page: number;
   orderBy?: {};
   where?: {
-    displayName_contains?: string;
+    name_contains?: string;
   };
 }
 
@@ -119,8 +119,8 @@ function _Datasets({
       orderBy: !sorter.columnKey
         ? {}
         : {
-        [sorter.columnKey]: sorter.order === 'ascend' ? 'asc' : 'desc',
-      },
+            [sorter.columnKey]: sorter.order === 'ascend' ? 'asc' : 'desc',
+          },
     };
     datasetQuery.refetch(variables);
   }
@@ -163,7 +163,7 @@ function _Datasets({
 
   if (querystring && querystring.get('operator') === 'create') {
     return (
-      <DatasetLayout page="create">
+      <DatasetLayout page='create'>
         <div style={styles}>
           <DatasetForm onSubmit={handleSubmit} />
         </div>
@@ -171,19 +171,13 @@ function _Datasets({
     );
   }
 
-  if (datasetQuery.loading && !datasetQuery?.datasetsConnection) {
-    return <Skeleton />;
-  }
+  const { loading, datasetsConnection = {} } = datasetQuery;
 
-  const {
-    loading,
-    datasetsConnection: {
-      edges,
-      pageInfo: { currentPage, totalPage },
-    },
-  } = datasetQuery;
+  const { edges = [], pageInfo = {} } = datasetsConnection;
 
-  const columns: ColumnProps<DatasetNode>[] = [
+  const { currentPage, totalPage } = pageInfo;
+
+  const columns: Array<ColumnProps<DatasetNode>> = [
     {
       key: 'name',
       title: 'Name',
@@ -195,14 +189,14 @@ function _Datasets({
       title: 'Display Name',
       dataIndex: 'node.displayName',
       sorter: true,
-      render: (text) => text || '-',
+      render: text => text || '-',
     },
     {
       key: 'type',
       title: 'Type',
       dataIndex: 'node.type',
       sorter: true,
-      render: (text) => {
+      render: text => {
         const datasetType = {
           pv: 'Persistent Volume',
           nfs: 'NFS',
@@ -222,18 +216,19 @@ function _Datasets({
       key: 'description',
       title: 'Description',
       dataIndex: 'node.description',
+      width: '16.6%',
       sorter: true,
-      render: (text) => text || '-',
+      render: text => text || '-',
     },
     {
       key: 'uploadServerLink',
       title: 'Upload Server',
       dataIndex: 'node.uploadServerLink',
       sorter: true,
-      render: (text) => {
+      render: text => {
         if (text) {
           return (
-            <a href={text} target="_blank">
+            <a href={text} target='_blank'>
               Link
             </a>
           );
@@ -250,14 +245,14 @@ function _Datasets({
           <Button.Group>
             <Button
               data-testid='edit-button'
-              icon="edit"
+              icon='edit'
               onClick={() => {
                 history.push(`${appPrefix}admin/dataset/${dataset.node.id}`);
               }}
             />
             <Button
               data-testid='delete-button'
-              icon="delete"
+              icon='delete'
               onClick={() => {
                 Modal.confirm({
                   title: 'Delete Dataset',
@@ -289,23 +284,29 @@ function _Datasets({
 
   return (
     <>
-      <DatasetLayout page="list">
+      <DatasetLayout page='list'>
         <div data-testid='dataset' style={styles}>
-          <FilterRow align="bottom" style={{marginBottom: 16, marginTop: 16}}>
-            <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
+          <FilterRow align='bottom' style={{ marginBottom: 16, marginTop: 16 }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'flex-end',
+              }}
+            >
               <InfuseButton
                 data-testid='add-button'
-                icon="plus"
+                icon='plus'
                 onClick={handleAdd}
-                style={{marginRight: 16, width: 120}}
-                type="primary"
+                style={{ marginRight: 16, width: 120 }}
+                type='primary'
               >
                 Add
               </InfuseButton>
             </div>
             <ButtonCol>
               <Col>
-                <FilterPlugins style={{marginRight: '10px'}}>
+                <FilterPlugins style={{ marginRight: '10px' }}>
                   <Search
                     data-testid='text-filter'
                     placeholder={`Search Dataset`}
@@ -316,7 +317,7 @@ function _Datasets({
             </ButtonCol>
           </FilterRow>
           <Table
-            rowKey={(data) => data.node.id}
+            rowKey={data => data.node.id}
             style={{ paddingTop: 8 }}
             columns={columns}
             loading={loading}
