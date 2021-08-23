@@ -102,7 +102,7 @@ function _Datasets({
       ...datasetQuery.variables,
       page: 1,
       where: {
-        displayName_contains: searchString,
+        name_contains: searchString,
       },
     };
     datasetQuery.refetch(variables);
