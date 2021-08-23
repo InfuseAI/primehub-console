@@ -15,7 +15,8 @@ const Label = styled.span`
 
 export default ({
   secret,
-  title,
+  onOk,
+  title
 }) => {
   Modal.success({
     title,
@@ -31,11 +32,12 @@ export default ({
         </Wrapper>
       </div>
     ),
+    onOk
   });
 }
 
 
-export class CopyToClipboard extends React.Component<{value: string}> {
+class CopyToClipboard extends React.Component<{value: string}> {
   private textArea: React.Ref<any> = React.createRef();
   private state = {
     tip: 'Copy'

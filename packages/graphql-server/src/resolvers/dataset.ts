@@ -133,7 +133,7 @@ export const createMapping = (data: any) => {
     },
     spec: {
       displayName: data.displayName || data.name,
-      description: data.description,
+      description: data.description || '',
       type: data.type,
       url: data.url,
       variables: data.variables,
@@ -201,7 +201,7 @@ export const updateMapping = (data: any) => {
       description: data.description,
       url: data.url,
       variables: data.variables,
-      enableUploadServer: isNil(data.enableUploadServer) ? 'false' : data.enableUploadServer.toString(),
+      enableUploadServer: isNil(data.enableUploadServer) ? undefined : data.enableUploadServer.toString(),
       ...gitSyncProp,
       ...nfsSyncProp,
       ...hostPathSyncProp

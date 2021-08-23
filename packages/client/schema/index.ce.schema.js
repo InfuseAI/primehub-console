@@ -3,12 +3,10 @@ import builder, { Body } from 'canner-script';
 import Group from './group.schema';
 import InstanceType from './instanceType.schema';
 import Image from './image.schema';
-import Dataset from './dataset.schema';
 import Jupyterhub from 'schema/jupyterhub.schema';
 import { LocalStorageConnector } from 'canner-graphql-interface';
 import { createFakeData } from 'canner-helpers';
 import { dict, graphqlClient, imageStorage } from './utils';
-import DatasetBody from 'cms-layouts/datasetBody';
 import CommonBody from 'cms-layouts/commonBody';
 import UserBody from 'cms-layouts/userBody';
 import JupyterhubBody from 'cms-layouts/jupyterhubBody';
@@ -23,9 +21,6 @@ const schema = (
     <Body component={CommonBody}>
       <InstanceType />
       <Image />
-    </Body>
-    <Body component={DatasetBody}>
-      <Dataset />
     </Body>
     <Body component={JupyterhubBody}>
       <Jupyterhub />

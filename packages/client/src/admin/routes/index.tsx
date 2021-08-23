@@ -4,6 +4,7 @@ import { Route, RouteProps } from 'react-router-dom';
 
 import { SystemSetting } from '../SystemSetting';
 import { UserList, UserDetail, UserAdd } from '../User';
+import { Datasets, DatasetInfo } from '../Datasets';
 import { Secrets, SecretInfo } from '../Secrets';
 import { appPrefix } from 'utils/env';
 import UsageReport from '../UsageReport';
@@ -69,7 +70,7 @@ export const routes = [
   {
     key: 'user',
     path: 'admin/user',
-    name: 'Users', 
+    name: 'Users',
     enabled: true,
     component: UserList,
   },
@@ -103,7 +104,17 @@ export const routes = [
   {
     key: 'dataset',
     path: 'admin/dataset',
+    enabled: true,
     name: 'Datasets',
+    exact: true,
+    component: Datasets,
+  },
+  {
+    key: 'dataset-id',
+    path: 'admin/dataset/:id',
+    enabled: true,
+    name: 'Datasets',
+    component: DatasetInfo,
   },
   {
     key: 'secret',

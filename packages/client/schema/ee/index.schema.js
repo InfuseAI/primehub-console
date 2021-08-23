@@ -3,7 +3,6 @@ import builder, {Body} from 'canner-script';
 import Group from 'schema/group.schema';
 import InstanceType from 'schema/instanceType.schema';
 import Image from 'schema/image.schema';
-import Dataset from 'schema/dataset.schema';
 import Jupyterhub from 'schema/jupyterhub.schema';
 import BuildImage from 'schema/ee/buildImage.schema';
 import BuildImageJob from 'schema/ee/buildImageJob.schema';
@@ -11,7 +10,6 @@ import { LocalStorageConnector } from 'canner-graphql-interface';
 import { createFakeData } from 'canner-helpers';
 import { dict, graphqlClient, imageStorage } from 'schema/utils';
 import BuildImageJobBody from 'cms-layouts/buildImageJobBody';
-import DatasetBody from 'cms-layouts/datasetBody';
 import CommonBody from 'cms-layouts/commonBody';
 import UserBody from 'cms-layouts/userBody';
 import JupyterhubBody from 'cms-layouts/jupyterhubBody';
@@ -44,9 +42,6 @@ const schema = (
     </Body>
     <Body component={BuildImageJobBody}>
       <BuildImageJob />
-    </Body>
-    <Body component={DatasetBody}>
-      <Dataset />
     </Body>
     <Body component={JupyterhubBody}>
       <Jupyterhub />
