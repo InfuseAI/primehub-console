@@ -76,7 +76,7 @@ describe('DatasetInfo', () => {
     render(
       <TestProvider>
         <MockedProvider mocks={mockRequests}>
-          <DatasetInfo />
+          <DatasetInfo fetchPolicy='no-cache' />
         </MockedProvider>
       </TestProvider>
     );

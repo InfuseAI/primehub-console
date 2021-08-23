@@ -15,8 +15,9 @@ import { pick } from 'lodash';
 import uploadServerSecretModal from 'cms-components/uploadServerSecretModal';
 import { errorHandler } from 'utils/errorHandler';
 
-interface Props {
-  intl: any,
+interface Props extends RouteComponentProps<{ id: string }> {
+  intl: any;
+  fetchPolicy: string;
   datasetQuery: {
     error: Error | undefined;
     loading: boolean;
@@ -89,11 +90,11 @@ export const DatasetInfo = compose(
   withRouter,
   graphql(DatasetQuery, {
     name: 'datasetQuery',
-    options: ({ match }: RouteComponentProps<{ id: string }>) => {
+    options: ({ match, fetchPolicy }: Props) => {
       const datasetId = match.params.id;
 
       return {
-        fetchPolicy: 'cache-and-network',
+        fetchPolicy: fetchPolicy ? fetchPolicy : 'cache-and-network',
         variables: {
           where: {
             id: datasetId,
