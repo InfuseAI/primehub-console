@@ -33,7 +33,7 @@ import { errorHandler } from 'utils/errorHandler';
 
 const { TabPane } = Tabs;
 
-const GroupsRelationTable = compose(
+export const GroupsRelationTable = compose(
   graphql(UserGroups, {
     name: 'queryUserGroups',
     alias: 'withQueryUserGroups',

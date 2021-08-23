@@ -15,6 +15,7 @@ function inputValidator(_, value, callback) {
 
   return callback();
 }
+
 interface NodeSelectorListProps {
   nodes: string[][];
   form: WrappedFormUtils;
@@ -56,11 +57,7 @@ export function NodeSelectorList({
                 nodeList: nextformNodeList,
               });
 
-              props.onChange(prev =>
-                prev.filter((_, id) => {
-                  return id !== i;
-                })
-              );
+              props.onChange(prev => prev.filter((_, id) => id !== i));
             }}
           />
         ))

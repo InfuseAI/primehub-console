@@ -2,6 +2,7 @@ fragment InstanceTypeInfo on InstanceType {
   id
   name
   displayName
+  description
   cpuLimit
   memoryLimit
   gpuLimit
@@ -34,7 +35,6 @@ query InstanceTypesQuery(
 query InstanceTypeInfoQuery($where: InstanceTypeWhereUniqueInput!) {
   instanceType(where: $where) {
     id
-    description
     cpuRequest
     memoryRequest
     global
@@ -68,6 +68,14 @@ mutation UpdateInstanceTypeMutation(
 ) {
   updateInstanceType(data: $payload, where: $where) {
     id
+    global
+    groups {
+      id
+      name
+      displayName
+      quotaCpu
+      quotaGpu
+    }
     nodeSelector
   }
 }
