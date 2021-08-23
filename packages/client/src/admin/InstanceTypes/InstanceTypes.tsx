@@ -117,7 +117,7 @@ export function _InstanceTypes({
       sorter: true,
     },
     {
-      key: 'display-name',
+      key: 'displayName',
       title: 'Display Name',
       dataIndex: 'node.displayName',
       sorter: true,
@@ -125,8 +125,10 @@ export function _InstanceTypes({
     {
       key: 'description',
       title: 'Description',
-      dataIndex: 'node.description',
       sorter: true,
+      render: (instance: InstanceTypeNode) => {
+        return instance.node.description || '-';
+      },
     },
     {
       key: 'cpuLimit',
@@ -333,7 +335,7 @@ export function _InstanceTypes({
             }}
           >
             <Input.Search
-              placeholder='Search by display name'
+              placeholder='Search by name'
               style={{ width: 295 }}
               value={keyword}
               onChange={event => setKeyword(event.currentTarget.value)}

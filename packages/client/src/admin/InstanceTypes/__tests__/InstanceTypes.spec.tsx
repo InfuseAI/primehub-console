@@ -27,6 +27,7 @@ function setup() {
                   id: 'cpu-1',
                   name: 'cpu-1',
                   displayName: 'cpu one',
+                  description: '',
                   cpuLimit: 1.5,
                   memoryLimit: 2,
                   gpuLimit: 0,
@@ -40,6 +41,7 @@ function setup() {
                   id: 'cpu-2',
                   name: 'cpu-2',
                   displayName: 'cpu two',
+                  description: '',
                   cpuLimit: 2,
                   memoryLimit: 1,
                   gpuLimit: 0,
@@ -69,6 +71,11 @@ function setup() {
     mockRequests,
   };
 }
+
+beforeEach(() => {
+  // @ts-ignore
+  global.modelDeploymentOnly = false;
+});
 
 describe('Secrets', () => {
   it('should render instance type with error messages', async () => {
