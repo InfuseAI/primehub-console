@@ -81,7 +81,6 @@ describe('DatasetInfo', () => {
       </TestProvider>
     );
 
-    screen.debug();
     await waitFor(() => {
       expect(screen.getByTestId('dataset'));
       expect(screen.getByTestId('dataset/input-name')).toHaveValue(dataset.name);

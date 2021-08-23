@@ -1,4 +1,4 @@
-import React, { PureComponent, useState } from 'react';
+import React, { useState } from 'react';
 import { compose } from 'recompose';
 import { Icon, Table, Button, Form } from 'antd';
 import gql from 'graphql-tag';
@@ -20,13 +20,13 @@ interface Props {
   groups: TDatasetGroups;
   value: TDatasetFormGroups;
   onChange: (TDatasetFormGroups) => void;
-  allowReadOnly: boolean;
-  allowWritable: boolean;
+  allowReadOnly?: boolean;
+  allowWritable?: boolean;
   groupsQuery: {
     error: Error | undefined;
     loading: boolean;
     groups?: any;
-    refetch;
+    refetch: (variables: any) => Promise<void>;
   };
 }
 
@@ -195,7 +195,7 @@ export const DatasetGroupsRelationTable = compose(
     name: 'groupsQuery',
     options: () => {
       return {
-        fetchPolicy: 'no-cache',
+        fetchPolicy: 'network-only',
       };
     },
   })

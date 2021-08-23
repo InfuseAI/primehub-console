@@ -20,38 +20,6 @@ export default class EnvVariables extends React.Component<{value: any, customize
     };
   }
 
-  componentDidMount() {
-    // const {customizeValidator} = this.props;
-    // const cb = (...args) => args;
-    // if (customizeValidator) {
-    //   this.callbackId = onDeploy(refId.getPathArr()[0], (result) => {
-    //     const validateResult = customizeValidator(arrayToObject(this.state.fields), cb);
-    //     if (validateResult) {
-    //       this.setState({
-    //         errorIndex: validateResult[0],
-    //         errorMessage: validateResult[1]
-    //       });
-    //       return {
-    //         ...result,
-    //         error: true
-    //       }
-    //     }
-    //     this.setState({
-    //       errorIndex: -1,
-    //       errorMessage: ''
-    //     })
-    //     return result;
-    //   });
-    // }
-  }
-
-  componentWillUnmount() {
-    // const {refId, removeOnDeploy} = this.props;
-    // if (this.callbackId) {
-    //   removeOnDeploy(refId.getPathArr()[0], this.callbackId || '');
-    // }
-  }
-
   add = () => {
     this.setState({
       fields: this.state.fields.concat({ key: '', value: '' }),

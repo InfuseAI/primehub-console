@@ -40,6 +40,7 @@ interface Props {
     refetch: (variables: any) => Promise<void>;
     error: Error | undefined;
     loading: boolean;
+    variables: any;
     datasetsConnection?: {
       edges: DatasetNode[];
       pageInfo: {
@@ -83,8 +84,6 @@ function _Datasets({
   const history = useHistory();
   const location = useLocation();
   const querystring = new URLSearchParams(location.search);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [queryVariables, setQueryVariables] = useState<QueryVariables>({ page: 1 });
 
   useEffect(() => {
     if (datasetQuery.error) {
@@ -100,13 +99,12 @@ function _Datasets({
 
   async function handleSearch(searchString) {
     const variables = {
-      ...queryVariables,
+      ...datasetQuery.variables,
       page: 1,
       where: {
         displayName_contains: searchString,
       },
     };
-    setQueryVariables(variables);
     datasetQuery.refetch(variables);
   }
 
@@ -116,6 +114,7 @@ function _Datasets({
 
   async function handleTableChange(pagination, filters, sorter) {
     const variables = {
+      ...datasetQuery.variables,
       page: pagination.current,
       orderBy: !sorter.columnKey
         ? {}
@@ -123,7 +122,6 @@ function _Datasets({
         [sorter.columnKey]: sorter.order === 'ascend' ? 'asc' : 'desc',
       },
     };
-    setQueryVariables(variables);
     datasetQuery.refetch(variables);
   }
 
@@ -174,7 +172,7 @@ function _Datasets({
   }
 
   if (datasetQuery.loading && !datasetQuery?.datasetsConnection) {
-    return <Skeleton></Skeleton>;
+    return <Skeleton />;
   }
 
   const {
@@ -205,13 +203,19 @@ function _Datasets({
       dataIndex: 'node.type',
       sorter: true,
       render: (text) => {
-        // return 'Persistent Volume';
-        if (text === 'pv') return 'Persistent Volume';
-        else if (text === 'nfs') return 'NFS';
-        else if (text === 'hostPath') return 'Host Path';
-        else if (text === 'git') return 'Git';
-        else if (text === 'env') return 'Env';
-        else return '';
+        const datasetType = {
+          pv: 'Persistent Volume',
+          nfs: 'NFS',
+          hostPath: 'Host Path',
+          git: 'Git',
+          env: 'Env',
+        };
+
+        if (datasetType[text]) {
+          return datasetType[text];
+        }
+
+        return '';
       },
     },
     {
@@ -250,7 +254,7 @@ function _Datasets({
               onClick={() => {
                 history.push(`${appPrefix}admin/dataset/${dataset.node.id}`);
               }}
-            ></Button>
+            />
             <Button
               data-testid='delete-button'
               icon="delete"
@@ -276,9 +280,7 @@ function _Datasets({
                   },
                 });
               }}
-            >
-              {/* <Icon type="delete" /> */}
-            </Button>
+            />
           </Button.Group>
         );
       },

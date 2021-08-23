@@ -15,8 +15,7 @@ const Label = styled.span`
 
 export default ({
   secret,
-  onOk,
-  title
+  title,
 }) => {
   Modal.success({
     title,
@@ -32,7 +31,6 @@ export default ({
         </Wrapper>
       </div>
     ),
-    onOk
   });
 }
 

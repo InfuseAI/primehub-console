@@ -11,7 +11,7 @@ interface Props {
   name: string;
   allowRegenerateSecret: boolean;
   value?: boolean;
-  onChange?;
+  onChange?: (boolean) => void;
 }
 
 interface State {
@@ -61,7 +61,6 @@ export default class EnableUploadServer extends React.Component<Props, State> {
               uploadServerSecretModal({
                 title: intl.formatMessage({id: 'dataset.regenerateSecretModalTitle'}),
                 secret,
-                onOk: () => {}
               });
             } else {
               Modal.error({

@@ -20,7 +20,7 @@ interface Props {
   initialValue;
   value;
   onChange;
-  secretsQuery: {
+  gitSecretsQuery: {
     error: Error | undefined;
     loading: boolean;
     secrets?: TSecret[];
@@ -34,14 +34,14 @@ interface State {
 }
 
 function _GitSecret(props: Props) {
-  const { initialValue, secretsQuery } = props;
+  const { initialValue, gitSecretsQuery } = props;
   const [state, setState] = useState<State>({
     modalVisible: false,
     secretId: initialValue?.id,
     selectedSecretId: initialValue?.id,
   });
 
-  if (secretsQuery.error) {
+  if (gitSecretsQuery.error) {
     return <div>Failure to query secrets.</div>;
   }
 
@@ -59,9 +59,9 @@ function _GitSecret(props: Props) {
   ];
 
   let secretDisplayName;
-  if (!secretsQuery.loading && state.secretId) {
+  if (!gitSecretsQuery.loading && state.secretId) {
     const secret = find(
-      secretsQuery?.secrets,
+      gitSecretsQuery?.secrets,
       (s) => s.id === state.secretId
     );
     if (secret) {
@@ -137,7 +137,7 @@ function _GitSecret(props: Props) {
   return (
     <>
       <div>
-        {!secretsQuery.loading && state.secretId && (
+        {!gitSecretsQuery.loading && state.secretId && (
           <Tag closable onClose={handleRemove}>
             {secretDisplayName}
           </Tag>
@@ -163,8 +163,7 @@ function _GitSecret(props: Props) {
             rowKey={(data) => data.id}
             style={{ paddingTop: 8 }}
             columns={columns}
-            // onChange={handleTableChange}
-            dataSource={secretsQuery?.secrets}
+            dataSource={gitSecretsQuery?.secrets}
             rowSelection={{
               type: 'radio',
               onChange: handleSelect,
@@ -182,10 +181,10 @@ function _GitSecret(props: Props) {
 
 export const GitSecret = compose(
   graphql(GetSecrets, {
-    name: 'secretsQuery',
+    name: 'gitSecretsQuery',
     options: () => {
       return {
-        fetchPolicy: 'no-cache',
+        fetchPolicy: 'network-only',
       };
     },
   })

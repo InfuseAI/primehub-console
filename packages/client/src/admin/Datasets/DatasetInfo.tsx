@@ -60,7 +60,6 @@ function _DatasetInfo({ datasetQuery, updateDatasetMutation, intl }: Props) {
         uploadServerSecretModal({
           title: intl.formatMessage({id: 'dataset.regenerateSecretModalTitle'}),
           secret,
-          onOk: () => {}
         });
       }
 
@@ -94,7 +93,7 @@ export const DatasetInfo = compose(
       const datasetId = match.params.id;
 
       return {
-        fetchPolicy: 'no-cache',
+        fetchPolicy: 'cache-and-network',
         variables: {
           where: {
             id: datasetId,
