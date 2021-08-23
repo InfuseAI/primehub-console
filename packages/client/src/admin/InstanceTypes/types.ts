@@ -1,3 +1,11 @@
+export interface Groups {
+  id: string;
+  name: string;
+  displayName: string;
+  quotaCpu: string;
+  quotaGpu: string;
+}
+
 export type TInstanceType = {
   id: string;
   name: string;
@@ -9,6 +17,7 @@ export type TInstanceType = {
   cpuRequest: number;
   memoryRequest: number;
   global: boolean;
+  groups: Groups[];
   nodeSelector: Record<string, string>;
   tolerations: TToleration[];
 };

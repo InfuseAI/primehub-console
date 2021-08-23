@@ -1,7 +1,6 @@
 /** @jsx builder */
 import builder, { Body } from 'canner-script';
 import Group from './group.schema';
-import InstanceType from './instanceType.schema';
 import Image from './image.schema';
 import Jupyterhub from 'schema/jupyterhub.schema';
 import { LocalStorageConnector } from 'canner-graphql-interface';
@@ -19,7 +18,6 @@ const schema = (
       <Group />
     </Body>
     <Body component={CommonBody}>
-      <InstanceType />
       <Image />
     </Body>
     <Body component={JupyterhubBody}>

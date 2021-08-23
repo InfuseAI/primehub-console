@@ -79,6 +79,11 @@ function setup() {
   };
 }
 
+beforeEach(() => {
+  // @ts-ignore
+  global.modelDeploymentOnly = false;
+});
+
 describe('InstanceTypeInfo', () => {
   it('should render instance type information with error messages', async () => {
     const { TestProvider } = setup();
