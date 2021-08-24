@@ -61,6 +61,9 @@ interface Props
 }
 
 export function DeploymentCard({ endpoint, ...props }: Props) {
+  if (!props.name) {
+    return (null);
+  }
   const [isLoading, setIsLoading] = React.useState(false);
   const previousStatus = usePrevious(props.status);
   const history = useHistory();
