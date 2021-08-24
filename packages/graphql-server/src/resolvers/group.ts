@@ -110,7 +110,6 @@ export const create = async (root, args, context: Context) => {
   const groups = await kcAdminClient.groups.find();
   // max group validation need minus everyone group.
   if (groups.length > config.maxGroup) {
-    //throw new ApolloError(`Max group limit: ${config.maxGroup} exceeded`, EXCEED_QUOTA_ERROR);
     throw new ApolloError('Group Maximum Deployments exceeded', EXCEED_QUOTA_ERROR);
   }
 
