@@ -282,7 +282,7 @@ function DeploymentListContainer({ groups, phDeployments, ...props }: Props) {
       <Spin spinning={phDeployments.loading}>
         <div style={{ padding: '16px' }}>
           <Row gutter={24} type="flex">
-            {phDeployments?.phDeploymentsConnection?.edges.map((edge) => {
+            {phDeployments?.phDeploymentsConnection?.edges.filter((edge) => edge.node?.name).map((edge) => {
               return (
                 <Col
                   xs={24}
