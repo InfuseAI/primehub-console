@@ -83,7 +83,7 @@ export function _SecretForm({ form, data, ...props }: SecretFormProps) {
   }, [data]);
 
   return (
-    <div data-testid='dataset'>
+    <div data-testid='secret'>
       <InfuseButton>
         <Link to={`${appPrefix}admin/secret`}>
           <Icon type='arrow-left' /> Back
