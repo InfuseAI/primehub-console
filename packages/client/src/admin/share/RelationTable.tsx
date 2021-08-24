@@ -5,10 +5,26 @@ import { FormattedMessage } from 'react-intl';
 import pluralize from 'pluralize';
 import RelationPicker from './RelationPicker';
 
-class RelationTable extends PureComponent {
+interface Props {
+  disabled: boolean;
+  onChange: (actions: any[]) => void;
+  value: any[];
+  uiParams: any;
+  relation: any;
+  relationValue: any;
+  loading: boolean;
+  title: string;
+  relationRefetch: () => void;
+  searchPlaceholder: string;
+}
+
+interface State {
+  modalVisible: boolean;
+}
+
+class RelationTable extends PureComponent<Props, State> {
   constructor(props) {
     super(props);
-    this.isOnComposition = false;
     this.state = {
       modalVisible: false,
     };
@@ -25,7 +41,7 @@ class RelationTable extends PureComponent {
   };
 
   handleOk = (queue, originData) => {
-    let { onChange, value = [] } = this.props;
+    const { onChange, value = [] } = this.props;
     const currentIds = value.map(v => v.id);
     const idsShouldCreate = difference(queue, currentIds);
     const idsShouldRemove = difference(currentIds, queue);
@@ -51,27 +67,24 @@ class RelationTable extends PureComponent {
     const TYPE_GROUPS = 'group';
     const { modalVisible } = this.state;
     let showValues = [];
-    let {
+    const {
       disabled,
       value = [],
       uiParams = {},
       relation,
-      toolbar,
-      Toolbar,
       relationValue,
       title,
       loading,
       relationRefetch,
-      keyName,
       searchPlaceholder,
     } = this.props;
-    let { columns, pickerColumns } = uiParams;
+    const { columns, pickerColumns } = uiParams;
 
-    remove(columns, obj => {
+    remove(columns, (obj: { visible: boolean }) => {
       return obj && obj.visible === false;
     });
 
-    remove(pickerColumns, obj => {
+    remove(pickerColumns, (obj: { visible: boolean }) => {
       return obj && obj.visible === false;
     });
 

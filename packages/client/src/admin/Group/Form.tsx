@@ -75,7 +75,6 @@ const UsersRelationTable = compose(
 )((props: any) => {
   const { value, queryUsers, onChange = () => undefined } = props;
   const { users, loading } = queryUsers;
-  if (loading) return <Skeleton active />;
   const columns = [
     {
       title: 'Username',
@@ -98,7 +97,7 @@ const UsersRelationTable = compose(
       title='Edit Users'
       searchPlaceholder='Search username'
       onChange={onChange}
-      loading={queryUsers.loading}
+      loading={loading}
       value={value}
       relationValue={users}
       relation={{
