@@ -1,7 +1,19 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { Input, Modal, Table, Button, Row, Col } from 'antd';
+import { Input, Modal, Table, Icon, Button, Row, Col } from 'antd';
 import { isEqual, get, keys } from 'lodash';
+
+interface WrapperProps {
+  marginTop?: number;
+  marginRight?: number;
+}
+
+const Wrapper = styled.div<WrapperProps>`
+  text-align: right;
+  margin-top: ${props => props.marginTop}px;
+  margin-right: ${props => props.marginRight}px;
+  display: inline-block;
+`;
 
 const { Search } = Input;
 
@@ -17,10 +29,8 @@ interface Props {
   title: string;
   onOk: (selectedRowKeys: any[], totalValue: any[]) => void;
   onCancel: () => void;
-  loading: boolean;
   visible: boolean;
   pickedIds: string[];
-  pickOne?: boolean;
   relation: {
     to: string;
     type: string;
@@ -31,8 +41,12 @@ interface Props {
     key: string;
     datIndex: string;
   }>;
-  showPagination: boolean;
   updateRelationQuery: (query: any) => void;
+  loading?: boolean;
+  pickOne?: boolean;
+  showPagination?: boolean;
+  prevPage?: () => void;
+  nextPage?: () => void;
 }
 
 interface State {
@@ -44,10 +58,42 @@ interface State {
   };
 }
 
+const SwitchPagination = props => {
+  const { enable, hasPreviousPage, hasNextPage, prevPage, nextPage } = props;
+  if (enable) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Wrapper marginTop={16}>
+          <Button.Group>
+            <Button
+              disabled={!hasPreviousPage}
+              onClick={prevPage}
+              data-testid='pagination-previous-button'
+            >
+              <Icon type='left' />
+              Previous
+            </Button>
+            <Button
+              disabled={!hasNextPage}
+              onClick={nextPage}
+              data-testid='pagination-next-button'
+            >
+              Next
+              <Icon type='right' />
+            </Button>
+          </Button.Group>
+        </Wrapper>
+      </div>
+    );
+  } else {
+    return <></>;
+  }
+};
+
 export default class Picker extends React.PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
-    const list = props.relationValue.edges.map(edge => edge.node);
+    const list = props.relationValue?.edges?.map(edge => edge.node);
     this.state = {
       totalValue: list || [],
       selectedRowKeys: props.pickedIds || [],
@@ -71,7 +117,7 @@ export default class Picker extends React.PureComponent<Props, State> {
   }
 
   updateData = (data: any) => {
-    const totalValue = data.edges.map(edge => edge.node);
+    const totalValue = data?.edges.map(edge => edge.node) || [];
     this.setState({
       totalValue,
     });
@@ -129,11 +175,14 @@ export default class Picker extends React.PureComponent<Props, State> {
       loading,
       title,
       searchPlaceholder = '',
-      relationValue,
+      relationValue = {},
+      prevPage = () => undefined,
+      nextPage = () => undefined,
     } = this.props;
 
-    const { pageInfo } = relationValue;
+    const { pageInfo = {} } = relationValue;
     const pageInfoKeys = keys(pageInfo);
+    const { hasNextPage, hasPreviousPage } = pageInfo;
     const switchPagination = pageInfoKeys.includes('hasNextPage');
     const { selectedRowKeys, totalValue, sorter } = this.state;
     return (
@@ -172,6 +221,13 @@ export default class Picker extends React.PureComponent<Props, State> {
             return column;
           })}
           dataSource={totalValue.map(v => ({ ...v, key: v.id }))}
+        />
+        <SwitchPagination
+          enable={switchPagination}
+          hasNextPage={hasNextPage}
+          hasPreviousPage={hasPreviousPage}
+          prevPage={prevPage}
+          nextPage={nextPage}
         />
       </Modal>
     );
