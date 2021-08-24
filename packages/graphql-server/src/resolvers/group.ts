@@ -111,7 +111,7 @@ export const create = async (root, args, context: Context) => {
   // max group validation need minus everyone group.
   if (groups.length > config.maxGroup) {
     //throw new ApolloError(`Max group limit: ${config.maxGroup} exceeded`, EXCEED_QUOTA_ERROR);
-    throw new ApolloError(`Max group limit: ${config.maxGroup} exceeded`, 'GROUP_CONFLICT_NAME');
+    throw new ApolloError('Group Maximum Deployments exceeded', EXCEED_QUOTA_ERROR);
   }
 
   // check existing groups with the same name
