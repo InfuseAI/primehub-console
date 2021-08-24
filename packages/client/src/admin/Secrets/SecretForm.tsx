@@ -6,6 +6,17 @@ import type { FormComponentProps } from 'antd/lib/form';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 import type { SecretType, TSecret } from './types';
+import InfuseButton from 'components/infuseButton';
+import styled from 'styled-components';
+
+const StyledForm = styled(Form)`
+  .ant-form-item-label {
+    margin-bottom: -4px;
+  }
+  .ant-form-item {
+    margin-bottom: 10px;
+  }
+`;
 
 function SecretTypeTip() {
   return (
@@ -72,143 +83,147 @@ export function _SecretForm({ form, data, ...props }: SecretFormProps) {
   }, [data]);
 
   return (
-    <Form
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#fff',
-      }}
-      onSubmit={event => {
-        event.preventDefault();
-
-        form.validateFields((err, values: SecretFormState) => {
-          if (err) {
-            console.error(err);
-            return;
-          }
-
-          if (props?.onSubmit) {
-            props.onSubmit(values);
-          }
-        });
-      }}
-    >
-      <Form.Item label='Name'>
-        {form.getFieldDecorator('name', {
-          initialValue: data?.name || '',
-          validateTrigger: ['onChange', 'onBlur'],
-          rules: [
-            {
-              required: !props?.disabledName || false,
-              validator: (_, value, callback) => {
-                if (
-                  !value.match(
-                    /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/
-                  )
-                ) {
-                  return callback(`lower case alphanumeric characters, '-' or '.', and must start and
-                  end with an alphanumeric character.`);
-                }
-                return true;
-              },
-            },
-          ],
-        })(<Input disabled={props?.disabledName || false} />)}
-      </Form.Item>
-
-      <Form.Item label='Display Name'>
-        {form.getFieldDecorator('displayName', {
-          initialValue: data?.displayName || '',
-        })(<Input />)}
-      </Form.Item>
-
-      <Form.Item>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          Type <SecretTypeTip />:
-        </label>
-
-        {form.getFieldDecorator('type', {
-          initialValue: data?.type || 'opaque',
-        })(
-          <Select
-            data-testid='secret-type'
-            onChange={value => setSecretType(value as SecretType)}
-          >
-            <Select.Option value='opaque'>Git Dataset</Select.Option>
-            <Select.Option value='kubernetes'>Image Pull</Select.Option>
-          </Select>
-        )}
-      </Form.Item>
-
-      {secretType === 'opaque' ? (
-        <Form.Item label='Secret'>
-          {form.getFieldDecorator('secret', {
-            initialValue: data?.secret || '',
-          })(<Input.TextArea rows={4} />)}
-        </Form.Item>
-      ) : (
-        <>
-          <Form.Item label='Registry Host'>
-            {form.getFieldDecorator('registryHost', {
-              initialValue: data?.registryHost || '',
-              validateTrigger: ['onChange', 'onBlur'],
-              rules: [
-                {
-                  required: true,
-                },
-              ],
-            })(<Input />)}
-          </Form.Item>
-
-          <Form.Item label='Username'>
-            {form.getFieldDecorator('username', {
-              initialValue: data?.username || '',
-              validateTrigger: ['onChange', 'onBlur'],
-              rules: [
-                {
-                  required: true,
-                },
-              ],
-            })(<Input />)}
-          </Form.Item>
-
-          <Form.Item label='Password'>
-            {form.getFieldDecorator('password', {
-              initialValue: data?.password || '',
-              validateTrigger: ['onChange', 'onBlur'],
-              rules: [
-                {
-                  required: true,
-                },
-              ],
-            })(<Input type='password' />)}
-          </Form.Item>
-        </>
-      )}
-
-      <Form.Item>
-        {form.getFieldDecorator('id', {
-          initialValue: data?.id || '',
-        })(<Input type='hidden' />)}
-      </Form.Item>
-
-      <div
+    <div data-testid='dataset'>
+      <InfuseButton>
+        <Link to={`${appPrefix}admin/secret`}>
+          <Icon type='arrow-left' /> Back
+        </Link>
+      </InfuseButton>
+      <StyledForm
         style={{
           display: 'flex',
-          gap: '16px',
-          justifyContent: 'flex-end',
+          flexDirection: 'column',
+          backgroundColor: '#fff',
+        }}
+        onSubmit={event => {
+          event.preventDefault();
+
+          form.validateFields((err, values: SecretFormState) => {
+            if (err) {
+              console.error(err);
+              return;
+            }
+
+            if (props?.onSubmit) {
+              props.onSubmit(values);
+            }
+          });
         }}
       >
-        <Button>
-          <Link to={`${appPrefix}admin/secret`}>Cancel</Link>
-        </Button>
+        <Form.Item label='Name'>
+          {form.getFieldDecorator('name', {
+            initialValue: data?.name || '',
+            validateTrigger: ['onChange', 'onBlur'],
+            rules: [
+              {
+                required: !props?.disabledName || false,
+                validator: (_, value, callback) => {
+                  if (
+                    !value.match(
+                      /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/
+                    )
+                  ) {
+                    return callback(`lower case alphanumeric characters, '-' or '.', and must start and
+                    end with an alphanumeric character.`);
+                  }
+                  return true;
+                },
+              },
+            ],
+          })(<Input disabled={props?.disabledName || false} />)}
+        </Form.Item>
 
-        {/* @ts-ignore */}
-        <Button type='primary' htmlType='submit'>
-          Save
-        </Button>
-      </div>
-    </Form>
+        <Form.Item label='Display Name'>
+          {form.getFieldDecorator('displayName', {
+            initialValue: data?.displayName || '',
+          })(<Input />)}
+        </Form.Item>
+
+        <Form.Item>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            Type <SecretTypeTip />:
+          </label>
+
+          {form.getFieldDecorator('type', {
+            initialValue: data?.type || 'opaque',
+          })(
+            <Select
+              data-testid='secret-type'
+              onChange={value => setSecretType(value as SecretType)}
+            >
+              <Select.Option value='opaque'>Git Dataset</Select.Option>
+              <Select.Option value='kubernetes'>Image Pull</Select.Option>
+            </Select>
+          )}
+        </Form.Item>
+
+        {secretType === 'opaque' ? (
+          <Form.Item label='Secret'>
+            {form.getFieldDecorator('secret', {
+              initialValue: data?.secret || '',
+            })(<Input.TextArea rows={4} />)}
+          </Form.Item>
+        ) : (
+          <>
+            <Form.Item label='Registry Host'>
+              {form.getFieldDecorator('registryHost', {
+                initialValue: data?.registryHost || '',
+                validateTrigger: ['onChange', 'onBlur'],
+                rules: [
+                  {
+                    required: true,
+                  },
+                ],
+              })(<Input />)}
+            </Form.Item>
+
+            <Form.Item label='Username'>
+              {form.getFieldDecorator('username', {
+                initialValue: data?.username || '',
+                validateTrigger: ['onChange', 'onBlur'],
+                rules: [
+                  {
+                    required: true,
+                  },
+                ],
+              })(<Input />)}
+            </Form.Item>
+
+            <Form.Item label='Password'>
+              {form.getFieldDecorator('password', {
+                initialValue: data?.password || '',
+                validateTrigger: ['onChange', 'onBlur'],
+                rules: [
+                  {
+                    required: true,
+                  },
+                ],
+              })(<Input type='password' />)}
+            </Form.Item>
+          </>
+        )}
+
+        <Form.Item>
+          {form.getFieldDecorator('id', {
+            initialValue: data?.id || '',
+          })(<Input type='hidden' />)}
+        </Form.Item>
+
+        <Form.Item style={{ textAlign: 'right', marginTop: 12 }}>
+          <InfuseButton
+            data-testid='confirm-button'
+            type='primary'
+            htmlType='submit'
+            style={{ marginRight: 16 }}
+          >
+            Confirm
+          </InfuseButton>
+          <InfuseButton data-testid='reset-button'>
+            <Link to={`${appPrefix}admin/secret`}>Cancel</Link>
+          </InfuseButton>
+        </Form.Item>
+      </StyledForm>
+    </div>
   );
 }
 
