@@ -61,7 +61,9 @@ export function GroupList(props: Props) {
   const add = () => {
     history.push('group_next/add');
   };
-  const edit = id => {};
+  const edit = id => {
+    history.push(`group_next/${id}`);
+  };
   const remove = (id, record) => {
     const { deleteGroup } = props;
     const { name } = record;
@@ -88,7 +90,7 @@ export function GroupList(props: Props) {
         <Button
           icon={'edit'}
           data-testid='edit-button'
-          onClick={() => this.edit(record.id)}
+          onClick={() => edit(record.id)}
         ></Button>
         <Button
           icon='delete'

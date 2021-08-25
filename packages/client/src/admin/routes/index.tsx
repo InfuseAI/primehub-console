@@ -5,6 +5,7 @@ import { UserList, UserDetail, UserAdd } from '../User';
 import { Datasets, DatasetInfo } from '../Datasets';
 import GroupList from '../Group/GroupList';
 import GroupAdd from '../Group/GroupAdd';
+import GroupUpdate from '../Group/GroupUpdate';
 import { Secrets, SecretInfo } from '../Secrets';
 import { InstanceTypes, InstanceTypeInfo } from '../InstanceTypes';
 import { appPrefix } from 'utils/env';
@@ -64,6 +65,12 @@ export const routes = [
     path: 'admin/group_next/add',
     enabled: true,
     component: GroupAdd,
+  },
+  {
+    key: 'group_next_update',
+    path: 'admin/group_next/:id',
+    enabled: true,
+    component: GroupUpdate,
   },
   {
     key: 'user',
