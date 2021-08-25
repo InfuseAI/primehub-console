@@ -40,6 +40,7 @@ import GroupSettingsPage from 'containers/groupSettingsPage';
 import GroupSettingsJobs from 'ee/components/groupSettings/jobs';
 import GroupSettingsDeployments from 'ee/components/groupSettings/deployments';
 import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
+import NotebookViewer from 'containers/sharedFiles/notebookViewer';
 
 const client = createGraphqlClient({
   fakeData,
@@ -63,6 +64,9 @@ class Main extends React.Component {
             {/* Shared Files */}
             <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
               <SharedFilesPage />
+            </Route>
+            <Route path={`${appPrefix}g/:groupName/view/notebook`}>
+              <NotebookViewer />
             </Route>
 
             {/* Group Images management*/}
