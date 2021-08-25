@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   docker: circleci/docker@1.2.0
+  codecov: codecov/codecov@3.0.0
 commands:
   build_console:
     description: Build primehub-console images and push to Docker Hub
@@ -276,6 +277,13 @@ jobs:
           name: Integration tests
           command: |
             ./ci/ci-test.sh
+  upload-coverage-to-codecov:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - codecov/upload:
+          flags: unittests
+          file: ./packages/client/coverage
 
 workflows:
   version: 2
@@ -362,3 +370,6 @@ workflows:
               only: /.*/
             branches:
               ignore: /.*/
+      - upload-coverage-to-codecov:
+          requires:
+            - client-unit-test
