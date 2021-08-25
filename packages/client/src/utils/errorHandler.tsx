@@ -60,7 +60,8 @@ export function errorHandler(e) {
       description = description || 'You do not have permissions.';
       break;
     default:
-      throw e;
+      message = e.message || 'Something wrong... :(';
+      description = e.description || 'Server Error';
   }
 
   notification.error({
