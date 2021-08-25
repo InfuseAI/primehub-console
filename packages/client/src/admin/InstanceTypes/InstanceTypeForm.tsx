@@ -105,22 +105,6 @@ export type InstanceTypeFormState = Pick<
   | 'nodeSelector'
 >;
 
-export const initialFormState: InstanceTypeFormState = {
-  id: '',
-  name: '',
-  displayName: '',
-  description: '',
-  cpuLimit: 0,
-  gpuLimit: 0,
-  memoryLimit: 0,
-  cpuRequest: 0,
-  memoryRequest: 0,
-  global: false,
-  groups: [],
-  tolerations: [],
-  nodeSelector: null,
-};
-
 type InstanceTypeFormProps = FormComponentProps<InstanceTypeFormState> & {
   onSubmit?: (data: InstanceTypeFormState) => void;
   disableName?: boolean;
@@ -134,8 +118,8 @@ type AdvanceFeatureState = {
 };
 
 type AdvanceFeatureAction =
-  | { type: 'CPU'; value: boolean }
-  | { type: 'MEMORY'; value: boolean };
+  | { type: 'CPU'; enabled: boolean }
+  | { type: 'MEMORY'; enabled: boolean };
 
 type UserGroupsState = {
   groups: Groups[];
@@ -164,18 +148,18 @@ export function _InstanceTypeForm({
   const [tolerModalFormAction, setTolerModalFormAction] =
     React.useState<'create' | 'update'>(null);
 
-  const [advanceFeature, dispatch] = React.useReducer(
+  const [advanceFeature, dispatchAdanceFeature] = React.useReducer(
     (state: AdvanceFeatureState, action: AdvanceFeatureAction) => {
       switch (action.type) {
         case 'CPU':
           return {
             ...state,
-            enableCpuRequest: action.value,
+            enableCpuRequest: action.enabled,
           };
         case 'MEMORY':
           return {
             ...state,
-            enableMemoryRequest: action.value,
+            enableMemoryRequest: action.enabled,
           };
       }
     },
@@ -236,7 +220,18 @@ export function _InstanceTypeForm({
         dispatchUserGroups({ type: 'GROUPS', groups: data.groups });
       }
 
-      setNodeList(Object.entries(data.nodeSelector));
+      if (data?.cpuRequest) {
+        dispatchAdanceFeature({ type: 'CPU', enabled: true });
+      }
+
+      if (data?.memoryRequest) {
+        dispatchAdanceFeature({ type: 'MEMORY', enabled: true });
+      }
+
+      if (data?.nodeSelector) {
+        setNodeList(Object.entries(data.nodeSelector));
+      }
+
       setGlobalStatus(data.global);
     }
   }, [data]);
@@ -335,6 +330,12 @@ export function _InstanceTypeForm({
 
               props.onSubmit({
                 ...values,
+                cpuRequest: advanceFeature.enableCpuRequest
+                  ? values.cpuRequest
+                  : null,
+                memoryRequest: advanceFeature.enableMemoryRequest
+                  ? values.memoryRequest
+                  : null,
                 groups: {
                   // @ts-ignore
                   connect,
@@ -418,7 +419,7 @@ export function _InstanceTypeForm({
                       data-testid='Memory Limit'
                       min={0}
                       precision={1}
-                      step={0.5}
+                      step={1}
                       formatter={value => `${value} GB`}
                       // @ts-ignore
                       parser={value => value.replace(/[^0-9.]/g, '')}
@@ -480,9 +481,9 @@ export function _InstanceTypeForm({
                       data-testid='enabled-cpuRequest'
                       checked={advanceFeature.enableCpuRequest}
                       onChange={() =>
-                        dispatch({
+                        dispatchAdanceFeature({
                           type: 'CPU',
-                          value: !advanceFeature.enableCpuRequest,
+                          enabled: !advanceFeature.enableCpuRequest,
                         })
                       }
                     />
@@ -524,9 +525,9 @@ export function _InstanceTypeForm({
                       data-testid='enabled-memoryRequest'
                       checked={advanceFeature.enableMemoryRequest}
                       onChange={() =>
-                        dispatch({
+                        dispatchAdanceFeature({
                           type: 'MEMORY',
-                          value: !advanceFeature.enableMemoryRequest,
+                          enabled: !advanceFeature.enableMemoryRequest,
                         })
                       }
                     />
@@ -536,7 +537,7 @@ export function _InstanceTypeForm({
                       <InputNumber
                         min={0}
                         precision={1}
-                        step={0.5}
+                        step={1}
                         formatter={value => {
                           if (advanceFeature.enableMemoryRequest) {
                             if (value === '') {

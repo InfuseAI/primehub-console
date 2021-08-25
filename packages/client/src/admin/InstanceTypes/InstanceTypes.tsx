@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Link, useHistory, useLocation } from 'react-router-dom';
-import { Button, Table, Input, Icon, Modal, notification } from 'antd';
+import { useHistory, useLocation } from 'react-router-dom';
+import { Button, Table, Input, Modal, notification } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -8,6 +8,7 @@ import { omit } from 'lodash';
 
 import InfuseButton from 'components/infuseButton';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
+import { errorHandler } from 'utils/errorHandler';
 
 import { InstanceTypesLayout } from './Layout';
 import { InstanceTypeForm, InstanceTypeFormState } from './InstanceTypeForm';
@@ -155,12 +156,16 @@ export function _InstanceTypes({
       render: function RenderActions(instance: InstanceTypeNode) {
         return (
           <Button.Group>
-            <Button>
-              <Link to={`${appPrefix}admin/instanceType/${instance.node.id}`}>
-                <Icon type='edit' />
-              </Link>
-            </Button>
             <Button
+              icon='edit'
+              onClick={() => {
+                history.push(
+                  `${appPrefix}admin/instanceType/${instance.node.id}`
+                );
+              }}
+            />
+            <Button
+              icon='delete'
               onClick={() => {
                 Modal.confirm({
                   title: 'Delete Instance',
@@ -199,9 +204,7 @@ export function _InstanceTypes({
                   },
                 });
               }}
-            >
-              <Icon type='delete' />
-            </Button>
+            />
           </Button.Group>
         );
       },
@@ -225,6 +228,7 @@ export function _InstanceTypes({
     formData: InstanceTypeFormState & { nodeList?: string[][] }
   ) {
     const { tolerations, ...rest } = formData;
+
     const nextTolerations =
       tolerations.length === 0
         ? []
@@ -244,13 +248,29 @@ export function _InstanceTypes({
     }
 
     try {
+      let fields = omit(rest, [
+        'id', // `id` just be used in the frontend
+        'nodeList', // omit tempoary field
+        'tolerations', // using `nextTolerations` to replace tolerations field
+        'groups.disconnect', // when creating instance type, groups' s field `disconnect` is not allowed
+      ]);
+
+      if (!rest.cpuRequest) {
+        // when creating instance type, if cpuRequest is `null` not allowed
+        fields = omit(fields, ['cpuRequest']);
+      }
+
+      if (!rest.memoryRequest) {
+        // when creating instance type, if memoryRequest is `null` not allowed
+        fields = omit(fields, ['memoryRequest']);
+      }
+
       const {
         data: { createInstanceType },
       } = await createInstanceTypeMutation({
         variables: {
           payload: {
-            // `id` just be used in the frontend
-            ...omit(rest, ['id', 'nodeList', 'tolerations']),
+            ...fields,
             tolerations: {
               // @ts-ignore Due to API have a `set` field
               set: nextTolerations,
@@ -425,6 +445,7 @@ export const InstanceTypes = compose(
           page: 1,
         },
         fetchPolicy: 'cache-and-network',
+        onError: errorHandler,
       };
     },
   }),
