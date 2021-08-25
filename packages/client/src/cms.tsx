@@ -309,9 +309,6 @@ export default class CMSPage extends React.Component<Props, State> {
         mode="vertical"
       >
         {navigationMenu}
-        <Menu.Item key={'group_next'}>
-          Group (New)
-        </Menu.Item>
         {
           Object.keys(this.schema.schema)
             .filter(key => key !== 'buildImageJob')

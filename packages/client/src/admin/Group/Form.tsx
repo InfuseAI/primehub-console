@@ -291,7 +291,7 @@ function GroupForm(props: Props) {
               <span>
                 Model Deployment{' '}
                 <PHTooltip
-                  tipText='The shared volume is shared storage among members in the group.'
+                  tipText='Groups with enabled model deployment are able to deploy/serve models. '
                   tipLink='https://docs.primehub.io/docs/guide_manual/admin-group#model-deployment'
                   placement='right'
                   style={{ margintLeft: 8 }}

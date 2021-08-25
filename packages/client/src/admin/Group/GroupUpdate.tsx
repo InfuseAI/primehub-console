@@ -33,15 +33,15 @@ function UpdatePage(props: any) {
   const breadcrumbs = [
     {
       key: 'list',
-      matcher: /\/group_next/,
+      matcher: /\/group/,
       title: 'Groups',
-      link: 'admin/group_next',
+      link: 'admin/group',
       tips: 'Admin can find and manage groups here.',
       tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-group',
     },
     {
       key: 'update',
-      matcher: /\/group_next\/([\w-])+/,
+      matcher: /\/group\/([\w-])+/,
       title: `Group: ${get(group, 'name', '')}`,
     },
   ];
@@ -216,7 +216,7 @@ function UpdatePage(props: any) {
     if (pathname) {
       return history.push(`${pathname}${search}`);
     }
-    history.push(`../group_next`);
+    history.push(`../group`);
   };
 
   return (
@@ -238,7 +238,7 @@ function UpdatePage(props: any) {
           animated={{ inkBar: true, tabPane: false }}
           activeKey={activeKey}
           onChange={key => {
-            history.push(`${appPrefix}admin/group_next/${params.id}/${key}`);
+            history.push(`${appPrefix}admin/group/${params.id}/${key}`);
           }}
         >
           <TabPane key='info' tab='Info'>
@@ -324,7 +324,7 @@ export default compose(
       },
       onCompleted: (data: any) => {
         const { history } = props;
-        history.push(`${appPrefix}admin/group_next`);
+        history.push(`${appPrefix}admin/group`);
         notification.success({
           duration: 10,
           placement: 'bottomRight',
@@ -334,7 +334,7 @@ export default compose(
               Group {data.updateGroup.name} updated. Click{' '}
               <a
                 onClick={() =>
-                  history.push(`group_next/${data.updateGroup.id}`)
+                  history.push(`group/${data.updateGroup.id}`)
                 }
               >
                 here

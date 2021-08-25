@@ -1,6 +1,5 @@
 /** @jsx builder */
 import builder, {Body} from 'canner-script';
-import Group from 'schema/group.schema';
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {createFakeData} from 'canner-helpers';
 import {dict, graphqlClient, imageStorage} from 'schema/utils';
@@ -16,15 +15,9 @@ const grafana = (
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
     <Body component={CommonBody}>
-      {/* <Idp/> */}
-      {/* <UserFederation/> */}
-      <Group/>
-    </Body>
-    <Body component={CommonBody}>
       <InstanceType/>
     </Body>
     {grafana}
-    {/* <Announcement /> */}
   </root>
 )
 if (process.env.NODE_ENV === 'production') {
