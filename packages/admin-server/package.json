@@ -32,7 +32,6 @@
   },
   "dependencies": {
     "@koa/cors": "^2.2.1",
-    "@kubernetes/client-node": "^0.5.2",
     "agentkeepalive": "^3.5.1",
     "axios": "^0.18.0",
     "basic-auth": "^2.0.1",
