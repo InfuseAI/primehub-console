@@ -1,0 +1,96 @@
+/* from https://github.com/chuangzhu/react-nbviewer/blob/master/index.css */
+
+.notebook_container {
+  width: 100%;
+  display: grid;
+  grid-template-columns: [col-begin] max-content [col-split] minmax(0, 1fr) [col-end];
+  box-sizing: border-box;
+  padding: 2em;
+  background-color: white;
+}
+
+.input_prompt,
+.output_prompt {
+  grid-column-start: col-begin;
+  grid-column-end: col-split;
+  text-align: right;
+  vertical-align: top;
+  margin-right: .5em;
+}
+
+.input_prompt {
+  color: #303f9f;
+}
+.output_prompt {
+  color: #d84315;
+}
+
+.inner_cell {
+  grid-column-start: col-split;
+  grid-column-end: col-end;
+}
+
+.inner_cell a {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.inner_cell pre {
+  overflow-x: auto;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.inner_cell img {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.inner_cell iframe {
+  border: none;
+  box-sizing: border-box;
+  width: 100%;
+  height: 400px;
+}
+
+.dataframe {
+  border-collapse: collapse;
+}
+
+.dataframe,
+.dataframe th,
+.dataframe td {
+  border: 1px solid;
+  padding: 3px 8px;
+}
+
+.output_stderr {
+  background-color: #fdd;
+}
+
+.ansi_black_fg {
+  color: #3e424d;
+}
+.ansi_red_fg {
+  color: #e75c58;
+}
+.ansi_green_fg {
+  color: #00a250;
+}
+.ansi_yellow_fg {
+  color: #ddb62b;
+}
+.ansi_blue_fg {
+  color: #208ffb;
+}
+.ansi_magenta_fg {
+  color: #d160c4;
+}
+.ansi_cyan_fg {
+  color: #60c6c8;
+}
+.ansi_white_fg {
+  color: #c5c1b4;
+}

@@ -40,6 +40,7 @@ import GroupSettingsPage from 'containers/groupSettingsPage';
 import GroupSettingsJobs from 'ee/components/groupSettings/jobs';
 import GroupSettingsDeployments from 'ee/components/groupSettings/deployments';
 import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
+import NotebookViewer from 'containers/sharedFiles/notebookViewer';
 
 const client = createGraphqlClient({
   fakeData,
@@ -50,7 +51,12 @@ class Main extends React.Component {
   render() {
     return (
       <BrowserRouter>
-        <ApolloProvider client={client}>
+        <Route path={`${appPrefix}preview`}>
+          <NotebookViewer />
+        </Route>
+
+        <Route path={`${appPrefix}g/`}>
+          <ApolloProvider client={client}>
           <MainPage
             sidebarItems={listEE}
             notification={<LicenseWarningBanner />}
@@ -188,6 +194,8 @@ class Main extends React.Component {
             />
           </MainPage>
         </ApolloProvider>
+        </Route>
+
       </BrowserRouter>
     );
   }
