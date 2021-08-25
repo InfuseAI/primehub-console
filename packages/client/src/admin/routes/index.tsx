@@ -68,7 +68,7 @@ export const routes = [
   },
   {
     key: 'group_next_update',
-    path: 'admin/group_next/:id',
+    path: 'admin/group_next/:id/:activeKey?',
     enabled: true,
     component: GroupUpdate,
   },
