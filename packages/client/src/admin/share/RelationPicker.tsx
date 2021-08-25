@@ -47,11 +47,13 @@ interface Props {
   showPagination?: boolean;
   prevPage?: () => void;
   nextPage?: () => void;
+  handleSearch?: (value: string) => void;
 }
 
 interface State {
   totalValue: any[];
   selectedRowKeys: string[];
+  selectedData: any[];
   sorter: {
     field?: string;
     order?: 'ascend' | 'descend';
@@ -96,6 +98,7 @@ export default class Picker extends React.PureComponent<Props, State> {
     const list = props.relationValue?.edges?.map(edge => edge.node);
     this.state = {
       totalValue: list || [],
+      selectedData: [],
       selectedRowKeys: props.pickedIds || [],
       sorter: {},
     };
@@ -128,22 +131,28 @@ export default class Picker extends React.PureComponent<Props, State> {
   };
 
   handleOk = () => {
-    this.props.onOk(this.state.selectedRowKeys, this.state.totalValue);
+    const { selectedRowKeys, selectedData } = this.state;
+    this.props.onOk(selectedRowKeys, selectedData);
   };
 
   handleSearch = value => {
-    const { updateRelationQuery } = this.props;
-    const { sorter } = this.state;
-    updateRelationQuery({
-      where: {
-        name_contains: value,
-      },
-      orderBy: sorter.field
-        ? {
-            [sorter.field]: get(sorter, 'order') === 'ascend' ? 'asc' : 'desc',
-          }
-        : {},
-    });
+    const { updateRelationQuery, handleSearch } = this.props;
+    if (handleSearch) {
+      handleSearch(value);
+    } else {
+      const { sorter } = this.state;
+      updateRelationQuery({
+        where: {
+          name_contains: value,
+        },
+        orderBy: sorter.field
+          ? {
+              [sorter.field]:
+                get(sorter, 'order') === 'ascend' ? 'asc' : 'desc',
+            }
+          : {},
+      });
+    }
   };
 
   handleTableChange = (pagination, filters, sorter) => {
@@ -165,6 +174,12 @@ export default class Picker extends React.PureComponent<Props, State> {
     this.setState({
       selectedRowKeys,
     });
+  };
+
+  rowOnSelect = record => {
+    const { selectedData } = this.state;
+    selectedData.push(record);
+    this.setState({ selectedData });
   };
 
   render() {
@@ -210,6 +225,7 @@ export default class Picker extends React.PureComponent<Props, State> {
           rowSelection={{
             type: pickOne ? 'radio' : 'checkbox',
             onChange: this.rowSelectOnChange,
+            onSelect: this.rowOnSelect,
             selectedRowKeys,
           }}
           onChange={this.handleTableChange}

@@ -48,3 +48,15 @@ mutation CreateGroup($data: GroupCreateInput!) {
     ...GroupBasicInfo
   }
 }
+
+mutation UpdateGroup($data: GroupUpdateInput!, $where: GroupWhereUniqueInput!) {
+  updateGroup(data: $data, where: $where) {
+    ...GroupBasicInfo
+  }
+}
+
+query Group($where: GroupWhereUniqueInput!) {
+  group(where: $where) {
+    ...GroupInfo
+  }
+}
