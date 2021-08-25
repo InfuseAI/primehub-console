@@ -11,6 +11,29 @@ fragment GroupBasicInfo on Group {
   projectQuotaMemory
 }
 
+fragment GroupResourceInfo on Group {
+  datasets {
+    id
+    displayName
+    description
+    type
+  }
+  images {
+    id
+    displayName
+    type
+    description
+  }
+  instanceTypes {
+    id
+    displayName
+    description
+    cpuLimit
+    gpuLimit
+    memoryLimit
+  }
+}
+
 fragment GroupInfo on Group {
   id
   displayName
@@ -26,9 +49,6 @@ fragment GroupInfo on Group {
   projectQuotaCpu
   projectQuotaGpu
   projectQuotaMemory
-  datasets {
-    displayName
-  }
   resourceStatus {
     cpuUsage
     memUsage
@@ -40,6 +60,7 @@ fragment GroupInfo on Group {
   jobDefaultActiveDeadlineSeconds
   sharedVolumeCapacity
   launchGroupOnly
+  ...GroupResourceInfo
 }
 
 fragment GroupMLflowConfig on Group {

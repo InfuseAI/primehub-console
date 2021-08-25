@@ -349,45 +349,45 @@ function GroupForm(props: Props) {
               />
             )}
           </Form.Item>
+          {form.getFieldValue('enabledSharedVolume') ? (
+            <Card title={'Shared Volume'} style={{ marginBottom: 16 }}>
+              <Row>
+                <Col sm={8} xs={24}>
+                  <Form.Item label={`Shared Volume Capacity`}>
+                    {form.getFieldDecorator('sharedVolumeCapacity', {
+                      initialValue: initialValue.sharedVolumeCapacity,
+                    })(
+                      <InputNumber
+                        disabled={type === 'update'}
+                        style={{ width: 'auto' }}
+                        formatter={value => `${value} GB`}
+                        parser={value => +value.replace(/[^0-9.]/g, '')}
+                        precision={0}
+                        min={1}
+                        step={1}
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+                <Col sm={8} xs={24}>
+                  <Form.Item label={`Launch Group Only`}>
+                    {form.getFieldDecorator('launchGroupOnly', {
+                      initialValue: initialValue.launchGroupOnly,
+                      valuePropName: 'checked',
+                    })(
+                      <Switch
+                        checkedChildren={<Icon type='check' />}
+                        unCheckedChildren={<Icon type='close' />}
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Card>
+          ) : (
+            <></>
+          )}
         </Feature>
-        {form.getFieldValue('enabledSharedVolume') ? (
-          <Card title={'Shared Volume'} style={{ marginBottom: 16 }}>
-            <Row>
-              <Col sm={8} xs={24}>
-                <Form.Item label={`Shared Volume Capacity`}>
-                  {form.getFieldDecorator('sharedVolumeCapacity', {
-                    initialValue: initialValue.sharedVolumeCapacity,
-                  })(
-                    <InputNumber
-                      disabled={type === 'update'}
-                      style={{ width: 'auto' }}
-                      formatter={value => `${value} GB`}
-                      parser={value => +value.replace(/[^0-9.]/g, '')}
-                      precision={0}
-                      min={1}
-                      step={1}
-                    />
-                  )}
-                </Form.Item>
-              </Col>
-              <Col sm={8} xs={24}>
-                <Form.Item label={`Launch Group Only`}>
-                  {form.getFieldDecorator('launchGroupOnly', {
-                    initialValue: initialValue.launchGroupOnly,
-                    valuePropName: 'checked',
-                  })(
-                    <Switch
-                      checkedChildren={<Icon type='check' />}
-                      unCheckedChildren={<Icon type='close' />}
-                    />
-                  )}
-                </Form.Item>
-              </Col>
-            </Row>
-          </Card>
-        ) : (
-          <></>
-        )}
         <Card title={'User Quota'} style={{ marginBottom: 16 }}>
           <Row>
             <Col sm={8} xs={24}>

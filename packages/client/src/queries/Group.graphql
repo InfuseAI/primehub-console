@@ -55,8 +55,11 @@ mutation UpdateGroup($data: GroupUpdateInput!, $where: GroupWhereUniqueInput!) {
   }
 }
 
-query Group($where: GroupWhereUniqueInput!) {
+query Group($where: GroupWhereUniqueInput!, $everyoneGroupWhere: GroupWhereUniqueInput!) {
   group(where: $where) {
     ...GroupInfo
+  }
+  everyoneGroup: group(where: $everyoneGroupWhere) {
+    ...GroupResourceInfo
   }
 }
