@@ -211,7 +211,8 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - build_watcher:
           tag: $CIRCLE_TAG
   # Tests
