@@ -4,7 +4,7 @@ FROM node:dubnium-slim AS build
 WORKDIR /usr/src/app
 
 # Copy
-COPY lerna.json package.json tsconfig.json tslint.json yarn.lock ./
+COPY package.json tsconfig.json tslint.json yarn.lock ./
 COPY packages/graphql-server packages/graphql-server
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
