@@ -302,13 +302,12 @@ class Browser extends React.Component<Props, State> {
     const menuItemDownload = <Menu.Item key='download'><a href={`${this.getFilePath(item.name)}?download=1`}>Download file</a></Menu.Item>;
     const menuItemCopyUri = <Menu.Item key='Copy Uri'><a onClick={() => {this.setState({itemCopyUri: item})}}>Copy PHFS URI</a></Menu.Item>;
     const menuItemDelete = <Menu.Item key='delete'><a onClick={() => {this.handleDelete(item)}}>Delete</a></Menu.Item>;
+    const renderable = ['txt', 'jpg', 'png', 'ipynb'];
 
     if (item.name.endsWith('/')) {
       // folder
-    } else if (item.name.endsWith('txt') ||
-        item.name.endsWith('png') ||
-        item.name.endsWith('jpg'))
-    {
+    }
+    else if (renderable.includes(item.name)) {
       // viewable file
       menuItems.push(menuItemView);
       menuItems.push(menuItemDownload);
