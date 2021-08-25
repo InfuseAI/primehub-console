@@ -77,8 +77,8 @@ describe('Admin Portal - List Component', () => {
 describe('Admin Portal - Group List', () => {
   const wrapper = ({children}) => {
     return (
-      <MemoryRouter initialEntries={['/group_next']}>
-        <Route path='/group_next'>
+      <MemoryRouter initialEntries={['/group']}>
+        <Route path='/group'>
         {children}
         </Route>
       </MemoryRouter>
