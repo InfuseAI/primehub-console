@@ -31,6 +31,7 @@ import { isUserAdmin } from './user';
 
 const config = createConfig();
 
+const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 const NOT_AUTH_ERROR = 'NOT_AUTH';
 
 // constants
@@ -109,7 +110,7 @@ export const create = async (root, args, context: Context) => {
   const groups = await kcAdminClient.groups.find();
   // max group validation need minus everyone group.
   if (groups.length > config.maxGroup) {
-    throw Boom.badData(`Max group limit: ${config.maxGroup} exceeded`);
+    throw new ApolloError(`Max group limit: ${config.maxGroup} exceeded`, EXCEED_QUOTA_ERROR);
   }
 
   // check existing groups with the same name
