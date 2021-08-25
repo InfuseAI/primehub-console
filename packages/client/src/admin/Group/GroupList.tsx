@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Input, Col, Layout, Button } from 'antd';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
+import {
+  withRouter,
+  RouteComponentProps,
+  useHistory,
+  useLocation,
+} from 'react-router-dom';
 import { List } from './list';
 import { reduce, get } from 'lodash';
 import PageTitle from 'components/pageTitle';
@@ -26,7 +31,8 @@ type Props = {
 } & RouteComponentProps;
 
 export function GroupList(props: Props) {
-  const { history } = props;
+  const history = useHistory();
+  const location = useLocation();
   const DISABLE_GROUP = (window as any).disableGroup || false;
   const breadcrumbs = [
     {
@@ -37,7 +43,7 @@ export function GroupList(props: Props) {
       tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-group',
     },
   ];
-  const params = queryString.parse(history.location.search.replace(/^\?/, ''));
+  const params = queryString.parse(location.search.replace(/^\?/, '')) || {};
   const [currentPage, setCurrentPage] = useState(get(params, 'page', 1));
   const [search, setSearch] = useState(get(params, 's', null));
   const [orderBy, setOrderBy] = useState(get(params, 'orderBy', null));
@@ -325,7 +331,6 @@ export default compose(
   return (
     <React.Fragment>
       <GroupList
-        history={props.history}
         dataSource={dataSource}
         listGroup={listGroup}
         deleteGroup={deleteGroup}
