@@ -97,9 +97,7 @@ describe('InstanceTypeInfo', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Failure to fetch data, try again later.')
-      ).toBeInTheDocument();
+      expect(screen.getByText('Server Error')).toBeInTheDocument();
     });
   });
 
@@ -121,8 +119,8 @@ describe('InstanceTypeInfo', () => {
       expect(screen.getByTestId('CPU Limit')).toHaveDisplayValue('1.5');
       expect(screen.getByTestId('Memory Limit')).toHaveDisplayValue('2.0 GB');
       expect(screen.getByTestId('GPU Limit')).toHaveDisplayValue('0');
-      expect(screen.getByTestId('enabled-memoryRequest')).not.toBeChecked();
-      expect(screen.getByTestId('enabled-cpuRequest')).not.toBeChecked();
+      expect(screen.getByTestId('enabled-memoryRequest')).toBeChecked();
+      expect(screen.getByTestId('enabled-cpuRequest')).toBeChecked();
       expect(screen.getByTestId('Global')).not.toBeChecked();
     });
   });

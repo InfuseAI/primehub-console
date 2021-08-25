@@ -6,6 +6,7 @@ import { notification } from 'antd';
 import { omit } from 'lodash';
 
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
+import { errorHandler } from 'utils/errorHandler';
 
 import { InstanceTypesLayout } from './Layout';
 import { InstanceTypeForm, InstanceTypeFormState } from './InstanceTypeForm';
@@ -45,7 +46,7 @@ function _InstanceTypeInfo({ data, ...props }: Props) {
         ? []
         : tolerations.map(toleration => omit(toleration, ['id', '__typename']));
 
-    let nextNodeSelector: Record<string, string> = null;
+    let nextNodeSelector: Record<string, string> = {};
     if (formData?.nodeList) {
       nextNodeSelector = formData.nodeList.reduce((acc, v) => {
         const key = v[0];
@@ -84,13 +85,7 @@ function _InstanceTypeInfo({ data, ...props }: Props) {
       });
     } catch (err) {
       console.error(err);
-
-      notification.error({
-        duration: 5,
-        placement: 'bottomRight',
-        message: 'Failure',
-        description: 'Failure to update, try again later.',
-      });
+      errorHandler(err);
     }
   }
 
@@ -127,14 +122,7 @@ export const InstanceTypeInfo = compose(
           },
         },
         fetchPolicy: 'cache-and-network',
-        onError: () => {
-          notification.error({
-            duration: 5,
-            placement: 'bottomRight',
-            message: 'Failure',
-            description: 'Failure to fetch data, try again later.',
-          });
-        },
+        onError: errorHandler,
       };
     },
   }),

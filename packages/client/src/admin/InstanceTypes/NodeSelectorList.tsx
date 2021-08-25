@@ -1,8 +1,16 @@
 import * as React from 'react';
-import { Button, Empty, Input, Icon, Form } from 'antd';
+import { Button, Empty, Input, Icon, Form, notification } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 
 function inputValidator(_, value, callback) {
+  if (!value) {
+    notification.warn({
+      duration: 5,
+      placement: 'bottomRight',
+      message: 'Node Selector inputs fields can not be empty.',
+    });
+  }
+
   if (value.length < 3 || value.length > 63) {
     return callback('Must be between 3 and 63 characters');
   }
@@ -35,7 +43,6 @@ export function NodeSelectorList({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '24px',
         ...props?.style,
       }}
     >
@@ -105,7 +112,7 @@ export function NodeItemInputGroup({
   ...props
 }: NodeItemInputGroupProps) {
   return (
-    <div style={{ display: 'flex', gap: '24px' }}>
+    <div style={{ display: 'flex', gap: '16px' }}>
       <Form.Item
         label='Key'
         labelCol={{ sm: { span: 5 } }}

@@ -69,6 +69,8 @@ mutation UpdateInstanceTypeMutation(
   updateInstanceType(data: $payload, where: $where) {
     id
     global
+    cpuRequest
+    memoryRequest
     groups {
       id
       name
