@@ -1,13 +1,20 @@
 import * as React from 'react';
 import Breadcrumbs from 'components/share/breadcrumb';
 
-export function DatasetLayout({ page, children }: { page: string, children: React.ReactNode }) {
+export function DatasetLayout({
+  page,
+  children,
+}: {
+  page: string;
+  children: React.ReactNode;
+}) {
   const tipsLink =
-    page === 'create' ?
-    'https://docs.primehub.io/docs/guide_manual/admin-dataset#creating-new-dataset':
-    'https://docs.primehub.io/docs/guide_manual/admin-dataset';
+    page === 'create'
+      ? 'https://docs.primehub.io/docs/guide_manual/admin-dataset#creating-new-dataset'
+      : 'https://docs.primehub.io/docs/guide_manual/admin-dataset';
 
-  return (<>
+  return (
+    <>
       <div
         style={{
           background: '#fff',
@@ -21,7 +28,7 @@ export function DatasetLayout({ page, children }: { page: string, children: Reac
               key: 'dataset',
               matcher: /\/dataset/,
               title: 'Datasets',
-              link: 'admin/dataset',
+              link: '/dataset',
               tips: 'Admin can manage datasets and control the access to them.',
               tipsLink,
             },
@@ -30,7 +37,6 @@ export function DatasetLayout({ page, children }: { page: string, children: Reac
       </div>
 
       {children}
-      </>
+    </>
   );
-
 }
