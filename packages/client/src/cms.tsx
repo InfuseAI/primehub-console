@@ -364,7 +364,7 @@ export default class CMSPage extends React.Component<Props, State> {
               errorHandler={(e) => {
                 console.dir(e);
                 // default message and description
-                let message = e.message || 'Error';
+                let message = get(e, 'graphQLErrors.0.message', 'Error');
                 let description = '';
                 let btn;
                 let key;
