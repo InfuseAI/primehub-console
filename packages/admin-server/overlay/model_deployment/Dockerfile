@@ -1,4 +1,4 @@
-FROM node:dubnium-slim AS build
+FROM node:14-slim AS build
 
 # create app directory
 WORKDIR /usr/src/app
@@ -10,15 +10,15 @@ COPY packages/client packages/client
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
-RUN cd packages/admin-server \
-  && npm run build:prod \
+RUN  yarn install \
+  && cd packages/admin-server \
+  && yarn build:prod \
   && cd ../client \
-  && npm run build:model_deploy \
-  && yarn list --pattern canner \
+  && yarn build:model_deploy \
   && ls | grep -v dist | xargs rm -rf
 
 # Run
-FROM node:dubnium-slim
+FROM node:14-slim
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app /usr/src/app
 ENV NODE_ENV production
