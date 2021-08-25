@@ -16,6 +16,10 @@ fragment GroupInfo on Group {
   displayName
   name
   admins
+  users {
+    id
+    username
+  }
   quotaCpu
   quotaGpu
   quotaMemory
