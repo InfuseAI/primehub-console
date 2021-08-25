@@ -154,7 +154,8 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - build_console:
           tag: latest
   latest-console-others:
@@ -162,7 +163,8 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - build_console_others:
           tag: latest
   latest-graphql:
@@ -170,7 +172,8 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - build_graphql:
           tag: latest
   latest-watcher:
@@ -178,7 +181,8 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - build_watcher:
           tag: latest
   # Release
@@ -187,7 +191,8 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - build_console:
           tag: $CIRCLE_TAG
   release-console-others:
@@ -195,7 +200,8 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - build_console_others:
           tag: $CIRCLE_TAG
   release-graphql:
@@ -203,7 +209,8 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - build_graphql:
           tag: $CIRCLE_TAG
   release-watcher:
