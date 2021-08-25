@@ -199,6 +199,13 @@ class Browser extends React.Component<Props, State> {
     return `${appPrefix}files/${prefix}${filename}`
   }
 
+  private getRenderPath(filename) {
+    const {data} = this.props;
+    const {files} = data || {};
+    const {prefix} = files || {};
+    return `${appPrefix}preview?file=${appPrefix}files/${prefix}${filename}`
+  }
+
   private getPhfsUri(name) {
     return `phfs://${this.normalizedPath()}` + name
   }
@@ -311,6 +318,10 @@ class Browser extends React.Component<Props, State> {
     {
       // viewable file
       menuItems.push(menuItemView);
+      menuItems.push(menuItemDownload);
+    } else if (item.name.endsWith('ipynb')) {
+      // render file
+      menuItems.push(<Menu.Item key='view'><a target='_blank' href={`${this.getRenderPath(item.name)}`}>View file</a></Menu.Item>);
       menuItems.push(menuItemDownload);
     } else {
       // other format file
