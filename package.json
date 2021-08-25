@@ -15,7 +15,6 @@
   },
   "main": "index.js",
   "scripts": {
-    "bootstrap": "lerna bootstrap",
     "prepare": "husky install"
   },
   "workspaces": [
@@ -33,7 +32,6 @@
   },
   "devDependencies": {
     "husky": "^6.0.0",
-    "lerna": "^3.22.1",
     "lint-staged": "^11.0.0",
     "prettier": "^2.3.0",
     "prettier-package-json": "^2.5.0"
