@@ -31,7 +31,7 @@ export function GroupList(props: Props) {
   const breadcrumbs = [
     {
       key: 'list',
-      matcher: /\/group_next/,
+      matcher: /\/group/,
       title: 'Groups',
       tips: 'Admin can find and manage groups here.',
       tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-group',
@@ -59,10 +59,10 @@ export function GroupList(props: Props) {
   }, [currentPage, search, orderBy, history]);
 
   const add = () => {
-    history.push('group_next/add');
+    history.push('group/add');
   };
   const edit = id => {
-    history.push(`group_next/${id}`);
+    history.push(`group/${id}`);
   };
   const remove = (id, record) => {
     const { deleteGroup } = props;

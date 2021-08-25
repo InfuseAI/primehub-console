@@ -12,7 +12,6 @@ import UsageReport from '../UsageReport';
 
 export const ROUTES = [
   'group',
-  'group_next',
   'user',
   'instanceType',
   'image',
@@ -51,23 +50,18 @@ export const routes = [
     key: 'group',
     path: 'admin/group',
     name: 'Groups',
-  },
-  {
-    key: 'group_next',
-    path: 'admin/group_next',
-    name: 'Groups (Next)',
     enabled: true,
     component: GroupList,
   },
   {
-    key: 'group_next_add',
-    path: 'admin/group_next/add',
+    key: 'group_add',
+    path: 'admin/group/add',
     enabled: true,
     component: GroupAdd,
   },
   {
-    key: 'group_next_update',
-    path: 'admin/group_next/:id/:activeKey?',
+    key: 'group_update',
+    path: 'admin/group/:id/:activeKey?',
     enabled: true,
     component: GroupUpdate,
   },
