@@ -12,14 +12,12 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 RUN  yarn install \
   && cd packages/graphql-server \
-  && yarn \
   && yarn build:prod \
   && cd ../watcher \
-  && yarn \
   && yarn build:prod
 
 # Run
-FROM node:dubnium-slim
+FROM node:14-slim
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app /usr/src/app
 ENV NODE_ENV production
