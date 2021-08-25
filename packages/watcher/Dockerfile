@@ -1,4 +1,4 @@
-FROM node:dubnium-slim AS build
+FROM node:14-slim AS build
 
 # create app directory
 WORKDIR /usr/src/app
@@ -10,11 +10,12 @@ COPY packages/watcher packages/watcher
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
-RUN cd packages/graphql-server \
-  && yarn install --ignore-engines --production=true \
+RUN  yarn install \
+  && cd packages/graphql-server \
+  && yarn \
   && yarn build:prod \
   && cd ../watcher \
-  && yarn install --ignore-engines --production=true \
+  && yarn \
   && yarn build:prod
 
 # Run
