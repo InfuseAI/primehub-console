@@ -1,7 +1,7 @@
 import React from 'react';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
-import { get, omit } from 'lodash';
+import { get, omit, uniqBy } from 'lodash';
 import {
   withRouter,
   useLocation,
@@ -9,7 +9,8 @@ import {
   useParams,
   RouteComponentProps,
 } from 'react-router-dom';
-import { notification, Tabs, Row, Col, Layout, Icon } from 'antd';
+import { notification, Card, Tabs, Row, Col, Layout, Icon, Button } from 'antd';
+import { List } from './list';
 import { Group, UpdateGroup } from 'queries/Group.graphql';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
@@ -24,6 +25,7 @@ function UpdatePage(props: any) {
   const { getGroup } = props;
   const { loading } = getGroup;
   const group = get(getGroup, 'group', {});
+  const everyoneGroup = get(getGroup, 'everyoneGroup', {});
   const location = useLocation();
   const history = useHistory();
   const params = useParams<{ id: string; activeKey?: string }>();
@@ -41,6 +43,145 @@ function UpdatePage(props: any) {
       key: 'update',
       matcher: /\/group_next\/([\w-])+/,
       title: `Group: ${get(group, 'name', '')}`,
+    },
+  ];
+
+  const instanceTypesSource = uniqBy(
+    get(everyoneGroup, 'instanceTypes', []).concat(
+      get(group, 'instanceTypes', [])
+    ),
+    'id'
+  );
+
+  const imagesSource = uniqBy(
+    get(everyoneGroup, 'images', []).concat(get(group, 'images', [])),
+    'id'
+  );
+
+  const datasetsSource = uniqBy(
+    get(everyoneGroup, 'datasets', []).concat(get(group, 'datasets', [])),
+    'id'
+  );
+
+  const instanceTypesColumns = [
+    {
+      title: 'Display Name',
+      dataIndex: 'displayName',
+    },
+    {
+      title: 'Description',
+      dataIndex: 'discription',
+    },
+    {
+      title: 'CPU Limit',
+      dataIndex: 'cpuLimit',
+      align: 'center',
+      render: value => value || 0,
+    },
+    {
+      title: 'Memory Limit',
+      dataIndex: 'memoryLimit',
+      align: 'center',
+      render: text => `${text || 0} GB`,
+    },
+    {
+      title: 'GPU Limit',
+      dataIndex: 'gpuLimit',
+      align: 'center',
+      render: value => value || 0,
+    },
+    {
+      title: 'Actions',
+      dataIndex: 'id',
+      align: 'center',
+      render: value => {
+        return (
+          <Button
+            icon={'edit'}
+            data-testid='edit-button'
+            onClick={() =>
+              history.push(`${appPrefix}admin/instanceType/${value}`)
+            }
+          ></Button>
+        );
+      },
+    },
+  ];
+
+  const imagesColumns = [
+    {
+      title: 'Display Name',
+      dataIndex: 'displayName',
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      align: 'center',
+      render: value => {
+        if (!value) {
+          return '-';
+        }
+
+        if (value === 'both') {
+          return 'universal';
+        }
+
+        return value;
+      },
+    },
+    {
+      title: 'Description',
+      dataIndex: 'discription',
+    },
+    {
+      title: 'Actions',
+      dataIndex: 'id',
+      align: 'center',
+      render: value => {
+        return (
+          <Button
+            icon={'edit'}
+            data-testid='edit-button'
+            onClick={() => history.push(`${appPrefix}admin/image/${value}`)}
+          ></Button>
+        );
+      },
+    },
+  ];
+
+  const datasetsColumns = [
+    {
+      title: 'Display Name',
+      dataIndex: 'displayName',
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      align: 'center',
+    },
+    {
+      title: 'Description',
+      dataIndex: 'discription',
+    },
+    {
+      title: 'Permissions',
+      dataIndex: 'writable',
+      align: 'center',
+      render: writable => (writable ? 'Write' : 'Read Only'),
+    },
+    {
+      title: 'Actions',
+      dataIndex: 'id',
+      align: 'center',
+      render: value => {
+        return (
+          <Button
+            icon={'edit'}
+            data-testid='edit-button'
+            onClick={() => history.push(`${appPrefix}admin/dataset/${value}`)}
+          ></Button>
+        );
+      },
     },
   ];
 
@@ -109,9 +250,43 @@ function UpdatePage(props: any) {
               initialValue={group}
             />
           </TabPane>
-          <TabPane key='instanceType' tab='Instance Types'></TabPane>
-          <TabPane key='images' tab='Images'></TabPane>
-          <TabPane key='datasets' tab='Datasets'></TabPane>
+          <TabPane key='instanceType' tab='Instance Types'>
+            <Card title={'Instance Types'}>
+              <List
+                loading={loading}
+                columns={instanceTypesColumns}
+                dataSource={instanceTypesSource}
+              />
+            </Card>
+          </TabPane>
+          {/* @ts-ignore */}
+          {__ENV__ === 'modelDeploy' ? (
+            <></>
+          ) : (
+            <TabPane key='images' tab='Images'>
+              <Card title={'Images'}>
+                <List
+                  loading={loading}
+                  columns={imagesColumns}
+                  dataSource={imagesSource}
+                />
+              </Card>
+            </TabPane>
+          )}
+          {/* @ts-ignore */}
+          {__ENV__ === 'modelDeploy' ? (
+            <></>
+          ) : (
+            <TabPane key='datasets' tab='Datasets'>
+              <Card title={'Datasets'}>
+                <List
+                  loading={loading}
+                  columns={datasetsColumns}
+                  dataSource={datasetsSource}
+                />
+              </Card>
+            </TabPane>
+          )}
         </Tabs>
       </PageBody>
     </Layout>
@@ -127,6 +302,9 @@ export default compose(
         variables: {
           where: {
             id: props.match.params.id,
+          },
+          everyoneGroupWhere: {
+            id: window.everyoneGroupId,
           },
         },
         fetchPolicy: 'cache-and-network',

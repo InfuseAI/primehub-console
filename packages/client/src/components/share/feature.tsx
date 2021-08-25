@@ -13,7 +13,7 @@ function Feature(props: Props) {
   const { ce = true, ee = true, modelDeploy = true, children } = props;
   if (!ce && __ENV__ === 'ce') return <></>;
   if (!ee && __ENV__ === 'ee') return <></>;
-  if (!modelDeploy && __ENV__ === 'modelDeploy') return <></>;
+  if (!modelDeploy && __ENV__ === 'modelDeploy') return null;
   return <React.Fragment>{children}</React.Fragment>;
 }
 
