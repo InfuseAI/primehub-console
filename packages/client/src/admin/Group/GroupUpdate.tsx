@@ -1,10 +1,15 @@
 import React from 'react';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
-import { get } from 'lodash';
-import { withRouter, useLocation, useHistory } from 'react-router-dom';
+import { get, omit } from 'lodash';
+import {
+  withRouter,
+  useLocation,
+  useHistory,
+  RouteComponentProps,
+} from 'react-router-dom';
 import { notification, Tabs, Row, Col, Layout, Icon } from 'antd';
-import { CreateGroup } from 'queries/Group.graphql';
+import { Group, UpdateGroup } from 'queries/Group.graphql';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import Breadcrumbs from 'components/share/breadcrumb';
@@ -13,7 +18,10 @@ import InfuseButton from 'components/infuseButton';
 import GroupForm from './Form';
 const { TabPane } = Tabs;
 
-function AddPage(props: any) {
+function UpdatePage(props: any) {
+  const { getGroup } = props;
+  const { loading } = getGroup;
+  const group = get(getGroup, 'group', {});
   const location = useLocation();
   const history = useHistory();
   const breadcrumbs = [
@@ -26,25 +34,31 @@ function AddPage(props: any) {
       tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-group',
     },
     {
-      key: 'add',
-      matcher: /\/group_next\/add/,
-      title: `Add Group`,
+      key: 'update',
+      matcher: /\/group_next\/([\w-])+/,
+      title: `Group: ${get(group, 'name', '')}`,
     },
   ];
 
-  const onSubmit = (data, relateUsers) => {
-    const { createGroup } = props;
+  const onSubmit = data => {
+    const { updateGroup } = props;
+    const { connect, disconnect } = data.users;
     const payload = {
-      ...data,
+      ...omit(data, ['name', 'enabledSharedVolume', 'sharedVolumeCapacity']),
       users: {
-        connect: relateUsers.map(r => {
+        connect: connect.map(c => {
           return {
-            id: r.id,
+            id: c.id,
+          };
+        }),
+        disconnect: disconnect.map(c => {
+          return {
+            id: c.id,
           };
         }),
       },
     };
-    createGroup({
+    updateGroup({
       variables: {
         data: payload,
       },
@@ -76,7 +90,13 @@ function AddPage(props: any) {
         </Row>
         <Tabs style={{ marginTop: 24 }}>
           <TabPane key='info' tab='Info'>
-            <GroupForm onSubmit={onSubmit} onCancel={onCancel} />
+            <GroupForm
+              loading={loading}
+              type={'update'}
+              onSubmit={onSubmit}
+              onCancel={onCancel}
+              initialValue={group}
+            />
           </TabPane>
         </Tabs>
       </PageBody>
@@ -86,10 +106,30 @@ function AddPage(props: any) {
 
 export default compose(
   withRouter,
-  graphql(CreateGroup, {
-    name: 'createGroup',
-    alias: 'withCreateGroup',
+  graphql(Group, {
+    options: (props: RouteComponentProps<{ id: string }>) => {
+      return {
+        onError: errorHandler,
+        variables: {
+          where: {
+            id: props.match.params.id,
+          },
+        },
+        fetchPolicy: 'cache-and-network',
+      };
+    },
+    name: 'getGroup',
+    alias: 'withGetGroup',
+  }),
+  graphql(UpdateGroup, {
+    name: 'updateGroup',
+    alias: 'withUpdateGroup',
     options: (props: any) => ({
+      variables: {
+        where: {
+          id: props.match.params.id,
+        },
+      },
       onCompleted: (data: any) => {
         const { history } = props;
         history.push(`../group_next`);
@@ -99,10 +139,10 @@ export default compose(
           message: 'Success!',
           description: (
             <>
-              Group {data.createGroup.name} Created. Click{' '}
+              Group {data.updateGroup.name} updated. Click{' '}
               <a
                 onClick={() =>
-                  history.push(`group_next/${data.createGroup.id}`)
+                  history.push(`group_next/${data.updateGroup.id}`)
                 }
               >
                 here
@@ -115,4 +155,4 @@ export default compose(
       onError: errorHandler,
     }),
   })
-)(AddPage);
+)(UpdatePage);

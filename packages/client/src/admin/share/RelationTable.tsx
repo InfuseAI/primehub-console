@@ -16,6 +16,9 @@ interface Props {
   title: string;
   relationRefetch: () => void;
   searchPlaceholder: string;
+  prevPage?: () => void;
+  nextPage?: () => void;
+  handleSearch?: (value: string) => void;
 }
 
 interface State {
@@ -77,6 +80,9 @@ class RelationTable extends PureComponent<Props, State> {
       loading,
       relationRefetch,
       searchPlaceholder,
+      nextPage,
+      prevPage,
+      handleSearch,
     } = this.props;
     const { columns, pickerColumns } = uiParams;
 
@@ -138,6 +144,9 @@ class RelationTable extends PureComponent<Props, State> {
             title={title}
             updateRelationQuery={relationRefetch}
             loading={loading}
+            prevPage={prevPage}
+            nextPage={nextPage}
+            handleSearch={handleSearch}
           />
         )}
       </div>
