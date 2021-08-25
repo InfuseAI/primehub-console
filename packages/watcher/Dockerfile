@@ -4,20 +4,18 @@ FROM node:dubnium-slim AS build
 WORKDIR /usr/src/app
 
 # Copy
-COPY lerna.json package.json tsconfig.json tslint.json yarn.lock ./
+COPY package.json tsconfig.json tslint.json yarn.lock ./
 COPY packages/graphql-server packages/graphql-server
 COPY packages/watcher packages/watcher
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
-RUN npx lerna bootstrap --scope=@infuseai/watcher
-
 RUN cd packages/graphql-server \
-  && npm run build:prod \
+  && yarn install --ignore-engines --production=true \
+  && yarn build:prod \
   && cd ../watcher \
-  && npm run build:prod
-
-RUN npx lerna bootstrap --scope=@infuseai/watcher -- --production
+  && yarn install --ignore-engines --production=true \
+  && yarn build:prod
 
 # Run
 FROM node:dubnium-slim
