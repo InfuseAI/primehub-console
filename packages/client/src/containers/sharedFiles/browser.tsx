@@ -199,6 +199,13 @@ class Browser extends React.Component<Props, State> {
     return `${appPrefix}files/${prefix}${filename}`
   }
 
+  private getRenderPath(filename) {
+    const {data} = this.props;
+    const {files} = data || {};
+    const {prefix} = files || {};
+    return `${appPrefix}render/${prefix}${filename}`
+  }
+
   private getPhfsUri(name) {
     return `phfs://${this.normalizedPath()}` + name
   }
@@ -302,14 +309,19 @@ class Browser extends React.Component<Props, State> {
     const menuItemDownload = <Menu.Item key='download'><a href={`${this.getFilePath(item.name)}?download=1`}>Download file</a></Menu.Item>;
     const menuItemCopyUri = <Menu.Item key='Copy Uri'><a onClick={() => {this.setState({itemCopyUri: item})}}>Copy PHFS URI</a></Menu.Item>;
     const menuItemDelete = <Menu.Item key='delete'><a onClick={() => {this.handleDelete(item)}}>Delete</a></Menu.Item>;
-    const renderable = ['txt', 'jpg', 'png', 'ipynb'];
 
     if (item.name.endsWith('/')) {
       // folder
-    }
-    else if (renderable.includes(item.name)) {
+    } else if (item.name.endsWith('txt') ||
+        item.name.endsWith('png') ||
+        item.name.endsWith('jpg'))
+    {
       // viewable file
       menuItems.push(menuItemView);
+      menuItems.push(menuItemDownload);
+    } else if (item.name.endsWith('ipynb')) {
+      // render file
+      menuItems.push(<Menu.Item key='view'><a target='_blank' href={`${this.getRenderPath(item.name)}`}>View file</a></Menu.Item>);
       menuItems.push(menuItemDownload);
     } else {
       // other format file
