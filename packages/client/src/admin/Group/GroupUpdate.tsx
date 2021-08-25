@@ -6,6 +6,7 @@ import {
   withRouter,
   useLocation,
   useHistory,
+  useParams,
   RouteComponentProps,
 } from 'react-router-dom';
 import { notification, Tabs, Row, Col, Layout, Icon } from 'antd';
@@ -16,6 +17,7 @@ import Breadcrumbs from 'components/share/breadcrumb';
 import { errorHandler } from 'utils/errorHandler';
 import InfuseButton from 'components/infuseButton';
 import GroupForm from './Form';
+const appPrefix = window.APP_PREFIX || '/';
 const { TabPane } = Tabs;
 
 function UpdatePage(props: any) {
@@ -24,6 +26,8 @@ function UpdatePage(props: any) {
   const group = get(getGroup, 'group', {});
   const location = useLocation();
   const history = useHistory();
+  const params = useParams<{ id: string; activeKey?: string }>();
+  const { activeKey = 'info' } = params;
   const breadcrumbs = [
     {
       key: 'list',
@@ -88,7 +92,14 @@ function UpdatePage(props: any) {
             </InfuseButton>
           </Col>
         </Row>
-        <Tabs style={{ marginTop: 24 }}>
+        <Tabs
+          style={{ marginTop: 24 }}
+          animated={{ inkBar: true, tabPane: false }}
+          activeKey={activeKey}
+          onChange={key => {
+            history.push(`${appPrefix}admin/group_next/${params.id}/${key}`);
+          }}
+        >
           <TabPane key='info' tab='Info'>
             <GroupForm
               loading={loading}
@@ -98,6 +109,9 @@ function UpdatePage(props: any) {
               initialValue={group}
             />
           </TabPane>
+          <TabPane key='instanceType' tab='Instance Types'></TabPane>
+          <TabPane key='images' tab='Images'></TabPane>
+          <TabPane key='datasets' tab='Datasets'></TabPane>
         </Tabs>
       </PageBody>
     </Layout>
@@ -132,7 +146,7 @@ export default compose(
       },
       onCompleted: (data: any) => {
         const { history } = props;
-        history.push(`../group_next`);
+        history.push(`${appPrefix}admin/group_next`);
         notification.success({
           duration: 10,
           placement: 'bottomRight',
