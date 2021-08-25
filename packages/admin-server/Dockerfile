@@ -4,22 +4,20 @@ FROM node:dubnium-slim AS build
 WORKDIR /usr/src/app
 
 # Copy
-COPY lerna.json package.json tsconfig.json tslint.json yarn.lock ./
+COPY package.json tsconfig.json tslint.json yarn.lock ./
 COPY packages/admin-server packages/admin-server
 COPY packages/client packages/client
-
-RUN npx lerna bootstrap
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 RUN cd packages/admin-server \
-  && npm run build:prod \
+  && yarn install --ignore-engines --production=true \
+  && yarn build:prod \
   && cd ../client \
-  && npm run build \
+  && yarn install --ignore-engines --production=true \
+  && yarn build \
   && yarn list --pattern canner \
   && ls | grep -v dist | xargs rm -rf
-
-RUN npx lerna bootstrap -- --production
 
 # Run
 FROM node:dubnium-slim
