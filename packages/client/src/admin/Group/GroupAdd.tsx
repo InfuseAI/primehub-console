@@ -19,15 +19,15 @@ function AddPage(props: any) {
   const breadcrumbs = [
     {
       key: 'list',
-      matcher: /\/group_next/,
+      matcher: /\/group/,
       title: 'Groups',
-      link: 'admin/group_next',
+      link: 'admin/group',
       tips: 'Admin can find and manage groups here.',
       tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-group',
     },
     {
       key: 'add',
-      matcher: /\/group_next\/add/,
+      matcher: /\/group\/add/,
       title: `Add Group`,
     },
   ];
@@ -57,7 +57,7 @@ function AddPage(props: any) {
     if (pathname) {
       return history.push(`${pathname}${search}`);
     }
-    history.push(`../group_next`);
+    history.push(`../group`);
   };
 
   return (
@@ -92,7 +92,7 @@ export default compose(
     options: (props: any) => ({
       onCompleted: (data: any) => {
         const { history } = props;
-        history.push(`../group_next`);
+        history.push(`../group`);
         notification.success({
           duration: 10,
           placement: 'bottomRight',
@@ -102,7 +102,7 @@ export default compose(
               Group {data.createGroup.name} Created. Click{' '}
               <a
                 onClick={() =>
-                  history.push(`group_next/${data.createGroup.id}`)
+                  history.push(`group/${data.createGroup.id}`)
                 }
               >
                 here

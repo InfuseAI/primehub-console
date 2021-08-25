@@ -1,6 +1,5 @@
 /** @jsx builder */
 import builder, {Body} from 'canner-script';
-import Group from 'schema/group.schema';
 import InstanceType from 'schema/instanceType.schema';
 import Image from 'schema/image.schema';
 import Jupyterhub from 'schema/jupyterhub.schema';
@@ -30,11 +29,6 @@ const grafana =
 
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
-    <Body component={CommonBody}>
-      {/* <Idp/> */}
-      {/* <UserFederation/> */}
-      <Group />
-    </Body>
     <Body component={CommonBody}>
       <InstanceType />
       <Image />
