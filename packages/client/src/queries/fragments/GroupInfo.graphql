@@ -1,4 +1,4 @@
-fragment GroupInfo on Group {
+fragment GroupBasicInfo on Group {
   id
   displayName
   name
@@ -9,9 +9,46 @@ fragment GroupInfo on Group {
   projectQuotaCpu
   projectQuotaGpu
   projectQuotaMemory
+}
+
+fragment GroupResourceInfo on Group {
   datasets {
+    id
     displayName
+    description
+    type
   }
+  images {
+    id
+    displayName
+    type
+    description
+  }
+  instanceTypes {
+    id
+    displayName
+    description
+    cpuLimit
+    gpuLimit
+    memoryLimit
+  }
+}
+
+fragment GroupInfo on Group {
+  id
+  displayName
+  name
+  admins
+  users {
+    id
+    username
+  }
+  quotaCpu
+  quotaGpu
+  quotaMemory
+  projectQuotaCpu
+  projectQuotaGpu
+  projectQuotaMemory
   resourceStatus {
     cpuUsage
     memUsage
@@ -23,6 +60,7 @@ fragment GroupInfo on Group {
   jobDefaultActiveDeadlineSeconds
   sharedVolumeCapacity
   launchGroupOnly
+  ...GroupResourceInfo
 }
 
 fragment GroupMLflowConfig on Group {

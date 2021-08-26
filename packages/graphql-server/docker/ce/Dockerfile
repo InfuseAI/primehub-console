@@ -1,22 +1,21 @@
-FROM node:dubnium-slim AS build
+FROM node:14-slim AS build
 
 # create app directory
 WORKDIR /usr/src/app
 
 # Copy
-COPY lerna.json package.json tsconfig.json tslint.json yarn.lock ./
+COPY package.json tsconfig.json tslint.json yarn.lock ./
 COPY packages/graphql-server packages/graphql-server
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
-RUN cd packages/graphql-server \
-  && yarn install --ignore-engines --production=false \
-  && npm run build:ce:prod \
-  && yarn install --ignore-engines --production=true \
+RUN  yarn install \
+  && cd packages/graphql-server \
+  && yarn build:ce:prod \
   && rm -rf server/src
 
 # Run
-FROM node:dubnium-slim
+FROM node:14-slim
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app /usr/src/app
 ENV NODE_ENV production

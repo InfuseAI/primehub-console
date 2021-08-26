@@ -1,7 +1,19 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { Input, Modal, Table, Button, Row, Col } from 'antd';
-import { isEqual, get } from 'lodash';
+import { Input, Modal, Table, Icon, Button, Row, Col } from 'antd';
+import { isEqual, get, keys } from 'lodash';
+
+interface WrapperProps {
+  marginTop?: number;
+  marginRight?: number;
+}
+
+const Wrapper = styled.div<WrapperProps>`
+  text-align: right;
+  margin-top: ${props => props.marginTop}px;
+  margin-right: ${props => props.marginRight}px;
+  display: inline-block;
+`;
 
 const { Search } = Input;
 
@@ -15,12 +27,10 @@ export const FilterRow = styled(Row)`
 interface Props {
   searchPlaceholder: string;
   title: string;
-  onOk: Function;
-  onCancel: Function;
-  loading: boolean;
+  onOk: (selectedRowKeys: any[], totalValue: any[]) => void;
+  onCancel: () => void;
   visible: boolean;
   pickedIds: string[];
-  pickOne?: boolean;
   relation: {
     to: string;
     type: string;
@@ -31,25 +41,64 @@ interface Props {
     key: string;
     datIndex: string;
   }>;
-  showPagination: boolean;
-  updateRelationQuery: Function;
+  updateRelationQuery: (query: any) => void;
+  loading?: boolean;
+  pickOne?: boolean;
+  showPagination?: boolean;
+  prevPage?: () => void;
+  nextPage?: () => void;
+  handleSearch?: (value: string) => void;
 }
 
 interface State {
   totalValue: any[];
   selectedRowKeys: string[];
+  selectedData: any[];
   sorter: {
     field?: string;
     order?: 'ascend' | 'descend';
   };
 }
 
+const SwitchPagination = props => {
+  const { enable, hasPreviousPage, hasNextPage, prevPage, nextPage } = props;
+  if (enable) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Wrapper marginTop={16}>
+          <Button.Group>
+            <Button
+              disabled={!hasPreviousPage}
+              onClick={prevPage}
+              data-testid='pagination-previous-button'
+            >
+              <Icon type='left' />
+              Previous
+            </Button>
+            <Button
+              disabled={!hasNextPage}
+              onClick={nextPage}
+              data-testid='pagination-next-button'
+            >
+              Next
+              <Icon type='right' />
+            </Button>
+          </Button.Group>
+        </Wrapper>
+      </div>
+    );
+  } else {
+    return <></>;
+  }
+};
+
 export default class Picker extends React.PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
-    const list = props.relationValue.edges.map(edge => edge.node);
+    const list = props.relationValue?.edges?.map(edge => edge.node);
     this.state = {
       totalValue: list || [],
+      selectedData: [],
       selectedRowKeys: props.pickedIds || [],
       sorter: {},
     };
@@ -71,7 +120,7 @@ export default class Picker extends React.PureComponent<Props, State> {
   }
 
   updateData = (data: any) => {
-    const totalValue = data.edges.map(edge => edge.node);
+    const totalValue = data?.edges.map(edge => edge.node) || [];
     this.setState({
       totalValue,
     });
@@ -82,22 +131,28 @@ export default class Picker extends React.PureComponent<Props, State> {
   };
 
   handleOk = () => {
-    this.props.onOk(this.state.selectedRowKeys, this.state.totalValue);
+    const { selectedRowKeys, selectedData } = this.state;
+    this.props.onOk(selectedRowKeys, selectedData);
   };
 
   handleSearch = value => {
-    const { updateRelationQuery } = this.props;
-    const { sorter } = this.state;
-    updateRelationQuery({
-      where: {
-        name_contains: value,
-      },
-      orderBy: sorter.field
-        ? {
-            [sorter.field]: get(sorter, 'order') === 'ascend' ? 'asc' : 'desc',
-          }
-        : {},
-    });
+    const { updateRelationQuery, handleSearch } = this.props;
+    if (handleSearch) {
+      handleSearch(value);
+    } else {
+      const { sorter } = this.state;
+      updateRelationQuery({
+        where: {
+          name_contains: value,
+        },
+        orderBy: sorter.field
+          ? {
+              [sorter.field]:
+                get(sorter, 'order') === 'ascend' ? 'asc' : 'desc',
+            }
+          : {},
+      });
+    }
   };
 
   handleTableChange = (pagination, filters, sorter) => {
@@ -121,6 +176,12 @@ export default class Picker extends React.PureComponent<Props, State> {
     });
   };
 
+  rowOnSelect = record => {
+    const { selectedData } = this.state;
+    selectedData.push(record);
+    this.setState({ selectedData });
+  };
+
   render() {
     const {
       visible,
@@ -129,7 +190,15 @@ export default class Picker extends React.PureComponent<Props, State> {
       loading,
       title,
       searchPlaceholder = '',
+      relationValue = {},
+      prevPage = () => undefined,
+      nextPage = () => undefined,
     } = this.props;
+
+    const { pageInfo = {} } = relationValue;
+    const pageInfoKeys = keys(pageInfo);
+    const { hasNextPage, hasPreviousPage } = pageInfo;
+    const switchPagination = pageInfoKeys.includes('hasNextPage');
     const { selectedRowKeys, totalValue, sorter } = this.state;
     return (
       <Modal
@@ -151,11 +220,12 @@ export default class Picker extends React.PureComponent<Props, State> {
         </FilterRow>
         <Table
           size={'small'}
-          pagination={{ size: 'default' }}
+          pagination={switchPagination ? false : { size: 'default' }}
           loading={loading}
           rowSelection={{
             type: pickOne ? 'radio' : 'checkbox',
             onChange: this.rowSelectOnChange,
+            onSelect: this.rowOnSelect,
             selectedRowKeys,
           }}
           onChange={this.handleTableChange}
@@ -167,6 +237,13 @@ export default class Picker extends React.PureComponent<Props, State> {
             return column;
           })}
           dataSource={totalValue.map(v => ({ ...v, key: v.id }))}
+        />
+        <SwitchPagination
+          enable={switchPagination}
+          hasNextPage={hasNextPage}
+          hasPreviousPage={hasPreviousPage}
+          prevPage={prevPage}
+          nextPage={nextPage}
         />
       </Modal>
     );

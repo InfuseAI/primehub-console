@@ -1,6 +1,5 @@
 /** @jsx builder */
 import builder, { Body } from 'canner-script';
-import Group from './group.schema';
 import Image from './image.schema';
 import Jupyterhub from 'schema/jupyterhub.schema';
 import { LocalStorageConnector } from 'canner-graphql-interface';
@@ -12,11 +11,6 @@ import JupyterhubBody from 'cms-layouts/jupyterhubBody';
 
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
-    <Body component={CommonBody}>
-      {/* <Idp/> */}
-      {/* <UserFederation/> */}
-      <Group />
-    </Body>
     <Body component={CommonBody}>
       <Image />
     </Body>

@@ -1,31 +1,15 @@
 import * as React from 'react';
-import styled from 'styled-components';
 import { Route, RouteProps } from 'react-router-dom';
-
 import { SystemSetting } from '../SystemSetting';
 import { UserList, UserDetail, UserAdd } from '../User';
 import { Datasets, DatasetInfo } from '../Datasets';
+import GroupList from '../Group/GroupList';
+import GroupAdd from '../Group/GroupAdd';
+import GroupUpdate from '../Group/GroupUpdate';
 import { Secrets, SecretInfo } from '../Secrets';
 import { InstanceTypes, InstanceTypeInfo } from '../InstanceTypes';
 import { appPrefix } from 'utils/env';
 import UsageReport from '../UsageReport';
-
-const Badge = styled.span`
-  position: absolute;
-  top: 12px;
-  left: 140px;
-  border-radius: 2px;
-  padding: 0px 5px;
-  line-height: 15px;
-  background: none;
-  border: 1px rgb(255, 255, 255, 0.5) solid;
-  font-size: 10px;
-
-  .ant-menu-item:hover &,
-  .ant-menu-item-selected & {
-    border-color: #fff;
-  }
-`;
 
 export const ROUTES = [
   'group',
@@ -57,7 +41,7 @@ export function RouteWithSubRoutes(route) {
     <Route
       path={`${appPrefix}${route.path}`}
       exact
-      render={(props) => <route.component {...props} />}
+      render={props => <route.component {...props} />}
     />
   );
 }
@@ -67,6 +51,20 @@ export const routes = [
     key: 'group',
     path: 'admin/group',
     name: 'Groups',
+    enabled: true,
+    component: GroupList,
+  },
+  {
+    key: 'group_add',
+    path: 'admin/group/add',
+    enabled: true,
+    component: GroupAdd,
+  },
+  {
+    key: 'group_update',
+    path: 'admin/group/:id/:activeKey?',
+    enabled: true,
+    component: GroupUpdate,
   },
   {
     key: 'user',

@@ -31,7 +31,6 @@ declare global {
     requestApiTokenEndpoint?: string;
     LOCALE?: string;
     APP_PREFIX?: string;
-
     refreshTokenExp?: number;
     accessTokenExp?: number;
   }

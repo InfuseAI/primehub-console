@@ -19,6 +19,7 @@ import CMSPage from './cms';
 import schema from 'index-schema';
 import myLocales from './utils/locales';
 import { BackgroundTokenSyncer } from './workers/backgroundTokenSyncer';
+import GroupList from 'components/admins/group/list';
 
 const firstKey = Object.keys(schema.schema)[0];
 const locales = {

@@ -287,7 +287,7 @@ export default class CMSPage extends React.Component<Props, State> {
     } else {
       history.push(`${window.APP_PREFIX}admin/${key}`);
     }
-  };
+  }
 
   replaceDatasetMutation = (mutation) => {
     if (mutation.indexOf('updateDataset') >= 0) {

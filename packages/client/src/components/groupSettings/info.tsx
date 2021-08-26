@@ -104,7 +104,6 @@ export default class GroupSettingsInfo extends React.Component<Props> {
           </Col>
         </Row>
         {
-          // @ts-ignore
           __ENV__ === 'modelDeploy' ? (
             <></>
           ) : (
@@ -130,7 +129,6 @@ export default class GroupSettingsInfo extends React.Component<Props> {
           </Col>
         </Row>
         {
-          // @ts-ignore
           __ENV__ === 'modelDeploy' ? (
             <></>
           ) : (

@@ -21,3 +21,45 @@ mutation UpdateGroupMLflowConfig($where: GroupWhereUniqueInput!, $data: GroupUpd
     ...GroupMLflowConfig
   }
 }
+
+query GroupsConnection($page: Int, $orderBy: GroupOrderByInput, $where: GroupWhereInput) {
+  group: groupsConnection(page: $page, orderBy: $orderBy, where: $where) {
+    edges {
+      cursor
+      node {
+        ...GroupBasicInfo
+      }
+    }
+    pageInfo {
+      currentPage
+      totalPage
+    }
+  }
+}
+
+mutation DeleteGroup($where: GroupWhereUniqueInput!) {
+  deleteGroup(where: $where) {
+    id
+  }
+}
+
+mutation CreateGroup($data: GroupCreateInput!) {
+  createGroup(data: $data) {
+    ...GroupBasicInfo
+  }
+}
+
+mutation UpdateGroup($data: GroupUpdateInput!, $where: GroupWhereUniqueInput!) {
+  updateGroup(data: $data, where: $where) {
+    ...GroupBasicInfo
+  }
+}
+
+query Group($where: GroupWhereUniqueInput!, $everyoneGroupWhere: GroupWhereUniqueInput!) {
+  group(where: $where) {
+    ...GroupInfo
+  }
+  everyoneGroup: group(where: $everyoneGroupWhere) {
+    ...GroupResourceInfo
+  }
+}
