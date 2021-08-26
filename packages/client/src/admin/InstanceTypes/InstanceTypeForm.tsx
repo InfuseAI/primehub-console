@@ -782,6 +782,7 @@ export function _InstanceTypeForm({
         </Tabs>
 
         <TolerationModalForm
+          form={form}
           type={tolerModalFormAction}
           visible={editModalVisible}
           currentToleration={editToleration}
@@ -794,11 +795,15 @@ export function _InstanceTypeForm({
             if (tolerModalFormAction === 'update') {
               onUpdateToleration();
             }
+
+            form.resetFields(['toleration-key', 'toleration-value']);
           }}
           onCancel={() => {
             setEditToleration(null);
             setTolerModalFormAction(null);
             setEditModalVisible(false);
+
+            form.resetFields(['toleration-key', 'toleration-value']);
           }}
         />
       </Form>

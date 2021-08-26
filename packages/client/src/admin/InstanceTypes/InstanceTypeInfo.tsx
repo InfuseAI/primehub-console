@@ -62,7 +62,13 @@ function _InstanceTypeInfo({ data, ...props }: Props) {
       await props.updateInstanceTypeMutation({
         variables: {
           payload: {
-            ...omit(rest, ['id', 'nodeList', 'tolerations']),
+            ...omit(rest, [
+              'id',
+              'nodeList',
+              'tolerations',
+              'toleration-key', // for create/edit toleration used
+              'toleration-value', // for create/edit toleration used
+            ]),
             tolerations: {
               // @ts-ignore Due to API have a `set` field
               set: nextTolerations,
