@@ -49,6 +49,7 @@ const client = createGraphqlClient({
 
 class Main extends React.Component {
   render() {
+    console.log(`appPrefix: ${appPrefix}`);
     return (
       <BrowserRouter>
         <ApolloProvider client={client}>
