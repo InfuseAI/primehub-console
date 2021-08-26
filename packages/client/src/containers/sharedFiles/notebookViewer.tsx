@@ -14,9 +14,8 @@ const MarkdownAdapter = (props) => {
 
 function NotebookViewer(props) {
   const [value, setValue] = React.useState('');
-  const url = 'https://qty0712-microk8s.aws.primehub.io/console/files/groups/phusers/00-getting-started.ipynb';
+  const url = new URLSearchParams(window.location.search).get('file') || '';
 
-    // Effect for original user data
   useEffect(() => {
     fetch(url).then(res => res.text().then(text => setValue(text)));
   }, [props.location]);

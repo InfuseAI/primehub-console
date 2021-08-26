@@ -203,7 +203,7 @@ class Browser extends React.Component<Props, State> {
     const {data} = this.props;
     const {files} = data || {};
     const {prefix} = files || {};
-    return `${appPrefix}render/${prefix}${filename}`
+    return `${appPrefix}view/notebook/?file=${appPrefix}files/${prefix}${filename}`
   }
 
   private getPhfsUri(name) {
