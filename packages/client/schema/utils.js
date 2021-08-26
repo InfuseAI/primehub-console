@@ -274,7 +274,7 @@ exports.parseToStepDot5 = function(value) {
 const instanceTypeLink = "https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-feature";
 const imageBuilderLink = "https://docs.primehub.io/docs/getting_started/configure-image-builder";
 
-exports.dict = {
+export const dict = {
   en: {
     // common
     quotaForNewly: 'It only works for newly created volume.',
@@ -775,4 +775,4 @@ exports.dict = {
     'grafana.title': 'Grafana',
     'grafana.externalLink': '/grafana/login/generic_oauth'
   }
-}
+};

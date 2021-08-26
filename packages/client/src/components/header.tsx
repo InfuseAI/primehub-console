@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {Menu, Layout, Avatar, Select, Form, Tag} from 'antd';
-import {LayoutProps} from 'antd/lib/layout';
+import { Menu, Layout, Avatar, Select, Form, Tag } from 'antd';
+import { LayoutProps } from 'antd/lib/layout';
 import styled from 'styled-components';
 import logo from 'images/primehub-logo-w.svg';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
@@ -23,7 +23,8 @@ const Header = styled<Props & LayoutProps>(Layout.Header)`
   background: #fff;
   display: flex;
   justify-content: flex-end;
-  .ant-menu-item .anticon, .ant-menu-submenu-title .anticon {
+  .ant-menu-item .anticon,
+  .ant-menu-submenu-title .anticon {
     margin: 0;
   }
   height: ${HEADER_HEIGHT}px;
@@ -64,7 +65,7 @@ class HeaderContainer extends React.Component<Props, {}> {
         break;
       }
       case 'apiToken': {
-        const {groupContext} = this.props;
+        const { groupContext } = this.props;
         const link = `${appPrefix}g/${groupContext.name}/api-token`;
         window.location.href = link;
         break;
@@ -77,57 +78,61 @@ class HeaderContainer extends React.Component<Props, {}> {
         window.location.href = links.logoutLink;
       }
     }
-  }
+  };
 
   render() {
-    const {groupContext, GroupSelectorCom, groupSelectorProps} = this.props;
+    const { groupContext, GroupSelectorCom, groupSelectorProps } = this.props;
     const thumbnail = window.thumbnail;
     const isUserAdmin = window.isUserAdmin;
     return (
       <Header>
-        <a href="/" style={{display: "flex", marginRight: "auto", position: "relative"}}>
+        <a
+          href='/'
+          style={{ display: 'flex', marginRight: 'auto', position: 'relative' }}
+        >
           <Logo />
         </a>
-        {
-          GroupSelectorCom ? (
-            <GroupSelectorCom {...groupSelectorProps} />
-          ) : (
-            <span/>
-          )
-        }
+        {GroupSelectorCom ? (
+          <GroupSelectorCom {...groupSelectorProps} />
+        ) : (
+          <span />
+        )}
         <Menu
           onClick={this.onClickMenu}
-          theme="light"
-          mode="horizontal"
-          style={{ lineHeight: '64px', border: 0}}
+          theme='light'
+          mode='horizontal'
+          style={{ lineHeight: '64px', border: 0 }}
         >
-          <Menu.SubMenu
-            title={<Avatar src={thumbnail} icon="user"/>}
-          >
-            <Menu.Item key="userProfile">
-              User Profile
-            </Menu.Item>
-            <Menu.Item key="changePassword">
-              Change Password
-            </Menu.Item>
-            {groupContext ? <Menu.Item key="apiToken">
-              API Token
-            </Menu.Item> : <></>}
-            <Menu.Item key="adminPortal" style={{display: isUserAdmin? undefined : 'none'}}>
+          <Menu.SubMenu title={<Avatar src={thumbnail} icon='user' />}>
+            <Menu.Item key='userProfile'>User Profile</Menu.Item>
+            <Menu.Item key='changePassword'>Change Password</Menu.Item>
+            {groupContext ? (
+              <Menu.Item key='apiToken'>API Token</Menu.Item>
+            ) : (
+              <></>
+            )}
+            <Menu.Item
+              key='adminPortal'
+              style={{ display: isUserAdmin ? undefined : 'none' }}
+            >
               Admin Portal
             </Menu.Item>
-            <Menu.Item key="logout" style={{borderTop: '1px solid #f1f1f1'}}>
+            <Menu.Item key='logout' style={{ borderTop: '1px solid #f1f1f1' }}>
               Logout
             </Menu.Item>
-            <Menu.Divider/>
-            <Menu.Item key="phVersion" disabled={ true } style={{
+            <Menu.Divider />
+            <Menu.Item
+              key='phVersion'
+              disabled={true}
+              style={{
                 fontSize: '12px',
                 height: '20px',
                 marginTop: 0,
                 lineHeight: '20px',
                 cursor: 'default',
-                color: '#999 !important'
-            }}>
+                color: '#999 !important',
+              }}
+            >
               version: {window.primehubVersion}
             </Menu.Item>
           </Menu.SubMenu>
@@ -137,4 +142,4 @@ class HeaderContainer extends React.Component<Props, {}> {
   }
 }
 
-export default withGroupContext(HeaderContainer)
+export default withGroupContext(HeaderContainer);

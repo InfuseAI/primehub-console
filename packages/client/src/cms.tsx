@@ -1,12 +1,14 @@
-import * as React from 'react';
-import { Layout, notification, Modal, Button } from 'antd';
-import { injectIntl, FormattedMessage } from 'react-intl';
+import React from 'react';
+import { Layout, notification, Modal } from 'antd';
+import { injectIntl } from 'react-intl';
 import Canner from 'canner';
 import gql from 'graphql-tag';
 import { Switch } from 'react-router-dom';
 import R from '@canner/history-router';
 import ContentHeader from 'components/header';
 import Error from 'components/error';
+// Will fixed after canner deps dropped.
+// @ts-ignore
 import styled, { createGlobalStyle } from 'styled-components';
 import { ApolloProvider } from 'react-apollo';
 import { createGraphqlClient } from 'utils/graphqlClient';
@@ -17,6 +19,7 @@ import myLocales from './utils/locales';
 import get from 'lodash/get';
 import { dict } from 'schema/utils';
 import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
+import { errorHandler } from 'utils/errorHandler';
 
 import { AdminSidebar } from './admin/AdminSidebar';
 import { RouteWithSubRoutes, routes as adminRoutes } from './admin/routes';
@@ -73,7 +76,7 @@ export interface State {
   prepare: boolean;
   hasError: boolean;
   deploying: boolean;
-  dataChanged: Object;
+  dataChanged: any;
 }
 
 @injectIntl
@@ -96,7 +99,7 @@ export default class CMSPage extends React.Component<Props, State> {
     this.notification = props.notification;
   }
 
-  process = (schema) => {
+  process = schema => {
     if (!window.enableCustomImage) {
       delete schema.schema.buildImage;
       delete schema.schema.buildImageJob;
@@ -120,10 +123,9 @@ export default class CMSPage extends React.Component<Props, State> {
   componentDidCatch(error, info) {
     // Display fallback UI
     this.setState({ hasError: true });
-    console.log(error, info);
   }
 
-  dataDidChange = (dataChanged: object) => {
+  dataDidChange = (dataChanged: any) => {
     this.setState({
       dataChanged,
     });
@@ -133,21 +135,23 @@ export default class CMSPage extends React.Component<Props, State> {
     // refetch the buildImage list after update
     if (key === 'buildImage' && !query) {
       try {
-        const query = gql`
+        query = gql`
           ${this.schema.schema.buildImage.graphql}
         `;
         const data = client.readQuery({
           query,
-          variables: variables,
+          variables,
         });
         // if cached, clean it
         if (data) client.clearStore();
-      } catch {}
+      } catch (e) {
+        errorHandler(e);
+      }
     }
 
     return {
       query,
-      variables: variables,
+      variables,
     };
   };
 
@@ -165,18 +169,18 @@ export default class CMSPage extends React.Component<Props, State> {
       // update or delete
       return {
         mutation,
-        variables: variables,
+        variables,
       };
     } else {
       // create
       return {
         mutation,
-        variables: variables,
+        variables,
       };
     }
   };
 
-  afterDeploy = (data) => {
+  afterDeploy = data => {
     const { intl, history } = this.props;
     const actionType = get(data, 'actions.0.type');
     if (actionType === 'CREATE_ARRAY') {
@@ -199,7 +203,7 @@ export default class CMSPage extends React.Component<Props, State> {
                 defaultMessage: 'Your changes have been saved. Click',
               })}
               <a
-                href="javascript:;"
+                href='javascript:;'
                 onClick={() => history.push(link)}
                 style={{ margin: '0 8px' }}
               >
@@ -268,7 +272,7 @@ export default class CMSPage extends React.Component<Props, State> {
           defaultMessage: `Cancel`,
         }),
         onOk: () => {
-          return new Promise((resolve) => {
+          return new Promise(resolve => {
             resolve();
           })
             .then(this.reset)
@@ -287,9 +291,9 @@ export default class CMSPage extends React.Component<Props, State> {
     } else {
       history.push(`${window.APP_PREFIX}admin/${key}`);
     }
-  }
+  };
 
-  replaceDatasetMutation = (mutation) => {
+  replaceDatasetMutation = mutation => {
     if (mutation.indexOf('updateDataset') >= 0) {
       return updateDatasetMutation;
     }
@@ -299,7 +303,7 @@ export default class CMSPage extends React.Component<Props, State> {
     return mutation;
   };
 
-  removeBuildImageJobs = (variables) => {
+  removeBuildImageJobs = variables => {
     delete variables.payload.buildImageJobs;
     return variables;
   };
@@ -307,8 +311,20 @@ export default class CMSPage extends React.Component<Props, State> {
   render() {
     const { history } = this.props;
     const { hasError } = this.state;
+
     if (hasError) {
-      return <Error />;
+      return (
+        <Layout style={{ minHeight: '100vh' }}>
+          <GlobalStyle />
+          <ContentHeader />
+          <Layout style={{ marginTop: 64 }}>
+            <AdminSidebar />
+            <Content style={{ marginLeft: 200 }}>
+              <Error />
+            </Content>
+          </Layout>
+        </Layout>
+      );
     }
 
     const router = new R({
@@ -330,15 +346,6 @@ export default class CMSPage extends React.Component<Props, State> {
         <ContentHeader />
         <Layout style={{ marginTop: 64 }}>
           <AdminSidebar />
-
-          {/* TODO: After drop canner we can use this way */}
-          {/* If want to test this, remove line 16 comment */}
-          {/* <Content style={{ marginLeft: '200px' }}>
-            <Switch>
-              {routes.map(RouteWithSubRoutes)}
-            </Switch>
-          </Content> */}
-
           <Content style={{ marginLeft: 200 }}>
             <ApolloProvider client={client}>
               {window.enableLicenseCheck && <LicenseWarningBanner />}
@@ -349,7 +356,7 @@ export default class CMSPage extends React.Component<Props, State> {
               schema={this.schema}
               goTo={router.goTo}
               routes={routes}
-              ref={(canner) => (this.cannerRef = canner)}
+              ref={canner => (this.cannerRef = canner)}
               routerParams={routerParams}
               dataDidChange={this.dataDidChange}
               afterDeploy={this.afterDeploy}
@@ -361,85 +368,7 @@ export default class CMSPage extends React.Component<Props, State> {
                 },
               }}
               beforeFetch={this.beforeFetch}
-              errorHandler={(e) => {
-                console.dir(e);
-                // default message and description
-                let message = get(e, 'graphQLErrors.0.message', 'Error');
-                let description = '';
-                let btn;
-                let key;
-                let duration;
-
-                // get the first error
-                let errorCode;
-                // from networkError
-                if (e.networkError) {
-                  errorCode = get(
-                    e,
-                    'networkError.result.errors.0.extensions.code'
-                  );
-                } else {
-                  // from graphQLErrors
-                  errorCode = get(e, 'graphQLErrors.0.extensions.code');
-                }
-
-                switch (errorCode) {
-                  case 'REQUEST_BODY_INVALID':
-                    message = 'Invalidation Error';
-                    description = 'The requested body is not valid';
-                    break;
-
-                  case 'USER_CONFLICT_USERNAME':
-                    message = 'Conflict Error';
-                    description = 'User exists with same username';
-                    break;
-
-                  case 'USER_CONFLICT_EMAIL':
-                    message = 'Conflict Error';
-                    description = 'User exists with same email';
-                    break;
-
-                  case 'GROUP_CONFLICT_NAME':
-                    message = 'Conflict Error';
-                    description = 'Group exists with same name';
-                    break;
-
-                  case 'RESOURCE_CONFLICT':
-                    message = 'Conflict Error';
-                    description = 'Resource name already exist';
-                    break;
-
-                  case 'REFRESH_TOKEN_EXPIRED':
-                    // show notification with button
-                    message = 'Token Expired or Invalid';
-                    description = 'Please login again';
-                    const loginUrl = get(
-                      e,
-                      'networkError.result.errors.0.loginUrl'
-                    );
-                    // add current location to redirect_uri
-                    duration = 20;
-                    key = 'REFRESH_TOKEN_EXPIRED';
-                    btn = (
-                      // @ts-ignore
-                      <Button
-                        type="primary"
-                        onClick={() => window.location.replace(loginUrl)}
-                      >
-                        Login
-                      </Button>
-                    );
-                    break;
-                }
-                return notification.error({
-                  message,
-                  description,
-                  placement: 'bottomRight',
-                  duration,
-                  btn,
-                  key,
-                });
-              }}
+              errorHandler={errorHandler}
             />
           </Content>
         </Layout>
