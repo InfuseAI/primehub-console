@@ -1,28 +1,6 @@
 import * as React from 'react';
-import { Button, Empty, Input, Icon, Form, notification } from 'antd';
+import { Button, Empty, Input, Icon, Form } from 'antd';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
-
-function inputValidator(_, value, callback) {
-  if (!value) {
-    notification.warn({
-      duration: 5,
-      placement: 'bottomRight',
-      message: 'Node Selector inputs fields can not be empty.',
-    });
-  }
-
-  if (value.length < 3 || value.length > 63) {
-    return callback('Must be between 3 and 63 characters');
-  }
-
-  if (!value.match(/^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/)) {
-    return callback(`Must be alphanumeric characters, '_', '.', '/' or
-              '-', and start and end with an alphanumeric
-              character.`);
-  }
-
-  return callback();
-}
 
 interface NodeSelectorListProps {
   nodes: string[][];
@@ -123,7 +101,16 @@ export function NodeItemInputGroup({
           rules: [
             {
               required: true,
-              validator: inputValidator,
+              message: 'Node Selector inputs fields can not be empty.',
+            },
+            {
+              min: 3,
+              max: 63,
+              message: 'Must be between 3 and 63 characters',
+            },
+            {
+              pattern: /^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/,
+              message: `Must be alphanumeric characters, '_', '.', '/' or '-', and start and end with an alphanumeric character.`,
             },
           ],
           initialValue: props.node[0],
@@ -142,7 +129,16 @@ export function NodeItemInputGroup({
           rules: [
             {
               required: true,
-              validator: inputValidator,
+              message: 'Node Selector inputs fields can not be empty.',
+            },
+            {
+              min: 3,
+              max: 63,
+              message: 'Must be between 3 and 63 characters',
+            },
+            {
+              pattern: /^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/,
+              message: `Must be alphanumeric characters, '_', '.', '/' or '-', and start and end with an alphanumeric character.`,
             },
           ],
           initialValue: props.node[1],
