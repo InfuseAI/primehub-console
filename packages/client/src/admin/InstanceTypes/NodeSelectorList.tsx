@@ -98,6 +98,7 @@ export function NodeItemInputGroup({
       >
         {form.getFieldDecorator(`nodeList[${props.id}][0]`, {
           validateTrigger: ['onChange', 'onBlur'],
+          validateFirst: true,
           rules: [
             {
               required: true,
@@ -110,7 +111,7 @@ export function NodeItemInputGroup({
             },
             {
               pattern: /^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/,
-              message: `Must be alphanumeric characters, '_', '.', '/' or '-', and start and end with an alphanumeric character.`,
+              message: `Must alphanumeric characters, '_', '.', '/' or '-', and start and end with an alphanumeric character.`,
             },
           ],
           initialValue: props.node[0],
@@ -126,6 +127,7 @@ export function NodeItemInputGroup({
       >
         {form.getFieldDecorator(`nodeList[${props.id}][1]`, {
           validateTrigger: ['onChange', 'onBlur'],
+          validateFirst: true,
           rules: [
             {
               required: true,

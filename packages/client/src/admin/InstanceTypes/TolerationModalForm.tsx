@@ -4,24 +4,6 @@ import { WrappedFormUtils } from 'antd/lib/form/Form';
 
 import type { TToleration } from './types';
 
-function inputValidator(_, value, callback) {
-  // Actually, we don't need this value if not exist,
-  // this field is just for doing validation if have value.
-  if (!value) {
-    return callback();
-  }
-
-  if (value.length < 3 || value.length > 63) {
-    return callback('Must be between 3 and 63 characters');
-  }
-
-  if (!value.match(/^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/)) {
-    return callback(`Must be alphanumeric characters, '_', '.', '/' or
-                                '-', and start and end with an alphanumeric
-                                character.`);
-  }
-}
-
 interface Props {
   form: WrappedFormUtils;
   type: 'create' | 'update';
@@ -62,10 +44,20 @@ export function TolerationModalForm({
         <Form.Item label='Key'>
           {props.form.getFieldDecorator('toleration-key', {
             validateTrigger: ['onChange', 'onBlur'],
+            validateFirst: true,
             rules: [
               {
                 required: true,
-                validator: inputValidator,
+                validator: (_, value, callback) => callback(),
+              },
+              {
+                min: 3,
+                max: 63,
+                message: 'Must be between 3 and 63 characters',
+              },
+              {
+                pattern: /^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/,
+                message: `Must alphanumeric characters, '_', '.', '/' or '-', and start and end with an alphanumeric character.`,
               },
             ],
             initialValue: currentToleration?.key,
@@ -90,10 +82,20 @@ export function TolerationModalForm({
         >
           {props.form.getFieldDecorator('toleration-value', {
             validateTrigger: ['onChange', 'onBlur'],
+            validateFirst: true,
             rules: [
               {
                 required: true,
-                validator: inputValidator,
+                validator: (_, value, callback) => callback(),
+              },
+              {
+                min: 3,
+                max: 63,
+                message: 'Must be between 3 and 63 characters',
+              },
+              {
+                pattern: /^[A-Za-z0-9][_./-A-Za-z0-9]+[A-Za-z0-9]$/,
+                message: `Must alphanumeric characters, '_', '.', '/' or '-', and start and end with an alphanumeric character.`,
               },
             ],
             initialValue: currentToleration?.value,
