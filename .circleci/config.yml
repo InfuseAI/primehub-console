@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   docker: circleci/docker@1.2.0
+  codecov: codecov/codecov@3.0.0
 commands:
   build_console:
     description: Build primehub-console images and push to Docker Hub
@@ -254,6 +255,9 @@ jobs:
           path: ./packages/client/reports/junit
       - store_artifacts:
           path: ./packages/client/coverage
+      - codecov/upload:
+          flags: unittests
+          file: ./packages/client/coverage/coverage-final.json
   graphql-unit-test:
     docker:
       - image: cimg/node:14.17.0
@@ -279,11 +283,6 @@ jobs:
 
 workflows:
   version: 2
-  #test:
-  #jobs:
-  #- client-unit-test
-  #- graphql-unit-test
-  #- graphql-integration-test
   build_and_push:
     jobs:
       - graphql-integration-test:
