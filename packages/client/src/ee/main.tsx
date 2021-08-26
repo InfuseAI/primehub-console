@@ -65,6 +65,9 @@ class Main extends React.Component {
             <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
               <SharedFilesPage />
             </Route>
+            <Route path={`${appPrefix}g/:groupName/view/notebook`}>
+            <NotebookViewer />
+            </Route>
             <Route path={`${appPrefix}view/notebook`}>
               <NotebookViewer />
             </Route>
