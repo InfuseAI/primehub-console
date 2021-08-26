@@ -34,12 +34,18 @@ function NotebookViewer(props) {
     );
   }
 
-  return (
-    <NbViewer
-      source={value}
-      markdown={MarkdownAdapter}
-      code={SyntaxHighlighter} />
+  if (value.startsWith('{') && value.endsWith('}')) {
+    return (
+      <NbViewer
+        source={value}
+        markdown={MarkdownAdapter}
+        code={SyntaxHighlighter} />
 
+    );
+  }
+
+  return (
+    <div>invalid content</div>
   );
 }
 
