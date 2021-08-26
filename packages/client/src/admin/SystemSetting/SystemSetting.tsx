@@ -280,7 +280,6 @@ function _SystemSetting({ data, ...props }: Props) {
             backgroundColor: '#fff',
           }}
         >
-          {/* @ts-ignore */}
           {__ENV__ === 'ce' ? (
             <></>
           ) : (

@@ -36,7 +36,6 @@ const EXTERNAL_LINKS = {
 };
 
 export function AdminSidebar() {
-  // @ts-ignore;
   const GLOBAL_ENV = __ENV__;
 
   const [activeRoute, setActiveRoute] = React.useState<ROUTE_KEYS>('group');
