@@ -257,7 +257,7 @@ jobs:
           path: ./packages/client/coverage
       - codecov/upload:
           flags: unittests
-          file: ./packages/client/coverage
+          file: ./packages/client/coverage/coverage-final.json
   graphql-unit-test:
     docker:
       - image: cimg/node:14.17.0
