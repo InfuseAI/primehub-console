@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Link, useHistory, useLocation } from 'react-router-dom';
-import { Button, Table, Icon, Modal, notification } from 'antd';
+import { useHistory, useLocation } from 'react-router-dom';
+import { Button, Table, Modal, notification } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -122,14 +122,24 @@ function _Secrets({
                   ),
                   okText: 'Yes',
                   onOk: async () => {
-                    await deleteSecretMutation({
-                      variables: {
-                        where: {
-                          id: secret.node.id,
+                    try {
+                      await deleteSecretMutation({
+                        variables: {
+                          where: {
+                            id: secret.node.id,
+                          },
                         },
-                      },
-                    });
-                    await secretQuery.refetch();
+                      });
+                      await secretQuery.refetch();
+                    } catch (err) {
+                      console.error(err);
+                      notification.error({
+                        duration: 5,
+                        placement: 'bottomRight',
+                        message: 'Failure',
+                        description: 'Failure to delete, try again later.',
+                      });
+                    }
                   },
                 });
               }}
@@ -233,15 +243,15 @@ function _Secrets({
               Add
             </Button>
           </div>
-          <div data-testid='secret'>
-            <Table
-              rowKey={data => data.node.id}
-              style={{ paddingTop: 8 }}
-              columns={columns}
-              loading={secretQuery.loading}
-              dataSource={secretQuery?.secretsConnection?.edges}
-            />
-          </div>
+
+          <Table
+            data-testid='secret'
+            rowKey={data => data.node.id}
+            style={{ paddingTop: 8 }}
+            columns={columns}
+            loading={secretQuery.loading}
+            dataSource={secretQuery?.secretsConnection?.edges}
+          />
         </div>
       </SecretLayout>
     </>

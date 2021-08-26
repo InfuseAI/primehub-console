@@ -1,0 +1,89 @@
+fragment InstanceTypeInfo on InstanceType {
+  id
+  name
+  displayName
+  description
+  cpuLimit
+  memoryLimit
+  gpuLimit
+}
+
+query InstanceTypesQuery(
+  $page: Int
+  $where: InstanceTypeWhereInput
+  $orderBy: InstanceTypeOrderByInput
+) {
+  instanceTypesConnection(
+    page: $page
+    where: $where
+    orderBy: $orderBy
+  ) {
+    edges {
+      cursor
+      node {
+        id
+        ...InstanceTypeInfo
+      }
+    }
+    pageInfo {
+      currentPage
+      totalPage
+    }
+  }
+}
+
+query InstanceTypeInfoQuery($where: InstanceTypeWhereUniqueInput!) {
+  instanceType(where: $where) {
+    id
+    cpuRequest
+    memoryRequest
+    global
+    groups {
+      id
+      name
+      displayName
+      quotaCpu
+      quotaGpu
+    }
+    tolerations {
+      key
+      value
+      operator
+      effect
+    }
+    nodeSelector
+    ...InstanceTypeInfo
+  }
+}
+
+mutation CreateInstanceTypeMutation($payload: InstanceTypeCreateInput!) {
+  createInstanceType(data: $payload) {
+    id
+  }
+}
+
+mutation UpdateInstanceTypeMutation(
+  $payload: InstanceTypeUpdateInput!
+  $where: InstanceTypeWhereUniqueInput!
+) {
+  updateInstanceType(data: $payload, where: $where) {
+    id
+    global
+    cpuRequest
+    memoryRequest
+    groups {
+      id
+      name
+      displayName
+      quotaCpu
+      quotaGpu
+    }
+    nodeSelector
+  }
+}
+
+mutation DeleteInstanceTypeMutation($where: InstanceTypeWhereUniqueInput!) {
+  deleteInstanceType(where: $where) {
+    id
+  }
+}

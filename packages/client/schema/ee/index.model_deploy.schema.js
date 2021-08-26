@@ -1,7 +1,6 @@
 /** @jsx builder */
 import builder, {Body} from 'canner-script';
 import Group from 'schema/group.schema';
-import InstanceType from 'schema/instanceType.schema';
 import {LocalStorageConnector} from 'canner-graphql-interface';
 import {createFakeData} from 'canner-helpers';
 import {dict, graphqlClient, imageStorage} from 'schema/utils';
