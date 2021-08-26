@@ -131,19 +131,19 @@ export default class CMSPage extends React.Component<Props, State> {
     });
   };
 
-  beforeFetch = (key, { _client, query, variables }) => {
+  beforeFetch = (key, { client, query, variables }) => {
     // refetch the buildImage list after update
     if (key === 'buildImage' && !query) {
       try {
         query = gql`
           ${this.schema.schema.buildImage.graphql}
         `;
-        const data = _client.readQuery({
+        const data = client.readQuery({
           query,
           variables,
         });
         // if cached, clean it
-        if (data) _client.clearStore();
+        if (data) client.clearStore();
       } catch (e) {
         errorHandler(e);
       }
@@ -291,7 +291,7 @@ export default class CMSPage extends React.Component<Props, State> {
     } else {
       history.push(`${window.APP_PREFIX}admin/${key}`);
     }
-  }
+  };
 
   replaceDatasetMutation = mutation => {
     if (mutation.indexOf('updateDataset') >= 0) {
@@ -311,31 +311,19 @@ export default class CMSPage extends React.Component<Props, State> {
   render() {
     const { history } = this.props;
     const { hasError } = this.state;
-    const ErrorAlert = () => {
-      if (hasError) {
-        return <Error />;
-      } else {
-        return <></>;
-      }
-    };
-    const CommonLayout = ({ children }) => {
+
+    if (hasError) {
       return (
         <Layout style={{ minHeight: '100vh' }}>
           <GlobalStyle />
           <ContentHeader />
           <Layout style={{ marginTop: 64 }}>
             <AdminSidebar />
-            <Content style={{ marginLeft: 200 }}>{children}</Content>
+            <Content style={{ marginLeft: 200 }}>
+              <Error />
+            </Content>
           </Layout>
         </Layout>
-      );
-    };
-
-    if (hasError) {
-      return (
-        <CommonLayout>
-          <ErrorAlert />
-        </CommonLayout>
       );
     }
 
@@ -353,33 +341,38 @@ export default class CMSPage extends React.Component<Props, State> {
     };
 
     return (
-      <CommonLayout>
-        <React.Fragment>
-          <ApolloProvider client={client}>
-            {window.enableLicenseCheck && <LicenseWarningBanner />}
-            <Switch>{adminRoutes.map(RouteWithSubRoutes)}</Switch>
-          </ApolloProvider>
-          {this.notification}
-          <Canner
-            schema={this.schema}
-            goTo={router.goTo}
-            routes={routes}
-            ref={canner => (this.cannerRef = canner)}
-            routerParams={routerParams}
-            dataDidChange={this.dataDidChange}
-            afterDeploy={this.afterDeploy}
-            beforeDeploy={this.beforeDeploy}
-            intl={{
-              locale: window.LOCALE,
-              messages: {
-                ...myLocales,
-              },
-            }}
-            beforeFetch={this.beforeFetch}
-            errorHandler={errorHandler}
-          />
-        </React.Fragment>
-      </CommonLayout>
+      <Layout style={{ minHeight: '100vh' }}>
+        <GlobalStyle />
+        <ContentHeader />
+        <Layout style={{ marginTop: 64 }}>
+          <AdminSidebar />
+          <Content style={{ marginLeft: 200 }}>
+            <ApolloProvider client={client}>
+              {window.enableLicenseCheck && <LicenseWarningBanner />}
+              <Switch>{adminRoutes.map(RouteWithSubRoutes)}</Switch>
+            </ApolloProvider>
+            {this.notification}
+            <Canner
+              schema={this.schema}
+              goTo={router.goTo}
+              routes={routes}
+              ref={canner => (this.cannerRef = canner)}
+              routerParams={routerParams}
+              dataDidChange={this.dataDidChange}
+              afterDeploy={this.afterDeploy}
+              beforeDeploy={this.beforeDeploy}
+              intl={{
+                locale: window.LOCALE,
+                messages: {
+                  ...myLocales,
+                },
+              }}
+              beforeFetch={this.beforeFetch}
+              errorHandler={errorHandler}
+            />
+          </Content>
+        </Layout>
+      </Layout>
     );
   }
 }
