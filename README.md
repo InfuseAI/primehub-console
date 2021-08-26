@@ -10,6 +10,7 @@
 # PrimeHub-Console
 
 [![CircleCI](https://circleci.com/gh/InfuseAI/primehub-console.svg?style=shield)](https://circleci.com/gh/InfuseAI/primehub-console)
+[![codecov](https://codecov.io/gh/InfuseAI/primehub-console/branch/master/graph/badge.svg?token=D395YX8K5Z)](https://codecov.io/gh/InfuseAI/primehub-console)
 
 The UI/GraphQL components for PrimeHub.
 
