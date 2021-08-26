@@ -255,6 +255,9 @@ jobs:
           path: ./packages/client/reports/junit
       - store_artifacts:
           path: ./packages/client/coverage
+      - codecov/upload:
+          flags: unittests
+          file: ./packages/client/coverage
   graphql-unit-test:
     docker:
       - image: cimg/node:14.17.0
@@ -277,21 +280,9 @@ jobs:
           name: Integration tests
           command: |
             ./ci/ci-test.sh
-  upload-coverage-to-codecov:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - codecov/upload:
-          flags: unittests
-          file: ./packages/client/coverage
 
 workflows:
   version: 2
-  #test:
-  #jobs:
-  #- client-unit-test
-  #- graphql-unit-test
-  #- graphql-integration-test
   build_and_push:
     jobs:
       - graphql-integration-test:
@@ -370,6 +361,3 @@ workflows:
               only: /.*/
             branches:
               ignore: /.*/
-      - upload-coverage-to-codecov:
-          requires:
-            - client-unit-test
