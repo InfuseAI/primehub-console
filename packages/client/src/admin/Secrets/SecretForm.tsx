@@ -1,22 +1,12 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Form, Select, Input, Tooltip, Icon } from 'antd';
+import { Form, Select, Input, Tooltip, Icon } from 'antd';
 import type { FormComponentProps } from 'antd/lib/form';
 
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 import type { SecretType, TSecret } from './types';
 import InfuseButton from 'components/infuseButton';
-import styled from 'styled-components';
-
-const StyledForm = styled(Form)`
-  .ant-form-item-label {
-    margin-bottom: -4px;
-  }
-  .ant-form-item {
-    margin-bottom: 10px;
-  }
-`;
 
 function SecretTypeTip() {
   return (
@@ -84,12 +74,12 @@ export function _SecretForm({ form, data, ...props }: SecretFormProps) {
 
   return (
     <div data-testid='secret'>
-      <InfuseButton>
+      <InfuseButton style={{ marginBottom: 16 }}>
         <Link to={`${appPrefix}admin/secret`}>
           <Icon type='arrow-left' /> Back
         </Link>
       </InfuseButton>
-      <StyledForm
+      <Form
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -222,7 +212,7 @@ export function _SecretForm({ form, data, ...props }: SecretFormProps) {
             <Link to={`${appPrefix}admin/secret`}>Cancel</Link>
           </InfuseButton>
         </Form.Item>
-      </StyledForm>
+      </Form>
     </div>
   );
 }
