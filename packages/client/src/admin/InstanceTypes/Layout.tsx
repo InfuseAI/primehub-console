@@ -21,7 +21,7 @@ export function InstanceTypesLayout({
               key: 'instanceType',
               matcher: /\/instanceType/,
               title: 'Instance Types',
-              link: 'admin/instanceType',
+              link: '/instanceType',
               tips: 'Instance type is a preset of resource allocation. Admin can find and manage instance types here.',
               tipsLink:
                 'https://docs.primehub.io/docs/guide_manual/admin-instancetype',
