@@ -131,14 +131,14 @@ const UsersRelationTable = compose(
     },
     {
       title: 'Group Admin',
-      dataIndex: 'username',
+      dataIndex: 'id',
       render: (val, record) => {
         return (
           <Checkbox
-            key={record.id}
-            value={val}
+            key={val}
+            value={record.username}
             onChange={onAdminChange}
-            checked={adminList.includes(val)}
+            checked={adminList.includes(record.username)}
           />
         );
       },

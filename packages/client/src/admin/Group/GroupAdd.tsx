@@ -100,11 +100,7 @@ export default compose(
           description: (
             <>
               Group {data.createGroup.name} Created. Click{' '}
-              <a
-                onClick={() =>
-                  history.push(`group/${data.createGroup.id}`)
-                }
-              >
+              <a onClick={() => history.push(`group/${data.createGroup.id}`)}>
                 here
               </a>{' '}
               to view.

@@ -1,8 +1,6 @@
 import * as React from 'react';
-import { render, screen, act } from 'test/test-utils';
+import { render, screen } from 'test/test-utils';
 import { Route, MemoryRouter } from 'react-router-dom';
-import ImageCreatePage from 'containers/imageCreatePage';
-import { MockedProvider } from 'react-apollo/test-utils';
 import { List } from '../list';
 import { GroupList } from '../GroupList';
 import groupsFakeData from '../../../fakeData/groups';
