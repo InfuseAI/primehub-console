@@ -421,7 +421,7 @@ function GroupForm(props: Props) {
                   getValueFromEvent: (refId, action, val) => val,
                 })(
                   <CheckableInputNumber
-                    uiParams={{ min: 0.5, step: 0.5, precision: 1 }}
+                    uiParams={{ min: 0, step: 1, precision: 0, unit: ' GB' }}
                   />
                 )}
               </Form.Item>
@@ -461,7 +461,7 @@ function GroupForm(props: Props) {
                   getValueFromEvent: (refId, action, val) => val,
                 })(
                   <CheckableInputNumber
-                    uiParams={{ min: 0.5, step: 0.5, precision: 1 }}
+                    uiParams={{ min: 0, step: 1, precision: 0, unit: ' GB' }}
                   />
                 )}
               </Form.Item>
