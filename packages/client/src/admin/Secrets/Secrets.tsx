@@ -66,21 +66,25 @@ function _Secrets({
   const history = useHistory();
   const location = useLocation();
   const querystring = new URLSearchParams(location.search);
+  const compareString = (a: string, b: string) => a.localeCompare(b);
 
   const columns: ColumnProps<SecretNode>[] = [
     {
       key: 'name',
       title: 'Name',
       dataIndex: 'node.name',
+      sorter: (a, b) => compareString(a.node.name, b.node.name),
     },
     {
       key: 'display-name',
       title: 'Display Name',
       dataIndex: 'node.displayName',
+      sorter: (a, b) => compareString(a.node.displayName, b.node.displayName),
     },
     {
       key: 'type',
       title: 'Type',
+      sorter: (a, b) => compareString(a.node.type, b.node.type),
       render: function RenderType(secret: SecretNode) {
         const secretName = {
           opaque: 'Git Dataset',
@@ -97,12 +101,16 @@ function _Secrets({
       render: function RenderActions(secret: SecretNode) {
         return (
           <Button.Group>
-            <Button>
-              <Link to={`${appPrefix}admin/secret/${secret.node.id}`}>
-                <Icon type='edit' />
-              </Link>
-            </Button>
             <Button
+              data-testid='edit-button'
+              icon='edit'
+              onClick={() => {
+                history.push(`${appPrefix}admin/secret/${secret.node.id}`);
+              }}
+            />
+            <Button
+              data-testid='delete-button'
+              icon='delete'
               onClick={() => {
                 Modal.confirm({
                   title: 'Delete Secret',
@@ -125,9 +133,7 @@ function _Secrets({
                   },
                 });
               }}
-            >
-              <Icon type='delete' />
-            </Button>
+            />
           </Button.Group>
         );
       },
@@ -215,6 +221,7 @@ function _Secrets({
         <div style={styles}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
+              data-testid='add-button'
               type='primary'
               icon='plus'
               // @ts-ignore
@@ -226,13 +233,15 @@ function _Secrets({
               Add
             </Button>
           </div>
-          <Table
-            rowKey={data => data.node.id}
-            style={{ paddingTop: 8 }}
-            columns={columns}
-            loading={secretQuery.loading}
-            dataSource={secretQuery?.secretsConnection?.edges}
-          />
+          <div data-testid='secret'>
+            <Table
+              rowKey={data => data.node.id}
+              style={{ paddingTop: 8 }}
+              columns={columns}
+              loading={secretQuery.loading}
+              dataSource={secretQuery?.secretsConnection?.edges}
+            />
+          </div>
         </div>
       </SecretLayout>
     </>

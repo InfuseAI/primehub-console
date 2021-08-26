@@ -125,6 +125,6 @@ describe('Secrets', () => {
     const addSecretButton = await screen.findByText('Add');
     userEvent.click(addSecretButton);
 
-    expect(screen.getByText('Save')).toBeInTheDocument();
+    expect(screen.getByText('Confirm')).toBeInTheDocument();
   });
 });
