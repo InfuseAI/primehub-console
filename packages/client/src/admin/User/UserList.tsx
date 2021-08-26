@@ -38,7 +38,7 @@ function List(props: Props) {
       key: 'list',
       matcher: /\/user/,
       title: 'Users',
-      link: 'admin/user',
+      link: '/user',
       tips: 'Admin can find and manage user accounts here.',
       tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-user',
     },

@@ -37,7 +37,7 @@ function AddPage(props: any) {
       key: 'list',
       matcher: /\/user/,
       title: 'Users',
-      link: 'admin/user',
+      link: '/user',
     },
     {
       key: 'add',
