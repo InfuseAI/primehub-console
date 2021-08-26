@@ -1,5 +1,4 @@
 export {};
-declare const __ENV__: string;
 declare global {
   interface Window {
     enablePhfs?: boolean;
