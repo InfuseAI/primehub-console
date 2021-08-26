@@ -16,10 +16,23 @@ function NotebookViewer(props) {
   const [value, setValue] = React.useState('');
   const url = new URLSearchParams(window.location.search).get('file') || '';
 
+  if (url === '') {
+    return (
+      <div>File not found</div>
+    );
+  }
+
   useEffect(() => {
-    fetch(url).then(res => res.text().then(text => setValue(text)));
+    fetch(url)
+      .then(res => res.text().then(text => setValue(text)))
+      .catch(e => setValue(`Error: cannot fetch content from ${url}`));
   }, [props.location]);
 
+  if (value.startsWith('Error:')) {
+    return (
+      <div>{value}</div>
+    );
+  }
 
   return (
     <NbViewer
