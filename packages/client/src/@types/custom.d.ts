@@ -5,3 +5,4 @@ declare module '*.svg' {
 
 declare module 'recompose';
 declare module '*.graphql';
+declare const __ENV__: string;

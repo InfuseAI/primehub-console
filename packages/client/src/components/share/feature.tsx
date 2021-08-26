@@ -1,7 +1,5 @@
 import React from 'react';
 
-declare const __ENV__: string;
-
 interface Props {
   children?: React.ReactNode;
   ce?: boolean;
