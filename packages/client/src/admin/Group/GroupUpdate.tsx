@@ -35,7 +35,7 @@ function UpdatePage(props: any) {
       key: 'list',
       matcher: /\/group/,
       title: 'Groups',
-      link: 'admin/group',
+      link: '/group',
       tips: 'Admin can find and manage groups here.',
       tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-group',
     },
