@@ -66,7 +66,7 @@ function _Secrets({
   const history = useHistory();
   const location = useLocation();
   const querystring = new URLSearchParams(location.search);
-  const compareString = (a: string, b: string) => (a ? a.localeCompare(b) : -1);
+  const compareString = (a: string, b: string) => a.localeCompare(b);
 
   const columns: ColumnProps<SecretNode>[] = [
     {
