@@ -9,6 +9,7 @@ fragment GroupBasicInfo on Group {
   projectQuotaCpu
   projectQuotaGpu
   projectQuotaMemory
+  sharedVolumeCapacity
 }
 
 fragment GroupResourceInfo on Group {
