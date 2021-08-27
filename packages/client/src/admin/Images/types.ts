@@ -1,3 +1,10 @@
+export interface Groups {
+  id: string;
+  name: string;
+  displayName: string;
+  quotaCpu: string;
+  quotaGpu: string;
+}
 export interface Image {
   id: string;
   name: string;
@@ -10,8 +17,7 @@ export interface Image {
   global: boolean;
   spec: Record<string, unknown>;
   useImagePullSecret: string;
-  // TODO: update type
-  groups: any[];
+  groups: Groups[];
   isReady: boolean;
   logEndpoint: string;
   imageSpec: ImageSpec;
@@ -22,8 +28,8 @@ interface ImageSpec {
   baseImage: string;
   pullSecret: string;
   packages: ImageSpecPackages;
-  cancel: boolean;
-  updateTime: string;
+  cancel?: boolean;
+  updateTime?: string;
 }
 
 interface ImageSpecPackages {

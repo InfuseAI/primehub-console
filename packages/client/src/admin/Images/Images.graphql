@@ -31,6 +31,31 @@ query ImagesQuery(
   }
 }
 
+query SecretsQuery {
+  secrets(where: { ifDockerConfigJson: true }) {
+    id
+    name
+    type
+  }
+}
+
+query BaseImageQuery($where: ImageWhereInput!) {
+  images(where: $where) {
+    id
+    url
+    urlForGpu
+    ...ImageInfo
+  }
+}
+
+
+mutation CreateImageMutation($data: ImageCreateInput!) {
+  createImage(data: $data) {
+    id
+  }
+}
+
+
 mutation DeleteImageMutation($where: ImageWhereUniqueInput!) {
   deleteImage(where: $where) {
     id

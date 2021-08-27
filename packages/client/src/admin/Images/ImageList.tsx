@@ -10,7 +10,7 @@ import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { errorHandler } from 'utils/errorHandler';
 
 import { ImagesLayout } from './Layout';
-import { ImagesQuery, DeleteImageMutation } from './Images.graphql';
+import { ImagesQuery, DeleteImageMutation } from './images.graphql';
 import type { Image } from './types';
 
 const styles: React.CSSProperties = {
@@ -178,7 +178,11 @@ function _ImageList({ data, ...props }: ImageListProps) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             {/* @ts-ignore */}
-            <Button type='primary' icon='plus'>
+            <Button
+              type='primary'
+              icon='plus'
+              onClick={() => history.push(`${appPrefix}admin/image/add`)}
+            >
               Add
             </Button>
           </div>
