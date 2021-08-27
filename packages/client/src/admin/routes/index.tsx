@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Route, RouteProps } from 'react-router-dom';
+import { Route, RouteProps, Link } from 'react-router-dom';
 import { SystemSetting } from '../SystemSetting';
+import { Alert } from 'antd';
 import { UserList, UserDetail, UserAdd } from '../User';
 import { Datasets, DatasetInfo } from '../Datasets';
 import GroupList from '../Group/GroupList';
@@ -10,6 +11,23 @@ import { Secrets, SecretInfo } from '../Secrets';
 import { InstanceTypes, InstanceTypeInfo } from '../InstanceTypes';
 import { appPrefix } from 'utils/env';
 import UsageReport from '../UsageReport';
+
+const DeprecatedWarning = () => {
+  return (
+    <Alert
+      message='Warning'
+      description={
+        <span>
+          <b>Deprecated</b>: Image Builder is deprecated, Please use built-in
+          custom image tool when{' '}
+          <Link to={`${appPrefix}admin/image`}>adding new image</Link>.{' '}
+        </span>
+      }
+      type='warning'
+      showIcon
+    />
+  );
+};
 
 export const ROUTES = [
   'group',
@@ -107,7 +125,9 @@ export const routes = [
   {
     key: 'buildImage',
     path: 'admin/buildImage',
+    enabled: true,
     name: 'Image Builder',
+    component: DeprecatedWarning,
   },
   {
     key: 'dataset',
