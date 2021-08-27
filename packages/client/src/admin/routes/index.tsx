@@ -11,6 +11,7 @@ import { Secrets, SecretInfo } from '../Secrets';
 import { InstanceTypes, InstanceTypeInfo } from '../InstanceTypes';
 import { appPrefix } from 'utils/env';
 import UsageReport from '../UsageReport';
+import { ImageList } from '../Images';
 
 const DeprecatedWarning = () => {
   return (
@@ -121,6 +122,8 @@ export const routes = [
     key: 'image',
     path: 'admin/image',
     name: 'Images',
+    enabled: true,
+    component: ImageList,
   },
   {
     key: 'buildImage',

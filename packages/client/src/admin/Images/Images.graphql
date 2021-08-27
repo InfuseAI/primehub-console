@@ -1,0 +1,38 @@
+fragment ImageInfo on Image {
+  id
+  name
+  displayName
+  description
+  type
+}
+
+query ImagesQuery(
+  $page: Int
+  $where: ImageWhereInput
+  $orderBy: ImageOrderByInput
+) {
+  imagesConnection(
+    page: $page
+    orderBy: $orderBy
+    where: $where
+    mode: SYSTEM_ONLY
+  ) {
+    edges {
+      cursor
+      node {
+        id
+        ...ImageInfo
+      }
+    }
+    pageInfo {
+      currentPage
+      totalPage
+    }
+  }
+}
+
+mutation DeleteImageMutation($where: ImageWhereUniqueInput!) {
+  deleteImage(where: $where) {
+    id
+  }
+}

@@ -1,0 +1,289 @@
+import * as React from 'react';
+import { useHistory } from 'react-router-dom';
+import { Button, Table, Input, Modal, notification } from 'antd';
+import { ColumnProps } from 'antd/lib/table';
+import { graphql } from 'react-apollo';
+import { compose } from 'recompose';
+
+import InfuseButton from 'components/infuseButton';
+import { useRoutePrefix } from 'hooks/useRoutePrefix';
+import { errorHandler } from 'utils/errorHandler';
+
+import { ImagesLayout } from './Layout';
+import { ImagesQuery, DeleteImageMutation } from './Images.graphql';
+import type { Image } from './types';
+
+const styles: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '16px',
+  margin: '16px',
+  padding: '32px',
+  backgroundColor: '#fff',
+};
+
+interface QueryVariables {
+  page: number;
+  where?: {
+    name_contains: string;
+  };
+  orderBy?: {
+    [key: string]: 'asc' | 'desc';
+  };
+}
+
+interface ImageNode {
+  cursor: string;
+  node: Pick<Image, 'id' | 'name' | 'displayName' | 'description' | 'type'>;
+}
+
+interface ImageConnection {
+  edges: ImageNode[];
+  pageInfo: {
+    currentPage: number;
+    totalPage: number;
+  };
+}
+
+interface ImageListProps {
+  data: {
+    refetch: (variables?: QueryVariables) => Promise<void>;
+    error: Error | undefined;
+    loading: boolean;
+    variables: QueryVariables;
+    imagesConnection?: ImageConnection;
+    fetchMore: ({
+      variables,
+      updateQuery,
+    }: {
+      variables: QueryVariables;
+      updateQuery: (
+        previousResult: ImageConnection,
+        { fetchMoreResult: ImageConnection }
+      ) => void;
+    }) => void;
+  };
+
+  deleteImageMutation: ({
+    variables,
+  }: {
+    variables: {
+      where: {
+        id: string;
+      };
+    };
+  }) => Promise<void>;
+}
+
+function _ImageList({ data, ...props }: ImageListProps) {
+  const [keyword, setKeyword] = React.useState('');
+  const history = useHistory();
+  const { appPrefix } = useRoutePrefix();
+
+  const columns: ColumnProps<ImageNode>[] = [
+    {
+      key: 'name',
+      title: 'Name',
+      dataIndex: 'node.name',
+      sorter: true,
+    },
+    {
+      key: 'displayName',
+      title: 'Display Name',
+      dataIndex: 'node.displayName',
+      sorter: true,
+    },
+    {
+      key: 'type',
+      title: 'Type',
+      sorter: true,
+      dataIndex: 'node.type',
+    },
+    {
+      key: 'description',
+      title: 'Description',
+      sorter: true,
+      dataIndex: 'node.description',
+    },
+    {
+      key: 'actions',
+      title: 'Actions',
+      width: '200px',
+      render: function RenderActions(image: ImageNode) {
+        return (
+          <Button.Group>
+            <Button
+              icon='edit'
+              onClick={() => {
+                history.push(`${appPrefix}admin/image/${image.node.id}`);
+              }}
+            />
+            <Button
+              icon='delete'
+              onClick={() => {
+                Modal.confirm({
+                  title: 'Delete Image',
+                  content: (
+                    <>
+                      Are you sure to delete <strong>{image.node.id}</strong>?
+                    </>
+                  ),
+                  okText: 'Yes',
+                  onOk: async () => {
+                    try {
+                      await props.deleteImageMutation({
+                        variables: {
+                          where: {
+                            id: image.node.id,
+                          },
+                        },
+                      });
+                      await data.refetch();
+
+                      notification.success({
+                        duration: 5,
+                        placement: 'bottomRight',
+                        message: 'Delete successfully!',
+                      });
+                    } catch (err) {
+                      console.error(err);
+                      errorHandler(err);
+                    }
+                  },
+                });
+              }}
+            />
+          </Button.Group>
+        );
+      },
+    },
+  ];
+
+  function onSearch() {
+    const { refetch, variables } = data;
+
+    refetch({
+      ...variables,
+      page: 1,
+      where: {
+        ...variables.where,
+        name_contains: keyword,
+      },
+    });
+  }
+
+  return (
+    <ImagesLayout>
+      <div style={styles}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            {/* @ts-ignore */}
+            <Button type='primary' icon='plus'>
+              Add
+            </Button>
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: '0.5rem',
+            }}
+          >
+            <Input.Search
+              placeholder='Search by name'
+              style={{ width: 295 }}
+              value={keyword}
+              onChange={event => setKeyword(event.currentTarget.value)}
+              onSearch={onSearch}
+            />
+            <InfuseButton onClick={onSearch}>Search</InfuseButton>
+            <InfuseButton
+              disabled={data.loading}
+              onClick={() => {
+                const { refetch } = data;
+
+                setKeyword('');
+                refetch({
+                  page: 1,
+                  where: null,
+                });
+              }}
+            >
+              Reset
+            </InfuseButton>
+          </div>
+        </div>
+
+        <Table
+          rowKey={data => data.node.id}
+          style={{ paddingTop: 8 }}
+          columns={columns}
+          loading={data.loading}
+          dataSource={data?.imagesConnection?.edges}
+          onChange={(pagination, filters, sorter) => {
+            const { refetch, variables } = data;
+
+            if (sorter?.columnKey) {
+              const { columnKey, order } = sorter;
+              const sortType = {
+                ascend: 'asc',
+                descend: 'desc',
+              } as const;
+
+              refetch({
+                ...variables,
+                page: pagination.current,
+                orderBy: {
+                  [columnKey]: sortType[order],
+                },
+              });
+            } else {
+              refetch({
+                ...variables,
+                page: pagination.current,
+                orderBy: null,
+              });
+            }
+          }}
+          pagination={{
+            current: data?.imagesConnection?.pageInfo.currentPage,
+            total: data?.imagesConnection?.pageInfo.totalPage * 10,
+
+            onChange: page => {
+              data.fetchMore({
+                variables: {
+                  page,
+                },
+                updateQuery: (previousResult, { fetchMoreResult }) => {
+                  if (!fetchMoreResult) {
+                    return previousResult;
+                  }
+
+                  return fetchMoreResult;
+                },
+              });
+            },
+          }}
+        />
+      </div>
+    </ImagesLayout>
+  );
+}
+
+export const ImageList = compose(
+  graphql(ImagesQuery, {
+    options: () => {
+      return {
+        variables: {
+          page: 1,
+        },
+        fetchPolicy: 'cache-and-network',
+        onError: errorHandler,
+      };
+    },
+  }),
+  graphql(DeleteImageMutation, {
+    name: 'deleteImageMutation',
+  })
+)(_ImageList);
