@@ -9,8 +9,6 @@ import {
   Row,
   Col,
   Switch,
-  Tooltip,
-  Icon,
   Select,
 } from 'antd';
 import { useHistory } from 'react-router-dom';
@@ -19,11 +17,12 @@ import { graphql } from 'react-apollo';
 import { isArray } from 'lodash';
 import type { FormComponentProps } from 'antd/lib/form';
 
+import PHTooltip from 'components/share/toolTip';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { UserGroups } from 'queries/User.graphql';
 
 import { GroupsRelationTable } from '../User/UserDetail';
-import { BaseImageQuery, SecretsQuery } from './Images.graphql';
+import { BaseImageQuery, SecretsQuery } from './images.graphql';
 import type { Image, Groups } from './types';
 
 export type ImageFormState = Partial<Image> & {
@@ -36,7 +35,7 @@ export type ImageFormState = Partial<Image> & {
 
 type ImageFormProps = FormComponentProps<ImageFormState> & {
   onSubmit?: (data: ImageFormState) => void;
-  disableName?: boolean;
+  disabledName?: boolean;
   loading?: boolean;
   data?: ImageFormState;
   baseImagesQuery: {
@@ -86,6 +85,7 @@ function _ImageForm({
   const history = useHistory();
   const { appPrefix } = useRoutePrefix();
 
+  const [hasData, setHasData] = React.useState(false);
   const [enabledSelectSecret, setEnabledSelectSecret] = React.useState(false);
   const [enabledURLForGpu, setEnabledURLForGpu] = React.useState(false);
   const [globalStatus, setGlobalStatus] = React.useState(false);
@@ -154,6 +154,8 @@ function _ImageForm({
 
   React.useEffect(() => {
     if (data) {
+      setHasData(true);
+
       // setting radio option and set image pull secret
       if (data?.imageSpec) {
         setToggleRadioGroup('customImage');
@@ -171,6 +173,10 @@ function _ImageForm({
 
       if (data?.urlForGpu) {
         setEnabledURLForGpu(true);
+      }
+
+      if (data?.global) {
+        setGlobalStatus(data.global);
       }
 
       if (data?.groups.length > 0) {
@@ -217,6 +223,9 @@ function _ImageForm({
               props.onSubmit({
                 ...values,
                 isBuildByCustomImage: toggleRadioGroup === 'customImage',
+                useImagePullSecret: enabledSelectSecret
+                  ? values.useImagePullSecret
+                  : null,
                 groups: {
                   // @ts-ignore
                   connect,
@@ -232,13 +241,18 @@ function _ImageForm({
             <Form.Item label='Name'>
               {form.getFieldDecorator('name', {
                 initialValue: data?.name || '',
+                validateFirst: true,
                 rules: [
                   {
-                    required: !props?.disableName || false,
+                    required: true,
                     message: 'Name is required',
                   },
+                  {
+                    pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*/,
+                    message: `Alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`,
+                  },
                 ],
-              })(<Input disabled={props?.disableName || false} />)}
+              })(<Input disabled={props?.disabledName || false} />)}
             </Form.Item>
 
             <Form.Item label='Display Name'>
@@ -257,6 +271,7 @@ function _ImageForm({
               <Radio.Group
                 value={toggleRadioGroup}
                 onChange={event => setToggleRadioGroup(event.target.value)}
+                disabled={hasData}
               >
                 <Radio value='existingOne'>Use Existing One</Radio>
                 <Radio value='customImage'>Build Custom Image</Radio>
@@ -265,7 +280,7 @@ function _ImageForm({
 
             <Form.Item label='Type'>
               {form.getFieldDecorator('type', {
-                initialValue: data?.type || 'global',
+                initialValue: data?.type || 'both',
                 rules: [
                   {
                     required: true,
@@ -275,10 +290,62 @@ function _ImageForm({
                 <Select>
                   <Select.Option value='cpu'>CPU</Select.Option>
                   <Select.Option value='gpu'>GPU</Select.Option>
-                  <Select.Option value='global'>Universal</Select.Option>
+                  <Select.Option value='both'>Universal</Select.Option>
                 </Select>
               )}
             </Form.Item>
+
+            {toggleRadioGroup === 'existingOne' && (
+              <>
+                <Form.Item label='Container Image URL'>
+                  {form.getFieldDecorator('url', {
+                    initialValue: data?.url || '',
+                  })(<Input />)}
+                </Form.Item>
+
+                {form.getFieldValue('type') === 'both' && (
+                  <Form.Item label='Specific Container Image URL for GPU'>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '16px',
+                      }}
+                    >
+                      <Checkbox
+                        checked={enabledURLForGpu}
+                        onChange={event =>
+                          setEnabledURLForGpu(event.target.checked)
+                        }
+                      />
+                      {form.getFieldDecorator('urlForGpu', {
+                        initialValue: data?.urlForGpu || '',
+                      })(<Input disabled={!enabledURLForGpu} />)}
+                    </div>
+                  </Form.Item>
+                )}
+              </>
+            )}
+
+            {toggleRadioGroup === 'customImage' && (
+              <Form.Item label='Base Image URL'>
+                {form.getFieldDecorator('baseImage', {
+                  rules: [
+                    {
+                      required: true,
+                      message: 'Base Image is required',
+                    },
+                  ],
+                  initialValue: data?.imageSpec?.baseImage || '',
+                })(
+                  <Select loading={baseImagesQuery.loading}>
+                    {baseImagesQuery?.images?.map(image => (
+                      <Select.Option key={image.id}>{image.name}</Select.Option>
+                    ))}
+                  </Select>
+                )}
+              </Form.Item>
+            )}
 
             <Form.Item label='Image Pull Secret'>
               <div
@@ -308,114 +375,56 @@ function _ImageForm({
               </div>
             </Form.Item>
 
-            {toggleRadioGroup === 'existingOne' && (
-              <>
-                <Form.Item label='Container Image URL'>
-                  {form.getFieldDecorator('url', {
-                    initialValue: data?.url || '',
-                  })(<Input />)}
-                </Form.Item>
-
-                <Form.Item label='Specific Container Image URL for GPU'>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '16px',
-                    }}
-                  >
-                    <Checkbox
-                      checked={enabledURLForGpu}
-                      onChange={event =>
-                        setEnabledURLForGpu(event.target.checked)
-                      }
-                    />
-                    {form.getFieldDecorator('urlForGpu', {
-                      initialValue: data?.urlForGpu || '',
-                    })(<Input disabled={!enabledURLForGpu} />)}
-                  </div>
-                </Form.Item>
-              </>
-            )}
-
             {toggleRadioGroup === 'customImage' && (
-              <>
-                <Form.Item label='Base Image URL'>
-                  {form.getFieldDecorator('baseImage', {
-                    rules: [
-                      {
-                        required: true,
-                        message: 'BaseImage is required',
-                      },
-                    ],
-                    initialValue: data?.imageSpec?.baseImage || '',
-                  })(
-                    <Select loading={baseImagesQuery.loading}>
-                      {baseImagesQuery?.images?.map(image => (
-                        <Select.Option key={image.id}>
-                          {image.name}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  )}
-                </Form.Item>
-
-                <Form.Item label='Package(s)' required>
-                  <Row gutter={16}>
-                    <Col span={8}>
-                      APT
-                      <Form.Item>
-                        {form.getFieldDecorator('apt', {
-                          rules: [
-                            {
-                              required: true,
-                              message: 'APT is required',
-                            },
-                          ],
-                          initialValue:
-                            data?.imageSpec?.packages.apt.join('\n') || '',
-                        })(
-                          <Input.TextArea rows={5} placeholder={placeholder} />
-                        )}
-                      </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                      Conda
-                      <Form.Item>
-                        {form.getFieldDecorator('conda', {
-                          rules: [
-                            {
-                              required: true,
-                              message: 'Conda is required',
-                            },
-                          ],
-                          initialValue:
-                            data?.imageSpec?.packages.conda.join('\n') || '',
-                        })(
-                          <Input.TextArea rows={5} placeholder={placeholder} />
-                        )}
-                      </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                      Pip
-                      <Form.Item>
-                        {form.getFieldDecorator('pip', {
-                          rules: [
-                            {
-                              required: true,
-                              message: 'Pip is required',
-                            },
-                          ],
-                          initialValue:
-                            data?.imageSpec?.packages.pip.join('\n') || '',
-                        })(
-                          <Input.TextArea rows={5} placeholder={placeholder} />
-                        )}
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                </Form.Item>
-              </>
+              <Form.Item label='Package(s)' required>
+                <Row gutter={16}>
+                  <Col span={8}>
+                    APT
+                    <Form.Item>
+                      {form.getFieldDecorator('apt', {
+                        rules: [
+                          {
+                            required: true,
+                            message: 'APT is required',
+                          },
+                        ],
+                        initialValue:
+                          data?.imageSpec?.packages.apt.join('\n') || '',
+                      })(<Input.TextArea rows={5} placeholder={placeholder} />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={8}>
+                    Conda
+                    <Form.Item>
+                      {form.getFieldDecorator('conda', {
+                        rules: [
+                          {
+                            required: true,
+                            message: 'Conda is required',
+                          },
+                        ],
+                        initialValue:
+                          data?.imageSpec?.packages.conda.join('\n') || '',
+                      })(<Input.TextArea rows={5} placeholder={placeholder} />)}
+                    </Form.Item>
+                  </Col>
+                  <Col span={8}>
+                    Pip
+                    <Form.Item>
+                      {form.getFieldDecorator('pip', {
+                        rules: [
+                          {
+                            required: true,
+                            message: 'Pip is required',
+                          },
+                        ],
+                        initialValue:
+                          data?.imageSpec?.packages.pip.join('\n') || '',
+                      })(<Input.TextArea rows={5} placeholder={placeholder} />)}
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Form.Item>
             )}
           </div>
 
@@ -428,24 +437,11 @@ function _ImageForm({
               }}
             >
               Global{' '}
-              <Tooltip
+              <PHTooltip
+                tipText='When Global, everyone can access this Instance Type.'
+                tipLink='https://docs.primehub.io/docs/guide_manual/admin-instancetype#edit-groups'
                 placement='right'
-                title={
-                  <div>
-                    When Global, everyone can access this Instance Type.
-                    <a
-                      href='https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-feature'
-                      target='_blank'
-                      rel='noopener'
-                      style={{ color: '#839ce0' }}
-                    >
-                      Learn More.
-                    </a>
-                  </div>
-                }
-              >
-                <Icon type='question-circle' />
-              </Tooltip>
+              />
             </label>
             {form.getFieldDecorator('global', {
               valuePropName: 'checked',

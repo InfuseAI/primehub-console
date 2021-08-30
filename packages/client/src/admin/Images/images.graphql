@@ -56,8 +56,6 @@ query ImageQuery($where: ImageWhereUniqueInput!) {
   }
 }
 
-
-
 query SecretsQuery {
   secrets(where: { ifDockerConfigJson: true }) {
     id
@@ -75,10 +73,16 @@ query BaseImageQuery($where: ImageWhereInput!) {
   }
 }
 
-
 mutation CreateImageMutation($data: ImageCreateInput!) {
   createImage(data: $data) {
     id
+  }
+}
+
+mutation UpdateImageMutation($data: ImageUpdateInput!, $where: ImageWhereUniqueInput!) {
+  updateImage(data: $data, where: $where) {
+    id
+    useImagePullSecret
   }
 }
 
