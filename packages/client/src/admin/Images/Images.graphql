@@ -31,6 +31,33 @@ query ImagesQuery(
   }
 }
 
+query ImageQuery($where: ImageWhereUniqueInput!) {
+  image(where: $where) {
+    id
+    url
+    urlForGpu
+    useImagePullSecret
+    global
+    groups {
+      id
+      name
+      displayName
+    }
+    imageSpec {
+      baseImage
+      pullSecret
+      packages {
+        apt
+        conda
+        pip
+      }
+    }
+    ...ImageInfo
+  }
+}
+
+
+
 query SecretsQuery {
   secrets(where: { ifDockerConfigJson: true }) {
     id

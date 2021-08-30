@@ -27,7 +27,7 @@ import { BaseImageQuery, SecretsQuery } from './Images.graphql';
 import type { Image, Groups } from './types';
 
 export type ImageFormState = Partial<Image> & {
-  isBuildByCustomImage: boolean;
+  isBuildByCustomImage?: boolean;
   baseImage?: string;
   apt?: string;
   conda?: string;
@@ -80,14 +80,16 @@ function _ImageForm({
   form,
   baseImagesQuery,
   secretsQuery,
+  data,
   ...props
 }: ImageFormProps) {
   const history = useHistory();
   const { appPrefix } = useRoutePrefix();
 
   const [enabledSelectSecret, setEnabledSelectSecret] = React.useState(false);
-  const [enabledSpecifyURL, setEnabledSpecifyURL] = React.useState(false);
+  const [enabledURLForGpu, setEnabledURLForGpu] = React.useState(false);
   const [globalStatus, setGlobalStatus] = React.useState(false);
+  const [pullSecret, setPullSecret] = React.useState('');
   const [toggleRadioGroup, setToggleRadioGroup] =
     React.useState<'existingOne' | 'customImage'>('existingOne');
 
@@ -150,6 +152,33 @@ function _ImageForm({
     }
   }
 
+  React.useEffect(() => {
+    if (data) {
+      // setting radio option and set image pull secret
+      if (data?.imageSpec) {
+        setToggleRadioGroup('customImage');
+
+        if (data.imageSpec.pullSecret) {
+          setPullSecret(data.imageSpec.pullSecret);
+          setEnabledSelectSecret(true);
+        }
+      } else {
+        if (data.useImagePullSecret) {
+          setPullSecret(data.useImagePullSecret);
+          setEnabledSelectSecret(true);
+        }
+      }
+
+      if (data?.urlForGpu) {
+        setEnabledURLForGpu(true);
+      }
+
+      if (data?.groups.length > 0) {
+        dispatchUserGroups({ type: 'GROUPS', groups: data.groups });
+      }
+    }
+  }, [data]);
+
   return (
     <>
       <Button
@@ -202,7 +231,7 @@ function _ImageForm({
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <Form.Item label='Name'>
               {form.getFieldDecorator('name', {
-                initialValue: '',
+                initialValue: data?.name || '',
                 rules: [
                   {
                     required: !props?.disableName || false,
@@ -214,13 +243,13 @@ function _ImageForm({
 
             <Form.Item label='Display Name'>
               {form.getFieldDecorator('displayName', {
-                initialValue: '',
+                initialValue: data?.displayName || '',
               })(<Input />)}
             </Form.Item>
 
             <Form.Item label='Description'>
               {form.getFieldDecorator('description', {
-                initialValue: '',
+                initialValue: data?.description || '',
               })(<Input />)}
             </Form.Item>
 
@@ -236,7 +265,7 @@ function _ImageForm({
 
             <Form.Item label='Type'>
               {form.getFieldDecorator('type', {
-                initialValue: 'global',
+                initialValue: data?.type || 'global',
                 rules: [
                   {
                     required: true,
@@ -262,7 +291,7 @@ function _ImageForm({
                   }
                 />
                 {form.getFieldDecorator('useImagePullSecret', {
-                  initialValue: '',
+                  initialValue: pullSecret || '',
                 })(
                   <Select
                     placeholder='Select Secret'
@@ -283,7 +312,7 @@ function _ImageForm({
               <>
                 <Form.Item label='Container Image URL'>
                   {form.getFieldDecorator('url', {
-                    initialValue: '',
+                    initialValue: data?.url || '',
                   })(<Input />)}
                 </Form.Item>
 
@@ -296,14 +325,14 @@ function _ImageForm({
                     }}
                   >
                     <Checkbox
-                      checked={enabledSpecifyURL}
+                      checked={enabledURLForGpu}
                       onChange={event =>
-                        setEnabledSpecifyURL(event.target.checked)
+                        setEnabledURLForGpu(event.target.checked)
                       }
                     />
                     {form.getFieldDecorator('urlForGpu', {
-                      initialValue: '',
-                    })(<Input disabled={!enabledSpecifyURL} />)}
+                      initialValue: data?.urlForGpu || '',
+                    })(<Input disabled={!enabledURLForGpu} />)}
                   </div>
                 </Form.Item>
               </>
@@ -319,7 +348,7 @@ function _ImageForm({
                         message: 'BaseImage is required',
                       },
                     ],
-                    initialValue: '',
+                    initialValue: data?.imageSpec?.baseImage || '',
                   })(
                     <Select loading={baseImagesQuery.loading}>
                       {baseImagesQuery?.images?.map(image => (
@@ -343,6 +372,8 @@ function _ImageForm({
                               message: 'APT is required',
                             },
                           ],
+                          initialValue:
+                            data?.imageSpec?.packages.apt.join('\n') || '',
                         })(
                           <Input.TextArea rows={5} placeholder={placeholder} />
                         )}
@@ -358,6 +389,8 @@ function _ImageForm({
                               message: 'Conda is required',
                             },
                           ],
+                          initialValue:
+                            data?.imageSpec?.packages.conda.join('\n') || '',
                         })(
                           <Input.TextArea rows={5} placeholder={placeholder} />
                         )}
@@ -373,6 +406,8 @@ function _ImageForm({
                               message: 'Pip is required',
                             },
                           ],
+                          initialValue:
+                            data?.imageSpec?.packages.pip.join('\n') || '',
                         })(
                           <Input.TextArea rows={5} placeholder={placeholder} />
                         )}
@@ -414,7 +449,7 @@ function _ImageForm({
             </label>
             {form.getFieldDecorator('global', {
               valuePropName: 'checked',
-              initialValue: false,
+              initialValue: data?.global || false,
             })(
               <Switch
                 data-testid='Global'
@@ -449,7 +484,7 @@ function _ImageForm({
           >
             {/* @ts-ignore */}
             <Button type='primary' htmlType='submit'>
-              Create
+              Confirm
             </Button>
             <Button
               onClick={() => {
