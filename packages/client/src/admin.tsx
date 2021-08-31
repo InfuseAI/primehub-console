@@ -109,7 +109,7 @@ ReactDOM.render(
             <Redirect
               exact
               from={`${appPrefix}admin/`}
-              to={`${appPrefix}admin/${firstKey}`}
+              to={`${appPrefix}admin/group`}
             />
           </Switch>
         </React.Fragment>
