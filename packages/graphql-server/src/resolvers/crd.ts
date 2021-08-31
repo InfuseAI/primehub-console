@@ -284,8 +284,9 @@ export class Crd<SpecType> {
 
   private query = async (root, args, context: Context) => {
     const customResource = context.crdClient[this.customResourceMethod];
+    const {mode = QueryImageMode.ALL} = args;
     const where = this.parseWhere(args.where);
-    const rows = await this.listQuery(customResource, where, args && args.orderBy, context);
+    const rows = await this.listQuery(customResource, where, args && args.orderBy, context, mode);
 
     return paginate(rows, extractPagination(args));
   }
