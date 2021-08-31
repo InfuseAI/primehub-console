@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { Input, Modal, Table, Icon, Button, Row, Col } from 'antd';
-import { isEqual, get, keys } from 'lodash';
+import { uniqBy, isEqual, get, keys } from 'lodash';
 
 interface WrapperProps {
   marginTop?: number;
@@ -179,7 +179,14 @@ export default class Picker extends React.PureComponent<Props, State> {
   rowOnSelect = record => {
     const { selectedData } = this.state;
     selectedData.push(record);
-    this.setState({ selectedData });
+    this.setState({ selectedData: uniqBy(selectedData, 'id') });
+  };
+
+  rowOnSelectAll = (selected, selectedRows, changeRows) => {
+    const { selectedData } = this.state;
+    this.setState({
+      selectedData: uniqBy(selectedData.concat(changeRows), 'id'),
+    });
   };
 
   render() {
@@ -226,6 +233,7 @@ export default class Picker extends React.PureComponent<Props, State> {
             type: pickOne ? 'radio' : 'checkbox',
             onChange: this.rowSelectOnChange,
             onSelect: this.rowOnSelect,
+            onSelectAll: this.rowOnSelectAll,
             selectedRowKeys,
           }}
           onChange={this.handleTableChange}
