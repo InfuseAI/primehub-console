@@ -236,7 +236,7 @@ function UpdatePage(props: any) {
             history.push(`${appPrefix}admin/group/${params.id}/${key}`);
           }}
         >
-          <TabPane key='info' tab='Info'>
+          <TabPane key='info' tab='Info' data-testid='tabs-info'>
             <GroupForm
               loading={loading}
               type={'update'}
@@ -245,7 +245,11 @@ function UpdatePage(props: any) {
               initialValue={group}
             />
           </TabPane>
-          <TabPane key='instanceType' tab='Instance Types'>
+          <TabPane
+            key='instanceType'
+            tab='Instance Types'
+            data-testid='tabs-instanceTypes'
+          >
             <Card title={'Instance Types'}>
               <List
                 loading={loading}
@@ -258,7 +262,7 @@ function UpdatePage(props: any) {
           {__ENV__ === 'modelDeploy' ? (
             <></>
           ) : (
-            <TabPane key='images' tab='Images'>
+            <TabPane key='images' tab='Images' data-testid='tabs-images'>
               <Card title={'Images'}>
                 <List
                   loading={loading}
@@ -272,7 +276,7 @@ function UpdatePage(props: any) {
           {__ENV__ === 'modelDeploy' ? (
             <></>
           ) : (
-            <TabPane key='datasets' tab='Datasets'>
+            <TabPane key='datasets' tab='Datasets' data-testid='tabs-dataset'>
               <Card title={'Datasets'}>
                 <List
                   loading={loading}
@@ -327,11 +331,7 @@ export default compose(
           description: (
             <>
               Group {data.updateGroup.name} updated. Click{' '}
-              <a
-                onClick={() =>
-                  history.push(`group/${data.updateGroup.id}`)
-                }
-              >
+              <a onClick={() => history.push(`group/${data.updateGroup.id}`)}>
                 here
               </a>{' '}
               to view.
