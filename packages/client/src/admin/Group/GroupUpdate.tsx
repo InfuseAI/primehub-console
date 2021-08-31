@@ -167,7 +167,7 @@ function UpdatePage(props: any) {
       title: 'Permissions',
       dataIndex: 'writable',
       align: 'center',
-      render: writable => (writable ? 'Write' : 'Read Only'),
+      render: writable => (writable ? 'Writable' : 'Read Only'),
     },
     {
       title: 'Actions',
@@ -211,12 +211,7 @@ function UpdatePage(props: any) {
   };
 
   const onCancel = () => {
-    const pathname = get(location, 'state.prevPathname');
-    const search = get(location, 'state.prevSearch');
-    if (pathname) {
-      return history.push(`${pathname}${search}`);
-    }
-    history.push(`../group`);
+    history.push(`${appPrefix}admin/group`);
   };
 
   return (

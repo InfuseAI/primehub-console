@@ -17,6 +17,7 @@ fragment GroupResourceInfo on Group {
     id
     displayName
     description
+    writable
     type
   }
   images {
