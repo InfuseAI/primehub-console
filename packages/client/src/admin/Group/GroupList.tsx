@@ -211,7 +211,7 @@ export function GroupList(props: Props) {
   ];
 
   const searchHandler = keyword => {
-    setSearch(keyword);
+    setSearch(encodeURIComponent(keyword));
     setCurrentPage(null);
   };
 
