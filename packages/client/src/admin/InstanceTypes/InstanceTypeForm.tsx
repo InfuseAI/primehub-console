@@ -11,7 +11,6 @@ import {
   Switch,
   Table,
   Tabs,
-  Tooltip,
   notification,
 } from 'antd';
 import { useHistory } from 'react-router-dom';
@@ -27,6 +26,7 @@ import { GroupsRelationTable } from '../User/UserDetail';
 import { NodeSelectorList } from './NodeSelectorList';
 import { TolerationModalForm } from './TolerationModalForm';
 import type { TInstanceType, TToleration, Groups } from './types';
+import PHTooltip from 'components/share/toolTip';
 
 function Tips({
   type,
@@ -62,29 +62,17 @@ function Tips({
     },
     global: {
       text: 'When Global, everyone can access this Instance Type.',
-      link: 'https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-feature',
+      link: 'https://docs.primehub.io/docs/guide_manual/admin-instancetype#edit-groups',
     },
   };
 
   return (
-    <Tooltip
+    <PHTooltip
+      tipText={instructions[type].text}
+      tipLink={instructions[type].link}
       placement='right'
-      title={
-        <div>
-          {instructions[type].text}{' '}
-          <a
-            href={instructions[type].link}
-            target='_blank'
-            rel='noopener'
-            style={{ color: '#839ce0' }}
-          >
-            Learn More.
-          </a>
-        </div>
-      }
-    >
-      <Icon type='question-circle' />
-    </Tooltip>
+      style={{ margintLeft: 8 }}
+    />
   );
 }
 
