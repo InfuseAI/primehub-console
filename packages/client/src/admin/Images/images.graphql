@@ -4,6 +4,7 @@ fragment ImageInfo on Image {
   displayName
   description
   type
+  isReady
 }
 
 query ImagesQuery(
@@ -64,9 +65,11 @@ query SecretsQuery {
   }
 }
 
-query BaseImageQuery($where: ImageWhereInput!) {
-  images(where: $where) {
+query BaseImagesQuery {
+  images(mode: SYSTEM_ONLY) {
     id
+    groupName
+    useImagePullSecret
     url
     urlForGpu
     ...ImageInfo

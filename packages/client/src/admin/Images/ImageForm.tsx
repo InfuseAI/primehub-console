@@ -20,9 +20,10 @@ import type { FormComponentProps } from 'antd/lib/form';
 import PHTooltip from 'components/share/toolTip';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { UserGroups } from 'queries/User.graphql';
+import BaseImageRow from 'components/images/baseImageRow';
 
 import { GroupsRelationTable } from '../User/UserDetail';
-import { BaseImageQuery, SecretsQuery } from './images.graphql';
+import { BaseImagesQuery, SecretsQuery } from './images.graphql';
 import type { Image, Groups } from './types';
 
 export type ImageFormState = Partial<Image> & {
@@ -44,8 +45,13 @@ type ImageFormProps = FormComponentProps<ImageFormState> & {
       id: string;
       name: string;
       displayName: string;
+      groupName: string;
+      useImagePullSecret: string;
       type: string;
       url: string;
+      urlForGpu: string;
+      description: string;
+      isReady: boolean;
     }[];
   };
   secretsQuery: {
@@ -324,108 +330,107 @@ function _ImageForm({
                     </div>
                   </Form.Item>
                 )}
+
+                <Form.Item label='Image Pull Secret'>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '16px',
+                    }}
+                  >
+                    <Checkbox
+                      checked={enabledSelectSecret}
+                      onChange={event =>
+                        setEnabledSelectSecret(event.target.checked)
+                      }
+                    />
+                    {form.getFieldDecorator('useImagePullSecret', {
+                      initialValue: pullSecret || '',
+                    })(
+                      <Select
+                        placeholder='Select Secret'
+                        disabled={!enabledSelectSecret}
+                        loading={secretsQuery.loading}
+                      >
+                        {secretsQuery?.secrets?.map(secret => (
+                          <Select.Option key={secret.id} value={secret.id}>
+                            {secret.name}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    )}
+                  </div>
+                </Form.Item>
               </>
             )}
 
             {toggleRadioGroup === 'customImage' && (
-              <Form.Item label='Base Image URL'>
-                {form.getFieldDecorator('baseImage', {
-                  rules: [
-                    {
-                      required: true,
-                      message: 'Base Image is required',
-                    },
-                  ],
-                  initialValue: data?.imageSpec?.baseImage || '',
-                })(
-                  <Select loading={baseImagesQuery.loading}>
-                    {baseImagesQuery?.images?.map(image => (
-                      <Select.Option key={image.id}>{image.name}</Select.Option>
-                    ))}
-                  </Select>
-                )}
-              </Form.Item>
+              <BaseImageRow
+                form={form}
+                imageSpec={data?.imageSpec}
+                availableImages={baseImagesQuery?.images}
+              />
             )}
 
-            <Form.Item label='Image Pull Secret'>
-              <div
-                style={{ display: 'flex', alignItems: 'center', gap: '16px' }}
-              >
-                <Checkbox
-                  checked={enabledSelectSecret}
-                  onChange={event =>
-                    setEnabledSelectSecret(event.target.checked)
-                  }
-                />
-                {form.getFieldDecorator('useImagePullSecret', {
-                  initialValue: pullSecret || '',
-                })(
-                  <Select
-                    placeholder='Select Secret'
-                    disabled={!enabledSelectSecret}
-                    loading={secretsQuery.loading}
-                  >
-                    {secretsQuery?.secrets?.map(secret => (
-                      <Select.Option key={secret.id} value={secret.id}>
-                        {secret.name}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                )}
-              </div>
-            </Form.Item>
-
-            {toggleRadioGroup === 'customImage' && (
-              <Form.Item label='Package(s)' required>
-                <Row gutter={16}>
-                  <Col span={8}>
-                    APT
-                    <Form.Item>
-                      {form.getFieldDecorator('apt', {
-                        rules: [
-                          {
-                            required: true,
-                            message: 'APT is required',
-                          },
-                        ],
-                        initialValue:
-                          data?.imageSpec?.packages.apt.join('\n') || '',
-                      })(<Input.TextArea rows={5} placeholder={placeholder} />)}
-                    </Form.Item>
-                  </Col>
-                  <Col span={8}>
-                    Conda
-                    <Form.Item>
-                      {form.getFieldDecorator('conda', {
-                        rules: [
-                          {
-                            required: true,
-                            message: 'Conda is required',
-                          },
-                        ],
-                        initialValue:
-                          data?.imageSpec?.packages.conda.join('\n') || '',
-                      })(<Input.TextArea rows={5} placeholder={placeholder} />)}
-                    </Form.Item>
-                  </Col>
-                  <Col span={8}>
-                    Pip
-                    <Form.Item>
-                      {form.getFieldDecorator('pip', {
-                        rules: [
-                          {
-                            required: true,
-                            message: 'Pip is required',
-                          },
-                        ],
-                        initialValue:
-                          data?.imageSpec?.packages.pip.join('\n') || '',
-                      })(<Input.TextArea rows={5} placeholder={placeholder} />)}
-                    </Form.Item>
-                  </Col>
-                </Row>
-              </Form.Item>
-            )}
+            {toggleRadioGroup === 'customImage' ||
+              (data?.imageSpec === null && (
+                <Form.Item label='Package(s)' required>
+                  <Row gutter={16}>
+                    <Col span={8}>
+                      APT
+                      <Form.Item>
+                        {form.getFieldDecorator('apt', {
+                          rules: [
+                            {
+                              required: true,
+                              message: 'APT is required',
+                            },
+                          ],
+                          initialValue:
+                            data?.imageSpec?.packages.apt.join('\n') || '',
+                        })(
+                          <Input.TextArea rows={5} placeholder={placeholder} />
+                        )}
+                      </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                      Conda
+                      <Form.Item>
+                        {form.getFieldDecorator('conda', {
+                          rules: [
+                            {
+                              required: true,
+                              message: 'Conda is required',
+                            },
+                          ],
+                          initialValue:
+                            data?.imageSpec?.packages.conda.join('\n') || '',
+                        })(
+                          <Input.TextArea rows={5} placeholder={placeholder} />
+                        )}
+                      </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                      Pip
+                      <Form.Item>
+                        {form.getFieldDecorator('pip', {
+                          rules: [
+                            {
+                              required: true,
+                              message: 'Pip is required',
+                            },
+                          ],
+                          initialValue:
+                            data?.imageSpec?.packages.pip.join('\n') || '',
+                        })(
+                          <Input.TextArea rows={5} placeholder={placeholder} />
+                        )}
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                </Form.Item>
+              ))}
           </div>
 
           <Form.Item>
@@ -505,7 +510,7 @@ export const ImageForm = compose(
       };
     },
   }),
-  graphql(BaseImageQuery, {
+  graphql(BaseImagesQuery, {
     name: 'baseImagesQuery',
     options: () => {
       return {

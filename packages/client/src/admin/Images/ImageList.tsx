@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Table, Input, Modal, notification } from 'antd';
+import { Button, Table, Input, Modal, Icon, notification } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -34,7 +34,10 @@ interface QueryVariables {
 
 interface ImageNode {
   cursor: string;
-  node: Pick<Image, 'id' | 'name' | 'displayName' | 'description' | 'type'>;
+  node: Pick<
+    Image,
+    'id' | 'name' | 'displayName' | 'description' | 'type' | 'isReady'
+  >;
 }
 
 interface ImageConnection {
@@ -84,8 +87,19 @@ function _ImageList({ data, ...props }: ImageListProps) {
     {
       key: 'name',
       title: 'Name',
-      dataIndex: 'node.name',
       sorter: true,
+      render: (image: ImageNode) => {
+        if (!image.node.isReady) {
+          return (
+            <>
+              {image.node.name}{' '}
+              <Icon type='warning' title='Image is not ready.' />
+            </>
+          );
+        }
+
+        return image.node.name;
+      },
     },
     {
       key: 'displayName',
@@ -97,7 +111,13 @@ function _ImageList({ data, ...props }: ImageListProps) {
       key: 'type',
       title: 'Type',
       sorter: true,
-      dataIndex: 'node.type',
+      render: (image: ImageNode) => {
+        if (image.node.type === 'both') {
+          return 'Universal';
+        }
+
+        return image.node.type.toUpperCase();
+      },
     },
     {
       key: 'description',

@@ -44,13 +44,13 @@ function _ImageAdd({ createImageMutation }: Props) {
           'groups.disconnect',
         ]),
         imageSpec: {
-          baseImage: restData.baseImage,
+          baseImage: restData.imageSpec.baseImage,
+          pullSecret: restData.imageSpec.pullSecret,
           packages: {
             apt: restData.apt.split('\n'),
             conda: restData.conda.split('\n'),
             pip: restData.pip.split('\n'),
           },
-          pullSecret: restData.useImagePullSecret,
         },
       };
     }
