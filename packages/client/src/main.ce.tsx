@@ -24,6 +24,7 @@ import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
 import GroupSettingsPage from 'containers/groupSettingsPage';
+import NotebookViewer from 'containers/sharedFiles/notebookViewer';
 
 const client = createGraphqlClient({
   fakeData,
@@ -34,7 +35,11 @@ class Main extends React.Component {
   render() {
     return (
       <BrowserRouter>
-        <ApolloProvider client={client}>
+        <Route path={`${appPrefix}preview/*`}>
+          <NotebookViewer appPrefix={appPrefix} />
+        </Route>
+        <Route path={`${appPrefix}g/`}>
+          <ApolloProvider client={client}>
           <MainPage sidebarItems={listCE}>
             {/* Jupyterhub */}
             <Route path={`${appPrefix}g/:groupName/hub`} exact>
@@ -95,6 +100,7 @@ class Main extends React.Component {
             </Route>
           </MainPage>
         </ApolloProvider>
+        </Route>
       </BrowserRouter>
     );
   }

@@ -149,6 +149,14 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
     });
   });
 
+  // preview
+  rootRouter.get('/preview/*', oidcCtrl.loggedIn, async ctx => {
+    await ctx.render('index', {
+      title: 'PrimeHub',
+      staticPath,
+    });
+  });
+
   // Admin Portal
   rootRouter.get('/admin', oidcCtrl.ensureAdmin, async ctx => {
     await ctx.render('admin', {
