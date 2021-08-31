@@ -20,6 +20,7 @@ import schema from 'index-schema';
 import myLocales from './utils/locales';
 import { BackgroundTokenSyncer } from './workers/backgroundTokenSyncer';
 import GroupList from 'components/admins/group/list';
+import PageChangeTracker from 'components/share/tracker';
 
 const firstKey = Object.keys(schema.schema)[0];
 const locales = {
@@ -113,6 +114,7 @@ ReactDOM.render(
             />
           </Switch>
         </React.Fragment>
+        <PageChangeTracker />
       </Router>
     </LocaleProvider>
   </IntlProvider>,
