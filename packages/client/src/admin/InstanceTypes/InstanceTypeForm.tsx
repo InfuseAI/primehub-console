@@ -354,10 +354,15 @@ export function _InstanceTypeForm({
                 <Form.Item label='Name'>
                   {form.getFieldDecorator('name', {
                     initialValue: data?.name || '',
+                    validateFirst: true,
                     rules: [
                       {
-                        required: !props?.disableName || false,
-                        message: 'Name is required',
+                        required: true,
+                      },
+                      {
+                        pattern:
+                          /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
+                        message: `lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`,
                       },
                     ],
                   })(<Input disabled={props?.disableName || false} />)}
