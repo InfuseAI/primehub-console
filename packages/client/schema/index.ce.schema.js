@@ -6,7 +6,6 @@ import { LocalStorageConnector } from 'canner-graphql-interface';
 import { createFakeData } from 'canner-helpers';
 import { dict, graphqlClient, imageStorage } from './utils';
 import CommonBody from 'cms-layouts/commonBody';
-import UserBody from 'cms-layouts/userBody';
 import JupyterhubBody from 'cms-layouts/jupyterhubBody';
 
 const schema = (

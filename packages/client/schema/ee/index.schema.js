@@ -1,5 +1,5 @@
 /** @jsx builder */
-import builder, {Body} from 'canner-script';
+import builder, { Body } from 'canner-script';
 import Image from 'schema/image.schema';
 import Jupyterhub from 'schema/jupyterhub.schema';
 import BuildImage from 'schema/ee/buildImage.schema';
@@ -9,19 +9,18 @@ import { createFakeData } from 'canner-helpers';
 import { dict, graphqlClient, imageStorage } from 'schema/utils';
 import BuildImageJobBody from 'cms-layouts/buildImageJobBody';
 import CommonBody from 'cms-layouts/commonBody';
-import UserBody from 'cms-layouts/userBody';
 import JupyterhubBody from 'cms-layouts/jupyterhubBody';
 
 const maintenance =
   typeof enableMaintenanceNotebook !== 'undefined' &&
   enableMaintenanceNotebook ? (
-    <object keyName="maintenance"></object>
+    <object keyName='maintenance'></object>
   ) : (
     {}
   );
 const grafana =
   typeof enableGrafana !== 'undefined' && enableGrafana ? (
-    <object keyName="grafana"></object>
+    <object keyName='grafana'></object>
   ) : (
     {}
   );
