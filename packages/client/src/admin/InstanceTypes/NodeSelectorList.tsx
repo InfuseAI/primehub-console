@@ -94,7 +94,8 @@ export function NodeItemInputGroup({
       <Form.Item
         label='Key'
         labelCol={{ sm: { span: 5 } }}
-        style={{ display: 'flex', maxWidth: '25%' }}
+        style={{ display: 'flex', width: '25%' }}
+        wrapperCol={{ style: { width: '100%' } }}
       >
         {form.getFieldDecorator(`nodeList[${props.id}][0]`, {
           validateTrigger: ['onChange', 'onBlur'],
@@ -120,10 +121,9 @@ export function NodeItemInputGroup({
 
       <Form.Item
         label='Value'
-        labelCol={{
-          sm: { span: 5 },
-        }}
-        style={{ display: 'flex', maxWidth: '25%' }}
+        labelCol={{ sm: { span: 5 } }}
+        style={{ display: 'flex', width: '25%' }}
+        wrapperCol={{ style: { width: '100%' } }}
       >
         {form.getFieldDecorator(`nodeList[${props.id}][1]`, {
           validateTrigger: ['onChange', 'onBlur'],
