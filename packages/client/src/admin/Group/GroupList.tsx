@@ -246,6 +246,7 @@ export function GroupList(props: Props) {
         >
           {/* @ts-ignore */}
           <InfuseButton
+            data-testid='add-button'
             icon='plus'
             onClick={add}
             style={{ marginRight: 16, width: 120 }}
@@ -263,6 +264,7 @@ export function GroupList(props: Props) {
           <Col key='search-handler' style={{ flex: 1 }}>
             <FilterPlugins style={{ marginRight: '10px' }}>
               <Search
+                data-testid='text-filter-name'
                 placeholder={`Search Group`}
                 defaultValue={search}
                 onSearch={searchHandler}

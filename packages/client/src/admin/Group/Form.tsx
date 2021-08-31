@@ -268,7 +268,7 @@ function GroupForm(props: Props) {
   return (
     <Skeleton loading={loading} active>
       <Form onSubmit={handleSubmit}>
-        <Form.Item label={'Name'}>
+        <Form.Item label={'Name'} data-testid='group/name'>
           {form.getFieldDecorator('name', {
             rules: [
               {
@@ -280,13 +280,14 @@ function GroupForm(props: Props) {
             initialValue: initialValue.name,
           })(<Input disabled={type === 'update'} />)}
         </Form.Item>
-        <Form.Item label={'Display Name'}>
+        <Form.Item label={'Display Name'} data-testid='group/displayName'>
           {form.getFieldDecorator('displayName', {
             initialValue: initialValue.displayName,
           })(<Input />)}
         </Form.Item>
         <FeatureEE>
           <Form.Item
+            data-testid='group/enabledDeployment'
             label={
               <span>
                 Model Deployment{' '}
@@ -310,7 +311,10 @@ function GroupForm(props: Props) {
             )}
           </Form.Item>
           {form.getFieldValue('enabledDeployment') ? (
-            <Form.Item label={`Maximum Deployment(s)`}>
+            <Form.Item
+              label={`Maximum Deployment(s)`}
+              data-testid='group/maxDeploy'
+            >
               {form.getFieldDecorator('maxDeploy', {
                 initialValue: initialValue.maxDeploy,
                 getValueFromEvent: (refId, action, val) => val,
@@ -326,6 +330,7 @@ function GroupForm(props: Props) {
         </FeatureEE>
         <Feature modelDeploy={false}>
           <Form.Item
+            data-testid='group/enableSharedVolume'
             label={
               <span>
                 Share Volume{' '}
@@ -353,7 +358,10 @@ function GroupForm(props: Props) {
             <Card title={'Shared Volume'} style={{ marginBottom: 16 }}>
               <Row>
                 <Col sm={8} xs={24}>
-                  <Form.Item label={`Shared Volume Capacity`}>
+                  <Form.Item
+                    label={`Shared Volume Capacity`}
+                    data-testid='group/sharedVolumeCapacity'
+                  >
                     {form.getFieldDecorator('sharedVolumeCapacity', {
                       initialValue: initialValue.sharedVolumeCapacity,
                     })(
@@ -370,7 +378,10 @@ function GroupForm(props: Props) {
                   </Form.Item>
                 </Col>
                 <Col sm={8} xs={24}>
-                  <Form.Item label={`Launch Group Only`}>
+                  <Form.Item
+                    label={`Launch Group Only`}
+                    data-testid='group/launchGroupOnly'
+                  >
                     {form.getFieldDecorator('launchGroupOnly', {
                       initialValue: initialValue.launchGroupOnly,
                       valuePropName: 'checked',
@@ -391,7 +402,7 @@ function GroupForm(props: Props) {
         <Card title={'User Quota'} style={{ marginBottom: 16 }}>
           <Row>
             <Col sm={8} xs={24}>
-              <Form.Item label={`CPU Quota`}>
+              <Form.Item label={`CPU Quota`} data-testid='group/quotaCpu'>
                 {form.getFieldDecorator('quotaCpu', {
                   initialValue: initialValue.quotaCpu,
                   getValueFromEvent: (refId, action, val) => val,
@@ -403,7 +414,7 @@ function GroupForm(props: Props) {
               </Form.Item>
             </Col>
             <Col sm={8} xs={24}>
-              <Form.Item label={`GPU Quota`}>
+              <Form.Item label={`GPU Quota`} data-testid='group/quotaGpu'>
                 {form.getFieldDecorator('quotaGpu', {
                   initialValue: initialValue.quotaGpu,
                   getValueFromEvent: (refId, action, val) => val,
@@ -415,7 +426,7 @@ function GroupForm(props: Props) {
               </Form.Item>
             </Col>
             <Col sm={8} xs={24}>
-              <Form.Item label={`Memory Quota`}>
+              <Form.Item label={`Memory Quota`} data-testid='group/quotaMemory'>
                 {form.getFieldDecorator('quotaMemory', {
                   initialValue: initialValue.quotaMemory,
                   getValueFromEvent: (refId, action, val) => val,
@@ -431,7 +442,10 @@ function GroupForm(props: Props) {
         <Card title={'Group Quota'} style={{ marginBottom: 16 }}>
           <Row>
             <Col sm={8} xs={24}>
-              <Form.Item label={`CPU Quota`}>
+              <Form.Item
+                label={`CPU Quota`}
+                data-testid='group/projectQuotaCpu'
+              >
                 {form.getFieldDecorator('projectQuotaCpu', {
                   initialValue: initialValue.projectQuotaCpu,
                   getValueFromEvent: (refId, action, val) => val,
@@ -443,7 +457,10 @@ function GroupForm(props: Props) {
               </Form.Item>
             </Col>
             <Col sm={8} xs={24}>
-              <Form.Item label={`GPU Quota`}>
+              <Form.Item
+                label={`GPU Quota`}
+                data-testid='group/projectQuotaGpu'
+              >
                 {form.getFieldDecorator('projectQuotaGpu', {
                   initialValue: initialValue.projectQuotaGpu,
                   getValueFromEvent: (refId, action, val) => val,
@@ -455,7 +472,10 @@ function GroupForm(props: Props) {
               </Form.Item>
             </Col>
             <Col sm={8} xs={24}>
-              <Form.Item label={`Memory Quota`}>
+              <Form.Item
+                label={`Memory Quota`}
+                data-testid='group/projectQuotaMemory'
+              >
                 {form.getFieldDecorator('projectQuotaMemory', {
                   initialValue: initialValue.projectQuotaMemory,
                   getValueFromEvent: (refId, action, val) => val,
@@ -478,13 +498,16 @@ function GroupForm(props: Props) {
         </Card>
         <Form.Item style={{ textAlign: 'right', marginTop: 12 }}>
           <InfuseButton
+            data-testid='confirm-button'
             type='primary'
             htmlType='submit'
             style={{ marginRight: 16 }}
           >
             {submitText}
           </InfuseButton>
-          <InfuseButton onClick={handleCancel}>Cancel</InfuseButton>
+          <InfuseButton onClick={handleCancel} data-testid='reset-button'>
+            Cancel
+          </InfuseButton>
         </Form.Item>
       </Form>
     </Skeleton>
