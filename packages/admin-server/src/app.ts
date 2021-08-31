@@ -7,6 +7,7 @@ import Router from 'koa-router';
 import morgan from 'koa-morgan';
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import koaMount from 'koa-mount';
+import md5 from 'md5';
 
 // controller
 import { OidcCtrl, mount as mountOidc } from './oidc';
@@ -141,6 +142,16 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
     if (apiToken) {
       ctx.state.apiToken = ctx.cookies.get('apiToken', { signed: true });
       ctx.cookies.set('apiToken', { path: staticPath });
+    }
+
+    // send anonymousId to client by cookie
+    const anonymousId = ctx.cookies.get('primehubAnonymousId', { signed: true }) || '';
+    if (anonymousId === '') {
+      const clusterId = md5(config.keycloakClientSecret);
+      const httpOnly = !config.graphqlSvcEndpoint.startsWith('https://');
+      ctx.cookies.set('primehubAnonymousId', clusterId, {
+        httpOnly: httpOnly
+      });
     }
 
     await ctx.render('index', {
