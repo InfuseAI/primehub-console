@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import styled from 'styled-components';
-import { Layout, Modal, Menu, Divider } from 'antd';
+import {
+  Button,
+  Layout,
+  Modal,
+  Menu,
+  Divider,
+  Card,
+  Row,
+  Col,
+  Icon,
+} from 'antd';
 import { Link, useParams, useLocation } from 'react-router-dom';
 
 import { UserContext } from 'context/user';
@@ -11,7 +21,7 @@ import {
 } from 'components/Sidebar/types';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
-const Icon = styled.img`
+const MenuIcon = styled.img`
   width: 25px;
   height: 25px;
 `;
@@ -49,16 +59,58 @@ const STATUS_BADGE = {
 
 const ProModal = (props: any) => {
   const { visible, onOk, onCancel } = props;
+  const ceFeatures = ['Notebook', 'Shared Files', 'Apps'];
+  const eeFeatures = ['Jobs', 'Schedule Jobs', 'Models', 'Deployments'];
+  const FeatureItem = (props: any) => {
+    const { children, key, available } = props;
+    return (
+      <p key={key}>
+        <Icon
+          type={available ? 'check-circle' : 'close-circle'}
+          theme='filled'
+          style={{ color: `${available ? '#00cb5d' : '#ff3845'}` }}
+        />{' '}
+        <span style={{ margin: '10px' }}>{children}</span>
+      </p>
+    );
+  };
+
   return (
     <Modal
       title='Upgrade to Enterprise Edition'
       visible={visible}
       onOk={onOk}
       onCancel={onCancel}
+      bodyStyle={{
+        backgroundColor: '#f0f6fd',
+      }}
+      footer={null}
     >
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
+      <Row gutter={8}>
+        <Col span={12}>
+          <Card title='Community Edition'>
+            {ceFeatures.map((text, index) => (
+              <FeatureItem key={`ce-${index}`} available={true}>
+                {text}
+              </FeatureItem>
+            ))}
+            {eeFeatures.map((text, index) => (
+              <FeatureItem key={`ee-${index}`} available={false}>
+                {text}
+              </FeatureItem>
+            ))}
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card title='Enterprise Edition'>
+            {ceFeatures.concat(eeFeatures).map((text, index) => (
+              <FeatureItem key={`ce-${index}`} available={true}>
+                {text}
+              </FeatureItem>
+            ))}
+          </Card>
+        </Col>
+      </Row>
     </Modal>
   );
 };
@@ -123,13 +175,13 @@ export function Sidebar({ sidebarItems }: Props) {
       >
         {item.proFeature ? (
           <span>
-            <Icon src={item.icon} style={item.style} />
+            <MenuIcon src={item.icon} style={item.style} />
             <Title>{item.title}</Title>
             {STATUS_BADGE.pro}
           </span>
         ) : (
           <Link to={`${appPrefix}g/${groupName}/${item.subPath}`}>
-            <Icon src={item.icon} style={item.style} />
+            <MenuIcon src={item.icon} style={item.style} />
             <Title>{item.title}</Title>
             {STATUS_BADGE[item.stage]}
           </Link>
