@@ -29,7 +29,9 @@
     "start:model_deploy": "webpack serve --env mode=development schema=modelDeploy --progress",
     "test": "jest",
     "test:watch": "jest --watch",
-    "watch": "webpack --env mode=production schema=ee --progress --watch"
+    "watch": "webpack --env mode=production schema=ee --progress --watch",
+    "watch:ce": "webpack --env mode=production schema=ce --progress --watch",
+    "watch:model_deploy": "webpack --env mode=production schema=modelDeploy --progress --watch"
   },
   "dependencies": {
     "@uppy/core": "^1.15.0",
