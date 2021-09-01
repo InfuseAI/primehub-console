@@ -55,23 +55,23 @@ export function Sidebar({ sidebarItems }: Props) {
   const { appPrefix } = useRoutePrefix();
   const { groupName } = useParams<{ groupName: string }>();
   const { userItems, adminItems, hasAdminItems } = React.useMemo(() => {
-    const filterSidebarItems = sidebarItems.filter((item) => {
+    const filterSidebarItems = sidebarItems.filter(item => {
       if (item.title === 'Apps' && !enableApp) {
         return false;
       }
       return true;
     });
 
-    const user = filterSidebarItems.filter((item) => !item?.groupAdminOnly);
+    const user = filterSidebarItems.filter(item => !item?.groupAdminOnly);
     const admin = filterSidebarItems.filter(
-      (item) => currentUser?.isCurrentGroupAdmin && item?.groupAdminOnly
+      item => currentUser?.isCurrentGroupAdmin && item?.groupAdminOnly
     );
-    const hasAdminItems = admin.length > 0;
+    const hasAdmin = admin.length > 0;
 
     return {
       userItems: user,
       adminItems: admin,
-      hasAdminItems,
+      hasAdminItems: hasAdmin,
     };
   }, [currentUser?.isCurrentGroupAdmin, sidebarItems, enableApp]);
 
@@ -95,8 +95,8 @@ export function Sidebar({ sidebarItems }: Props) {
 
   return (
     <Layout.Sider style={{ position: 'fixed', height: '100%' }}>
-      <Menu theme="dark" selectedKeys={[path]} data-testid={`${path}-active`}>
-        {userItems.map((item) => (
+      <Menu theme='dark' selectedKeys={[path]} data-testid={`${path}-active`}>
+        {userItems.map(item => (
           <Menu.Item
             key={item.subPath}
             style={{ paddingLeft: 26 }}
@@ -122,7 +122,7 @@ export function Sidebar({ sidebarItems }: Props) {
         )}
 
         {hasAdminItems &&
-          adminItems.map((item) => (
+          adminItems.map(item => (
             <Menu.Item
               key={item.subPath}
               style={{ paddingLeft: 26 }}
