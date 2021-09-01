@@ -35,6 +35,7 @@ export interface SidebarItem {
   subPath: SidebarPathList;
   icon: string;
   enabledIn: Feature[];
+  proFeature?: boolean;
   style?: React.CSSProperties;
   stage?: string;
   groupAdminOnly?: boolean;
@@ -175,14 +176,27 @@ export const sidebarList: SidebarList = [
   },
 ];
 
-export const listEE = sidebarList.filter((item) =>
+export const listEE = sidebarList.filter(item =>
   item.enabledIn.includes(FEATURES.EE)
 );
 
-export const listCE = sidebarList.filter((item) =>
-  item.enabledIn.includes(FEATURES.CE)
-);
+export const listCE = sidebarList
+  .filter(
+    item =>
+      item.enabledIn.includes(FEATURES.CE) ||
+      item.enabledIn.includes(FEATURES.EE)
+  )
+  .map(item => {
+    if (
+      item.enabledIn.includes(FEATURES.EE) &&
+      !item.enabledIn.includes(FEATURES.CE)
+    ) {
+      item.proFeature = true;
+      return item;
+    }
+    return item;
+  });
 
-export const listDeploy = sidebarList.filter((item) =>
+export const listDeploy = sidebarList.filter(item =>
   item.enabledIn.includes(FEATURES.DEPLOY)
 );

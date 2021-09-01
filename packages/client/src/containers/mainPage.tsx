@@ -31,7 +31,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
     currentGroupName: localStorage.getItem('currentGroupName') || '',
   };
 
-  onSelectGroup = (groupName) => {
+  onSelectGroup = groupName => {
     const { currentGroupName } = this.state;
 
     if (currentGroupName !== groupName) {
@@ -53,7 +53,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
     const { loading, error, me } = currentUser;
     const groups =
       !loading && !error && me
-        ? me.groups.filter((group) => group.id !== everyoneGroupId)
+        ? me.groups.filter(group => group.id !== everyoneGroupId)
         : undefined;
     return { loading, error, groups, me };
   }
@@ -64,7 +64,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
     const { loading, error, groups, me } = this.getGroups();
     const currentUser = me;
     const currentGroup = groups
-      ? groups.find((group) => group.name === currentGroupName)
+      ? groups.find(group => group.name === currentGroupName)
       : undefined;
     if (currentUser) {
       currentUser.isCurrentGroupAdmin = checkUserIsGroupAdmin(
@@ -82,13 +82,13 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
         <Switch>
           <Route path={`${appPrefix}g`} exact>
             <Alert
-              message="Failed to retrieve data"
-              description="Please contact your administrator."
-              type="error"
+              message='Failed to retrieve data'
+              description='Please contact your administrator.'
+              type='error'
               showIcon
             />
           </Route>
-          <Route path="/">
+          <Route path='/'>
             <Redirect to={`${appPrefix}g`} />
           </Route>
         </Switch>
@@ -98,13 +98,13 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
         <Switch>
           <Route path={`${appPrefix}g`} exact>
             <Alert
-              message="No group is available"
-              description="Please contact your administrator to be added to a group."
-              type="warning"
+              message='No group is available'
+              description='Please contact your administrator to be added to a group.'
+              type='warning'
               showIcon
             />
           </Route>
-          <Route path="/">
+          <Route path='/'>
             <Redirect to={`${appPrefix}g`} />
           </Route>
         </Switch>
@@ -130,7 +130,7 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
             <Landing includeHeader={false} />
           </Route>
 
-          <Route path="/">
+          <Route path='/'>
             <Redirect to={`${appPrefix}g`} />
           </Route>
         </Switch>

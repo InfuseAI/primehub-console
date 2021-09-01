@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import styled from 'styled-components';
-import { Layout, Menu, Divider } from 'antd';
+import { Layout, Modal, Menu, Divider } from 'antd';
 import { Link, useParams, useLocation } from 'react-router-dom';
 
 import { UserContext } from 'context/user';
@@ -23,7 +23,7 @@ const Title = styled.span`
 const Badge = styled.span`
   position: absolute;
   top: 12px;
-  left: 140px;
+  left: 155px;
   border-radius: 2px;
   padding: 0px 5px;
   line-height: 15px;
@@ -44,17 +44,35 @@ interface Props {
 const STATUS_BADGE = {
   beta: <Badge>beta</Badge>,
   alpha: <Badge>alpha</Badge>,
+  pro: <Badge>pro</Badge>,
+};
+
+const ProModal = (props: any) => {
+  const { visible, onOk, onCancel } = props;
+  return (
+    <Modal
+      title='Upgrade to Enterprise Edition'
+      visible={visible}
+      onOk={onOk}
+      onCancel={onCancel}
+    >
+      <p>Some contents...</p>
+      <p>Some contents...</p>
+      <p>Some contents...</p>
+    </Modal>
+  );
 };
 
 export function Sidebar({ sidebarItems }: Props) {
-  const [path, setPath] = React.useState<SidebarPathList>('home');
-  const [enableApp, setEnableApp] = React.useState(false);
-  const currentUser = React.useContext(UserContext);
+  const [path, setPath] = useState<SidebarPathList>('home');
+  const [modal, setModal] = useState(false);
+  const [enableApp, setEnableApp] = useState(false);
+  const currentUser = useContext(UserContext);
 
   const location = useLocation();
   const { appPrefix } = useRoutePrefix();
   const { groupName } = useParams<{ groupName: string }>();
-  const { userItems, adminItems, hasAdminItems } = React.useMemo(() => {
+  const { userItems, adminItems, hasAdminItems } = useMemo(() => {
     const filterSidebarItems = sidebarItems.filter(item => {
       if (item.title === 'Apps' && !enableApp) {
         return false;
@@ -75,7 +93,7 @@ export function Sidebar({ sidebarItems }: Props) {
     };
   }, [currentUser?.isCurrentGroupAdmin, sidebarItems, enableApp]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Split by `/g/` => [prefix, routes]
     const routes = location.pathname.split('/g/')[1];
 
@@ -87,29 +105,51 @@ export function Sidebar({ sidebarItems }: Props) {
     }
   }, [location]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (window?.enableApp) {
       setEnableApp(true);
     }
   }, []);
 
+  const renderMenuItem = item => {
+    return (
+      <Menu.Item
+        key={item.subPath}
+        style={{ paddingLeft: 26 }}
+        data-testid={item.subPath}
+        onClick={
+          item.proFeature ? () => setModal(true) : () => setPath(item.subPath)
+        }
+      >
+        {item.proFeature ? (
+          <span>
+            <Icon src={item.icon} style={item.style} />
+            <Title>{item.title}</Title>
+            {STATUS_BADGE.pro}
+          </span>
+        ) : (
+          <Link to={`${appPrefix}g/${groupName}/${item.subPath}`}>
+            <Icon src={item.icon} style={item.style} />
+            <Title>{item.title}</Title>
+            {STATUS_BADGE[item.stage]}
+          </Link>
+        )}
+      </Menu.Item>
+    );
+  };
+
+  const handleOk = () => {
+    setModal(false);
+  };
+
+  const handleCancel = () => {
+    setModal(false);
+  };
+
   return (
     <Layout.Sider style={{ position: 'fixed', height: '100%' }}>
       <Menu theme='dark' selectedKeys={[path]} data-testid={`${path}-active`}>
-        {userItems.map(item => (
-          <Menu.Item
-            key={item.subPath}
-            style={{ paddingLeft: 26 }}
-            data-testid={item.subPath}
-            onClick={() => setPath(item.subPath)}
-          >
-            <Link to={`${appPrefix}g/${groupName}/${item.subPath}`}>
-              <Icon src={item.icon} style={item.style} />
-              <Title>{item.title}</Title>
-              {STATUS_BADGE[item.stage]}
-            </Link>
-          </Menu.Item>
-        ))}
+        {userItems.map(renderMenuItem)}
 
         {hasAdminItems && (
           <Divider
@@ -121,21 +161,9 @@ export function Sidebar({ sidebarItems }: Props) {
           />
         )}
 
-        {hasAdminItems &&
-          adminItems.map(item => (
-            <Menu.Item
-              key={item.subPath}
-              style={{ paddingLeft: 26 }}
-              onClick={() => setPath(item.subPath)}
-            >
-              <Link to={`${appPrefix}g/${groupName}/${item.subPath}`}>
-                <Icon src={item.icon} style={item.style} />
-                <Title>{item.title}</Title>
-                {STATUS_BADGE[item.stage]}
-              </Link>
-            </Menu.Item>
-          ))}
+        {hasAdminItems && adminItems.map(renderMenuItem)}
       </Menu>
+      <ProModal visible={modal} onOk={handleOk} onCancel={handleCancel} />
     </Layout.Sider>
   );
 }
