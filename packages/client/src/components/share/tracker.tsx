@@ -40,11 +40,11 @@ const updatePageChange = (state, setState, setDisplay: Function) => {
 }
 
 const CommunityList = (props) => {
-  const { userTakeAction, state, setState } = props;
+  const { userTakeAction } = props;
   return (
     <div>
-      <p><Icon type="twitter" /><a href="https://bit.ly/38vv6JG" target="_blank" onClick={() => { userTakeAction(state, setState, 'twitter') }}>Share To Twitter</a></p>
-      <p><Icon type="user-add" /><a href="https://bit.ly/3DHxMlQ" target="_blank" onClick={() => { userTakeAction(state, setState, 'discord') }}>Join our Discord</a></p>
+      <p><Icon type="twitter" /><a href="https://bit.ly/38vv6JG" target="_blank" onClick={() => { userTakeAction('twitter') }}>Share To Twitter</a></p>
+      <p><Icon type="user-add" /><a href="https://bit.ly/3DHxMlQ" target="_blank" onClick={() => { userTakeAction('discord') }}>Join our Discord</a></p>
     </div>
   )
 }
@@ -70,13 +70,13 @@ const PageChangeTracker = (props) => {
     updatePageChange(collectedState, setCollectedState, setDisplay);
   }, [location]);
 
-  const userTakeAction = (state, setState, shareTo: string) => {
-    const s = state
+  const userTakeAction = (shareTo: string) => {
+    const s = collectedState
     s['collected'] = true;
     s['anonymousId'] = window['primehubAnonymousId'] || '';
     s['shareTo'] = shareTo
     analytics.track("CEUserFeedback", s);
-    setState(s);
+    setCollectedState(s);
 
     // close all prompt
     setDisplay({ show: false, type: display.type });
@@ -105,7 +105,7 @@ const PageChangeTracker = (props) => {
             OK
           </Button>
         ]}>
-        <CommunityList userTakeAction={userTakeAction} state={collectedState} setState={setCollectedState} />
+        <CommunityList userTakeAction={userTakeAction} />
       </Modal>
     )
   } else {
@@ -114,7 +114,7 @@ const PageChangeTracker = (props) => {
       message: `${title}`,
       placement: 'bottomRight',
       duration: 0,
-      description: <CommunityList userTakeAction={userTakeAction} state={collectedState} setState={setCollectedState} />
+      description: <CommunityList userTakeAction={userTakeAction} />
     });
 
     return (<></>);
