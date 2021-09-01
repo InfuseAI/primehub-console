@@ -21,6 +21,62 @@ import {
 } from 'components/Sidebar/types';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
+const ExModal = styled(Modal)`
+  .ant-modal-header {
+    background-color: #f0f6fd;
+    border-bottom: none;
+  }
+  .ant-modal-title {
+    font-weight: 200 !important;
+    font-size: 20px;
+    color: #4e77cf;
+  }
+
+  .ant-modal-body {
+    background-color: #f0f6fd;
+    padding-top: 12px;
+    border-radius: 4px;
+  }
+
+  .ant-card {
+    box-shadow: #6282e64a 1px 1px 24px 0;
+  }
+
+  .ant-card-head-title {
+    font-weight: 300;
+    color: #4e77cf;
+  }
+
+  .ant-card-body {
+    padding: 24px 32px;
+  }
+`;
+
+const ActionRow = styled.div`
+  margin-top: 20px;
+  text-align: center;
+  .ant-btn-primary {
+    padding: 0 42px;
+    font-weight: 700;
+    font-size: 11px;
+  }
+  .find-out-more {
+    font-size: 10px;
+  }
+`;
+
+const CurrentRow = styled(ActionRow)`
+  .ant-btn {
+    padding: 0 42px;
+    font-weight: 700;
+    font-size: 11px;
+    color: #5b7cc9 !important;
+    background-color: #fff !important;
+    border-width: 2px !important;
+    border-color: #5b7cc9 !important;
+  }
+`;
+
 const MenuIcon = styled.img`
   width: 25px;
   height: 25px;
@@ -68,50 +124,89 @@ const ProModal = (props: any) => {
         <Icon
           type={available ? 'check-circle' : 'close-circle'}
           theme='filled'
-          style={{ color: `${available ? '#00cb5d' : '#ff3845'}` }}
+          style={{
+            marginLeft: 16,
+            color: `${available ? '#00cb5d' : '#ff3845'}`,
+          }}
         />{' '}
-        <span style={{ margin: '10px' }}>{children}</span>
+        <span style={{ marginLeft: 8 }}>{children}</span>
       </p>
     );
   };
 
   return (
-    <Modal
+    <ExModal
       title='Upgrade to Enterprise Edition'
       visible={visible}
       onOk={onOk}
       onCancel={onCancel}
-      bodyStyle={{
-        backgroundColor: '#f0f6fd',
-      }}
       footer={null}
     >
       <Row gutter={8}>
         <Col span={12}>
-          <Card title='Community Edition'>
-            {ceFeatures.map((text, index) => (
-              <FeatureItem key={`ce-${index}`} available={true}>
-                {text}
-              </FeatureItem>
-            ))}
-            {eeFeatures.map((text, index) => (
-              <FeatureItem key={`ee-${index}`} available={false}>
-                {text}
-              </FeatureItem>
-            ))}
-          </Card>
+          <Row>
+            <Card
+              title='Community Edition'
+              headStyle={{
+                textAlign: 'center',
+                fontWeight: 200,
+              }}
+            >
+              {ceFeatures.map((text, index) => (
+                <FeatureItem key={`ce-${index}`} available={true}>
+                  {text}
+                </FeatureItem>
+              ))}
+              {eeFeatures.map((text, index) => (
+                <FeatureItem key={`ee-${index}`} available={false}>
+                  {text}
+                </FeatureItem>
+              ))}
+              <CurrentRow>
+                <Button
+                  shape='round'
+                  style={{ cursor: 'default', marginBottom: 21 }}
+                >
+                  CURRENT
+                </Button>
+              </CurrentRow>
+            </Card>
+          </Row>
         </Col>
         <Col span={12}>
-          <Card title='Enterprise Edition'>
+          <Card
+            title='Enterprise Edition'
+            headStyle={{
+              textAlign: 'center',
+              fontWeight: 200,
+            }}
+          >
             {ceFeatures.concat(eeFeatures).map((text, index) => (
-              <FeatureItem key={`ce-${index}`} available={true}>
+              <FeatureItem key={`ee-${index}`} available={true}>
                 {text}
               </FeatureItem>
             ))}
+            <ActionRow>
+              <Button
+                shape='round'
+                type='primary'
+                href='https://www.infuseai.io/request-demo'
+              >
+                TRIAL
+              </Button>
+              <div>
+                <a
+                  className='find-out-more'
+                  href='https://docs.primehub.io/docs/comparison'
+                >
+                  Find out more
+                </a>
+              </div>
+            </ActionRow>
           </Card>
         </Col>
       </Row>
-    </Modal>
+    </ExModal>
   );
 };
 
