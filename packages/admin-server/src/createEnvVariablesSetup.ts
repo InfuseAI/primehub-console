@@ -36,6 +36,8 @@ const createEnvVariablesSetup = () => (ctx: Context, next: Next) => {
   ctx.state.isUserAdmin = config.isUserAdmin;
   ctx.state.newAccessToken = config.newAccessToken;
   ctx.state.apiToken = '';
+
+  ctx.state.enableTelemetry = config.enableTelemetry;
   ctx.state.primehubAnonymousId = md5(config.keycloakClientSecret);
 
   // referrer
