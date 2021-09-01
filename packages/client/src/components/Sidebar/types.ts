@@ -191,8 +191,10 @@ export const listCE = sidebarList
       item.enabledIn.includes(FEATURES.EE) &&
       !item.enabledIn.includes(FEATURES.CE)
     ) {
-      item.proFeature = true;
-      return item;
+      return {
+        ...item,
+        proFeature: true,
+      };
     }
     return item;
   });
