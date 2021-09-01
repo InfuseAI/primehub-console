@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { useEffect } from 'react'
 import ReactDOM from 'react-dom';
 import { ApolloProvider } from 'react-apollo';
 import { notification, Button } from 'antd';
-import { BrowserRouter, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Route } from 'react-router-dom';
 import { BackgroundTokenSyncer } from './workers/backgroundTokenSyncer';
 import MainPage from 'containers/mainPage';
 import { appPrefix } from 'utils/env';

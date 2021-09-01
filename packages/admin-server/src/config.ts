@@ -67,6 +67,7 @@ export interface Config {
   enableJobMonitoring: boolean;
   // PrimeHub App
   enableApp: boolean;
+  enableTelemetry: boolean;
   // maximux group
   licenseStatus: string;
   maxGroup: number;
@@ -113,6 +114,7 @@ const defaultConfigs = {
   enableJobArtifact: false,
   enableJobMonitoring: false,
   enableApp: true,
+  enableTelemetry: false,
   licenseStatus: 'invalid',
   maxGroup: 999,
   jobDefaultActiveDeadlineSeconds: 86400,
@@ -187,6 +189,7 @@ export const createConfig = (): Config => {
     enableJobArtifact: getEnvBoolean('PRIMEHUB_FEATURE_JOB_ARTIFACT', false),
     enableJobMonitoring: getEnvBoolean('PRIMEHUB_FEATURE_JOB_MONITORING', false),
     enableApp: getEnvBoolean('PRIMEHUB_FEATURE_APP', true),
+    enableTelemetry: getEnvBoolean('PRIMEHUB_FEATURE_TELEMETRY', false),
   });
 
   const env = process.env.NODE_ENV || 'development';
