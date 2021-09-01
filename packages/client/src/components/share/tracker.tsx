@@ -1,124 +1,152 @@
 import { useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { Modal, Button, Icon, notification } from 'antd';
-import React from 'react';
 
-const updatePageChange = (state, setState, setDisplay: Function) => {
-
-  if (state['collected'] === true) {
-    // feedback has already done.
-    return;
-  }
-
-  const location = window.location.href;
-  if (state['location'] == '') {
-    state['location'] = location;
-    setState(state);
-  } else if (state['location'] !== location) {
-    state['location'] = location;
-    state['pageChanges'] += 1;
-    setState(state);
-  }
-
-  const { prompt, pageChanges } = state;
-
-  if (prompt >= 2) {
-    setDisplay({ show: true, type: 'notification' });
-    state['prompt'] += 1;
-    setState(state);
-  } else if (prompt === 0 && pageChanges >= 3) {
-    setDisplay({ show: true, type: 'modal' });
-    state['prompt'] += 1;
-    setState(state);
-  } else if (prompt === 1 && pageChanges >= 30) {
-    setDisplay({ show: true, type: 'modal' });
-    state['prompt'] += 1;
-    setState(state);
-  }
-
-}
-
-const CommunityList = (props) => {
+const CommunityList = props => {
   const { userTakeAction } = props;
   return (
     <div>
-      <p><Icon type="twitter" /><a href="https://bit.ly/38vv6JG" target="_blank" onClick={() => { userTakeAction('twitter') }}>Share To Twitter</a></p>
-      <p><Icon type="user-add" /><a href="https://bit.ly/3DHxMlQ" target="_blank" onClick={() => { userTakeAction('discord') }}>Join our Discord</a></p>
+      <p>
+        <Icon type='twitter' />
+        &nbsp;
+        <a
+          href='https://bit.ly/38vv6JG'
+          target='_blank'
+          onClick={() => {
+            userTakeAction('twitter');
+          }}
+          rel='noreferrer'
+        >
+          Share your experience to us on Twitter
+        </a>
+      </p>
+      <p>
+        <Icon type='user-add' />
+        &nbsp;
+        <a
+          href='https://bit.ly/3DHxMlQ'
+          target='_blank'
+          onClick={() => {
+            userTakeAction('discord');
+          }}
+          rel='noreferrer'
+        >
+          Join our Discord community
+        </a>
+      </p>
     </div>
-  )
-}
+  );
+};
 
-const PageChangeTracker = (props) => {
+const PageChangeTracker = props => {
   if (primehubCE !== true) {
-    return (<></>)
+    return <></>;
   }
 
-  const analytics = window['analytics'] || null;
+  const analytics = window.analytics || null;
   if (analytics == null) {
-    return (<></>)
+    return <></>;
   }
 
   const location = useLocation();
-  const [display, setDisplay] = useState({ show: false, type: 'modal' });
 
-  const initialState = { 'pageChanges': 0, 'collected': false, 'location': '', 'prompt': 0 };
-  const [collectedState, setCollectedState] = useLocalStorage('primehub:ce:collector', initialState);
+  const [visible, setVisible] = useState(false);
+  const [promptType, setPromptType] = useState('modal');
+
+  const [event, setEvent] = useLocalStorage('primehub:ce:collector', {
+    pageChanges: 0,
+    collected: false,
+    location: '',
+    prompt: 0,
+  });
+
+  const updatePageChange = () => {
+    const { collected, location, prompt, pageChanges } = event;
+    if (collected === true) {
+      // feedback has already done.
+      return;
+    }
+
+    if (location === '') {
+      event.location = window.location.href;
+      setEvent(event);
+      return;
+    } else if (location !== location) {
+      event.location = location;
+    }
+
+    if (prompt >= 2) {
+      setPromptType('notification');
+      setVisible(true);
+      event.prompt += 1;
+    } else if (prompt === 0 && pageChanges >= 5) {
+      setPromptType('modal');
+      setVisible(true);
+      event.prompt += 1;
+    } else if (prompt === 1 && pageChanges >= 30) {
+      setPromptType('modal');
+      setVisible(true);
+      event.prompt += 1;
+    }
+
+    event.pageChanges += 1;
+    setEvent(event);
+  };
 
   useEffect(() => {
-    updatePageChange(collectedState, setCollectedState, setDisplay);
+    updatePageChange();
   }, [location]);
 
   const userTakeAction = (shareTo: string) => {
-    const s = collectedState
+    const s = event;
     s['collected'] = true;
-    s['anonymousId'] = window['primehubAnonymousId'] || '';
-    s['shareTo'] = shareTo
-    analytics.track("CEUserFeedback", s);
-    setCollectedState(s);
+    s['anonymousId'] = window.primehubAnonymousId || '';
+    s['shareTo'] = shareTo;
+    analytics.track('CEUserFeedback', s);
+    setEvent(s);
+  };
 
-    // close all prompt
-    setDisplay({ show: false, type: display.type });
-    notification.close('prompt-notification');
-    return true;
+  const title = 'Thanks for using PrimeHub! Any thing you want to share?';
+  if (visible !== true) {
+    return <></>;
   }
 
-  const title: string = 'Talk to PrimeHub';
-  if (display.show !== true) {
-    return (<></>)
-  }
-
-  if (display.type === 'modal') {
+  if (promptType === 'modal') {
     return (
-      <Modal key='prompt-modal'
+      <Modal
+        key='prompt-modal'
         title={title}
-        visible={display.show}
+        visible={visible}
+        onCancel={() => {
+          setVisible(false);
+        }}
         footer={[
           <Button
-            href="#"
+            href='#'
             type='primary'
             onClick={() => {
-              setDisplay({ show: false, type: display.type });
+              setVisible(false);
             }}
           >
             OK
-          </Button>
-        ]}>
+          </Button>,
+        ]}
+      >
         <CommunityList userTakeAction={userTakeAction} />
       </Modal>
-    )
+    );
   } else {
     notification.open({
       key: 'prompt-notification',
       message: `${title}`,
       placement: 'bottomRight',
       duration: 0,
-      description: <CommunityList userTakeAction={userTakeAction} />
+      description: <CommunityList userTakeAction={userTakeAction} />,
     });
 
-    return (<></>);
+    return <></>;
   }
-
-}
+};
 
 export default PageChangeTracker;
