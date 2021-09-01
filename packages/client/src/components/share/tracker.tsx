@@ -73,7 +73,7 @@ const PageChangeTracker = (props) => {
   const userTakeAction = (state, setState, shareTo: string) => {
     const s = state
     s['collected'] = true;
-    s['anonymousId'] = getClusterId();
+    s['anonymousId'] = window['primehubAnonymousId'] || '';
     s['shareTo'] = shareTo
     analytics.track("CEUserFeedback", s);
     setState(s);
@@ -83,14 +83,6 @@ const PageChangeTracker = (props) => {
     notification.close('prompt-notification');
     return true;
   }
-
-  const getClusterId = () => {
-    const g = document.cookie.match(/primehubAnonymousId=([^; ]+).*;?/);
-    if (g == null) {
-      return "";
-    }
-    return g[1];
-  };
 
   const title: string = 'Talk to PrimeHub';
   if (display.show !== true) {
