@@ -163,7 +163,8 @@ function _ImageList({ data, ...props }: ImageListProps) {
                       notification.success({
                         duration: 5,
                         placement: 'bottomRight',
-                        message: 'Delete successfully!',
+                        message: 'Successfully!',
+                        description: `${image.node.displayName} has been deleted!`,
                       });
                     } catch (err) {
                       console.error(err);

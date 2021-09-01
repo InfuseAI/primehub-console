@@ -30,18 +30,21 @@ function _ImageAdd({ createImageMutation }: Props) {
     isBuildByCustomImage,
     ...restData
   }: ImageFormState) {
-    // When create image, omit `groups.disconnect` field
-    let formData = omit(restData, 'groups.disconnect');
+    // When creating an image, omit the `groups.disconnect` field
+    let formData = omit(
+      restData,
+      'groups.disconnect',
+      'baseImage',
+      'apt',
+      'conda',
+      'pip'
+    );
 
     if (isBuildByCustomImage) {
       formData = {
-        ...omit(restData, [
-          'baseImage',
-          'apt',
-          'conda',
-          'pip',
+        ...omit(formData, [
+          'pullSecret', // just only display on the custom image
           'useImagePullSecret',
-          'groups.disconnect',
         ]),
         imageSpec: {
           baseImage: restData.imageSpec.baseImage,

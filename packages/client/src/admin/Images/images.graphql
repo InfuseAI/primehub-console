@@ -1,10 +1,29 @@
 fragment ImageInfo on Image {
   id
-  name
   displayName
   description
+  url
+  urlForGpu
+  name
   type
+  groupName
+  useImagePullSecret
+  logEndpoint
   isReady
+  spec
+  global
+  jobStatus {
+    phase
+  }
+  imageSpec {
+    baseImage
+    pullSecret
+    packages {
+      apt
+      conda
+      pip
+    }
+  }
 }
 
 query ImagesQuery(
@@ -22,7 +41,11 @@ query ImagesQuery(
       cursor
       node {
         id
-        ...ImageInfo
+        name
+        displayName
+        description
+        type
+        isReady
       }
     }
     pageInfo {
@@ -35,23 +58,10 @@ query ImagesQuery(
 query ImageQuery($where: ImageWhereUniqueInput!) {
   image(where: $where) {
     id
-    url
-    urlForGpu
-    useImagePullSecret
-    global
     groups {
       id
       name
       displayName
-    }
-    imageSpec {
-      baseImage
-      pullSecret
-      packages {
-        apt
-        conda
-        pip
-      }
     }
     ...ImageInfo
   }
@@ -68,10 +78,6 @@ query SecretsQuery {
 query BaseImagesQuery {
   images(mode: SYSTEM_ONLY) {
     id
-    groupName
-    useImagePullSecret
-    url
-    urlForGpu
     ...ImageInfo
   }
 }
@@ -85,13 +91,33 @@ mutation CreateImageMutation($data: ImageCreateInput!) {
 mutation UpdateImageMutation($data: ImageUpdateInput!, $where: ImageWhereUniqueInput!) {
   updateImage(data: $data, where: $where) {
     id
-    useImagePullSecret
+    groups {
+      id
+      name
+      displayName
+    }
+    ...ImageInfo
   }
 }
-
 
 mutation DeleteImageMutation($where: ImageWhereUniqueInput!) {
   deleteImage(where: $where) {
     id
   }
 }
+
+mutation RebuildImageMutation(
+  $data: ImageSpecUpdateInput!
+  $where: ImageWhereUniqueInput!
+) {
+  rebuildImage(data: $data, where: $where) {
+    id
+    ...ImageInfo
+  }
+}
+
+mutation CancelImageBuildMutation($where: ImageWhereUniqueInput!) {
+    cancelImageBuild(where: $where) {
+      id
+    }
+  }

@@ -24,7 +24,7 @@ export interface Image {
   jobStatus: JobStatus;
 }
 
-interface ImageSpec {
+export interface ImageSpec {
   baseImage: string;
   pullSecret: string;
   packages: ImageSpecPackages;
@@ -40,5 +40,12 @@ interface ImageSpecPackages {
 
 interface JobStatus {
   image: string;
-  phase: string;
+  phase:
+    | 'Pending'
+    | 'Preparing'
+    | 'Running'
+    | 'Succeeded'
+    | 'Failed'
+    | 'Cancelled'
+    | 'Unknown';
 }
