@@ -288,11 +288,7 @@ export function Sidebar({ sidebarItems }: Props) {
     );
   };
 
-  const handleOk = () => {
-    setModal(false);
-  };
-
-  const handleCancel = () => {
+  const closeModal = () => {
     setModal(false);
   };
 
@@ -313,7 +309,7 @@ export function Sidebar({ sidebarItems }: Props) {
 
         {hasAdminItems && adminItems.map(renderMenuItem)}
       </Menu>
-      <ProModal visible={modal} onOk={handleOk} onCancel={handleCancel} />
+      <ProModal visible={modal} onOk={closeModal} onCancel={closeModal} />
     </Layout.Sider>
   );
 }
