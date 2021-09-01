@@ -20,7 +20,7 @@ export const validateLicense = () => {
     }
 };
 
-export const validateModelDeployQuota = async (context: Context) => {
+export const validateModelDeployQuota = async (context: Context, excludeId = '') => {
   // -1 = unlimited
   if (config.maxModelDeploy === -1) {
     return;
@@ -28,7 +28,7 @@ export const validateModelDeployQuota = async (context: Context) => {
 
   const {crdClient} = context;
   const deploys = await crdClient.phDeployments.list();
-  const deployed = deploys.filter(d => d.spec.stop === false);
+  const deployed = deploys.filter(d => d.spec.stop === false).filter(d => d.metadata.name !== excludeId);
   if (deployed.length >= Math.ceil(1.1 * config.maxModelDeploy)) {
     throw new ApolloError('Number of running model deployments exceeds license limitation', LICENSE_QUOTA_EXCEEDED);
   }
