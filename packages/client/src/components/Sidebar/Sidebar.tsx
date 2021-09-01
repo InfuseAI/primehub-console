@@ -22,9 +22,14 @@ import {
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 const ExModal = styled(Modal)`
+  .ant-modal-content {
+    border-radius: 10px;
+    background-color: #f0f6fd;
+  }
   .ant-modal-header {
     background-color: #f0f6fd;
     border-bottom: none;
+    border-radius: 10px;
   }
   .ant-modal-title {
     font-weight: 200 !important;
@@ -33,9 +38,8 @@ const ExModal = styled(Modal)`
   }
 
   .ant-modal-body {
-    background-color: #f0f6fd;
-    padding-top: 12px;
-    border-radius: 4px;
+    padding: 24px 48px 42px;
+    border-radius: 10px;
   }
 
   .ant-card {
@@ -55,8 +59,9 @@ const ExModal = styled(Modal)`
 const ActionRow = styled.div`
   margin-top: 20px;
   text-align: center;
-  .ant-btn-primary {
-    padding: 0 42px;
+  .ant-btn {
+    width: 140px;
+    padding: 0 auto;
     font-weight: 700;
     font-size: 11px;
   }
@@ -67,9 +72,6 @@ const ActionRow = styled.div`
 
 const CurrentRow = styled(ActionRow)`
   .ant-btn {
-    padding: 0 42px;
-    font-weight: 700;
-    font-size: 11px;
     color: #5b7cc9 !important;
     background-color: #fff !important;
     border-width: 2px !important;
@@ -136,13 +138,14 @@ const ProModal = (props: any) => {
 
   return (
     <ExModal
+      width={550}
       title='Upgrade to Enterprise Edition'
       visible={visible}
       onOk={onOk}
       onCancel={onCancel}
       footer={null}
     >
-      <Row gutter={8}>
+      <Row gutter={24}>
         <Col span={12}>
           <Row>
             <Card
