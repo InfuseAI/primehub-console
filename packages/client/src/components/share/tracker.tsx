@@ -51,15 +51,13 @@ const CommunityList = (props) => {
 
 const PageChangeTracker = (props) => {
   if (primehubCE !== true) {
-    return (
-      <span></span>
-    )
+    return (<></>)
   }
 
   const analytics = window['analytics'] || null;
   if (analytics == null) {
     console.log('Cannot find the analytics');
-    return (<span></span>)
+    return (<></>)
   }
 
   const location = useLocation();
@@ -96,29 +94,27 @@ const PageChangeTracker = (props) => {
 
   const title: string = 'Talk to PrimeHub';
   if (display.show !== true) {
-    return (<div></div>)
+    return (<></>)
   }
 
   if (display.type === 'modal') {
     return (
-      <div>
-        <Modal key='prompt-modal'
-          title={title}
-          visible={display.show}
-          footer={[
-            <Button
-              href="#"
-              type='primary'
-              onClick={() => {
-                setDisplay({ show: false, type: display.type });
-              }}
-            >
-              OK
-            </Button>
-          ]}>
-          <CommunityList userTakeAction={userTakeAction} state={collectedState} setState={setCollectedState} />
-        </Modal>
-      </div>
+      <Modal key='prompt-modal'
+        title={title}
+        visible={display.show}
+        footer={[
+          <Button
+            href="#"
+            type='primary'
+            onClick={() => {
+              setDisplay({ show: false, type: display.type });
+            }}
+          >
+            OK
+          </Button>
+        ]}>
+        <CommunityList userTakeAction={userTakeAction} state={collectedState} setState={setCollectedState} />
+      </Modal>
     )
   } else {
     notification.open({
@@ -129,10 +125,7 @@ const PageChangeTracker = (props) => {
       description: <CommunityList userTakeAction={userTakeAction} state={collectedState} setState={setCollectedState} />
     });
 
-    return (
-      <div>
-      </div>
-    );
+    return (<></>);
   }
 
 }
