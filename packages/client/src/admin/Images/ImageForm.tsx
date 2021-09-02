@@ -16,6 +16,7 @@ import {
 import { useHistory } from 'react-router-dom';
 import { compose } from 'recompose';
 import { graphql } from 'react-apollo';
+import { get } from 'lodash';
 import type { FormComponentProps } from 'antd/lib/form';
 
 import BaseImageRow from 'components/images/baseImageRow';
@@ -160,7 +161,6 @@ function _ImageForm({
 
   const [enabledSelectSecret, setEnabledSelectSecret] = React.useState(false);
   const [enabledURLForGpu, setEnabledURLForGpu] = React.useState(false);
-  const [globalStatus, setGlobalStatus] = React.useState(true);
   const [buildDetailVisible, setBuildDetailVisible] = React.useState(false);
   const [pullSecret, setPullSecret] = React.useState('');
   const [toggleRadioGroup, setToggleRadioGroup] =
@@ -230,32 +230,26 @@ function _ImageForm({
   }
 
   React.useEffect(() => {
-    if (data) {
-      // setting radio option and set image pull secret
-      if (data?.imageSpec) {
-        setToggleRadioGroup('customImage');
-        // If it's the custom image use `pullImage`, otherwise use `useImagePullSecret`
-        if (data.imageSpec.pullSecret) {
-          setPullSecret(data.imageSpec.pullSecret);
-          setEnabledSelectSecret(true);
-        }
-      } else {
-        if (data?.useImagePullSecret) {
-          setPullSecret(data.useImagePullSecret);
-          setEnabledSelectSecret(true);
-        }
+    if (data?.imageSpec) {
+      setToggleRadioGroup('customImage');
+      // If it's the custom image use `pullImage`, otherwise use `useImagePullSecret`
+      if (data.imageSpec.pullSecret) {
+        setPullSecret(data.imageSpec.pullSecret);
+        setEnabledSelectSecret(true);
       }
-
-      if (data?.urlForGpu) {
-        setEnabledURLForGpu(true);
+    } else {
+      if (data?.useImagePullSecret) {
+        setPullSecret(data.useImagePullSecret);
+        setEnabledSelectSecret(true);
       }
+    }
 
-      if (data?.groups?.length > 0) {
-        dispatchUserGroups({ type: 'GROUPS', groups: data.groups });
-      }
+    if (data?.urlForGpu) {
+      setEnabledURLForGpu(true);
+    }
 
-      // setting fetched `global` value
-      setGlobalStatus(data.global);
+    if (data?.groups?.length > 0) {
+      dispatchUserGroups({ type: 'GROUPS', groups: data.groups });
     }
   }, [data]);
 
@@ -535,19 +529,18 @@ function _ImageForm({
             </label>
             {form.getFieldDecorator('global', {
               valuePropName: 'checked',
-              initialValue: globalStatus,
+              initialValue: get(data, 'global', true),
             })(
               <Switch
                 data-testid='global'
                 checkedChildren='Yes'
                 unCheckedChildren='No'
-                onChange={value => setGlobalStatus(value)}
                 style={{ width: '60px' }}
               />
             )}
           </Form.Item>
 
-          {!globalStatus && (
+          {!form.getFieldValue('global') && (
             <Form.Item>
               <label
                 style={{
