@@ -63,6 +63,7 @@ const PageChangeTracker = props => {
     const { collected, location, prompt, pageChanges } = event;
     if (collected === true) {
       // feedback has already done.
+      setVisible(false);
       return;
     }
 
@@ -106,7 +107,7 @@ const PageChangeTracker = props => {
   };
 
   const title = 'Thanks for using PrimeHub! Anything you want to share?';
-  if (visible !== true) {
+  if (visible !== true || event.collected) {
     return <></>;
   }
 
