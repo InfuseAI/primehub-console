@@ -140,6 +140,7 @@ export function _SecretForm({ form, data, ...props }: SecretFormProps) {
             <Select
               data-testid='secret-type'
               onChange={value => setSecretType(value as SecretType)}
+              disabled={props?.disabledName || false}
             >
               <Select.Option value='opaque'>Git Dataset</Select.Option>
               <Select.Option value='kubernetes'>Image Pull</Select.Option>
