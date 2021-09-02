@@ -106,7 +106,7 @@ const PageChangeTracker = props => {
   };
 
   const title = 'Thanks for using PrimeHub! Anything you want to share?';
-  if (visible !== true) {
+  if (visible !== true || event.collected) {
     return <></>;
   }
 
