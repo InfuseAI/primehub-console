@@ -4,7 +4,7 @@ import { MemoryRouter, Route } from 'react-router-dom';
 
 import { UserContext } from 'context/user';
 import { Sidebar, listCE, listEE } from 'components/Sidebar';
-import { render, screen, act } from 'test/test-utils';
+import { render, screen } from 'test/test-utils';
 
 const MOCK_GROUP_NAME = 'fakeGroup';
 const MOCK_ROUTE_PATHNAME = 'home';
