@@ -66,7 +66,9 @@ export function Sidebar({ sidebarItems }: Props) {
 
     const user = filterSidebarItems.filter(item => !item?.groupAdminOnly);
     const admin = filterSidebarItems.filter(
-      item => currentUser?.isCurrentGroupAdmin && item?.groupAdminOnly
+      item =>
+        (currentUser?.isCurrentGroupAdmin || window.isUserAdmin) &&
+        item?.groupAdminOnly
     );
     const hasAdmin = admin.length > 0;
 
@@ -130,7 +132,6 @@ export function Sidebar({ sidebarItems }: Props) {
     <Layout.Sider style={{ position: 'fixed', height: '100%' }}>
       <Menu theme='dark' selectedKeys={[path]} data-testid={`${path}-active`}>
         {userItems.map(renderMenuItem)}
-
         {hasAdminItems && (
           <Divider
             style={{
