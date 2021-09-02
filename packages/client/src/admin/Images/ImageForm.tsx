@@ -414,6 +414,7 @@ function _ImageForm({
                     }}
                   >
                     <Checkbox
+                      data-testid='enabled-useImagePullSecret'
                       checked={enabledSelectSecret}
                       onChange={event =>
                         setEnabledSelectSecret(event.target.checked)
@@ -426,6 +427,7 @@ function _ImageForm({
                         placeholder='Select Secret'
                         disabled={!enabledSelectSecret}
                         loading={secretsQuery.loading}
+                        data-testid='useImagePullSecret'
                       >
                         {secretsQuery?.secrets?.map(secret => (
                           <Select.Option key={secret.id} value={secret.id}>
