@@ -130,6 +130,7 @@ class JobCreatePage extends React.Component<Props, State> {
               selectedGroup={selectedGroup}
               onSelectGroup={this.onChangeGroup}
               groups={sortNameByAlphaBet(groups)}
+              everyoneGroup={everyoneGroup}
               instanceTypes={sortNameByAlphaBet(instanceTypes)}
               images={sortNameByAlphaBet(images)}
               defaultActiveDeadlineSeconds={jobActiveDeadlineSeconds}

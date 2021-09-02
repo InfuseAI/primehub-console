@@ -14,6 +14,7 @@ type Props = FormComponentProps & {
   refetchGroup?: Function;
   groupContext?: any;
   groups: Array<Record<string, any>>;
+  everyoneGroup: Array<Record<string, any>>;
   onSelectGroup: Function;
   selectedGroup: string;
   instanceTypes: Array<Record<string, any>>;
@@ -200,6 +201,7 @@ class CreateForm extends React.Component<Props, State> {
       refetchGroup,
       groupContext,
       groups,
+      everyoneGroup,
       onSelectGroup,
       instanceTypes,
       images,
@@ -484,6 +486,7 @@ class CreateForm extends React.Component<Props, State> {
                   refetchGroup={refetchGroup}
                   selectedGroup={selectedGroup}
                   showDataset={true}
+                  globalDatasets={get(everyoneGroup, 'datasets', [])}
                 />
               ) : (
                 <></>

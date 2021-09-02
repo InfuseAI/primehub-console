@@ -7,7 +7,6 @@ import {flatMap, uniq, get, snakeCase, debounce, isEmpty, sortBy} from 'lodash';
 import Log from 'components/share/log';
 import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
-import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 import styled from 'styled-components';
 import BuildCustomImageForm from './buildCustomImageForm';
 import BaseImageRow from './baseImageRow';
