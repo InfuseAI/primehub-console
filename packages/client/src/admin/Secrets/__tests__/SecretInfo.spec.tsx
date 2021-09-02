@@ -91,27 +91,4 @@ describe('SecretInfo', () => {
     });
   });
 
-  it('should render image pull related fields with change secret type', async () => {
-    const { TestProvider, mockRequests } = setup();
-
-    render(
-      <TestProvider>
-        <MockedProvider mocks={mockRequests}>
-          <SecretInfo />
-        </MockedProvider>
-      </TestProvider>
-    );
-
-    const secretType = await screen.findByTestId('secret-type');
-    userEvent.click(secretType);
-
-    const imagePullOption = await screen.findByText('Image Pull');
-    userEvent.click(imagePullOption);
-
-    await waitFor(() => {
-      expect(screen.getByText('Registry Host')).toBeInTheDocument();
-      expect(screen.getByText('Username')).toBeInTheDocument();
-      expect(screen.getByText('Password')).toBeInTheDocument();
-    });
-  });
 });
