@@ -50,8 +50,7 @@ describe('ImageAdd', () => {
       screen.getByLabelText('Specific Container Image URL for GPU')
     ).toBeInTheDocument();
     expect(screen.getByText('Image Pull Secret')).toBeInTheDocument();
-    expect(screen.getByTestId('global')).not.toBeChecked();
-    expect(screen.getByText('Groups')).toBeInTheDocument();
+    expect(screen.getByTestId('global')).toBeChecked();
   });
 
   it('should render create image by custom image form', () => {
@@ -85,12 +84,12 @@ describe('ImageAdd', () => {
       </TestProvider>
     );
 
-    expect(screen.getByText('Groups')).toBeInTheDocument();
+    expect(screen.queryByText('Groups')).toBeNull();
 
     const globalSwitch = screen.getByTestId('global');
     userEvent.click(globalSwitch);
 
-    expect(screen.queryByText('Groups')).toBeNull();
+    expect(screen.getByText('Groups')).toBeInTheDocument();
   });
 
   it('should not render specific container image url for cpu when type not eqaul to universal', async () => {

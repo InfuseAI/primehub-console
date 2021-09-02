@@ -230,31 +230,32 @@ function _ImageForm({
   }
 
   React.useEffect(() => {
-    // setting radio option and set image pull secret
-    if (data?.imageSpec) {
-      setToggleRadioGroup('customImage');
-      // If it's the custom image use `pullImage`, otherwise use `useImagePullSecret`
-      if (data.imageSpec.pullSecret) {
-        setPullSecret(data.imageSpec.pullSecret);
-        setEnabledSelectSecret(true);
+    if (data) {
+      // setting radio option and set image pull secret
+      if (data?.imageSpec) {
+        setToggleRadioGroup('customImage');
+        // If it's the custom image use `pullImage`, otherwise use `useImagePullSecret`
+        if (data.imageSpec.pullSecret) {
+          setPullSecret(data.imageSpec.pullSecret);
+          setEnabledSelectSecret(true);
+        }
+      } else {
+        if (data?.useImagePullSecret) {
+          setPullSecret(data.useImagePullSecret);
+          setEnabledSelectSecret(true);
+        }
       }
-    } else {
-      if (data?.useImagePullSecret) {
-        setPullSecret(data.useImagePullSecret);
-        setEnabledSelectSecret(true);
+
+      if (data?.urlForGpu) {
+        setEnabledURLForGpu(true);
       }
-    }
 
-    if (data?.urlForGpu) {
-      setEnabledURLForGpu(true);
-    }
+      if (data?.groups?.length > 0) {
+        dispatchUserGroups({ type: 'GROUPS', groups: data.groups });
+      }
 
-    if (data?.global) {
+      // setting fetched `global` value
       setGlobalStatus(data.global);
-    }
-
-    if (data?.groups?.length > 0) {
-      dispatchUserGroups({ type: 'GROUPS', groups: data.groups });
     }
   }, [data]);
 
@@ -532,7 +533,7 @@ function _ImageForm({
             </label>
             {form.getFieldDecorator('global', {
               valuePropName: 'checked',
-              initialValue: data?.global || false,
+              initialValue: globalStatus,
             })(
               <Switch
                 data-testid='global'
