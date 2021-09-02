@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import styled from 'styled-components';
 import { Layout, Menu, Divider } from 'antd';
 import { Link, useParams, useLocation } from 'react-router-dom';
-
+import ProModal from 'components/share/ProModal';
 import { UserContext } from 'context/user';
 import {
   SidebarList,
@@ -11,7 +11,7 @@ import {
 } from 'components/Sidebar/types';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
-const Icon = styled.img`
+const MenuIcon = styled.img`
   width: 25px;
   height: 25px;
 `;
@@ -23,7 +23,7 @@ const Title = styled.span`
 const Badge = styled.span`
   position: absolute;
   top: 12px;
-  left: 140px;
+  left: 155px;
   border-radius: 2px;
   padding: 0px 5px;
   line-height: 15px;
@@ -44,17 +44,19 @@ interface Props {
 const STATUS_BADGE = {
   beta: <Badge>beta</Badge>,
   alpha: <Badge>alpha</Badge>,
+  pro: <Badge>pro</Badge>,
 };
 
 export function Sidebar({ sidebarItems }: Props) {
-  const [path, setPath] = React.useState<SidebarPathList>('home');
-  const [enableApp, setEnableApp] = React.useState(false);
-  const currentUser = React.useContext(UserContext);
+  const [path, setPath] = useState<SidebarPathList>('home');
+  const [modal, setModal] = useState(false);
+  const [enableApp, setEnableApp] = useState(false);
+  const currentUser = useContext(UserContext);
 
   const location = useLocation();
   const { appPrefix } = useRoutePrefix();
   const { groupName } = useParams<{ groupName: string }>();
-  const { userItems, adminItems, hasAdminItems } = React.useMemo(() => {
+  const { userItems, adminItems, hasAdminItems } = useMemo(() => {
     const filterSidebarItems = sidebarItems.filter(item => {
       if (item.title === 'Apps' && !enableApp) {
         return false;
@@ -68,16 +70,16 @@ export function Sidebar({ sidebarItems }: Props) {
         (currentUser?.isCurrentGroupAdmin || window.isUserAdmin) &&
         item?.groupAdminOnly
     );
-    const hasAdminItems = admin.length > 0;
+    const hasAdmin = admin.length > 0;
 
     return {
       userItems: user,
       adminItems: admin,
-      hasAdminItems,
+      hasAdminItems: hasAdmin,
     };
   }, [currentUser?.isCurrentGroupAdmin, sidebarItems, enableApp]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Split by `/g/` => [prefix, routes]
     const routes = location.pathname.split('/g/')[1];
 
@@ -89,30 +91,47 @@ export function Sidebar({ sidebarItems }: Props) {
     }
   }, [location]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (window?.enableApp) {
       setEnableApp(true);
     }
   }, []);
 
+  const renderMenuItem = item => {
+    return (
+      <Menu.Item
+        key={item.subPath}
+        style={{ paddingLeft: 26 }}
+        data-testid={item.subPath}
+        onClick={
+          item.proFeature ? () => setModal(true) : () => setPath(item.subPath)
+        }
+      >
+        {item.proFeature ? (
+          <span>
+            <MenuIcon src={item.icon} style={item.style} />
+            <Title>{item.title}</Title>
+            {STATUS_BADGE.pro}
+          </span>
+        ) : (
+          <Link to={`${appPrefix}g/${groupName}/${item.subPath}`}>
+            <MenuIcon src={item.icon} style={item.style} />
+            <Title>{item.title}</Title>
+            {STATUS_BADGE[item.stage]}
+          </Link>
+        )}
+      </Menu.Item>
+    );
+  };
+
+  const closeModal = () => {
+    setModal(false);
+  };
+
   return (
     <Layout.Sider style={{ position: 'fixed', height: '100%' }}>
       <Menu theme='dark' selectedKeys={[path]} data-testid={`${path}-active`}>
-        {userItems.map(item => (
-          <Menu.Item
-            key={item.subPath}
-            style={{ paddingLeft: 26 }}
-            data-testid={item.subPath}
-            onClick={() => setPath(item.subPath)}
-          >
-            <Link to={`${appPrefix}g/${groupName}/${item.subPath}`}>
-              <Icon src={item.icon} style={item.style} />
-              <Title>{item.title}</Title>
-              {STATUS_BADGE[item.stage]}
-            </Link>
-          </Menu.Item>
-        ))}
-
+        {userItems.map(renderMenuItem)}
         {hasAdminItems && (
           <Divider
             style={{
@@ -123,21 +142,9 @@ export function Sidebar({ sidebarItems }: Props) {
           />
         )}
 
-        {hasAdminItems &&
-          adminItems.map(item => (
-            <Menu.Item
-              key={item.subPath}
-              style={{ paddingLeft: 26 }}
-              onClick={() => setPath(item.subPath)}
-            >
-              <Link to={`${appPrefix}g/${groupName}/${item.subPath}`}>
-                <Icon src={item.icon} style={item.style} />
-                <Title>{item.title}</Title>
-                {STATUS_BADGE[item.stage]}
-              </Link>
-            </Menu.Item>
-          ))}
+        {hasAdminItems && adminItems.map(renderMenuItem)}
       </Menu>
+      <ProModal visible={modal} onOk={closeModal} onCancel={closeModal} />
     </Layout.Sider>
   );
 }

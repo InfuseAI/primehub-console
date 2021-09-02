@@ -40,66 +40,66 @@ class Main extends React.Component {
         </Route>
         <Route path={`${appPrefix}g/`}>
           <ApolloProvider client={client}>
-          <MainPage sidebarItems={listCE}>
-            {/* Jupyterhub */}
-            <Route path={`${appPrefix}g/:groupName/hub`} exact>
-              <Jupyterhub />
-            </Route>
+            <MainPage sidebarItems={listCE}>
+              {/* Jupyterhub */}
+              <Route path={`${appPrefix}g/:groupName/hub`} exact>
+                <Jupyterhub />
+              </Route>
 
-            {/* Shared Files */}
-            <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
-              <SharedFilesPage />
-            </Route>
+              {/* Shared Files */}
+              <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
+                <SharedFilesPage />
+              </Route>
 
-            {/* Group Images management*/}
-            <Route path={`${appPrefix}g/:groupName/images`} exact>
-              <ListContainer Com={ImageListContainer} />
-            </Route>
-            <Route path={`${appPrefix}g/:groupName/images/create`} exact>
-              <ImageCreatePage />
-            </Route>
-            <Route
-              path={`${appPrefix}g/:groupName/images/:imageId/edit`}
-              exact
-              component={ImageEditPage}
-            />
+              {/* Group Images management*/}
+              <Route path={`${appPrefix}g/:groupName/images`} exact>
+                <ListContainer Com={ImageListContainer} />
+              </Route>
+              <Route path={`${appPrefix}g/:groupName/images/create`} exact>
+                <ImageCreatePage />
+              </Route>
+              <Route
+                path={`${appPrefix}g/:groupName/images/:imageId/edit`}
+                exact
+                component={ImageEditPage}
+              />
 
-            {/* Apps */}
-            <Route path={`${appPrefix}g/:groupName/apps`} exact>
-              <ListContainer Com={AppListContainer} />
-            </Route>
-            <Route
-              path={`${appPrefix}g/:groupName/apps/store`}
-              exact
-              component={AppStore}
-            />
-            <Route
-              path={`${appPrefix}g/:groupName/apps/create`}
-              exact
-              component={AppCreate}
-            />
-            <Route
-              path={`${appPrefix}g/:groupName/apps/create/:templateId`}
-              exact
-              component={AppCreate}
-            />
-            <Route
-              path={`${appPrefix}g/:groupName/apps/:appId`}
-              exact
-              component={AppDetail}
-            />
-            <Route
-              path={`${appPrefix}g/:groupName/apps/:appId/edit`}
-              exact
-              component={AppEdit}
-            />
+              {/* Apps */}
+              <Route path={`${appPrefix}g/:groupName/apps`} exact>
+                <ListContainer Com={AppListContainer} />
+              </Route>
+              <Route
+                path={`${appPrefix}g/:groupName/apps/store`}
+                exact
+                component={AppStore}
+              />
+              <Route
+                path={`${appPrefix}g/:groupName/apps/create`}
+                exact
+                component={AppCreate}
+              />
+              <Route
+                path={`${appPrefix}g/:groupName/apps/create/:templateId`}
+                exact
+                component={AppCreate}
+              />
+              <Route
+                path={`${appPrefix}g/:groupName/apps/:appId`}
+                exact
+                component={AppDetail}
+              />
+              <Route
+                path={`${appPrefix}g/:groupName/apps/:appId/edit`}
+                exact
+                component={AppEdit}
+              />
 
-            {/* Group Settings */}
-            <Route path={`${appPrefix}g/:groupName/settings`}>
-              <GroupSettingsPage />
-            </Route>
-          </MainPage>
-        </ApolloProvider>
+              {/* Group Settings */}
+              <Route path={`${appPrefix}g/:groupName/settings`}>
+                <GroupSettingsPage />
+              </Route>
+            </MainPage>
+          </ApolloProvider>
         </Route>
       </BrowserRouter>
     );
@@ -145,7 +145,7 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       btn: (
         // @ts-ignore
         <Button
-          type="primary"
+          type='primary'
           onClick={() =>
             window.location.replace(`${window.APP_PREFIX}oidc/logout`)
           }
