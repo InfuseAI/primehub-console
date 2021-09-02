@@ -4,6 +4,7 @@ import { Layout, Menu, Divider } from 'antd';
 import { Link, useParams, useLocation } from 'react-router-dom';
 import ProModal from 'components/share/ProModal';
 import { UserContext } from 'context/user';
+import { Badge } from 'components/share/utils';
 import {
   SidebarList,
   SidebarPathList,
@@ -18,23 +19,6 @@ const MenuIcon = styled.img`
 
 const Title = styled.span`
   margin-left: 16px;
-`;
-
-const Badge = styled.span`
-  position: absolute;
-  top: 12px;
-  left: 155px;
-  border-radius: 2px;
-  padding: 0px 5px;
-  line-height: 15px;
-  background: none;
-  border: 1px rgb(255, 255, 255, 0.5) solid;
-  font-size: 10px;
-
-  .ant-menu-item:hover &,
-  .ant-menu-item-selected & {
-    border-color: #fff;
-  }
 `;
 
 interface Props {

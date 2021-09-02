@@ -170,6 +170,7 @@ export const routes = [
     name: 'Usage Reports',
     component: UsageReport,
     enabled: window.enableUsageReport,
+    proFeature: true,
   },
   {
     key: 'system',

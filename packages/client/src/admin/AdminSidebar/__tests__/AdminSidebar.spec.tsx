@@ -106,6 +106,39 @@ describe('AdminSidebar', () => {
     expect(screen.queryByText('Image Builder')).not.toBeInTheDocument();
   });
 
+  it('should render usage reports with pro badge when version is CE', async () => {
+    // @ts-ignore
+    global.__ENV__ = 'ce';
+
+    render(
+      <MemoryRouter initialEntries={[`/admin/${MOCK_ROUTE_PATHNAME}`]}>
+        <AdminSidebar />
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByText('Usage Reports')).toBeInTheDocument();
+    expect(
+      screen.queryByText('Usage Reports').querySelector('span').textContent
+    ).toBe('pro');
+  });
+
+  it('should render upgrade dialog if click pro feature menu in ce list', () => {
+    // @ts-ignore
+    global.__ENV__ = 'ce';
+
+    render(
+      <MemoryRouter initialEntries={[`/admin/${MOCK_ROUTE_PATHNAME}`]}>
+        <AdminSidebar />
+      </MemoryRouter>
+    );
+
+    const usageReportItem = screen.queryByText('Usage Reports');
+    userEvent.click(usageReportItem);
+    expect(
+      screen.getByText('Upgrade to Enterprise Edition')
+    ).toBeInTheDocument();
+  });
+
   it('should not render dataset, image, image builder and notebook when version is Deployment', async () => {
     // @ts-ignore
     global.__ENV__ = 'modelDeploy';
