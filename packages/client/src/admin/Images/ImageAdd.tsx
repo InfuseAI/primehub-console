@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { compose } from 'recompose';
 import { graphql } from 'react-apollo';

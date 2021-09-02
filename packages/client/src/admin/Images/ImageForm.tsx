@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState, useReducer } from 'react';
 import {
   Button,
   Checkbox,
@@ -159,14 +159,14 @@ function _ImageForm({
   const history = useHistory();
   const { appPrefix } = useRoutePrefix();
 
-  const [enabledSelectSecret, setEnabledSelectSecret] = React.useState(false);
-  const [enabledURLForGpu, setEnabledURLForGpu] = React.useState(false);
-  const [buildDetailVisible, setBuildDetailVisible] = React.useState(false);
-  const [pullSecret, setPullSecret] = React.useState('');
+  const [enabledSelectSecret, setEnabledSelectSecret] = useState(false);
+  const [enabledURLForGpu, setEnabledURLForGpu] = useState(false);
+  const [buildDetailVisible, setBuildDetailVisible] = useState(false);
+  const [pullSecret, setPullSecret] = useState('');
   const [toggleRadioGroup, setToggleRadioGroup] =
-    React.useState<'existingOne' | 'customImage'>('existingOne');
+    useState<'existingOne' | 'customImage'>('existingOne');
 
-  const [userGroups, dispatchUserGroups] = React.useReducer(
+  const [userGroups, dispatchUserGroups] = useReducer(
     (state: UserGroupsState, action: UserGroupsAction) => {
       switch (action.type) {
         case 'GROUPS':
@@ -229,7 +229,7 @@ function _ImageForm({
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (data?.imageSpec) {
       setToggleRadioGroup('customImage');
       // If it's the custom image use `pullImage`, otherwise use `useImagePullSecret`
