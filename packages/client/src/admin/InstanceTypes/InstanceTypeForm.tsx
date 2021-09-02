@@ -130,7 +130,7 @@ export function _InstanceTypeForm({
   const [activePanel, setActivePanel] = React.useState('1');
   const [tolerations, setTolerations] = React.useState([]);
   const [nodeList, setNodeList] = React.useState<string[][]>([]);
-  const [globalStatus, setGlobalStatus] = React.useState(false);
+  const [globalStatus, setGlobalStatus] = React.useState(true);
   const [editModalVisible, setEditModalVisible] = React.useState(false);
   const [editToleration, setEditToleration] = React.useState<TToleration>(null);
   const [tolerModalFormAction, setTolerModalFormAction] =

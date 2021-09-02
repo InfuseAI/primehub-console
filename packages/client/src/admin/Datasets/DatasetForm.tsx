@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Select, Input, Icon, InputNumber, Form, Row, Col, Switch } from 'antd';
+import { get } from 'lodash';
 import { appPrefix } from 'utils/env';
 
 import { DatasetPvProvisioning, DatasetType, TDataset, TDatasetForm } from './types';
@@ -265,10 +266,6 @@ function _DatasetForm(props: Props) {
 
   const type = form.getFieldValue('type') || initialValue?.type;
   const name = form.getFieldValue('name') || initialValue?.name;
-  const global =
-    form.getFieldValue('global') != undefined ?
-      form.getFieldValue('global') :
-      initialValue?.global;
 
   let typeSepcificItems = null;
   let allowWritable = false;
@@ -345,7 +342,7 @@ function _DatasetForm(props: Props) {
             <div data-testid='dataset/global'>
               <Form.Item label={`Global`}>
                 {form.getFieldDecorator('global', {
-                  initialValue: initialValue?.global,
+                  initialValue: get(initialValue, 'global', true),
                   valuePropName: 'checked',
                 })(<Switch />)
               }
@@ -394,7 +391,7 @@ function _DatasetForm(props: Props) {
                 <DatasetGroupsRelationTable
                   groups={initialValue?.groups}
                   allowWritable={allowWritable}
-                  allowReadOnly={!global}
+                  allowReadOnly={!form.getFieldValue('global')}
                 />
               )}
             </div>
