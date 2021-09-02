@@ -25,6 +25,7 @@ import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
 import GroupSettingsPage from 'containers/groupSettingsPage';
 import NotebookViewer from 'containers/sharedFiles/notebookViewer';
+import PageChangeTracker from 'components/share/tracker';
 
 const client = createGraphqlClient({
   fakeData,
@@ -32,6 +33,7 @@ const client = createGraphqlClient({
 });
 
 class Main extends React.Component {
+
   render() {
     return (
       <BrowserRouter>
@@ -41,10 +43,10 @@ class Main extends React.Component {
         <Route path={`${appPrefix}g/`}>
           <ApolloProvider client={client}>
             <MainPage sidebarItems={listCE}>
-              {/* Jupyterhub */}
-              <Route path={`${appPrefix}g/:groupName/hub`} exact>
-                <Jupyterhub />
-              </Route>
+            {/* Jupyterhub */}
+            <Route path={`${appPrefix}g/:groupName/hub`} exact>
+              <Jupyterhub />
+            </Route>
 
               {/* Shared Files */}
               <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
@@ -99,6 +101,7 @@ class Main extends React.Component {
                 <GroupSettingsPage />
               </Route>
             </MainPage>
+            <PageChangeTracker />
           </ApolloProvider>
         </Route>
       </BrowserRouter>

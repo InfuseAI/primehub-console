@@ -1,5 +1,6 @@
 import { Context, Next } from 'koa';
 import { createConfig } from './config';
+import md5 from 'md5';
 
 const createEnvVariablesSetup = () => (ctx: Context, next: Next) => {
   const config = createConfig();
@@ -35,6 +36,9 @@ const createEnvVariablesSetup = () => (ctx: Context, next: Next) => {
   ctx.state.isUserAdmin = config.isUserAdmin;
   ctx.state.newAccessToken = config.newAccessToken;
   ctx.state.apiToken = '';
+
+  ctx.state.enableTelemetry = config.enableTelemetry;
+  ctx.state.primehubAnonymousId = md5(config.keycloakClientSecret);
 
   // referrer
   const referrer = `${config.cmsHost}${ctx.path}`;
