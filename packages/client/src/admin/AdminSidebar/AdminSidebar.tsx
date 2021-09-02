@@ -1,10 +1,10 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Layout, Menu, Icon } from 'antd';
-
+import { Badge } from 'components/share/utils';
 import ExternalLinkIcon from 'images/icon-new-tab.svg';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
-
+import ProModal from 'components/share/ProModal';
 import { ROUTES, ROUTE_KEYS, routes } from '../routes';
 
 const VISIBLE_ITEMS = {
@@ -38,16 +38,17 @@ const EXTERNAL_LINKS = {
 export function AdminSidebar() {
   const GLOBAL_ENV = __ENV__;
 
-  const [activeRoute, setActiveRoute] = React.useState<ROUTE_KEYS>('group');
-  const [visible, setVisible] = React.useState(VISIBLE_ITEMS);
-  const [externalVisible, setExternalVisisble] = React.useState(EXTERNAL_LINKS);
+  const [activeRoute, setActiveRoute] = useState<ROUTE_KEYS>('group');
+  const [visible, setVisible] = useState(VISIBLE_ITEMS);
+  const [externalVisible, setExternalVisisble] = useState(EXTERNAL_LINKS);
+  const [modal, setModal] = useState(false);
 
   const location = useLocation();
   const { appPrefix } = useRoutePrefix();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (window?.enableMaintenanceNotebook) {
-      setExternalVisisble((prev) => ({
+      setExternalVisisble(prev => ({
         ...prev,
         maintenance: {
           ...prev.maintenance,
@@ -57,7 +58,7 @@ export function AdminSidebar() {
     }
 
     if (window?.enableGrafana) {
-      setExternalVisisble((prev) => ({
+      setExternalVisisble(prev => ({
         ...prev,
         grafana: {
           ...prev.grafana,
@@ -67,7 +68,7 @@ export function AdminSidebar() {
     }
 
     if (GLOBAL_ENV === 'ee') {
-      setVisible((prev) => ({
+      setVisible(prev => ({
         ...prev,
         image: true,
         buildImage: true,
@@ -78,17 +79,18 @@ export function AdminSidebar() {
     }
 
     if (GLOBAL_ENV === 'ce') {
-      setVisible((prev) => ({
+      setVisible(prev => ({
         ...prev,
         image: true,
         dataset: true,
         jupyterhub: true,
+        usageReport: true,
       }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Split by `/admin` => [prefix, routes]
     const routes = location.pathname.split('/admin')[1];
 
@@ -100,48 +102,67 @@ export function AdminSidebar() {
     }
   }, [location]);
 
+  const closeModal = () => {
+    setModal(false);
+  };
+
+  const renderMenuItem = route => {
+    const { key } = route;
+    if (visible[key]) {
+      return (
+        <Menu.Item
+          key={route.key}
+          data-testid={route.key}
+          onClick={
+            route.proFeature
+              ? () => setModal(true)
+              : () => setActiveRoute(route.key)
+          }
+        >
+          {route.proFeature ? (
+            <span>
+              {route.name}
+              <Badge>pro</Badge>
+            </span>
+          ) : (
+            <Link to={`${appPrefix}${route.path}`}>{route.name}</Link>
+          )}
+        </Menu.Item>
+      );
+    }
+  };
+
   return (
     <Layout.Sider style={{ position: 'fixed', height: '100%' }}>
       <Menu
-        theme="dark"
+        theme='dark'
         selectedKeys={[activeRoute]}
         data-testid={`${activeRoute}-active`}
       >
-        <Menu.Item key="backToUserPortal">
-          <a href="/">
-            <Icon type="left" />
+        <Menu.Item key='backToUserPortal'>
+          <a href='/'>
+            <Icon type='left' />
             Back to User Portal
           </a>
         </Menu.Item>
 
-        {routes.map(
-          (route) =>
-            visible[route.key] && (
-              <Menu.Item
-                key={route.key}
-                data-testid={route.key}
-                onClick={() => setActiveRoute(route.key)}
-              >
-                <Link to={`${appPrefix}${route.path}`}>{route.name}</Link>
-              </Menu.Item>
-            )
-        )}
+        {routes.map(renderMenuItem)}
 
         {Object.keys(externalVisible).map(
-          (ex) =>
+          ex =>
             externalVisible[ex].enable && (
               <Menu.Item key={ex}>
                 <a
-                  target="_blank"
-                  rel="noopener"
+                  target='_blank'
+                  rel='noopener'
                   href={externalVisible[ex].link}
                 >
                   {externalVisible[ex].name}
 
                   <img
                     src={ExternalLinkIcon}
-                    width="10px"
-                    height="10px"
+                    width='10px'
+                    height='10px'
                     style={{ marginLeft: '8px' }}
                   />
                 </a>
@@ -149,6 +170,7 @@ export function AdminSidebar() {
             )
         )}
       </Menu>
+      <ProModal visible={modal} onOk={closeModal} onCancel={closeModal} />
     </Layout.Sider>
   );
 }
