@@ -135,7 +135,7 @@ describe('Sidebar Component', () => {
     expect(screen.queryByText('Apps')).toBeNull();
   });
 
-  it('should render pro feature badege and item in ce list', () => {
+  it('should render pro feature badge and item in ce list', () => {
     const mockUser = createMockUser({ isCurrentGroupAdmin: true });
 
     // @ts-ignore

@@ -149,6 +149,7 @@ const ProModal = (props: any) => {
                 shape='round'
                 type='primary'
                 href='https://www.infuseai.io/request-demo'
+                target='_blank'
               >
                 TRIAL
               </Button>
@@ -156,6 +157,7 @@ const ProModal = (props: any) => {
                 <a
                   className='find-out-more'
                   href='https://docs.primehub.io/docs/comparison'
+                  target='_blank'
                 >
                   Find out more
                 </a>
