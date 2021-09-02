@@ -40,7 +40,7 @@ const Table = styled.table`
   }
 `;
 
-export default class ResrouceMonitor extends React.Component<Props, State> {
+export default class ResourceMonitor extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     this.state = {
