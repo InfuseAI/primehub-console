@@ -3,7 +3,11 @@ import { InputNumber, Checkbox, Input } from 'antd';
 import isNull from 'lodash/isNull';
 
 interface Props {
-  uiParams: any
+  uiParams: any;
+  disabled: any;
+  value: any;
+  refId: any;
+  onChange: any;
 }
 
 export default class CheckableInputNumber extends PureComponent<Props> {
@@ -41,7 +45,7 @@ export default class CheckableInputNumber extends PureComponent<Props> {
   render() {
     const { value, uiParams, disabled } = this.props;
     return (
-      <React.Fragment>
+      <div data-testid={this.props['data-testid']}>
         <Checkbox
           onChange={this.onCheck}
           disabled={disabled}
@@ -74,7 +78,7 @@ export default class CheckableInputNumber extends PureComponent<Props> {
             onChange={this.onChange}
           />
         )}
-      </React.Fragment>
+      </div>
     );
   }
 }

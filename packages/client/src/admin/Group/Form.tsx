@@ -268,7 +268,7 @@ function GroupForm(props: Props) {
   return (
     <Skeleton loading={loading} active>
       <Form onSubmit={handleSubmit}>
-        <Form.Item label={'Name'} data-testid='group/name'>
+        <Form.Item label={'Name'}>
           {form.getFieldDecorator('name', {
             rules: [
               {
@@ -278,16 +278,15 @@ function GroupForm(props: Props) {
               },
             ],
             initialValue: initialValue.name,
-          })(<Input disabled={type === 'update'} />)}
+          })(<Input data-testid='group/name' disabled={type === 'update'} />)}
         </Form.Item>
-        <Form.Item label={'Display Name'} data-testid='group/displayName'>
+        <Form.Item label={'Display Name'}>
           {form.getFieldDecorator('displayName', {
             initialValue: initialValue.displayName,
-          })(<Input />)}
+          })(<Input data-testid='group/displayName' />)}
         </Form.Item>
         <FeatureEE>
           <Form.Item
-            data-testid='group/enabledDeployment'
             label={
               <span>
                 Model Deployment{' '}
@@ -305,21 +304,20 @@ function GroupForm(props: Props) {
               valuePropName: 'checked',
             })(
               <Switch
+                data-testid='group/enabledDeployment'
                 checkedChildren={<Icon type='check' />}
                 unCheckedChildren={<Icon type='close' />}
               />
             )}
           </Form.Item>
           {form.getFieldValue('enabledDeployment') ? (
-            <Form.Item
-              label={`Maximum Deployment(s)`}
-              data-testid='group/maxDeploy'
-            >
+            <Form.Item label={`Maximum Deployment(s)`}>
               {form.getFieldDecorator('maxDeploy', {
                 initialValue: initialValue.maxDeploy,
                 getValueFromEvent: (refId, action, val) => val,
               })(
                 <CheckableInputNumber
+                  data-testid='group/maxDeploy'
                   uiParams={{ min: 0, step: 1, precision: 0 }}
                 />
               )}
@@ -330,7 +328,6 @@ function GroupForm(props: Props) {
         </FeatureEE>
         <Feature modelDeploy={false}>
           <Form.Item
-            data-testid='group/enableSharedVolume'
             label={
               <span>
                 Share Volume{' '}
@@ -348,6 +345,7 @@ function GroupForm(props: Props) {
               valuePropName: 'checked',
             })(
               <Switch
+                data-testid='group/enableSharedVolume'
                 disabled={type === 'update'}
                 checkedChildren={<Icon type='check' />}
                 unCheckedChildren={<Icon type='close' />}
@@ -358,14 +356,12 @@ function GroupForm(props: Props) {
             <Card title={'Shared Volume'} style={{ marginBottom: 16 }}>
               <Row>
                 <Col sm={8} xs={24}>
-                  <Form.Item
-                    label={`Shared Volume Capacity`}
-                    data-testid='group/sharedVolumeCapacity'
-                  >
+                  <Form.Item label={`Shared Volume Capacity`}>
                     {form.getFieldDecorator('sharedVolumeCapacity', {
                       initialValue: initialValue.sharedVolumeCapacity,
                     })(
                       <InputNumber
+                        data-testid='group/sharedVolumeCapacity'
                         disabled={type === 'update'}
                         style={{ width: 'auto' }}
                         formatter={value => `${value} GB`}
@@ -378,15 +374,13 @@ function GroupForm(props: Props) {
                   </Form.Item>
                 </Col>
                 <Col sm={8} xs={24}>
-                  <Form.Item
-                    label={`Launch Group Only`}
-                    data-testid='group/launchGroupOnly'
-                  >
+                  <Form.Item label={`Launch Group Only`}>
                     {form.getFieldDecorator('launchGroupOnly', {
                       initialValue: initialValue.launchGroupOnly,
                       valuePropName: 'checked',
                     })(
                       <Switch
+                        data-testid='group/launchGroupOnly'
                         checkedChildren={<Icon type='check' />}
                         unCheckedChildren={<Icon type='close' />}
                       />
@@ -402,36 +396,39 @@ function GroupForm(props: Props) {
         <Card title={'User Quota'} style={{ marginBottom: 16 }}>
           <Row>
             <Col sm={8} xs={24}>
-              <Form.Item label={`CPU Quota`} data-testid='group/quotaCpu'>
+              <Form.Item label={`CPU Quota`}>
                 {form.getFieldDecorator('quotaCpu', {
                   initialValue: initialValue.quotaCpu,
                   getValueFromEvent: (refId, action, val) => val,
                 })(
                   <CheckableInputNumber
+                    data-testid='group/quotaCpu'
                     uiParams={{ min: 0.5, step: 0.5, precision: 1 }}
                   />
                 )}
               </Form.Item>
             </Col>
             <Col sm={8} xs={24}>
-              <Form.Item label={`GPU Quota`} data-testid='group/quotaGpu'>
+              <Form.Item label={`GPU Quota`}>
                 {form.getFieldDecorator('quotaGpu', {
                   initialValue: initialValue.quotaGpu,
                   getValueFromEvent: (refId, action, val) => val,
                 })(
                   <CheckableInputNumber
+                    data-testid='group/quotaGpu'
                     uiParams={{ min: 0, step: 1, precision: 0 }}
                   />
                 )}
               </Form.Item>
             </Col>
             <Col sm={8} xs={24}>
-              <Form.Item label={`Memory Quota`} data-testid='group/quotaMemory'>
+              <Form.Item label={`Memory Quota`}>
                 {form.getFieldDecorator('quotaMemory', {
                   initialValue: initialValue.quotaMemory,
                   getValueFromEvent: (refId, action, val) => val,
                 })(
                   <CheckableInputNumber
+                    data-testid='group/quotaMemory'
                     uiParams={{ min: 0, step: 1, precision: 0, unit: ' GB' }}
                   />
                 )}
@@ -442,45 +439,39 @@ function GroupForm(props: Props) {
         <Card title={'Group Quota'} style={{ marginBottom: 16 }}>
           <Row>
             <Col sm={8} xs={24}>
-              <Form.Item
-                label={`CPU Quota`}
-                data-testid='group/projectQuotaCpu'
-              >
+              <Form.Item label={`CPU Quota`}>
                 {form.getFieldDecorator('projectQuotaCpu', {
                   initialValue: initialValue.projectQuotaCpu,
                   getValueFromEvent: (refId, action, val) => val,
                 })(
                   <CheckableInputNumber
+                    data-testid='group/projectQuotaCpu'
                     uiParams={{ min: 0.5, step: 0.5, precision: 1 }}
                   />
                 )}
               </Form.Item>
             </Col>
             <Col sm={8} xs={24}>
-              <Form.Item
-                label={`GPU Quota`}
-                data-testid='group/projectQuotaGpu'
-              >
+              <Form.Item label={`GPU Quota`}>
                 {form.getFieldDecorator('projectQuotaGpu', {
                   initialValue: initialValue.projectQuotaGpu,
                   getValueFromEvent: (refId, action, val) => val,
                 })(
                   <CheckableInputNumber
+                    data-testid='group/projectQuotaGpu'
                     uiParams={{ min: 0, step: 1, precision: 0 }}
                   />
                 )}
               </Form.Item>
             </Col>
             <Col sm={8} xs={24}>
-              <Form.Item
-                label={`Memory Quota`}
-                data-testid='group/projectQuotaMemory'
-              >
+              <Form.Item label={`Memory Quota`}>
                 {form.getFieldDecorator('projectQuotaMemory', {
                   initialValue: initialValue.projectQuotaMemory,
                   getValueFromEvent: (refId, action, val) => val,
                 })(
                   <CheckableInputNumber
+                    data-testid='group/projectQuotaMemory'
                     uiParams={{ min: 0, step: 1, precision: 0, unit: ' GB' }}
                   />
                 )}
