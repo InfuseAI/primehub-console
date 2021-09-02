@@ -1,12 +1,13 @@
 import * as React from 'react';
 import {Card} from 'antd';
-import {get} from 'lodash';
+import {get, unionBy} from 'lodash';
 import styled from 'styled-components';
 
 interface Props {
   groupContext: any;
   refetchGroup: () => void;
   showDataset?: boolean;
+  globalDatasets?: Array<Record<string, any>>;
   selectedGroup: string;
   style: any;
 }
@@ -73,9 +74,13 @@ export default class ResrouceMonitor extends React.Component<Props, State> {
   }
 
   render() {
-    const { showDataset, style } = this.props;
+    const { showDataset, globalDatasets, style } = this.props;
     const { groupContext } = this.state;
     if (groupContext) {
+      const datasets = unionBy(
+        get(groupContext, 'datasets', []),
+        globalDatasets,
+      );
       return (
         <>
             <Card style={{overflow: 'auto', ...style}}>
@@ -112,10 +117,10 @@ export default class ResrouceMonitor extends React.Component<Props, State> {
                 <Card style={{overflow: 'auto'}}>
                   <h3>Datasets</h3>
                   {
-                    groupContext.datasets.length ? (
+                    datasets.length ? (
                     <ul>
                       {
-                        groupContext.datasets.map(dataset =>(<li>{dataset.displayName}</li>))
+                        datasets.map(dataset =>(<li>{get(dataset, 'displayName')}</li>))
                       }
                     </ul>
                     ) : (
