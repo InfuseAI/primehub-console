@@ -476,20 +476,16 @@ function _ImageForm({
 
           {/* custom image */}
           {data?.imageSpec && (
-            <Form.Item
-              label={
-                <>
-                  Container Image URL (
-                  <a onClick={() => setBuildDetailVisible(true)}>
-                    {getImageStatus({
-                      isReady: data?.isReady,
-                      jobStatus: data?.jobStatus,
-                    })}
-                  </a>
-                  )
-                </>
-              }
-            >
+            <Form.Item>
+              <div>
+                Conatiner Image URL:{' '}
+                <a onClick={() => setBuildDetailVisible(true)}>
+                  {getImageStatus({
+                    isReady: data?.isReady,
+                    jobStatus: data?.jobStatus,
+                  })}
+                </a>
+              </div>
               {form.getFieldDecorator('url', {
                 initialValue: data?.url || '',
               })(<Input disabled />)}
@@ -638,9 +634,6 @@ function _ImageForm({
                     justifyContent: 'flex-end',
                   }}
                 >
-                  <Button onClick={() => setBuildDetailVisible(false)}>
-                    Close
-                  </Button>
                   {/* @ts-ignore */}
                   <Button
                     type='primary'
@@ -681,6 +674,9 @@ function _ImageForm({
                   >
                     Rebuild
                   </Button>
+                  <Button onClick={() => setBuildDetailVisible(false)}>
+                    Close
+                  </Button>
                 </div>
               ) : (
                 <div
@@ -690,9 +686,6 @@ function _ImageForm({
                     justifyContent: 'flex-end',
                   }}
                 >
-                  <Button onClick={() => setBuildDetailVisible(false)}>
-                    Close
-                  </Button>
                   {/* @ts-ignore */}
                   <Button
                     type='primary'
@@ -719,6 +712,9 @@ function _ImageForm({
                     }}
                   >
                     Cancel Build
+                  </Button>
+                  <Button onClick={() => setBuildDetailVisible(false)}>
+                    Close
                   </Button>
                 </div>
               )}
