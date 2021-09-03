@@ -67,12 +67,13 @@ const PageChangeTracker = props => {
       return;
     }
 
+    const href = window.location.href;
     if (location === '') {
-      event.location = window.location.href;
+      event.location = href;
       setEvent(event);
       return;
-    } else if (location !== location) {
-      event.location = window.location.href;
+    } else if (location !== href) {
+      event.location = href;
     }
 
     if (prompt >= 2) {
