@@ -6,11 +6,12 @@ import { omit } from 'lodash';
 import { notification } from 'antd';
 
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
+import { errorHandler } from 'utils/errorHandler';
 
 import { ImagesLayout } from './Layout';
 import { ImageForm, ImageFormState } from './ImageForm';
 import { CreateImageMutation } from './images.graphql';
-import { errorHandler } from 'utils/errorHandler';
+import type { ImageSpec } from './types';
 
 interface Props {
   createImageMutation: ({
@@ -41,20 +42,31 @@ function _ImageAdd({ createImageMutation }: Props) {
     );
 
     if (isBuildByCustomImage) {
+      const imageSpec: ImageSpec = {
+        baseImage: restData.imageSpec.baseImage,
+        pullSecret: restData.imageSpec.pullSecret,
+        // @ts-ignore
+        packages: {},
+      };
+
+      if (restData.apt.length > 0) {
+        imageSpec.packages['apt'] = restData.apt.split('\n');
+      }
+
+      if (restData.conda.length > 0) {
+        imageSpec.packages['conda'] = restData.conda.split('\n');
+      }
+
+      if (restData.pip.length > 0) {
+        imageSpec.packages['pip'] = restData.pip.split('\n');
+      }
+
       formData = {
         ...omit(formData, [
           'pullSecret', // just only display on the custom image
           'useImagePullSecret',
         ]),
-        imageSpec: {
-          baseImage: restData.imageSpec.baseImage,
-          pullSecret: restData.imageSpec.pullSecret,
-          packages: {
-            apt: restData.apt.split('\n'),
-            conda: restData.conda.split('\n'),
-            pip: restData.pip.split('\n'),
-          },
-        },
+        imageSpec,
       };
     }
 
