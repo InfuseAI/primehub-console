@@ -15,14 +15,15 @@ describe('Admin Portal - Group Update', () => {
       </IntlProvider>
     );
   };
-  beforeEach(() => {
+
+
+  it('Render Group list with breadcrumb', () => {
+
     // @ts-ignore
     global.modelDeploymentOnly = false;
     // @ts-ignore
     global.__ENV__ = 'ee';
-  });
 
-  it('Render Group list with breadcrumb', () => {
     render(
       <MockedProvider mocks={[]}>
         <GroupUpdate />
@@ -30,5 +31,42 @@ describe('Admin Portal - Group Update', () => {
       { wrapper }
     );
     expect(screen.queryByText('Info')).toBeInTheDocument();
+    expect(screen.queryByText('Model Deployment')).toBeInTheDocument();
+  });
+
+  it('Render ce-related settings in group settings', () => {
+    global.__ENV__ = 'ce';
+    render(
+      <MockedProvider mocks={[]}>
+        <GroupUpdate />
+      </MockedProvider>,
+      { wrapper }
+    );
+    expect(screen.queryByText('Share Volume')).toBeInTheDocument();
+    expect(screen.queryByText('Model Deployment')).not.toBeInTheDocument();
+  });
+
+  it('Render ee-related settings in group settings', () => {
+    global.__ENV__ = 'ee';
+    render(
+      <MockedProvider mocks={[]}>
+        <GroupUpdate />
+      </MockedProvider>,
+      { wrapper }
+    );
+    expect(screen.queryByText('Share Volume')).toBeInTheDocument();
+    expect(screen.queryByText('Model Deployment')).toBeInTheDocument();
+  });
+
+  it('Render deploy-related settings in group settings', () => {
+    global.__ENV__ = 'modelDeploy';
+    render(
+      <MockedProvider mocks={[]}>
+        <GroupUpdate />
+      </MockedProvider>,
+      { wrapper }
+    );
+    expect(screen.queryByText('Share Volume')).not.toBeInTheDocument();
+    expect(screen.queryByText('Model Deployment')).not.toBeInTheDocument();
   });
 });
