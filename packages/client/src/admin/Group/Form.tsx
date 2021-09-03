@@ -310,6 +310,8 @@ function GroupForm(props: Props) {
               />
             )}
           </Form.Item>
+        </FeatureEE>
+        <Feature ce={false}>
           {form.getFieldValue('enabledDeployment') ? (
             <Form.Item label={`Maximum Deployment(s)`}>
               {form.getFieldDecorator('maxDeploy', {
@@ -325,7 +327,7 @@ function GroupForm(props: Props) {
           ) : (
             <></>
           )}
-        </FeatureEE>
+        </Feature>
         <Feature modelDeploy={false}>
           <Form.Item
             label={
