@@ -591,7 +591,7 @@ function _ImageForm({
                       <Form.Item label='APT' style={{ marginBottom: '10px' }}>
                         {form.getFieldDecorator('apt', {
                           initialValue:
-                            data?.imageSpec.packages.apt.join('\n') || [],
+                            data?.imageSpec.packages.apt.join('\n') || '',
                         })(
                           <Input.TextArea disabled={!isImageReady} rows={4} />
                         )}
@@ -601,7 +601,7 @@ function _ImageForm({
                       <Form.Item label='Conda' style={{ marginBottom: '10px' }}>
                         {form.getFieldDecorator('conda', {
                           initialValue:
-                            data?.imageSpec.packages.conda.join('\n') || [],
+                            data?.imageSpec.packages.conda.join('\n') || '',
                         })(
                           <Input.TextArea disabled={!isImageReady} rows={4} />
                         )}
@@ -611,7 +611,7 @@ function _ImageForm({
                       <Form.Item label='Pip' style={{ marginBottom: '10px' }}>
                         {form.getFieldDecorator('pip', {
                           initialValue:
-                            data?.imageSpec.packages.pip.join('\n') || [],
+                            data?.imageSpec.packages.pip.join('\n') || '',
                         })(
                           <Input.TextArea disabled={!isImageReady} rows={4} />
                         )}
