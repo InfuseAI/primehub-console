@@ -23,6 +23,7 @@ import DeploymentCreatePage from 'ee/containers/deploymentCreatePage';
 import DeploymentEditPage from 'ee/containers/deploymentEditPage';
 import GroupSettingsPage from 'containers/groupSettingsPage';
 import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
+import NotebookViewer from 'containers/sharedFiles/notebookViewer';
 
 const client = createGraphqlClient({
   fakeData,
@@ -33,62 +34,67 @@ class Main extends React.Component {
   render() {
     return (
       <BrowserRouter>
-        <ApolloProvider client={client}>
-          <MainPage
-            sidebarItems={listDeploy}
-            notification={<LicenseWarningBanner />}
-          >
-            {/* Shared Files */}
-            <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
-              <SharedFilesPage />
-            </Route>
-            {/* Group Settings */}
-            <Route path={`${appPrefix}g/:groupName/settings`}>
-              <GroupSettingsPage
-                extraTabs={[
-                  {
-                    component: GroupSettingsMLflow,
-                    key: 'mlflow',
-                    tab: 'MLflow',
-                  },
-                ]}
-              />
-            </Route>
-            {/* Model Management */}
-            <Route path={`${appPrefix}g/:groupName/models`} exact>
-              <ListContainer Com={ModelListContainer} />
-            </Route>
-            <Route
-              path={`${appPrefix}g/:groupName/models/:modelName`}
-              exact
-              component={ModelDetail}
-            />
-            <Route
-              path={`${appPrefix}g/:groupName/models/:modelName/versions/:version`}
-              exact
-              component={ModelVersionDetailContainer}
-            />
-
-            {/* Model Deployment */}
-            <Route path={`${appPrefix}g/:groupName/deployments`} exact>
-              <ListContainer Com={DeploymentListContainer} />
-            </Route>
-            <Route path={`${appPrefix}g/:groupName/deployments/create`} exact>
-              <DeploymentCreatePage />
-            </Route>
-            <Route
-              path={`${appPrefix}g/:groupName/deployments/:deploymentId`}
-              exact
-              component={DeploymentDetailContainer}
-            />
-            <Route
-              path={`${appPrefix}g/:groupName/deployments/:deploymentId/edit`}
-              exact
+        <Route path={`${appPrefix}preview/*`}>
+          <NotebookViewer appPrefix={appPrefix} />
+        </Route>
+        <Route path={`${appPrefix}g/`}>
+          <ApolloProvider client={client}>
+            <MainPage
+              sidebarItems={listDeploy}
+              notification={<LicenseWarningBanner />}
             >
-              <DeploymentEditPage />
-            </Route>
-          </MainPage>
-        </ApolloProvider>
+              {/* Shared Files */}
+              <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
+                <SharedFilesPage />
+              </Route>
+              {/* Group Settings */}
+              <Route path={`${appPrefix}g/:groupName/settings`}>
+                <GroupSettingsPage
+                  extraTabs={[
+                    {
+                      component: GroupSettingsMLflow,
+                      key: 'mlflow',
+                      tab: 'MLflow',
+                    },
+                  ]}
+                />
+              </Route>
+              {/* Model Management */}
+              <Route path={`${appPrefix}g/:groupName/models`} exact>
+                <ListContainer Com={ModelListContainer} />
+              </Route>
+              <Route
+                path={`${appPrefix}g/:groupName/models/:modelName`}
+                exact
+                component={ModelDetail}
+              />
+              <Route
+                path={`${appPrefix}g/:groupName/models/:modelName/versions/:version`}
+                exact
+                component={ModelVersionDetailContainer}
+              />
+
+              {/* Model Deployment */}
+              <Route path={`${appPrefix}g/:groupName/deployments`} exact>
+                <ListContainer Com={DeploymentListContainer} />
+              </Route>
+              <Route path={`${appPrefix}g/:groupName/deployments/create`} exact>
+                <DeploymentCreatePage />
+              </Route>
+              <Route
+                path={`${appPrefix}g/:groupName/deployments/:deploymentId`}
+                exact
+                component={DeploymentDetailContainer}
+              />
+              <Route
+                path={`${appPrefix}g/:groupName/deployments/:deploymentId/edit`}
+                exact
+              >
+                <DeploymentEditPage />
+              </Route>
+            </MainPage>
+          </ApolloProvider>
+        </Route>
       </BrowserRouter>
     );
   }
@@ -133,7 +139,7 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       btn: (
         // @ts-ignore
         <Button
-          type="primary"
+          type='primary'
           onClick={() =>
             window.location.replace(`${window.APP_PREFIX}oidc/logout`)
           }
