@@ -108,18 +108,18 @@ export function AdminSidebar() {
 
   const renderMenuItem = route => {
     const { key } = route;
-    if (visible[key]) {
+    if (visible[key] && route.enabled) {
       return (
         <Menu.Item
           key={route.key}
           data-testid={route.key}
           onClick={
-            route.proFeature
+            route.proFeature && GLOBAL_ENV === 'ce'
               ? () => setModal(true)
               : () => setActiveRoute(route.key)
           }
         >
-          {route.proFeature ? (
+          {route.proFeature && GLOBAL_ENV === 'ce' ? (
             <span>
               {route.name}
               <Badge>pro</Badge>
