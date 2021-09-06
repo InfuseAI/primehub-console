@@ -4,7 +4,6 @@ import { injectIntl } from 'react-intl';
 import { Switch } from 'react-router-dom';
 import ContentHeader from 'components/header';
 import Error from 'components/error';
-// Will fixed after canner deps dropped.
 // @ts-ignore
 import { createGlobalStyle } from 'styled-components';
 import { ApolloProvider } from 'react-apollo';

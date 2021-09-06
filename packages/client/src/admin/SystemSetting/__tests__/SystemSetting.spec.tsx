@@ -45,7 +45,6 @@ function setup() {
                 name: null,
                 size: 0,
                 url: 'https://i.imgur.com/CDz3JAY.png',
-                __typename: 'CannerImage',
               },
               __typename: 'Org',
             },

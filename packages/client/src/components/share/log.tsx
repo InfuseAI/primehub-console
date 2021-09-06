@@ -1,8 +1,8 @@
 /* tslint:disable:no-console */
 import * as React from 'react';
-import {FixedSizeList as List} from 'react-window';
-import {Button, Icon} from 'antd';
-import {get} from 'lodash';
+import { FixedSizeList as List } from 'react-window';
+import { Button, Icon } from 'antd';
+import { get } from 'lodash';
 import downloadjs from 'downloadjs';
 import styled from 'styled-components';
 import moment from 'moment';
@@ -33,7 +33,7 @@ const Hint = styled.div`
   z-index: 1;
   background: #eee;
   letter-spacing: 0.4px;
-  opacity: ${(props: any) => props.opacity ? 0 : 1};
+  opacity: ${(props: any) => (props.opacity ? 0 : 1)};
   color: #333;
   transition: opacity 0.1s;
 ` as any;
@@ -77,13 +77,18 @@ export default class Logs extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.endpoint !== this.props.endpoint) {
-      this.setState({log: [], loaded: false});
+      this.setState({ log: [], loaded: false });
       this.refetch();
     }
 
     const restartAutoScroll = !prevState.autoScroll && this.state.autoScroll;
     // scroll log box to bottom
-    if (((this.state.log[this.state.log.length - 1] !== prevState.log[prevState.log.length - 1] && this.state.autoScroll) || restartAutoScroll)) {
+    if (
+      (this.state.log[this.state.log.length - 1] !==
+        prevState.log[prevState.log.length - 1] &&
+        this.state.autoScroll) ||
+      restartAutoScroll
+    ) {
       // https://github.com/ant-design/ant-design/issues/10527
       this.scrollToBottom();
     }
@@ -96,30 +101,38 @@ export default class Logs extends React.Component<Props, State> {
 
   scrollToBottom = () => {
     if (!this.listRef.current) return;
-    this.listRef.current.scrollToItem(this.outerRef.current.scrollHeight - this.outerRef.current.clientHeight);
-  }
+    this.listRef.current.scrollToItem(
+      this.outerRef.current.scrollHeight - this.outerRef.current.clientHeight
+    );
+  };
 
   appendNewLog = (chunk: string) => {
     const newLog = chunk.split(/[\n\r]+/);
     if (!newLog[newLog.length - 1]) newLog.pop();
-    this.setState((prevState: any) => {
-      const log = prevState.log.length >= 2000 ?
-      prevState.log.slice(newLog.length) :
-      prevState.log;
-      return {
-        log: [...log, ...newLog],
-      };
-    }, () => {
-      if (!this.state.autoScroll && this.state.log.length >= 2000) {
-        this.listRef.current.scrollTo(this.outerRef.current.scrollTop - newLog.length * LINE_HEIGHT);
+    this.setState(
+      (prevState: any) => {
+        const log =
+          prevState.log.length >= 2000
+            ? prevState.log.slice(newLog.length)
+            : prevState.log;
+        return {
+          log: [...log, ...newLog],
+        };
+      },
+      () => {
+        if (!this.state.autoScroll && this.state.log.length >= 2000) {
+          this.listRef.current.scrollTo(
+            this.outerRef.current.scrollTop - newLog.length * LINE_HEIGHT
+          );
+        }
       }
-    });
-  }
+    );
+  };
 
   refetch() {
     this.setState({
       loading: true,
-      tailLines: INITIAL_LENGTH
+      tailLines: INITIAL_LENGTH,
     });
 
     this.fetchLog().then(() => {
@@ -136,9 +149,9 @@ export default class Logs extends React.Component<Props, State> {
   }
 
   fetchLog = async () => {
-    const token = window.localStorage.getItem('canner.accessToken');
-    const {endpoint} = this.props;
-    const {tailLines} = this.state;
+    const token = window.localStorage.getItem('primehub.accessToken');
+    const { endpoint } = this.props;
+    const { tailLines } = this.state;
     if (this.controller) this.controller.abort();
     const controller = new AbortController();
     this.controller = controller;
@@ -155,37 +168,40 @@ export default class Logs extends React.Component<Props, State> {
           signal,
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
         });
 
         if (res.status >= 400) {
-          const allowPersist = this.props.allowPersistLog ?
-            this.props.allowPersistLog() :
-            false;
+          const allowPersist = this.props.allowPersistLog
+            ? this.props.allowPersistLog()
+            : false;
           if (allowPersist && this.state.loaded === false) {
-            this.setState({fromPersist: true});
-            res = await fetch(`${endpoint}?tailLines=${tailLines}&persist=true`, {
-              signal,
-              method: 'GET',
-              headers: {
-                Authorization: `Bearer ${token}`
-              },
-            });
+            this.setState({ fromPersist: true });
+            res = await fetch(
+              `${endpoint}?tailLines=${tailLines}&persist=true`,
+              {
+                signal,
+                method: 'GET',
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
           } else {
             const content = await res.json();
             const reason = get(content, 'message', 'of internal error');
             if (this.state.loaded === false) {
               this.setState(() => ({
                 log: [`Error: cannot get log due to ${reason}`],
-                loading: false
+                loading: false,
               }));
             }
             return;
           }
         }
         this.setState({
-          loading: false
+          loading: false,
         });
         break;
       } catch (err) {
@@ -195,7 +211,7 @@ export default class Logs extends React.Component<Props, State> {
         console.log(err);
         if (this.state.loaded === false) {
           this.setState(() => ({
-            log: [`Error: cannot fetch the log`]
+            log: [`Error: cannot fetch the log`],
           }));
         }
 
@@ -210,7 +226,7 @@ export default class Logs extends React.Component<Props, State> {
     }
 
     // Keep reading the trunk
-    this.setState({log: []});
+    this.setState({ log: [] });
     const reader = res.body.getReader();
     try {
       while (true) {
@@ -224,35 +240,35 @@ export default class Logs extends React.Component<Props, State> {
     } catch (e) {
       this.refetch(); // refetch log if error in response.
     } finally {
-      this.setState({loaded: true});
+      this.setState({ loaded: true });
     }
-  }
+  };
 
-  onScroll = ({
-    scrollDirection,
-    scrollOffset,
-    scrollUpdateWasRequested
-  }) => {
+  onScroll = ({ scrollDirection, scrollOffset, scrollUpdateWasRequested }) => {
     if (!this.outerRef.current) return;
     if (scrollUpdateWasRequested) {
       return;
     }
     this.setState({
       topmost: scrollDirection === 'backward' && scrollOffset === 0,
-      autoScroll: scrollDirection === 'forward' && this.outerRef.current.scrollHeight - this.outerRef.current.clientHeight === scrollOffset
+      autoScroll:
+        scrollDirection === 'forward' &&
+        this.outerRef.current.scrollHeight -
+          this.outerRef.current.clientHeight ===
+          scrollOffset,
     });
-  }
+  };
 
   enableAutoScroll = () => {
     this.setState({
-      autoScroll: true
+      autoScroll: true,
     });
-  }
+  };
 
   download = () => {
-    const {endpoint} = this.props;
-    const token = window.localStorage.getItem('canner.accessToken');
-    this.setState({downloading: true});
+    const { endpoint } = this.props;
+    const token = window.localStorage.getItem('primehub.accessToken');
+    this.setState({ downloading: true });
     let url = `${endpoint}?follow=false`;
     if (this.state.fromPersist) {
       url += '&persist=true';
@@ -261,22 +277,28 @@ export default class Logs extends React.Component<Props, State> {
     fetch(url, {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-    }).then(res => res.blob())
-    .then(blob => {
-      return downloadjs(
-        blob, `${moment(new Date().toISOString()).format('YYYY-MM-DD-HH-mm-ss')}.log`, 'text/plain');
     })
-    // @ts-ignore
-    .finally(() => {
-      this.setState({downloading: false});
-    });
-  }
+      .then(res => res.blob())
+      .then(blob => {
+        return downloadjs(
+          blob,
+          `${moment(new Date().toISOString()).format(
+            'YYYY-MM-DD-HH-mm-ss'
+          )}.log`,
+          'text/plain'
+        );
+      })
+      // @ts-ignore
+      .finally(() => {
+        this.setState({ downloading: false });
+      });
+  };
 
   render() {
-    const {endpoint, rows = 40, style = {}} = this.props;
-    const {log, loading, downloading, fromPersist} = this.state;
+    const { endpoint, rows = 40, style = {} } = this.props;
+    const { log, loading, downloading, fromPersist } = this.state;
     const hints = [];
     hints.push('Please download the log to view more than 2000 lines.');
 
@@ -294,51 +316,64 @@ export default class Logs extends React.Component<Props, State> {
     if (endpoint && endpoint.includes('phdeployments'))
       hints.push('Timestamp reflects Universal Time Coordinated (UTC).');
     if (fromPersist)
-      hints.push('Log content may be delayed by up to 1 hour because the pod was deleted.');
-    return <>
-      <div style={{float: 'right', marginBottom: 4, display: 'flex'}}>
-        <Button
-          onClick={this.download}
-          style={{marginRight: 8}}
-          disabled={ log.length <= 0 }
-          loading={downloading}
-        >
-          Download
-        </Button>
-        <Button
-          onClick={this.enableAutoScroll}
-          disabled={ log.length <= 0 }
-        >
-          Scroll to Bottom
-        </Button>
-      </div>
-      <div style={{position: 'relative', marginTop: 48, ...style}}>
-        <Hint>
-          {hints.map(hint => (
-            <div style={{display: 'flex'}}>
-              <Icon type='info-circle' theme='twoTone' style={{marginTop: 4}}/><div style={{marginLeft: 4, flex: '0 0 100%'}}>{hint}</div>
-            </div>))
-          }
-        </Hint>
+      hints.push(
+        'Log content may be delayed by up to 1 hour because the pod was deleted.'
+      );
+    return (
+      <>
+        <div style={{ float: 'right', marginBottom: 4, display: 'flex' }}>
+          <Button
+            onClick={this.download}
+            style={{ marginRight: 8 }}
+            disabled={log.length <= 0}
+            loading={downloading}
+          >
+            Download
+          </Button>
+          <Button onClick={this.enableAutoScroll} disabled={log.length <= 0}>
+            Scroll to Bottom
+          </Button>
+        </div>
+        <div style={{ position: 'relative', marginTop: 48, ...style }}>
+          <Hint>
+            {hints.map(hint => (
+              <div style={{ display: 'flex' }}>
+                <Icon
+                  type='info-circle'
+                  theme='twoTone'
+                  style={{ marginTop: 4 }}
+                />
+                <div style={{ marginLeft: 4, flex: '0 0 100%' }}>{hint}</div>
+              </div>
+            ))}
+          </Hint>
 
-        <List
-          style={listStyle}
-          onScroll={this.onScroll}
-          ref={this.listRef}
-          outerRef={this.outerRef}
-          height={rows * LINE_HEIGHT}
-          itemCount={listItems.length}
-          itemSize={LINE_HEIGHT}
-        >
-          {({index, style}) => <div key={index} style={{
-            ...style,
-            padding: '0px 12px',
-            overflow: 'visible',
-            whiteSpace: 'nowrap'
-          }}>{handleLong(listItems[index])}</div>}
-        </List>
-      </div>
-    </>;
+          <List
+            style={listStyle}
+            onScroll={this.onScroll}
+            ref={this.listRef}
+            outerRef={this.outerRef}
+            height={rows * LINE_HEIGHT}
+            itemCount={listItems.length}
+            itemSize={LINE_HEIGHT}
+          >
+            {({ index, style }) => (
+              <div
+                key={index}
+                style={{
+                  ...style,
+                  padding: '0px 12px',
+                  overflow: 'visible',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {handleLong(listItems[index])}
+              </div>
+            )}
+          </List>
+        </div>
+      </>
+    );
   }
 }
 
