@@ -31,12 +31,6 @@ import { BaseImagesQuery, SecretsQuery } from './images.graphql';
 import type { Image, ImageSpec, Groups } from './types';
 
 const StyledFormItem = styled<any>(Form.Item)`
-  > .ant-form-item-label label {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
   > .ant-form-item-label label:after {
     content: '';
   }
@@ -329,8 +323,9 @@ function _ImageForm({
                   message: 'Name is required',
                 },
                 {
-                  pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*/,
-                  message: `Alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`,
+                  pattern:
+                    /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
+                  message: `lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`,
                 },
               ],
             })(<Input disabled={props?.disabledName || false} />)}
@@ -363,7 +358,18 @@ function _ImageForm({
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item label='Type'>
+          <Form.Item
+            label={
+              <span>
+                Type{' '}
+                <PHTooltip
+                  tipText='Specify a CPU, GPU, or Universal type for this image.'
+                  tipLink='https://docs.primehub.io/docs/guide_manual/admin-image'
+                  placement='right'
+                />
+              </span>
+            }
+          >
             {form.getFieldDecorator('type', {
               initialValue: data?.type || 'both',
               rules: [
@@ -491,7 +497,7 @@ function _ImageForm({
           {data?.imageSpec && (
             <StyledFormItem
               label={
-                <>
+                <span>
                   Conatiner Image URL:{' '}
                   <a onClick={() => setBuildDetailVisible(true)}>
                     {getImageStatus({
@@ -499,7 +505,7 @@ function _ImageForm({
                       jobStatus: data?.jobStatus,
                     })}
                   </a>
-                </>
+                </span>
               }
             >
               {form.getFieldDecorator('url', {
@@ -518,27 +524,20 @@ function _ImageForm({
 
         <StyledFormItem
           label={
-            <>
+            <span>
               Global{' '}
               <PHTooltip
                 tipText='When Global, everyone can access this Instance Type.'
                 tipLink='https://docs.primehub.io/docs/guide_manual/admin-instancetype#edit-groups'
                 placement='right'
               />
-            </>
+            </span>
           }
         >
           {form.getFieldDecorator('global', {
             valuePropName: 'checked',
             initialValue: get(data, 'global', true),
-          })(
-            <Switch
-              data-testid='global'
-              checkedChildren='Yes'
-              unCheckedChildren='No'
-              style={{ width: '60px' }}
-            />
-          )}
+          })(<Switch unCheckedChildren='No' data-testid='global' />)}
         </StyledFormItem>
 
         {!form.getFieldValue('global') && (
@@ -758,11 +757,17 @@ export const ImageForm = compose(
         variables: {
           where: {},
         },
+        fetchPolicy: 'cache-and-network',
       };
     },
   }),
   graphql(SecretsQuery, {
     name: 'secretsQuery',
+    options: () => {
+      return {
+        fetchPolicy: 'cache-and-network',
+      };
+    },
   })
 )(
   Form.create<ImageFormProps>({
