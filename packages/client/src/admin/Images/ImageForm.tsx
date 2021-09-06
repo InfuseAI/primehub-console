@@ -702,6 +702,11 @@ function _ImageForm({
                   {/* @ts-ignore */}
                   <Button
                     type='primary'
+                    onClick={() => setBuildDetailVisible(false)}
+                  >
+                    Close
+                  </Button>
+                  <Button
                     onClick={() => {
                       Modal.confirm({
                         title: 'Cancel Build',
@@ -725,9 +730,6 @@ function _ImageForm({
                     }}
                   >
                     Cancel Build
-                  </Button>
-                  <Button onClick={() => setBuildDetailVisible(false)}>
-                    Close
                   </Button>
                 </div>
               )}
