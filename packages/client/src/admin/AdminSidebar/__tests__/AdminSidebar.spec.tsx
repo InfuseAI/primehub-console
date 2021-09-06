@@ -2,12 +2,16 @@ import * as React from 'react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { render, screen } from 'test/test-utils';
-import { AdminSidebar } from '../AdminSidebar';
 
 const MOCK_ROUTE_PATHNAME = 'group';
 
 // @ts-ignore
 global.modelDeploymentOnly = false;
+
+// @ts-ignore
+global.enableUsageReport = true;
+
+import { AdminSidebar } from '../AdminSidebar';
 
 describe('AdminSidebar', () => {
   it('should render AdminSidebar with default items', () => {
