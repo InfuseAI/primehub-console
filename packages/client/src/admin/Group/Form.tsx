@@ -302,11 +302,7 @@ function GroupForm(props: Props) {
             {form.getFieldDecorator('enabledDeployment', {
               initialValue: initialValue.enabledDeployment,
               valuePropName: 'checked',
-            })(
-              <Switch
-                data-testid='group/enabledDeployment'
-              />
-            )}
+            })(<Switch data-testid='group/enabledDeployment' />)}
           </Form.Item>
         </FeatureEE>
         <Feature ce={false}>
@@ -376,11 +372,7 @@ function GroupForm(props: Props) {
                     {form.getFieldDecorator('launchGroupOnly', {
                       initialValue: initialValue.launchGroupOnly,
                       valuePropName: 'checked',
-                    })(
-                      <Switch
-                        data-testid='group/launchGroupOnly'
-                      />
-                    )}
+                    })(<Switch data-testid='group/launchGroupOnly' />)}
                   </Form.Item>
                 </Col>
               </Row>
