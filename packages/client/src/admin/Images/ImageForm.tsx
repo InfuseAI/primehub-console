@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useReducer } from 'react';
+import styled from 'styled-components';
 import {
   Button,
   Checkbox,
@@ -28,6 +29,18 @@ import { errorHandler } from 'utils/errorHandler';
 import { GroupsRelationTable } from '../User/UserDetail';
 import { BaseImagesQuery, SecretsQuery } from './images.graphql';
 import type { Image, ImageSpec, Groups } from './types';
+
+const StyledFormItem = styled<any>(Form.Item)`
+  > .ant-form-item-label label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  > .ant-form-item-label label:after {
+    content: '';
+  }
+`;
 
 export type ImageFormState = Partial<Image> & {
   isBuildByCustomImage?: boolean;
@@ -476,16 +489,19 @@ function _ImageForm({
 
           {/* custom image */}
           {data?.imageSpec && (
-            <Form.Item>
-              <div>
-                Conatiner Image URL:{' '}
-                <a onClick={() => setBuildDetailVisible(true)}>
-                  {getImageStatus({
-                    isReady: data?.isReady,
-                    jobStatus: data?.jobStatus,
-                  })}
-                </a>
-              </div>
+            <StyledFormItem
+              label={
+                <>
+                  Conatiner Image URL:{' '}
+                  <a onClick={() => setBuildDetailVisible(true)}>
+                    {getImageStatus({
+                      isReady: data?.isReady,
+                      jobStatus: data?.jobStatus,
+                    })}
+                  </a>
+                </>
+              }
+            >
               {form.getFieldDecorator('url', {
                 initialValue: data?.url || '',
               })(<Input disabled />)}
@@ -496,25 +512,22 @@ function _ImageForm({
               {form.getFieldDecorator('pullSecret', {
                 initialValue: data?.imageSpec.pullSecret || '',
               })(<Input hidden />)}
-            </Form.Item>
+            </StyledFormItem>
           )}
         </div>
 
-        <Form.Item>
-          <label
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-            }}
-          >
-            Global{' '}
-            <PHTooltip
-              tipText='When Global, everyone can access this Instance Type.'
-              tipLink='https://docs.primehub.io/docs/guide_manual/admin-instancetype#edit-groups'
-              placement='right'
-            />
-          </label>
+        <StyledFormItem
+          label={
+            <>
+              Global{' '}
+              <PHTooltip
+                tipText='When Global, everyone can access this Instance Type.'
+                tipLink='https://docs.primehub.io/docs/guide_manual/admin-instancetype#edit-groups'
+                placement='right'
+              />
+            </>
+          }
+        >
           {form.getFieldDecorator('global', {
             valuePropName: 'checked',
             initialValue: get(data, 'global', true),
@@ -526,7 +539,7 @@ function _ImageForm({
               style={{ width: '60px' }}
             />
           )}
-        </Form.Item>
+        </StyledFormItem>
 
         {!form.getFieldValue('global') && (
           <Form.Item>
