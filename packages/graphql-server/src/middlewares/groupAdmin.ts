@@ -1,5 +1,5 @@
 import Koa, {Context} from 'koa';
-import { isGroupAdmin } from '../resolvers/utils';
+import { isGroupAdmin, isAdmin } from '../resolvers/utils';
 import Boom from 'boom';
 import { createConfig } from '../config';
 import CrdClient from '../crdClient/crdClientImpl';
@@ -17,7 +17,7 @@ export const groupAdminMiddleware = async (ctx: Koa.ParameterizedContext, next: 
   if (imageId) {
     const image = await crdClient.images.get(imageId);
     const groupName = image.spec.groupName;
-    if (await isGroupAdmin(username, groupName, kcAdminClient)) {
+    if (isAdmin || await isGroupAdmin(username, groupName, kcAdminClient)) {
       return next();
     } else {
       throw Boom.forbidden('request not authorized');
