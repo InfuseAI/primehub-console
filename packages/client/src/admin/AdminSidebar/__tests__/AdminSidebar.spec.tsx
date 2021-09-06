@@ -30,7 +30,6 @@ describe('AdminSidebar', () => {
     expect(screen.getByText('Users')).toBeInTheDocument();
     expect(screen.getByText('Instance Types')).toBeInTheDocument();
     expect(screen.getByText('Images')).toBeInTheDocument();
-    expect(screen.getByText('Image Builder')).toBeInTheDocument();
     expect(screen.getByText('Datasets')).toBeInTheDocument();
     expect(screen.getByText('Secrets')).toBeInTheDocument();
     expect(screen.getByText('System Settings')).toBeInTheDocument();
