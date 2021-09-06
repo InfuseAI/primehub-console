@@ -305,8 +305,6 @@ function GroupForm(props: Props) {
             })(
               <Switch
                 data-testid='group/enabledDeployment'
-                checkedChildren={<Icon type='check' />}
-                unCheckedChildren={<Icon type='close' />}
               />
             )}
           </Form.Item>
@@ -349,8 +347,6 @@ function GroupForm(props: Props) {
               <Switch
                 data-testid='group/enableSharedVolume'
                 disabled={type === 'update'}
-                checkedChildren={<Icon type='check' />}
-                unCheckedChildren={<Icon type='close' />}
               />
             )}
           </Form.Item>
@@ -383,8 +379,6 @@ function GroupForm(props: Props) {
                     })(
                       <Switch
                         data-testid='group/launchGroupOnly'
-                        checkedChildren={<Icon type='check' />}
-                        unCheckedChildren={<Icon type='close' />}
                       />
                     )}
                   </Form.Item>
