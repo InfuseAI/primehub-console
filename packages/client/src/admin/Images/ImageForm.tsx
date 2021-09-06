@@ -329,8 +329,9 @@ function _ImageForm({
                   message: 'Name is required',
                 },
                 {
-                  pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*/,
-                  message: `Alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`,
+                  pattern:
+                    /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
+                  message: `lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`,
                 },
               ],
             })(<Input disabled={props?.disabledName || false} />)}
