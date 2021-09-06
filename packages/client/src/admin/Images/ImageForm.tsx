@@ -31,12 +31,6 @@ import { BaseImagesQuery, SecretsQuery } from './images.graphql';
 import type { Image, ImageSpec, Groups } from './types';
 
 const StyledFormItem = styled<any>(Form.Item)`
-  > .ant-form-item-label label {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
   > .ant-form-item-label label:after {
     content: '';
   }
@@ -364,16 +358,16 @@ function _ImageForm({
             </Radio.Group>
           </Form.Item>
 
-          <StyledFormItem
+          <Form.Item
             label={
-              <>
+              <span>
                 Type{' '}
                 <PHTooltip
                   tipText='Specify a CPU, GPU, or Universal type for this image.'
                   tipLink='https://docs.primehub.io/docs/guide_manual/admin-image'
                   placement='right'
                 />
-              </>
+              </span>
             }
           >
             {form.getFieldDecorator('type', {
@@ -390,7 +384,7 @@ function _ImageForm({
                 <Select.Option value='both'>Universal</Select.Option>
               </Select>
             )}
-          </StyledFormItem>
+          </Form.Item>
 
           {toggleRadioGroup === 'existingOne' && (
             <>
@@ -503,7 +497,7 @@ function _ImageForm({
           {data?.imageSpec && (
             <StyledFormItem
               label={
-                <>
+                <span>
                   Conatiner Image URL:{' '}
                   <a onClick={() => setBuildDetailVisible(true)}>
                     {getImageStatus({
@@ -511,7 +505,7 @@ function _ImageForm({
                       jobStatus: data?.jobStatus,
                     })}
                   </a>
-                </>
+                </span>
               }
             >
               {form.getFieldDecorator('url', {
@@ -530,30 +524,20 @@ function _ImageForm({
 
         <StyledFormItem
           label={
-            <div onClick={event => event.preventDefault()}>
+            <span>
               Global{' '}
               <PHTooltip
                 tipText='When Global, everyone can access this Instance Type.'
                 tipLink='https://docs.primehub.io/docs/guide_manual/admin-instancetype#edit-groups'
                 placement='right'
               />
-            </div>
+            </span>
           }
         >
           {form.getFieldDecorator('global', {
             valuePropName: 'checked',
             initialValue: get(data, 'global', true),
-          })(
-            <Switch
-              onChange={(_, event) => {
-                event.stopPropagation();
-              }}
-              data-testid='global'
-              checkedChildren='Yes'
-              unCheckedChildren='No'
-              style={{ width: '60px' }}
-            />
-          )}
+          })(<Switch unCheckedChildren='No' data-testid='global' />)}
         </StyledFormItem>
 
         {!form.getFieldValue('global') && (
@@ -773,11 +757,17 @@ export const ImageForm = compose(
         variables: {
           where: {},
         },
+        fetchPolicy: 'cache-and-network',
       };
     },
   }),
   graphql(SecretsQuery, {
     name: 'secretsQuery',
+    options: () => {
+      return {
+        fetchPolicy: 'cache-and-network',
+      };
+    },
   })
 )(
   Form.create<ImageFormProps>({
