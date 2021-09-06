@@ -1,13 +1,10 @@
-import * as React from 'react';
-
+import React from 'react';
 import { IFrame } from 'components/hub/iframe';
 
-function JupyterhubBody() {
+export default function JupyterhubAdmin() {
   return (
     <div style={{ height: 'calc(100vh - 64px)' }}>
-      <IFrame src="/hub/admin" />
+      <IFrame src='/hub/admin' />
     </div>
   );
 }
-
-export default JupyterhubBody;

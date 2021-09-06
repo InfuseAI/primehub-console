@@ -11,7 +11,7 @@ import { InstanceTypes, InstanceTypeInfo } from '../InstanceTypes';
 import { appPrefix } from 'utils/env';
 import UsageReport from '../UsageReport';
 import { ImageList, ImageAdd, ImageInfo } from '../Images';
-import JupyterhubBody from 'cms-layouts/jupyterhubBody';
+import JupyterHubAdmin from '../JupyterHubAdmin';
 
 export const ROUTES = [
   'group',
@@ -155,7 +155,7 @@ export const routes = [
     path: 'admin/jupyterhub',
     name: 'Notebooks Admin',
     enabled: true,
-    component: JupyterhubBody,
+    component: JupyterHubAdmin,
   },
   {
     key: 'usageReport',
