@@ -4,7 +4,6 @@ import { LocalStorageConnector } from 'canner-graphql-interface';
 
 export const createGraphqlClient = (options: {
   fakeData: any;
-  schema: any;
 }) => {
   const graphqlClient = new GraphqlClient({
     uri: window.graphqlEndpoint,
@@ -27,7 +26,6 @@ export const createGraphqlClient = (options: {
     { graphqlClient } :
     {
       connector,
-      schema: options.schema,
     });
 }
 

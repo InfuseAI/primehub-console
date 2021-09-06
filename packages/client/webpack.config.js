@@ -73,20 +73,6 @@ function getPlugins(env) {
   return plugins[currentEnv];
 }
 
-function getSchema(env) {
-  const schema = env.schema || 'ce';
-  const schemaMap = {
-    ee: path.resolve(__dirname, 'schema/ee/index.schema.js'),
-    ce: path.resolve(__dirname, 'schema/index.ce.schema.js'),
-    modelDeploy: path.resolve(
-      __dirname,
-      'schema/ee/index.model_deploy.schema.js'
-    ),
-  };
-
-  return schemaMap[schema];
-}
-
 function getEntry(env) {
   const version = env.schema || 'ce';
   const entryMap = {
@@ -155,7 +141,6 @@ module.exports = (env) => {
         queries: path.resolve(__dirname, 'src/queries'),
         schema: path.resolve(__dirname, 'schema'),
         hooks: path.resolve(__dirname, 'src/hooks'),
-        'index-schema': getSchema(env),
       },
     },
     devServer: {
@@ -194,17 +179,6 @@ module.exports = (env) => {
           test: /\.(graphql|gql)$/i,
           exclude: /node_modules/,
           loader: 'graphql-tag/loader',
-        },
-        {
-          test: /(\.schema\.js|canner\.def\.js)$/,
-          use: [
-            {
-              loader: 'canner-schema-loader',
-            },
-            {
-              loader: 'babel-loader?cacheDirectory',
-            },
-          ],
         },
         {
           test: /\.js$/,
