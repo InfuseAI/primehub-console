@@ -1,13 +1,9 @@
 /** @jsx builder */
 import builder, { Body } from 'canner-script';
 import Jupyterhub from 'schema/jupyterhub.schema';
-import BuildImage from 'schema/ee/buildImage.schema';
-import BuildImageJob from 'schema/ee/buildImageJob.schema';
 import { LocalStorageConnector } from 'canner-graphql-interface';
 import { createFakeData } from 'canner-helpers';
 import { dict, graphqlClient, imageStorage } from 'schema/utils';
-import BuildImageJobBody from 'cms-layouts/buildImageJobBody';
-import CommonBody from 'cms-layouts/commonBody';
 import JupyterhubBody from 'cms-layouts/jupyterhubBody';
 
 const maintenance =
@@ -26,19 +22,12 @@ const grafana =
 
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
-    <Body component={CommonBody}>
-      <BuildImage />
-    </Body>
-    <Body component={BuildImageJobBody}>
-      <BuildImageJob />
-    </Body>
     <Body component={JupyterhubBody}>
       <Jupyterhub />
     </Body>
 
     {maintenance}
     {grafana}
-    {/* <Announcement /> */}
   </root>
 );
 if (process.env.NODE_ENV === 'production') {

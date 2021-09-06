@@ -138,13 +138,6 @@ export const routes = [
     component: ImageInfo,
   },
   {
-    key: 'buildImage',
-    path: 'admin/buildImage',
-    enabled: true,
-    name: 'Image Builder',
-    component: DeprecatedWarning,
-  },
-  {
     key: 'dataset',
     path: 'admin/dataset',
     enabled: true,
