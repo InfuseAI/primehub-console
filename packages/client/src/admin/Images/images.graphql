@@ -1,0 +1,123 @@
+fragment ImageInfo on Image {
+  id
+  displayName
+  description
+  url
+  urlForGpu
+  name
+  type
+  groupName
+  useImagePullSecret
+  logEndpoint
+  isReady
+  spec
+  global
+  jobStatus {
+    phase
+  }
+  imageSpec {
+    baseImage
+    pullSecret
+    packages {
+      apt
+      conda
+      pip
+    }
+  }
+}
+
+query ImagesQuery(
+  $page: Int
+  $where: ImageWhereInput
+  $orderBy: ImageOrderByInput
+) {
+  imagesConnection(
+    page: $page
+    orderBy: $orderBy
+    where: $where
+    mode: SYSTEM_ONLY
+  ) {
+    edges {
+      cursor
+      node {
+        id
+        name
+        displayName
+        description
+        type
+        isReady
+      }
+    }
+    pageInfo {
+      currentPage
+      totalPage
+    }
+  }
+}
+
+query ImageQuery($where: ImageWhereUniqueInput!) {
+  image(where: $where) {
+    id
+    groups {
+      id
+      name
+      displayName
+    }
+    ...ImageInfo
+  }
+}
+
+query SecretsQuery {
+  secrets(where: { ifDockerConfigJson: true }) {
+    id
+    name
+    type
+  }
+}
+
+query BaseImagesQuery {
+  images(mode: SYSTEM_ONLY) {
+    id
+    ...ImageInfo
+  }
+}
+
+mutation CreateImageMutation($data: ImageCreateInput!) {
+  createImage(data: $data) {
+    id
+  }
+}
+
+mutation UpdateImageMutation($data: ImageUpdateInput!, $where: ImageWhereUniqueInput!) {
+  updateImage(data: $data, where: $where) {
+    id
+    groups {
+      id
+      name
+      displayName
+    }
+    ...ImageInfo
+  }
+}
+
+mutation DeleteImageMutation($where: ImageWhereUniqueInput!) {
+  deleteImage(where: $where) {
+    id
+  }
+}
+
+mutation RebuildImageMutation(
+  $data: ImageSpecUpdateInput!
+  $where: ImageWhereUniqueInput!
+) {
+  rebuildImage(data: $data, where: $where) {
+    id
+    ...ImageInfo
+  }
+}
+
+mutation CancelImageBuildMutation($where: ImageWhereUniqueInput!) {
+    cancelImageBuild(where: $where) {
+      id
+    }
+  }

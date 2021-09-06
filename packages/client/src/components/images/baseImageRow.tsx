@@ -7,7 +7,7 @@ const {Option} = Select;
 
 interface Props {
   form: any;
-  imageSpec: any;
+  imageSpec?: any;
   disabled?: boolean;
   availableImages: any[];
 }

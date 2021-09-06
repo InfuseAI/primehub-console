@@ -1,6 +1,5 @@
 /** @jsx builder */
 import builder, { Body } from 'canner-script';
-import Image from 'schema/image.schema';
 import Jupyterhub from 'schema/jupyterhub.schema';
 import BuildImage from 'schema/ee/buildImage.schema';
 import BuildImageJob from 'schema/ee/buildImageJob.schema';
@@ -28,7 +27,6 @@ const grafana =
 const schema = (
   <root imageStorage={imageStorage} dict={dict}>
     <Body component={CommonBody}>
-      <Image />
       <BuildImage />
     </Body>
     <Body component={BuildImageJobBody}>

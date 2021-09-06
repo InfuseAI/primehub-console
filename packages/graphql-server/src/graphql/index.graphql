@@ -82,6 +82,7 @@ type Query {
   """Image"""
   image(where: ImageWhereUniqueInput!): Image
   images(
+    mode: QueryImageMode
     where: ImageWhereInput
     page: Int
     orderBy: ImageOrderByInput

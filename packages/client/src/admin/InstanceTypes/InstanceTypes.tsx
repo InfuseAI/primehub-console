@@ -42,7 +42,7 @@ interface InstanceTypeNode {
   >;
 }
 
-interface InstanceTypeEdges {
+interface InstanceTypeConnection {
   edges: InstanceTypeNode[];
   pageInfo: {
     currentPage: number;
@@ -66,15 +66,15 @@ interface Props {
     error: Error | undefined;
     loading: boolean;
     variables: QueryVariables;
-    instanceTypesConnection?: InstanceTypeEdges;
+    instanceTypesConnection?: InstanceTypeConnection;
     fetchMore: ({
       variables,
       updateQuery,
     }: {
       variables: QueryVariables;
       updateQuery: (
-        previousResult: InstanceTypeEdges,
-        { fetchMoreResult: InstanceTypeEdges }
+        previousResult: InstanceTypeConnection,
+        { fetchMoreResult: InstanceTypeConnection }
       ) => void;
     }) => void;
   };
