@@ -363,7 +363,18 @@ function _ImageForm({
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item label='Type'>
+          <StyledFormItem
+            label={
+              <>
+                Type{' '}
+                <PHTooltip
+                  tipText='Specify a CPU, GPU, or Universal type for this image.'
+                  tipLink='https://docs.primehub.io/docs/guide_manual/admin-image'
+                  placement='right'
+                />
+              </>
+            }
+          >
             {form.getFieldDecorator('type', {
               initialValue: data?.type || 'both',
               rules: [
@@ -378,7 +389,7 @@ function _ImageForm({
                 <Select.Option value='both'>Universal</Select.Option>
               </Select>
             )}
-          </Form.Item>
+          </StyledFormItem>
 
           {toggleRadioGroup === 'existingOne' && (
             <>
@@ -518,14 +529,14 @@ function _ImageForm({
 
         <StyledFormItem
           label={
-            <>
+            <div onClick={event => event.preventDefault()}>
               Global{' '}
               <PHTooltip
                 tipText='When Global, everyone can access this Instance Type.'
                 tipLink='https://docs.primehub.io/docs/guide_manual/admin-instancetype#edit-groups'
                 placement='right'
               />
-            </>
+            </div>
           }
         >
           {form.getFieldDecorator('global', {
@@ -533,6 +544,9 @@ function _ImageForm({
             initialValue: get(data, 'global', true),
           })(
             <Switch
+              onChange={(_, event) => {
+                event.stopPropagation();
+              }}
               data-testid='global'
               checkedChildren='Yes'
               unCheckedChildren='No'
