@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { ApolloProvider } from 'react-apollo';
 import { fakeData } from './fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
-import { dict } from 'schema/utils';
+import dict from './utils/dict';
 import {
   BrowserRouter as Router,
   Route,
