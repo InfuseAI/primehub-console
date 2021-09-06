@@ -1,7 +1,6 @@
-import * as React from 'react';
-import { Route, RouteProps, Link } from 'react-router-dom';
+import React from 'react';
+import { Route, RouteProps } from 'react-router-dom';
 import { SystemSetting } from '../SystemSetting';
-import { Alert } from 'antd';
 import { UserList, UserDetail, UserAdd } from '../User';
 import { Datasets, DatasetInfo } from '../Datasets';
 import GroupList from '../Group/GroupList';
