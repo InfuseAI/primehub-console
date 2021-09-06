@@ -10,87 +10,91 @@ import { ImageInfo } from '../ImageInfo';
 import { ImageQuery, BaseImagesQuery, SecretsQuery } from '../images.graphql';
 
 function setup() {
-  const mockExistingOneRequests = [
-    {
-      request: {
-        query: SecretsQuery,
-      },
-      result: {
-        data: {
-          secrets: [
-            {
-              id: 'image-dev-keroro',
-              name: 'dev-keroro',
-              type: 'kubernetes',
-              __typename: 'Secret',
-            },
-          ],
-        },
+  const mockSecretsQuery = {
+    request: {
+      query: SecretsQuery,
+    },
+    result: {
+      data: {
+        secrets: [
+          {
+            id: 'image-dev-keroro',
+            name: 'dev-keroro',
+            type: 'kubernetes',
+            __typename: 'Secret',
+          },
+        ],
       },
     },
-    {
-      request: {
-        query: BaseImagesQuery,
-        variables: {
-          where: {},
-        },
+  };
+
+  const mockBaseImagesQuery = {
+    request: {
+      query: BaseImagesQuery,
+      variables: {
+        where: {},
       },
-      result: {
-        data: {
-          images: [
-            {
-              id: 'keroro',
-              displayName: 'keroro',
+    },
+    result: {
+      data: {
+        images: [
+          {
+            id: 'keroro',
+            displayName: 'keroro',
+            description: 'gerogero',
+            url: 'https://infuseai.io',
+            urlForGpu: 'https://infuseai.io',
+            name: 'keroro',
+            type: 'cpu',
+            groupName: null,
+            useImagePullSecret: 'image-dev-keroro',
+            logEndpoint: 'http://localhost:3001/logs/images/keroro/job',
+            isReady: true,
+            spec: {
               description: 'gerogero',
+              displayName: 'keroro',
+              pullSecret: 'image-dev-keroro',
+              type: 'cpu',
               url: 'https://infuseai.io',
               urlForGpu: 'https://infuseai.io',
-              name: 'keroro',
-              type: 'cpu',
-              groupName: null,
-              useImagePullSecret: 'image-dev-keroro',
-              logEndpoint: 'http://localhost:3001/logs/images/keroro/job',
-              isReady: true,
-              spec: {
-                description: 'gerogero',
-                displayName: 'keroro',
-                pullSecret: 'image-dev-keroro',
-                type: 'cpu',
-                url: 'https://infuseai.io',
-                urlForGpu: 'https://infuseai.io',
-              },
-              global: true,
-              jobStatus: null,
-              imageSpec: null,
-              __typename: 'Image',
             },
-            {
-              id: 'doramon',
-              displayName: 'doramon',
+            global: true,
+            jobStatus: null,
+            imageSpec: null,
+            __typename: 'Image',
+          },
+          {
+            id: 'doraemon',
+            displayName: 'doraemon',
+            description: '',
+            url: 'cpu2',
+            urlForGpu: 'cpu2',
+            name: 'doraemon',
+            type: 'both',
+            groupName: null,
+            useImagePullSecret: null,
+            logEndpoint: 'http://localhost:3001/logs/images/doraemon/job',
+            isReady: true,
+            spec: {
               description: '',
+              displayName: 'doraemon',
+              type: 'both',
               url: 'cpu2',
               urlForGpu: 'cpu2',
-              name: 'doramon',
-              type: 'both',
-              groupName: null,
-              useImagePullSecret: null,
-              logEndpoint: 'http://localhost:3001/logs/images/doramon/job',
-              isReady: true,
-              spec: {
-                description: '',
-                displayName: 'doramon',
-                type: 'both',
-                url: 'cpu2',
-                urlForGpu: 'cpu2',
-              },
-              global: false,
-              jobStatus: null,
-              imageSpec: null,
-              __typename: 'Image',
             },
-          ],
-        },
+            global: false,
+            jobStatus: null,
+            imageSpec: null,
+            __typename: 'Image',
+          },
+        ],
       },
     },
+  };
+
+  const mockExistingOneRequests = [
+    mockSecretsQuery,
+    mockBaseImagesQuery,
     {
       request: {
         query: ImageQuery,
@@ -133,6 +137,72 @@ function setup() {
     },
   ];
 
+  const mockCustomImageRequests = [
+    mockSecretsQuery,
+    mockBaseImagesQuery,
+    {
+      request: {
+        query: ImageQuery,
+        variables: {
+          where: {
+            id: 'keroro',
+          },
+        },
+      },
+      result: {
+        data: {
+          image: {
+            id: 'keroro',
+            groups: [],
+            displayName: 'keroro',
+            description: 'gerogero',
+            url: 'https://infuseai.io',
+            urlForGpu: 'https://infuseai.io',
+            name: 'keroro',
+            type: 'both',
+            groupName: null,
+            useImagePullSecret: 'image-dev-keroro',
+            logEndpoint: 'http://localhost:3001/logs/images/keroro/job',
+            isReady: true,
+            spec: {
+              description: 'gerogero',
+              displayName: 'keroro',
+              imageSpec: {
+                baseImage: 'infuseai/docker-stacks:base-notebook-3f48358e',
+                packages: {
+                  apt: ['curl'],
+                  pip: [],
+                  conda: [],
+                  __typename: 'ImageSpecPackages',
+                },
+                pullSecret: 'image-dev-keroro',
+                updateTime: '2021-09-03T12:14:19Z',
+              },
+            },
+            global: false,
+            jobStatus: {
+              phase: 'Succeeded',
+              __typename: 'JobStatus',
+            },
+            imageSpec: {
+              baseImage: 'infuseai/docker-stacks:base-notebook-3f48358e',
+              packages: {
+                apt: ['curl'],
+                pip: [],
+                conda: [],
+                __typename: 'ImageSpecPackages',
+              },
+              pullSecret: 'image-dev-keroro',
+              updateTime: '2021-09-03T12:14:19Z',
+              __typename: 'ImageSpec',
+            },
+            __typename: 'Image',
+          },
+        },
+      },
+    },
+  ];
+
   function TestProvider({ children }: { children: React.ReactNode }) {
     return (
       <IntlProvider locale='en'>
@@ -146,6 +216,7 @@ function setup() {
   return {
     TestProvider,
     mockExistingOneRequests,
+    mockCustomImageRequests,
   };
 }
 
@@ -222,5 +293,21 @@ describe('ImageInfo', () => {
     expect(
       screen.getByLabelText('Specific Container Image URL for GPU')
     ).toBeInTheDocument();
+  });
+
+  it('should render the custom image with success build from fetched data', async () => {
+    const { TestProvider, mockCustomImageRequests } = setup();
+
+    render(
+      <TestProvider>
+        <MockedProvider mocks={mockCustomImageRequests}>
+          <ImageInfo />
+        </MockedProvider>
+      </TestProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('View build details')).toBeInTheDocument();
+    });
   });
 });
