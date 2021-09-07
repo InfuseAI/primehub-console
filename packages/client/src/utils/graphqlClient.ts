@@ -89,7 +89,7 @@ export function genClient(schema: LoadedSchema, fakeData: any) {
 
   if (isEmpty(connector) && isEmpty(graphqlClient)) {
     options.connector = new MemoryConnector({
-      defaultData: createFakeData(schema.schema, 10),
+      defaultData: fakeData,
     });
   }
 
@@ -99,7 +99,7 @@ export function genClient(schema: LoadedSchema, fakeData: any) {
   return createClient(options);
 }
 
-export const createGraphqlClient = (options: { fakeData: any }) => {
+export const createGraphqlClient = (options: { fakeData: any, schema: any }) => {
   const graphqlClient = new GraphqlClient({
     uri: window.graphqlEndpoint,
     fetch: (uri, option) => {
@@ -122,7 +122,7 @@ export const createGraphqlClient = (options: { fakeData: any }) => {
       ? { graphqlClient }
       : {
           connector,
-          schema: {},
+          schema: options.schema,
         },
     options.fakeData
   );

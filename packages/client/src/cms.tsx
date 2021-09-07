@@ -8,7 +8,7 @@ import Error from 'components/error';
 import { createGlobalStyle } from 'styled-components';
 import { ApolloProvider } from 'react-apollo';
 import { createGraphqlClient } from 'utils/graphqlClient';
-import { fakeData } from './fakeData';
+import { fakeData, schema } from './fakeData';
 import { RouteComponentProps } from 'react-router';
 import LicenseWarningBanner from 'ee/components/shared/licenseWarningBanner';
 
@@ -19,6 +19,7 @@ const { Content } = Layout;
 
 const client = createGraphqlClient({
   fakeData,
+  schema,
 });
 
 const GlobalStyle = createGlobalStyle`

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ApolloProvider } from 'react-apollo';
-import { fakeData } from './fakeData';
+import { fakeData, schema } from './fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
 import dict from './utils/dict';
 import {
@@ -78,6 +78,7 @@ export const tokenSyncWorker = new BackgroundTokenSyncer({
 
 const client = createGraphqlClient({
   fakeData,
+  schema,
 });
 
 tokenSyncWorker.run().catch(console.error);
