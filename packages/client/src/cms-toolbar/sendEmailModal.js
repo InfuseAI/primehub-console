@@ -8,7 +8,7 @@ import Spin from '../cms-components/spin';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-const SEND_MULTI_EMAIL = gql`
+export const SEND_MULTI_EMAIL = gql`
   mutation SendMultiEmail(
     $in: [String]
     $resetActions: [String]
@@ -90,6 +90,7 @@ export default class EmailForm extends React.Component {
       labelCol: { xs: 24, sm: 8 },
       wrapperCol: { xs: 24, sm: 16 },
     };
+    console.log(212314, loading);
     return (
       <Mutation
         mutation={SEND_MULTI_EMAIL}
@@ -251,7 +252,7 @@ class Expires extends React.Component {
   }
 }
 
-function parseToSecond(expiresIn) {
+export function parseToSecond(expiresIn) {
   const { number, unit } = expiresIn;
 
   switch (unit) {
@@ -260,8 +261,4 @@ function parseToSecond(expiresIn) {
     case 'minutes':
       return number * 60;
   }
-}
-
-function getIdFromRootValue({ rootValue, refId }) {
-  return get(rootValue, refId.getPathArr().slice(0, 2).concat('id'));
 }
