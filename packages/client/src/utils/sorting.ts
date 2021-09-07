@@ -1,4 +1,4 @@
-export const compareByAlphabetical = (prev: string, next: string) => {
+export const compareByAlphabetical = (prev: any, next: any) => {
   if (prev < next) return -1;
   if (prev > next) return 1;
   return 0;
@@ -6,11 +6,10 @@ export const compareByAlphabetical = (prev: string, next: string) => {
 
 export const sortNameByAlphaBet = (items: any[]): any[] => {
   const copiedItems = items.slice();
-  copiedItems
-    .sort((prev, next) => {
-      const prevName = prev.displayName || prev.name;
-      const nextName = next.displayName || next.name;
-      return compareByAlphabetical(prevName, nextName);
-    });
+  copiedItems.sort((prev, next) => {
+    const prevName = prev.displayName || prev.name;
+    const nextName = next.displayName || next.name;
+    return compareByAlphabetical(prevName, nextName);
+  });
   return copiedItems;
 };
