@@ -336,8 +336,8 @@ export default class Logs extends React.Component<Props, State> {
         </div>
         <div style={{ position: 'relative', marginTop: 48, ...style }}>
           <Hint>
-            {hints.map(hint => (
-              <div style={{ display: 'flex' }}>
+            {hints.map((hint, i) => (
+              <div key={`hints-${i}`} style={{ display: 'flex' }}>
                 <Icon
                   type='info-circle'
                   theme='twoTone'
