@@ -30,8 +30,10 @@
     "**/**/websocket-extensions": "^0.1.4"
   },
   "devDependencies": {
+    "chartjs-adapter-moment": "^1.0.0",
     "husky": "^6.0.0",
     "lint-staged": "^11.0.0",
+    "moment": "^2.29.1",
     "prettier": "^2.3.0",
     "prettier-package-json": "^2.5.0"
   },

@@ -51,7 +51,6 @@ export class MainPage extends React.Component<MainPageProps, MainPageState> {
     const everyoneGroupId = window.EVERYONE_GROUP_ID;
     const { currentUser } = this.props;
     const { loading, error, me } = currentUser;
-    console.log(currentUser, 22222);
     const groups =
       !loading && !error && me
         ? me.groups.filter(group => group.id !== everyoneGroupId)
