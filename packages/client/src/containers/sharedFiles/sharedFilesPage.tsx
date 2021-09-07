@@ -6,6 +6,7 @@ import Breadcrumbs from 'components/share/breadcrumb';
 import { GroupContextComponentProps, withGroupContext} from 'context/group';
 import {withRouter} from 'react-router-dom';
 import Browser from './browser';
+import NextBrowser from './NextBrowse';
 import { appPrefix } from 'utils/env';
 import { RouteComponentProps } from 'react-router';
 
@@ -45,11 +46,7 @@ class ShareFilesPage extends React.Component<Props> {
         title={"Shared Files"}
       />
       <PageBody>
-        <Browser
-          path={path}
-          groupName={groupContext.name}
-          onPathChanged={(newPath)=>{this.onPathChanged(newPath)}}
-        />
+        <NextBrowser path={path} />
       </PageBody>
     </div>
   }

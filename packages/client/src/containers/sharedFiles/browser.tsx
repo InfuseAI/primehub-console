@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {errorHandler} from 'utils/errorHandler';
