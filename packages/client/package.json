@@ -20,8 +20,8 @@
   "scripts": {
     "analyze": "webpack serve --env mode=development analyze",
     "build": "npm run clean && webpack --env mode=production schema=ee --progress profile",
-    "build:ce": "npm run clean && webpack --env mode=production schema=ce --progress profile",
-    "build:model_deploy": "npm run clean && webpack --env mode=production schema=modelDeploy --progress profile",
+    "build:ce": "npm run clean && webpack --env mode=production schema=ce --progress",
+    "build:model_deploy": "npm run clean && webpack --env mode=production schema=modelDeploy --progress",
     "clean": "rimraf dist",
     "lint": "eslint .",
     "start": "webpack serve --env mode=development schema=ee --progress",
@@ -83,7 +83,7 @@
     "babel-jest": "^27.0.6",
     "babel-loader": "^8.2.2",
     "babel-plugin-styled-components": "^1.13.2",
-    "compression-webpack-plugin": "^2.0.0",
+    "compression-webpack-plugin": "^8.0.1",
     "cron-validator": "^1.1.1",
     "css-loader": "^6.1.0",
     "eslint": "^7.31.0",
@@ -111,7 +111,8 @@
     "webpack": "^5.45.1",
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.7.0",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-dev-server": "^3.11.2",
+    "webpackbar": "^5.0.0-3"
   },
   "theme": {
     "menu-dark-bg": "#373d62",

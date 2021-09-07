@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const tsImportPluginFactory = require('ts-import-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const Webpackbar = require('webpackbar');
 
 const { theme } = require('./package.json');
 
@@ -22,6 +23,7 @@ function getPlugins(env) {
     favicon: isDev ? 'public/icon.svg' : '',
   };
   const common = [
+    new Webpackbar(),
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebPackPlugin({
       ...htmlWebpackPluginConfig,
@@ -114,6 +116,7 @@ module.exports = (env) => {
     mode: configs[currentEnv].mode,
     devtool: configs[currentEnv].devtool,
     entry: configs[currentEnv].entry,
+    stats: 'minimal',
     output: {
       path: path.join(__dirname, 'dist'),
       filename: '[name].js',
@@ -121,6 +124,9 @@ module.exports = (env) => {
     },
     optimization: {
       minimize: false,
+    },
+    performance: {
+      hints: false
     },
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.graphql'],
