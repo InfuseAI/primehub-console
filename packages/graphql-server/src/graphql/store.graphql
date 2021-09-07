@@ -23,3 +23,13 @@ input StoreFileListOptionInput {
 input StoreFileDeleteOptionInput {
   recursive: Boolean
 }
+
+type SharedFile {
+  shared: Boolean
+  shareLink: String
+}
+
+input SharedFileWhereUniqueInput {
+  groupName: String!
+  phfsPrefix: String!
+}
