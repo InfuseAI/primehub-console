@@ -96,7 +96,7 @@ function AddPage(props: any) {
                     },
                   ],
                   initialValue: '',
-                })(<Input />)}
+                })(<Input data-testid='username' />)}
               </Form.Item>
               <Form.Item label={'Email'}>
                 {form.getFieldDecorator('email', {
@@ -108,7 +108,7 @@ function AddPage(props: any) {
                     },
                   ],
                   initialValue: '',
-                })(<Input />)}
+                })(<Input data-testid='email' />)}
               </Form.Item>
               <Form.Item
                 label={
@@ -128,6 +128,7 @@ function AddPage(props: any) {
                   valuePropName: 'checked',
                 })(
                   <Switch
+                    data-testid='sendEmail'
                     checkedChildren={<Icon type='check' />}
                     unCheckedChildren={<Icon type='close' />}
                   />

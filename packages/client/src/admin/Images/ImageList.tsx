@@ -133,12 +133,14 @@ function _ImageList({ data, ...props }: ImageListProps) {
         return (
           <Button.Group>
             <Button
+              data-testid='edit-button'
               icon='edit'
               onClick={() => {
                 history.push(`${appPrefix}admin/image/${image.node.id}`);
               }}
             />
             <Button
+              data-testid='delete-button'
               icon='delete'
               onClick={() => {
                 Modal.confirm({
@@ -200,6 +202,7 @@ function _ImageList({ data, ...props }: ImageListProps) {
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             {/* @ts-ignore */}
             <Button
+              data-testid='add-button'
               type='primary'
               icon='plus'
               onClick={() => history.push(`${appPrefix}admin/image/add`)}
@@ -222,8 +225,11 @@ function _ImageList({ data, ...props }: ImageListProps) {
               onChange={event => setKeyword(event.currentTarget.value)}
               onSearch={onSearch}
             />
-            <InfuseButton onClick={onSearch}>Search</InfuseButton>
+            <InfuseButton onClick={onSearch} data-testid='search-button'>
+              Search
+            </InfuseButton>
             <InfuseButton
+              data-testid='reset-button'
               disabled={data.loading}
               onClick={() => {
                 const { refetch } = data;

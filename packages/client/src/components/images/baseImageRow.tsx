@@ -103,6 +103,7 @@ export default class BaseImageRow extends React.Component<Props, State> {
               ]
             })(
               <AutoComplete
+                data-testid='baseImageUrl'
                 style={{width: '100%'}}
                 dataSource={this.getDataSource()}
                 onSearch={this.onSearch}
@@ -115,11 +116,13 @@ export default class BaseImageRow extends React.Component<Props, State> {
         </Col>
         <Col span={12}>
           <Form.Item label={`Image Pull Secret`}>
-            {form.getFieldDecorator('imageSpec.pullSecret', {
-              initialValue: get(imageSpec, 'pullSecret'),
-            })(
-              <ImagePullSecret disabled={disabled}/>
-            )}
+            <div data-testid='baseImagePullSecret'>
+              {form.getFieldDecorator('imageSpec.pullSecret', {
+                initialValue: get(imageSpec, 'pullSecret'),
+              })(
+                <ImagePullSecret disabled={disabled}/>
+              )}
+            </div>
           </Form.Item>
         </Col>
       </Row>

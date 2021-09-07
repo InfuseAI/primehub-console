@@ -204,6 +204,7 @@ function List(props: Props) {
           <Button.Group>
             {/* @ts-ignore */}
             <InfuseButton
+              data-testid='mail-button'
               icon='email'
               onClick={() => {
                 setEmailFormVisible(true);
@@ -215,6 +216,7 @@ function List(props: Props) {
             </InfuseButton>
             {/* @ts-ignore */}
             <InfuseButton
+              data-testid='add-button'
               icon='plus'
               onClick={add}
               style={{ width: 120 }}

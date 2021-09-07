@@ -328,19 +328,24 @@ function _ImageForm({
                   message: `lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`,
                 },
               ],
-            })(<Input disabled={props?.disabledName || false} />)}
+            })(
+              <Input
+                disabled={props?.disabledName || false}
+                data-testid='name'
+              />
+            )}
           </Form.Item>
 
           <Form.Item label='Display Name'>
             {form.getFieldDecorator('displayName', {
               initialValue: data?.displayName || '',
-            })(<Input />)}
+            })(<Input data-testid='displayName' />)}
           </Form.Item>
 
           <Form.Item label='Description'>
             {form.getFieldDecorator('description', {
               initialValue: data?.description || '',
-            })(<Input />)}
+            })(<Input data-testid='description' />)}
           </Form.Item>
 
           <Form.Item>
@@ -391,12 +396,13 @@ function _ImageForm({
               <Form.Item label='Container Image URL'>
                 {form.getFieldDecorator('url', {
                   initialValue: data?.url || '',
-                })(<Input />)}
+                })(<Input data-testid='imageUrl' />)}
               </Form.Item>
 
               {form.getFieldValue('type') === 'both' && (
                 <Form.Item label='Specific Container Image URL for GPU'>
                   <div
+                    data-testid='imageUrlForGpu'
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -418,6 +424,7 @@ function _ImageForm({
 
               <Form.Item label='Image Pull Secret'>
                 <div
+                  data-testid='imagePullSecret'
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -467,7 +474,7 @@ function _ImageForm({
                       {form.getFieldDecorator('apt', {
                         initialValue:
                           data?.imageSpec?.packages.apt.join('\n') || '',
-                      })(<Input.TextArea rows={4} placeholder={placeholder} />)}
+                      })(<Input.TextArea data-testid='packageApt' rows={4} placeholder={placeholder} />)}
                     </Form.Item>
                   </Col>
                   <Col span={8}>
@@ -476,7 +483,7 @@ function _ImageForm({
                       {form.getFieldDecorator('conda', {
                         initialValue:
                           data?.imageSpec?.packages.conda.join('\n') || '',
-                      })(<Input.TextArea rows={4} placeholder={placeholder} />)}
+                      })(<Input.TextArea data-testid='packageConda' rows={4} placeholder={placeholder} />)}
                     </Form.Item>
                   </Col>
                   <Col span={8}>
@@ -485,7 +492,7 @@ function _ImageForm({
                       {form.getFieldDecorator('pip', {
                         initialValue:
                           data?.imageSpec?.packages.pip.join('\n') || '',
-                      })(<Input.TextArea rows={4} placeholder={placeholder} />)}
+                      })(<Input.TextArea data-testid='packagePip' rows={4} placeholder={placeholder} />)}
                     </Form.Item>
                   </Col>
                 </Row>
@@ -562,10 +569,11 @@ function _ImageForm({
           style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end' }}
         >
           {/* @ts-ignore */}
-          <Button type='primary' htmlType='submit'>
+          <Button type='primary' htmlType='submit' data-testid='confirm-button'>
             Confirm
           </Button>
           <Button
+            data-testid='reset-button'
             onClick={() => {
               history.push(`${appPrefix}admin/image`);
             }}

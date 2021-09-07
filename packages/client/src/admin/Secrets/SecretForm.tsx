@@ -120,13 +120,18 @@ export function _SecretForm({ form, data, ...props }: SecretFormProps) {
                 },
               },
             ],
-          })(<Input disabled={props?.disabledName || false} />)}
+          })(
+            <Input
+              disabled={props?.disabledName || false}
+              data-testid='name'
+            />
+          )}
         </Form.Item>
 
         <Form.Item label='Display Name'>
           {form.getFieldDecorator('displayName', {
             initialValue: data?.displayName || '',
-          })(<Input />)}
+          })(<Input data-testid='displayName' />)}
         </Form.Item>
 
         <Form.Item>
@@ -165,7 +170,7 @@ export function _SecretForm({ form, data, ...props }: SecretFormProps) {
                     required: true,
                   },
                 ],
-              })(<Input />)}
+              })(<Input data-testid='registryHost' />)}
             </Form.Item>
 
             <Form.Item label='Username'>
@@ -177,7 +182,7 @@ export function _SecretForm({ form, data, ...props }: SecretFormProps) {
                     required: true,
                   },
                 ],
-              })(<Input />)}
+              })(<Input data-testid='username' />)}
             </Form.Item>
 
             <Form.Item label='Password'>
@@ -189,7 +194,7 @@ export function _SecretForm({ form, data, ...props }: SecretFormProps) {
                     required: true,
                   },
                 ],
-              })(<Input type='password' />)}
+              })(<Input type='password' data-testid='password' />)}
             </Form.Item>
           </>
         )}
