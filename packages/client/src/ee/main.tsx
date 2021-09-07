@@ -40,7 +40,7 @@ import GroupSettingsPage from 'containers/groupSettingsPage';
 import GroupSettingsJobs from 'ee/components/groupSettings/jobs';
 import GroupSettingsDeployments from 'ee/components/groupSettings/deployments';
 import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
-import NotebookViewer from 'containers/sharedFiles/notebookViewer';
+import NotebookViewer from 'containers/sharedFiles/NotebookView';
 
 const client = createGraphqlClient({
   fakeData,
