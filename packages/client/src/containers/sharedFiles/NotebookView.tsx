@@ -1,14 +1,13 @@
-import * as React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
-import NbViewer from 'react-nbviewer'
-import './nbviewer.css'
+import NbViewer from 'react-nbviewer';
+import './nbviewer.css';
 
-import Markdown from 'react-markdown'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { reject } from 'lodash';
+import Markdown from 'react-markdown';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import SharingOptions from './NotebookShareOptions';
 
-const loadingNotebook: string = `{
+const loadingNotebook = `{
   "cells": [
    {
     "cell_type": "markdown",
@@ -48,7 +47,7 @@ const loadingNotebook: string = `{
   "nbformat_minor": 4
  }`;
 
-const errorNotebook: string = `{
+const errorNotebook = `{
   "cells": [
    {
     "cell_type": "markdown",
@@ -95,33 +94,46 @@ const errorNotebook: string = `{
   "nbformat_minor": 4
  }`;
 
+const MarkdownAdapter = props => {
+  return <Markdown children={props.source} />;
+};
 
-const MarkdownAdapter = (props) => {
-  return <Markdown children={props.source} />
+interface NotebookProps {
+  appPrefix: string;
+  previewFile?: string;
+  sharable?: boolean;
 }
 
-function NotebookViewer(props) {
+function NotebookViewer(props: NotebookProps) {
   const [value, setValue] = React.useState(loadingNotebook);
-  const filesPattern = /\/preview\/(files.+)/;
-  const appPrefix = props.appPrefix;
-  let filePath = window.location.href.match(filesPattern)
+  const { appPrefix, previewFile, sharable } = props;
+  const getPreviewURL = () => {
+    if (previewFile) {
+      return previewFile;
+    }
 
-  if (filePath == null) {
-    return (
-      <div>File not found</div>
-    );
-  }
+    // resolve the URL from the current location
+    const filesPattern = /\/preview\/(files.+)/;
+    const filePath = window.location.href.match(filesPattern);
+    if (filePath == null) {
+      return <div>File not found</div>;
+    }
+    const fullPath = `${window.location.origin}${appPrefix}${filePath[1]}`;
+    return fullPath;
+  };
 
-  const fullPath = `${window.location.origin}${appPrefix}${filePath[1]}`;
+  const fullPath = getPreviewURL();
 
   const showError = (reason: string, content: string) => {
-    setValue(errorNotebook.replace('$REASON', reason).replace('$CONTENT', content));
+    setValue(
+      errorNotebook.replace('$REASON', reason).replace('$CONTENT', content)
+    );
   };
 
   useEffect(() => {
     (async () => {
       try {
-        const response = await fetch(fullPath);
+        const response = await fetch(fullPath as string);
         if (response.status === 200) {
           const text = await response.text();
           const data = JSON.parse(text);
@@ -137,13 +149,20 @@ function NotebookViewer(props) {
         showError(`${error}`, `cannot fetch content from ${fullPath}`);
       }
     })();
-  }, [props.location]);
+  }, []);
 
   return (
-    <NbViewer
-      source={value}
-      markdown={MarkdownAdapter}
-      code={SyntaxHighlighter} />
+    <div>
+      <SharingOptions
+        hidden={previewFile ? true : false}
+        inGroupPreview={false}
+      />
+      <NbViewer
+        source={value}
+        markdown={MarkdownAdapter}
+        code={SyntaxHighlighter}
+      />
+    </div>
   );
 }
 

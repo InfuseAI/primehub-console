@@ -94,3 +94,20 @@
 .ansi_white_fg {
   color: #c5c1b4;
 }
+
+.header_container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.header_operations {
+  margin: 22px;
+}
+
+.header_icon {
+  color: white;
+  font-size: 20px;
+  margin-right: 5px;
+  margin-left: 5px;
+}
+
