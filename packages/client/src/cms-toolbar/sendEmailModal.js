@@ -90,7 +90,6 @@ export default class EmailForm extends React.Component {
       labelCol: { xs: 24, sm: 8 },
       wrapperCol: { xs: 24, sm: 16 },
     };
-    console.log(212314, loading);
     return (
       <Mutation
         mutation={SEND_MULTI_EMAIL}
