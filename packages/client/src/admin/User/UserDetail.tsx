@@ -225,7 +225,7 @@ function DetailPage(props: any) {
                       },
                     ],
                     initialValue: get(user, 'username'),
-                  })(<Input disabled={true} />)}
+                  })(<Input disabled={true} data-testid='username' />)}
                 </Form.Item>
                 <Form.Item label={'Email'}>
                   {form.getFieldDecorator('email', {
@@ -237,17 +237,17 @@ function DetailPage(props: any) {
                       },
                     ],
                     initialValue: get(user, 'email'),
-                  })(<Input />)}
+                  })(<Input data-testid='email' />)}
                 </Form.Item>
                 <Form.Item label={'First Name'}>
                   {form.getFieldDecorator('firstName', {
                     initialValue: get(user, 'firstName'),
-                  })(<Input />)}
+                  })(<Input data-testid='firstName' />)}
                 </Form.Item>
                 <Form.Item label={'Last Name'}>
                   {form.getFieldDecorator('lastName', {
                     initialValue: get(user, 'lastName'),
-                  })(<Input />)}
+                  })(<Input data-testid='lastName' />)}
                 </Form.Item>
                 <Form.Item label={'Enabled'}>
                   {form.getFieldDecorator('enabled', {
@@ -255,6 +255,7 @@ function DetailPage(props: any) {
                     valuePropName: 'checked',
                   })(
                     <Switch
+                      data-testid='enabled'
                       checkedChildren={<Icon type='check' />}
                       unCheckedChildren={<Icon type='close' />}
                     />
@@ -266,6 +267,7 @@ function DetailPage(props: any) {
                     valuePropName: 'checked',
                   })(
                     <Switch
+                      data-testid='isAdmin'
                       checkedChildren={<Icon type='check' />}
                       unCheckedChildren={<Icon type='close' />}
                     />
@@ -277,6 +279,7 @@ function DetailPage(props: any) {
                     getValueFromEvent: (refId, action, val) => val,
                   })(
                     <CheckableInputNumber
+                      data-testid='volumeCapacity'
                       uiParams={{
                         unit: ' GB',
                         step: 1,
@@ -288,10 +291,12 @@ function DetailPage(props: any) {
                   )}
                 </Form.Item>
                 <Form.Item label={'Groups'}>
-                  <GroupsRelationTable
-                    onChange={handleRelationConnection}
-                    value={relateGroups}
-                  />
+                  <div data-testid="groups">
+                    <GroupsRelationTable
+                      onChange={handleRelationConnection}
+                      value={relateGroups}
+                    />
+                  </div>
                 </Form.Item>
                 <Form.Item style={{ textAlign: 'right', marginTop: 12 }}>
                   <InfuseButton

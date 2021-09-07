@@ -157,6 +157,7 @@ export function _InstanceTypes({
         return (
           <Button.Group>
             <Button
+              data-testid='edit-button'
               icon='edit'
               onClick={() => {
                 history.push(
@@ -165,6 +166,7 @@ export function _InstanceTypes({
               }}
             />
             <Button
+              data-testid='delete-button'
               icon='delete'
               onClick={() => {
                 Modal.confirm({
@@ -332,6 +334,7 @@ export function _InstanceTypes({
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             {/* @ts-ignore */}
             <Button
+              data-testid='add-button'
               type='primary'
               icon='plus'
               onClick={() =>
@@ -350,6 +353,7 @@ export function _InstanceTypes({
             }}
           >
             <Input.Search
+              data-testid='search-button'
               placeholder='Search by name'
               style={{ width: 295 }}
               value={keyword}

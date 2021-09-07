@@ -353,19 +353,24 @@ export function _InstanceTypeForm({
                         message: `lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`,
                       },
                     ],
-                  })(<Input disabled={props?.disableName || false} />)}
+                  })(
+                    <Input
+                      disabled={props?.disableName || false}
+                      data-testid='name'
+                    />
+                  )}
                 </Form.Item>
 
                 <Form.Item label='Display Name'>
                   {form.getFieldDecorator('displayName', {
                     initialValue: data?.displayName || '',
-                  })(<Input />)}
+                  })(<Input data-testid='displayName' />)}
                 </Form.Item>
 
                 <Form.Item label='Description'>
                   {form.getFieldDecorator('description', {
                     initialValue: data?.description || '',
-                  })(<Input />)}
+                  })(<Input data-testid='description' />)}
                 </Form.Item>
 
                 <Form.Item>
@@ -469,7 +474,7 @@ export function _InstanceTypeForm({
                   >
                     CPU Request <Tips type='cpuRequest' />
                   </label>
-                  <div>
+                  <div data-testid='cpuRequest'>
                     <Checkbox
                       data-testid='enabled-cpuRequest'
                       checked={advanceFeature.enableCpuRequest}
@@ -513,7 +518,7 @@ export function _InstanceTypeForm({
                   >
                     Memory Request <Tips type='memoryRequest' />
                   </label>
-                  <div>
+                  <div data-testid='memoryRequest'>
                     <Checkbox
                       data-testid='enabled-memoryRequest'
                       checked={advanceFeature.enableMemoryRequest}
@@ -594,6 +599,7 @@ export function _InstanceTypeForm({
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                   <Button
+                    data-testid='next1-button'
                     icon='arrow-right'
                     onClick={() =>
                       setActivePanel(prev => String(Number(prev) + 1))
@@ -617,6 +623,7 @@ export function _InstanceTypeForm({
             >
               {/* @ts-ignore */}
               <Button
+                data-testid='create-toleration'
                 type='primary'
                 icon='plus'
                 onClick={() => {
@@ -664,6 +671,7 @@ export function _InstanceTypeForm({
                       return (
                         <Button.Group>
                           <Button
+                            data-testid='edit-button'
                             icon='edit'
                             onClick={() => {
                               setTolerModalFormAction('update');
@@ -686,6 +694,7 @@ export function _InstanceTypeForm({
                             }}
                           >
                             <Button
+                              data-testid='delete-button'
                               icon='delete'
                               onClick={() => {
                                 setEditToleration({
@@ -718,6 +727,7 @@ export function _InstanceTypeForm({
                 Basic Info
               </Button>
               <Button
+                data-testid='next2-button'
                 icon='arrow-right'
                 onClick={() => setActivePanel(prev => String(Number(prev) + 1))}
               >
@@ -755,10 +765,15 @@ export function _InstanceTypeForm({
 
               <div style={{ display: 'flex', gap: '16px' }}>
                 {/* @ts-ignore */}
-                <Button type='primary' htmlType='submit'>
+                <Button
+                  data-testid='confirm-button'
+                  type='primary'
+                  htmlType='submit'
+                >
                   Confirm
                 </Button>
                 <Button
+                  data-testid='reset-button'
                   onClick={() => {
                     history.push(`${appPrefix}admin/instanceType`);
                   }}
