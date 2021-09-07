@@ -27,14 +27,20 @@ type Props = {
   multiple?: boolean; // legend shows or not
 };
 
-class LineChart extends React.Component<Props> {
+type States = {
+  chart: Chart
+};
+
+class LineChart extends React.Component<Props, States> {
   chartRef: any;
-  chart: any;
   config: any;
 
   constructor(props: Props) {
     super(props);
     const { title, multiple } = props;
+    this.state = {
+      chart: undefined,
+    };
     this.chartRef = React.createRef();
     this.config = {
       type: 'line',
@@ -72,7 +78,7 @@ class LineChart extends React.Component<Props> {
             grid: {
               color: 'rgba(200, 200, 200, 0.5)',
             },
-            min: 0
+            min: 0,
           },
         },
       },
@@ -88,12 +94,14 @@ class LineChart extends React.Component<Props> {
   }
 
   public componentDidMount = () => {
-    this.chart = new Chart(this.chartRef.current, this.config);
+    const chart = new Chart(this.chartRef.current, this.config);
+    this.setState({ chart });
   };
 
   public render = () => {
     const { datasets, labels } = this.props;
-    if (this.chart && datasets && labels) {
+    const { chart } = this.state;
+    if (chart && datasets && labels) {
       for (let i = 0; i < datasets.length; i++) {
         if (!datasets[i].fill) {
           datasets[i].fill = false;
@@ -101,7 +109,7 @@ class LineChart extends React.Component<Props> {
       }
       this.config.data.labels = labels;
       this.config.data.datasets = datasets;
-      this.chart.update();
+      chart.update();
     }
     return <canvas ref={this.chartRef} />;
   };
