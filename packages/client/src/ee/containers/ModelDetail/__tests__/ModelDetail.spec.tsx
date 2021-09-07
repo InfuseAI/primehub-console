@@ -319,23 +319,21 @@ describe('ModelDetail', () => {
 
     userEvent.click(screen.getByText('OK'));
 
-    await waitFor(() => {
-      expect(window.localStorage.getItem('primehub-model-params')).toBe(
-        JSON.stringify(['batch_size', 'class_weight', 'epochs'])
-      );
+    expect(window.localStorage.getItem('primehub-model-params')).toBe(
+      JSON.stringify(['batch_size', 'class_weight', 'epochs'])
+    );
 
-      expect(
-        screen.getByText('batch_size', { selector: 'div' })
-      ).toBeInTheDocument();
-
-      expect(
-        screen.getByText('class_weight', { selector: 'div' })
-      ).toBeInTheDocument();
-
-      expect(
-        screen.getByText('epochs', { selector: 'div' })
-      ).toBeInTheDocument();
-    });
+    expect(
+      screen.queryByText('batch_size', { selector: '.ant-table-column-title' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('class_weight', {
+        selector: '.ant-table-column-title',
+      })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('epochs', { selector: '.ant-table-column-title' })
+    ).toBeInTheDocument();
   });
 
   it('should render ModelDetail and save all the checked model metrics', async () => {
@@ -358,18 +356,20 @@ describe('ModelDetail', () => {
     expect(metricsCheckBox).toBeChecked();
 
     userEvent.click(screen.getByText('OK'));
-    await waitFor(() => {
-      expect(window.localStorage.getItem('primehub-model-metrics')).toBe(
-        JSON.stringify(['accuracy', 'foo', 'loss'])
-      );
+    expect(window.localStorage.getItem('primehub-model-metrics')).toBe(
+      JSON.stringify(['accuracy', 'foo', 'loss'])
+    );
 
-      expect(
-        screen.getByText('accuracy', { selector: 'div' })
-      ).toBeInTheDocument();
+    expect(
+      screen.queryByText('accuracy', { selector: '.ant-table-column-title' })
+    ).toBeInTheDocument();
 
-      expect(screen.getByText('foo', { selector: 'div' })).toBeInTheDocument();
-      expect(screen.getByText('loss', { selector: 'div' })).toBeInTheDocument();
-    });
+    expect(
+      screen.queryByText('foo', { selector: '.ant-table-column-title' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('loss', { selector: '.ant-table-column-title' })
+    ).toBeInTheDocument();
   });
 
   it('should render ModelDetail and save specify checked model params', async () => {
@@ -394,15 +394,13 @@ describe('ModelDetail', () => {
     });
 
     userEvent.click(screen.getByText('OK'));
-    await waitFor(() => {
-      expect(window.localStorage.getItem('primehub-model-params')).toBe(
-        JSON.stringify(['batch_size'])
-      );
+    expect(window.localStorage.getItem('primehub-model-params')).toBe(
+      JSON.stringify(['batch_size'])
+    );
 
-      expect(
-        screen.getByText('batch_size', { selector: 'div' })
-      ).toBeInTheDocument();
-    });
+    expect(
+      screen.queryByText('batch_size', { selector: '.ant-table-column-title' })
+    ).toBeInTheDocument();
   });
 
   it('should render ModelDetail and save specify checked model metrics', async () => {
@@ -427,12 +425,12 @@ describe('ModelDetail', () => {
     });
 
     userEvent.click(screen.getByText('OK'));
-    await waitFor(() => {
-      expect(window.localStorage.getItem('primehub-model-metrics')).toBe(
-        JSON.stringify(['foo'])
-      );
-      expect(screen.getByText('foo', { selector: 'div' })).toBeInTheDocument();
-    });
+    expect(window.localStorage.getItem('primehub-model-metrics')).toBe(
+      JSON.stringify(['foo'])
+    );
+    expect(
+      screen.queryByText('foo', { selector: '.ant-table-column-title' })
+    ).toBeInTheDocument();
   });
 
   it('should render ModelDetail with default params and metrics', async () => {
@@ -457,11 +455,13 @@ describe('ModelDetail', () => {
     );
 
     expect(
-      await screen.findByText('batch_size', { selector: 'div' })
+      await screen.findByText('batch_size', {
+        selector: '.ant-table-column-title',
+      })
     ).toBeInTheDocument();
 
     expect(
-      await screen.findByText('foo', { selector: 'div' })
+      await screen.findByText('foo', { selector: '.ant-table-column-title' })
     ).toBeInTheDocument();
   });
 });
