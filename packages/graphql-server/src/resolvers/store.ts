@@ -5,6 +5,7 @@ import * as logger from '../logger';
 import { toGroupPath, isGroupBelongUser } from '../utils/groupCheck';
 
 import { ErrorCodes } from '../errorCodes';
+import { createHash } from 'crypto';
 const {NOT_AUTH_ERROR, INTERNAL_ERROR} = ErrorCodes;
 
 interface StoreFile {
@@ -154,4 +155,28 @@ export const destroy = async (root, args, context: Context) => {
     });
     throw new ApolloError('failed to remove store objects', INTERNAL_ERROR);
   }
+};
+
+export const share = async (root, args, context: Context) => {
+  const shasum = createHash('sha1')
+  shasum.update('foo');
+  const hash = shasum.digest('hex');
+
+  return {
+    shared: true,
+    shareLink: `https://example.com/console/share/${hash}`,
+  };
+}
+
+export const unshare = async (root, args, context: Context) => {
+  return {
+    shared: false,
+  };
+}
+
+export const querySharedFile = async (root, args, context: Context) => {
+  return {
+    shared: true,
+    shareLink: "https://example.com/console/share/12345678xyzabcd",
+  };
 };
