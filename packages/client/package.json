@@ -42,6 +42,7 @@
     "apollo-boost": "^0.1.22",
     "canner-graphql-interface": "2.1.1",
     "chart.js": "^3.5.1",
+    "chartjs-adapter-moment": "^1.0.0",
     "downloadjs": "^1.4.7",
     "lodash": "^4.17.21",
     "md5": "^2.3.0",
