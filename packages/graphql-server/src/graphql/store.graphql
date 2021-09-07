@@ -26,10 +26,11 @@ input StoreFileDeleteOptionInput {
 
 type SharedFile {
   shared: Boolean
+  hash: String
   shareLink: String
 }
 
 input SharedFileWhereUniqueInput {
   groupName: String!
-  phfsPrefix: String!
+  phfsPath: String!
 }
