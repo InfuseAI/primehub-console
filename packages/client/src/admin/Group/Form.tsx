@@ -9,7 +9,6 @@ import {
   Form,
   Input,
   Switch,
-  Icon,
   Card,
   InputNumber,
 } from 'antd';
@@ -50,7 +49,7 @@ const defaultGroupValue: GroupInput = {
   displayName: '',
   admins: '',
   enabledSharedVolume: false,
-  enabledDeployment: false,
+  enabledDeployment: __ENV__ === 'modelDeploy' || false,
   launchGroupOnly: false,
   sharedVolumeCapacity: 1,
   maxDeploy: null,
