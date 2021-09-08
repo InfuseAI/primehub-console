@@ -5,7 +5,7 @@ import mime from 'mime';
 
 import * as logger from '../logger';
 import { Stream } from 'stream';
-import getStream = require('get-stream');
+import getStream from 'get-stream';
 import { last } from 'lodash';
 
 export const mountStoreCtrl = (router: Router,
