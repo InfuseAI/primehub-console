@@ -1,8 +1,11 @@
-import {GroupContextValue} from 'context/group';
-import {UserContextValue} from 'context/user';
-import {get} from 'lodash';
+import { GroupContextValue } from 'context/group';
+import { UserContextValue } from 'context/user';
+import { get } from 'lodash';
 
-export const checkUserIsGroupAdmin = (currentGroup: GroupContextValue, currentUser: UserContextValue): boolean => {
+export const checkUserIsGroupAdmin = (
+  currentGroup: GroupContextValue,
+  currentUser: UserContextValue
+): boolean => {
   if (!currentUser) {
     return false;
   }

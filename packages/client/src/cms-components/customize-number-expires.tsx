@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Select, Input} from 'antd';
+import { Select, Input } from 'antd';
 const Option = Select.Option;
 
 interface Props {
@@ -27,7 +27,7 @@ export default class Expires extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const {isReactComponent, value} = this.props;
+    const { isReactComponent, value } = this.props;
     if (!isReactComponent) {
       const minutes = value / 60;
       let hours = 0;
@@ -35,12 +35,12 @@ export default class Expires extends React.Component<Props, State> {
         hours = minutes / 60;
         this.setState({
           number: hours,
-          unit: 'hours'
+          unit: 'hours',
         });
       } else {
         this.setState({
           number: minutes,
-          unit: 'minutes'
+          unit: 'minutes',
         });
       }
     }
@@ -53,32 +53,31 @@ export default class Expires extends React.Component<Props, State> {
     }
   }
 
-  handleNumberChange = (e) => {
+  handleNumberChange = e => {
     const number = parseInt(e.target.value || 0, 10);
     if (isNaN(number)) {
       return;
     }
     this.setState({ number });
     this.triggerChange({ number });
-  }
+  };
 
-  handleUnitChange = (unit) => {
+  handleUnitChange = unit => {
     this.setState({ unit });
     this.triggerChange({ unit });
-  }
+  };
 
-  triggerChange = (changedValue) => {
+  triggerChange = changedValue => {
     // Should provide an event to pass value to Form.
-    const {refId, onChange, isReactComponent} = this.props;
-    const newValue = {...this.state, ...changedValue};
+    const { refId, onChange, isReactComponent } = this.props;
+    const newValue = { ...this.state, ...changedValue };
     if (isReactComponent) {
       onChange(newValue);
     } else {
-      // in canner component
       const secs = parseToSecond(newValue);
-      onChange(refId, 'update', secs)
+      onChange(refId, 'update', secs);
     }
-  }
+  };
 
   render() {
     const { size } = this.props;
@@ -86,23 +85,27 @@ export default class Expires extends React.Component<Props, State> {
     return (
       <span>
         <Input
-          data-testid="expires-in-input"
-          type="text"
+          data-testid='expires-in-input'
+          type='text'
           size={size}
           value={state.number}
           onChange={this.handleNumberChange}
           style={{ width: '80px', marginRight: '24px' }}
-          min="0"
+          min='0'
         />
         <Select
-          data-testid="expires-in-select"
+          data-testid='expires-in-select'
           value={state.unit}
           size={size}
           style={{ width: '120px' }}
           onChange={this.handleUnitChange}
         >
-          <Option data-testid="expires-in-option-hours" value="hours">Hours</Option>
-          <Option data-testid="expires-in-option-minutes" value="minutes">Minutes</Option>
+          <Option data-testid='expires-in-option-hours' value='hours'>
+            Hours
+          </Option>
+          <Option data-testid='expires-in-option-minutes' value='minutes'>
+            Minutes
+          </Option>
         </Select>
       </span>
     );
@@ -110,10 +113,10 @@ export default class Expires extends React.Component<Props, State> {
 }
 
 function parseToSecond(expiresIn) {
-  const {number, unit} = expiresIn;
+  const { number, unit } = expiresIn;
 
   switch (unit) {
-    case 'hours': 
+    case 'hours':
       return number * 60 * 60;
     case 'minutes':
       return number * 60;

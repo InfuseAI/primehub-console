@@ -10,7 +10,7 @@ export default class TextFilter extends Component {
     onChange: PropTypes.func,
     name: PropTypes.string,
     label: PropTypes.string,
-    intl: Object,
+    intl: PropTypes.objectOf(PropTypes.any),
   };
 
   onInput = e => {

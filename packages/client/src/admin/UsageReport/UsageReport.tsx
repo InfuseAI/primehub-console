@@ -11,7 +11,7 @@ import { UsageReportQuery } from './usageReport.graphql';
 
 function useReportDownload() {
   const [loading, setLoading] = React.useState(false);
-  const [token] = useLocalStorage('canner.accessToken', []);
+  const [token] = useLocalStorage('primehub.accessToken', []);
 
   const downloadReport = React.useCallback(
     ({ URL, fileName }: { URL: string; fileName: string }) => {

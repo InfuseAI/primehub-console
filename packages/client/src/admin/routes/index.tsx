@@ -1,7 +1,6 @@
-import * as React from 'react';
-import { Route, RouteProps, Link } from 'react-router-dom';
+import React from 'react';
+import { Route, RouteProps } from 'react-router-dom';
 import { SystemSetting } from '../SystemSetting';
-import { Alert } from 'antd';
 import { UserList, UserDetail, UserAdd } from '../User';
 import { Datasets, DatasetInfo } from '../Datasets';
 import GroupList from '../Group/GroupList';
@@ -12,6 +11,7 @@ import { InstanceTypes, InstanceTypeInfo } from '../InstanceTypes';
 import { appPrefix } from 'utils/env';
 import UsageReport from '../UsageReport';
 import { ImageList, ImageAdd, ImageInfo } from '../Images';
+import JupyterHubAdmin from '../JupyterHubAdmin';
 
 export const ROUTES = [
   'group',
@@ -154,6 +154,8 @@ export const routes = [
     key: 'jupyterhub',
     path: 'admin/jupyterhub',
     name: 'Notebooks Admin',
+    enabled: true,
+    component: JupyterHubAdmin,
   },
   {
     key: 'usageReport',

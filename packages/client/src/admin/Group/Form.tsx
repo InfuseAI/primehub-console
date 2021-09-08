@@ -9,7 +9,6 @@ import {
   Form,
   Input,
   Switch,
-  Icon,
   Card,
   InputNumber,
 } from 'antd';
@@ -300,7 +299,8 @@ function GroupForm(props: Props) {
             }
           >
             {form.getFieldDecorator('enabledDeployment', {
-              initialValue: initialValue.enabledDeployment,
+              initialValue:
+                __ENV__ === 'modelDeploy' || initialValue.enabledDeployment,
               valuePropName: 'checked',
             })(<Switch data-testid='group/enabledDeployment' />)}
           </Form.Item>

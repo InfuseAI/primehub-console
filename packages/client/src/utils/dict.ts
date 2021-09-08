@@ -1,280 +1,9 @@
-import React from 'react';
-import GraphqlClient from 'canner-graphql-interface/lib/graphqlClient/graphqlClient';
-import {ImgurStorage} from '@canner/storage';
-import {FormattedMessage} from 'react-intl';
-import {Tag, Button, Icon, Tooltip} from 'antd';
+const instanceTypeLink =
+  'https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-feature';
+const imageBuilderLink =
+  'https://docs.primehub.io/docs/getting_started/configure-image-builder';
 
-export const groupColumns = [{
-  title: '${name}',
-  dataIndex: 'name',
-  render: (text, record, cannerProps) => {
-    const onClick = () => {
-      const currentPath = cannerProps.routes.join('/');
-      cannerProps.goTo({
-        pathname: `/group/${record.id}`,
-        payload: {
-          backTo: currentPath
-        }
-      })
-    }
-    return <a onClick={onClick}>{text}</a>;
-  }
-}, {
-  title: '${displayName}',
-  dataIndex: 'displayName'
-}, , {
-  title: '${cpuQuota}',
-  dataIndex: 'quotaCpu',
-  render: text => {
-    return text === null ? '∞' : text;
-  },
-  visible: !modelDeploymentOnly
-}, {
-  title: '${gpuQuota}',
-  dataIndex: 'quotaGpu',
-  render: text => {
-    return text === null ? '∞' : text;
-  },
-  visible: !modelDeploymentOnly
-}
-];
-
-export const groupPickerColumns =  [{
-  title: '${name}',
-  dataIndex: 'name',
-  sorter: true,
-}].concat(groupColumns.slice(1));
-
-exports.InvalidChError = <React.Fragment>
-  Invalid characters: &nbsp;
-  <Tag color="red">;</Tag>
-  <Tag color="red">|</Tag>
-  <Tag color="red">#</Tag>
-  <Tag color="red">\</Tag>
-  <Tag color="red">"</Tag>
-  <Tag color="red">'</Tag>
-  <Tag color="red">`</Tag>
-</React.Fragment>
-
-exports.graphqlClient = new GraphqlClient({
-  uri: window.graphqlEndpoint,
-  fetch: (uri, options) => {
-    const token = window.localStorage.getItem('canner.accessToken');
-    options.headers = {
-      Authorization: `Bearer ${token}`,
-      ...options.headers || {}
-    };
-    return fetch(uri, options);
-  },
-});
-
-exports.imageStorage = new ImgurStorage({
-  clientId: "cd7b1ab0aa39732",
-  mashapeKey: "bF1fkS9EKrmshtCbRspDUxPL5yhCp1rzz8ejsnqLqwI2KQC3s9"
-});
-exports.renderRelationField = function(text, record) {
-  return <span>
-    {text.length}
-  </span>
-}
-
-exports.renderUploadServerLink = function(text, record) {
-  if (text) {
-    return <a href={text} target="_blank">
-      Link
-    </a>
-  }
-  return '-';
-}
-
-class CopyableText extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      tooltipVisible: false
-    }
-  }
-
-  copy = () => {
-    this.textRef.select();
-
-    try {
-      let status = document.execCommand("Copy");
-      if(!status) {
-        console.log('Cannot copy text');
-        this.setState({
-          tooltipVisible: false
-        });
-      } else {
-        this.setState({
-          tooltipVisible: true
-        });
-        setTimeout(() => {
-          this.setState({
-            tooltipVisible: false
-          });
-        }, 1000)
-
-      }
-    } catch(err) {
-      this.setState({
-        tooltipVisible: false
-      });
-      console.log('Could not copy');
-    }
-  }
-
-  render() {
-    const {children} = this.props;
-    const {tooltipVisible} = this.state;
-    return (
-      <>
-        <input
-          style={{
-            outline: 'none',
-            border: 0,
-            background: 'transparent',
-            width: '250px'
-          }}
-          value={children}
-          ref={text => this.textRef = text}
-        />
-        <Tooltip placement="top" title={"copied"} visible={tooltipVisible}>
-          <Button icon="copy" onClick={this.copy}></Button>
-        </Tooltip>
-      </>
-    )
-  }
-}
-
-exports.renderCopyableText = function(text, record) {
-  if (text) {
-    return <CopyableText>
-      {text}
-    </CopyableText>
-  }
-  return '-';
-}
-
-exports.renderContent = function(content) {
-  var html = content ? content.html : '<p>-</p>';
-  var div = document.createElement("div");
-  div.innerHTML = html;
-  var text = div.textContent || div.innerText || "";
-  return (
-    <div
-      style={{
-        width: 160,
-        height: 30,
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        overflow: 'hidden'
-      }}
-    >
-      {text || '-'}
-    </div>
-  );
-}
-exports.renderStatus = function(status) {
-  if (status === 'published') {
-    return <Tag color="green">Published</Tag>
-  } else {
-    // draft
-    return <Tag color="orange">Draft</Tag>;
-  }
-}
-
-exports.renderActions = function(text, record, cannerProps) {
-  const {refId, onChange, deploy, goTo, intl} = cannerProps;
-  const {id, __index} = record;
-  const key = refId.getPathArr()[0];
-
-  function send() {
-    console.log(record);
-    console.log(refId.child(__index).child('status'));
-    onChange(refId.child(__index).child('status'), 'update', 'published')
-      .then(() => {
-        deploy(key);
-      });
-  }
-
-  function edit() {
-    goTo({
-      pathname: `/${key}/${id}`
-    })
-  }
-
-  function goToDelete() {
-    confirm({
-      title: intl.formatMessage({id: "array.table.delete.confirm"}),
-      okType: 'danger',
-      onOk() {
-        onChange(refId.child(__index), 'delete').then(() => {
-          deploy(key);
-        });
-      }
-    });
-  }
-
-  return (
-    <React.Fragment>
-      <Button type="primary" onClick={send} disabled={record.status === 'published'}>
-        <Icon type="notification" theme="filled" style={{color: 'white'}} />
-        Send
-      </Button>
-      <Button.Group style={{marginLeft: 8}}>
-        <Button icon="edit" onClick={edit}></Button>
-        <Button icon="delete" onClick={goToDelete}></Button>
-      </Button.Group>
-    </React.Fragment>
-  )
-}
-
-exports.renderTextWithTooltip = function(text, tooltipText) {
-  return <>
-    {text}
-    <Tooltip
-      title={tooltipText}
-    >
-      <Icon
-        type="info-circle"
-        theme="filled"
-        style={{marginLeft: 8}}
-      />
-    </Tooltip>
-  </>
-}
-
-exports.SendEmailTitle = <FormattedMessage
-  id="sendEmail"
-  defaultMessage="Send Email"
-/>
-
-exports.ResetPasswordTitle = <FormattedMessage
-  id="resetPassword"
-  defaultMessage="Reset Password"
-/>;
-exports.parseToStepDot5 = function(value) {
-  let [int, float] = value.split('.');
-  if (!float) {
-    return value;
-  }
-  float = float[0];
-  if (float && float < 3) {
-    return `${int}.0`;
-  }
-  if (float && float < 8) {
-    return `${int}.5`;
-  }
-  if (float && float < 10) {
-    return `${1 + Number(int)}.0`;
-  }
-}
-
-const instanceTypeLink = "https://docs.primehub.io/docs/guide_manual/admin-instancetype#overcommitting-advanced-feature";
-const imageBuilderLink = "https://docs.primehub.io/docs/getting_started/configure-image-builder";
-
-export const dict = {
+const dict = {
   en: {
     // common
     quotaForNewly: 'It only works for newly created volume.',
@@ -307,13 +36,13 @@ export const dict = {
     // group
     groups: 'Groups',
     group: 'Groups',
-    "groups.enabledDeployment": "Model Deployment",
-    "groups.datasets.writable": "Permissions",
-    "group.enabledSharedVolume": "Shared Volume",
-    "group.sharedVolumeCapacity": "Shared Volume Capacity",
-    "group.launchGroupOnly": "Launch Group Only",
-    "group.jobDefaultActiveDeadlineSeconds": "Default Timeout Setting",
-    "group.admin": 'Group Admin',
+    'groups.enabledDeployment': 'Model Deployment',
+    'groups.datasets.writable': 'Permissions',
+    'group.enabledSharedVolume': 'Shared Volume',
+    'group.sharedVolumeCapacity': 'Shared Volume Capacity',
+    'group.launchGroupOnly': 'Launch Group Only',
+    'group.jobDefaultActiveDeadlineSeconds': 'Default Timeout Setting',
+    'group.admin': 'Group Admin',
     sendEmail: 'Send Email',
     resetPassword: 'Reset Password',
     displayName: 'Display Name',
@@ -364,8 +93,10 @@ export const dict = {
     volumeSize: 'Volume Size',
     uploadServerLink: 'Upload Server',
     'dataset.enableUploadServer': 'Enable Upload Server',
-    'dataset.regenerateSecretModalTitle': 'Regenerate secret successfully, please memorize the secret below',
-    'dataset.enableUploadServerModalTitle': 'Enable upload server successfully, please memorize the secret below.',
+    'dataset.regenerateSecretModalTitle':
+      'Regenerate secret successfully, please memorize the secret below',
+    'dataset.enableUploadServerModalTitle':
+      'Enable upload server successfully, please memorize the secret below.',
     'dataset.regenerateSecretErrorModalTitle': `Sorry.`,
     'dataset.regenerateSecretErrorModalContent': `Something went wrong, we cloudn't regenerate secret.`,
     nfsServer: 'NFS Server',
@@ -376,9 +107,7 @@ export const dict = {
     // userfederation
     userFederations: 'User Federations',
     basicInformation: 'Basic Information',
-    requiredSettings: 'Required Settings',
     importEnabled: 'Import Enabled',
-    syncRegistrations: 'Sync Registrations',
     usernameLDAPAttribute: 'Username LDAP attribute',
     rdnLDAPAttribute: 'RDN LDAP attribute',
     uuidLDAPAttribute: 'UUID LDAP attribute',
@@ -397,7 +126,8 @@ export const dict = {
     pagination: 'Pagination',
     kerberosIntegration: 'Kerberos Integration',
     allowKerberosAuthentication: 'Allow Kerberos Authentication',
-    useKerberosForPasswordAuthentication: 'Use Kerberos for Password Authentication',
+    useKerberosForPasswordAuthentication:
+      'Use Kerberos for Password Authentication',
     syncSetting: 'Sync Setting',
     batchSizeForSync: 'Batch Size for Sync',
     fullSyncPeriod: 'Full Sync Period',
@@ -411,14 +141,11 @@ export const dict = {
     idp: 'Identity Provider',
     alias: 'Alias',
     providerId: 'Provider Id',
-    enabled: 'Enabled',
     updateProfileFirstLoginMode: 'Update Profile First Login Mode',
     trustEmail: 'Trust Email',
     storeToken: 'Store Token',
     ReadTokenRoleOnCreate: 'Add Read Token Role on Create',
     authenticateByDefault: 'Authenticate by Default',
-    linkOnly: 'Link Only',
-    firstBrokerLoginFlowAlias: 'First Broker Login Flow Alias',
     firstBrokerLogin: 'first broker login',
     // config
     saml: 'SAML Config',
@@ -461,7 +188,7 @@ export const dict = {
     'smtp.auth.password': 'Password',
 
     // announcement
-    announcement: "Announcements",
+    announcement: 'Announcements',
     'anno.title': 'Title',
     'anno.content': 'Content',
     'anno.expiryDate': 'Expiry Date',
@@ -484,7 +211,7 @@ export const dict = {
     'image.useImagePullSecret.component.select.placeholder': 'Select Secret',
 
     // buildImage
-    'buildImage': 'Image Builder',
+    buildImage: 'Image Builder',
     'buildImage.tabs.info': 'Info',
     'buildImage.tabs.jobs': 'Jobs',
     'buildImage.name': 'Name',
@@ -494,15 +221,19 @@ export const dict = {
     'buildImage.baseImage.placeholder': 'Input image url',
     'buildImage.useImagePullSecret': 'Use Image PullSecret',
     'buildImage.packages': 'Package(s)',
-    'buildImage.msg.pleaseCheckSetup': 'Image registry not found. Please set up your image registry using Image Builder.',
+    'buildImage.msg.pleaseCheckSetup':
+      'Image registry not found. Please set up your image registry using Image Builder.',
     'buildImage.msg.registrySetupLink': imageBuilderLink,
     'buildImage.apt': 'APT',
     'buildImage.pip': 'Pip',
     'buildImage.conda': 'Conda',
-    'buildImage.packages.apt.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
-    'buildImage.packages.pip.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
-    'buildImage.packages.conda.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
-    'buildImageJob': 'Image Builder Job',
+    'buildImage.packages.apt.placeholder':
+      'one package per line. e.g. \npackage1\npackage2\n',
+    'buildImage.packages.pip.placeholder':
+      'one package per line. e.g. \npackage1\npackage2\n',
+    'buildImage.packages.conda.placeholder':
+      'one package per line. e.g. \npackage1\npackage2\n',
+    buildImageJob: 'Image Builder Job',
     'buildImageJob.baseImage': 'Base Image',
     'buildImageJob.targetImage': 'Image',
     'buildImageJob.imageRevision': 'Image Revision',
@@ -515,7 +246,8 @@ export const dict = {
     'buildImageJob.logEndpoint': 'Logs',
 
     'usageReport.download.modal.title': 'This month is not over yet!',
-    'usageReport.download.modal.content': 'This report will only contain usage from the 1st of this month until today. Would you like to continue to download?',
+    'usageReport.download.modal.content':
+      'This report will only contain usage from the 1st of this month until today. Would you like to continue to download?',
     'usageReport.table.id': 'Date',
     'usageReport.download.summary.actions': 'Summary Report',
     'usageReport.download.details.actions': 'Detailed Report',
@@ -525,7 +257,7 @@ export const dict = {
     'maintenance.externalLink': '/maintenance',
     // grafana
     'grafana.title': 'Grafana',
-    'grafana.externalLink': '/grafana/login/generic_oauth'
+    'grafana.externalLink': '/grafana/login/generic_oauth',
   },
   zh: {
     // common
@@ -560,13 +292,13 @@ export const dict = {
     readOnlyGroups: 'Readonly Groups',
     writableGroups: 'Writable Groups',
     group: 'Groups',
-    "groups.enabledDeployment": "Model Deployment",
-    "groups.datasets.writable": "Permissions",
-    "group.enabledSharedVolume": "Shared Volume",
-    "group.sharedVolumeCapacity": "Shared Volume Capacity",
-    "group.launchGroupOnly": "Launch Group Only",
-    "group.jobDefaultActiveDeadlineSeconds": "Default Timeout Setting",
-    "group.admin": 'Group Admin',
+    'groups.enabledDeployment': 'Model Deployment',
+    'groups.datasets.writable': 'Permissions',
+    'group.enabledSharedVolume': 'Shared Volume',
+    'group.sharedVolumeCapacity': 'Shared Volume Capacity',
+    'group.launchGroupOnly': 'Launch Group Only',
+    'group.jobDefaultActiveDeadlineSeconds': 'Default Timeout Setting',
+    'group.admin': 'Group Admin',
     sendEmail: 'Send Email',
     resetPassword: 'Reset Password',
     displayName: 'Display Name',
@@ -615,8 +347,10 @@ export const dict = {
     volumeSize: 'Volume Size',
     uploadServerLink: 'Upload Server',
     'dataset.enableUploadServer': 'Enable Upload Server',
-    'dataset.regenerateSecretModalTitle': 'Regenerate secret successfully, please memorize the secret below',
-    'dataset.enableUploadServerModalTitle': 'Enable upload server successfully, please memorize the secret below.',
+    'dataset.regenerateSecretModalTitle':
+      'Regenerate secret successfully, please memorize the secret below',
+    'dataset.enableUploadServerModalTitle':
+      'Enable upload server successfully, please memorize the secret below.',
     'dataset.regenerateSecretErrorModalTitle': `Sorry.`,
     'dataset.regenerateSecretErrorModalContent': `Something went wrong, we cloudn't regenerate secret.`,
     nfsServer: 'NFS Server',
@@ -647,7 +381,8 @@ export const dict = {
     pagination: 'Pagination',
     kerberosIntegration: 'Kerberos Integration',
     allowKerberosAuthentication: 'Allow Kerberos Authentication',
-    useKerberosForPasswordAuthentication: 'Use Kerberos for Password Authentication',
+    useKerberosForPasswordAuthentication:
+      'Use Kerberos for Password Authentication',
     syncSetting: 'Sync Setting',
     batchSizeForSync: 'Batch Size for Sync',
     fullSyncPeriod: 'Full Sync Period',
@@ -711,7 +446,7 @@ export const dict = {
     'smtp.auth.password': 'Password',
 
     // announcement
-    announcement: "Announcements",
+    announcement: 'Announcements',
     'anno.title': 'Title',
     'anno.content': 'Content',
     'anno.expiryDate': 'Expiry Date',
@@ -734,7 +469,7 @@ export const dict = {
     'image.useImagePullSecret.component.select.placeholder': 'Select Secret',
 
     // buildImage
-    'buildImage': 'Image Builder',
+    buildImage: 'Image Builder',
     'buildImage.tabs.info': 'Info',
     'buildImage.tabs.jobs': 'Jobs',
     'buildImage.name': 'Name',
@@ -747,10 +482,13 @@ export const dict = {
     'buildImage.apt': 'APT',
     'buildImage.pip': 'Pip',
     'buildImage.conda': 'Conda',
-    'buildImage.packages.apt.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
-    'buildImage.packages.pip.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
-    'buildImage.packages.conda.placeholder': 'one package per line. e.g. \npackage1\npackage2\n',
-    'buildImageJob': 'Image Builder Job',
+    'buildImage.packages.apt.placeholder':
+      'one package per line. e.g. \npackage1\npackage2\n',
+    'buildImage.packages.pip.placeholder':
+      'one package per line. e.g. \npackage1\npackage2\n',
+    'buildImage.packages.conda.placeholder':
+      'one package per line. e.g. \npackage1\npackage2\n',
+    buildImageJob: 'Image Builder Job',
     'buildImageJob.baseImage': 'Base Image',
     'buildImageJob.targetImage': 'Image',
     'buildImageJob.imageRevision': 'Image Revision',
@@ -763,7 +501,8 @@ export const dict = {
     'buildImageJob.logEndpoint': 'Logs',
 
     'usageReport.download.modal.title': 'This month is not over yet!',
-    'usageReport.download.modal.content': 'This report will only contain usage from the 1st of this month until today. Would you like to continue to download?',
+    'usageReport.download.modal.content':
+      'This report will only contain usage from the 1st of this month until today. Would you like to continue to download?',
     'usageReport.table.id': 'Date',
     'usageReport.download.summary.actions': 'Summary Report',
     'usageReport.download.details.actions': 'Detailed Report',
@@ -773,6 +512,7 @@ export const dict = {
     'maintenance.externalLink': '/maintenance',
     // grafana
     'grafana.title': 'Grafana',
-    'grafana.externalLink': '/grafana/login/generic_oauth'
-  }
+    'grafana.externalLink': '/grafana/login/generic_oauth',
+  },
 };
+export default dict;

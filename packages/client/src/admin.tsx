@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ApolloProvider } from 'react-apollo';
-import { fakeData, schema as fakeDataSchema } from './fakeData';
+import { fakeData, schema } from './fakeData';
 import { createGraphqlClient } from 'utils/graphqlClient';
+import dict from './utils/dict';
 import {
   BrowserRouter as Router,
   Route,
@@ -16,13 +17,10 @@ import en_US from 'antd/lib/locale-provider/en_US';
 import 'moment/locale/zh-tw';
 addLocaleData([...en]);
 import CMSPage from './cms';
-import schema from 'index-schema';
 import myLocales from './utils/locales';
 import { BackgroundTokenSyncer } from './workers/backgroundTokenSyncer';
-import GroupList from 'components/admins/group/list';
 import PageChangeTracker from 'components/share/tracker';
 
-const firstKey = Object.keys(schema.schema)[0];
 const locales = {
   en: en_US,
 };
@@ -61,14 +59,13 @@ export const tokenSyncWorker = new BackgroundTokenSyncer({
     // notify with fixed card
     notification.warning({
       message: 'Warning',
-      description:
-        "In less than 1 minute, you're going to be redirected to login page.",
+      description: `In less than 1 minute, you're going to be redirected to login page.`,
       placement: 'bottomRight',
       duration: null,
       btn: (
         // @ts-ignore
         <Button
-          type="primary"
+          type='primary'
           onClick={() => window.location.replace(`${appPrefix}oidc/logout`)}
         >
           Login Again
@@ -81,7 +78,7 @@ export const tokenSyncWorker = new BackgroundTokenSyncer({
 
 const client = createGraphqlClient({
   fakeData,
-  schema: fakeDataSchema,
+  schema,
 });
 
 tokenSyncWorker.run().catch(console.error);
@@ -91,7 +88,7 @@ tokenSyncWorker.run().catch(console.error);
 ReactDOM.render(
   <IntlProvider
     locale={locale}
-    messages={{ ...schema.dict[locale], ...myLocales[locale] }}
+    messages={{ ...dict[locale], ...myLocales[locale] }}
   >
     <LocaleProvider locale={locales[locale]}>
       <Router>
@@ -99,10 +96,9 @@ ReactDOM.render(
           <Switch>
             <Route
               path={`${appPrefix}admin/:activeKey`}
-              component={(props) => (
+              component={props => (
                 <CMSPage
                   {...props}
-                  schema={schema}
                   notification={<ApolloProvider client={client} {...props} />}
                 />
               )}

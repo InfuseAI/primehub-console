@@ -34,6 +34,10 @@ module.exports = {
   testURL: 'http://localhost/',
   testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
   testPathIgnorePatterns: ['/node_modules/', '/dist/', '/schema'],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '<rootDir>/src/queries/fragments/',
+  ],
   transformIgnorePatterns: ['/node_modules/', '/dist/', '/schema'],
   transform: {
     '\\.(gql|graphql)$': 'jest-transform-graphql',
