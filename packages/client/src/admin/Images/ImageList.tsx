@@ -219,6 +219,7 @@ function _ImageList({ data, ...props }: ImageListProps) {
             }}
           >
             <Input.Search
+              data-testid='text-filter'
               placeholder='Search by name'
               style={{ width: 295 }}
               value={keyword}
