@@ -1,11 +1,13 @@
 import * as  React from 'react';
-import { Layout, Card, Button, Row, Input, message, Modal, notification } from 'antd';
+import { Layout, Card, Button, Row, Input, message, Modal, Typography, Tag } from 'antd';
 import gql from 'graphql-tag';
 import PageTitle from 'components/pageTitle';
 import { ApolloConsumer } from 'react-apollo';
 import { ApolloClient } from 'apollo-client';
 import { errorHandler } from 'utils/errorHandler';
 import Breadcrumbs, {BreadcrumbItemSetup} from 'components/share/breadcrumb';
+import FileSaver from 'file-saver';
+import { GroupContext, GroupContextValue } from 'context/group';
 
 const breadcrumbs: BreadcrumbItemSetup[] = [
   {
@@ -112,6 +114,25 @@ class ApiTokenPage extends React.Component<Props, State> {
     }
   }
 
+  downloadConfig = (groupContext: GroupContextValue) => {
+    const { id, name, displayName } = groupContext;
+    const config = {
+      endpoint: this.graphqlEndpoint,
+      'api-token': this.apiToken,
+      group: {
+        id,
+        name,
+        displayName,
+      },
+    };
+
+    const blob = new Blob([JSON.stringify(config)], {
+      type: 'text/plain;charset=utf-8',
+    });
+
+    FileSaver.saveAs(blob, 'config.json');
+  };
+
   render = () => {
     const example = `\nAPI_TOKEN="${this.apiToken ? this.apiToken : '<API TOKEN>'}"
 
@@ -121,7 +142,9 @@ curl -X POST \\
     -d '{"query":"{me{id,username}}"}' \\
     ${this.graphqlEndpoint}`
 
-    const Token = (this.apiToken ? <>
+    const apiToken = this.apiToken ? this.apiToken : 'abc';
+
+    const Token = (apiToken ? <>
 
       <Input
         readOnly
@@ -131,8 +154,21 @@ curl -X POST \\
         ref={this.refToken}
       />
 
+        <GroupContext.Consumer>
+          {groupContext => (
+            <Row style={{ marginBottom: 16 }}>
+              Please save this token. You won't be able to access it again. You can also
+              {' '}<Tag color="blue" onClick={() => this.downloadConfig(groupContext)}>download</Tag>
+              the config file for{' '}
+              <a target='_blank'
+                  href='https://github.com/infuseai/primehub-python-sdk'
+              >{' '}
+              PrimeHub CLI/SDK</a> and save it at <Typography.Text code>~/.primehub/config.json</Typography.Text>
+              .
+            </Row>
+          )}
+        </GroupContext.Consumer>
 
-      <Row style={{ marginBottom: 16 }}>Please save this token. You won't be able to access it again.</Row>
     </> : <></>);
 
     return (
