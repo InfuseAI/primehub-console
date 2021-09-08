@@ -49,7 +49,7 @@ const defaultGroupValue: GroupInput = {
   displayName: '',
   admins: '',
   enabledSharedVolume: false,
-  enabledDeployment: __ENV__ === 'modelDeploy' || false,
+  enabledDeployment: false,
   launchGroupOnly: false,
   sharedVolumeCapacity: 1,
   maxDeploy: null,
@@ -299,7 +299,8 @@ function GroupForm(props: Props) {
             }
           >
             {form.getFieldDecorator('enabledDeployment', {
-              initialValue: initialValue.enabledDeployment,
+              initialValue:
+                __ENV__ === 'modelDeploy' || initialValue.enabledDeployment,
               valuePropName: 'checked',
             })(<Switch data-testid='group/enabledDeployment' />)}
           </Form.Item>
