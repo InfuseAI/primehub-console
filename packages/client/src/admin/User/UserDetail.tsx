@@ -300,13 +300,14 @@ function DetailPage(props: any) {
                 </Form.Item>
                 <Form.Item style={{ textAlign: 'right', marginTop: 12 }}>
                   <InfuseButton
+                    data-testid='confirm-button'
                     type='primary'
                     htmlType={'submit'}
                     style={{ marginRight: 16 }}
                   >
                     Update
                   </InfuseButton>
-                  <InfuseButton onClick={onCancel}>Cancel</InfuseButton>
+                  <InfuseButton onClick={onCancel} data-testid='reset-button'>Cancel</InfuseButton>
                 </Form.Item>
               </Form>
             </Skeleton>

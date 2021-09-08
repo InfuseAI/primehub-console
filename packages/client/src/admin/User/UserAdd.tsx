@@ -136,13 +136,14 @@ function AddPage(props: any) {
               </Form.Item>
               <Form.Item style={{ textAlign: 'right', marginTop: 12 }}>
                 <InfuseButton
+                  data-testid='confirm-button'
                   type='primary'
                   htmlType='submit'
                   style={{ marginRight: 16 }}
                 >
                   Create
                 </InfuseButton>
-                <InfuseButton onClick={onCancel}>Cancel</InfuseButton>
+                <InfuseButton data-testid='reset-button' onClick={onCancel}>Cancel</InfuseButton>
               </Form.Item>
             </Form>
           </TabPane>

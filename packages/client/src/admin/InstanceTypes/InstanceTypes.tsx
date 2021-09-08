@@ -353,17 +353,22 @@ export function _InstanceTypes({
             }}
           >
             <Input.Search
-              data-testid='search-button'
+              data-testid='text-filter'
               placeholder='Search by name'
               style={{ width: 295 }}
               value={keyword}
               onChange={event => setKeyword(event.currentTarget.value)}
               onSearch={onSearch}
             />
-            <InfuseButton disabled={data.loading} onClick={onSearch}>
+            <InfuseButton
+              data-testid='search-button'
+              disabled={data.loading}
+              onClick={onSearch}
+            >
               Search
             </InfuseButton>
             <InfuseButton
+              data-testid='reset-button'
               disabled={data.loading}
               onClick={() => {
                 const { refetch } = data;
