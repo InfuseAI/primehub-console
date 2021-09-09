@@ -269,7 +269,6 @@ class AppListContainer extends React.Component<Props, State> {
                     xs={24}
                     md={12}
                     xl={8}
-                    xxl={6}
                     key={edge.cursor}
                     style={{ marginBottom: 16 }}
                   >

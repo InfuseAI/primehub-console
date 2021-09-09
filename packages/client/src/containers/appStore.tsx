@@ -79,7 +79,7 @@ class AppStore extends React.Component<Props, State> {
       />
       <PageBody>
         <Row gutter={24} type='flex' style={{marginBottom: '16px'}}>
-          <Col xs={24} md={12} xl={12} xxl={8}>
+          <Col xs={24} md={12} xl={12}>
             <Search placeholder='Search application' onChange={ e => this.onSearch(e.currentTarget.value)} onSearch={this.onSearch}/>
           </Col>
         </Row>
@@ -106,7 +106,7 @@ class AppStore extends React.Component<Props, State> {
             {description.substr(descIndex + searchText.length)}
           </span> : description;
           return (
-            <Col xs={24} span={12} md={12} xxl={8} key={appTemplate.id} style={{marginBottom: 16}}>
+            <Col xs={24} span={12} md={12} xl={8} key={appTemplate.id} style={{marginBottom: 16}}>
               <Card style={{borderRadius: '4px'}}>
                 <Left>
                   <AppLogo src={appTemplate.icon} style={{marginRight: '8px'}}/>
