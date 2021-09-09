@@ -297,7 +297,7 @@ interface BrowseSharedFilesFCProps {
   }) => Promise<{ data: { deleteFiles: number } }>;
 }
 
-export function BrowseSharedFiles({
+function _BrowseSharedFiles({
   data,
   path,
   ...props
@@ -613,4 +613,4 @@ export default compose(
     }),
     name: 'deleteFiles',
   })
-)(BrowseSharedFiles);
+)(_BrowseSharedFiles);
