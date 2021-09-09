@@ -204,13 +204,6 @@ class Browser extends React.Component<Props, State> {
     return `${appPrefix}files/${prefix}${filename}`
   }
 
-  private getRenderPath(filename) {
-    const {data} = this.props;
-    const {files} = data || {};
-    const {prefix} = files || {};
-    return `${appPrefix}preview/files/${prefix}${filename}`
-  }
-
   private getPhfsUri(name) {
     return `phfs://${this.normalizedPath()}` + name
   }
@@ -556,7 +549,7 @@ const StyledModal = styled(Modal)`
           onCancel={() => closeModal()}
         />
         <div style={{maxHeight: maxHeight, overflow: "scroll"}}>
-          <NotebookViewer appPrefix={appPrefix} previewFile={previewFile} sharable={true} />
+          <NotebookViewer previewFile={previewFile} />
         </div>
       </StyledModal>
     );

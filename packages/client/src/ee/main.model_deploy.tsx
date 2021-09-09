@@ -24,7 +24,6 @@ import DeploymentEditPage from 'ee/containers/deploymentEditPage';
 import GroupSettingsPage from 'containers/groupSettingsPage';
 import GroupSettingsDeployments from 'ee/components/groupSettings/deployments';
 import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
-import NotebookViewer from 'containers/sharedFiles/notebookViewer';
 
 const client = createGraphqlClient({
   fakeData,
@@ -35,9 +34,6 @@ class Main extends React.Component {
   render() {
     return (
       <BrowserRouter>
-        <Route path={`${appPrefix}preview/*`}>
-          <NotebookViewer appPrefix={appPrefix} />
-        </Route>
         <Route path={`${appPrefix}g/`}>
           <ApolloProvider client={client}>
             <MainPage
