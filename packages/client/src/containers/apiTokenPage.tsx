@@ -142,34 +142,7 @@ curl -X POST \\
     -d '{"query":"{me{id,username}}"}' \\
     ${this.graphqlEndpoint}`
 
-    const apiToken = this.apiToken ? this.apiToken : 'abc';
-
-    const Token = (apiToken ? <>
-
-      <Input
-        readOnly
-        style={{ marginBottom: 16 }}
-        defaultValue={this.apiToken}
-        addonAfter={<a onClick={() => this.copyToken()} style={{ color: "black" }}>Copy</a>}
-        ref={this.refToken}
-      />
-
-        <GroupContext.Consumer>
-          {groupContext => (
-            <Row style={{ marginBottom: 16 }}>
-              Please save this token. You won't be able to access it again. You can also
-              {' '}<Tag color="blue" onClick={() => this.downloadConfig(groupContext)}>download</Tag>
-              the config file for{' '}
-              <a target='_blank'
-                  href='https://github.com/infuseai/primehub-python-sdk'
-              >{' '}
-              PrimeHub CLI/SDK</a> and save it at <Typography.Text code>~/.primehub/config.json</Typography.Text>
-              .
-            </Row>
-          )}
-        </GroupContext.Consumer>
-
-    </> : <></>);
+    const apiToken = this.apiToken;
 
     return (
       <Layout>
@@ -179,9 +152,40 @@ curl -X POST \\
         />
         <Row style={{ margin: "16px 24px" }}>
           <Card title="Token">
-            {Token}
+            {apiToken && (
+              <>
+                <Input
+                readOnly
+                style={{ marginBottom: 16 }}
+                defaultValue={this.apiToken}
+                  addonAfter={
+                    <a
+                      onClick={() => this.copyToken()}
+                      style={{ color: 'black' }}
+                    >
+                      Copy
+                    </a>
+                  }
+                ref={this.refToken}
+              />
 
+              <Row style={{ marginBottom: 16 }}>
+                Please save this token. You won't be able to access it again. You can also download the config file for <a target='_blank'href='https://github.com/infuseai/primehub-python-sdk'> PrimeHub CLI/SDK</a> and save it at <Typography.Text code>~/.primehub/config.json</Typography.Text>.
+              </Row>
+            </>)}
             <Button type="primary" onClick={this.handleRequestApiToken} >Request API Token</Button>
+            {apiToken && (
+              <GroupContext.Consumer>
+                {groupContext => (
+                  <Button
+                    style={{ marginLeft: 8 }}
+                    onClick={() => this.downloadConfig(groupContext)}
+                  >
+                    Download Config
+                  </Button>
+                )}
+              </GroupContext.Consumer>
+            )}
           </Card>
           <Card title="Example" style={{ margin: "16px 0" }}>
             <Button icon="copy" onClick={() => this.copyExample()}
