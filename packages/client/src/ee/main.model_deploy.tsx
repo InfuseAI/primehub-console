@@ -13,7 +13,7 @@ import { listDeploy } from 'components/Sidebar';
 
 // Components
 import ListContainer from 'containers/ListContainer';
-import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
+import SharedFilesPage from 'containers/sharedFiles/SharedFilesPage';
 import ModelListContainer from 'ee/containers/modelList';
 import ModelDetail from 'ee/containers/ModelDetail';
 import ModelVersionDetailContainer from 'ee/containers/modelVersionDetail';

@@ -13,7 +13,7 @@ import { listCE } from 'components/Sidebar';
 // Components
 import Jupyterhub from 'containers/JupyterHubPage';
 import ListContainer from 'containers/ListContainer';
-import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
+import SharedFilesPage from 'containers/sharedFiles/SharedFilesPage';
 import AppListContainer from 'containers/AppListContainer';
 import AppCreate from 'containers/appCreatePage';
 import AppStore from 'containers/appStore';
