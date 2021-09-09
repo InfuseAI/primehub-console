@@ -134,22 +134,22 @@ function ShareSwitch(props: ShareSwitchProps) {
   );
 }
 
+const headerHeight = 64;
+export const Logo = styled.div`
+  background-image: url(${logo});
+  background-color: #373d62;
+  background-size: 65%;
+  background-position: 14px 13px;
+  background-repeat: no-repeat;
+  width: 200px;
+  height: ${headerHeight}px;
+` as any;
+
 function SharingOptions(props: SharingOptionsProps) {
   const optionsRef = useRef();
 
-  const headerHeight = 64;
   const [shareVisible, setShareVisible] = useState(false);
   const [sharePosition, setSharePosition] = useState({ top: 0, left: 0 });
-
-  const Logo = styled.div`
-    background-image: url(${logo});
-    background-color: #373d62;
-    background-size: 65%;
-    background-position: 14px 13px;
-    background-repeat: no-repeat;
-    width: 200px;
-    height: ${headerHeight}px;
-  ` as any;
 
   if (props.hidden) {
     return <></>;

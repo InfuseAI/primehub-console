@@ -36,6 +36,11 @@ function getPlugins(env) {
       filename: isDev ? 'index.html' : 'index.ejs',
     }),
     new HtmlWebPackPlugin({
+      template: '!!raw-loader!public/share.ejs',
+      chunks: ['share'],
+      filename: 'share.ejs',
+    }),
+    new HtmlWebPackPlugin({
       chunks: ['login'],
       template: '!!raw-loader!public/login.ejs',
       filename: 'login.ejs',
@@ -99,6 +104,7 @@ module.exports = (env) => {
       entry: {
         admin: './src/admin.tsx',
         main: entryPage,
+        share: './src/share.tsx',
       },
     },
     production: {
@@ -107,6 +113,7 @@ module.exports = (env) => {
       entry: {
         admin: ['./src/public-import.js', './src/admin.tsx'],
         main: ['./src/public-import.js', entryPage],
+        share: ['./src/public-import.js', './src/share.tsx'],
       },
     },
   };

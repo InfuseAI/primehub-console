@@ -24,7 +24,6 @@ import ImageEditPage from 'containers/imageEditPage';
 import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
 import GroupSettingsPage from 'containers/groupSettingsPage';
-import NotebookViewer from 'containers/sharedFiles/notebookViewer';
 import PageChangeTracker from 'components/share/tracker';
 
 const client = createGraphqlClient({
@@ -37,9 +36,6 @@ class Main extends React.Component {
   render() {
     return (
       <BrowserRouter>
-        <Route path={`${appPrefix}preview/*`}>
-          <NotebookViewer appPrefix={appPrefix} />
-        </Route>
         <Route path={`${appPrefix}g/`}>
           <ApolloProvider client={client}>
             <MainPage sidebarItems={listCE}>

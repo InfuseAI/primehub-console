@@ -204,13 +204,6 @@ class Browser extends React.Component<Props, State> {
     return `${appPrefix}files/${prefix}${filename}`
   }
 
-  private getRenderPath(filename) {
-    const {data} = this.props;
-    const {files} = data || {};
-    const {prefix} = files || {};
-    return `${appPrefix}preview/files/${prefix}${filename}`
-  }
-
   private getPhfsUri(name) {
     return `phfs://${this.normalizedPath()}` + name
   }

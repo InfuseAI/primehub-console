@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 
 import NbViewer from 'react-nbviewer';
-import './nbviewer.css';
 
 import Markdown from 'react-markdown';
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import SharingOptions from './NotebookShareOptions';
+
+import { Icon } from 'antd';
+import { Logo } from 'containers/sharedFiles/NotebookShareOptions';
 
 const loadingNotebook = `{
   "cells": [
@@ -104,26 +105,50 @@ interface NotebookProps {
   sharable?: boolean;
 }
 
+function toPublicDownloadLink(sharedHash) {
+  let apiHost = window.absGraphqlEndpoint.replace('/graphql', '');
+  if (window.graphqlPrefix !== '/') {
+    apiHost = apiHost.replace(window.graphqlPrefix, '');
+  }
+  if (!apiHost.endsWith('/')) {
+    apiHost = apiHost + '/';
+  }
+  return `${apiHost}share/${sharedHash}`;
+}
+
+const Header = (props: { downloadLink: string }) => {
+  return (
+    <div className='header_container' style={{ backgroundColor: '#373d62' }}>
+      <Logo />
+      <div className='header_operations'>
+        <a href={props.downloadLink} target="_blank">
+          <Icon type='download' className='header_icon' />
+        </a>
+      </div>
+    </div>
+  );
+};
+
 function NotebookViewer(props: NotebookProps) {
   const [value, setValue] = React.useState(loadingNotebook);
   const { appPrefix, previewFile, sharable } = props;
   const getPreviewURL = () => {
-    if (previewFile) {
-      return previewFile;
+    // resolve the URL from the current location
+    const filesPattern = /\/share\/(.+)/;
+    const sharedHash = window.location.href.match(filesPattern);
+    if (sharedHash == null) {
+      return null;
     }
 
-    // resolve the URL from the current location
-    const filesPattern = /\/preview\/(files.+)/;
-    const filePath = window.location.href.match(filesPattern);
-    if (filePath == null) {
-      return <div>File not found</div>;
-    }
-    const fullPath = `${window.location.origin}${appPrefix}${filePath[1]}`;
-    return fullPath;
+    return toPublicDownloadLink(sharedHash[1]);
   };
 
-  const fullPath = getPreviewURL();
+  let fullPath = previewFile;
+  if (!fullPath) {
+    fullPath = getPreviewURL() as string;
+  }
 
+  const isSharedPage = fullPath.includes('/share/');
   const showError = (reason: string, content: string) => {
     setValue(
       errorNotebook.replace('$REASON', reason).replace('$CONTENT', content)
@@ -153,10 +178,7 @@ function NotebookViewer(props: NotebookProps) {
 
   return (
     <div>
-      <SharingOptions
-        hidden={previewFile ? true : false}
-        inGroupPreview={false}
-      />
+      {isSharedPage && <Header downloadLink={fullPath + '?download=1'} />}
       <NbViewer
         source={value}
         markdown={MarkdownAdapter}
