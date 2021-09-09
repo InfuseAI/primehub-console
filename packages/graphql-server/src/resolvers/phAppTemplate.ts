@@ -95,8 +95,8 @@ export const importFromURL = async (root, args, context: Context) => {
   const template = get(templates, '[0]');
 
   if (template.kind === 'PhAppTemplate' && template.metadata && template.spec) {
-    return await crdClient.phAppTemplates.create(template.metadata, template.spec);
+    return crdClient.phAppTemplates.create(template.metadata, template.spec);
   }
 
   throw new ApolloError('Invalid PhAppTemplate yaml');
-}
+};
