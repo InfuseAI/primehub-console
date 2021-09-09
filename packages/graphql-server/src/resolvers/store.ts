@@ -5,7 +5,10 @@ import * as logger from '../logger';
 import { toGroupPath, isGroupBelongUser } from '../utils/groupCheck';
 
 import { ErrorCodes } from '../errorCodes';
-const {NOT_AUTH_ERROR, INTERNAL_ERROR} = ErrorCodes;
+import { createHash } from 'crypto';
+import { Readable, Stream } from 'stream';
+import getStream from 'get-stream';
+const {NOT_AUTH_ERROR, INTERNAL_ERROR, RESOURCE_NOT_FOUND} = ErrorCodes;
 
 interface StoreFile {
   name?: string;
@@ -13,8 +16,12 @@ interface StoreFile {
   lastModified?: string;
 }
 
-const canUserQueryFiles = async (context: Context, userId: string, groupName: string): Promise<boolean> => {
-  return isGroupBelongUser(context, userId, groupName);
+const checkPermission = async (context: Context, groupName: string) => {
+  const {userId} = context;
+  const viewable = await isGroupBelongUser(context, userId, groupName);
+  if (!viewable) {
+    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
+  }
 };
 
 const listQuery = async (context: Context, prefix: string, limit: number, recursive: boolean): Promise<StoreFile[]> => {
@@ -63,14 +70,24 @@ const generatePrefixForQuery = (groupName: string, phfsPrefix: string, recursive
   };
 };
 
+const getShareInfo = (context: Context, groupName: any, opts: {phfsPath?: string, objectPath?: string}) => {
+  const {graphqlHost} = context;
+  const path: any = opts.phfsPath ?
+    `groups/${toGroupPath(groupName)}/${opts.phfsPath}` :
+    opts.objectPath;
+  const shasum = createHash('sha1');
+  shasum.update(path);
+  const hash = shasum.digest('hex');
+  const sharePath = `share/${hash}`;
+  const shareLink = `${graphqlHost}/console/share/${hash}`;
+  return { path, sharePath, shareLink, hash };
+};
+
 export const query = async (root, args, context: Context) => {
   const {userId} = context;
   const {groupName, phfsPrefix} = args.where;
 
-  const viewable = await canUserQueryFiles(context, userId, groupName);
-  if (!viewable) {
-    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
-  }
+  await checkPermission(context, groupName);
 
   let limit = 1000;
   if (args.options && args.options.limit) {
@@ -104,13 +121,10 @@ export const query = async (root, args, context: Context) => {
 };
 
 export const destroy = async (root, args, context: Context) => {
-  const {minioClient, storeBucket, userId} = context;
+  const {minioClient, storeBucket} = context;
   const {groupName, phfsPrefix} = args.where;
 
-  const viewable = await canUserQueryFiles(context, userId, groupName);
-  if (!viewable) {
-    throw new ApolloError('user not auth', NOT_AUTH_ERROR);
-  }
+  await checkPermission(context, groupName);
 
   let recursive = false;
   if (args.options && args.options.recursive) {
@@ -133,17 +147,24 @@ export const destroy = async (root, args, context: Context) => {
     throw new ApolloError('failed to list store objects', INTERNAL_ERROR);
   }
   const removeObjNames = [];
+  const removeSharedNames = [];
   for (const element of fetchedFiles) {
     if (recursive) {
-      removeObjNames.push(`${fullPrefix}${element.name}`);
+      const objName = `${fullPrefix}${element.name}`;
+      removeObjNames.push(objName);
+      const {sharePath} = getShareInfo(context, groupName, {objectPath: objName});
+      removeSharedNames.push(sharePath);
     } else if (recursive === false && element.name === '') {
       // Element name is without prefix, therefore, if it's exactly match, it will be an empty string
-      removeObjNames.push(`${fullPrefix}`);
+      removeObjNames.push(fullPrefix);
+      const {sharePath} = getShareInfo(context, groupName, {objectPath: fullPrefix});
+      removeSharedNames.push(sharePath);
     }
   }
 
   try {
     await minioClient.removeObjects(storeBucket, removeObjNames);
+    await minioClient.removeObjects(storeBucket, removeSharedNames);
     return removeObjNames.length;
   } catch (err) {
     logger.error({
@@ -154,4 +175,109 @@ export const destroy = async (root, args, context: Context) => {
     });
     throw new ApolloError('failed to remove store objects', INTERNAL_ERROR);
   }
+};
+
+export const share = async (root, args, context: Context) => {
+  const {minioClient, storeBucket} = context;
+  const {groupName, phfsPath} = args.where;
+  const { path, hash, sharePath, shareLink } = await getShareInfo(context, groupName, {phfsPath});
+
+  await checkPermission(context, groupName);
+
+  // check if file available
+  try {
+    await minioClient.statObject(storeBucket, path);
+  } catch (err) {
+    if (err.code === 'NotFound') {
+      throw new ApolloError('failed to share store object', RESOURCE_NOT_FOUND);
+    } else {
+      logger.error({
+        component: logger.components.store,
+        type: 'STORE_SHARE_OBJECT',
+        stacktrace: err.stack,
+        message: err.message
+      });
+      throw new ApolloError('failed to share store object', INTERNAL_ERROR);
+    }
+  }
+
+  try {
+    const sharedFileMetadata = {
+      path
+    };
+
+    const content = (Readable as any).from([JSON.stringify(sharedFileMetadata)]);
+    await minioClient.putObject(storeBucket, sharePath, content);
+  } catch (err) {
+    if (err.code === 'NotFound') {
+      throw new ApolloError('failed to share store object', RESOURCE_NOT_FOUND);
+    } else {
+      logger.error({
+        component: logger.components.store,
+        type: 'STORE_SHARE_OBJECT',
+        stacktrace: err.stack,
+        message: err.message
+      });
+      throw new ApolloError('failed to share file', INTERNAL_ERROR);
+    }
+  }
+
+  return {
+    shared: true,
+    hash,
+    shareLink,
+  };
+};
+
+export const unshare = async (root, args, context: Context) => {
+  const {minioClient, storeBucket} = context;
+  const {groupName, phfsPath} = args.where;
+  const { sharePath } = getShareInfo(context, groupName, {phfsPath});
+
+  await checkPermission(context, groupName);
+
+  try {
+    await minioClient.removeObject(storeBucket, sharePath);
+  } catch (err) {
+    if (err.code === 'NotFound') {
+      throw new ApolloError('failed to unshare file', RESOURCE_NOT_FOUND);
+    } else {
+      logger.error({
+        component: logger.components.store,
+        type: 'STORE_SHARE_OBJECT',
+        stacktrace: err.stack,
+        message: err.message
+      });
+      throw new ApolloError('failed to unshare', INTERNAL_ERROR);
+    }
+  }
+
+  return {
+    shared: false,
+  };
+};
+
+export const querySharedFile = async (root, args, context: Context) => {
+  const {minioClient, storeBucket} = context;
+  const {groupName, phfsPath} = args.where;
+  const { sharePath, shareLink, hash } = getShareInfo(context, groupName, {phfsPath});
+  let sharedFileMetadata;
+  let shared = false;
+
+  try {
+    const stream: Stream = await minioClient.getObject(storeBucket, sharePath);
+    const result = await getStream(stream);
+    sharedFileMetadata = JSON.parse(result);
+    shared = true;
+  } catch (e) {
+    return {
+      shared: false
+    };
+  }
+
+  return {
+    shared: true,
+    hash,
+    shareLink,
+  };
 };
