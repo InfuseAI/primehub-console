@@ -514,7 +514,7 @@ class AppCreateForm extends React.Component<Props, State> {
               }
             </Form.Item>
           </Col>
-          <Col xs='24' sm='8' lg='8'>
+          <Col xs={24} sm={8} lg={8}>
             <ResourceMonitor
               selectedGroup={groupContext.id}
               groupContext={groupContext}

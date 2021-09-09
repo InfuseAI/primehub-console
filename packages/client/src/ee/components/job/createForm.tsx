@@ -478,7 +478,7 @@ class CreateForm extends React.Component<Props, State> {
               }
             </Form.Item>
           </Col>
-          <Col xs="24" sm="8" lg="8">
+          <Col xs={24} sm={8} lg={8}>
             {
               showResources ? (
                 <ResourceMonitor
