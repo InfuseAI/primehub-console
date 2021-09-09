@@ -3,9 +3,9 @@ import { MemoryRouter, Route } from 'react-router-dom';
 import { MockedProvider } from 'react-apollo/test-utils';
 
 import { render, screen } from 'test/test-utils';
+import { GroupContext } from 'context/group';
 
 import BrowseSharedFiles, { GET_FILES } from '../BrowseSharedFiles';
-import { GroupContext } from 'context/group';
 
 function setup() {
   const mockGroups = {

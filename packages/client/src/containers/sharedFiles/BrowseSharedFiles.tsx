@@ -36,7 +36,7 @@ import { useClipboard } from 'hooks/useClipboard';
 import NotebookViewer from './NotebookView';
 import SharingOptions from './NotebookShareOptions';
 
-const GET_FILES = gql`
+export const GET_FILES = gql`
   query files($where: StoreFileWhereInput!) {
     files(where: $where) {
       prefix
@@ -118,7 +118,7 @@ function BreadcrumbPaths({
   paths.forEach((path, i) => {
     if (i === 0) {
       items.push(
-        <Breadcrumb.Item>
+        <Breadcrumb.Item key={i}>
           <a onClick={() => history.push(`${appPrefix}g/${name}/browse`)}>
             {name}
           </a>
@@ -127,6 +127,7 @@ function BreadcrumbPaths({
     } else if (i < paths.length - 1) {
       items.push(
         <Breadcrumb.Item
+          key={i}
           onClick={() => {
             const targetPath = paths.slice(0, i + 1).join('/');
             history.push(`${appPrefix}g/${name}/browse${targetPath}`);
@@ -137,7 +138,7 @@ function BreadcrumbPaths({
       );
     } else if (i === paths.length - 1) {
       items.push(
-        <Breadcrumb.Item>
+        <Breadcrumb.Item key={i}>
           <Tooltip placement='bottom' title='Choose or create new path'>
             <a onClick={() => onCreate()}>
               <Icon
@@ -229,7 +230,7 @@ function ShareFileActions({
   }
 
   actions.push(CopyFileURI);
-  actions.push(<Menu.Divider />);
+  actions.push(<Menu.Divider key='divider' />);
   actions.push(DeleteFile);
 
   useEffect(() => {
@@ -272,7 +273,7 @@ interface FileItem {
 
 interface BrowseSharedFilesFCProps {
   path: string;
-  data: {
+  data?: {
     error: Error | undefined;
     loading: boolean;
     refetch: () => Promise<void>;
@@ -521,7 +522,8 @@ function _BrowseSharedFiles({
       </div>
 
       <Table
-        loading={data.loading}
+        rowKey={data => data.name}
+        loading={data?.loading}
         dataSource={get(data, 'files.items', [])}
         columns={columns}
         pagination={{
@@ -541,7 +543,7 @@ function _BrowseSharedFiles({
             type='primary'
             onClick={() => {
               setIsUploading(false);
-              data.refetch();
+              data?.refetch();
             }}
           >
             OK
@@ -593,7 +595,6 @@ export default compose(
       },
       fetchPolicy: 'cache-and-network',
       onError: errorHandler,
-      skip: !window.enablePhfs,
     }),
   }),
   graphql(DELETE_FILES, {
