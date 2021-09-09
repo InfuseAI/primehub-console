@@ -1,6 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react';
 import gql from 'graphql-tag';
 import moment from 'moment';
+import styled from 'styled-components';
 import {
   Table,
   Alert,
@@ -31,6 +32,9 @@ import {
 import { errorHandler } from 'utils/errorHandler';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { useClipboard } from 'hooks/useClipboard';
+
+import NotebookViewer from './NotebookView';
+import SharingOptions from './NotebookShareOptions';
 
 const GET_FILES = gql`
   query files($where: StoreFileWhereInput!) {
@@ -159,6 +163,7 @@ function ShareFileActions({
   prefix: string;
   path: string;
   onDelete: () => void;
+  onPreviewFile: (path: string) => void;
 }) {
   const { appPrefix } = useRoutePrefix();
   const [copyStatus, copyName] = useClipboard({ lazy: true });
@@ -211,14 +216,13 @@ function ShareFileActions({
 
   if (props.name.endsWith('ipynb')) {
     actions.push(
-      <Menu.Item key='view'>
-        <a
-          target='_blank'
-          rel='noreferrer'
-          href={`${appPrefix}preview/files/${prefix}${props.name}`}
-        >
-          View file
-        </a>
+      <Menu.Item
+        key='view'
+        onClick={() =>
+          props.onPreviewFile(`${appPrefix}files/${prefix}${props.name}`)
+        }
+      >
+        View file
       </Menu.Item>
     );
     actions.push(DownloadFile);
@@ -247,6 +251,18 @@ function ShareFileActions({
     </Dropdown>
   );
 }
+
+const PreviewFileModal = styled(Modal)`
+  .ant-form-item-label {
+    margin-bottom: -4px;
+  }
+  .ant-form-item {
+    margin-bottom: 10px;
+  }
+  .ant-modal-body {
+    padding: 0px;
+  }
+`;
 
 interface FileItem {
   name: string;
@@ -294,6 +310,7 @@ export function BrowseSharedFiles({
   const [enabledPHFS, setEndabledPHFS] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [previewFilePath, setPreviewFilePath] = useState('');
 
   const columns: ColumnProps<FileItem>[] = [
     {
@@ -373,6 +390,7 @@ export function BrowseSharedFiles({
             {...item}
             prefix={get(data, 'files.prefix', '')}
             path={path}
+            onPreviewFile={path => setPreviewFilePath(path)}
             onDelete={() => {
               onFilesDeleted(item);
             }}
@@ -535,6 +553,30 @@ export function BrowseSharedFiles({
       >
         <Uploader dirPath={get(data, 'files.prefix', '')} />
       </Modal>
+
+      {previewFilePath && (
+        <PreviewFileModal
+          visible
+          centered
+          closable={false}
+          bodyStyle={{ height: '80%' }}
+          width='80%'
+          footer={[]}
+        >
+          <SharingOptions
+            previewFile={previewFilePath}
+            onCancel={() => setPreviewFilePath('')}
+          />
+          <div
+            style={{
+              maxHeight: Math.floor(window.innerHeight * 0.7),
+              overflow: 'scroll',
+            }}
+          >
+            <NotebookViewer previewFile={previewFilePath} />
+          </div>
+        </PreviewFileModal>
+      )}
     </div>
   );
 }

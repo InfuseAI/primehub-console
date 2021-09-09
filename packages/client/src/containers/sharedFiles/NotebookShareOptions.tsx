@@ -17,7 +17,7 @@ interface ShareAndUnShareVariables {
 }
 
 interface SharingOptionsProps {
-  previewFile?: string;
+  previewFile: string;
   data?: {
     loading: boolean;
     sharedFile: SharedFile;
@@ -160,9 +160,7 @@ function SharingOptions({ data, ...props }: SharingOptionsProps) {
       style={{ position: 'relative', backgroundColor: '#373d62' }}
     >
       <Logo />
-      <div
-        className='header_operations'
-      >
+      <div className='header_operations'>
         <Icon
           type='share-alt'
           className='header_icon'
