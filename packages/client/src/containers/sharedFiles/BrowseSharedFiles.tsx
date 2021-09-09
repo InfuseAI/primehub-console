@@ -451,7 +451,7 @@ export function BrowseSharedFiles({
             onBlur={() => {
               setTimeout(() => {
                 setIsEditing(false);
-              }, 100);
+              }, 200);
             }}
             onSearch={value => {
               setIsEditing(false);
@@ -492,7 +492,6 @@ export function BrowseSharedFiles({
           />
         )}
 
-        {/* @ts-ignore */}
         <InfuseButton
           icon='upload'
           type='primary'
@@ -519,7 +518,6 @@ export function BrowseSharedFiles({
         title='Upload'
         visible={isUploading}
         footer={[
-          // @ts-ignore
           <Button
             key='ok'
             type='primary'
