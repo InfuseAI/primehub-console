@@ -125,7 +125,6 @@ const Header = (props: { downloadLink: string }) => {
       <div className='header_operations'>
         <a
           href={props.downloadLink}
-          target='_blank'
           data-testid='download-url'
           rel='noreferrer'
         >
