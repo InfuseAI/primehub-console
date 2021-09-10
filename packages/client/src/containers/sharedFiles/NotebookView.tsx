@@ -5,7 +5,7 @@ import NbViewer from 'react-nbviewer';
 import Markdown from 'react-markdown';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 
-import { Icon } from 'antd';
+import { Icon, Affix } from 'antd';
 import { Logo } from 'containers/sharedFiles/NotebookShareOptions';
 
 const messageNotebook = `{
@@ -64,7 +64,7 @@ function toPublicDownloadLink(): string {
   return `${apiHost}share/${sharedHash[1]}`;
 }
 
-const Header = (props: { downloadLink: string }) => {
+const Header = (props: { downloadLink: string }): ReactElement => {
   return (
     <div className='header_container' style={{ backgroundColor: '#373d62' }}>
       <Logo />
@@ -82,7 +82,9 @@ const Header = (props: { downloadLink: string }) => {
 };
 
 function NotebookViewer(props: NotebookProps) {
-  const [value, setValue] = React.useState(messageNotebook.replace('$MESSAGE', 'Loading ...'));
+  const [value, setValue] = React.useState(
+    messageNotebook.replace('$MESSAGE', 'Loading ...')
+  );
   const { previewFile } = props;
 
   let fullPath = previewFile;
@@ -93,7 +95,10 @@ function NotebookViewer(props: NotebookProps) {
   const isSharedPage = fullPath.includes('/share/');
   const fileNotFound = () => {
     setValue(
-      messageNotebook.replace('$MESSAGE', 'The file is not currently shared or has been deleted.')
+      messageNotebook.replace(
+        '$MESSAGE',
+        'The file is not currently shared or has been deleted.'
+      )
     );
   };
 
@@ -120,7 +125,11 @@ function NotebookViewer(props: NotebookProps) {
 
   return (
     <div>
-      {isSharedPage && <Header downloadLink={fullPath + '?download=1'} />}
+      {isSharedPage && (
+        <Affix offsetTop={0}>
+          <Header downloadLink={fullPath + '?download=1'} />{' '}
+        </Affix>
+      )}
       <NbViewer
         key='nbviewer'
         source={value}
