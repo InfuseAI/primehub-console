@@ -8,67 +8,13 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { Icon } from 'antd';
 import { Logo } from 'containers/sharedFiles/NotebookShareOptions';
 
-const loadingNotebook = `{
+const messageNotebook = `{
   "cells": [
    {
     "cell_type": "markdown",
     "metadata": {},
     "source": [
-     "Loading ..."
-    ]
-   },
-   {
-    "cell_type": "code",
-    "execution_count": null,
-    "metadata": {},
-    "outputs": [],
-    "source": []
-   }
-  ],
-  "metadata": {
-   "kernelspec": {
-    "display_name": "Python 3",
-    "language": "python",
-    "name": "python3"
-   },
-   "language_info": {
-    "codemirror_mode": {
-     "name": "ipython",
-     "version": 3
-    },
-    "file_extension": ".py",
-    "mimetype": "text/x-python",
-    "name": "python",
-    "nbconvert_exporter": "python",
-    "pygments_lexer": "ipython3",
-    "version": "3.7.6"
-   }
-  },
-  "nbformat": 4,
-  "nbformat_minor": 4
- }`;
-
-const errorNotebook = `{
-  "cells": [
-   {
-    "cell_type": "markdown",
-    "metadata": {},
-    "source": [
-     "### Error"
-    ]
-   },
-   {
-    "cell_type": "markdown",
-    "metadata": {},
-    "source": [
-     "Reason: $REASON"
-    ]
-   },
-   {
-    "cell_type": "markdown",
-    "metadata": {},
-    "source": [
-     "Content: $CONTENT"
+     "$MESSAGE"
     ]
    }
   ],
@@ -136,7 +82,7 @@ const Header = (props: { downloadLink: string }) => {
 };
 
 function NotebookViewer(props: NotebookProps) {
-  const [value, setValue] = React.useState(loadingNotebook);
+  const [value, setValue] = React.useState(messageNotebook.replace('$MESSAGE', 'Loading ...'));
   const { previewFile } = props;
 
   let fullPath = previewFile;
@@ -145,9 +91,9 @@ function NotebookViewer(props: NotebookProps) {
   }
 
   const isSharedPage = fullPath.includes('/share/');
-  const showError = (reason: string, content: string) => {
+  const fileNotFound = () => {
     setValue(
-      errorNotebook.replace('$REASON', reason).replace('$CONTENT', content)
+      messageNotebook.replace('$MESSAGE', 'The file is not currently shared or has been deleted.')
     );
   };
 
@@ -161,13 +107,13 @@ function NotebookViewer(props: NotebookProps) {
           if (data['nbformat'] === 4) {
             setValue(text);
           } else {
-            showError('Not a valid ipynb', text);
+            fileNotFound();
           }
         } else {
-          showError(`bad request`, `cannot fetch content from ${fullPath}`);
+          fileNotFound();
         }
       } catch (error) {
-        showError(`${error}`, `cannot fetch content from ${fullPath}`);
+        fileNotFound();
       }
     })();
   }, []);
