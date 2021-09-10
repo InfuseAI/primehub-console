@@ -102,25 +102,23 @@ function NotebookViewer(props: NotebookProps) {
     );
   };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const response = await fetch(fullPath as string);
-        if (response.status === 200) {
-          const text = await response.text();
-          const data = JSON.parse(text);
-          if (data['nbformat'] === 4) {
-            setValue(text);
-          } else {
-            fileNotFound();
-          }
+  useEffect(async () => {
+    try {
+      const response = await fetch(fullPath as string);
+      if (response.status === 200) {
+        const text = await response.text();
+        const data = JSON.parse(text);
+        if (data['nbformat'] === 4) {
+          setValue(text);
         } else {
           fileNotFound();
         }
-      } catch (error) {
+      } else {
         fileNotFound();
       }
-    })();
+    } catch (error) {
+      fileNotFound();
+    }
   }, []);
 
   return (
