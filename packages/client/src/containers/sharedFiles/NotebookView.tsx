@@ -107,12 +107,14 @@ interface NotebookProps {
 
 function toPublicDownloadLink(sharedHash) {
   let apiHost = window.absGraphqlEndpoint.replace('/graphql', '');
-  if (window.graphqlPrefix !== '/') {
-    apiHost = apiHost.replace(window.graphqlPrefix, '');
-  }
+  // if (window.graphqlPrefix !== '/') {
+  //   apiHost = apiHost.replace(window.graphqlPrefix, '');
+  // }
+  console.log("[1] apiHost", apiHost);
   if (!apiHost.endsWith('/')) {
     apiHost = apiHost + '/';
   }
+  console.log("[2] apiHost", apiHost, `${apiHost}share/${sharedHash}`);
   return `${apiHost}share/${sharedHash}`;
 }
 
