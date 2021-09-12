@@ -29,7 +29,11 @@ const breadcrumbs: BreadcrumbItemSetup[] = [
   },
 ];
 
-export default function ApiTokenPage() {
+interface Props {
+  downloadConfig?: (config) => void;
+}
+
+export default function ApiTokenPage(props: Props) {
   const graphqlEndpoint = window.absGraphqlEndpoint;
   const apiToken = window.apiToken;
   const example = `\nAPI_TOKEN="${apiToken ? apiToken : '<API TOKEN>'}"
@@ -85,7 +89,8 @@ curl -X POST \\
     }
   };
 
-  const downloadConfig = (groupContext: GroupContextValue) => {
+  const handleDownloadConfig = (groupContext: GroupContextValue) => {
+    const { downloadConfig } = props;
     const { id, name, displayName } = groupContext;
     const config = {
       endpoint: graphqlEndpoint,
@@ -96,6 +101,12 @@ curl -X POST \\
         displayName,
       },
     };
+
+    if (downloadConfig) {
+      // just for testing
+      downloadConfig(config);
+      return;
+    }
 
     const blob = new Blob([JSON.stringify(config)], {
       type: 'text/plain;charset=utf-8',
@@ -138,6 +149,7 @@ curl -X POST \\
           <ApolloConsumer>
             {client => (
               <Button
+                data-testid='request-button'
                 type='primary'
                 onClick={() => handleRequestApiToken(client)}
               >
@@ -150,8 +162,9 @@ curl -X POST \\
             <GroupContext.Consumer>
               {groupContext => (
                 <Button
+                  data-testid='download-button'
                   style={{ marginLeft: 8 }}
-                  onClick={() => downloadConfig(groupContext)}
+                  onClick={() => handleDownloadConfig(groupContext)}
                 >
                   Download Config
                 </Button>

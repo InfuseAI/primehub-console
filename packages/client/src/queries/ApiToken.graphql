@@ -5,8 +5,6 @@ query GetApiTokenCount {
   }
 }
 
-
-
 mutation RevokeApiToken {
   revokeApiToken {
     id
