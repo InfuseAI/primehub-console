@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './nbviewer.css';
 
 import styled from 'styled-components';
@@ -10,126 +10,132 @@ import { errorHandler } from 'utils/errorHandler';
 import { compose } from 'recompose';
 import { useClipboard } from 'hooks/useClipboard';
 
+interface ShareAndUnShareVariables {
+  variables: {
+    where: { groupName: string; phfsPath: string };
+  };
+}
 interface SharingOptionsProps {
-  hidden?: boolean;
-  onCancel?: Function;
   previewFile?: string;
   inGroupPreview: boolean;
-  data?: any;
+  data?: {
+    loading: boolean;
+    sharedFile: SharedFile;
+  };
+  onCancel: () => void;
+  shareFile: ({
+    variables,
+  }: ShareAndUnShareVariables) => Promise<{ data: { shareFile: SharedFile } }>;
+  unshareFile: ({ variables }: ShareAndUnShareVariables) => Promise<{
+    data: { unshareFile: SharedFile };
+  }>;
+}
+
+interface SharedFile {
+  shared: boolean;
+  hash: string | null;
+  shareLink: string | null;
 }
 
 interface ShareSwitchProps {
-  data?: any;
-  sharePosition: any;
-  setShareVisible: Function;
-  previewFile?: string;
-  shareFile: Function;
-  unshareFile: Function;
-}
-
-interface SharedStatus {
-  shared: boolean;
-  shareLink?: string;
+  data: SharedFile | null;
+  visible: boolean;
+  onSwitchChange: (
+    status: boolean
+  ) => Promise<{ data: { shareFile?: SharedFile; unshareFile?: SharedFile } }>;
+  onVisibleChange: () => void;
 }
 
 const notificationWidth = 410;
 
-function ShareSwitch(props: ShareSwitchProps) {
-  const { data } = props;
-  const [sharedStatus, setSharedStatus] = useState<SharedStatus>({
+function ShareSwitch({ data, ...props }: ShareSwitchProps) {
+  const [sharedStatus, setSharedStatus] = useState<SharedFile>({
     shared: false,
+    hash: null,
+    shareLink: null,
   });
   const [copyStatus, copy] = useClipboard({ lazy: true, timeout: 2000 });
 
   useEffect(() => {
     if (data) {
-      setSharedStatus(data.sharedFile);
+      setSharedStatus(data);
     }
-  }, [props.data]);
+  }, [data]);
 
   return (
     <div
       className='ant-notification'
       style={{
-        top: props.sharePosition.top,
-        left: props.sharePosition.left,
-        margin: 0,
-        transition: null,
+        position: 'absolute',
+        opacity: props.visible ? 1 : 0,
+        visibility: props.visible ? 'visible' : 'hidden',
+        transition: 'all .3s ease-out',
+        top: '50px',
+        right: '50px',
       }}
     >
-      <span>
+      <div
+        className='ant-notification-notice'
+        style={{ width: notificationWidth }}
+      >
         <div
-          className='ant-notification-notice'
-          style={{ width: notificationWidth }}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginBottom: 16,
+          }}
         >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginBottom: 16,
-            }}
-          >
-            <div>Anyone outside the group can view the link</div>
-            <Switch
-              loading={data.loading}
-              checked={sharedStatus.shared}
-              onChange={status => {
-                const { shareFile, unshareFile } = props;
-                const callback = status ? shareFile : unshareFile;
-                const variables = {
-                  where: {
-                    ...previewFileToVaraibles(props.previewFile),
-                  },
-                };
+          <div>Anyone outside the group can view the link</div>
+          <Switch
+            checked={sharedStatus.shared}
+            onChange={async status => {
+              const result = await props.onSwitchChange(status);
+              const nextSharedStatus =
+                result.data.shareFile || result.data.unshareFile;
 
-                callback({ variables }).then(result => {
-                  const status =
-                    result.data.shareFile || result.data.unshareFile;
-                  setSharedStatus(status);
-                });
-              }}
-            />
-          </div>
-          <div>
-            <Input
-              disabled
-              style={{ marginBottom: 16 }}
-              value={sharedStatus.shareLink}
-              addonAfter={
-                <a
-                  onClick={() => {
-                    if (!sharedStatus.shared) {
-                      return;
-                    }
-                    copy(sharedStatus.shareLink);
-                  }}
-                  style={{ color: 'black' }}
-                >
-                  {copyStatus === 'inactive' ? 'Copy' : 'Copied'}
-                </a>
-              }
-            />
-          </div>
-          <Divider
-            style={{
-              margin: 0,
-              marginBottom: 10,
-              width: notificationWidth,
-              left: -30,
+              setSharedStatus(nextSharedStatus);
             }}
           />
-          <div style={{ display: 'flex', justifyContent: 'end' }}>
-            <Button
-              type='primary'
-              onClick={() => {
-                props.setShareVisible(false);
-              }}
-            >
-              Done
-            </Button>
-          </div>
         </div>
-      </span>
+        <div>
+          <Input
+            disabled
+            style={{ marginBottom: 16 }}
+            value={sharedStatus.shareLink}
+            addonAfter={
+              <a
+                onClick={() => {
+                  if (!sharedStatus.shared) {
+                    return;
+                  }
+                  copy(sharedStatus.shareLink);
+                }}
+                style={{ color: 'black' }}
+              >
+                {copyStatus === 'inactive' ? 'Copy' : 'Copied'}
+              </a>
+            }
+          />
+        </div>
+        <Divider
+          style={{
+            margin: 0,
+            marginBottom: 10,
+            width: notificationWidth,
+            left: -30,
+          }}
+        />
+        <div style={{ display: 'flex', justifyContent: 'end' }}>
+          <Button
+            type='primary'
+            onClick={() => {
+              props.onVisibleChange();
+            }}
+          >
+            Done
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -143,58 +149,62 @@ export const Logo = styled.div`
   background-repeat: no-repeat;
   width: 200px;
   height: ${headerHeight}px;
-` as any;
+`;
 
-function SharingOptions(props: SharingOptionsProps) {
-  const optionsRef = useRef();
-
+function SharingOptions({ data, ...props }: SharingOptionsProps) {
   const [shareVisible, setShareVisible] = useState(false);
-  const [sharePosition, setSharePosition] = useState({ top: 0, left: 0 });
-
-  if (props.hidden) {
-    return <></>;
-  }
 
   return (
     <div
       className='header_container'
-      style={{ backgroundColor: '#373d62' }}
-      ref={optionsRef}
+      style={{ position: 'relative', backgroundColor: '#373d62' }}
     >
       <Logo />
       <div
         className='header_operations'
         style={{ visibility: props.inGroupPreview ? 'visible' : 'hidden' }}
       >
-        <a
+        <Icon
+          type='share-alt'
+          className='header_icon'
           onClick={() => {
-            const rect = optionsRef.current.getBoundingClientRect();
-            const y = rect.y + headerHeight + 10;
-            const left = rect.x + rect.width - notificationWidth - 25;
             setShareVisible(true);
-            setSharePosition({ top: y, left: left });
           }}
-        >
-          <Icon type='share-alt' className='header_icon' />
-        </a>
+        />
 
-        <a
+        <Icon
+          type='close-circle'
+          className='header_icon'
           onClick={() => {
             if (props.onCancel) {
               props.onCancel();
             }
           }}
-        >
-          <Icon type='close-circle' className='header_icon' />
-        </a>
-      </div>
-      {props.data && props.data.sharedFile && shareVisible && (
-        <ShareSwitch
-          {...props}
-          sharePosition={sharePosition}
-          setShareVisible={setShareVisible}
         />
-      )}
+      </div>
+
+      <ShareSwitch
+        data={data.sharedFile}
+        visible={shareVisible}
+        onVisibleChange={() => setShareVisible(prev => !prev)}
+        onSwitchChange={async (status: boolean) => {
+          const mutation = status ? props.shareFile : props.unshareFile;
+          const variables = {
+            where: {
+              ...previewFileToVaraibles(props.previewFile),
+            },
+          };
+
+          try {
+            const result = await mutation({
+              variables,
+            } as ShareAndUnShareVariables);
+            return result;
+          } catch (err) {
+            console.error(err);
+          }
+        }}
+      />
     </div>
   );
 }
