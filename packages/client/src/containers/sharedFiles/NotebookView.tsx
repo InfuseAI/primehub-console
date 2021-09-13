@@ -59,7 +59,7 @@ function toPublicDownloadLink(): string {
 
   let apiHost = window.absGraphqlEndpoint.replace('/graphql', '');
   if (!apiHost.endsWith('/')) {
-    apiHost = apiHost + '/';
+    apiHost = `${apiHost}/`;
   }
   return `${apiHost}share/${sharedHash[1]}`;
 }
@@ -129,7 +129,7 @@ function NotebookViewer(props: NotebookProps) {
     <div>
       {isSharedPage && (
         <Affix offsetTop={0}>
-          <Header downloadLink={fullPath + '?download=1'} />
+          <Header downloadLink={`${fullPath}?download=1`} />
         </Affix>
       )}
       <NbViewer
