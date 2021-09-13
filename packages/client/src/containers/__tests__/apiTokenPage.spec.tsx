@@ -1,12 +1,19 @@
 import * as React from 'react';
-import { findByAltText, render, screen, waitFor } from 'test/test-utils';
+import { render, screen, waitFor } from 'test/test-utils';
 import { MemoryRouter } from 'react-router-dom';
 import ApiTokenPage from 'containers/apiTokenPage';
 import { GroupContext } from 'context/group';
 import { UserContext } from 'context/user';
 import { MockedProvider } from 'react-apollo/test-utils';
-import { GetApiTokenCount, RevokeApiToken, DELETE_DOG_MUTATION } from 'queries/ApiToken.graphql';
+import { GetApiTokenCount, RevokeApiToken } from 'queries/ApiToken.graphql';
 import userEvent from '@testing-library/user-event';
+import FileSaver from 'file-saver';
+
+jest.mock('file-saver', () => {
+  return {
+    saveAs: jest.fn(),
+  };
+});
 
 const mockRequests = [
   {
@@ -113,15 +120,9 @@ describe('ApiToken page Container', () => {
     // @ts-ignore
     global.apiToken = testApiToken;
 
-    const promise = new Promise(downloadConfig => {
-      render(<ApiTokenPage downloadConfig={downloadConfig} />, {
-        wrapper: AllTheProviders,
-      });
-    });
+    render(<ApiTokenPage />, { wrapper: AllTheProviders });
 
     await userEvent.click(screen.getByTestId('download-button'));
-    const result: any = await promise;
-    expect(result.endpoint).toEqual(graphqlEndpoint);
-    expect(result['api-token']).toEqual(testApiToken);
+    expect(FileSaver.saveAs).toHaveBeenCalled();
   });
 });

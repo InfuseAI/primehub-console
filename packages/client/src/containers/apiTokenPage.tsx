@@ -30,11 +30,7 @@ const breadcrumbs: BreadcrumbItemSetup[] = [
   },
 ];
 
-interface Props {
-  downloadConfig?: (config) => void; // This is only used in unit test
-}
-
-export default function ApiTokenPage(props: Props) {
+export default function ApiTokenPage() {
   const graphqlEndpoint = window.absGraphqlEndpoint;
   const apiToken = window.apiToken;
   const example = `\nAPI_TOKEN="${apiToken ? apiToken : '<API TOKEN>'}"
@@ -91,7 +87,6 @@ curl -X POST \\
   };
 
   const handleDownloadConfig = (groupContext: GroupContextValue) => {
-    const { downloadConfig } = props;
     const { id, name, displayName } = groupContext;
     const config = {
       endpoint: graphqlEndpoint,
@@ -102,12 +97,6 @@ curl -X POST \\
         displayName,
       },
     };
-
-    if (downloadConfig) {
-      // just for testing
-      downloadConfig(config);
-      return;
-    }
 
     const blob = new Blob([JSON.stringify(config)], {
       type: 'text/plain;charset=utf-8',
