@@ -64,7 +64,7 @@ function toPublicDownloadLink(): string {
   return `${apiHost}share/${sharedHash[1]}`;
 }
 
-const Header = (props: { downloadLink: string }): ReactElement => {
+const Header = (props: { downloadLink: string }) => {
   return (
     <div className='header_container' style={{ backgroundColor: '#373d62' }}>
       <Logo />
@@ -102,30 +102,34 @@ function NotebookViewer(props: NotebookProps) {
     );
   };
 
-  useEffect(async () => {
-    try {
-      const response = await fetch(fullPath as string);
-      if (response.status === 200) {
-        const text = await response.text();
-        const data = JSON.parse(text);
-        if (data['nbformat'] === 4) {
-          setValue(text);
+  useEffect(() => {
+    async function fetchPath() {
+      try {
+        const response = await fetch(fullPath);
+        if (response.status === 200) {
+          const text = await response.text();
+          const data = JSON.parse(text);
+          if (data['nbformat'] === 4) {
+            setValue(text);
+          } else {
+            fileNotFound();
+          }
         } else {
           fileNotFound();
         }
-      } else {
+      } catch (error) {
         fileNotFound();
       }
-    } catch (error) {
-      fileNotFound();
     }
-  }, []);
+
+    fetchPath();
+  }, [fullPath]);
 
   return (
     <div>
       {isSharedPage && (
         <Affix offsetTop={0}>
-          <Header downloadLink={fullPath + '?download=1'} />{' '}
+          <Header downloadLink={fullPath + '?download=1'} />
         </Affix>
       )}
       <NbViewer
