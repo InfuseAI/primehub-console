@@ -18,6 +18,7 @@ import Breadcrumbs, { BreadcrumbItemSetup } from 'components/share/breadcrumb';
 import FileSaver from 'file-saver';
 import { GroupContext, GroupContextValue } from 'context/group';
 import { useClipboard } from 'hooks/useClipboard';
+import { useContext } from 'react';
 
 const breadcrumbs: BreadcrumbItemSetup[] = [
   {
@@ -30,7 +31,7 @@ const breadcrumbs: BreadcrumbItemSetup[] = [
 ];
 
 interface Props {
-  downloadConfig?: (config) => void;
+  downloadConfig?: (config) => void; // This is only used in unit test
 }
 
 export default function ApiTokenPage(props: Props) {
@@ -43,7 +44,7 @@ curl -X POST \\
   -H "authorization: Bearer \${API_TOKEN}" \\
   -d '{"query":"{me{id,username}}"}' \\
   ${graphqlEndpoint}`;
-
+  const groupContext = useContext(GroupContext);
   const [statusCopyToken, copyToken] = useClipboard({
     text: apiToken,
     timeout: 2000,
@@ -159,17 +160,13 @@ curl -X POST \\
           </ApolloConsumer>
 
           {apiToken && (
-            <GroupContext.Consumer>
-              {groupContext => (
-                <Button
-                  data-testid='download-button'
-                  style={{ marginLeft: 8 }}
-                  onClick={() => handleDownloadConfig(groupContext)}
-                >
-                  Download Config
-                </Button>
-              )}
-            </GroupContext.Consumer>
+            <Button
+              data-testid='download-button'
+              style={{ marginLeft: 8 }}
+              onClick={() => handleDownloadConfig(groupContext)}
+            >
+              Download Config
+            </Button>
           )}
         </Card>
         <Card title='Example' style={{ margin: '16px 0' }}>
