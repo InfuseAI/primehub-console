@@ -149,9 +149,11 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
     });
   });
 
-  // preview
-  rootRouter.get('/preview/*', oidcCtrl.loggedIn, async ctx => {
-    await ctx.render('index', {
+  // public share url
+  rootRouter.get('/share/*', async (ctx: Koa.ParameterizedContext, next: any) => {
+    return next();
+  }, async ctx => {
+    await ctx.render('share', {
       title: 'PrimeHub',
       staticPath,
     });

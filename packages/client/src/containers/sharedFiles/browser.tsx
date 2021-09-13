@@ -13,6 +13,10 @@ import Uploader from 'components/sharedFiles/uploader';
 import InfuseButton from 'components/infuseButton';
 import iconShareFiles from 'images/icon-files-gray.svg';
 import iconMore from 'images/icon-more.svg';
+import SharingOptions from './NotebookShareOptions';
+import styled from 'styled-components';
+import logo from 'images/primehub-logo-w.svg';
+import NotebookViewer from './NotebookView';
 
 interface Props extends RouteComponentProps {
   path: string;
@@ -32,6 +36,7 @@ interface State {
   editing: boolean;
   uploading: boolean;
   itemCopyUri?: ItemType;
+  previewFile?: string;
 }
 
 const GET_FILES = gql`
@@ -199,13 +204,6 @@ class Browser extends React.Component<Props, State> {
     return `${appPrefix}files/${prefix}${filename}`
   }
 
-  private getRenderPath(filename) {
-    const {data} = this.props;
-    const {files} = data || {};
-    const {prefix} = files || {};
-    return `${appPrefix}preview/files/${prefix}${filename}`
-  }
-
   private getPhfsUri(name) {
     return `phfs://${this.normalizedPath()}` + name
   }
@@ -238,6 +236,7 @@ class Browser extends React.Component<Props, State> {
       {this.renderContent()}
       {this.renderCopyUriModal()}
       {this.renderUploadModal()}
+      {this.renderPreviewFile()}
     </div>
   }
 
@@ -321,7 +320,17 @@ class Browser extends React.Component<Props, State> {
       menuItems.push(menuItemDownload);
     } else if (item.name.endsWith('ipynb')) {
       // render file
-      menuItems.push(<Menu.Item key='view'><a target='_blank' href={`${this.getRenderPath(item.name)}`}>View file</a></Menu.Item>);
+      menuItems.push(
+        <Menu.Item key='view'>
+          <a
+            onClick={() => {
+              this.setState({ previewFile: this.getFilePath(item.name) });
+            }}
+          >
+            View file
+          </a>
+        </Menu.Item>
+      );
       menuItems.push(menuItemDownload);
     } else {
       // other format file
@@ -487,6 +496,63 @@ class Browser extends React.Component<Props, State> {
     return <Table style={{paddingTop: 8}}dataSource={dataSource} columns={columns} pagination={pagination}/>;
 
   }
+
+  private renderPreviewFile = () => {
+    const { previewFile } = this.state;
+
+    if (!previewFile) {
+      return <></>;
+    }
+
+    const HEADER_HEIGHT = 64;
+    const Logo = styled.div`
+  background-image: url(${logo});
+  background-color: #373d62;
+  background-size: 65%;
+  background-position: 14px 13px;
+  background-repeat: no-repeat;
+  width: 200px;
+  height: ${HEADER_HEIGHT}px;
+` as any;
+
+
+const StyledModal = styled(Modal)`
+  .ant-form-item-label {
+    margin-bottom: -4px;
+  }
+  .ant-form-item {
+    margin-bottom: 10px;
+  }
+  .ant-modal-body {
+    padding: 0px;
+  }
+`;
+
+    const maxHeight = Math.floor(window.innerHeight * 0.7);
+    const closeModal = () => {
+      this.setState({ previewFile: null });
+    }
+
+    return (
+      <StyledModal
+        closable={false}
+        title=""
+        centered
+        bodyStyle={{ height: '80%' }}
+        width='80%'
+        visible={true}
+        footer={[]}
+      >
+        <SharingOptions
+          previewFile={previewFile}
+          onCancel={() => closeModal()}
+        />
+        <div style={{maxHeight: maxHeight, overflow: "scroll"}}>
+          <NotebookViewer previewFile={previewFile} />
+        </div>
+      </StyledModal>
+    );
+  };
 }
 
 export default compose(

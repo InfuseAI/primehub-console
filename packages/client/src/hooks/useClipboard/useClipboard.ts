@@ -3,19 +3,31 @@ import { useEffect, useCallback, useState } from 'react';
 type Status = 'inactive' | 'copied' | 'failed';
 
 export function useClipboard({
-  text,
+  text = '',
   timeout = 1000,
+  lazy = false,
 }: {
-  text: string;
+  text?: string;
   timeout?: number;
+  lazy?: boolean;
 }) {
   const [status, setStatus] = useState<Status>('inactive');
-  const copy = useCallback(() => {
-    navigator.clipboard
-      .writeText(text)
-      .then(() => setStatus('copied'))
-      .catch(() => setStatus('failed'));
-  }, [text]);
+  const copy = useCallback(
+    (value?: string) => {
+      if (lazy) {
+        navigator.clipboard
+          .writeText(value)
+          .then(() => setStatus('copied'))
+          .catch(() => setStatus('failed'));
+      } else {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => setStatus('copied'))
+          .catch(() => setStatus('failed'));
+      }
+    },
+    [lazy, text]
+  );
 
   useEffect(() => {
     if (status === 'inactive') return;
