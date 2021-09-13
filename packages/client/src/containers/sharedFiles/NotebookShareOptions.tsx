@@ -15,9 +15,9 @@ interface ShareAndUnShareVariables {
     where: { groupName: string; phfsPath: string };
   };
 }
+
 interface SharingOptionsProps {
   previewFile?: string;
-  inGroupPreview: boolean;
   data?: {
     loading: boolean;
     sharedFile: SharedFile;
@@ -70,8 +70,8 @@ function ShareSwitch({ data, ...props }: ShareSwitchProps) {
         opacity: props.visible ? 1 : 0,
         visibility: props.visible ? 'visible' : 'hidden',
         transition: 'all .3s ease-out',
-        top: '50px',
-        right: '50px',
+        top: '79px',
+        right: '25px',
       }}
     >
       <div
@@ -162,7 +162,6 @@ function SharingOptions({ data, ...props }: SharingOptionsProps) {
       <Logo />
       <div
         className='header_operations'
-        style={{ visibility: props.inGroupPreview ? 'visible' : 'hidden' }}
       >
         <Icon
           type='share-alt'
@@ -240,9 +239,6 @@ const UNSHARE_FILE = gql`
 `;
 
 const previewFileToVaraibles = previewFile => {
-  if (!previewFile) {
-    return {};
-  }
   const result = previewFile.match('/files/groups/([^/]+)/(.+)');
   const [groupName, phfsPath] = result.slice(1);
   return { groupName: groupName, phfsPath: phfsPath };
@@ -250,24 +246,17 @@ const previewFileToVaraibles = previewFile => {
 
 export default compose(
   graphql(CHECK_SHARED_STATUS, {
-    skip: (props: SharingOptionsProps) => {
-      return props.inGroupPreview !== true;
-    },
     options: (props: SharingOptionsProps) => ({
       variables: {
         where: {
           ...previewFileToVaraibles(props.previewFile),
         },
       },
-      // fetchPolicy: 'network-only',
       onError: errorHandler,
     }),
   }),
   graphql(SHARE_FILE, {
     name: 'shareFile',
-    skip: (props: SharingOptionsProps) => {
-      return props.inGroupPreview !== true;
-    },
     options: (props: SharingOptionsProps) => ({
       onError: errorHandler,
       refetchQueries: [
@@ -284,9 +273,6 @@ export default compose(
   }),
   graphql(UNSHARE_FILE, {
     name: 'unshareFile',
-    skip: (props: SharingOptionsProps) => {
-      return props.inGroupPreview !== true;
-    },
     options: (props: SharingOptionsProps) => ({
       onError: errorHandler,
       refetchQueries: [

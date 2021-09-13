@@ -544,7 +544,6 @@ const StyledModal = styled(Modal)`
         footer={[]}
       >
         <SharingOptions
-          inGroupPreview={true}
           previewFile={previewFile}
           onCancel={() => closeModal()}
         />
