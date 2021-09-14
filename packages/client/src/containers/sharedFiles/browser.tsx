@@ -542,6 +542,7 @@ const StyledModal = styled(Modal)`
         width='80%'
         visible={true}
         footer={[]}
+        onCancel={() => closeModal()}
       >
         <SharingOptions
           previewFile={previewFile}
