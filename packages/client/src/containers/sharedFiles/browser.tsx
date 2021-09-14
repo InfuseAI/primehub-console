@@ -535,6 +535,7 @@ const StyledModal = styled(Modal)`
 
     return (
       <StyledModal
+        closable={false}
         title=""
         centered
         bodyStyle={{ height: '80%' }}
