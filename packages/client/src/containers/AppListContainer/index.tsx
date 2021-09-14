@@ -227,6 +227,7 @@ class AppListContainer extends React.Component<Props, State> {
         <div style={{ textAlign: 'right' }}>
           {isUserAdmin ? (
             <a
+              data-testid='system-setting-link'
               href={`${appPrefix}admin/system#apps`}
               style={{ marginRight: 16 }}
             >
