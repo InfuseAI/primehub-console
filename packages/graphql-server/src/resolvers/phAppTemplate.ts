@@ -91,7 +91,7 @@ export const importFromURL = async (root, args, context: Context) => {
 
   const response = await fetch(url);
   const content = await response.text();
-  const templates = yaml.loadAll(content);
+  const templates = yaml.safeLoadAll(content);
   const template = get(templates, '[0]');
 
   if (template.kind === 'PhAppTemplate' && template.metadata && template.spec) {
