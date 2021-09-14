@@ -20,6 +20,7 @@ import Pagination from 'components/share/pagination';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import { errorHandler } from 'utils/errorHandler';
+import { appPrefix } from 'utils/env';
 import AppCard from 'components/apps/card';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
@@ -205,6 +206,7 @@ class AppListContainer extends React.Component<Props, State> {
       this.props;
     const { error, phApplicationsConnection, refetch } =
       getPhApplicationConnection;
+    const { isUserAdmin } = window;
 
     if (error) {
       return <div>Error</div>;
@@ -223,6 +225,16 @@ class AppListContainer extends React.Component<Props, State> {
     let pageBody = (
       <>
         <div style={{ textAlign: 'right' }}>
+          {isUserAdmin ? (
+            <a
+              href={`${appPrefix}admin/system#apps`}
+              style={{ marginRight: 16 }}
+            >
+              Apps
+            </a>
+          ) : (
+            <></>
+          )}
           {/* @ts-ignore */}
           <InfuseButton
             icon="plus"
