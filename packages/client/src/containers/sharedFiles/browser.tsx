@@ -535,13 +535,13 @@ const StyledModal = styled(Modal)`
 
     return (
       <StyledModal
-        closable={false}
         title=""
         centered
         bodyStyle={{ height: '80%' }}
         width='80%'
         visible={true}
         footer={[]}
+        onCancel={() => closeModal()}
       >
         <SharingOptions
           previewFile={previewFile}
