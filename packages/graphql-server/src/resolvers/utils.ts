@@ -19,6 +19,7 @@ import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
 import { EOL } from 'os';
 import { Context, Role } from './interface';
 import { keycloakMaxCount } from './constant';
+import GroupRepresentation from 'keycloak-admin/lib/defs/groupRepresentation';
 const ITEMS_PER_PAGE = 10;
 
 export enum QueryImageMode {
@@ -69,6 +70,13 @@ export const isGroupMember = async (userId: string, groupName: string, kcAdminCl
   });
   const memberIds = members.map(user => user.id);
   return (memberIds.indexOf(userId) >= 0);
+};
+
+export const findGroupByName = async (groupName: string, kcAdminClient: KcAdminClient): Promise<GroupRepresentation> => {
+  const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});
+  const groupData = find(groups, ['name', groupName]);
+  const group = await kcAdminClient.groups.findOne({id: get(groupData, 'id', '')});
+  return group;
 };
 
 export const numberedPaginate = (rows: any[], pagination?: Pagination) => {

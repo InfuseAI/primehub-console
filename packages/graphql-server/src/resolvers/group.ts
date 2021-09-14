@@ -12,7 +12,9 @@ import {
   stringifyMemory,
   filter,
   paginate,
-  extractPagination} from './utils';
+  extractPagination,
+  findGroupByName,
+  getFromAttr} from './utils';
 import { pick, isNil, omit, get, isEmpty, mapValues } from 'lodash';
 import { crd as instanceTypeResolver } from './instanceType';
 import { crd as datasetResolver } from './dataset';
@@ -28,6 +30,7 @@ import {createConfig} from '../config';
 import { transform } from './groupUtils';
 import { isGroupNameAvailable } from '../utils/groupCheck';
 import { isUserAdmin } from './user';
+import { PhApplication } from './phApplication';
 
 const config = createConfig();
 
@@ -267,6 +270,56 @@ export const update = async (root, args, context: Context) => {
   });
 
   return transform(group);
+};
+
+export const onPhAppDeleted = async (context: Context, phApplication: PhApplication) => {
+  const {kcAdminClient} = context;
+
+  // update resource
+  const group = await findGroupByName(phApplication.groupName, kcAdminClient);
+
+  // merge attrs
+  // displayName, canUseGpu, quotaGpu in attributes
+  const attrs = new Attributes({
+    keycloakAttr: group.attributes,
+    schema: attrSchema
+  });
+  const mlflowTrackingUri = getFromAttr('mlflow-tracking-uri', group.attributes, null);
+  const matched = mlflowTrackingUri.match(/^http:\/\/app-(?<app>mlflow-.+):5000$/);
+  if (!matched) {
+    return;
+  }
+
+  if (matched.groups.app !== phApplication.id) {
+    return;
+  }
+
+  const data = {
+    trackingUri: null,
+    uiUrl: null,
+    trackingEnvs: [],
+    artifactEnvs: [],
+  };
+  attrs.mergeWithData(data);
+  // update
+  try {
+    await kcAdminClient.groups.update({id: group.id}, {
+      attributes: attrs.toKeycloakAttrs()
+    });
+  } catch (err) {
+    if (!err.response || err.response.status !== 409) {
+      throw err;
+    }
+    throw new ApolloError('Group reset mlflow settings failed', 'GROUP_UNKNOWN_ERROR');
+  }
+
+  logger.info({
+    component: logger.components.group,
+    type: 'RESET_MLFLOW_SETTING',
+    userId: context.userId,
+    username: context.username,
+    id: group.id
+  });
 };
 
 export const destroy = async (root, args, context: Context) => {
