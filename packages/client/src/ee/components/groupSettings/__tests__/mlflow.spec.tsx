@@ -22,12 +22,12 @@ const AllTheProviders = ({ children }) => {
         group: {
           id: 'test-group',
           name: 'test-group',
-          mlflow: mlflow,
+          mlflow,
         },
       },
     },
   };
-  
+
   const groupValue = {
     id: 'test-group',
     name: 'test-group',
@@ -61,7 +61,9 @@ describe('GroupSettingsMLflow Component', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(screen.queryByText('MLflow Tracking URI')).toBeInTheDocument();
-    screen.queryAllByDisplayValue('http://localhost:5000').forEach(uri => expect(uri).toBeInTheDocument());
+    screen
+      .queryAllByDisplayValue('http://localhost:5000')
+      .forEach(uri => expect(uri).toBeInTheDocument());
     expect(screen.queryByDisplayValue('FOO')).toBeInTheDocument();
     expect(screen.queryByDisplayValue('BAR_A')).toBeInTheDocument();
   });
