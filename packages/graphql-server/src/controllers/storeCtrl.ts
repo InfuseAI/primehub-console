@@ -50,9 +50,8 @@ export const mountStoreCtrl = (router: Router,
     const mimetype = mime.getType(path);
     ctx.set('Content-type', mimetype);
     if (download) {
-      const {filename} = opts;
-      if (filename) {
-        ctx.set('Content-Disposition', `attachment; filename="${filename}"`);
+      if (opts?.filename) {
+        ctx.set('Content-Disposition', `attachment; filename="${opts?.filename}"`);
       } else {
         ctx.set('Content-Disposition', 'attachment');
       }
