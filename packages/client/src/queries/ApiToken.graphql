@@ -1,0 +1,12 @@
+
+query GetApiTokenCount {
+  me {
+    apiTokenCount
+  }
+}
+
+mutation RevokeApiToken {
+  revokeApiToken {
+    id
+  }
+}

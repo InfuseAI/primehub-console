@@ -319,8 +319,9 @@ export class OidcCtrl {
 
   public requestApiToken = async (ctx: any) => {
     const nonce = this.saveNonceSecret(ctx);
+    const prefix = this.appPrefix ? this.appPrefix : '';
     const query = ctx.query;
-    let redirectUri = `${this.cmsHost}${this.appPrefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`;
+    let redirectUri = `${this.cmsHost}${prefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`;
     if (query.backUrl) {
       redirectUri = `${redirectUri}?backUrl=${encodeURIComponent(query.backUrl)}`;
     }
@@ -335,8 +336,9 @@ export class OidcCtrl {
 
   public requestApiTokenCallback = async (ctx: any) => {
     const nonce = this.createNonceFromSecret(ctx);
+    const prefix = this.appPrefix ? this.appPrefix : '';
     const query = ctx.query;
-    let redirectUri = `${this.cmsHost}${this.appPrefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`;
+    let redirectUri = `${this.cmsHost}${prefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`;
     if (query.backUrl) {
       redirectUri = `${redirectUri}?backUrl=${encodeURIComponent(query.backUrl)}`;
     }

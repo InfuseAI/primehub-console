@@ -1,10 +1,48 @@
 import * as React from 'react';
-import { render, screen } from 'test/test-utils';
+import { render, screen, waitFor } from 'test/test-utils';
 import { MemoryRouter } from 'react-router-dom';
 import ApiTokenPage from 'containers/apiTokenPage';
 import { GroupContext } from 'context/group';
 import { UserContext } from 'context/user';
 import { MockedProvider } from 'react-apollo/test-utils';
+import { GetApiTokenCount, RevokeApiToken } from 'queries/ApiToken.graphql';
+import userEvent from '@testing-library/user-event';
+import FileSaver from 'file-saver';
+
+jest.mock('file-saver', () => {
+  return {
+    saveAs: jest.fn(),
+  };
+});
+
+const mockRequests = [
+  {
+    request: {
+      query: GetApiTokenCount,
+    },
+    result: {
+      data: {
+        me: {
+          apiTokenCount: 1,
+          __typename: 'User',
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: RevokeApiToken,
+    },
+    result: {
+      data: {
+        revokeApiToken: {
+          id: 'user-id',
+          __typename: 'UserActionResponse',
+        },
+      },
+    },
+  },
+];
 
 const AllTheProviders = ({ children }) => {
   const groupValue = {
@@ -26,7 +64,9 @@ const AllTheProviders = ({ children }) => {
     <MockedProvider>
       <GroupContext.Provider value={groupValue}>
         <UserContext.Provider value={userValue}>
-          <MemoryRouter>{children}</MemoryRouter>
+          <MockedProvider mocks={mockRequests}>
+            <MemoryRouter>{children}</MemoryRouter>
+          </MockedProvider>
         </UserContext.Provider>
       </GroupContext.Provider>
     </MockedProvider>
@@ -45,5 +85,44 @@ describe('ApiToken page Container', () => {
     global.apiToken = testApiToken;
     render(<ApiTokenPage />, { wrapper: AllTheProviders });
     expect(screen.queryByDisplayValue(testApiToken)).toContainHTML('<Input readOnly');
+  });
+
+  it('Should go to requestApiTokenEndpoint when click the request button', async () => {
+    // @ts-ignore
+    global.requestApiTokenEndpoint = '/console/oidc/request-api-token';
+    // @ts-ignore
+    global.window = Object.create(window);
+    Object.defineProperty(window, 'location', {
+      value: {
+        href: 'https://dummy.com/console/g/phusers/api-token',
+        pathname: '/console/g/phusers/api-token',
+      },
+      writable: true,
+    });
+    render(<ApiTokenPage />, { wrapper: AllTheProviders });
+    await userEvent.click(screen.getByTestId('request-button'));
+    await screen.findByText('Are you sure you want to request an API token?');
+    const okButton = screen.getByText('OK');
+    await userEvent.click(okButton);
+    await waitFor(() =>
+      expect(window.location.href).toEqual(
+        '/console/oidc/request-api-token?backUrl=%2Fconsole%2Fg%2Fphusers%2Fapi-token'
+      )
+    );
+  });
+
+  it('Should copy the config file', async () => {
+    const testApiToken = 'test-api-token';
+    const graphqlEndpoint = 'https://dummy.com/console/g/phusers/api-token';
+
+    // @ts-ignore
+    global.absGraphqlEndpoint = graphqlEndpoint;
+    // @ts-ignore
+    global.apiToken = testApiToken;
+
+    render(<ApiTokenPage />, { wrapper: AllTheProviders });
+
+    await userEvent.click(screen.getByTestId('download-button'));
+    expect(FileSaver.saveAs).toHaveBeenCalled();
   });
 });
