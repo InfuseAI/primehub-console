@@ -534,8 +534,8 @@ function _ImageForm({
             <span>
               Global{' '}
               <PHTooltip
-                tipText='When Global, everyone can access this Instance Type.'
-                tipLink='https://docs.primehub.io/docs/guide_manual/admin-instancetype#edit-groups'
+                tipText='When Global, everyone can access this Image.'
+                tipLink='https://docs.primehub.io/docs/guide_manual/admin-image#editing-groups'
                 placement='right'
               />
             </span>
