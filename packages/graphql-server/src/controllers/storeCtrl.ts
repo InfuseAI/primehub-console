@@ -13,7 +13,7 @@ export const mountStoreCtrl = (router: Router,
                                checkUserGroup: Middleware,
                                minioClient: Client,
                                storeBucket: string) => {
-  const downloadFile = async (ctx, path, opts?: {filename: string}) => {
+  const downloadFile = async (ctx, path) => {
     let download = false;
     if ('download' in ctx.request.query && ctx.request.query.download === '1') {
       download = true;
@@ -50,11 +50,8 @@ export const mountStoreCtrl = (router: Router,
     const mimetype = mime.getType(path);
     ctx.set('Content-type', mimetype);
     if (download) {
-      if (opts?.filename) {
-        ctx.set('Content-Disposition', `attachment; filename="${opts?.filename}"`);
-      } else {
-        ctx.set('Content-Disposition', 'attachment');
-      }
+      const filename: string = last(path.split('/'));
+      ctx.set('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
     }
   };
 
@@ -90,7 +87,6 @@ export const mountStoreCtrl = (router: Router,
       return ctx.status = 500;
     }
 
-    const filename: string = last(path.split('/'));
-    await downloadFile(ctx, path, {filename});
+    await downloadFile(ctx, path);
   });
 };
