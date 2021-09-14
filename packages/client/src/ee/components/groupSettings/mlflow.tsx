@@ -4,6 +4,7 @@ import { get, pick } from 'lodash';
 import { compose } from 'recompose';
 import {
   Tooltip,
+  Select,
   Icon,
   notification,
   Form,
@@ -17,11 +18,14 @@ import InfuseButton from 'components/infuseButton';
 import EnvFields from 'components/share/envFields';
 import { errorHandler } from 'utils/errorHandler';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
+import PHTooltip from 'components/share/toolTip';
 import {
   UpdateGroupMLflowConfig,
   GetGroupMLflowConfig,
 } from 'queries/Group.graphql';
 import Env from 'interfaces/env';
+
+const { Option } = Select;
 
 type MLflowConfigProps = {
   updateGroupMLflowConfig: any;
@@ -38,43 +42,27 @@ interface FormValue {
 
 class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
   trackingEnvsTips = (
-    <Tooltip
+    <PHTooltip
       placement='right'
-      title={
-        <span>
-          This is used to access the MLflow tracking server,{' '}
-          <a
-            style={{ color: '#739af3' }}
-            target='_blank'
-            href='https://www.mlflow.org/docs/latest/tracking.html#logging-to-a-tracking-server'
-          >
-            Learn more
-          </a>
-        </span>
-      }
-    >
-      <Icon type='question-circle' />
-    </Tooltip>
+      tipText='This is used to access the MLflow tracking server'
+      tipLink='https://www.mlflow.org/docs/latest/tracking.html#logging-to-a-tracking-server'
+    />
   );
 
   artifactEnvsTips = (
-    <Tooltip
+    <PHTooltip
       placement='right'
-      title={
-        <span>
-          This is used to access the MLflow artifact stores,{' '}
-          <a
-            style={{ color: '#739af3' }}
-            target='_blank'
-            href='https://www.mlflow.org/docs/latest/tracking.html#artifact-stores'
-          >
-            Learn more
-          </a>
-        </span>
-      }
-    >
-      <Icon type='question-circle' />
-    </Tooltip>
+      tipText='This is used to access the MLflow artifact stores'
+      tipLink='https://www.mlflow.org/docs/latest/tracking.html#artifact-stores'
+    />
+  );
+
+  mlflowAppSelectorTips = (
+    <PHTooltip
+      placement='right'
+      tipText='You can setup a MLflow application in PrimeHub Apps to configure MLflow settings.'
+      tipLink='https://docs.primehub.io/docs/model-configuration'
+    />
   );
 
   onSubmit = e => {
@@ -101,20 +89,27 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
     const groupMLflowConfig = get(getGroupMLflowConfig, 'group.mlflow', {});
     return (
       <Form onSubmit={this.onSubmit}>
-        <Alert
-          message={
-            <span>
-              You can setup a MLflow application in PrimeHub Apps to configure
-              MLflow settings.{' '}
-              <a href='https://docs.primehub.io/docs/model-configuration'>
-                Learn more
-              </a>
-            </span>
-          }
-          type='info'
-          closeText='Got It'
-          showIcon
-        />
+        <Row style={{ marginTop: 5 }}>
+          <Col span={8}>
+            <Form.Item
+              label={
+                <span>
+                  Configure with Installed Apps {this.mlflowAppSelectorTips}
+                </span>
+              }
+              style={{ marginBottom: 20 }}
+            >
+              <Select>
+                <Option key='1' value='1'>
+                  MLFlow app 1
+                </Option>
+                <Option key='2' value='2'>
+                  MLFlow app 2
+                </Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
         <Row style={{ marginTop: 5 }}>
           <Col>
             <Form.Item
