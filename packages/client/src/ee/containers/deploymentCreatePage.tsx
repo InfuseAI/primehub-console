@@ -1,6 +1,6 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
-import { notification } from 'antd';
+import { Alert, notification } from 'antd';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import { get, unionBy, pick } from 'lodash';
@@ -10,6 +10,7 @@ import { withRouter } from 'react-router-dom';
 import { errorHandler } from 'utils/errorHandler';
 import DeploymentCreateForm from 'ee/components/modelDeployment/createForm';
 import PageTitle from 'components/pageTitle';
+import PageBody from 'components/pageBody';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
 import { sortNameByAlphaBet } from 'utils/sorting';
@@ -43,11 +44,65 @@ type Props = RouteComponentProps & GroupContextComponentProps & {
   currentUser: any;
   createPhDeployment: any;
   createPhDeploymentResult: any;
+  licenseQuery: any;
 };
 
 type State = {
   selectedGroup: string | null;
 };
+
+function renderReachedDeploymentLimitAlert({
+  isReachedGroupDeploymentsLimit,
+  isReachedSystemDeploymentsLimit,
+}: {
+  isReachedGroupDeploymentsLimit: boolean;
+  isReachedSystemDeploymentsLimit: boolean;
+}) {
+  const REACHED_DEPLOYMENTS_LIMIT_MESSAGES = {
+    group: (
+      <PageBody>
+        <Alert
+          message="The group deployment limit has been reached."
+          description="Please get in touch with your system administrator to increase the group deployment limit or delete one of your current deployments to deploy a new model."
+          type="error"
+          showIcon
+        />
+      </PageBody>
+    ),
+    system: (
+      <PageBody>
+        <Alert
+          message="The system deployment limit has been reached."
+          description="Please get in touch with your system administrator to update the license or delete one of the group’s deployments to deploy a new model."
+          type="error"
+          showIcon
+        />
+      </PageBody>
+    ),
+    both: (
+      <PageBody>
+        <Alert
+          message="Both system deployment limit and group deployment limit has been reached."
+          description="Please get in touch with your system administrator to update the license and increase the group deployment limit, or delete one of the group’s deployments to deploy a new model."
+          type="error"
+          showIcon
+        />
+      </PageBody>
+    ),
+  };
+
+  if (isReachedGroupDeploymentsLimit && isReachedSystemDeploymentsLimit) {
+    return REACHED_DEPLOYMENTS_LIMIT_MESSAGES['system'];
+  }
+
+  if (isReachedGroupDeploymentsLimit && !isReachedSystemDeploymentsLimit) {
+    return REACHED_DEPLOYMENTS_LIMIT_MESSAGES['group'];
+  }
+
+  if (isReachedGroupDeploymentsLimit && isReachedSystemDeploymentsLimit) {
+    return REACHED_DEPLOYMENTS_LIMIT_MESSAGES['both'];
+  }
+}
 
 class DeploymentCreatePage extends React.Component<Props, State> {
   state = {
@@ -97,13 +152,25 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       }
     } catch(e) {}
 
+    const isReachedGroupDeploymentsLimit =
+      group?.deployments >= group?.maxpGroup;
+    const isReachedSystemDeploymentsLimit =
+      this.props.licenseQuery?.license.usage.maxModelDeploy >=
+      this.props.licenseQuery?.license.maxModelDeploy;
+
     return (
       <React.Fragment>
         <PageTitle
           breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
           title={'Create Deployment'}
         />
-        <div style={{margin: '16px'}}>
+
+        {renderReachedDeploymentLimitAlert({
+          isReachedGroupDeploymentsLimit,
+          isReachedSystemDeploymentsLimit,
+        })}
+
+        <div style={{ margin: '16px' }}>
           <DeploymentCreateForm
             type="create"
             groupContext={groupContext}
@@ -128,15 +195,30 @@ export default compose(
   withGroupContext,
   graphql(CurrentUser, {
     alias: 'withCurrentUser',
-    name: 'currentUser'
+    name: 'currentUser',
   }),
+  graphql(
+    gql`
+      query {
+        license {
+          maxModelDeploy
+          usage {
+            maxModelDeploy
+          }
+        }
+      }
+    `,
+    {
+      name: 'licenseQuery',
+    }
+  ),
   graphql(CREATE_DEPLOYMENT, {
     options: (props: Props) => ({
       onCompleted: (data: any) => {
-        const {history} = props;
+        const { history } = props;
         history.push({
           pathname: `../deployments`,
-          search: queryString.stringify({first: 8})
+          search: queryString.stringify({ first: 8 }),
         });
         notification.success({
           duration: 10,
@@ -144,14 +226,21 @@ export default compose(
           message: 'Success!',
           description: (
             <>
-              Your model has begun deploying.
-              Click <a onClick={() => history.push(`deployments/${data.createPhDeployment.id}`)}>here</a> to view.
+              Your model has begun deploying. Click{' '}
+              <a
+                onClick={() =>
+                  history.push(`deployments/${data.createPhDeployment.id}`)
+                }
+              >
+                here
+              </a>{' '}
+              to view.
             </>
-          )
+          ),
         });
       },
-      onError: errorHandler
+      onError: errorHandler,
     }),
-    name: 'createPhDeployment'
+    name: 'createPhDeployment',
   })
-)(DeploymentCreatePage)
+)(DeploymentCreatePage);
