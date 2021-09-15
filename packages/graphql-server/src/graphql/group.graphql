@@ -48,6 +48,7 @@ type Group {
   # enabledDeployment
   enabledDeployment: Boolean
   maxDeploy: Int
+  deploymentsUsage: Int
   jobDefaultActiveDeadlineSeconds: Int
   # group admin
   admins: String

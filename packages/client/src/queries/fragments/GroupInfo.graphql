@@ -58,6 +58,7 @@ fragment GroupInfo on Group {
   }
   enabledDeployment
   maxDeploy
+  deploymentsUsage
   enabledSharedVolume
   jobDefaultActiveDeadlineSeconds
   sharedVolumeCapacity

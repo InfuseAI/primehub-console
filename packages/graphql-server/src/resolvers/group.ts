@@ -54,6 +54,7 @@ const attrSchema = {
   launchGroupOnly: {type: FieldType.boolean, rename: 'launch-group-only'},
   enabledDeployment: {type: FieldType.boolean, rename: 'enabled-deployment'},
   maxDeploy: {type: FieldType.integer, rename: 'max-deploy'},
+  deploymentsUsage: { type: FieldType.integer },
   jobDefaultActiveDeadlineSeconds: {type: FieldType.integer, rename: 'job-default-active-deadline-seconds'},
   // group admin
   admins: {serialize: splitByComma, deserialize: joinByComma},
