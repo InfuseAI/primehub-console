@@ -106,8 +106,13 @@ export default class ResourceMonitor extends React.Component<Props, State> {
                   </tr>
                   <tr>
                     <td>GPU</td>
-                    <td>{groupContext.resourceStatus.gpuUsage} </td>
+                    <td>{groupContext.resourceStatus.gpuUsage}</td>
                     <td>{groupContext.projectQuotaGpu == null ? '∞' : groupContext.projectQuotaGpu}</td>
+                  </tr>
+                  <tr>
+                    <td>Deployments</td>
+                    <td>{groupContext.deploymentsUsage}</td>
+                    <td>{groupContext.maxDeploy}</td>
                   </tr>
                 </tbody>
               </Table>
