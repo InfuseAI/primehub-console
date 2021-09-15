@@ -13,6 +13,13 @@ import { GitSecret } from './GitSecret';
 import { DatasetGroupsRelationTable } from './DatasetGroupsRelationTable';
 import { MountRoot } from './MountRoot';
 import styled from 'styled-components';
+import PHTooltip from 'components/share/toolTip';
+
+const StyledFormItem = styled<any>(Form.Item)`
+  > .ant-form-item-label label:after {
+    content: '';
+  }
+`;
 
 interface Props extends FormComponentProps {
   onSubmit?: (data: Partial<TDatasetForm>) => Promise<void>;
@@ -339,15 +346,23 @@ function _DatasetForm(props: Props) {
               </div>
             }
 
-            <div data-testid='dataset/global'>
-              <Form.Item label={`Global`}>
-                {form.getFieldDecorator('global', {
-                  initialValue: get(initialValue, 'global', true),
-                  valuePropName: 'checked',
-                })(<Switch />)
+            <StyledFormItem
+              label={
+                <span>
+                  Global{' '}
+                  <PHTooltip
+                    tipText='When Global, everyone can access this Dataset.'
+                    tipLink='https://docs.primehub.io/docs/guide_manual/admin-dataset#groups-access-control'
+                    placement='right'
+                  />
+                </span>
               }
-              </Form.Item>
-            </div>
+            >
+              {form.getFieldDecorator('global', {
+                valuePropName: 'checked',
+                initialValue: get(initialValue, 'global', true),
+              })(<Switch unCheckedChildren='No' data-testid='dataset/global' />)}
+            </StyledFormItem>
 
             <div data-testid='dataset/displayName'>
               <Form.Item label='Type'>
