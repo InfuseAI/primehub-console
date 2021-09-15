@@ -413,6 +413,7 @@ function _ImageForm({
                     }}
                   >
                     <Checkbox
+                      data-testid='enabled-imageUrlForGpu'
                       checked={enabledURLForGpu}
                       onChange={event =>
                         setEnabledURLForGpu(event.target.checked)

@@ -7,9 +7,21 @@ import { IntlProvider } from 'react-intl';
 import { render, screen, waitFor } from 'test/test-utils';
 
 import { ImageInfo } from '../ImageInfo';
-import { ImageQuery, BaseImagesQuery, SecretsQuery } from '../images.graphql';
+import {
+  ImageQuery,
+  BaseImagesQuery,
+  SecretsQuery,
+  UpdateImageMutation,
+} from '../images.graphql';
 
-function setup() {
+interface SetupOptions {
+  imageOverride?: any;
+  updateImageVariables?: any;
+}
+
+function setup(options: SetupOptions = {}) {
+  const { imageOverride, updateImageVariables } = options;
+
   const mockSecretsQuery = {
     request: {
       query: SecretsQuery,
@@ -92,9 +104,25 @@ function setup() {
     },
   };
 
+  const mockUpdateImageMutation = {
+    request: {
+      query: UpdateImageMutation,
+      variables: updateImageVariables,
+    },
+    result: {
+      data: {
+        updateImage: {
+          id: updateImageVariables?.where?.id,
+          __typename: 'Image',
+        },
+      },
+    },
+  };
+
   const mockExistingOneRequests = [
     mockSecretsQuery,
     mockBaseImagesQuery,
+    mockUpdateImageMutation,
     {
       request: {
         query: ImageQuery,
@@ -131,6 +159,7 @@ function setup() {
             jobStatus: null,
             imageSpec: null,
             __typename: 'Image',
+            ...imageOverride,
           },
         },
       },
@@ -140,6 +169,7 @@ function setup() {
   const mockCustomImageRequests = [
     mockSecretsQuery,
     mockBaseImagesQuery,
+    mockUpdateImageMutation,
     {
       request: {
         query: ImageQuery,
@@ -197,6 +227,7 @@ function setup() {
               __typename: 'ImageSpec',
             },
             __typename: 'Image',
+            ...imageOverride,
           },
         },
       },
@@ -293,6 +324,61 @@ describe('ImageInfo', () => {
     expect(
       screen.getByLabelText('Specific Container Image URL for GPU')
     ).toBeInTheDocument();
+  });
+
+  it('should update the urlForGpu to null if uncheck the checkbox for gpu when image is universal', async () => {
+    const imageOverride = {
+      type: 'both',
+      url: 'image_cpu',
+      urlForGpu: 'image_gpu',
+    };
+    const updateImageVariables = {
+      data: {
+        name: 'keroro',
+        displayName: 'keroro',
+        description: 'gerogero',
+        type: 'both',
+        url: 'image_cpu',
+        urlForGpu: 'image_gpu',
+        useImagePullSecret: 'image-dev-keroro',
+        global: false,
+        groups: {
+          connect: [],
+          disconnect: [],
+        },
+      },
+      where: {
+        id: 'keroro',
+      },
+    };
+
+    const { TestProvider, mockExistingOneRequests } = setup({
+      imageOverride,
+      updateImageVariables,
+    });
+
+    render(
+      <TestProvider>
+        <MockedProvider mocks={mockExistingOneRequests}>
+          <ImageInfo />
+        </MockedProvider>
+      </TestProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('type')).toHaveTextContent('Universal');
+      expect(screen.getByTestId('enabled-imageUrlForGpu')).toBeChecked();
+      expect(
+        screen.getByLabelText('Specific Container Image URL for GPU')
+      ).toBeInTheDocument();
+    });
+
+    const confirmButton = await screen.findByTestId('confirm-button');
+    await userEvent.click(confirmButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('Save successfully!')).toBeInTheDocument();
+    });
   });
 
   it('should render the custom image with success build from fetched data', async () => {
