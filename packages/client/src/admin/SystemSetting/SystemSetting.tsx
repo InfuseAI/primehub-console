@@ -749,6 +749,9 @@ function _SystemSetting({ data, ...props }: Props) {
           </Card>
 
           <Card title='Apps'>
+            <div>
+              <CustomLabel>Import App template YAML from URL</CustomLabel>
+            </div>
             <div
               style={{
                 display: 'flex',
