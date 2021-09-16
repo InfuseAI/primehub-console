@@ -153,7 +153,7 @@ class ImageEditPage extends React.Component<Props, State> {
 
   render() {
     const {getImage, history, groupContext, userContext, currentUser} = this.props;
-    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
+    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false) && !window.isUserAdmin) {
       history.push(`../home`);
     }
 
