@@ -12,6 +12,7 @@ import { get, find, isEmpty } from 'lodash';
 import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
 import {createConfig} from '../config';
+import { onPhAppDeleted } from './group';
 
 const config = createConfig();
 
@@ -342,6 +343,10 @@ export const destroy = async (root, args, context: Context) => {
   }
 
   await context.crdClient.phApplications.del(id);
+
+  // reset the mlflow setting if the current setting is linked to deleted app.
+  await onPhAppDeleted(context, await transform(phApplication, context.kcAdminClient));
+
   return {id};
 };
 
