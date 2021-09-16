@@ -5,28 +5,77 @@ import { GroupContext } from 'context/group';
 import { UserContext } from 'context/user';
 import { MockedProvider } from 'react-apollo/test-utils';
 import { GetGroupMLflowConfig } from 'queries/Group.graphql';
+import { PhApplicationsConnection } from 'queries/PhApplication.graphql';
 import { mlflow } from '../../../../fakeData/groups';
 
+const phApplicationEdges = [
+  {
+    cursor: 'mlflow-x98ab',
+    node: {
+      id: 'mlflow-x98ab',
+      displayName: 'test-mlflow',
+      appVersion: 'v1.9.1',
+      appName: 'mlflow',
+      groupName: 'InfuseAICat',
+      instanceType: 'cpu-only',
+      scope: 'primehub',
+      appUrl: 'http://localhost:3001/console/apps/mlflow-x98ab',
+      internalAppUrl: 'http://app-mlflow-x98ab:5000/console/apps/mlflow-x98ab',
+      svcEndpoints: ['app-mlflow-x98ab:5000'],
+      stop: false,
+      status: 'Ready',
+      message: 'Deployment is ready',
+    },
+  },
+];
+
 const AllTheProviders = ({ children }) => {
-  const mlflowConfigMock = {
-    request: {
-      query: GetGroupMLflowConfig,
-      variables: {
-        where: {
-          id: 'test-group',
+  const mocks = [
+    {
+      request: {
+        query: GetGroupMLflowConfig,
+        variables: {
+          where: {
+            id: 'test-group',
+          },
+        },
+      },
+      result: {
+        data: {
+          group: {
+            id: 'test-group',
+            name: 'test-group',
+            mlflow,
+          },
         },
       },
     },
-    result: {
-      data: {
-        group: {
-          id: 'test-group',
-          name: 'test-group',
-          mlflow,
+    {
+      request: {
+        query: PhApplicationsConnection,
+        variables: {
+          first: 999,
+          where: {
+            appName_contains: 'mlflow',
+            groupName_in: ['test-group'],
+          },
+        },
+      },
+      result: {
+        data: {
+          phApplicationsConnection: {
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: 'mlflow-x98ab',
+              endCursor: 'mlflow-x98ab',
+            },
+            edges: phApplicationEdges,
+          },
         },
       },
     },
-  };
+  ];
 
   const groupValue = {
     id: 'test-group',
@@ -44,7 +93,7 @@ const AllTheProviders = ({ children }) => {
   };
 
   return (
-    <MockedProvider mocks={[mlflowConfigMock]} addTypename={false}>
+    <MockedProvider mocks={mocks} addTypename={false}>
       <GroupContext.Provider value={groupValue}>
         <UserContext.Provider value={userValue}>
           {children}
@@ -68,3 +117,4 @@ describe('GroupSettingsMLflow Component', () => {
     expect(screen.queryByDisplayValue('BAR_A')).toBeInTheDocument();
   });
 });
+

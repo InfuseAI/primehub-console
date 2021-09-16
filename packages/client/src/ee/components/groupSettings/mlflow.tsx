@@ -2,17 +2,7 @@ import React from 'react';
 import { graphql } from 'react-apollo';
 import { get, pick } from 'lodash';
 import { compose } from 'recompose';
-import {
-  Tooltip,
-  Select,
-  Icon,
-  notification,
-  Form,
-  Row,
-  Col,
-  Input,
-  Alert,
-} from 'antd';
+import { Select, notification, Form, Row, Col, Input } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 import InfuseButton from 'components/infuseButton';
 import EnvFields from 'components/share/envFields';
@@ -23,6 +13,7 @@ import {
   UpdateGroupMLflowConfig,
   GetGroupMLflowConfig,
 } from 'queries/Group.graphql';
+import { PhApplicationsConnection } from 'queries/PhApplication.graphql';
 import Env from 'interfaces/env';
 
 const { Option } = Select;
@@ -30,6 +21,7 @@ const { Option } = Select;
 type MLflowConfigProps = {
   updateGroupMLflowConfig: any;
   getGroupMLflowConfig: any;
+  getPhApplicationConnection: any;
 } & GroupContextComponentProps &
   FormComponentProps;
 
@@ -83,9 +75,24 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
       });
     });
   };
+
+  renderMLflowOptions(apps: any[]) {
+    const appList = apps.map(a => a.node);
+  }
+
   render() {
-    const { getGroupMLflowConfig, form } = this.props;
-    if (!getGroupMLflowConfig.group) return null;
+    const { getGroupMLflowConfig, getPhApplicationConnection, form } =
+      this.props;
+    if (
+      !getGroupMLflowConfig.group ||
+      !getPhApplicationConnection.phApplicationsConnection
+    )
+      return null;
+    const mlflowApps = get(
+      getPhApplicationConnection,
+      'phApplicationsConnection.edges',
+      []
+    );
     const groupMLflowConfig = get(getGroupMLflowConfig, 'group.mlflow', {});
     return (
       <Form onSubmit={this.onSubmit}>
@@ -99,14 +106,7 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
               }
               style={{ marginBottom: 20 }}
             >
-              <Select>
-                <Option key='1' value='1'>
-                  MLFlow app 1
-                </Option>
-                <Option key='2' value='2'>
-                  MLFlow app 2
-                </Option>
-              </Select>
+              {this.renderMLflowOptions(mlflowApps)}
             </Form.Item>
           </Col>
         </Row>
@@ -195,6 +195,25 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
 export default compose(
   Form.create(),
   withGroupContext,
+  graphql(PhApplicationsConnection, {
+    options: (props: any) => {
+      const { groupContext } = props;
+      const where = {
+        appName_contains: 'mlflow',
+        groupName_in: [groupContext.name],
+      };
+
+      return {
+        variables: {
+          first: 999,
+          where,
+        },
+        fetchPolicy: 'cache-and-network',
+      };
+    },
+    name: 'getPhApplicationConnection',
+    alias: 'withPhApplicationConnection',
+  }),
   graphql(GetGroupMLflowConfig, {
     options: (props: any) => ({
       variables: {
