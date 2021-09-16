@@ -2,6 +2,7 @@ import React from 'react';
 import { graphql } from 'react-apollo';
 import { get, pick } from 'lodash';
 import { compose } from 'recompose';
+import { Link } from 'react-router-dom';
 import { Select, notification, Form, Row, Col, Input } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 import InfuseButton from 'components/infuseButton';
@@ -88,7 +89,8 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
   };
 
   renderMLflowOptions(apps: any[], currentTrackingUri: string) {
-    const appList = apps.map(a => a.node).filter(a => !a.stop);
+    const appList = apps.map(a => a.node);
+    const disabled = appList.length <= 0;
     const optElements = appList.map(app => {
       const firstSvcEndpoint = `http://${get(app, 'svcEndpoints[0]', '')}`;
       return (
@@ -98,14 +100,23 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
       );
     });
     return (
-      <Select
-        defaultValue={currentTrackingUri}
-        onChange={this.handleMLflowSetupChange}
-        data-testid='mlflow-app-selector'
-        placeholder='Select MLflow Apps'
-      >
-        {optElements}
-      </Select>
+      <div>
+        <Select
+          style={{ width: 260, marginRight: 20 }}
+          disabled={disabled}
+          defaultValue={disabled ? undefined : currentTrackingUri}
+          onChange={this.handleMLflowSetupChange}
+          data-testid='mlflow-app-selector'
+          placeholder={disabled ? 'Not Available' : 'Select MLflow Apps'}
+        >
+          {optElements}
+        </Select>
+        {disabled ? (
+          <Link to='apps/create/mlflow'>Create MLflow App</Link>
+        ) : (
+          <></>
+        )}
+      </div>
     );
   }
 
@@ -126,7 +137,7 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
     return (
       <Form onSubmit={this.onSubmit}>
         <Row style={{ marginTop: 5 }}>
-          <Col span={8}>
+          <Col>
             <Form.Item
               label={
                 <span>
@@ -135,7 +146,10 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
               }
               style={{ marginBottom: 20 }}
             >
-              {this.renderMLflowOptions(mlflowApps, groupMLflowConfig.trackingUri)}
+              {this.renderMLflowOptions(
+                mlflowApps,
+                groupMLflowConfig.trackingUri
+              )}
             </Form.Item>
           </Col>
         </Row>
