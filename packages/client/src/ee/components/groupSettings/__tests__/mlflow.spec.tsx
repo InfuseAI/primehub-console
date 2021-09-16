@@ -1,6 +1,6 @@
 import * as React from 'react';
 import GroupSettingsMLflow from '../mlflow';
-import { render, screen } from 'test/test-utils';
+import { render, screen, waitFor } from 'test/test-utils';
 import { GroupContext } from 'context/group';
 import { UserContext } from 'context/user';
 import { MockedProvider } from 'react-apollo/test-utils';
@@ -116,5 +116,13 @@ describe('GroupSettingsMLflow Component', () => {
     expect(screen.queryByDisplayValue('FOO')).toBeInTheDocument();
     expect(screen.queryByDisplayValue('BAR_A')).toBeInTheDocument();
   });
-});
 
+  it('Should render mlflow selector', async () => {
+    render(<GroupSettingsMLflow />, {
+      wrapper: AllTheProviders,
+    });
+    waitFor(() => {
+      expect(screen.queryByText('Select MLflow Apps')).toBeInTheDocument();
+    });
+  });
+});

@@ -76,8 +76,37 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
     });
   };
 
-  renderMLflowOptions(apps: any[]) {
-    const appList = apps.map(a => a.node);
+  handleMLflowSetupChange = (value, option) => {
+    const { form } = this.props;
+    if (value) {
+      const appUrl = get(option, 'props.data-app-url', '');
+      form.setFieldsValue({
+        trackingUri: value,
+        uiUrl: appUrl,
+      });
+    }
+  };
+
+  renderMLflowOptions(apps: any[], currentTrackingUri: string) {
+    const appList = apps.map(a => a.node).filter(a => !a.stop);
+    const optElements = appList.map(app => {
+      const firstSvcEndpoint = `http://${get(app, 'svcEndpoints[0]', '')}`;
+      return (
+        <Option key={app.id} value={firstSvcEndpoint} data-app-url={app.appUrl}>
+          {app.displayName}
+        </Option>
+      );
+    });
+    return (
+      <Select
+        defaultValue={currentTrackingUri}
+        onChange={this.handleMLflowSetupChange}
+        data-testid='mlflow-app-selector'
+        placeholder='Select MLflow Apps'
+      >
+        {optElements}
+      </Select>
+    );
   }
 
   render() {
@@ -106,7 +135,7 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
               }
               style={{ marginBottom: 20 }}
             >
-              {this.renderMLflowOptions(mlflowApps)}
+              {this.renderMLflowOptions(mlflowApps, groupMLflowConfig.trackingUri)}
             </Form.Item>
           </Col>
         </Row>
