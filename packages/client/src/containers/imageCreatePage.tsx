@@ -76,7 +76,7 @@ class ImageCreatePage extends React.Component<Props, State> {
 
   render() {
     const {userContext, groupContext, history, currentUser, createImageResult, defaultValue} = this.props;
-    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)) {
+    if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)  && !window.isUserAdmin) {
       history.push(`../home`);
     }
     const everyoneGroupId = window.EVERYONE_GROUP_ID;
