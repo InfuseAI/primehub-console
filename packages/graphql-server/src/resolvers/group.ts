@@ -15,7 +15,7 @@ import {
   extractPagination,
   findGroupByName,
   getFromAttr} from './utils';
-import { pick, isNil, omit, get, isEmpty, mapValues } from 'lodash';
+import { pick, isNil, omit, get, isEmpty, mapValues, find } from 'lodash';
 import { crd as instanceTypeResolver } from './instanceType';
 import { crd as datasetResolver } from './dataset';
 import { crd as imageResolver } from './image';
@@ -285,12 +285,8 @@ export const onPhAppDeleted = async (context: Context, phApplication: PhApplicat
     schema: attrSchema
   });
   const mlflowTrackingUri = getFromAttr('mlflow-tracking-uri', group.attributes, null);
-  const matched = mlflowTrackingUri.match(/^http:\/\/app-(?<app>mlflow-.+):5000$/);
-  if (!matched) {
-    return;
-  }
-
-  if (matched.groups.app !== phApplication.id) {
+  const svcEndpoints = phApplication?.svcEndpoints || [];
+  if (!find(svcEndpoints, svcEndpoint => mlflowTrackingUri.startsWith(`http://${svcEndpoint}`))) {
     return;
   }
 
