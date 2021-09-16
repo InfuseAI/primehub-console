@@ -250,7 +250,7 @@ function _ImageForm({
       }
     }
 
-    if (data?.urlForGpu) {
+    if (data?.type == 'both' && data?.urlForGpu !== data?.url) {
       setEnabledURLForGpu(true);
     }
 
@@ -302,6 +302,9 @@ function _ImageForm({
                 useImagePullSecret: enabledSelectSecret
                   ? values.useImagePullSecret
                   : null,
+                urlForGpu: values.type === 'both' && !enabledURLForGpu
+                  ? null
+                  : values.urlForGpu,
                 groups: {
                   // @ts-ignore
                   connect,
@@ -410,13 +413,16 @@ function _ImageForm({
                     }}
                   >
                     <Checkbox
+                      data-testid='enabled-imageUrlForGpu'
                       checked={enabledURLForGpu}
                       onChange={event =>
                         setEnabledURLForGpu(event.target.checked)
                       }
                     />
                     {form.getFieldDecorator('urlForGpu', {
-                      initialValue: data?.urlForGpu || '',
+                      initialValue: enabledURLForGpu
+                        ? data?.urlForGpu || ''
+                        : '',
                     })(<Input disabled={!enabledURLForGpu} />)}
                   </div>
                 </Form.Item>
