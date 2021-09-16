@@ -342,7 +342,9 @@ function GroupForm(props: Props) {
             })(
               <Switch
                 data-testid='group/enableSharedVolume'
-                disabled={type === 'update'}
+                disabled={
+                  type === 'update' && initialValue.enabledSharedVolume === true
+                }
               />
             )}
           </Form.Item>
@@ -352,11 +354,14 @@ function GroupForm(props: Props) {
                 <Col sm={8} xs={24}>
                   <Form.Item label={`Shared Volume Capacity`}>
                     {form.getFieldDecorator('sharedVolumeCapacity', {
-                      initialValue: initialValue.sharedVolumeCapacity,
+                      initialValue: initialValue.sharedVolumeCapacity || 1,
                     })(
                       <InputNumber
                         data-testid='group/sharedVolumeCapacity'
-                        disabled={type === 'update'}
+                        disabled={
+                          type === 'update' &&
+                          initialValue.enabledSharedVolume === true
+                        }
                         style={{ width: 'auto' }}
                         formatter={value => `${value} GB`}
                         parser={value => +value.replace(/[^0-9.]/g, '')}
