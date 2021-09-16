@@ -299,6 +299,7 @@ function ModelDetail({
       title: 'Deployed By',
       dataIndex: 'deployedBy',
       align: 'center',
+      width: '200px',
       render: (deployedBy: ModelVersion['deployedBy']) => {
         const tags = deployedBy.map((deploy, id) => (
           <Link key={id} to={`../deployments/${deploy.id}`}>
