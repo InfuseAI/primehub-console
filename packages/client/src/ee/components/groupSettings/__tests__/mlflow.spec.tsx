@@ -8,6 +8,9 @@ import { GetGroupMLflowConfig } from 'queries/Group.graphql';
 import { PhApplicationsConnection } from 'queries/PhApplication.graphql';
 import { mlflow } from '../../../../fakeData/groups';
 
+// @ts-ignore
+global.__ENV__ = 'ee';
+
 const phApplicationEdges = [
   {
     cursor: 'mlflow-x98ab',

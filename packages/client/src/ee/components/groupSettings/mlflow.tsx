@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { graphql } from 'react-apollo';
 import { get, pick } from 'lodash';
 import { compose } from 'recompose';
@@ -10,6 +10,7 @@ import EnvFields from 'components/share/envFields';
 import { errorHandler } from 'utils/errorHandler';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import PHTooltip from 'components/share/toolTip';
+import Feature from 'components/share/feature';
 import {
   UpdateGroupMLflowConfig,
   GetGroupMLflowConfig,
@@ -18,6 +19,8 @@ import { PhApplicationsConnection } from 'queries/PhApplication.graphql';
 import Env from 'interfaces/env';
 
 const { Option } = Select;
+const CUSTOM = 'custom';
+const EMPTY = '';
 
 type MLflowConfigProps = {
   updateGroupMLflowConfig: any;
@@ -26,6 +29,11 @@ type MLflowConfigProps = {
 } & GroupContextComponentProps &
   FormComponentProps;
 
+interface MLflowConfigState {
+  mlDisableEdit: boolean;
+  init: boolean;
+}
+
 interface FormValue {
   trackingUri: string;
   uiUrl: string;
@@ -33,7 +41,107 @@ interface FormValue {
   artifactEnvs: Env[];
 }
 
-class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
+interface SelectorProps extends GroupContextComponentProps {
+  getPhApplicationConnection: any;
+  onChange: (value: string) => void;
+  currentConfig: string;
+}
+
+const SetupSelector = compose(withGroupContext)((props: SelectorProps) => {
+  const { getPhApplicationConnection, groupContext, currentConfig, onChange } =
+    props;
+  if (getPhApplicationConnection.loading)
+    return <Skeleton paragraph={{ rows: 1 }} active />;
+  const mlflowApps = get(
+    getPhApplicationConnection,
+    'phApplicationsConnection.edges',
+    []
+  );
+  const appList = mlflowApps.map(a => a.node);
+  const optDict = appList.reduce((acc, app) => {
+    const firstSvcEndpoint = `http://${get(app, 'svcEndpoints[0]', '')}`;
+    const optValue = `${firstSvcEndpoint},${app.appUrl}`;
+    acc[optValue] = app.id;
+    return acc;
+  }, {});
+  const [disabled, setDisabled] = useState(appList.length <= 0);
+  const [matched, setMatched] = useState(false);
+  const [matchedId, setMatchedId] = useState('');
+  const [selected, setSelected] = useState(
+    optDict[currentConfig] ? currentConfig : CUSTOM
+  );
+
+  useEffect(() => {
+    setDisabled(appList.length <= 0);
+  }, [appList]);
+  useEffect(() => {
+    if (optDict[selected]) {
+      setMatched(true);
+      setMatchedId(optDict[selected]);
+    } else {
+      setMatched(false);
+      setMatchedId(EMPTY);
+    }
+  }, [optDict, selected]);
+
+  const optElements = appList.map(app => {
+    const firstSvcEndpoint = `http://${get(app, 'svcEndpoints[0]', '')}`;
+    const optValue = `${firstSvcEndpoint},${app.appUrl}`;
+    return (
+      <Option key={app.id} value={optValue}>
+        {app.displayName}
+      </Option>
+    );
+  });
+
+  const handleChange = value => {
+    if (value) {
+      setSelected(value);
+      onChange(value);
+    }
+  };
+
+  return (
+    <Skeleton
+      key={`selector-${groupContext.id}`}
+      active
+      loading={getPhApplicationConnection.loading}
+    >
+      <Select
+        placeholder={disabled ? 'Not Available' : 'Select MLflow Apps'}
+        style={{ width: 260, marginRight: 20 }}
+        disabled={disabled}
+        onChange={handleChange}
+        value={disabled ? undefined : selected}
+      >
+        {optElements}
+        <Option key='CUSTOM' value={CUSTOM}>
+          Custom
+        </Option>
+      </Select>
+      {disabled ? (
+        <Link to='apps/create/mlflow'>Create MLflow App</Link>
+      ) : (
+        <></>
+      )}
+      {matched ? (
+        <Link to={`apps/${matchedId}`}>Check App Settings</Link>
+      ) : (
+        <></>
+      )}
+    </Skeleton>
+  );
+});
+
+class GroupSettingsMLflow extends React.Component<
+  MLflowConfigProps,
+  MLflowConfigState
+> {
+  state = {
+    mlDisableEdit: false,
+    init: true,
+  };
+
   trackingEnvsTips = (
     <PHTooltip
       placement='right'
@@ -77,89 +185,77 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
     });
   };
 
-  handleMLflowSetupChange = (value, option) => {
+  handleMLflowSetupChange = value => {
     const { form } = this.props;
     if (value) {
-      const appUrl = get(option, 'props.data-app-url', '');
-      form.setFieldsValue({
-        trackingUri: value,
-        uiUrl: appUrl,
-      });
+      if (value !== CUSTOM) {
+        const [trackingUri, uiUrl] = value.split(',');
+        form.setFieldsValue({
+          trackingUri,
+          uiUrl,
+        });
+        this.setState({
+          mlDisableEdit: true,
+          init: false,
+        });
+      } else {
+        form.setFieldsValue({
+          trackingUri: '',
+          uiUrl: '',
+        });
+        this.setState({
+          mlDisableEdit: false,
+          init: false,
+        });
+      }
     }
   };
-
-  renderMLflowOptions(apps: any[], currentTrackingUri: string) {
-    const appList = apps.map(a => a.node);
-    const disabled = appList.length <= 0;
-    const optElements = appList.map(app => {
-      const firstSvcEndpoint = `http://${get(app, 'svcEndpoints[0]', '')}`;
-      return (
-        <Option key={app.id} value={firstSvcEndpoint} data-app-url={app.appUrl}>
-          {app.displayName}
-        </Option>
-      );
-    });
-    return (
-      <div>
-        <Select
-          style={{ width: 260, marginRight: 20 }}
-          disabled={disabled}
-          value={disabled ? undefined : currentTrackingUri}
-          onChange={this.handleMLflowSetupChange}
-          data-testid='mlflow-app-selector'
-          placeholder={disabled ? 'Not Available' : 'Select MLflow Apps'}
-        >
-          {optElements}
-        </Select>
-        {disabled ? (
-          <Link to='apps/create/mlflow'>Create MLflow App</Link>
-        ) : (
-          <></>
-        )}
-      </div>
-    );
-  }
 
   render() {
     const { getGroupMLflowConfig, getPhApplicationConnection, form } =
       this.props;
-    if (
-      !getGroupMLflowConfig.group ||
-      !getPhApplicationConnection.phApplicationsConnection
-    )
-      return null;
+    if (!getGroupMLflowConfig.group) return null;
     const mlflowApps = get(
       getPhApplicationConnection,
       'phApplicationsConnection.edges',
       []
     );
+    const appList = mlflowApps.map(a => a.node);
+    const optDict = appList.reduce((acc, app) => {
+      const firstSvcEndpoint = `http://${get(app, 'svcEndpoints[0]', '')}`;
+      const optValue = `${firstSvcEndpoint},${app.appUrl}`;
+      acc[optValue] = app.id;
+      return acc;
+    }, {});
     const groupMLflowConfig = get(getGroupMLflowConfig, 'group.mlflow', {});
+    const currentConfig = `${groupMLflowConfig.trackingUri},${groupMLflowConfig.uiUrl}`;
     return (
       <Skeleton
         active
         paragraph={{ rows: 17 }}
-        loading={
-          getGroupMLflowConfig.loading || getPhApplicationConnection.loading
-        }
+        loading={getGroupMLflowConfig.loading}
       >
         <Form onSubmit={this.onSubmit}>
-          <Row style={{ marginTop: 5 }}>
-            <Col>
-              <Form.Item
-                label={
-                  <span>
-                    Configure with Installed Apps {this.mlflowAppSelectorTips}
-                  </span>
-                }
-                style={{ marginBottom: 20 }}
-              >
-                {this.renderMLflowOptions(
-                  mlflowApps,
-                  groupMLflowConfig.trackingUri
-                )}
-              </Form.Item>
-            </Col>
-          </Row>
+          <Feature modelDeploy={false}>
+            <Row style={{ marginTop: 5 }}>
+              <Col>
+                <Form.Item
+                  label={
+                    <span>
+                      Configure with Installed Apps {this.mlflowAppSelectorTips}
+                    </span>
+                  }
+                  style={{ marginBottom: 20 }}
+                >
+                  <SetupSelector
+                    onChange={this.handleMLflowSetupChange}
+                    getPhApplicationConnection={getPhApplicationConnection}
+                    currentConfig={currentConfig}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Feature>
           <Row style={{ marginTop: 5 }}>
             <Col>
               <Form.Item
@@ -169,7 +265,14 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
                 {form.getFieldDecorator('trackingUri', {
                   initialValue: groupMLflowConfig.trackingUri,
                   rules: [{ required: true }],
-                })(<Input />)}
+                })(
+                  <Input
+                    disabled={
+                      this.state.mlDisableEdit ||
+                      (this.state.init && optDict[currentConfig])
+                    }
+                  />
+                )}
               </Form.Item>
             </Col>
           </Row>
@@ -178,7 +281,14 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
               <Form.Item label={`MLflow UI URI`} style={{ marginBottom: 20 }}>
                 {form.getFieldDecorator('uiUrl', {
                   initialValue: groupMLflowConfig.uiUrl,
-                })(<Input />)}
+                })(
+                  <Input
+                    disabled={
+                      this.state.mlDisableEdit ||
+                      (this.state.init && optDict[currentConfig])
+                    }
+                  />
+                )}
               </Form.Item>
             </Col>
           </Row>
