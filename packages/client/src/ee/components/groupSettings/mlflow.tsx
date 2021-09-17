@@ -31,7 +31,6 @@ type MLflowConfigProps = {
 
 interface MLflowConfigState {
   mlDisableEdit: boolean;
-  init: boolean;
 }
 
 interface FormValue {
@@ -139,7 +138,6 @@ class GroupSettingsMLflow extends React.Component<
 > {
   state = {
     mlDisableEdit: false,
-    init: true,
   };
 
   trackingEnvsTips = (
@@ -193,19 +191,13 @@ class GroupSettingsMLflow extends React.Component<
         form.setFieldsValue({
           trackingUri,
           uiUrl,
-        });
-        this.setState({
-          mlDisableEdit: true,
-          init: false,
+          mlflowAppSetup: value,
         });
       } else {
         form.setFieldsValue({
           trackingUri: '',
           uiUrl: '',
-        });
-        this.setState({
-          mlDisableEdit: false,
-          init: false,
+          mlflowAppSetup: value,
         });
       }
     }
@@ -247,6 +239,9 @@ class GroupSettingsMLflow extends React.Component<
                   }
                   style={{ marginBottom: 20 }}
                 >
+                  {form.getFieldDecorator('mlflowAppSetup', {
+                    initialValue: optDict[currentConfig] || CUSTOM,
+                  })(<input type='hidden' />)}
                   <SetupSelector
                     onChange={this.handleMLflowSetupChange}
                     getPhApplicationConnection={getPhApplicationConnection}
@@ -266,10 +261,7 @@ class GroupSettingsMLflow extends React.Component<
                   initialValue: groupMLflowConfig.trackingUri,
                 })(
                   <Input
-                    disabled={
-                      this.state.mlDisableEdit ||
-                      (this.state.init && optDict[currentConfig])
-                    }
+                    disabled={form.getFieldValue('mlflowAppSetup') !== CUSTOM}
                   />
                 )}
               </Form.Item>
@@ -282,10 +274,7 @@ class GroupSettingsMLflow extends React.Component<
                   initialValue: groupMLflowConfig.uiUrl,
                 })(
                   <Input
-                    disabled={
-                      this.state.mlDisableEdit ||
-                      (this.state.init && optDict[currentConfig])
-                    }
+                    disabled={form.getFieldValue('mlflowAppSetup') !== CUSTOM}
                   />
                 )}
               </Form.Item>
