@@ -49,7 +49,7 @@ function _Apps({ ...props }: Props) {
   const [filteredTemplates, setFilteredTemplates] = React.useState([]);
   const [searchText, setSearchText] = React.useState('');
 
-  const filtered: PhAppTemplate[] = phAppTemplates.filter(template => {
+  const filter = template => {
     const title = template.name;
     const description = template.description || '';
     const index = title.toLowerCase().indexOf(searchText.toLowerCase());
@@ -57,14 +57,16 @@ function _Apps({ ...props }: Props) {
       .toLowerCase()
       .indexOf(searchText.toLowerCase());
     return index >= 0 || descIndex >= 0;
-  });
+  };
 
   React.useEffect(() => {
-    setFilteredTemplates(filtered);
+    if (phAppTemplates.length > 0) {
+      setFilteredTemplates(phAppTemplates.filter(filter));
+    }
   }, [phAppTemplates]);
 
   React.useEffect(() => {
-    setFilteredTemplates(filtered);
+    setFilteredTemplates(phAppTemplates.filter(filter));
   }, [searchText]);
 
   const onSearch = (text: string): void => {
