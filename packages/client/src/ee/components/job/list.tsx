@@ -1,15 +1,14 @@
 import * as React from 'react';
-import {Button, Tooltip, Table as AntTable, Icon, Modal} from 'antd';
-import {RouteComponentProps} from 'react-router';
-import {Link, withRouter} from 'react-router-dom';
-import {startCase, get} from 'lodash';
+import { Button, Tooltip, Table as AntTable, Icon, Modal } from 'antd';
+import { RouteComponentProps } from 'react-router';
+import { Link, withRouter } from 'react-router-dom';
+import { startCase, get } from 'lodash';
 import styled from 'styled-components';
 import Filter from '../shared/filter';
 import moment from 'moment';
-import {Group} from '../shared/groupFilter';
-import {computeDuration} from './detail';
+import { Group } from '../shared/groupFilter';
+import { computeDuration } from './detail';
 import { Phase, getActionByPhase } from './phase';
-import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
@@ -286,20 +285,35 @@ class JobList extends React.Component<Props> {
       const loading = cancelPhJobResult.loading && rerunPhJobResult.loading && id === currentId;
       return (
         <Button.Group>
-          {
-            action.toLowerCase() === 'cancel' ? (
-              <Button onClick={() => this.handleCancel(id)} loading={loading}>
-                {action}
-              </Button>
-            ) : [
-              <Button key="re-run" onClick={() => this.handleRerun(id)} loading={loading}>
-                {action}
-              </Button>,
-              <Button key="clone-job" onClick={() => this.cloneJob(record)}>Clone</Button>
+          {action.toLowerCase() === 'cancel' ? (
+            <Tooltip placement="bottom" title="Cancel">
+              <Button
+                icon="close-circle"
+                onClick={() => this.handleCancel(id)}
+                loading={loading}
+              />
+            </Tooltip>
+          ) : (
+            [
+              <Tooltip placement="bottom" title="Re-run">
+                <Button
+                  key="re-run"
+                  icon="caret-right"
+                  onClick={() => this.handleRerun(id)}
+                  loading={loading}
+                />
+              </Tooltip>,
+              <Tooltip placement="bottom" title="Clone">
+                <Button
+                  key="clone-job"
+                  icon="copy"
+                  onClick={() => this.cloneJob(record)}
+                />
+              </Tooltip>,
             ]
-          }
+          )}
         </Button.Group>
-      )
+      );
     }
     const columns = [{
       title: 'Status',

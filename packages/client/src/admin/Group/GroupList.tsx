@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Input, Col, Layout, Button } from 'antd';
+import { Modal, Input, Col, Layout, Button, Tooltip } from 'antd';
 import {
   withRouter,
   RouteComponentProps,
@@ -93,17 +93,21 @@ export function GroupList(props: Props) {
   const renderAction = (id, record) => {
     return (
       <ButtonGroup>
-        <Button
-          icon={'edit'}
-          data-testid='edit-button'
-          onClick={() => edit(record.id)}
-        ></Button>
-        <Button
-          icon='delete'
-          data-testid='delete-button'
-          disabled={DISABLE_GROUP === true}
-          onClick={() => remove(id, record)}
-        />
+        <Tooltip placement="bottom" title="Edit">
+          <Button
+            icon={'edit'}
+            data-testid="edit-button"
+            onClick={() => edit(record.id)}
+          />
+        </Tooltip>
+        <Tooltip placement="bottom" title="Delete">
+          <Button
+            icon="delete"
+            data-testid="delete-button"
+            disabled={DISABLE_GROUP === true}
+            onClick={() => remove(id, record)}
+          />
+        </Tooltip>
       </ButtonGroup>
     );
   };

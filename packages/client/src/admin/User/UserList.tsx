@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Table, Input, Col, Layout, Button, Icon, Modal } from 'antd';
+import React, { useState, useCallback } from 'react';
+import { Table, Col, Layout, Button, Icon, Modal, Tooltip } from 'antd';
 import { withRouter, useHistory } from 'react-router-dom';
-import { reduce, get, pick } from 'lodash';
+import { reduce, pick } from 'lodash';
 import { RouteComponentProps } from 'react-router';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import Pagination from 'components/share/pagination';
 import Breadcrumbs from 'components/share/breadcrumb';
-import queryString from 'querystring';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import InfuseButton from 'components/infuseButton';
@@ -74,16 +73,20 @@ function List(props: Props) {
   const renderAction = (id, record) => {
     return (
       <ButtonGroup>
-        <Button
-          icon={'edit'}
-          data-testid='edit-button'
-          onClick={() => edit(record.id)}
-        />
-        <Button
-          icon='delete'
-          data-testid='delete-button'
-          onClick={() => remove(record)}
-        />
+        <Tooltip placement="bottom" title="Edit">
+          <Button
+            icon={'edit'}
+            data-testid='edit-button'
+            onClick={() => edit(record.id)}
+          />
+        </Tooltip>
+        <Tooltip placement="bottom" title="Delete">
+          <Button
+            icon='delete'
+            data-testid='delete-button'
+            onClick={() => remove(record)}
+          />
+        </Tooltip>
       </ButtonGroup>
     );
   };

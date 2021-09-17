@@ -1,11 +1,10 @@
 import * as React from 'react';
-import {Alert, Col, Button, Input, Tooltip, Table as AntTable, Icon, Modal} from 'antd';
-import {RouteComponentProps} from 'react-router';
-import {Link, withRouter} from 'react-router-dom';
-import {startCase, get} from 'lodash';
+import {Col, Button, Input, Tooltip, Table as AntTable, Icon, Modal} from 'antd';
+import { RouteComponentProps } from 'react-router';
+import { Link, withRouter } from 'react-router-dom';
+import { get } from 'lodash';
 import styled from 'styled-components';
 import moment from 'moment';
-import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
@@ -13,6 +12,7 @@ import { GroupContextComponentProps } from 'context/group';
 import { UserContextComponentProps } from 'context/user';
 import {FilterRow, FilterPlugins, ButtonCol} from 'cms-toolbar/filter';
 import Breadcrumbs from 'components/share/breadcrumb';
+
 const breadcrumbs = [
   {
     key: 'list',
@@ -163,20 +163,30 @@ class ImageList extends React.Component<Props> {
 
 
   render() {
-    const { groupContext, groups, imagesConnection, imagesLoading, removeImage, imagesVariables } = this.props;
+    const { imagesConnection, imagesLoading, removeImage, imagesVariables } =
+      this.props;
 
-    const {currentId} = this.state;
     const renderAction = (id, record) => {
       return (
         <Button.Group>
-          <Button size={'small'} onClick={() => {this.editGroupImage(id)}}>
-            <Icon type="edit" />
-          </Button>
-          <Button size={'small'} onClick={() => {this.removeGroupImage(id)}}>
-            <Icon type="delete" />
-          </Button>
+          <Tooltip placement="bottom" title="Edit">
+            <Button
+              icon="edit"
+              onClick={() => {
+                this.editGroupImage(id);
+              }}
+            />
+          </Tooltip>
+          <Tooltip placement="bottom" title="Delete">
+            <Button
+              icon="delete"
+              onClick={() => {
+                this.removeGroupImage(id);
+              }}
+            />
+          </Tooltip>
         </Button.Group>
-      )
+      );
     }
     const columns = [{
       title: 'Name',

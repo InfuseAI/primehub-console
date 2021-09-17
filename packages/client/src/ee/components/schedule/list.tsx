@@ -1,14 +1,13 @@
 import * as React from 'react';
-import {Button, Tooltip, Table as AntTable, Row, Col, Icon, Modal} from 'antd';
+import {Button, Tooltip, Table as AntTable, Icon, Modal} from 'antd';
 import {RouteComponentProps} from 'react-router';
-import {Link, withRouter} from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import moment from 'moment';
-import {get} from 'lodash';
+import { get } from 'lodash';
 import styled from 'styled-components';
 import Filter from '../shared/filter';
-import {Group} from '../shared/groupFilter';
-import Pagination from 'components/share/pagination';
-import {renderRecurrence} from './recurrence';
+import { Group } from '../shared/groupFilter';
+import { renderRecurrence } from './recurrence';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
@@ -188,11 +187,21 @@ class ScheduleList extends React.Component<Props> {
     const renderAction = (id: string, record) => {
       return (
         <Button.Group>
-          <Button icon="caret-right" onClick={() => this.runJob(id)} disabled={record.invalid} />
-          <Button icon="edit" onClick={() => this.editJob(id)} />
-          <Button icon="delete" onClick={() => this.deleteSchedule(id)} />
+          <Tooltip placement="bottom" title="Run">
+            <Button
+              icon="caret-right"
+              onClick={() => this.runJob(id)}
+              disabled={record.invalid}
+            />
+          </Tooltip>
+          <Tooltip placement="bottom" title="Edit">
+            <Button icon="edit" onClick={() => this.editJob(id)} />
+          </Tooltip>
+          <Tooltip placement="bottom" title="Delete">
+            <Button icon="delete" onClick={() => this.deleteSchedule(id)} />
+          </Tooltip>
         </Button.Group>
-      )
+      );
     }
     const columns = [{
       title: 'Name',

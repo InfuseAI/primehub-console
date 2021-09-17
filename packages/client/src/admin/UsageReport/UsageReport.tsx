@@ -123,17 +123,19 @@ function UsageReport({ usageReportQuery }: Props) {
       align: 'center',
       render: function DownloadDetailReport(report: UsageReportNode) {
         return (
-          <Button
-            icon="vertical-align-bottom"
-            onClick={() => {
-              const id = report.node.id.replace('/', '_');
+          <Tooltip placement="bottom" title="Download">
+            <Button
+              icon="vertical-align-bottom"
+              onClick={() => {
+                const id = report.node.id.replace('/', '_');
 
-              downloadReport({
-                URL: report.node.detailedUrl,
-                fileName: `PrimeHub_Usage_Detalied_${id}.csv`,
-              });
-            }}
-          />
+                downloadReport({
+                  URL: report.node.detailedUrl,
+                  fileName: `PrimeHub_Usage_Detalied_${id}.csv`,
+                });
+              }}
+            />
+          </Tooltip>
         );
       },
     },
@@ -143,17 +145,19 @@ function UsageReport({ usageReportQuery }: Props) {
       align: 'center',
       render: function DownloadSummarylReport(report: UsageReportNode) {
         return (
-          <Button
-            icon="vertical-align-bottom"
-            onClick={() => {
-              const id = report.node.id.replace('/', '_');
+          <Tooltip placement="bottom" title="Download">
+            <Button
+              icon="vertical-align-bottom"
+              onClick={() => {
+                const id = report.node.id.replace('/', '_');
 
-              downloadSummary({
-                URL: report.node.summaryUrl,
-                fileName: `PrimeHub_Usage_Summary_${id}.csv`,
-              });
-            }}
-          />
+                downloadSummary({
+                  URL: report.node.summaryUrl,
+                  fileName: `PrimeHub_Usage_Summary_${id}.csv`,
+                });
+              }}
+            />
+          </Tooltip>
         );
       },
     },

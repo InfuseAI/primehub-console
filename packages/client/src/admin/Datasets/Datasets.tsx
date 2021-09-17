@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Button, Table, Modal, notification, Skeleton, Col } from 'antd';
+import { Button, Table, Modal, notification, Tooltip, Col } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -243,39 +243,43 @@ function _Datasets({
       render: function RenderActions(dataset: DatasetNode) {
         return (
           <Button.Group>
-            <Button
-              data-testid='edit-button'
-              icon='edit'
-              onClick={() => {
-                history.push(`${appPrefix}admin/dataset/${dataset.node.id}`);
-              }}
-            />
-            <Button
-              data-testid='delete-button'
-              icon='delete'
-              onClick={() => {
-                Modal.confirm({
-                  title: 'Delete Dataset',
-                  content: (
-                    <>
-                      Are you sure to delete{' '}
-                      <strong>{dataset.node.displayName}</strong> dataset?
-                    </>
-                  ),
-                  okText: 'Yes',
-                  onOk: async () => {
-                    await deleteDatasetMutation({
-                      variables: {
-                        where: {
-                          id: dataset.node.id,
+            <Tooltip placement="bottom" title="Edit">
+              <Button
+                data-testid='edit-button'
+                icon='edit'
+                onClick={() => {
+                  history.push(`${appPrefix}admin/dataset/${dataset.node.id}`);
+                }}
+              />
+            </Tooltip>
+            <Tooltip placement="bottom" title="Delete">
+              <Button
+                data-testid='delete-button'
+                icon='delete'
+                onClick={() => {
+                  Modal.confirm({
+                    title: 'Delete Dataset',
+                    content: (
+                      <>
+                        Are you sure to delete{' '}
+                        <strong>{dataset.node.displayName}</strong> dataset?
+                      </>
+                    ),
+                    okText: 'Yes',
+                    onOk: async () => {
+                      await deleteDatasetMutation({
+                        variables: {
+                          where: {
+                            id: dataset.node.id,
+                          },
                         },
-                      },
-                    });
-                    await datasetQuery.refetch();
-                  },
-                });
-              }}
-            />
+                      });
+                      await datasetQuery.refetch();
+                    },
+                  });
+                }}
+              />
+            </Tooltip>
           </Button.Group>
         );
       },
