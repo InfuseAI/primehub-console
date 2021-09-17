@@ -228,10 +228,10 @@ class AppListContainer extends React.Component<Props, State> {
           {isUserAdmin ? (
             <a
               data-testid='system-setting-link'
-              href={`${appPrefix}admin/system#apps`}
+              href={`${appPrefix}admin/apps`}
               style={{ marginRight: 16 }}
             >
-              Apps
+              App Settings
             </a>
           ) : (
             <></>
