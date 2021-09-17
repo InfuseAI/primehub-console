@@ -1,8 +1,6 @@
 import { rule, shield, and, or, not } from 'graphql-shield';
 import { isAdmin, isClient, isUser, isGroupAdmin } from '../utils/roles';
-
-export const permissions = shield({
-  Query: {
+export const ShieldQuery = {
     '*': isAdmin,
     'system': or(isAdmin, isClient),
     'me': or(isAdmin, isUser),
@@ -22,8 +20,10 @@ export const permissions = shield({
     'phApplicationsConnection': or(isAdmin, isUser, isClient),
     'groupImagesConnection': or(isAdmin, isUser, isClient),
     'files': or(isAdmin, isUser),
-  },
-  Mutation: {
+    'sharedFile': or(isAdmin, isUser),
+};
+
+export const ShieldMutation = {
     '*': isAdmin,
     'revokeApiToken': or(isAdmin, isUser),
     'createImage': or(isAdmin, isUser),
@@ -32,13 +32,19 @@ export const permissions = shield({
     'cancelImageBuild': or(isAdmin, isUser),
     'deleteImage': or(isAdmin, isUser),
     'deleteFiles': or(isAdmin, isUser),
+    'shareFile': or(isAdmin, isUser),
+    'unshareFile': or(isAdmin, isUser),
     'createPhApplication': or(isAdmin, isUser),
     'updatePhApplication': or(isAdmin, isUser),
     'deletePhApplication': or(isAdmin, isUser),
     'startPhApplication': or(isAdmin, isUser),
     'stopPhApplication': or(isAdmin, isUser),
     'notifyNotebookEvent': or(isClient),
-  },
+}
+
+export const permissions = shield({
+  Query: ShieldQuery,
+  Mutation: ShieldMutation,
 }, {
   allowExternalErrors: true
 });
