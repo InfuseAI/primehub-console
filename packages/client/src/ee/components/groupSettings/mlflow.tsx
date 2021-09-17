@@ -264,7 +264,6 @@ class GroupSettingsMLflow extends React.Component<
               >
                 {form.getFieldDecorator('trackingUri', {
                   initialValue: groupMLflowConfig.trackingUri,
-                  rules: [{ required: true }],
                 })(
                   <Input
                     disabled={
