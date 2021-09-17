@@ -23,7 +23,7 @@ import { ActionBtn, ClearBoth, Left } from 'components/apps/detail';
 import { GetPhAppTemplates } from 'queries/PhAppTemplate.graphql';
 import AppLogo from 'components/apps/appLogo';
 
-import { ImportPhAppTemplateFromURL } from '../SystemSetting/systemSettings.graphql';
+import { ImportPhAppTemplateFromURL } from './apps.graphql';
 
 const { Search } = Input;
 const { Text } = Typography;
@@ -45,7 +45,31 @@ function _Apps({ ...props }: Props) {
   const importURL = React.useRef(null);
   const { getPhAppTemplates } = props;
   const phAppTemplates = get(getPhAppTemplates, 'phAppTemplates', []);
-  const searchText = '';
+
+  const [filteredTemplates, setFilteredTemplates] = React.useState([]);
+  const [searchText, setSearchText] = React.useState('');
+
+  const filtered: PhAppTemplate[] = phAppTemplates.filter(template => {
+    const title = template.name;
+    const description = template.description || '';
+    const index = title.toLowerCase().indexOf(searchText.toLowerCase());
+    const descIndex = description
+      .toLowerCase()
+      .indexOf(searchText.toLowerCase());
+    return index >= 0 || descIndex >= 0;
+  });
+
+  React.useEffect(() => {
+    setFilteredTemplates(filtered);
+  }, [phAppTemplates]);
+
+  React.useEffect(() => {
+    setFilteredTemplates(filtered);
+  }, [searchText]);
+
+  const onSearch = (text: string): void => {
+    setSearchText(text);
+  }
 
   const PageHead = () => (
     <div
@@ -82,6 +106,7 @@ function _Apps({ ...props }: Props) {
             color: 'rgba(0, 0, 0, 0.85)',
             paddingBottom: '16px',
             fontWeight: 500,
+            fontSize: '16px',
           }}
         >
           Import Custom App Template YAML from URL
@@ -125,22 +150,33 @@ function _Apps({ ...props }: Props) {
             color: 'rgba(0, 0, 0, 0.85)',
             paddingBottom: '16px',
             fontWeight: 500,
+            fontSize: '16px',
           }}
         >
           Available Apps
         </div>
         <Row gutter={24} type='flex' style={{ marginBottom: '16px' }}>
           <Col xs={24} md={12} xl={12} xxl={8}>
-            <Search placeholder='Search application' />
+            <Search
+              placeholder='Search application'
+              onChange={e => onSearch(e.currentTarget.value)}
+              onSearch={onSearch}
+            />
           </Col>
         </Row>
         <Row gutter={24} type='flex'>
-          {phAppTemplates.map((appTemplate: PhAppTemplate): JSX.Element => {
+          {filteredTemplates.map((appTemplate: PhAppTemplate): JSX.Element => {
             const title = appTemplate.name;
-            const imageTag = get(appTemplate, 'template.spec.podTemplate.spec.containers[0].image', 'unknow');
+            const imageTag = get(
+              appTemplate,
+              'template.spec.podTemplate.spec.containers[0].image',
+              'unknown'
+            );
             const description = appTemplate.description || '';
             const index = title.toLowerCase().indexOf(searchText.toLowerCase());
-            const descIndex = description.toLowerCase().indexOf(searchText.toLowerCase());
+            const descIndex = description
+              .toLowerCase()
+              .indexOf(searchText.toLowerCase());
             const text =
               index >= 0 ? (
                 <span>
@@ -222,6 +258,6 @@ export const Apps = compose(
   }),
   graphql(GetPhAppTemplates, {
     name: 'getPhAppTemplates',
-    alias: 'withPhAppTemplates'
+    alias: 'withPhAppTemplates',
   })
 )(_Apps);

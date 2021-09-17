@@ -1,0 +1,3 @@
+mutation ImportPhAppTemplateFromURL($url: String!) {
+  importPhAppTemplateFromURL(url: $url)
+}
