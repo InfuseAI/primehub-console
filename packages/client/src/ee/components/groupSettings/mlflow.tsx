@@ -3,7 +3,7 @@ import { graphql } from 'react-apollo';
 import { get, pick } from 'lodash';
 import { compose } from 'recompose';
 import { Link } from 'react-router-dom';
-import { Select, notification, Form, Row, Col, Input } from 'antd';
+import { Skeleton, Select, notification, Form, Row, Col, Input } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 import InfuseButton from 'components/infuseButton';
 import EnvFields from 'components/share/envFields';
@@ -104,7 +104,7 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
         <Select
           style={{ width: 260, marginRight: 20 }}
           disabled={disabled}
-          defaultValue={disabled ? undefined : currentTrackingUri}
+          value={disabled ? undefined : currentTrackingUri}
           onChange={this.handleMLflowSetupChange}
           data-testid='mlflow-app-selector'
           placeholder={disabled ? 'Not Available' : 'Select MLflow Apps'}
@@ -135,102 +135,110 @@ class GroupSettingsMLflow extends React.Component<MLflowConfigProps> {
     );
     const groupMLflowConfig = get(getGroupMLflowConfig, 'group.mlflow', {});
     return (
-      <Form onSubmit={this.onSubmit}>
-        <Row style={{ marginTop: 5 }}>
-          <Col>
-            <Form.Item
-              label={
-                <span>
-                  Configure with Installed Apps {this.mlflowAppSelectorTips}
-                </span>
-              }
-              style={{ marginBottom: 20 }}
-            >
-              {this.renderMLflowOptions(
-                mlflowApps,
-                groupMLflowConfig.trackingUri
-              )}
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row style={{ marginTop: 5 }}>
-          <Col>
-            <Form.Item
-              label={`MLflow Tracking URI`}
-              style={{ marginBottom: 20 }}
-            >
-              {form.getFieldDecorator('trackingUri', {
-                initialValue: groupMLflowConfig.trackingUri,
-                rules: [{ required: true }],
-              })(<Input />)}
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Form.Item label={`MLflow UI URI`} style={{ marginBottom: 20 }}>
-              {form.getFieldDecorator('uiUrl', {
-                initialValue: groupMLflowConfig.uiUrl,
-              })(<Input />)}
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Form.Item
-              label={
-                <span>
-                  Tracking Environment Variables {this.trackingEnvsTips}
-                </span>
-              }
-              style={{ marginBottom: 20 }}
-            >
-              {form.getFieldDecorator('trackingEnvs', {
-                initialValue: groupMLflowConfig.trackingEnvs,
-              })(
-                <EnvFields
-                  empty={null}
-                  dumbValue={groupMLflowConfig.trackingEnvs}
-                />
-              )}
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Form.Item
-              label={
-                <span>
-                  Artifact Store Environment Variables {this.artifactEnvsTips}
-                </span>
-              }
-              style={{ marginBottom: 20 }}
-            >
-              {form.getFieldDecorator('artifactEnvs', {
-                initialValue: groupMLflowConfig.artifactEnvs,
-              })(
-                <EnvFields
-                  empty={null}
-                  dumbValue={groupMLflowConfig.artifactEnvs}
-                />
-              )}
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Form.Item style={{ textAlign: 'right', marginTop: 12 }}>
-              <InfuseButton
-                type='primary'
-                htmlType='submit'
-                style={{ width: '100%' }}
+      <Skeleton
+        active
+        paragraph={{ rows: 17 }}
+        loading={
+          getGroupMLflowConfig.loading || getPhApplicationConnection.loading
+        }
+      >
+        <Form onSubmit={this.onSubmit}>
+          <Row style={{ marginTop: 5 }}>
+            <Col>
+              <Form.Item
+                label={
+                  <span>
+                    Configure with Installed Apps {this.mlflowAppSelectorTips}
+                  </span>
+                }
+                style={{ marginBottom: 20 }}
               >
-                Save
-              </InfuseButton>
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
+                {this.renderMLflowOptions(
+                  mlflowApps,
+                  groupMLflowConfig.trackingUri
+                )}
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row style={{ marginTop: 5 }}>
+            <Col>
+              <Form.Item
+                label={`MLflow Tracking URI`}
+                style={{ marginBottom: 20 }}
+              >
+                {form.getFieldDecorator('trackingUri', {
+                  initialValue: groupMLflowConfig.trackingUri,
+                  rules: [{ required: true }],
+                })(<Input />)}
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Form.Item label={`MLflow UI URI`} style={{ marginBottom: 20 }}>
+                {form.getFieldDecorator('uiUrl', {
+                  initialValue: groupMLflowConfig.uiUrl,
+                })(<Input />)}
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Form.Item
+                label={
+                  <span>
+                    Tracking Environment Variables {this.trackingEnvsTips}
+                  </span>
+                }
+                style={{ marginBottom: 20 }}
+              >
+                {form.getFieldDecorator('trackingEnvs', {
+                  initialValue: groupMLflowConfig.trackingEnvs,
+                })(
+                  <EnvFields
+                    empty={null}
+                    dumbValue={groupMLflowConfig.trackingEnvs}
+                  />
+                )}
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Form.Item
+                label={
+                  <span>
+                    Artifact Store Environment Variables {this.artifactEnvsTips}
+                  </span>
+                }
+                style={{ marginBottom: 20 }}
+              >
+                {form.getFieldDecorator('artifactEnvs', {
+                  initialValue: groupMLflowConfig.artifactEnvs,
+                })(
+                  <EnvFields
+                    empty={null}
+                    dumbValue={groupMLflowConfig.artifactEnvs}
+                  />
+                )}
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Form.Item style={{ textAlign: 'right', marginTop: 12 }}>
+                <InfuseButton
+                  type='primary'
+                  htmlType='submit'
+                  style={{ width: '100%' }}
+                >
+                  Save
+                </InfuseButton>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Skeleton>
     );
   }
 }
