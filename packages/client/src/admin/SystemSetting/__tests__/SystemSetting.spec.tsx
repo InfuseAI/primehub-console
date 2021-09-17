@@ -330,20 +330,4 @@ describe('SystemSetting', () => {
       expect(screen.queryByText('License Status')).toBeNull();
     });
   });
-
-  it('should render system setting with apps', async () => {
-    const { mockRequests } = setup();
-
-    render(
-      <MemoryRouter>
-        <MockedProvider mocks={mockRequests}>
-          <SystemSetting />
-        </MockedProvider>
-      </MemoryRouter>
-    );
-
-    expect(
-      await screen.findByText('Import App template YAML from URL')
-    ).toBeInTheDocument();
-  });
 });

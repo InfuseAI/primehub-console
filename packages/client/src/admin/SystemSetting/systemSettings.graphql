@@ -74,7 +74,3 @@ mutation UpdateSystemSetting($payload: SystemUpdateInput!) {
     }
   }
 }
-
-mutation ImportPhAppTemplateFromURL($url: String!) {
-  importPhAppTemplateFromURL(url: $url)
-}

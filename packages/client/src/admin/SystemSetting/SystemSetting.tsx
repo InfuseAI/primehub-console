@@ -21,7 +21,6 @@ import { compose } from 'recompose';
 import { Controller, useForm } from 'react-hook-form';
 import { timezones } from 'react-timezone';
 
-import { errorHandler } from 'utils/errorHandler';
 import Breadcrumbs from 'components/share/breadcrumb';
 
 import { TimeZone } from './Timezone';
@@ -29,7 +28,6 @@ import { LicenseStatus, LicenseTag } from './LicenseStatus';
 import {
   GetSystemSetting,
   UpdateSystemSetting,
-  ImportPhAppTemplateFromURL,
 } from './systemSettings.graphql';
 
 function CustomLabel({
@@ -53,9 +51,6 @@ function CustomLabel({
 }
 
 const EMAIL_REGEX = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;
-const GITHUB_REGEX =
-  /^https:\/\/github.com\/([A-Za-z0-9._-]+\/[A-Za-z0-9._-]+)\/blob\/(.+)/;
-const GITHUB_REGEX_REPLACE_VALUE = 'https://raw.githubusercontent.com/$1/$2';
 
 const initialState = {
   systemName: '',
@@ -135,11 +130,6 @@ interface Props {
       payload: Omit<SystemInfo, 'license'>;
     };
   }) => Promise<void>;
-  importPhAppTemplateFromURL: ({
-    variables,
-  }: {
-    variables: { url: string };
-  }) => Promise<void>;
 }
 
 function _SystemSetting({ data, ...props }: Props) {
@@ -147,7 +137,6 @@ function _SystemSetting({ data, ...props }: Props) {
     React.useState(false);
   const [pasteImageModalVisible, setPasteImageModalVisible] =
     React.useState(false);
-  const importURL = React.useRef(null);
 
   const { control, formState, reset, watch, handleSubmit } = useForm({
     defaultValues: initialState,
@@ -747,34 +736,6 @@ function _SystemSetting({ data, ...props }: Props) {
               )}
             </div>
           </Card>
-
-          <Card title='Apps'>
-            <div>
-              <CustomLabel>Import App template YAML from URL</CustomLabel>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                width: '100%',
-              }}
-            >
-              <Input ref={importURL} data-testid='import-template-url' />
-              <Button
-                type='primary'
-                data-testid='import-template-button'
-                onClick={() => {
-                  let url = importURL.current.input.value;
-                  if (url) {
-                    url = url.replace(GITHUB_REGEX, GITHUB_REGEX_REPLACE_VALUE);
-                    props.importPhAppTemplateFromURL({ variables: { url } });
-                  }
-                }}
-                style={{ marginLeft: '16px' }}
-              >
-                Import
-              </Button>
-            </div>
-          </Card>
         </form>
 
         <div
@@ -822,21 +783,6 @@ export const SystemSetting = compose(
           description: 'Update failure, try again later.',
         });
       },
-    }),
-  }),
-  graphql(ImportPhAppTemplateFromURL, {
-    name: 'importPhAppTemplateFromURL',
-    options: () => ({
-      onCompleted: data => {
-        const name = get(data, 'importPhAppTemplateFromURL.metadata.name', '');
-        notification.success({
-          duration: 5,
-          placement: 'bottomRight',
-          message: 'Successfully imported!',
-          description: `PhAppTemplate '${name}' imported`,
-        });
-      },
-      onError: errorHandler,
     }),
   }),
   graphql(GetSystemSetting, {
