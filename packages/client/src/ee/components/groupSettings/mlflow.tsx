@@ -67,7 +67,11 @@ const SetupSelector = compose(withGroupContext)((props: SelectorProps) => {
   const [matched, setMatched] = useState(false);
   const [matchedId, setMatchedId] = useState('');
   const [selected, setSelected] = useState(
-    optDict[currentConfig] ? currentConfig : CUSTOM
+    optDict[currentConfig]
+      ? currentConfig
+      : currentConfig === ','
+      ? undefined
+      : CUSTOM
   );
 
   useEffect(() => {
@@ -241,7 +245,10 @@ class GroupSettingsMLflow extends React.Component<
                   style={{ marginBottom: 20 }}
                 >
                   {form.getFieldDecorator('mlflowAppSetup', {
-                    initialValue: optDict[currentConfig] || CUSTOM,
+                    initialValue:
+                      optDict[currentConfig] || currentConfig === ','
+                        ? undefined
+                        : CUSTOM,
                   })(<input type='hidden' />)}
                   <SetupSelector
                     onChange={this.handleMLflowSetupChange}

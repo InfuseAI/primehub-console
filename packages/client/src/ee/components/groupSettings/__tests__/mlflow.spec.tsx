@@ -34,6 +34,84 @@ const phApplicationEdges = [
   },
 ];
 
+const EmptyPhAppProviders = ({ children }) => {
+  const mocks = [
+    {
+      request: {
+        query: GetGroupMLflowConfig,
+        variables: {
+          where: {
+            id: 'test-group',
+          },
+        },
+      },
+      result: {
+        data: {
+          group: {
+            id: 'test-group',
+            name: 'test-group',
+            mlflow,
+          },
+        },
+      },
+    },
+    {
+      request: {
+        query: PhApplicationsConnection,
+        variables: {
+          first: 999,
+          where: {
+            appName_contains: 'mlflow',
+            groupName_in: ['test-group'],
+          },
+        },
+      },
+      result: {
+        data: {
+          phApplicationsConnection: {
+            pageInfo: {
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: 'mlflow-x98ab',
+              endCursor: 'mlflow-x98ab',
+            },
+            edges: [],
+          },
+        },
+      },
+    },
+  ];
+
+  const groupValue = {
+    id: 'test-group',
+    name: 'test-group',
+    displayName: 'test-group',
+    admins: 'test',
+    enabledSharedVolume: true,
+    enabledDeployment: true,
+  };
+
+  const userValue = {
+    id: '1',
+    username: 'test',
+    isCurrentGroupAdmin: true,
+  };
+
+  return (
+    <MemoryRouter initialEntries={[`/mocks`]}>
+      <Route path={`/mocks`}>
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <GroupContext.Provider value={groupValue}>
+            <UserContext.Provider value={userValue}>
+              {children}
+            </UserContext.Provider>
+          </GroupContext.Provider>
+        </MockedProvider>
+      </Route>
+    </MemoryRouter>
+  );
+};
+
 const AllTheProviders = ({ children }) => {
   const mocks = [
     {
@@ -149,5 +227,14 @@ describe('GroupSettingsMLflow Component', () => {
       )
     ).toBeInTheDocument();
     expect(screen.queryByText('Check App Settings')).toBeInTheDocument();
+  });
+
+  it('Show create link when no mlflow app provide', async () => {
+    render(<GroupSettingsMLflow />, {
+      wrapper: EmptyPhAppProviders,
+    });
+    await new Promise(resolve => setTimeout(resolve, 0));
+    const selector = await screen.queryByTestId('setup-selector');
+    expect(screen.queryByText('Create MLflow App')).toBeInTheDocument();
   });
 });
