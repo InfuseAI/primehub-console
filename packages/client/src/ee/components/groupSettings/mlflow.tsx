@@ -107,6 +107,7 @@ const SetupSelector = compose(withGroupContext)((props: SelectorProps) => {
       loading={getPhApplicationConnection.loading}
     >
       <Select
+        data-testid='setup-selector'
         placeholder={disabled ? 'Not Available' : 'Select MLflow Apps'}
         style={{ width: 260, marginRight: 20 }}
         disabled={disabled}

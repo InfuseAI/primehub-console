@@ -1,7 +1,9 @@
 import * as React from 'react';
 import GroupSettingsMLflow from '../mlflow';
 import { render, screen, waitFor } from 'test/test-utils';
+import { MemoryRouter, Route } from 'react-router-dom';
 import { GroupContext } from 'context/group';
+import userEvent from '@testing-library/user-event';
 import { UserContext } from 'context/user';
 import { MockedProvider } from 'react-apollo/test-utils';
 import { GetGroupMLflowConfig } from 'queries/Group.graphql';
@@ -96,13 +98,17 @@ const AllTheProviders = ({ children }) => {
   };
 
   return (
-    <MockedProvider mocks={mocks} addTypename={false}>
-      <GroupContext.Provider value={groupValue}>
-        <UserContext.Provider value={userValue}>
-          {children}
-        </UserContext.Provider>
-      </GroupContext.Provider>
-    </MockedProvider>
+    <MemoryRouter initialEntries={[`/mocks`]}>
+      <Route path={`/mocks`}>
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <GroupContext.Provider value={groupValue}>
+            <UserContext.Provider value={userValue}>
+              {children}
+            </UserContext.Provider>
+          </GroupContext.Provider>
+        </MockedProvider>
+      </Route>
+    </MemoryRouter>
   );
 };
 
@@ -124,8 +130,24 @@ describe('GroupSettingsMLflow Component', () => {
     render(<GroupSettingsMLflow />, {
       wrapper: AllTheProviders,
     });
-    waitFor(() => {
-      expect(screen.queryByText('Select MLflow Apps')).toBeInTheDocument();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(screen.queryByText('Select MLflow Apps')).toBeInTheDocument();
+  });
+
+  it('Select action run properly', async () => {
+    render(<GroupSettingsMLflow />, {
+      wrapper: AllTheProviders,
     });
+    await new Promise(resolve => setTimeout(resolve, 0));
+    const selector = await screen.queryByTestId('setup-selector');
+    expect(selector).toBeInTheDocument();
+    await userEvent.click(selector);
+    await userEvent.click(screen.queryByText('test-mlflow'));
+    expect(
+      screen.queryByDisplayValue(
+        'http://localhost:3001/console/apps/mlflow-x98ab'
+      )
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Check App Settings')).toBeInTheDocument();
   });
 });
