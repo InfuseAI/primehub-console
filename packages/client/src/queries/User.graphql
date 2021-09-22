@@ -120,3 +120,9 @@ mutation CreateUser($payload: UserCreateInput!) {
     username
   }
 }
+
+mutation CreateInvitation($data: InvitationCreateInput!) {
+  createInvitation(data: $data){
+    invitationToken
+  }
+}

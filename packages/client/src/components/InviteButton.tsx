@@ -1,43 +1,47 @@
-import React from 'react';
-import { Button, Input, Modal } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Button, Input, Icon, Modal, notification } from 'antd';
 import { useClipboard } from 'hooks/useClipboard';
+import { useRoutePrefix } from 'hooks/useRoutePrefix/useRoutePrefix';
 
 interface InviteButtonProps {
   groupId: string;
+  onRequestToken: (
+    id: string
+  ) => Promise<{ data: { createInvitation: { invitationToken: string } } }>;
 }
 
-const InviteButton = (props: InviteButtonProps) => {
-  const [visible, setVisible] = React.useState(false);
-  const inviteLinkPrefix = `${window.cmsHost}${window.APP_PREFIX}invite`;
-  const [copyStatus, copy] = useClipboard({ lazy: true, timeout: 2000 });
+const InviteButton = ({ groupId, onRequestToken }: InviteButtonProps) => {
+  const [isRequesting, setIsRequesting] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [inviteLink, setInviteLink] = useState('');
+  const [, copy] = useClipboard({ lazy: true, timeout: 2000 });
+  const { appPrefix } = useRoutePrefix();
 
-  const onCreatingInvitation = () => {
-    setVisible(!visible);
-  };
-
-  const generateToken = () => {
-    const length = 32;
-    let result = '';
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  useEffect(() => {
+    if (isRequesting) {
+      setInviteLink('');
     }
-    return result;
-  };
-
-  const inviteLink = `${inviteLinkPrefix}/${generateToken()}`;
+  }, [isRequesting]);
 
   return (
-    <Button
-      icon='user-add'
-      style={{ marginRight: 1 }}
-      onClick={onCreatingInvitation}
-    >
-      Invite Users
+    <>
+      <Button
+        icon='user-add'
+        onClick={() => {
+          setVisible(true);
+        }}
+      >
+        Invite Users
+      </Button>
       <Modal
         title='Share an invite link'
         visible={visible}
+        okButtonProps={{
+          disabled: isRequesting,
+        }}
+        cancelButtonProps={{
+          disabled: isRequesting,
+        }}
         onOk={() => {
           setVisible(false);
         }}
@@ -46,24 +50,50 @@ const InviteButton = (props: InviteButtonProps) => {
         }}
       >
         <div>
-          <p>Anyone can use this link to create a new account.</p>
+          <p>Anyone can request invitation link to create a new account.</p>
           <p>The link will be expired after 1 day or a new accound created.</p>
           <Input
-            disabled
+            disabled={!inviteLink}
+            readOnly={!!inviteLink}
             value={inviteLink}
+            onFocus={() => {
+              copy(inviteLink);
+              notification.success({
+                duration: 3,
+                placement: 'bottomRight',
+                message: 'Copied!',
+              });
+            }}
             addonAfter={
-              <a
-                onClick={() => {
-                  copy(inviteLink);
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  width: '84px',
+                  cursor: 'pointer',
+                }}
+                onClick={async () => {
+                  setIsRequesting(true);
+
+                  const {
+                    data: {
+                      createInvitation: { invitationToken },
+                    },
+                  } = await onRequestToken(groupId);
+
+                  setIsRequesting(false);
+                  setInviteLink(
+                    `${window.cmsHost}${appPrefix}invite/${invitationToken}`
+                  );
                 }}
               >
-                {copyStatus === 'inactive' ? 'Create and Copy' : 'Created'}
-              </a>
+                {isRequesting ? <Icon type='loading' /> : 'Request Link'}
+              </div>
             }
           />
         </div>
       </Modal>
-    </Button>
+    </>
   );
 };
 
