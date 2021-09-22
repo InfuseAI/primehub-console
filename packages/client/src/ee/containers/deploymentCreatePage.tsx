@@ -1,6 +1,6 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
-import { Alert, notification } from 'antd';
+import { notification } from 'antd';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import { get, unionBy, pick } from 'lodash';
@@ -10,7 +10,6 @@ import { withRouter } from 'react-router-dom';
 import { errorHandler } from 'utils/errorHandler';
 import DeploymentCreateForm from 'ee/components/modelDeployment/createForm';
 import PageTitle from 'components/pageTitle';
-import PageBody from 'components/pageBody';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
 import { sortNameByAlphaBet } from 'utils/sorting';
@@ -50,59 +49,6 @@ type Props = RouteComponentProps & GroupContextComponentProps & {
 type State = {
   selectedGroup: string | null;
 };
-
-function renderReachedDeploymentLimitAlert({
-  isReachedGroupDeploymentsLimit,
-  isReachedSystemDeploymentsLimit,
-}: {
-  isReachedGroupDeploymentsLimit: boolean;
-  isReachedSystemDeploymentsLimit: boolean;
-}) {
-  const REACHED_DEPLOYMENTS_LIMIT_MESSAGES = {
-    group: (
-      <PageBody>
-        <Alert
-          message="The group deployment limit has been reached."
-          description="Please get in touch with your system administrator to increase the group deployment limit or delete one of your current deployments to deploy a new model."
-          type="error"
-          showIcon
-        />
-      </PageBody>
-    ),
-    system: (
-      <PageBody>
-        <Alert
-          message="The system deployment limit has been reached."
-          description="Please get in touch with your system administrator to update the license or delete one of the group’s deployments to deploy a new model."
-          type="error"
-          showIcon
-        />
-      </PageBody>
-    ),
-    both: (
-      <PageBody>
-        <Alert
-          message="Both system deployment limit and group deployment limit has been reached."
-          description="Please get in touch with your system administrator to update the license and increase the group deployment limit, or delete one of the group’s deployments to deploy a new model."
-          type="error"
-          showIcon
-        />
-      </PageBody>
-    ),
-  };
-
-  if (isReachedGroupDeploymentsLimit && isReachedSystemDeploymentsLimit) {
-    return REACHED_DEPLOYMENTS_LIMIT_MESSAGES['system'];
-  }
-
-  if (isReachedGroupDeploymentsLimit && !isReachedSystemDeploymentsLimit) {
-    return REACHED_DEPLOYMENTS_LIMIT_MESSAGES['group'];
-  }
-
-  if (isReachedGroupDeploymentsLimit && isReachedSystemDeploymentsLimit) {
-    return REACHED_DEPLOYMENTS_LIMIT_MESSAGES['both'];
-  }
-}
 
 class DeploymentCreatePage extends React.Component<Props, State> {
   state = {
@@ -165,11 +111,6 @@ class DeploymentCreatePage extends React.Component<Props, State> {
           title={'Create Deployment'}
         />
 
-        {renderReachedDeploymentLimitAlert({
-          isReachedGroupDeploymentsLimit,
-          isReachedSystemDeploymentsLimit,
-        })}
-
         <div style={{ margin: '16px' }}>
           <DeploymentCreateForm
             type="create"
@@ -183,6 +124,8 @@ class DeploymentCreatePage extends React.Component<Props, State> {
             initialValue={initValue}
             onSubmit={this.onSubmit}
             loading={currentUser.loading || createPhDeploymentResult.loading}
+            isReachedGroupDeploymentsLimit={isReachedGroupDeploymentsLimit}
+            isReachedSystemDeploymentsLimit={isReachedSystemDeploymentsLimit}
           />
         </div>
       </React.Fragment>
