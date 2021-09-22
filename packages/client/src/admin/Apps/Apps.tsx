@@ -29,7 +29,7 @@ const { Search } = Input;
 const { Text } = Typography;
 
 const GITHUB_REGEX =
-  /^https:\/\/github.com\/([A-Za-z0-9._-]+\/[A-Za-z0-9._-]+)\/blob\/(.+)/;
+  /^https?:\/\/github.com\/([A-Za-z0-9._-]+\/[A-Za-z0-9._-]+)\/blob\/(.+)/;
 const GITHUB_REGEX_REPLACE_VALUE = 'https://raw.githubusercontent.com/$1/$2';
 
 interface Props {
