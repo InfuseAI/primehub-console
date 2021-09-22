@@ -48,29 +48,30 @@ function _Apps({ getPhAppTemplates, ...props }: Props) {
   const [filteredTemplates, setFilteredTemplates] = React.useState([]);
   const [searchText, setSearchText] = React.useState('');
 
-  const filter = template => {
-    const title = template.name;
-    const description = template.description || '';
-    const index = title.toLowerCase().indexOf(searchText.toLowerCase());
-    const descIndex = description
-      .toLowerCase()
-      .indexOf(searchText.toLowerCase());
-    return index >= 0 || descIndex >= 0;
-  };
-
   React.useEffect(() => {
     if (phAppTemplates.length > 0) {
-      setFilteredTemplates(phAppTemplates.filter(filter));
+      setFilteredTemplates(phAppTemplates);
+      setSearchText('');
     }
   }, [phAppTemplates]);
 
   React.useEffect(() => {
-    setFilteredTemplates(phAppTemplates.filter(filter));
+    setFilteredTemplates(
+      phAppTemplates.filter(template => {
+        const title = template.name;
+        const description = template.description || '';
+        const index = title.toLowerCase().indexOf(searchText.toLowerCase());
+        const descIndex = description
+          .toLowerCase()
+          .indexOf(searchText.toLowerCase());
+        return index >= 0 || descIndex >= 0;
+      })
+    );
   }, [searchText]);
 
   const onSearch = (text: string): void => {
     setSearchText(text);
-  }
+  };
 
   const PageHead = () => (
     <div
@@ -162,6 +163,7 @@ function _Apps({ getPhAppTemplates, ...props }: Props) {
               placeholder='Search application'
               onChange={e => onSearch(e.currentTarget.value)}
               onSearch={onSearch}
+              value={searchText}
             />
           </Col>
         </Row>
