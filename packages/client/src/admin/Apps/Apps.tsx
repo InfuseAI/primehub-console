@@ -41,9 +41,8 @@ interface Props {
   }) => Promise<void>;
 }
 
-function _Apps({ ...props }: Props) {
+function _Apps({ getPhAppTemplates, ...props }: Props) {
   const importURL = React.useRef(null);
-  const { getPhAppTemplates } = props;
   const phAppTemplates = get(getPhAppTemplates, 'phAppTemplates', []);
 
   const [filteredTemplates, setFilteredTemplates] = React.useState([]);
@@ -167,7 +166,7 @@ function _Apps({ ...props }: Props) {
           </Col>
         </Row>
         <Row gutter={24} type='flex'>
-          {filteredTemplates.map((appTemplate: PhAppTemplate): JSX.Element => {
+          {filteredTemplates.map((appTemplate: PhAppTemplate) => {
             const title = appTemplate.name;
             const imageTag = get(
               appTemplate,

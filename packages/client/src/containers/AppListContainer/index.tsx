@@ -225,7 +225,7 @@ class AppListContainer extends React.Component<Props, State> {
     let pageBody = (
       <>
         <div style={{ textAlign: 'right' }}>
-          {isUserAdmin ? (
+          {isUserAdmin && (
             <a
               data-testid='system-setting-link'
               href={`${appPrefix}admin/apps`}
@@ -233,8 +233,6 @@ class AppListContainer extends React.Component<Props, State> {
             >
               App Settings
             </a>
-          ) : (
-            <></>
           )}
           {/* @ts-ignore */}
           <InfuseButton
