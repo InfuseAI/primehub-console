@@ -10,7 +10,7 @@ import {compose} from 'recompose';
 import {graphql} from 'react-apollo';
 import Breadcrumbs, {BreadcrumbItemSetup} from 'components/share/breadcrumb';
 import RecentTasks, {ThinTitle, GuideList, Content, SubContent} from 'components/landing/recentTasks';
-import InviteBotton from 'components/InviteButton';
+import InviteButton from 'components/InviteButton';
 
 const breadcrumbs: BreadcrumbItemSetup[] = [
   {
@@ -42,7 +42,12 @@ class Landing extends React.Component<Props> {
           breadcrumb={
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxHeight:21 }}>
               <Breadcrumbs pathList={breadcrumbs} />
-              <InviteBotton isAdmin={currentUser.me.isAdmin} groupId={groupContext.id}/>
+              {currentUser.me.isAdmin && (
+                <InviteButton
+                  isAdmin={currentUser.me.isAdmin}
+                  groupId={groupContext.id}
+                />
+              )}
             </div>
           }
           title={'Home'}

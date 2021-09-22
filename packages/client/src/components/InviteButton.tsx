@@ -1,14 +1,15 @@
-import { Button, Icon, Input, Modal } from 'antd';
-import { useClipboard } from 'hooks/useClipboard';
 import React from 'react';
+import { Button, Input, Modal } from 'antd';
+import { useClipboard } from 'hooks/useClipboard';
 
-const InviteBotton = (props: { isAdmin: boolean; groupId: string }) => {
+interface InviteButtonProps {
+  groupId: string;
+}
+
+const InviteButton = (props: InviteButtonProps) => {
   const [visible, setVisible] = React.useState(false);
   const inviteLinkPrefix = `${window.cmsHost}${window.APP_PREFIX}invite`;
   const [copyStatus, copy] = useClipboard({ lazy: true, timeout: 2000 });
-  if (props.isAdmin !== true) {
-    return null;
-  }
 
   const onCreatingInvitation = () => {
     setVisible(!visible);
@@ -26,9 +27,13 @@ const InviteBotton = (props: { isAdmin: boolean; groupId: string }) => {
   };
 
   const inviteLink = `${inviteLinkPrefix}/${generateToken()}`;
+
   return (
-    <Button style={{ marginRight: 1 }} onClick={onCreatingInvitation}>
-      <Icon type='user-add' />
+    <Button
+      icon='user-add'
+      style={{ marginRight: 1 }}
+      onClick={onCreatingInvitation}
+    >
       Invite Users
       <Modal
         title='Share an invite link'
@@ -62,4 +67,4 @@ const InviteBotton = (props: { isAdmin: boolean; groupId: string }) => {
   );
 };
 
-export default InviteBotton;
+export default InviteButton;
