@@ -177,4 +177,23 @@ describe('AppListContainer', () => {
     expect(await screen.findByText('Refresh')).toBeInTheDocument();
     expect(await screen.findByText('My MLflow')).toBeInTheDocument();
   });
+
+  it('should render app list container with system setting link if admin', async () => {
+    const { mockGroupContext, mockRequests } = setup();
+    // @ts-ignore
+    window.isUserAdmin = true;
+
+    const { container } = render(
+      <MockedProvider mocks={mockRequests}>
+        <MemoryRouter>
+          <AppListContainer
+            groups={mockGroups}
+            groupContext={mockGroupContext}
+          />
+        </MemoryRouter>
+      </MockedProvider>
+    );
+
+    expect(await screen.findByTestId('system-setting-link')).toBeInTheDocument();
+  });
 });

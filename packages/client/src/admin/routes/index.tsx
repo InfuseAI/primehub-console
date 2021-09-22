@@ -12,6 +12,7 @@ import { appPrefix } from 'utils/env';
 import UsageReport from '../UsageReport';
 import { ImageList, ImageAdd, ImageInfo } from '../Images';
 import JupyterHubAdmin from '../JupyterHubAdmin';
+import { Apps } from '../Apps';
 
 export const ROUTES = [
   'group',
@@ -24,6 +25,7 @@ export const ROUTES = [
   'jupyterhub',
   'usageReport',
   'system',
+  'apps',
 ] as const;
 
 export type ROUTE_KEYS = typeof ROUTES[number];
@@ -164,6 +166,13 @@ export const routes = [
     component: UsageReport,
     enabled: window.enableUsageReport,
     proFeature: true,
+  },
+  {
+    key: 'apps',
+    path: 'admin/apps',
+    name: 'App Settings',
+    enabled: true,
+    component: Apps,
   },
   {
     key: 'system',

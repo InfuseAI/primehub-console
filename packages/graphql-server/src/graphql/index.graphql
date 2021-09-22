@@ -280,6 +280,7 @@ type Mutation {
   deletePhApplication(where: PhApplicationWhereUniqueInput!): PhApplication
   startPhApplication(where: PhApplicationWhereUniqueInput!): PhApplication
   stopPhApplication(where: PhApplicationWhereUniqueInput!): PhApplication
+  importPhAppTemplateFromURL(url: String!): JSON
 
   """Notebook"""
   notifyNotebookEvent(data: NotebookNotifyEventInput!): Int

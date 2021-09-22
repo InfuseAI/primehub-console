@@ -13,6 +13,7 @@ const VISIBLE_ITEMS = {
   instanceType: true,
   secret: true,
   system: true,
+  apps: true,
 
   // Control by global or tier variable
   image: false,

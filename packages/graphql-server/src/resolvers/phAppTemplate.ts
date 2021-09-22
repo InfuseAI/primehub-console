@@ -1,20 +1,11 @@
-import { Context } from './interface';
-import {
-  toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, mergeVariables, getGroupIdsByUser
-} from './utils';
-import {
-  PhAppTemplateSpec, client as kubeClient
-} from '../crdClient/crdClientImpl';
-import CustomResource, { Item } from '../crdClient/customResource';
-import { orderBy, omit, get, isUndefined, isNil, isEmpty, isNull, capitalize, intersection } from 'lodash';
-import * as moment from 'moment';
+import fetch from 'node-fetch';
+import yaml from 'js-yaml';
+import { get } from 'lodash';
 import { ApolloError } from 'apollo-server';
-import KeycloakAdminClient from 'keycloak-admin';
-import { mapping } from './instanceType';
-import * as logger from '../logger';
-import { keycloakMaxCount } from './constant';
-import { isUserAdmin } from './user';
-import md5 = require('apache-md5');
+import { Context } from './interface';
+import { toRelay, filter, paginate, extractPagination } from './utils';
+import { PhAppTemplateSpec, client as kubeClient } from '../crdClient/crdClientImpl';
+import CustomResource, { Item } from '../crdClient/customResource';
 
 export interface PhAppTemplate {
   id: string;
@@ -89,4 +80,23 @@ export const queryOne = async (root, args, context: Context) => {
   const transformed =
     await transform(phAppTemplate);
   return transformed;
+};
+
+export const importFromURL = async (root, args, context: Context) => {
+  const { crdClient } = context;
+  const { url } = args;
+  if (!url) {
+    throw new ApolloError('URL is required');
+  }
+
+  const response = await fetch(url);
+  const content = await response.text();
+  const templates = yaml.safeLoadAll(content);
+  const template = get(templates, '[0]');
+
+  if (template.kind === 'PhAppTemplate' && template.metadata && template.spec) {
+    return crdClient.phAppTemplates.create(template.metadata, template.spec);
+  }
+
+  throw new ApolloError('Invalid PhAppTemplate yaml');
 };
