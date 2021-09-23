@@ -2,7 +2,6 @@ import React, { useState, useCallback } from 'react';
 import { Table, Col, Layout, Button, Icon, Modal, Tooltip } from 'antd';
 import { withRouter, useHistory } from 'react-router-dom';
 import { reduce, pick } from 'lodash';
-import { RouteComponentProps } from 'react-router';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import Pagination from 'components/share/pagination';
@@ -73,14 +72,14 @@ function List(props: Props) {
   const renderAction = (id, record) => {
     return (
       <ButtonGroup>
-        <Tooltip placement="bottom" title="Edit">
+        <Tooltip placement='bottom' title='Edit'>
           <Button
             icon={'edit'}
             data-testid='edit-button'
             onClick={() => edit(record.id)}
           />
         </Tooltip>
-        <Tooltip placement="bottom" title="Delete">
+        <Tooltip placement='bottom' title='Delete'>
           <Button
             icon='delete'
             data-testid='delete-button'
@@ -262,7 +261,7 @@ function List(props: Props) {
           loading={props.loading}
           dataSource={props.dataSource}
           columns={columns}
-          rowKey={(record, index) => record.id}
+          rowKey={record => record.id}
           pagination={false}
         />
         <Pagination
@@ -293,7 +292,7 @@ function List(props: Props) {
 export const UserList = compose(
   withRouter,
   graphql(UsersConnection, {
-    options: (props: RouteComponentProps) => {
+    options: () => {
       return {
         fetchPolicy: 'cache-and-network',
       };

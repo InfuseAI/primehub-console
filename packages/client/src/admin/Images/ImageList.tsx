@@ -132,7 +132,7 @@ function _ImageList({ data, ...props }: ImageListProps) {
       render: function RenderActions(image: ImageNode) {
         return (
           <Button.Group>
-            <Tooltip placement="bottom" title="Edit">
+            <Tooltip placement='bottom' title='Edit'>
               <Button
                 data-testid='edit-button'
                 icon='edit'
@@ -141,7 +141,7 @@ function _ImageList({ data, ...props }: ImageListProps) {
                 }}
               />
             </Tooltip>
-            <Tooltip placement="bottom" title="Delete">
+            <Tooltip placement='bottom' title='Delete'>
               <Button
                 data-testid='delete-button'
                 icon='delete'

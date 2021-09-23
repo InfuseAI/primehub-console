@@ -93,17 +93,17 @@ export function GroupList(props: Props) {
   const renderAction = (id, record) => {
     return (
       <ButtonGroup>
-        <Tooltip placement="bottom" title="Edit">
+        <Tooltip placement='bottom' title='Edit'>
           <Button
             icon={'edit'}
-            data-testid="edit-button"
+            data-testid='edit-button'
             onClick={() => edit(record.id)}
           />
         </Tooltip>
-        <Tooltip placement="bottom" title="Delete">
+        <Tooltip placement='bottom' title='Delete'>
           <Button
-            icon="delete"
-            data-testid="delete-button"
+            icon='delete'
+            data-testid='delete-button'
             disabled={DISABLE_GROUP === true}
             onClick={() => remove(id, record)}
           />

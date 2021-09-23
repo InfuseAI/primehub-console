@@ -156,10 +156,10 @@ export function _InstanceTypes({
       render: function RenderActions(instance: InstanceTypeNode) {
         return (
           <Button.Group>
-            <Tooltip placement="bottom" title="Edit">
+            <Tooltip placement='bottom' title='Edit'>
               <Button
-                data-testid="edit-button"
-                icon="edit"
+                data-testid='edit-button'
+                icon='edit'
                 onClick={() => {
                   history.push(
                     `${appPrefix}admin/instanceType/${instance.node.id}`
@@ -167,10 +167,10 @@ export function _InstanceTypes({
                 }}
               />
             </Tooltip>
-            <Tooltip placement="bottom" title="Delete">
+            <Tooltip placement='bottom' title='Delete'>
               <Button
-                data-testid="delete-button"
-                icon="delete"
+                data-testid='delete-button'
+                icon='delete'
                 onClick={() => {
                   Modal.confirm({
                     title: 'Delete Instance',

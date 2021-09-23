@@ -101,7 +101,7 @@ function _Secrets({
       render: function RenderActions(secret: SecretNode) {
         return (
           <Button.Group>
-            <Tooltip placement="bottom" title="Edit">
+            <Tooltip placement='bottom' title='Edit'>
               <Button
                 data-testid='edit-button'
                 icon='edit'
@@ -110,7 +110,7 @@ function _Secrets({
                 }}
               />
             </Tooltip>
-            <Tooltip placement="bottom" title="Delete">
+            <Tooltip placement='bottom' title='Delete'>
               <Button
                 data-testid='delete-button'
                 icon='delete'
