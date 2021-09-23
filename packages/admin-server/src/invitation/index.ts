@@ -28,29 +28,50 @@ export class InvitationCtrl {
     next: any
   ) => {
     const {invitationToken, username} = ctx.request.body;
+
     if (!(invitationToken && username)) {
-      throw Boom.badRequest('BAD_REQUEST');
+      ctx.body = {
+        code: 'BAD_REQUEST',
+        message: 'Invalid token or username.'
+      };
     }
 
     // invalid token
     try {
       const result:{validation:boolean} = await this.validate(invitationToken);
-      if(!result.validation) {
-        throw Boom.badRequest('INVALID_TOKEN');
+      if (!result.validation) {
+        ctx.body = {
+          code: 'BAD_REQUEST',
+          message: 'Invalid token.'
+        };
       }
     } catch (error) {
       console.error(error);
-      throw Boom.badRequest('INVALID_TOKEN');
+
+      ctx.body = {
+        code: 'BAD_REQUEST',
+        message: 'Invalid token.'
+      };
     }
 
     try {
       const createdUser = await this.createUserByToken(invitationToken, username);
-      ctx.body = createdUser;
+      ctx.body = {
+        code: 'SUCCESS',
+        createdUser,
+      };
     } catch (error) {
-      if(error.response?.errors){
-        throw Boom.badRequest(error.response?.errors[0].message);
+      if (error.response?.errors){
+        ctx.body = {
+          code: 'BAD_REQUEST',
+          message: error.response?.errors[0].message,
+        };
       }
-      throw Boom.badRequest('BAD_REQUEST');
+
+      ctx.body = {
+        code: 'BAD_REQUEST',
+        message: 'Invalid token or duplicated username.'
+      };
     }
   };
 
