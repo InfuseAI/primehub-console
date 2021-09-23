@@ -243,7 +243,7 @@ function _Datasets({
       render: function RenderActions(dataset: DatasetNode) {
         return (
           <Button.Group>
-            <Tooltip placement="bottom" title="Edit">
+            <Tooltip placement='bottom' title='Edit'>
               <Button
                 data-testid='edit-button'
                 icon='edit'
@@ -252,7 +252,7 @@ function _Datasets({
                 }}
               />
             </Tooltip>
-            <Tooltip placement="bottom" title="Delete">
+            <Tooltip placement='bottom' title='Delete'>
               <Button
                 data-testid='delete-button'
                 icon='delete'
