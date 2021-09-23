@@ -154,6 +154,7 @@ function _ImageList({ data, ...props }: ImageListProps) {
                       </>
                     ),
                     okText: 'Yes',
+                    maskClosable: true,
                     onOk: async () => {
                       try {
                         await props.deleteImageMutation({

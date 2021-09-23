@@ -1,24 +1,27 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
-import {Icon, notification, Modal} from 'antd';
-import {graphql} from 'react-apollo';
-import {compose} from 'recompose';
-import {get, unionBy, isEqual, pick} from 'lodash';
-import {RouteComponentProps} from 'react-router';
-import {withRouter} from 'react-router-dom';
-import {errorHandler} from 'utils/errorHandler';
+import { Icon, notification, Modal } from 'antd';
+import { graphql } from 'react-apollo';
+import { compose } from 'recompose';
+import { get, unionBy, isEqual, pick } from 'lodash';
+import { RouteComponentProps } from 'react-router';
+import { withRouter } from 'react-router-dom';
+import { errorHandler } from 'utils/errorHandler';
 import DeploymentCreateForm from 'ee/components/modelDeployment/createForm';
 import PageTitle from 'components/pageTitle';
-import {PhDeploymentFragment} from 'ee/components/modelDeployment/common';
-import {GET_PH_DEPLOYMENT, getMessage} from 'ee/containers/deploymentDetail';
+import { PhDeploymentFragment } from 'ee/components/modelDeployment/common';
+import { GET_PH_DEPLOYMENT, getMessage } from 'ee/containers/deploymentDetail';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
-import {sortNameByAlphaBet} from 'utils/sorting';
-import {CurrentUser} from 'queries/User.graphql';
+import { sortNameByAlphaBet } from 'utils/sorting';
+import { CurrentUser } from 'queries/User.graphql';
 import queryString from 'querystring';
 
 export const UPDATE_DEPLOYMENT = gql`
-  mutation updatePhDeployment($where: PhDeploymentWhereUniqueInput!, $data: PhDeploymentUpdateInput!) {
+  mutation updatePhDeployment(
+    $where: PhDeploymentWhereUniqueInput!
+    $data: PhDeploymentUpdateInput!
+  ) {
     updatePhDeployment(where: $where, data: $data) {
       ...PhDeploymentInfo
     }
@@ -26,14 +29,15 @@ export const UPDATE_DEPLOYMENT = gql`
   ${PhDeploymentFragment}
 `;
 
-type Props = RouteComponentProps<{deploymentId: string}> & GroupContextComponentProps & {
-  currentUser: any;
-  refetchGroup: any;
-  updatePhDeployment: any;
-  updatePhDeploymentResult: any;
-  getPhDeployment: any;
-  licenseQuery: any;
-};
+type Props = RouteComponentProps<{ deploymentId: string }> &
+  GroupContextComponentProps & {
+    currentUser: any;
+    refetchGroup: any;
+    updatePhDeployment: any;
+    updatePhDeploymentResult: any;
+    getPhDeployment: any;
+    licenseQuery: any;
+  };
 
 type State = {
   selectedGroup: string | null;
@@ -41,17 +45,28 @@ type State = {
 
 class DeploymentCreatePage extends React.Component<Props, State> {
   onSubmit = payload => {
-    const {updatePhDeployment} = this.props;
+    const { updatePhDeployment } = this.props;
     updatePhDeployment({
       variables: {
-        where: {id: payload.id},
-        data: pick(payload, ['instanceType', 'modelImage', 'imagePullSecret', 'modelURI', 'replicas', 'metadata', 'description', 'updateMessage', 'endpointAccessType', 'env'])
-      }
+        where: { id: payload.id },
+        data: pick(payload, [
+          'instanceType',
+          'modelImage',
+          'imagePullSecret',
+          'modelURI',
+          'replicas',
+          'metadata',
+          'description',
+          'updateMessage',
+          'endpointAccessType',
+          'env',
+        ]),
+      },
     });
-  }
+  };
 
   onCancel = values => {
-    const {history, getPhDeployment} = this.props;
+    const { history, getPhDeployment } = this.props;
     const initialValue = {
       id: get(getPhDeployment, 'phDeployment.id'),
       instanceType: get(getPhDeployment, 'phDeployment.instanceType.id'),
@@ -67,40 +82,49 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       updateMessage: get(getPhDeployment, 'phDeployment.updateMessage'),
     };
 
-    if (isEqual(values, initialValue))
-      return history.goBack();
+    if (isEqual(values, initialValue)) return history.goBack();
 
     Modal.confirm({
       title: 'Do you want to discard the changes?',
       content: 'Your changes will be lost. Are you sure?',
       okText: 'Discard',
       cancelText: 'Cancel',
+      maskClosable: true,
       onOk: () => history.goBack(),
       cancelButtonProps: {
         style: {
           float: 'right',
-          marginLeft: 8
-        }
-      }
+          marginLeft: 8,
+        },
+      },
     });
-  }
+  };
 
   render() {
-    const {currentUser, updatePhDeploymentResult, location, getPhDeployment, groupContext, refetchGroup, match} = this.props;
-    const {params} = match;
+    const {
+      currentUser,
+      updatePhDeploymentResult,
+      location,
+      getPhDeployment,
+      groupContext,
+      refetchGroup,
+      match,
+    } = this.props;
+    const { params } = match;
 
     if (getPhDeployment.loading) return null;
     if (getPhDeployment.error) {
-      return getMessage(getPhDeployment.error)
-    };
+      return getMessage(getPhDeployment.error);
+    }
 
     const everyoneGroupId = window.EVERYONE_GROUP_ID;
-    const allGroups = get(currentUser, 'me.groups', []).filter(group => group.enabledDeployment || group.id === everyoneGroupId);
+    const allGroups = get(currentUser, 'me.groups', []).filter(
+      group => group.enabledDeployment || group.id === everyoneGroupId
+    );
     const groups = allGroups.filter(group => group.id !== everyoneGroupId);
     const everyoneGroup = allGroups.find(group => group.id === everyoneGroupId);
     const selectedGroup = getPhDeployment.phDeployment.groupId;
-    const group = groups
-      .find(group => group.id === selectedGroup);
+    const group = groups.find(group => group.id === selectedGroup);
     const instanceTypes = unionBy(
       get(group, 'instanceTypes', []),
       get(everyoneGroup, 'instanceTypes', []),
@@ -111,31 +135,34 @@ class DeploymentCreatePage extends React.Component<Props, State> {
         key: 'list',
         matcher: /\/deployments/,
         title: 'Deployments',
-        link: '/deployments?page=1'
+        link: '/deployments?page=1',
       },
       {
         key: 'detail',
         matcher: /\/deployments\/([\w-])+/,
         title: `Deployment: ${get(getPhDeployment, 'phDeployment.name')}`,
-        link: `/deployments/${params.deploymentId}`
+        link: `/deployments/${params.deploymentId}`,
       },
       {
         key: 'update',
         matcher: /\/deployments\/([\w-])+\/edit/,
         title: 'Update Deployments',
         tips: 'Update the settings of the deployment.',
-        tipsLink: 'https://docs.primehub.io/docs/model-deployment-feature#update'
-      }
+        tipsLink:
+          'https://docs.primehub.io/docs/model-deployment-feature#update',
+      },
     ];
 
-    const {defaultValue} = queryString.parse(location.search.replace(/^\?/, ''));
-    let initValue = {}
+    const { defaultValue } = queryString.parse(
+      location.search.replace(/^\?/, '')
+    );
+    let initValue = {};
     try {
       if (defaultValue) {
         initValue = JSON.parse(defaultValue as any);
-        initValue = pick(initValue, ["modelURI"]);
+        initValue = pick(initValue, ['modelURI']);
       }
-    } catch(e) {}
+    } catch (e) {}
 
     const isReachedGroupDeploymentsLimit =
       group?.deployments >= group?.maxpGroup;
@@ -149,13 +176,21 @@ class DeploymentCreatePage extends React.Component<Props, State> {
           title={`Update Deployment`}
           breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
         />
-        <div style={{margin: '16px'}}>
+        <div style={{ margin: '16px' }}>
           <DeploymentCreateForm
-            type="edit"
+            type='edit'
             initialValue={{
               ...(getPhDeployment.phDeployment || {}),
-              instanceTypeId: get(getPhDeployment, 'phDeployment.instanceType.id', ''),
-              instanceTypeName: get(getPhDeployment, 'phDeployment.instanceType.name', ''),
+              instanceTypeId: get(
+                getPhDeployment,
+                'phDeployment.instanceType.id',
+                ''
+              ),
+              instanceTypeName: get(
+                getPhDeployment,
+                'phDeployment.instanceType.name',
+                ''
+              ),
               ...initValue,
             }}
             selectedGroup={selectedGroup}
@@ -180,7 +215,7 @@ export default compose(
   withGroupContext,
   graphql(CurrentUser, {
     alias: 'withCurrentUser',
-    name: 'currentUser'
+    name: 'currentUser',
   }),
   graphql(
     gql`
@@ -201,17 +236,17 @@ export default compose(
     options: (props: Props) => ({
       variables: {
         where: {
-          id: props.match.params.deploymentId
-        }
+          id: props.match.params.deploymentId,
+        },
       },
-      fetchPolicy: 'cache-and-network'
+      fetchPolicy: 'cache-and-network',
     }),
-    name: 'getPhDeployment'
+    name: 'getPhDeployment',
   }),
   graphql(UPDATE_DEPLOYMENT, {
     options: (props: Props) => ({
       onCompleted: (data: any) => {
-        const {history} = props;
+        const { history } = props;
         history.push(`../../deployments`);
         notification.success({
           duration: 10,
@@ -219,14 +254,21 @@ export default compose(
           message: 'Success!',
           description: (
             <>
-              Your update has begun deploying.
-              Click <a onClick={() => history.push(`deployments/${data.updatePhDeployment.id}`)}>here</a> to view.
+              Your update has begun deploying. Click{' '}
+              <a
+                onClick={() =>
+                  history.push(`deployments/${data.updatePhDeployment.id}`)
+                }
+              >
+                here
+              </a>{' '}
+              to view.
             </>
-          )
+          ),
         });
       },
-      onError: errorHandler
+      onError: errorHandler,
     }),
-    name: 'updatePhDeployment'
+    name: 'updatePhDeployment',
   })
-)(DeploymentCreatePage)
+)(DeploymentCreatePage);

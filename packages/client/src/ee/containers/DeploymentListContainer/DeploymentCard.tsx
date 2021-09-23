@@ -35,7 +35,7 @@ const CardButton = styled.div<{ loading?: number }>`
   width: 180px;
   margin: 12px 0;
 
-  cursor: ${(props) => (props.loading ? 'not-allowed' : 'pointer')};
+  cursor: ${props => (props.loading ? 'not-allowed' : 'pointer')};
 
   &:hover {
     border-radius: 4px;
@@ -143,7 +143,7 @@ export function DeploymentCard({ endpoint, ...props }: Props) {
       <Divider style={{ margin: '24px 0px 0px' }} />
 
       <div
-        className="deployment-actions"
+        className='deployment-actions'
         style={{
           display: 'flex',
           justifyContent: 'space-evenly',
@@ -155,10 +155,10 @@ export function DeploymentCard({ endpoint, ...props }: Props) {
             history.push(`deployments/${props.id}`);
           }}
         >
-          <Icon type="setting" style={{ fontSize: '1rem' }} /> Manage
+          <Icon type='setting' style={{ fontSize: '1rem' }} /> Manage
         </CardButton>
 
-        <Divider type="vertical" style={{ height: '36px', margin: '12px 0' }} />
+        <Divider type='vertical' style={{ height: '36px', margin: '12px 0' }} />
 
         <CardButton
           loading={+isLoading}
@@ -167,6 +167,7 @@ export function DeploymentCard({ endpoint, ...props }: Props) {
 
             Modal.confirm({
               title: isStoppted ? 'Start Deploy' : 'Stop Deploy',
+              maskClosable: true,
               content: (
                 <p>
                   Do you want to {isStoppted ? 'start' : 'stop'} "

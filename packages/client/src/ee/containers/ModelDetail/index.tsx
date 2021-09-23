@@ -120,17 +120,17 @@ function ModelDetail({
 
   const { modelParameters, modelMetrics } = React.useMemo(() => {
     if (getModel?.modelVersions) {
-      const data = getModel.modelVersions.map((m) => get(m, 'run.data'));
+      const data = getModel.modelVersions.map(m => get(m, 'run.data'));
 
       const modelParameters: string[] = uniqBy(
-        data.map((d) => get(d, 'params')).flat(),
+        data.map(d => get(d, 'params')).flat(),
         'key'
       )
         .map(({ key }) => key)
         .sort((a, b) => (a > b ? 1 : -1));
 
       const modelMetrics: string[] = uniqBy(
-        data.map((d) => get(d, 'metrics')).flat(),
+        data.map(d => get(d, 'metrics')).flat(),
         'key'
       )
         .map(({ key }) => key)
@@ -168,6 +168,7 @@ function ModelDetail({
         title: 'Feature not available',
         content:
           'Model Deployment is not enabled for this group. Please contact your administrator to enable it.',
+        maskClosable: true,
       });
       return;
     }
@@ -180,7 +181,7 @@ function ModelDetail({
         },
         fetchPolicy: 'no-cache',
       })
-      .then((result) => {
+      .then(result => {
         setDeploy({
           visible: true,
           phDeployments: result.data.phDeployments,
@@ -223,7 +224,7 @@ function ModelDetail({
   }
 
   function handleColumnsModalOk() {
-    setColumnsModalVisible((visible) => !visible);
+    setColumnsModalVisible(visible => !visible);
   }
 
   function handleSaveModelMetrics() {
@@ -233,7 +234,7 @@ function ModelDetail({
 
   React.useEffect(() => {
     // update checkgroup status after fetch data
-    setCurrentModelParams((params) => ({
+    setCurrentModelParams(params => ({
       ...params,
       checkAll: defaultModelParams?.length === modelParameters?.length,
       indeterminate:
@@ -241,7 +242,7 @@ function ModelDetail({
         defaultModelParams?.length < modelParameters?.length,
     }));
 
-    setCurrentModelMetrics((metrics) => ({
+    setCurrentModelMetrics(metrics => ({
       ...metrics,
       checkAll: defaultModelMetrics?.length === modelMetrics?.length,
       indeterminate:
@@ -319,7 +320,7 @@ function ModelDetail({
       children:
         currentModelParams.options.length === 0
           ? null
-          : currentModelParams.options.map((param) => ({
+          : currentModelParams.options.map(param => ({
               key: param as string,
               title: param,
               width: '120px',
@@ -341,7 +342,7 @@ function ModelDetail({
       children:
         currentModelMetrics.options.length === 0
           ? null
-          : currentModelMetrics.options.map((metric) => ({
+          : currentModelMetrics.options.map(metric => ({
               key: metric as string,
               title: metric,
               width: '120px',
@@ -394,19 +395,19 @@ function ModelDetail({
             <Field
               labelCol={4}
               valueCol={8}
-              label="Created Time"
+              label='Created Time'
               value={formatTimestamp(getModel.model.creationTimestamp)}
             />
             <Field
               labelCol={4}
               valueCol={8}
-              label="Last Modified"
+              label='Last Modified'
               value={formatTimestamp(getModel.model.lastUpdatedTimestamp)}
             />
             <Field
               labelCol={4}
               valueCol={8}
-              label="Description"
+              label='Description'
               value={formatTimestamp(getModel.model.description)}
             />
           </Col>
@@ -415,10 +416,10 @@ function ModelDetail({
             style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}
           >
             <Button
-              data-testid="setting-columns"
+              data-testid='setting-columns'
               onClick={handleColumnsModalOk}
             >
-              <Icon type="setting" />
+              <Icon type='setting' />
               Columns
             </Button>
             <Button
@@ -430,20 +431,20 @@ function ModelDetail({
             </Button>
 
             <Modal
-              title="Select Columns"
+              title='Select Columns'
               visible={columnsModalVisible}
               onCancel={() => {
                 setColumnsModalVisible(false);
 
                 // reset to the original options
-                setCurrentModelParams((params) => ({
+                setCurrentModelParams(params => ({
                   ...params,
                   options: defaultModelParams,
                   checkAll:
                     defaultModelParams?.length === modelParameters?.length,
                   indeterminate: defaultModelParams?.length !== 0,
                 }));
-                setCurrentModelMetrics((metrics) => ({
+                setCurrentModelMetrics(metrics => ({
                   ...metrics,
                   options: defaultModelMetrics,
                   checkAll:
@@ -471,11 +472,11 @@ function ModelDetail({
                 bordered={false}
                 defaultActiveKey={defaultOpenCollapse && ['1']}
                 expandIcon={({ isActive }) => (
-                  <Icon type="caret-right" rotate={isActive ? 90 : 0} />
+                  <Icon type='caret-right' rotate={isActive ? 90 : 0} />
                 )}
               >
                 <Collapse.Panel
-                  key="1"
+                  key='1'
                   style={{ borderBottom: '0px' }}
                   header={
                     <div
@@ -484,24 +485,24 @@ function ModelDetail({
                         gap: '8px',
                         alignItems: 'center',
                       }}
-                      onClick={(event) => {
+                      onClick={event => {
                         event.stopPropagation();
                       }}
                     >
                       <Checkbox
-                        data-testid="params-checkbox"
+                        data-testid='params-checkbox'
                         indeterminate={currentModelParams.indeterminate}
                         checked={currentModelParams.checkAll}
-                        onChange={(event) => {
+                        onChange={event => {
                           if (event.target.checked) {
-                            setCurrentModelParams((params) => ({
+                            setCurrentModelParams(params => ({
                               ...params,
                               checkAll: true,
                               indeterminate: false,
                               options: modelParameters,
                             }));
                           } else {
-                            setCurrentModelParams((params) => ({
+                            setCurrentModelParams(params => ({
                               ...params,
                               checkAll: false,
                               indeterminate: false,
@@ -517,8 +518,8 @@ function ModelDetail({
                   <CustomCheckboxGroup
                     options={modelParameters}
                     value={currentModelParams.options as CheckboxValueType[]}
-                    onChange={(checkedList) => {
-                      setCurrentModelParams((params) => ({
+                    onChange={checkedList => {
+                      setCurrentModelParams(params => ({
                         ...params,
                         options: checkedList,
                         indeterminate:
@@ -536,11 +537,11 @@ function ModelDetail({
                 bordered={false}
                 defaultActiveKey={defaultOpenCollapse && ['1']}
                 expandIcon={({ isActive }) => (
-                  <Icon type="caret-right" rotate={isActive ? 90 : 0} />
+                  <Icon type='caret-right' rotate={isActive ? 90 : 0} />
                 )}
               >
                 <Collapse.Panel
-                  key="1"
+                  key='1'
                   style={{ borderBottom: '0px' }}
                   header={
                     <div
@@ -549,24 +550,24 @@ function ModelDetail({
                         gap: '8px',
                         alignItems: 'center',
                       }}
-                      onClick={(event) => {
+                      onClick={event => {
                         event.stopPropagation();
                       }}
                     >
                       <Checkbox
-                        data-testid="metrics-checkbox"
+                        data-testid='metrics-checkbox'
                         indeterminate={currentModelMetrics.indeterminate}
                         checked={currentModelMetrics.checkAll}
-                        onChange={(event) => {
+                        onChange={event => {
                           if (event.target.checked) {
-                            setCurrentModelMetrics((metrics) => ({
+                            setCurrentModelMetrics(metrics => ({
                               ...metrics,
                               checkAll: true,
                               indeterminate: false,
                               options: modelMetrics,
                             }));
                           } else {
-                            setCurrentModelMetrics((metrics) => ({
+                            setCurrentModelMetrics(metrics => ({
                               ...metrics,
                               checkAll: false,
                               indeterminate: false,
@@ -582,8 +583,8 @@ function ModelDetail({
                   <CustomCheckboxGroup
                     options={modelMetrics}
                     value={currentModelMetrics.options as CheckboxValueType[]}
-                    onChange={(checkedList) => {
-                      setCurrentModelMetrics((metrics) => ({
+                    onChange={checkedList => {
+                      setCurrentModelMetrics(metrics => ({
                         ...metrics,
                         options: checkedList,
                         indeterminate:
@@ -604,7 +605,7 @@ function ModelDetail({
           style={{ paddingTop: 8 }}
           dataSource={getModel.modelVersions}
           columns={columns}
-          rowKey={(record) => record.version}
+          rowKey={record => record.version}
           loading={getModel.loading}
         />
       </PageBody>

@@ -302,9 +302,10 @@ function _ImageForm({
                 useImagePullSecret: enabledSelectSecret
                   ? values.useImagePullSecret
                   : null,
-                urlForGpu: values.type === 'both' && !enabledURLForGpu
-                  ? null
-                  : values.urlForGpu,
+                urlForGpu:
+                  values.type === 'both' && !enabledURLForGpu
+                    ? null
+                    : values.urlForGpu,
                 groups: {
                   // @ts-ignore
                   connect,
@@ -480,7 +481,13 @@ function _ImageForm({
                       {form.getFieldDecorator('apt', {
                         initialValue:
                           data?.imageSpec?.packages.apt.join('\n') || '',
-                      })(<Input.TextArea data-testid='packageApt' rows={4} placeholder={placeholder} />)}
+                      })(
+                        <Input.TextArea
+                          data-testid='packageApt'
+                          rows={4}
+                          placeholder={placeholder}
+                        />
+                      )}
                     </Form.Item>
                   </Col>
                   <Col span={8}>
@@ -489,7 +496,13 @@ function _ImageForm({
                       {form.getFieldDecorator('conda', {
                         initialValue:
                           data?.imageSpec?.packages.conda.join('\n') || '',
-                      })(<Input.TextArea data-testid='packageConda' rows={4} placeholder={placeholder} />)}
+                      })(
+                        <Input.TextArea
+                          data-testid='packageConda'
+                          rows={4}
+                          placeholder={placeholder}
+                        />
+                      )}
                     </Form.Item>
                   </Col>
                   <Col span={8}>
@@ -498,7 +511,13 @@ function _ImageForm({
                       {form.getFieldDecorator('pip', {
                         initialValue:
                           data?.imageSpec?.packages.pip.join('\n') || '',
-                      })(<Input.TextArea data-testid='packagePip' rows={4} placeholder={placeholder} />)}
+                      })(
+                        <Input.TextArea
+                          data-testid='packagePip'
+                          rows={4}
+                          placeholder={placeholder}
+                        />
+                      )}
                     </Form.Item>
                   </Col>
                 </Row>
@@ -723,6 +742,7 @@ function _ImageForm({
                     onClick={() => {
                       Modal.confirm({
                         title: 'Cancel Build',
+                        maskClosable: true,
                         content:
                           'Are you sure you want to cancel building this custom image?',
                         okText: 'Confirm',

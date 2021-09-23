@@ -26,7 +26,7 @@ const breadcrumbs: BreadcrumbItemSetup[] = [
     matcher: /\/api-token/,
     title: 'API token',
     tips: 'A valid token is mandatory to allow 3rd-party using PrimeHub APIs.',
-    tipsLink: 'https://docs.primehub.io/docs/tasks/api-token'
+    tipsLink: 'https://docs.primehub.io/docs/tasks/api-token',
   },
 ];
 
@@ -72,6 +72,7 @@ curl -X POST \\
         Modal.confirm({
           title: 'Are you sure you want to request an API token?',
           content: 'Submitting a new request will revoke your existing token.',
+          maskClosable: true,
           onOk: async () => {
             try {
               await requestToken();
@@ -130,12 +131,24 @@ curl -X POST \\
                     {statusCopyToken === 'copied' ? 'Copied' : 'Copy'}
                   </a>
                 }
-            />
+              />
 
-            <Row style={{ marginBottom: 16 }}>
-              Please save this token. You won't be able to access it again. You can also download the config file for <a target='_blank'href='https://github.com/infuseai/primehub-python-sdk'> PrimeHub CLI/SDK</a> and save it at <Typography.Text code>~/.primehub/config.json</Typography.Text>.
-            </Row>
-          </>)}
+              <Row style={{ marginBottom: 16 }}>
+                Please save this token. You won't be able to access it again.
+                You can also download the config file for{' '}
+                <a
+                  target='_blank'
+                  href='https://github.com/infuseai/primehub-python-sdk'
+                  rel='noreferrer'
+                >
+                  {' '}
+                  PrimeHub CLI/SDK
+                </a>{' '}
+                and save it at{' '}
+                <Typography.Text code>~/.primehub/config.json</Typography.Text>.
+              </Row>
+            </>
+          )}
           <ApolloConsumer>
             {client => (
               <Button
@@ -143,7 +156,7 @@ curl -X POST \\
                 type='primary'
                 onClick={() => handleRequestApiToken(client)}
               >
-              Request API Token
+                Request API Token
               </Button>
             )}
           </ApolloConsumer>

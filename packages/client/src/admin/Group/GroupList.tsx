@@ -84,6 +84,7 @@ export function GroupList(props: Props) {
       okText: 'Yes',
       okType: 'danger',
       cancelText: 'No',
+      maskClosable: true,
       onOk() {
         return deleteGroup({ variables: { where: { id } } });
       },

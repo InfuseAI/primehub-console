@@ -107,10 +107,7 @@ class ImageList extends React.Component<Props> {
       iconType: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
-      onOk() {},
-      onCancel() {
-        console.log('Cancel');
-      },
+      maskClosable: true,
     });
   };
 

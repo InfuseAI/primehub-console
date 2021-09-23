@@ -1,16 +1,16 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
 import queryString from 'querystring';
-import {get} from 'lodash';
-import {Modal} from 'antd';
-import {graphql} from 'react-apollo';
-import {compose} from 'recompose';
-import {withRouter, Link} from 'react-router-dom';
-import {RouteComponentProps} from 'react-router';
-import {GroupContextComponentProps} from 'context/group';
-import {errorHandler} from 'utils/errorHandler';
+import { get } from 'lodash';
+import { Modal } from 'antd';
+import { graphql } from 'react-apollo';
+import { compose } from 'recompose';
+import { withRouter, Link } from 'react-router-dom';
+import { RouteComponentProps } from 'react-router';
+import { GroupContextComponentProps } from 'context/group';
+import { errorHandler } from 'utils/errorHandler';
 import ScheduleList from 'ee/components/schedule/list';
-import {Group} from 'ee/components/shared/groupFilter';
+import { Group } from 'ee/components/shared/groupFilter';
 import withPath, { PathComponentProps } from 'ee/components/job/withPath';
 
 export const PhScheduleFragment = gql`
@@ -40,11 +40,15 @@ export const PhScheduleFragment = gql`
     userName
     nextRunTime
     activeDeadlineSeconds
- }
-`
+  }
+`;
 
 export const GET_PH_SCHEDULE_CONNECTION = gql`
-  query phSchedulesConnection($where: PhScheduleWhereInput, $page: Int, $orderBy: PhScheduleOrderByInput) {
+  query phSchedulesConnection(
+    $where: PhScheduleWhereInput
+    $page: Int
+    $orderBy: PhScheduleOrderByInput
+  ) {
     phSchedulesConnection(where: $where, page: $page, orderBy: $orderBy) {
       pageInfo {
         totalPage
@@ -87,36 +91,52 @@ type Props = {
   deletePhSchedule: any;
   runPhScheduleResult: any;
   deletePhScheduleResult: any;
-} & RouteComponentProps & PathComponentProps & GroupContextComponentProps;
+} & RouteComponentProps &
+  PathComponentProps &
+  GroupContextComponentProps;
 
 class ScheduleListContainer extends React.Component<Props> {
-  scheduleRefetch = (payload) => {
-    const {pathname} = this.props;
-    const payloadWithStringWhere = {...payload};
+  scheduleRefetch = payload => {
+    const { pathname } = this.props;
+    const payloadWithStringWhere = { ...payload };
     if (payloadWithStringWhere.where)
       payloadWithStringWhere.where = JSON.stringify(payload.where);
     if (payloadWithStringWhere.orderBy)
       payloadWithStringWhere.orderBy = JSON.stringify(payload.orderBy || {});
 
-    const {history, getPhScheduleConnection} = this.props;
+    const { history, getPhScheduleConnection } = this.props;
     const search = queryString.stringify(payloadWithStringWhere);
     if (history.location.search === `?${search}`) {
       getPhScheduleConnection.refetch(payload);
     } else {
       history.replace({
         pathname: `schedule`,
-        search
+        search,
       });
     }
-  }
+  };
 
   render() {
-    const {getPhScheduleConnection, runPhSchedule, runPhScheduleResult,deletePhScheduleResult, deletePhSchedule, groups, pathname, groupContext} = this.props;
+    const {
+      getPhScheduleConnection,
+      runPhSchedule,
+      runPhScheduleResult,
+      deletePhScheduleResult,
+      deletePhSchedule,
+      groups,
+      pathname,
+      groupContext,
+    } = this.props;
     return (
       <ScheduleList
         schedulesLoading={getPhScheduleConnection.loading}
         schedulesError={getPhScheduleConnection.error}
-        schedulesConnection={getPhScheduleConnection.phSchedulesConnection || {pageInfo: {}, edges: []}}
+        schedulesConnection={
+          getPhScheduleConnection.phSchedulesConnection || {
+            pageInfo: {},
+            edges: [],
+          }
+        }
         schedulesVariables={getPhScheduleConnection.variables}
         schedulesRefetch={this.scheduleRefetch}
         runPhSchedule={runPhSchedule}
@@ -135,9 +155,11 @@ export default compose(
   withPath,
   graphql(GET_PH_SCHEDULE_CONNECTION, {
     options: (props: Props) => {
-      const params = queryString.parse(props.location.search.replace(/^\?/, ''));
-      const {groupContext} = props;
-      const where = JSON.parse(params.where as string || '{}');
+      const params = queryString.parse(
+        props.location.search.replace(/^\?/, '')
+      );
+      const { groupContext } = props;
+      const where = JSON.parse((params.where as string) || '{}');
       if (groupContext) {
         where.groupId_in = [groupContext.id];
       }
@@ -145,32 +167,37 @@ export default compose(
       return {
         variables: {
           where,
-          orderBy: JSON.parse(params.orderBy as string || '{}'),
-          page: Number(params.page || 1)
+          orderBy: JSON.parse((params.orderBy as string) || '{}'),
+          page: Number(params.page || 1),
         },
-        fetchPolicy: 'cache-and-network'
-      }
+        fetchPolicy: 'cache-and-network',
+      };
     },
-    name: 'getPhScheduleConnection'
+    name: 'getPhScheduleConnection',
   }),
   graphql(RUN_SCHEDULE, {
     options: (props: Props) => ({
-      refetchQueries: [{
-        query: GET_PH_SCHEDULE_CONNECTION,
-        variables: props.getPhScheduleConnection.variables,
-      }],
+      refetchQueries: [
+        {
+          query: GET_PH_SCHEDULE_CONNECTION,
+          variables: props.getPhScheduleConnection.variables,
+        },
+      ],
       onCompleted: data => {
         const jobId = get(data, 'runPhSchedule.job.id', '');
         const jobName = get(data, 'runPhSchedule.job.displayName', '');
         const modal = Modal.success({
           title: 'Success',
+          maskClosable: true,
           content: (
             <div>
               {jobName} has been submitted! You can
-              <a onClick={() => {
-                props.history.push(`job/${jobId}`)
-                modal.destroy();
-              }}>
+              <a
+                onClick={() => {
+                  props.history.push(`job/${jobId}`);
+                  modal.destroy();
+                }}
+              >
                 {` `}
                 <u>view your job details here.</u>
               </a>
@@ -179,18 +206,20 @@ export default compose(
           onOk() {},
         });
       },
-      onError: errorHandler
+      onError: errorHandler,
     }),
-    name: 'runPhSchedule'
+    name: 'runPhSchedule',
   }),
   graphql(DELETE_SCHEDULE, {
     options: (props: Props) => ({
-      refetchQueries: [{
-        query: GET_PH_SCHEDULE_CONNECTION,
-        variables: props.getPhScheduleConnection.variables
-      }],
-      onError: errorHandler
+      refetchQueries: [
+        {
+          query: GET_PH_SCHEDULE_CONNECTION,
+          variables: props.getPhScheduleConnection.variables,
+        },
+      ],
+      onError: errorHandler,
     }),
-    name: 'deletePhSchedule'
+    name: 'deletePhSchedule',
   })
-)(ScheduleListContainer)
+)(ScheduleListContainer);

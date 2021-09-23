@@ -31,13 +31,13 @@ export default class EnableUploadServer extends React.Component<Props, State> {
     });
   }
 
-  handleChange = (checked) => {
+  handleChange = checked => {
     const { onChange } = this.props;
     this.setState({
       checked,
     });
     onChange(checked);
-  }
+  };
 
   render() {
     const { intl, name, allowRegenerateSecret, value } = this.props;
@@ -45,39 +45,59 @@ export default class EnableUploadServer extends React.Component<Props, State> {
 
     return (
       <>
-        <Switch onChange={(value) => {
-          this.handleChange(value);
-        }} checked={value} />
+        <Switch
+          onChange={value => {
+            this.handleChange(value);
+          }}
+          checked={value}
+        />
         <Mutation
           mutation={RegenerateUploadServerSecretMutation}
           variables={{
             where: {
               id: name,
-            }
+            },
           }}
           onCompleted={data => {
-            const secret = get(data, 'regenerateUploadServerSecret.uploadServerSecret', null);
+            const secret = get(
+              data,
+              'regenerateUploadServerSecret.uploadServerSecret',
+              null
+            );
             if (isPlainObject(secret) && secret.username && secret.password) {
               uploadServerSecretModal({
-                title: intl.formatMessage({id: 'dataset.regenerateSecretModalTitle'}),
+                title: intl.formatMessage({
+                  id: 'dataset.regenerateSecretModalTitle',
+                }),
                 secret,
               });
             } else {
               Modal.error({
-                title: intl.formatMessage({id: 'dataset.regenerateSecretErrorModalTitle'}),
-                content: intl.formatMessage({id: 'dataset.regenerateSecretErrorModalContent'})
+                title: intl.formatMessage({
+                  id: 'dataset.regenerateSecretErrorModalTitle',
+                }),
+                content: intl.formatMessage({
+                  id: 'dataset.regenerateSecretErrorModalContent',
+                }),
+                maskClosable: true,
               });
             }
           }}
           onError={() => {
             Modal.error({
-              title: intl.formatMessage({id: 'dataset.regenerateSecretErrorModalTitle'}),
-              content: intl.formatMessage({id: 'dataset.regenerateSecretErrorModalContent'})
+              title: intl.formatMessage({
+                id: 'dataset.regenerateSecretErrorModalTitle',
+              }),
+              content: intl.formatMessage({
+                id: 'dataset.regenerateSecretErrorModalContent',
+              }),
+              maskClosable: true,
             });
           }}
         >
           {(mutate, { loading }) => (
-            <Button disabled={!allowRegenerateSecret || !checked}
+            <Button
+              disabled={!allowRegenerateSecret || !checked}
               onClick={mutate}
               loading={loading}
               style={{ marginLeft: 24 }}

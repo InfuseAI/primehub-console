@@ -228,7 +228,7 @@ function _Datasets({
       render: text => {
         if (text) {
           return (
-            <a href={text} target='_blank'>
+            <a href={text} target='_blank' rel='noreferrer'>
               Link
             </a>
           );
@@ -259,6 +259,7 @@ function _Datasets({
                 onClick={() => {
                   Modal.confirm({
                     title: 'Delete Dataset',
+                    maskClosable: true,
                     content: (
                       <>
                         Are you sure to delete{' '}

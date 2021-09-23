@@ -59,6 +59,7 @@ function List(props: Props) {
           Do you really want to delete user: "<b>{username}</b>"?
         </span>
       ),
+      maskClosable: true,
       iconType: 'info-circle',
       okText: 'Yes',
       okType: 'danger',

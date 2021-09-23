@@ -181,6 +181,7 @@ export function _InstanceTypes({
                       </>
                     ),
                     okText: 'Yes',
+                    maskClosable: true,
                     onOk: async () => {
                       try {
                         await deleteInstanceTypeMutation({

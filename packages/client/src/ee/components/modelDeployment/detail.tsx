@@ -75,10 +75,10 @@ export default function Detail({ phDeployment, ...props }: Props) {
 
     props
       .deletePhDeploymentClient({ variables: { where } })
-      .then((result) => {
+      .then(result => {
         console.log(result);
       })
-      .catch((err) => {
+      .catch(err => {
         console.error(err);
       });
   }
@@ -91,7 +91,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
 
     props
       .createPhDeploymentClient({ variables: { data } })
-      .then((result) => {
+      .then(result => {
         const { data } = result;
         const { name, plainTextToken } = data.createPhDeploymentClient;
 
@@ -100,7 +100,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
           plainTextToken,
         });
       })
-      .catch((err) => {
+      .catch(err => {
         console.error(err);
       });
   }
@@ -112,6 +112,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
       icon: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
+      maskClosable: true,
       onOk() {
         return props.deployPhDeployment({
           variables: { where: { id: phDeployment.id } },
@@ -132,6 +133,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
       okText: 'Yes',
       okType: 'danger',
       cancelText: 'No',
+      maskClosable: true,
       onOk() {
         return props.stopPhDeployment({
           variables: { where: { id: phDeployment.id } },
@@ -174,7 +176,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
         <div style={{ marginBottom: 16, textAlign: 'right' }}>
           <InfuseButton
             onClick={() => {
-              setDeleteModal((prevState) => ({
+              setDeleteModal(prevState => ({
                 ...prevState,
                 visible: true,
               }));
@@ -199,7 +201,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
             </InfuseButton>
           }
           <Modal
-            title="Permanently delete deployment?"
+            title='Permanently delete deployment?'
             visible={deleteModal.visible}
             okButtonProps={{
               // @ts-ignore
@@ -207,36 +209,36 @@ export default function Detail({ phDeployment, ...props }: Props) {
               ghost: true,
               disabled: !deleteModal.deleteable,
             }}
-            okText="Delete"
+            okText='Delete'
             onOk={() => {
               props.deletePhDeployment({
                 variables: { where: { id: phDeployment.id } },
               });
             }}
             onCancel={() => {
-              setDeleteModal((prevState) => ({
+              setDeleteModal(prevState => ({
                 ...prevState,
                 visible: false,
               }));
             }}
           >
-            <label htmlFor="delete-deployment">
+            <label htmlFor='delete-deployment'>
               Are you sure you want to <b>permanently</b> delete this
               deployment? It will also be deleted from any other collaborators
-              in the group. <br /> Please type <b>{phDeployment.name}</b> to confirm
-              this action.
+              in the group. <br /> Please type <b>{phDeployment.name}</b> to
+              confirm this action.
             </label>
             <Input
-              id="delete-deployment"
+              id='delete-deployment'
               style={{ marginTop: '1rem' }}
-              onChange={(event) => {
+              onChange={event => {
                 if (event.currentTarget.value === phDeployment?.name) {
-                  setDeleteModal((prevState) => ({
+                  setDeleteModal(prevState => ({
                     ...prevState,
                     deleteable: true,
                   }));
                 } else {
-                  setDeleteModal((prevState) => ({
+                  setDeleteModal(prevState => ({
                     ...prevState,
                     deleteable: false,
                   }));
@@ -245,27 +247,27 @@ export default function Detail({ phDeployment, ...props }: Props) {
             />
           </Modal>
         </div>
-        <Tabs defaultActiveKey="information">
-          <Tabs.TabPane key="information" tab="Information">
+        <Tabs defaultActiveKey='information'>
+          <Tabs.TabPane key='information' tab='Information'>
             <div style={{ padding: '16px 36px' }}>
               <Row gutter={36}>
                 <Col span={24}>
                   <Field
                     labelCol={4}
                     valueCol={20}
-                    label="Status"
+                    label='Status'
                     value={<strong>{phDeployment.status}</strong>}
                   />
                   <Field
                     labelCol={4}
                     valueCol={20}
-                    label="Message"
+                    label='Message'
                     value={getMessage(phDeployment)}
                   />
                   <Field
                     labelCol={4}
                     valueCol={20}
-                    label="Endpoint"
+                    label='Endpoint'
                     value={
                       phDeployment.status === Status.Deployed
                         ? phDeployment.endpoint
@@ -275,13 +277,13 @@ export default function Detail({ phDeployment, ...props }: Props) {
                   <Field
                     labelCol={4}
                     valueCol={20}
-                    label="Creation Time"
+                    label='Creation Time'
                     value={renderTime(phDeployment.creationTime)}
                   />
                   <Field
                     labelCol={4}
                     valueCol={20}
-                    label="Last Updated"
+                    label='Last Updated'
                     value={renderTime(phDeployment.lastUpdatedTime)}
                   />
                 </Col>
@@ -290,7 +292,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
               <Row gutter={36}>
                 <Col span={12}>
                   <Field
-                    label="Model Image"
+                    label='Model Image'
                     value={
                       phDeployment.status !== Status.Stopped
                         ? phDeployment.modelImage
@@ -298,7 +300,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
                     }
                   />
                   <Field
-                    label="Image Pull Secret"
+                    label='Image Pull Secret'
                     value={
                       phDeployment.imagePullSecret
                         ? phDeployment.imagePullSecret
@@ -306,7 +308,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
                     }
                   />
                   <Field
-                    label="Model URI"
+                    label='Model URI'
                     value={
                       phDeployment.status !== Status.Stopped &&
                       phDeployment.modelURI
@@ -315,7 +317,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
                     }
                   />
                   <Field
-                    label="Description"
+                    label='Description'
                     value={
                       <div style={{ whiteSpace: 'pre-line' }}>
                         {phDeployment.description || '-'}
@@ -323,7 +325,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
                     }
                   />
                   <Field
-                    label="Instance Type"
+                    label='Instance Type'
                     value={
                       phDeployment.status !== Status.Stopped
                         ? renderInstanceType(phDeployment.instanceType || {})
@@ -331,13 +333,13 @@ export default function Detail({ phDeployment, ...props }: Props) {
                     }
                   />
                   <Field
-                    label="Replicas"
+                    label='Replicas'
                     value={`${phDeployment.availableReplicas || 0}/${
                       phDeployment.replicas
                     }`}
                   />
                   <Field
-                    label="Access Type"
+                    label='Access Type'
                     value={
                       phDeployment.endpointAccessType === 'private'
                         ? 'private'
@@ -347,28 +349,26 @@ export default function Detail({ phDeployment, ...props }: Props) {
                 </Col>
                 <Col span={12}>
                   <Field
-                    type="vertical"
-                    label="Metadata"
+                    type='vertical'
+                    label='Metadata'
                     value={<Metadata metadata={phDeployment.metadata} />}
                   />
                   <Field
-                    type="vertical"
+                    type='vertical'
                     label={
                       <div>
                         Environment Variables{' '}
                         <span
-                          onClick={() =>
-                            setToggleEnvVisible((status) => !status)
-                          }
+                          onClick={() => setToggleEnvVisible(status => !status)}
                           style={{
                             cursor: 'pointer',
                             verticalAlign: '-0.05em',
                           }}
                         >
                           {toggleEnvVisible ? (
-                            <Icon type="eye" title="Hide value" />
+                            <Icon type='eye' title='Hide value' />
                           ) : (
-                            <Icon type="eye-invisible" title="Show value" />
+                            <Icon type='eye-invisible' title='Show value' />
                           )}
                         </span>
                       </div>
@@ -384,14 +384,14 @@ export default function Detail({ phDeployment, ...props }: Props) {
               </Row>
               <Field
                 style={{ marginTop: 32 }}
-                type="vertical"
+                type='vertical'
                 label={
                   <span>
                     Run an Example{' '}
                     <PHTooltip
-                      tipText="Using Curl query sample to test the service; the sample varies according to Public or Private access."
-                      tipLink="https://docs.primehub.io/docs/model-deployment-feature#information"
-                      placement="right"
+                      tipText='Using Curl query sample to test the service; the sample varies according to Public or Private access.'
+                      tipLink='https://docs.primehub.io/docs/model-deployment-feature#information'
+                      placement='right'
                       style={{ margintLeft: 8 }}
                     />
                   </span>
@@ -399,9 +399,9 @@ export default function Detail({ phDeployment, ...props }: Props) {
                 value={
                   <>
                     <Button
-                      icon="copy"
+                      icon='copy'
                       ghost={true}
-                      size="small"
+                      size='small'
                       style={{
                         float: 'right',
                         top: 35,
@@ -430,7 +430,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
               />
             </div>
           </Tabs.TabPane>
-          <Tabs.TabPane key="logs" tab="Logs">
+          <Tabs.TabPane key='logs' tab='Logs'>
             <ModelDeploymentLogs
               refetchPhDeployment={() =>
                 props.refetchPhDeployment({ where: { id: phDeployment.id } })
@@ -438,11 +438,11 @@ export default function Detail({ phDeployment, ...props }: Props) {
               pods={phDeployment.pods}
             />
           </Tabs.TabPane>
-          <Tabs.TabPane key="history" tab="History">
+          <Tabs.TabPane key='history' tab='History'>
             <ModelDeploymentHistory history={phDeployment.history} />
           </Tabs.TabPane>
           {phDeployment.endpointAccessType === 'private' && (
-            <Tabs.TabPane key="clients" tab="Clients">
+            <Tabs.TabPane key='clients' tab='Clients'>
               <ModelDeploymentClients
                 clients={phDeployment.endpointClients || []}
                 addClient={handleAddClient}
@@ -474,7 +474,7 @@ function getMessage(deployment: DeploymentInfo) {
   }
 }
 
-const dashOrNumber = (value) => (value === null ? '-' : value);
+const dashOrNumber = value => (value === null ? '-' : value);
 const getExampleCURL = ({ endpointAccessType, endpoint }: DeploymentInfo) => {
   return (
     `curl -X POST \\\n` +
