@@ -1,11 +1,10 @@
-import KcAdminClient from "keycloak-admin";
-import { createConfig } from "../config";
-import { ApolloError } from "apollo-server";
-import { Attributes, FieldType } from "./attr";
-import { v4 as uuidv4 } from "uuid";
-import moment from "moment";
-import * as user from "./user";
-import { platform } from "os";
+import KcAdminClient from 'keycloak-admin';
+import { createConfig } from '../config';
+import { ApolloError } from 'apollo-server';
+import { Attributes, FieldType } from './attr';
+import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment';
+import * as user from './user';
 
 const config = createConfig();
 
@@ -21,10 +20,10 @@ export const queryInvitation = async (root, args, context) => {
   const invitationToken = args.data.invitationToken;
   const invitationKey: string = `invitation-${invitationToken}`;
 
-  const roleName = "invitation";
+  const roleName = 'invitation';
   const role = await kcAdminClient.roles.findOneByName({ name: roleName });
   if (!role) {
-    throw new ApolloError("INVALID_TOKEN");
+    throw new ApolloError('INVALID_TOKEN');
   }
 
   const { attributes } = role;
@@ -33,18 +32,18 @@ export const queryInvitation = async (root, args, context) => {
 
   // token doesn;t exist
   if (!attributes[invitationKey]) {
-    throw new ApolloError("INVALID_TOKEN");
+    throw new ApolloError('INVALID_TOKEN');
   }
 
   try {
     payload = JSON.parse(attributes[invitationKey][0]);
   } catch (error) {
     console.error(error);
-    throw new ApolloError("INVALID_TOKEN");
+    throw new ApolloError('INVALID_TOKEN');
   }
 
   if (moment().isAfter(moment(payload.expiredDate))) {
-    throw new ApolloError("EXPIRED_TOKEN");
+    throw new ApolloError('EXPIRED_TOKEN');
   }
 
   payload.validation = true;
@@ -64,7 +63,7 @@ export const createUserFromInvitation = async (root, args, context) => {
   }
 
   // create the user and set a temporary password
-  const password = uuidv4().split("-")[0];
+  const password = uuidv4().split('-')[0];
   try {
     const userData = await createUser(username, payload, root, context);
     const resetPasswordInput = {
@@ -75,7 +74,7 @@ export const createUserFromInvitation = async (root, args, context) => {
 
     await user.resetPassword(root, resetPasswordInput, context);
   } catch (error) {
-    throw new ApolloError("BAD_USERNAME");
+    throw new ApolloError('BAD_USERNAME');
   }
 
   // remove the invitation
@@ -92,7 +91,7 @@ export const createInvitation = async (root, args, context) => {
   await checkGroup(kcAdminClient, groupId);
 
   const invitationToken = uuidv4();
-  const expiredDate = moment.utc().add(1, "day").toISOString();
+  const expiredDate = moment.utc().add(1, 'day').toISOString();
   await updateInvitations(kcAdminClient, invitationToken, {
     groupId,
     invitationToken,
@@ -116,7 +115,7 @@ const updateInvitations = async (
   invitationToken: string,
   content: InvitationProps
 ) => {
-  const roleName = "invitation";
+  const roleName = 'invitation';
   let role = await kcAdminClient.roles.findOneByName({ name: roleName });
   if (!role) {
     await kcAdminClient.roles.create({ name: roleName });
@@ -149,7 +148,7 @@ const updateInvitations = async (
   );
 
   role = await kcAdminClient.roles.findOneByName({ name: roleName });
-  console.log("updateInvitations => ", role);
+  console.log('updateInvitations => ', role);
 };
 
 async function createUser(
@@ -161,7 +160,7 @@ async function createUser(
   const userCreateInput = {
     data: {
       username,
-      email: "",
+      email: '',
       sendEmail: false,
       groups: {
         connect: [{ id: payload.groupId }],
@@ -173,7 +172,7 @@ async function createUser(
 
 async function checkGroup(kcAdminClient: KcAdminClient, groupId: any) {
   const groups = await kcAdminClient.groups.find();
-  const selectedGroup = groups.filter((g) => g.id === groupId);
+  const selectedGroup = groups.filter(g => g.id === groupId);
   if (selectedGroup.length === 0) {
     throw new ApolloError(`invalid groupId: ${groupId}`);
   }

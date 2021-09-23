@@ -163,7 +163,7 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
   });
 
   // invite link
-  new InvitationCtrl({config}).mount(staticPath, rootRouter)
+  new InvitationCtrl({config}).mount(staticPath, rootRouter);
 
   // Admin Portal
   rootRouter.get('/admin', oidcCtrl.ensureAdmin, async ctx => {

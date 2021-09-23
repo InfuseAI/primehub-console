@@ -284,7 +284,7 @@ export class ProxyCtrl {
   private handleFiles = async (ctx: Koa.ParameterizedContext, next: any) => {
     const target = this.apiTarget;
     const urlRewrite = path => {
-      if(this.config.appPrefix) {
+      if (this.config.appPrefix) {
         path = path.slice(this.config.appPrefix.length);
         path = this.apiPrefix + path;
       }

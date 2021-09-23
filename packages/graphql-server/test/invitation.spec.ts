@@ -1,15 +1,15 @@
 // tslint:disable:no-unused-expression
-import chai from "chai";
-import chaiHttp = require("chai-http");
-import faker from "faker";
-import KeycloakAdminClient from "keycloak-admin";
+import chai from 'chai';
+import chaiHttp = require('chai-http');
+import faker from 'faker';
+import KeycloakAdminClient from 'keycloak-admin';
 
 chai.use(chaiHttp);
 
 const expect = chai.expect;
 
 // interface
-declare module "mocha" {
+declare module 'mocha' {
   // tslint:disable-next-line:interface-name
   interface ISuiteCallbackContext {
     graphqlRequest?: (query: string, variables?: any) => Promise<any>;
@@ -18,7 +18,7 @@ declare module "mocha" {
   }
 }
 
-describe("invitation graphql", function () {
+describe('invitation graphql', function() {
   before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;
@@ -26,7 +26,7 @@ describe("invitation graphql", function () {
     this.groupData = (await createGroup(this.graphqlRequest)).createGroup;
   });
 
-  it("generate invitation and create user from the invitation", async () => {
+  it('generate invitation and create user from the invitation', async () => {
     // generate invitation
     const variables = {
       data: { groupId: this.groupData.id },
@@ -48,7 +48,7 @@ describe("invitation graphql", function () {
     const applyInvitationVars = {
       data: {
         invitationToken: data.createInvitation.invitationToken,
-        username: username,
+        username,
       },
     };
 
@@ -79,7 +79,7 @@ describe("invitation graphql", function () {
     console.log(usersData);
 
     const createdUser = usersData.users.filter(
-      (t) => t.username == appliedData.createUserFromInvitation.username
+      t => t.username === appliedData.createUserFromInvitation.username
     );
     expect(createdUser.length).to.be.equal(1);
 
@@ -101,7 +101,7 @@ describe("invitation graphql", function () {
       queryStatusVar
     );
 
-    expect("INVALID_TOKEN").to.be.equals(invitationTokenStatus[0].message);
+    expect('INVALID_TOKEN').to.be.equals(invitationTokenStatus[0].message);
   });
 
   async function createGroup(graphqlRequest) {
