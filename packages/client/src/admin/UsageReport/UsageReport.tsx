@@ -22,11 +22,11 @@ function useReportDownload() {
           Authorization: `Bearer ${token}`,
         },
       })
-        .then((res) => {
+        .then(res => {
           setLoading(false);
           return res.blob();
         })
-        .then((blob) => {
+        .then(blob => {
           const url = window.URL.createObjectURL(new Blob([blob]));
           const link = document.createElement('a');
 
@@ -103,10 +103,10 @@ function UsageReport({ usageReportQuery }: Props) {
           return (
             <>
               {report.node.id}
-              <Tooltip title="This report only includes usage up until today, as this month is not over yet.">
+              <Tooltip title='This report only includes usage up until today, as this month is not over yet.'>
                 <Icon
-                  type="info-circle"
-                  theme="filled"
+                  type='info-circle'
+                  theme='filled'
                   style={{ marginLeft: 8 }}
                 />
               </Tooltip>
@@ -123,17 +123,19 @@ function UsageReport({ usageReportQuery }: Props) {
       align: 'center',
       render: function DownloadDetailReport(report: UsageReportNode) {
         return (
-          <Button
-            icon="vertical-align-bottom"
-            onClick={() => {
-              const id = report.node.id.replace('/', '_');
+          <Tooltip placement='bottom' title='Download'>
+            <Button
+              icon='vertical-align-bottom'
+              onClick={() => {
+                const id = report.node.id.replace('/', '_');
 
-              downloadReport({
-                URL: report.node.detailedUrl,
-                fileName: `PrimeHub_Usage_Detalied_${id}.csv`,
-              });
-            }}
-          />
+                downloadReport({
+                  URL: report.node.detailedUrl,
+                  fileName: `PrimeHub_Usage_Detalied_${id}.csv`,
+                });
+              }}
+            />
+          </Tooltip>
         );
       },
     },
@@ -143,17 +145,19 @@ function UsageReport({ usageReportQuery }: Props) {
       align: 'center',
       render: function DownloadSummarylReport(report: UsageReportNode) {
         return (
-          <Button
-            icon="vertical-align-bottom"
-            onClick={() => {
-              const id = report.node.id.replace('/', '_');
+          <Tooltip placement='bottom' title='Download'>
+            <Button
+              icon='vertical-align-bottom'
+              onClick={() => {
+                const id = report.node.id.replace('/', '_');
 
-              downloadSummary({
-                URL: report.node.summaryUrl,
-                fileName: `PrimeHub_Usage_Summary_${id}.csv`,
-              });
-            }}
-          />
+                downloadSummary({
+                  URL: report.node.summaryUrl,
+                  fileName: `PrimeHub_Usage_Summary_${id}.csv`,
+                });
+              }}
+            />
+          </Tooltip>
         );
       },
     },
@@ -210,13 +214,13 @@ function UsageReport({ usageReportQuery }: Props) {
         </Button>
         <Input.Search
           enterButton
-          data-testid="search-input"
-          placeholder="e.g. 2021/01"
+          data-testid='search-input'
+          placeholder='e.g. 2021/01'
           style={{ width: '160px' }}
           disabled={usageReportQuery.loading}
           value={date}
-          onChange={(event) => setDate(event.currentTarget.value)}
-          onSearch={(value) => {
+          onChange={event => setDate(event.currentTarget.value)}
+          onSearch={value => {
             setDate(value);
 
             try {
@@ -234,7 +238,7 @@ function UsageReport({ usageReportQuery }: Props) {
       </div>
 
       <Table
-        rowKey={(data) => data.node.id}
+        rowKey={data => data.node.id}
         style={{ paddingTop: 8 }}
         columns={columns}
         dataSource={usageReportQuery?.usageReport?.edges}
@@ -245,7 +249,7 @@ function UsageReport({ usageReportQuery }: Props) {
           current: usageReportQuery?.usageReport?.pageInfo.currentPage,
           total: usageReportQuery?.usageReport?.pageInfo.totalPage * 10,
 
-          onChange: (page) => {
+          onChange: page => {
             usageReportQuery?.fetchMore({
               variables: {
                 usageReportPage: page,

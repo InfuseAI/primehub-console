@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Table, Input, Modal, Icon, notification } from 'antd';
+import { Button, Table, Input, Modal, Icon, Tooltip, notification } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -132,50 +132,54 @@ function _ImageList({ data, ...props }: ImageListProps) {
       render: function RenderActions(image: ImageNode) {
         return (
           <Button.Group>
-            <Button
-              data-testid='edit-button'
-              icon='edit'
-              onClick={() => {
-                history.push(`${appPrefix}admin/image/${image.node.id}`);
-              }}
-            />
-            <Button
-              data-testid='delete-button'
-              icon='delete'
-              onClick={() => {
-                Modal.confirm({
-                  title: 'Delete Image',
-                  content: (
-                    <>
-                      Are you sure to delete <strong>{image.node.id}</strong>?
-                    </>
-                  ),
-                  okText: 'Yes',
-                  onOk: async () => {
-                    try {
-                      await props.deleteImageMutation({
-                        variables: {
-                          where: {
-                            id: image.node.id,
+            <Tooltip placement='bottom' title='Edit'>
+              <Button
+                data-testid='edit-button'
+                icon='edit'
+                onClick={() => {
+                  history.push(`${appPrefix}admin/image/${image.node.id}`);
+                }}
+              />
+            </Tooltip>
+            <Tooltip placement='bottom' title='Delete'>
+              <Button
+                data-testid='delete-button'
+                icon='delete'
+                onClick={() => {
+                  Modal.confirm({
+                    title: 'Delete Image',
+                    content: (
+                      <>
+                        Are you sure to delete <strong>{image.node.id}</strong>?
+                      </>
+                    ),
+                    okText: 'Yes',
+                    onOk: async () => {
+                      try {
+                        await props.deleteImageMutation({
+                          variables: {
+                            where: {
+                              id: image.node.id,
+                            },
                           },
-                        },
-                      });
-                      await data.refetch();
+                        });
+                        await data.refetch();
 
-                      notification.success({
-                        duration: 5,
-                        placement: 'bottomRight',
-                        message: 'Successfully!',
-                        description: `${image.node.displayName} has been deleted!`,
-                      });
-                    } catch (err) {
-                      console.error(err);
-                      errorHandler(err);
-                    }
-                  },
-                });
-              }}
-            />
+                        notification.success({
+                          duration: 5,
+                          placement: 'bottomRight',
+                          message: 'Successfully!',
+                          description: `${image.node.displayName} has been deleted!`,
+                        });
+                      } catch (err) {
+                        console.error(err);
+                        errorHandler(err);
+                      }
+                    },
+                  });
+                }}
+              />
+            </Tooltip>
           </Button.Group>
         );
       },

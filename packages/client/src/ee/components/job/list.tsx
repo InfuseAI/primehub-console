@@ -1,15 +1,14 @@
 import * as React from 'react';
-import {Button, Tooltip, Table as AntTable, Icon, Modal} from 'antd';
-import {RouteComponentProps} from 'react-router';
-import {Link, withRouter} from 'react-router-dom';
-import {startCase, get} from 'lodash';
+import { Button, Tooltip, Table as AntTable, Icon, Modal } from 'antd';
+import { RouteComponentProps } from 'react-router';
+import { Link, withRouter } from 'react-router-dom';
+import { startCase, get } from 'lodash';
 import styled from 'styled-components';
 import Filter from '../shared/filter';
 import moment from 'moment';
-import {Group} from '../shared/groupFilter';
-import {computeDuration} from './detail';
+import { Group } from '../shared/groupFilter';
+import { computeDuration } from './detail';
 import { Phase, getActionByPhase } from './phase';
-import {appPrefix} from 'utils/env';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
@@ -23,11 +22,11 @@ const breadcrumbs = [
     title: 'Jobs',
     link: '/job?page=1',
     tips: 'Users can submit time-consuming tasks as jobs here.',
-    tipsLink: 'https://docs.primehub.io/docs/job-submission-feature'
-  }
+    tipsLink: 'https://docs.primehub.io/docs/job-submission-feature',
+  },
 ];
 
-const {confirm} = Modal;
+const { confirm } = Modal;
 const Table = styled(AntTable as any)`
   background: white;
   .ant-pagination.ant-table-pagination {
@@ -36,36 +35,32 @@ const Table = styled(AntTable as any)`
 `;
 
 const renderJobName = (text, record) => (
-  <Tooltip
-    placement="top"
-    title={`Job ID: ${record.id}`}
-  >
-    <Link to={{
-      state: {
-        prevPathname: location.pathname,
-        prevSearch: location.search,
-      },
-      pathname: `job/${record.id}`
-    }} >
+  <Tooltip placement='top' title={`Job ID: ${record.id}`}>
+    <Link
+      to={{
+        state: {
+          prevPathname: location.pathname,
+          prevSearch: location.search,
+        },
+        pathname: `job/${record.id}`,
+      }}
+    >
       {text}
     </Link>
   </Tooltip>
 );
 
-const renderSchedule = text => text ? (
-  <Link to={`schedule/${text}`}>
-    {text}
-  </Link>
-) : '-'
+const renderSchedule = text =>
+  text ? <Link to={`schedule/${text}`}>{text}</Link> : '-';
 
 const renderTimeIfValid = time => {
   if (!time) {
-    return '-'
+    return '-';
   }
 
   const momentTime = moment(time);
   return momentTime.isValid() ? momentTime.format('YYYY-MM-DD HH:mm:ss') : '-';
-}
+};
 
 const getCreateTimeAndFinishTime = (startTime, finishTime, phase: Phase) => {
   switch (phase) {
@@ -73,60 +68,71 @@ const getCreateTimeAndFinishTime = (startTime, finishTime, phase: Phase) => {
     case Phase.Preparing:
       return {
         startTime: '-',
-        finishTime: '-'
+        finishTime: '-',
       };
 
     case Phase.Running:
       return {
         startTime: renderTimeIfValid(startTime),
-        finishTime: '-'
+        finishTime: '-',
       };
 
     default:
       return {
         startTime: renderTimeIfValid(startTime),
-        finishTime: renderTimeIfValid(finishTime)
+        finishTime: renderTimeIfValid(finishTime),
       };
   }
-}
+};
 
 const renderTiming = (_, record) => {
   const createTime = record.createTime;
   const startTime = record.startTime;
   const finishTime = record.finishTime;
-  const duration = computeDuration(moment(startTime), moment(finishTime || new Date().toISOString()));
-  const {startTime: startTimeText, finishTime: finishTimeText} = getCreateTimeAndFinishTime(startTime, finishTime, record.phase);
+  const duration = computeDuration(
+    moment(startTime),
+    moment(finishTime || new Date().toISOString())
+  );
+  const { startTime: startTimeText, finishTime: finishTimeText } =
+    getCreateTimeAndFinishTime(startTime, finishTime, record.phase);
   return (
     <>
       <Tooltip
-        overlayStyle={{maxWidth: 300}}
-        placement="top"
-        title={`Creation time: ${moment(createTime).format('YYYY-MM-DD HH:mm:ss')}`}
+        overlayStyle={{ maxWidth: 300 }}
+        placement='top'
+        title={`Creation time: ${moment(createTime).format(
+          'YYYY-MM-DD HH:mm:ss'
+        )}`}
       >
         {createTime ? moment(createTime).fromNow() : '-'}
-        <br/>
+        <br />
       </Tooltip>
       <Tooltip
-        overlayStyle={{maxWidth: 300}}
-        placement="top"
+        overlayStyle={{ maxWidth: 300 }}
+        placement='top'
         title={
           <>
             Start time: {startTimeText}
-            <br/>
+            <br />
             Finished time: {finishTimeText}
           </>
         }
       >
         {startTime ? (
           <div>
-            <Icon type="clock-circle" style={{marginRight: 4, position: 'relative', top: 1}} />
+            <Icon
+              type='clock-circle'
+              style={{ marginRight: 4, position: 'relative', top: 1 }}
+            />
             {duration}
           </div>
-        ): '-'}
+        ) : (
+          '-'
+        )}
       </Tooltip>
     </>
   );
-}
+};
 
 type JobsConnection = {
   pageInfo: {
@@ -134,35 +140,36 @@ type JobsConnection = {
     hasPreviousPage: boolean;
     startCursor: string;
     endCursor: string;
-  },
+  };
   edges: Array<{
     cursor: string;
-    node: any
-  }>
-}
-
-type Props = RouteComponentProps & GroupContextComponentProps & {
-  groups: Array<Group>;
-  jobsLoading: boolean;
-  jobsError: any;
-  jobsConnection: JobsConnection;
-  jobsVariables: any;
-  jobsRefetch: Function;
-  rerunPhJob: Function;
-  cancelPhJob: Function;
-  rerunPhJobResult: any;
-  cancelPhJobResult: any;
+    node: any;
+  }>;
 };
+
+type Props = RouteComponentProps &
+  GroupContextComponentProps & {
+    groups: Array<Group>;
+    jobsLoading: boolean;
+    jobsError: any;
+    jobsConnection: JobsConnection;
+    jobsVariables: any;
+    jobsRefetch: Function;
+    rerunPhJob: Function;
+    cancelPhJob: Function;
+    rerunPhJobResult: any;
+    cancelPhJobResult: any;
+  };
 
 class JobList extends React.Component<Props> {
   state = {
-    currentId: null
+    currentId: null,
   };
 
   handleCancel = (id: string) => {
-    const {jobsConnection, cancelPhJob} = this.props;
+    const { jobsConnection, cancelPhJob } = this.props;
     const job = jobsConnection.edges.find(edge => edge.node.id === id).node;
-    this.setState({currentId: id});
+    this.setState({ currentId: id });
     confirm({
       title: `Cancel`,
       content: `Do you want to cancel '${job.displayName || job.name}'?`,
@@ -170,18 +177,18 @@ class JobList extends React.Component<Props> {
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
-        return cancelPhJob({variables: {where: {id}}});
+        return cancelPhJob({ variables: { where: { id } } });
       },
       onCancel() {
         console.log('Cancel');
       },
     });
-  }
+  };
 
   handleRerun = (id: string) => {
-    const {jobsConnection, rerunPhJob} = this.props;
+    const { jobsConnection, rerunPhJob } = this.props;
     const job = jobsConnection.edges.find(edge => edge.node.id === id).node;
-    this.setState({currentId: id});
+    this.setState({ currentId: id });
     confirm({
       title: `Rerun`,
       content: `Do you want to rerun '${job.displayName || job.name}'?`,
@@ -189,42 +196,42 @@ class JobList extends React.Component<Props> {
       okText: 'Yes',
       cancelText: 'No',
       onOk() {
-        return rerunPhJob({variables: {where: {id}}});
+        return rerunPhJob({ variables: { where: { id } } });
       },
       onCancel() {
         console.log('Cancel');
       },
     });
-  }
+  };
 
   createPhJob = () => {
-    const {history} = this.props;
+    const { history } = this.props;
     history.push(`job/create`);
-  }
+  };
 
   refresh = () => {
-    const {groupContext, jobsVariables, jobsRefetch} = this.props;
+    const { groupContext, jobsVariables, jobsRefetch } = this.props;
     const newVariables = {
       ...jobsVariables,
       page: 1,
     };
     jobsRefetch(newVariables);
-  }
+  };
 
   changeFilter = ({
     selectedGroups,
-    submittedByMe
+    submittedByMe,
   }: {
     selectedGroups: Array<string>;
     submittedByMe: boolean;
   }) => {
-    const {groupContext, jobsVariables, jobsRefetch} = this.props;
+    const { groupContext, jobsVariables, jobsRefetch } = this.props;
     const newVariables = {
       ...jobsVariables,
       where: {
         ...jobsVariables.where,
         mine: submittedByMe,
-      }
+      },
     };
 
     if (!groupContext) {
@@ -232,123 +239,166 @@ class JobList extends React.Component<Props> {
     }
 
     jobsRefetch(newVariables);
-  }
+  };
 
-  searchHandler = (queryString) => {
-    const {groupContext, jobsVariables, jobsRefetch} = this.props;
-    let newVariables = jobsVariables
+  searchHandler = queryString => {
+    const { groupContext, jobsVariables, jobsRefetch } = this.props;
+    let newVariables = jobsVariables;
     if (queryString && queryString.length > 0) {
       newVariables = {
         ...jobsVariables,
         where: {
           ...jobsVariables.where,
-          displayName_contains: queryString
-        }
-      }
+          displayName_contains: queryString,
+        },
+      };
     }
     jobsRefetch(newVariables);
-  }
-
+  };
 
   handleTableChange = (pagination, _filters, sorter) => {
-    const {jobsVariables, jobsRefetch} = this.props;
-    const orderBy: any = {}
+    const { jobsVariables, jobsRefetch } = this.props;
+    const orderBy: any = {};
     if (sorter.field) {
-      orderBy[sorter.field] = get(sorter, 'order') === 'ascend' ? 'asc' : 'desc'
+      orderBy[sorter.field] =
+        get(sorter, 'order') === 'ascend' ? 'asc' : 'desc';
     }
     jobsRefetch({
       ...jobsVariables,
       page: pagination.current,
-      orderBy
+      orderBy,
     });
-  }
+  };
 
-  cloneJob = (record) => {
-    const {groupContext, history} = this.props;
-    let data: any = {
+  cloneJob = record => {
+    const { groupContext, history } = this.props;
+    const data: any = {
       displayName: record.displayName,
       groupId: !groupContext ? record.groupId : groupContext.id,
       groupName: !groupContext ? record.groupName : groupContext.name,
       instanceTypeId: get(record, 'instanceType.id'),
-      instanceTypeName: get(record, 'instanceType.displayName') || get(record, 'instanceType.name'),
+      instanceTypeName:
+        get(record, 'instanceType.displayName') ||
+        get(record, 'instanceType.name'),
       image: record.image,
       command: record.command,
-    }
-    history.push(`job/create?defaultValue=${encodeURIComponent(JSON.stringify(data))}`)
-  }
+    };
+    history.push(
+      `job/create?defaultValue=${encodeURIComponent(JSON.stringify(data))}`
+    );
+  };
 
   render() {
-    const {groupContext, groups, jobsConnection, jobsLoading, jobsVariables, cancelPhJobResult, rerunPhJobResult} = this.props;
-    const {currentId} = this.state;
+    const {
+      groupContext,
+      groups,
+      jobsConnection,
+      jobsLoading,
+      jobsVariables,
+      cancelPhJobResult,
+      rerunPhJobResult,
+    } = this.props;
+    const { currentId } = this.state;
     const renderAction = (phase: Phase, record) => {
       const action = getActionByPhase(phase);
       const id = record.id;
-      const loading = cancelPhJobResult.loading && rerunPhJobResult.loading && id === currentId;
+      const loading =
+        cancelPhJobResult.loading &&
+        rerunPhJobResult.loading &&
+        id === currentId;
       return (
         <Button.Group>
-          {
-            action.toLowerCase() === 'cancel' ? (
-              <Button onClick={() => this.handleCancel(id)} loading={loading}>
-                {action}
-              </Button>
-            ) : [
-              <Button key="re-run" onClick={() => this.handleRerun(id)} loading={loading}>
-                {action}
-              </Button>,
-              <Button key="clone-job" onClick={() => this.cloneJob(record)}>Clone</Button>
+          {action.toLowerCase() === 'cancel' ? (
+            <Tooltip placement='bottom' title='Cancel'>
+              <Button
+                icon='close-circle'
+                onClick={() => this.handleCancel(id)}
+                loading={loading}
+              />
+            </Tooltip>
+          ) : (
+            [
+              <Tooltip key='re-run' placement='bottom' title='Re-run'>
+                <Button
+                  key='re-run'
+                  icon='caret-right'
+                  onClick={() => this.handleRerun(id)}
+                  loading={loading}
+                />
+              </Tooltip>,
+              <Tooltip key='clone' placement='bottom' title='Clone'>
+                <Button
+                  key='clone-job'
+                  icon='copy'
+                  onClick={() => this.cloneJob(record)}
+                />
+              </Tooltip>,
             ]
-          }
+          )}
         </Button.Group>
-      )
-    }
-    const columns = [{
-      title: 'Status',
-      dataIndex: 'phase',
-      key: 'phase',
-      sorter: true,
-      render: text => startCase(text)
-    }, {
-      title: 'Job name',
-      dataIndex: 'displayName',
-      sorter: true,
-      render: renderJobName
-    }, {
-      title: 'Schedule',
-      dataIndex: 'schedule',
-      sorter: true,
-      render: renderSchedule,
-    }, {
-      title: 'User',
-      sorter: true,
-      dataIndex: 'userName'
-    }, {
-      title: 'Timing',
-      sorter: true,
-      key: 'timing',
-      dataIndex: 'createTime',
-      render: renderTiming
-    }, {
-      title: 'Action',
-      dataIndex: 'phase',
-      key: 'action',
-      render: renderAction,
-      width: 200
-    }]
+      );
+    };
+    const columns = [
+      {
+        title: 'Status',
+        dataIndex: 'phase',
+        key: 'phase',
+        sorter: true,
+        render: text => startCase(text),
+      },
+      {
+        title: 'Job name',
+        dataIndex: 'displayName',
+        sorter: true,
+        render: renderJobName,
+      },
+      {
+        title: 'Schedule',
+        dataIndex: 'schedule',
+        sorter: true,
+        render: renderSchedule,
+      },
+      {
+        title: 'User',
+        sorter: true,
+        dataIndex: 'userName',
+      },
+      {
+        title: 'Timing',
+        sorter: true,
+        key: 'timing',
+        dataIndex: 'createTime',
+        render: renderTiming,
+      },
+      {
+        title: 'Action',
+        dataIndex: 'phase',
+        key: 'action',
+        render: renderAction,
+        width: 200,
+      },
+    ];
 
     return (
       <>
         <PageTitle
           breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-          title={"Jobs"}
+          title={'Jobs'}
         />
         <PageBody>
-          <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'flex-end',
+            }}
+          >
             {/* @ts-ignore */}
             <InfuseButton
-              icon="plus"
+              icon='plus'
               onClick={this.createPhJob}
               style={{ marginRight: 16, width: 120 }}
-              type="primary"
+              type='primary'
             >
               New Job
             </InfuseButton>
@@ -360,7 +410,7 @@ class JobList extends React.Component<Props> {
             groups={groups}
             selectedGroups={get(jobsVariables, 'where.groupId_in', [])}
             submittedByMe={get(jobsVariables, 'where.mine', false)}
-            resourceKey="job"
+            resourceKey='job'
             searchHandler={this.searchHandler}
             onChange={this.changeFilter}
           />
@@ -368,7 +418,7 @@ class JobList extends React.Component<Props> {
             loading={jobsLoading}
             dataSource={jobsConnection.edges.map(edge => edge.node)}
             columns={columns}
-            rowKey="id"
+            rowKey='id'
             pagination={{
               current: get(jobsConnection, 'pageInfo.currentPage', 0),
               total: get(jobsConnection, 'pageInfo.totalPage', 0) * 10,
@@ -377,7 +427,7 @@ class JobList extends React.Component<Props> {
           />
         </PageBody>
       </>
-    )
+    );
   }
 }
 

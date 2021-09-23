@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Button, Table, Input, Modal, notification } from 'antd';
+import { Button, Table, Input, Modal, Tooltip, notification } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -156,52 +156,56 @@ export function _InstanceTypes({
       render: function RenderActions(instance: InstanceTypeNode) {
         return (
           <Button.Group>
-            <Button
-              data-testid='edit-button'
-              icon='edit'
-              onClick={() => {
-                history.push(
-                  `${appPrefix}admin/instanceType/${instance.node.id}`
-                );
-              }}
-            />
-            <Button
-              data-testid='delete-button'
-              icon='delete'
-              onClick={() => {
-                Modal.confirm({
-                  title: 'Delete Instance',
-                  content: (
-                    <>
-                      Are you sure to delete <strong>{instance.node.id}</strong>
-                      ?
-                    </>
-                  ),
-                  okText: 'Yes',
-                  onOk: async () => {
-                    try {
-                      await deleteInstanceTypeMutation({
-                        variables: {
-                          where: {
-                            id: instance.node.id,
+            <Tooltip placement='bottom' title='Edit'>
+              <Button
+                data-testid='edit-button'
+                icon='edit'
+                onClick={() => {
+                  history.push(
+                    `${appPrefix}admin/instanceType/${instance.node.id}`
+                  );
+                }}
+              />
+            </Tooltip>
+            <Tooltip placement='bottom' title='Delete'>
+              <Button
+                data-testid='delete-button'
+                icon='delete'
+                onClick={() => {
+                  Modal.confirm({
+                    title: 'Delete Instance',
+                    content: (
+                      <>
+                        Are you sure to delete{' '}
+                        <strong>{instance.node.id}</strong>?
+                      </>
+                    ),
+                    okText: 'Yes',
+                    onOk: async () => {
+                      try {
+                        await deleteInstanceTypeMutation({
+                          variables: {
+                            where: {
+                              id: instance.node.id,
+                            },
                           },
-                        },
-                      });
-                      await data.refetch();
+                        });
+                        await data.refetch();
 
-                      notification.success({
-                        duration: 5,
-                        placement: 'bottomRight',
-                        message: 'Delete successfully!',
-                      });
-                    } catch (err) {
-                      console.error(err);
-                      errorHandler(err);
-                    }
-                  },
-                });
-              }}
-            />
+                        notification.success({
+                          duration: 5,
+                          placement: 'bottomRight',
+                          message: 'Delete successfully!',
+                        });
+                      } catch (err) {
+                        console.error(err);
+                        errorHandler(err);
+                      }
+                    },
+                  });
+                }}
+              />
+            </Tooltip>
           </Button.Group>
         );
       },

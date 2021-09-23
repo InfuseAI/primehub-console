@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Button, Table, Modal, notification } from 'antd';
+import { Button, Table, Modal, Tooltip, notification } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -101,49 +101,53 @@ function _Secrets({
       render: function RenderActions(secret: SecretNode) {
         return (
           <Button.Group>
-            <Button
-              data-testid='edit-button'
-              icon='edit'
-              onClick={() => {
-                history.push(`${appPrefix}admin/secret/${secret.node.id}`);
-              }}
-            />
-            <Button
-              data-testid='delete-button'
-              icon='delete'
-              onClick={() => {
-                Modal.confirm({
-                  title: 'Delete Secret',
-                  content: (
-                    <>
-                      Are you sure to delete{' '}
-                      <strong>{secret.node.displayName}</strong> secret?
-                    </>
-                  ),
-                  okText: 'Yes',
-                  onOk: async () => {
-                    try {
-                      await deleteSecretMutation({
-                        variables: {
-                          where: {
-                            id: secret.node.id,
+            <Tooltip placement='bottom' title='Edit'>
+              <Button
+                data-testid='edit-button'
+                icon='edit'
+                onClick={() => {
+                  history.push(`${appPrefix}admin/secret/${secret.node.id}`);
+                }}
+              />
+            </Tooltip>
+            <Tooltip placement='bottom' title='Delete'>
+              <Button
+                data-testid='delete-button'
+                icon='delete'
+                onClick={() => {
+                  Modal.confirm({
+                    title: 'Delete Secret',
+                    content: (
+                      <>
+                        Are you sure to delete{' '}
+                        <strong>{secret.node.displayName}</strong> secret?
+                      </>
+                    ),
+                    okText: 'Yes',
+                    onOk: async () => {
+                      try {
+                        await deleteSecretMutation({
+                          variables: {
+                            where: {
+                              id: secret.node.id,
+                            },
                           },
-                        },
-                      });
-                      await secretQuery.refetch();
-                    } catch (err) {
-                      console.error(err);
-                      notification.error({
-                        duration: 5,
-                        placement: 'bottomRight',
-                        message: 'Failure',
-                        description: 'Failure to delete, try again later.',
-                      });
-                    }
-                  },
-                });
-              }}
-            />
+                        });
+                        await secretQuery.refetch();
+                      } catch (err) {
+                        console.error(err);
+                        notification.error({
+                          duration: 5,
+                          placement: 'bottomRight',
+                          message: 'Failure',
+                          description: 'Failure to delete, try again later.',
+                        });
+                      }
+                    },
+                  });
+                }}
+              />
+            </Tooltip>
           </Button.Group>
         );
       },
