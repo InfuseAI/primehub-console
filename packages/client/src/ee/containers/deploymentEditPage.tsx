@@ -32,6 +32,7 @@ type Props = RouteComponentProps<{deploymentId: string}> & GroupContextComponent
   updatePhDeployment: any;
   updatePhDeploymentResult: any;
   getPhDeployment: any;
+  licenseQuery: any;
 };
 
 type State = {
@@ -136,6 +137,12 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       }
     } catch(e) {}
 
+    const isReachedGroupDeploymentsLimit =
+      group?.deployments >= group?.maxpGroup;
+    const isReachedSystemDeploymentsLimit =
+      this.props.licenseQuery?.license.usage.maxModelDeploy >=
+      this.props.licenseQuery?.license.maxModelDeploy;
+
     return (
       <React.Fragment>
         <PageTitle
@@ -159,6 +166,8 @@ class DeploymentCreatePage extends React.Component<Props, State> {
             onSubmit={this.onSubmit}
             onCancel={this.onCancel}
             loading={currentUser.loading || updatePhDeploymentResult.loading}
+            isReachedGroupDeploymentsLimit={isReachedGroupDeploymentsLimit}
+            isReachedSystemDeploymentsLimit={isReachedSystemDeploymentsLimit}
           />
         </div>
       </React.Fragment>
@@ -173,6 +182,21 @@ export default compose(
     alias: 'withCurrentUser',
     name: 'currentUser'
   }),
+  graphql(
+    gql`
+      query {
+        license {
+          maxModelDeploy
+          usage {
+            maxModelDeploy
+          }
+        }
+      }
+    `,
+    {
+      name: 'licenseQuery',
+    }
+  ),
   graphql(GET_PH_DEPLOYMENT, {
     options: (props: Props) => ({
       variables: {

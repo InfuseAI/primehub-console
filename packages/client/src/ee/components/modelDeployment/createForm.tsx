@@ -1,13 +1,29 @@
 import * as React from 'react';
-import {Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon, InputNumber, Switch, AutoComplete, Checkbox} from 'antd';
-import {FormComponentProps} from 'antd/lib/form';
-import {get, snakeCase, debounce} from 'lodash';
+import {
+  Alert,
+  Radio,
+  Select,
+  Form,
+  Card,
+  Divider,
+  Row,
+  Col,
+  Input,
+  Tooltip,
+  Icon,
+  InputNumber,
+  Switch,
+  AutoComplete,
+  Checkbox,
+} from 'antd';
+import { FormComponentProps } from 'antd/lib/form';
+import { get, debounce } from 'lodash';
 import DynamicFields from 'components/share/dynamicFields';
 import EnvFields from 'components/share/envFields';
 import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
-import {PrePackagedServers} from 'ee/components/modelDeployment/prePackagedServers';
+import { PrePackagedServers } from 'ee/components/modelDeployment/prePackagedServers';
 import PHTooltip from 'components/share/toolTip';
 import gql from 'graphql-tag';
 import { ApolloConsumer } from 'react-apollo';
@@ -27,6 +43,8 @@ type Props = FormComponentProps & {
   loading: boolean;
   initialValue?: any;
   type?: 'edit' | 'create';
+  isReachedGroupDeploymentsLimit: boolean;
+  isReachedSystemDeploymentsLimit: boolean;
 };
 
 type State = {
@@ -79,6 +97,49 @@ const autoGenId = (name: string) => {
   const randomString = Math.random().toString(36).substring(7).substring(0, 5);
   return `${normalizedNAme}-${randomString}`;
 };
+
+function renderReachedDeploymentLimitAlert({
+  isReachedGroupDeploymentsLimit = false,
+  isReachedSystemDeploymentsLimit = false,
+}: {
+  isReachedGroupDeploymentsLimit?: boolean;
+  isReachedSystemDeploymentsLimit?: boolean;
+}) {
+  if (!isReachedGroupDeploymentsLimit && isReachedSystemDeploymentsLimit) {
+    return (
+      <Alert
+        message="The system deployment limit has been reached."
+        description="Please get in touch with your system administrator to update the license or delete one of the group’s deployments to deploy a new model."
+        type="error"
+        showIcon
+      />
+    );
+  }
+
+  if (isReachedGroupDeploymentsLimit && !isReachedSystemDeploymentsLimit) {
+    return (
+      <Alert
+        message="The group deployment limit has been reached."
+        description="Please get in touch with your system administrator to increase the group deployment limit or delete one of your current deployments to deploy a new model."
+        type="error"
+        showIcon
+      />
+    );
+  }
+
+  if (isReachedGroupDeploymentsLimit && isReachedSystemDeploymentsLimit) {
+    return (
+      <Alert
+        message="Both system deployment limit and group deployment limit has been reached."
+        description="Please get in touch with your system administrator to update the license and increase the group deployment limit, or delete one of the group’s deployments to deploy a new model."
+        type="error"
+        showIcon
+      />
+    );
+  }
+
+  return null;
+}
 
 class DeploymentCreateForm extends React.Component<Props, State> {
   state = {
@@ -306,6 +367,8 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       initialValue,
       selectedGroup,
       type,
+      isReachedGroupDeploymentsLimit,
+      isReachedSystemDeploymentsLimit,
     } = this.props;
     const {
       groupId,
@@ -393,6 +456,21 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   </Form.Item>
                 )
               }
+            <Card
+              style={{
+                marginBottom: '16px',
+                display:
+                  !isReachedGroupDeploymentsLimit &&
+                  !isReachedSystemDeploymentsLimit
+                    ? 'none'
+                    : 'inline-block',
+              }}
+            >
+              {renderReachedDeploymentLimitAlert({
+                isReachedGroupDeploymentsLimit,
+                isReachedSystemDeploymentsLimit,
+              })}
+            </Card>
             <Card loading={loading} style={{overflow: 'auto'}}>
               <Form.Item label={`Deployment Name`} style={{marginBottom: '8px'}}>
                 {form.getFieldDecorator('name', {

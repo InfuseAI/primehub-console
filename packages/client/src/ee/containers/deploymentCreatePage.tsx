@@ -43,6 +43,7 @@ type Props = RouteComponentProps & GroupContextComponentProps & {
   currentUser: any;
   createPhDeployment: any;
   createPhDeploymentResult: any;
+  licenseQuery: any;
 };
 
 type State = {
@@ -97,13 +98,20 @@ class DeploymentCreatePage extends React.Component<Props, State> {
       }
     } catch(e) {}
 
+    const isReachedGroupDeploymentsLimit =
+      group?.deployments >= group?.maxpGroup;
+    const isReachedSystemDeploymentsLimit =
+      this.props.licenseQuery?.license.usage.maxModelDeploy >=
+      this.props.licenseQuery?.license.maxModelDeploy;
+
     return (
       <React.Fragment>
         <PageTitle
           breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
           title={'Create Deployment'}
         />
-        <div style={{margin: '16px'}}>
+
+        <div style={{ margin: '16px' }}>
           <DeploymentCreateForm
             type="create"
             groupContext={groupContext}
@@ -116,6 +124,8 @@ class DeploymentCreatePage extends React.Component<Props, State> {
             initialValue={initValue}
             onSubmit={this.onSubmit}
             loading={currentUser.loading || createPhDeploymentResult.loading}
+            isReachedGroupDeploymentsLimit={isReachedGroupDeploymentsLimit}
+            isReachedSystemDeploymentsLimit={isReachedSystemDeploymentsLimit}
           />
         </div>
       </React.Fragment>
@@ -128,15 +138,30 @@ export default compose(
   withGroupContext,
   graphql(CurrentUser, {
     alias: 'withCurrentUser',
-    name: 'currentUser'
+    name: 'currentUser',
   }),
+  graphql(
+    gql`
+      query {
+        license {
+          maxModelDeploy
+          usage {
+            maxModelDeploy
+          }
+        }
+      }
+    `,
+    {
+      name: 'licenseQuery',
+    }
+  ),
   graphql(CREATE_DEPLOYMENT, {
     options: (props: Props) => ({
       onCompleted: (data: any) => {
-        const {history} = props;
+        const { history } = props;
         history.push({
           pathname: `../deployments`,
-          search: queryString.stringify({first: 8})
+          search: queryString.stringify({ first: 8 }),
         });
         notification.success({
           duration: 10,
@@ -144,14 +169,21 @@ export default compose(
           message: 'Success!',
           description: (
             <>
-              Your model has begun deploying.
-              Click <a onClick={() => history.push(`deployments/${data.createPhDeployment.id}`)}>here</a> to view.
+              Your model has begun deploying. Click{' '}
+              <a
+                onClick={() =>
+                  history.push(`deployments/${data.createPhDeployment.id}`)
+                }
+              >
+                here
+              </a>{' '}
+              to view.
             </>
-          )
+          ),
         });
       },
-      onError: errorHandler
+      onError: errorHandler,
     }),
-    name: 'createPhDeployment'
+    name: 'createPhDeployment',
   })
-)(DeploymentCreatePage)
+)(DeploymentCreatePage);

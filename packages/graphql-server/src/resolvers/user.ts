@@ -697,24 +697,36 @@ const queryGroupsByUser = (effectiveGroup: boolean) => {
       const groups = await context.kcAdminClient.users.listGroups({
         id: userId
       });
+      const deployments = await context.crdClient.phDeployments.list() || [];
+
       const fetchedGroups = await Promise.all(groups.map(async group => {
         return context.kcAdminClient.groups.findOne({id: group.id});
       }));
+
       return fetchedGroups
-      .filter(group => {
-        if (effectiveGroup) {
-          return group.id !== context.everyoneGroupId;
-        } else {
-          return true;
-        }
-      })
-      .map(transformGroup)
-      .map(group => ({
-        ...group,
-        effectiveGroup,
-        realmRolesEveryone,
-        realmRolesUser
-      }));
+        .filter(group => {
+          if (effectiveGroup) {
+            return group.id !== context.everyoneGroupId;
+          } else {
+            return true;
+          }
+        })
+        .map(transformGroup)
+        .map(group => {
+          const deploymentsUsage = deployments.filter(
+            deployment =>
+              deployment.spec.groupId === group.id &&
+              deployment.spec.stop === false
+          ).length;
+
+          return {
+            ...group,
+            deploymentsUsage,
+            effectiveGroup,
+            realmRolesEveryone,
+            realmRolesUser,
+          };
+        });
     } catch (err) {
       return [];
     }
