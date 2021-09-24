@@ -1,6 +1,7 @@
 export const me = {
   id: 'test-user',
   username: 'test-user',
+  isAdmin: true,
   groups: [
     {
       id: 'groupId1',

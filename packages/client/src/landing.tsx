@@ -70,7 +70,7 @@ function Landing({ groupContext, currentUser, ...props }: Props) {
             }}
           >
             <Breadcrumbs pathList={breadcrumbs} />
-            {currentUser.me.isAdmin && (
+            {currentUser?.me?.isAdmin && (
               <InviteButton
                 groupId={groupContext.id}
                 onRequestToken={onRequestInvitation}
