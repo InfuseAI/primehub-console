@@ -298,11 +298,7 @@ interface BrowseSharedFilesFCProps {
   }) => Promise<{ data: { deleteFiles: number } }>;
 }
 
-function _BrowseSharedFiles({
-  data,
-  path,
-  ...props
-}: BrowseSharedFilesFCProps) {
+function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesFCProps) {
   const history = useHistory();
 
   const { appPrefix } = useRoutePrefix();
@@ -614,4 +610,4 @@ export default compose(
     }),
     name: 'deleteFiles',
   })
-)(_BrowseSharedFiles);
+)(BrowseSharedFiles);
