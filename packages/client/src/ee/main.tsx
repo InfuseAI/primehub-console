@@ -14,7 +14,7 @@ import { listEE } from 'components/Sidebar';
 // Components
 import Jupyterhub from 'containers/JupyterHubPage';
 import ListContainer from 'containers/ListContainer';
-import SharedFilesPage from 'containers/sharedFiles/sharedFilesPage';
+import SharedFilesPage from 'containers/sharedFiles/SharedFilesPage';
 import JobDetailContainer from 'ee/containers/jobDetail';
 import JobCreatePage from 'ee/containers/jobCreatePage';
 import JobListContainer from 'ee/containers/JobListContainer';
