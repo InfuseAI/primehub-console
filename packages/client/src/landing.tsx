@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Tag, Divider, Typography, Layout, Row, Col, Card, notification, Button} from 'antd';
+import {Divider, Layout, Row, Col} from 'antd';
 import {Link} from 'react-router-dom';
 import PageTitle from 'components/pageTitle';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
@@ -10,6 +10,7 @@ import {compose} from 'recompose';
 import {graphql} from 'react-apollo';
 import Breadcrumbs, {BreadcrumbItemSetup} from 'components/share/breadcrumb';
 import RecentTasks, {ThinTitle, GuideList, Content, SubContent} from 'components/landing/recentTasks';
+import InviteBotton from 'components/InviteButton';
 
 const breadcrumbs: BreadcrumbItemSetup[] = [
   {
@@ -25,19 +26,25 @@ type Props = {
   currentUser: any;
 } & GroupContextComponentProps;
 
+
+
 class Landing extends React.Component<Props> {
 
   render() {
     const {groupContext, currentUser} = this.props;
     // @ts-ignore
     const qsLink = modelDeploymentOnly ? 'https://docs.primehub.io/docs/quickstart/qs-primehub-deploy' : 'https://docs.primehub.io/docs/quickstart/qs-primehub';
-
     if (!groupContext) return <div></div>;
 
     return (
       <Layout>
         <PageTitle
-          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
+          breadcrumb={
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxHeight:21 }}>
+              <Breadcrumbs pathList={breadcrumbs} />
+              <InviteBotton isAdmin={currentUser.me.isAdmin} groupId={groupContext.id}/>
+            </div>
+          }
           title={'Home'}
         />
         <Row>

@@ -3,6 +3,7 @@ query CurrentUser {
   me {
     id
     username
+    isAdmin
     groups {
       ...GroupInfo
       instanceTypes {

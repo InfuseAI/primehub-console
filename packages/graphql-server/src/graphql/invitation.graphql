@@ -1,0 +1,26 @@
+type Invitation {
+  invitationToken: String!
+  groupId: String!
+}
+
+type InvitationResult {
+  username: String!
+  password: String!
+}
+
+input InvitationQueryInput {
+  invitationToken: String!
+}
+
+type InvitationQueryResult {
+  validation: Boolean!
+}
+
+input InvitationCreateInput {
+  groupId: String!
+}
+
+input InvitationApplyInput {
+  invitationToken: String!
+  username: String!
+}
