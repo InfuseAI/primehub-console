@@ -124,6 +124,7 @@ function _Secrets({
                       </>
                     ),
                     okText: 'Yes',
+                    maskClosable: true,
                     onOk: async () => {
                       try {
                         await deleteSecretMutation({

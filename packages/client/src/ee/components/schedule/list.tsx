@@ -96,10 +96,10 @@ class ScheduleList extends React.Component<Props> {
       iconType: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
+      maskClosable: true,
       onOk() {
         return deletePhSchedule({ variables: { where: { id } } });
       },
-      onCancel() {},
     });
   };
 

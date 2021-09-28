@@ -90,7 +90,7 @@ interface State {
 class AppListContainer extends React.Component<Props, State> {
   private textArea: React.RefObject<any> = React.createRef();
 
-  copyClipBoard = (value) => {
+  copyClipBoard = value => {
     if (this.textArea && this.textArea.current) {
       this.textArea.current.input.value = value;
       this.textArea.current.select();
@@ -138,6 +138,7 @@ class AppListContainer extends React.Component<Props, State> {
       iconType: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
+      maskClosable: true,
       onOk() {
         return startApp({ variables: { where: { id: appId } } });
       },
@@ -158,13 +159,14 @@ class AppListContainer extends React.Component<Props, State> {
       okText: 'Yes',
       okType: 'danger',
       cancelText: 'No',
+      maskClosable: true,
       onOk() {
         return stopApp({ variables: { where: { id: appId } } });
       },
     });
   };
 
-  searchHandler = (query) => {
+  searchHandler = query => {
     const { getPhApplicationConnection } = this.props;
     const { refetch, variables } = getPhApplicationConnection;
     const newVariables = {
@@ -214,7 +216,7 @@ class AppListContainer extends React.Component<Props, State> {
 
     if (!phApplicationsConnection) {
       return (
-        <div data-testid="loading">
+        <div data-testid='loading'>
           <Skeleton />
         </div>
       );
@@ -236,8 +238,8 @@ class AppListContainer extends React.Component<Props, State> {
           )}
           {/* @ts-ignore */}
           <InfuseButton
-            icon="plus"
-            type="primary"
+            icon='plus'
+            type='primary'
             onClick={() => {
               history.push(`apps/store`);
             }}
@@ -251,13 +253,13 @@ class AppListContainer extends React.Component<Props, State> {
     );
 
     if (groupContext) {
-      const group = groups.find((g) => g.id === groupContext.id);
+      const group = groups.find(g => g.id === groupContext.id);
       if (!group) {
         pageBody = (
           <Alert
-            message="Group not found"
+            message='Group not found'
             description={`Group ${groupContext.name} is not found or not authorized.`}
-            type="error"
+            type='error'
             showIcon
           />
         );
@@ -273,8 +275,8 @@ class AppListContainer extends React.Component<Props, State> {
               !(phApplicationsConnection && phApplicationsConnection.edges)
             }
           >
-            <Row gutter={24} type="flex">
-              {phApplicationsConnection.edges.map((edge) => {
+            <Row gutter={24} type='flex'>
+              {phApplicationsConnection.edges.map(edge => {
                 return (
                   <Col
                     xs={24}
@@ -310,7 +312,7 @@ class AppListContainer extends React.Component<Props, State> {
           <Empty
             description={
               <span>
-                No Applications, <Link to="apps/store">add one?</Link>
+                No Applications, <Link to='apps/store'>add one?</Link>
               </span>
             }
           />
@@ -325,9 +327,9 @@ class AppListContainer extends React.Component<Props, State> {
         />
         {!groupContext.enabledSharedVolume ? (
           <Alert
-            message="No group shared volume."
-            description="The data which is not available after stop the application, please contact your administrator to enable the shared volume."
-            type="warning"
+            message='No group shared volume.'
+            description='The data which is not available after stop the application, please contact your administrator to enable the shared volume.'
+            type='warning'
             showIcon
           />
         ) : (

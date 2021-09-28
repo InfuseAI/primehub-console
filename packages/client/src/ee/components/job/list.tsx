@@ -176,11 +176,9 @@ class JobList extends React.Component<Props> {
       iconType: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
+      maskClosable: true,
       onOk() {
         return cancelPhJob({ variables: { where: { id } } });
-      },
-      onCancel() {
-        console.log('Cancel');
       },
     });
   };
@@ -195,11 +193,9 @@ class JobList extends React.Component<Props> {
       iconType: 'info-circle',
       okText: 'Yes',
       cancelText: 'No',
+      maskClosable: true,
       onOk() {
         return rerunPhJob({ variables: { where: { id } } });
-      },
-      onCancel() {
-        console.log('Cancel');
       },
     });
   };

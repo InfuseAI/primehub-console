@@ -407,6 +407,7 @@ function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesFCProps) {
     try {
       Modal.confirm({
         title: `Are you sure to delete '${name}'?`,
+        maskClosable: true,
         onOk: async () => {
           const { data } = await props.deleteFiles({
             variables: {
