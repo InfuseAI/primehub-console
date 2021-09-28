@@ -48,15 +48,35 @@ const InviteButton = ({ groupId, onRequestToken }: InviteButtonProps) => {
         onCancel={() => {
           setVisible(false);
         }}
+        footer={[
+          <Button
+            key='submit'
+            type='primary'
+            disabled={isRequesting}
+            onClick={() => {
+              setVisible(false);
+            }}
+          >
+            Done
+          </Button>,
+        ]}
       >
         <div>
-          <p>Anyone can request invitation link to create a new account.</p>
-          <p>The link will be expired after 1 day or a new accound created.</p>
+          <p>
+            Generate a unique link to invite people to create an account in this
+            group.
+          </p>
+          <p>
+            <b>
+              The link will be expired after 24 hours or after an account has
+              been created.
+            </b>
+          </p>
           <Input
             disabled={!inviteLink}
             readOnly={!!inviteLink}
             value={inviteLink}
-            onFocus={() => {
+            onClick={() => {
               copy(inviteLink);
               notification.success({
                 duration: 3,
