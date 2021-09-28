@@ -25,6 +25,7 @@ import * as phSchedule from './resolvers/phSchedule';
 import * as phDeployment from './resolvers/phDeployment';
 import * as usageReport from './resolvers/usageReport';
 import * as model from './resolvers/model';
+import * as invitation from '../resolvers/invitation';
 import { resolvers as ceResolvers } from '../app';
 import { crd as instanceType} from '../resolvers/instanceType';
 import { crd as image} from '../resolvers/image';

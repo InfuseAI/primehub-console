@@ -23,6 +23,7 @@ export const permissions = shield({
     modelVersion: or(isAdmin, isGroupMember),
     modelVersions: or(isAdmin, isGroupMember),
     modelVersionsConnection: or(isAdmin, isGroupMember),
+    invitation: or(isClient, isAdmin),
   },
   Mutation: {
     ...ShieldMutation,
@@ -39,6 +40,7 @@ export const permissions = shield({
     deletePhDeployment: or(isAdmin, isUser),
     stopPhDeployment: or(isAdmin, isUser),
     deployPhDeployment: or(isAdmin, isUser),
+    createUserFromInvitation: or(isClient, isAdmin),
   },
 }, {
   allowExternalErrors: true

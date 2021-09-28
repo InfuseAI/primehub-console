@@ -31,7 +31,7 @@ export interface Config {
   appPrefix?: string;
 
   // standalone graphql endpoint
-  graphqlPrefix: string
+  graphqlPrefix: string;
   graphqlEndpoint: string;
   graphqlSvcEndpoint: string;
   sharedGraphqlSecretKey: string;

@@ -75,6 +75,7 @@ import { mountStoreCtrl } from './controllers/storeCtrl';
 import { Telemetry } from './utils/telemetry';
 import { createDefaultTraitMiddleware } from './utils/telemetryTraits';
 import { isGroupBelongUser } from './utils/groupCheck';
+import * as invitation from './resolvers/invitation';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
@@ -100,10 +101,11 @@ export const resolvers = {
     phApplicationsConnection: phApplication.connectionQuery,
     phAppTemplate: phAppTemplate.queryOne,
     phAppTemplates: phAppTemplate.query,
+    invitation: invitation.queryInvitation,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),
-    ...ann.resolvers()
+    ...ann.resolvers(),
   },
   Mutation: {
     updateSystem: system.update,
@@ -135,6 +137,8 @@ export const resolvers = {
     ...dataset.resolveInMutation(),
     ...image.resolveInMutation(),
     ...ann.resolveInMutation(),
+    createInvitation: invitation.createInvitation,
+    createUserFromInvitation: invitation.createUserFromInvitation,
   },
   System: {
     smtp: system.querySmtp,

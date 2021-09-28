@@ -6,17 +6,17 @@ import { GroupContext } from 'context/group';
 import { UserContext } from 'context/user';
 import { MockedProvider } from 'react-apollo/test-utils';
 import me from '../fakeData/me';
-import {CurrentUser} from 'queries/User.graphql';
+import { CurrentUser } from 'queries/User.graphql';
 
 const mocks = [
   {
     request: {
-      query: CurrentUser
+      query: CurrentUser,
     },
     result: {
-      me
-    }
-  }
+      me,
+    },
+  },
 ];
 
 const groupValue = {
@@ -35,7 +35,6 @@ const userValue = {
 };
 
 const AllTheProviders = ({ children }) => {
-
   return (
     // @ts-ignore
     <MockedProvider mocks={mocks}>

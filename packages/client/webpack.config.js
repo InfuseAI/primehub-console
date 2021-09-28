@@ -36,9 +36,9 @@ function getPlugins(env) {
       filename: isDev ? 'index.html' : 'index.ejs',
     }),
     new HtmlWebPackPlugin({
-      template: '!!raw-loader!public/share.ejs',
-      chunks: ['share'],
-      filename: 'share.ejs',
+      template: '!!raw-loader!public/anonymous.ejs',
+      chunks: ['anonymous'],
+      filename: 'anonymous.ejs',
     }),
     new HtmlWebPackPlugin({
       chunks: ['login'],
@@ -104,7 +104,7 @@ module.exports = (env) => {
       entry: {
         admin: './src/admin.tsx',
         main: entryPage,
-        share: './src/share.tsx',
+        anonymous: './src/anonymous.tsx',
       },
     },
     production: {
@@ -113,7 +113,7 @@ module.exports = (env) => {
       entry: {
         admin: ['./src/public-import.js', './src/admin.tsx'],
         main: ['./src/public-import.js', entryPage],
-        share: ['./src/public-import.js', './src/share.tsx'],
+        anonymous: ['./src/public-import.js', './src/anonymous.tsx'],
       },
     },
   };

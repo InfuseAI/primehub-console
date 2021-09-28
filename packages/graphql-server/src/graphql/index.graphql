@@ -1,6 +1,6 @@
 # import System, SystemUpdateInput from "./system.graphql"
 # import User, UsersOrderBy, UserMultiEmailResponse, UserConnection, UserWhereInput, UserWhereUniqueInput, UserCreateInput, UserUpdateInput, UserActionResponse from "./user.graphql"
-# import  Group, GroupOrderByInput, GroupConnection, GroupWhereInput, GroupWhereUniqueInput, GroupCreateInput, GroupUpdateInput from "./group.graphql"
+# import Group, GroupOrderByInput, GroupConnection, GroupWhereInput, GroupWhereUniqueInput, GroupCreateInput, GroupUpdateInput from "./group.graphql"
 # import InstanceType, InstanceTypeOrderByInput, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput, InstanceTypeCreateInput, InstanceTypeUpdateInput from "./instanceType.graphql"
 # import QueryImageMode, Image, ImageOrderByInput, ImageConnection, GroupImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput, GroupImageDeleteInput from "./image.graphql"
 # import Announcement, AnnouncementConnection, AnnouncementWhereInput, AnnouncementWhereUniqueInput, AnnouncementCreateInput, AnnouncementUpdateInput from "./announcement.graphql"
@@ -10,6 +10,7 @@
 # import PhApplication, PhApplicationWhereInput, PhApplicationWhereUniqueInput, PhApplicationCreateInput, PhApplicationUpdateInput, PhApplicationOrderBy from "./phApplication.graphql"
 # import PhAppTemplate, PhAppTemplateWhereInput, PhAppTemplateWhereUniqueInput from "./phAppTemplate.graphql"
 # import NotebookNotifyEventInput from "./notebook.graphql"
+# import Invitation, InvitationApplyInput, InvitationQueryInput, InvitationQueryResult from "./invitation.graphql"
 
 scalar JSON
 
@@ -219,6 +220,8 @@ type Query {
     last: Int
   ): [PhAppTemplate]!
 
+  """Invitation"""
+  invitation(data: InvitationQueryInput!): InvitationQueryResult
 }
 
 type Mutation {
@@ -284,4 +287,8 @@ type Mutation {
 
   """Notebook"""
   notifyNotebookEvent(data: NotebookNotifyEventInput!): Int
+
+  """Invitation"""
+  createInvitation(data: InvitationCreateInput!): Invitation!
+  createUserFromInvitation(data: InvitationApplyInput!): InvitationResult!
 }

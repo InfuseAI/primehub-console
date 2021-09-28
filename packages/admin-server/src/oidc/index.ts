@@ -21,9 +21,9 @@ const ERRORS = {
 };
 
 interface OidcCtrlOptions {
-  oidcClient: any,
-  config: Config,
-};
+  oidcClient: any;
+  config: Config;
+}
 
 export class OidcCtrl {
   private clientId: string;

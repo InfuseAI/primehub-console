@@ -3,6 +3,7 @@ query CurrentUser {
   me {
     id
     username
+    isAdmin
     groups {
       ...GroupInfo
       instanceTypes {
@@ -117,5 +118,11 @@ mutation CreateUser($payload: UserCreateInput!) {
   createUser(data: $payload) {
     id
     username
+  }
+}
+
+mutation CreateInvitation($data: InvitationCreateInput!) {
+  createInvitation(data: $data){
+    invitationToken
   }
 }

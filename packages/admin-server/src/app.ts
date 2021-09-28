@@ -19,6 +19,8 @@ import errorHandler from './errorHandler';
 
 // logger
 import * as logger from './logger';
+import { InvitationCtrl } from './invitation';
+import bodyParser from 'koa-bodyparser';
 
 export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
   const config = createConfig();
@@ -99,6 +101,7 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
     ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../../client/dist'), {gzip: true, index: false}))
     : serve(path.resolve(__dirname, '../../client/dist'), {gzip: true, index: false});
   app.use(serveClientStatic);
+  app.use(bodyParser());
 
   // router
   const rootRouter = new Router({
@@ -153,11 +156,14 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
   rootRouter.get('/share/*', async (ctx: Koa.ParameterizedContext, next: any) => {
     return next();
   }, async ctx => {
-    await ctx.render('share', {
+    await ctx.render('anonymous', {
       title: 'PrimeHub',
       staticPath,
     });
   });
+
+  // invite link
+  new InvitationCtrl({config}).mount(staticPath, rootRouter);
 
   // Admin Portal
   rootRouter.get('/admin', oidcCtrl.ensureAdmin, async ctx => {
