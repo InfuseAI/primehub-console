@@ -21,6 +21,7 @@ import errorHandler from './errorHandler';
 import * as logger from './logger';
 import { InvitationCtrl } from './invitation';
 import bodyParser from 'koa-bodyparser';
+import { ApiTokenCtrl } from './api-token';
 
 export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
   const config = createConfig();
@@ -164,6 +165,9 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
 
   // invite link
   new InvitationCtrl({config}).mount(staticPath, rootRouter);
+
+  // ApiToken generator for SDK
+  new ApiTokenCtrl({config}).mount(staticPath, rootRouter);
 
   // Admin Portal
   rootRouter.get('/admin', oidcCtrl.ensureAdmin, async ctx => {
