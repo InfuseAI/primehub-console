@@ -34,12 +34,15 @@ export class ApiTokenCtrl {
       async ctx => {
         // redirect to OIDC auth
         const config = this.config;
+
         const queryString = `response_type=code&scope=offline_access&client_id=${
           config.keycloakClientId
         }&redirect_uri=${this.redirectUri}&state=${uuidv4()}`;
+
         const authorizationCodeUrl = encodeURI(
           `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/auth?${queryString}`
         );
+
         console.log('redirect api-token request to oidc', authorizationCodeUrl);
         ctx.redirect(authorizationCodeUrl);
       }
@@ -53,10 +56,11 @@ export class ApiTokenCtrl {
       },
       async ctx => {
         const querystring = encode(ctx.request.querystring);
-
-        // ctx.body = encode(querystring);
-        const response = `curl http://127.0.0.1:3000/api-token/exchange -d 'code=${querystring}'`;
-        ctx.body = response;
+        ctx.state.apiTokenExhangeCode = querystring;
+        await ctx.render('anonymous', {
+          title: 'PrimeHub',
+          staticPath,
+        });
       }
     );
 
