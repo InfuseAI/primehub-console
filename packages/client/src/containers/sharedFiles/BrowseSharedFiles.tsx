@@ -212,6 +212,9 @@ function ShareFileActions({
 
   if (/\.(txt|jpg|jpeg|png)$/i.test(props.name)) {
     actions.push(ViewFile);
+  }
+
+  if (/\.([a-zA-Z]+)$/i.test(props.name)) {
     actions.push(DownloadFile);
   }
 
@@ -398,9 +401,12 @@ function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesFCProps) {
   ];
 
   function onFilesDeleted({ name }: FileItem) {
+    const basePath = `${appPrefix}g/${groupName}/browse`;
     const isFolder = name.endsWith('/');
+    const isGroupRootFolder = history.location.pathname === basePath;
+
     const targetDeletePath = `${history.location.pathname.replace(
-      `${appPrefix}g/${groupName}/browse/`,
+      `${basePath}/`,
       ''
     )}/`;
 
@@ -413,7 +419,9 @@ function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesFCProps) {
             variables: {
               where: {
                 groupName,
-                phfsPrefix: `${targetDeletePath}${name}`,
+                phfsPrefix: isGroupRootFolder
+                  ? name
+                  : `${targetDeletePath}${name}`,
               },
               options: {
                 recursive: isFolder,
