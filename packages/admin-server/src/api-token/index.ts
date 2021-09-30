@@ -40,7 +40,7 @@ export class ApiTokenCtrl {
         }&redirect_uri=${this.redirectUri}&state=${uuidv4()}`;
 
         const authorizationCodeUrl = encodeURI(
-          `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/auth?${queryString}`
+          `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/auth?${queryString}`
         );
 
         console.log('redirect api-token request to oidc', authorizationCodeUrl);
@@ -75,7 +75,7 @@ export class ApiTokenCtrl {
         const { code } = ctx.request.body;
         const oidcParams = decode(code);
         const params = `grant_type=authorization_code&client_id=${config.keycloakClientId}&client_secret=${config.keycloakClientSecret}&redirect_uri=${this.redirectUri}&${oidcParams}`;
-        const tokenUrl = `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/token`;
+        const tokenUrl = `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/token`;
         console.log(params);
 
         try {
