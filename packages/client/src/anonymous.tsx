@@ -180,12 +180,6 @@ function UserRegistration() {
   );
 }
 
-// .code-box-demo {
-//   padding: 42px 24px 50px;
-//   color: rgba(0,0,0,.65);
-//   border-bottom: 1px solid #ebedf0;
-// }
-
 function AuthorizationCode() {
   const code = window.apiTokenExhangeCode;
   const [copyStatus, copy] = useClipboard({ lazy: true, timeout: 2000 });
@@ -199,12 +193,12 @@ function AuthorizationCode() {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          minHeight: 400,
+          minHeight: '400px',
         }}
       >
         <div
           style={{
-            maxWidth: 400,
+            maxWidth: '400px',
             border: '1px solid #ebedf0',
             padding: '42px 24px 50px',
           }}
@@ -214,7 +208,7 @@ function AuthorizationCode() {
           </p>
           <Input
             disabled
-            style={{ marginBottom: 16 }}
+            style={{ marginBottom: '16px' }}
             value={code}
             addonAfter={
               <a

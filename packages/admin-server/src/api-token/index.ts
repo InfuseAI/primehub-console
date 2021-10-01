@@ -76,14 +76,12 @@ export class ApiTokenCtrl {
         const oidcParams = decode(code);
         const params = `grant_type=authorization_code&client_id=${config.keycloakClientId}&client_secret=${config.keycloakClientSecret}&redirect_uri=${this.redirectUri}&${oidcParams}`;
         const tokenUrl = `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/token`;
-        console.log(params);
 
         try {
           const response = await axios.post(tokenUrl, params);
 
           ctx.body = response.data.refresh_token;
           const user_data = decode(response.data.access_token.split('.')[1]);
-          console.log('user', user_data);
 
           const data = {
             'api-token': response.data.refresh_token,
