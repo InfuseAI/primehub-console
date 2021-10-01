@@ -104,9 +104,11 @@ function normalizedPath(path = '/') {
 function BreadcrumbPaths({
   path,
   onCreate,
+  refetchFiles,
 }: {
   path: string;
   onCreate: () => void;
+  refetchFiles: () => Promise<void>;
 }) {
   const history = useHistory();
   const { name } = useContext(GroupContext);
@@ -119,7 +121,12 @@ function BreadcrumbPaths({
     if (i === 0) {
       items.push(
         <Breadcrumb.Item key={i}>
-          <a onClick={() => history.push(`${appPrefix}g/${name}/browse`)}>
+          <a
+            onClick={async () => {
+              history.push(`${appPrefix}g/${name}/browse`);
+              await refetchFiles();
+            }}
+          >
             {name}
           </a>
         </Breadcrumb.Item>
@@ -128,9 +135,10 @@ function BreadcrumbPaths({
       items.push(
         <Breadcrumb.Item
           key={i}
-          onClick={() => {
+          onClick={async () => {
             const targetPath = paths.slice(0, i + 1).join('/');
             history.push(`${appPrefix}g/${name}/browse${targetPath}`);
+            await refetchFiles();
           }}
         >
           <a>{path}</a>
@@ -212,6 +220,9 @@ function ShareFileActions({
 
   if (/\.(txt|jpg|jpeg|png)$/i.test(props.name)) {
     actions.push(ViewFile);
+  }
+
+  if (/\.([a-zA-Z]+)$/i.test(props.name)) {
     actions.push(DownloadFile);
   }
 
@@ -271,7 +282,7 @@ interface FileItem {
   lastModified: string;
 }
 
-interface BrowseSharedFilesFCProps {
+interface BrowseSharedFilesProps {
   path: string;
   data?: {
     error: Error | undefined;
@@ -298,7 +309,7 @@ interface BrowseSharedFilesFCProps {
   }) => Promise<{ data: { deleteFiles: number } }>;
 }
 
-function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesFCProps) {
+function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesProps) {
   const history = useHistory();
 
   const { appPrefix } = useRoutePrefix();
@@ -398,9 +409,12 @@ function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesFCProps) {
   ];
 
   function onFilesDeleted({ name }: FileItem) {
+    const basePath = `${appPrefix}g/${groupName}/browse`;
     const isFolder = name.endsWith('/');
+    const isGroupRootFolder = history.location.pathname === basePath;
+
     const targetDeletePath = `${history.location.pathname.replace(
-      `${appPrefix}g/${groupName}/browse/`,
+      `${basePath}/`,
       ''
     )}/`;
 
@@ -413,7 +427,9 @@ function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesFCProps) {
             variables: {
               where: {
                 groupName,
-                phfsPrefix: `${targetDeletePath}${name}`,
+                phfsPrefix: isGroupRootFolder
+                  ? name
+                  : `${targetDeletePath}${name}`,
               },
               options: {
                 recursive: isFolder,
@@ -502,6 +518,7 @@ function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesFCProps) {
         ) : (
           <BreadcrumbPaths
             path={path}
+            refetchFiles={data.refetch}
             onCreate={() => {
               setIsEditing(true);
             }}
