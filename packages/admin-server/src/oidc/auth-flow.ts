@@ -1,32 +1,30 @@
 import { Config } from '../config';
 import Koa from 'koa';
-import { gql, GraphQLClient } from 'graphql-request';
 import Router from 'koa-router';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 
-interface ApiTokenOtpions {
+interface OidcAuthenticationFlow {
   config: Config;
 }
 
-export class ApiTokenCtrl {
+export class OidcAuthenticationFlowCtrl {
   private config: Config;
   private redirectUri: string;
 
-  public constructor(opts: ApiTokenOtpions) {
+  public constructor(opts: OidcAuthenticationFlow) {
     const { config } = opts;
     this.config = config;
 
     this.redirectUri = `${config.cmsHost}${
       config.appPrefix || ''
-    }/api-token/callback`;
+    }/oidc/auth-flow/callback`;
   }
 
   public mount(staticPath: string, rootRouter: Router) {
-
     // OIDC starting flow
     rootRouter.get(
-      '/api-token/request',
+      '/oidc/auth-flow/request',
       async (ctx: Koa.ParameterizedContext, next: any) => {
         return next();
       },
@@ -49,7 +47,7 @@ export class ApiTokenCtrl {
 
     // Callback for OIDC to show Authorization Code
     rootRouter.get(
-      '/api-token/callback',
+      '/oidc/auth-flow/callback',
       async (ctx: Koa.ParameterizedContext, next: any) => {
         return next();
       },
@@ -65,7 +63,7 @@ export class ApiTokenCtrl {
 
     // Fetch token by server to server call
     rootRouter.post(
-      '/api-token/exchange',
+      '/oidc/auth-flow/exchange',
       async (ctx: Koa.ParameterizedContext, next: any) => {
         return next();
       },
