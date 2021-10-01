@@ -16,6 +16,7 @@ import {
 } from 'antd';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import type { FormComponentProps } from 'antd/lib/form';
+import { useClipboard } from 'hooks/useClipboard';
 
 interface CreateUserVariables {
   username: string;
@@ -179,6 +180,56 @@ function UserRegistration() {
   );
 }
 
+function AuthorizationCode() {
+  const code = window.apiTokenExhangeCode;
+  const [copyStatus, copy] = useClipboard({ lazy: true, timeout: 2000 });
+  return (
+    <div>
+      <div className='header_container' style={{ backgroundColor: '#373d62' }}>
+        <Logo />
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '400px',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '400px',
+            border: '1px solid #ebedf0',
+            padding: '42px 24px 50px',
+          }}
+        >
+          <p>
+            Please copy the code, switch to your application and paste it there:
+          </p>
+          <Input
+            disabled
+            style={{ marginBottom: '16px' }}
+            value={code}
+            addonAfter={
+              <a
+                onClick={() => {
+                  if (!code) {
+                    return;
+                  }
+                  copy(code);
+                }}
+                style={{ color: 'black' }}
+              >
+                {copyStatus === 'inactive' ? 'Copy' : 'Copied'}
+              </a>
+            }
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const AnonymousPage = () => {
   return (
     <BrowserRouter>
@@ -187,6 +238,9 @@ const AnonymousPage = () => {
       </Route>
       <Route path={`${appPrefix}invite/:token`}>
         <UserRegistration />
+      </Route>
+      <Route path={`${appPrefix}api-token/callback`}>
+        <AuthorizationCode />
       </Route>
     </BrowserRouter>
   );
