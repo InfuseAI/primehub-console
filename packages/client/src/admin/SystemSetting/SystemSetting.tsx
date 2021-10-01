@@ -682,9 +682,6 @@ function _SystemSetting({ data, ...props }: Props) {
               <Controller
                 control={control}
                 name="smtpUsername"
-                rules={{
-                  required: true,
-                }}
                 render={({ field: { onChange, value } }) => (
                   <>
                     <Input
@@ -692,13 +689,6 @@ function _SystemSetting({ data, ...props }: Props) {
                       value={value}
                       onChange={onChange}
                     />
-                    {formState.errors.smtpUsername && (
-                      <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
-                        <Typography.Text type="danger">
-                          Username is required!
-                        </Typography.Text>
-                      </CustomLabel>
-                    )}
                   </>
                 )}
               />
@@ -710,20 +700,10 @@ function _SystemSetting({ data, ...props }: Props) {
               <Controller
                 control={control}
                 name="smtpPassword"
-                rules={{
-                  required: true,
-                }}
                 render={({ field: { onChange, value } }) => (
                   <Input type="password" value={value} onChange={onChange} />
                 )}
               />
-              {formState.errors.smtpPassword && (
-                <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
-                  <Typography.Text type="danger">
-                    Password is required!
-                  </Typography.Text>
-                </CustomLabel>
-              )}
             </div>
           </Card>
         </form>
