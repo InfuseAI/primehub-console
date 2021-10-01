@@ -23,7 +23,6 @@ export class ApiTokenCtrl {
   }
 
   public mount(staticPath: string, rootRouter: Router) {
-    // rootRouter.post(`/invite`, this.createUserFromInvitation);
 
     // OIDC starting flow
     rootRouter.get(
