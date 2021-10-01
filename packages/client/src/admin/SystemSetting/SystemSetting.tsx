@@ -489,9 +489,6 @@ function _SystemSetting({ data, ...props }: Props) {
               <Controller
                 control={control}
                 name="smtpHost"
-                rules={{
-                  required: true,
-                }}
                 render={({ field: { onChange, value } }) => (
                   <Input
                     value={value}
@@ -500,13 +497,6 @@ function _SystemSetting({ data, ...props }: Props) {
                   />
                 )}
               />
-              {formState.errors.smtpHost && (
-                <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
-                  <Typography.Text type="danger">
-                    SMTP Host is required!
-                  </Typography.Text>
-                </CustomLabel>
-              )}
             </div>
 
             <div style={{ width: '300px', marginTop: '32px' }}>
