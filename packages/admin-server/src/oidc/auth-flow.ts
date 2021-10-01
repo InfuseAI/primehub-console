@@ -1,32 +1,37 @@
 import { Config } from '../config';
 import Koa from 'koa';
-import { gql, GraphQLClient } from 'graphql-request';
 import Router from 'koa-router';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import { gql, GraphQLClient } from 'graphql-request';
 
-interface ApiTokenOtpions {
+interface OidcAuthenticationFlow {
   config: Config;
 }
 
-export class ApiTokenCtrl {
+export class OidcAuthenticationFlowCtrl {
   private config: Config;
   private redirectUri: string;
+  private graphqlClient: GraphQLClient;
 
-  public constructor(opts: ApiTokenOtpions) {
+  public constructor(opts: OidcAuthenticationFlow) {
     const { config } = opts;
     this.config = config;
+    this.graphqlClient = new GraphQLClient(config.graphqlSvcEndpoint, {
+      headers: {
+        authorization: `Bearer ${config.sharedGraphqlSecretKey}`,
+      },
+    });
 
     this.redirectUri = `${config.cmsHost}${
       config.appPrefix || ''
-    }/api-token/callback`;
+    }/oidc/auth-flow/callback`;
   }
 
   public mount(staticPath: string, rootRouter: Router) {
-
     // OIDC starting flow
     rootRouter.get(
-      '/api-token/request',
+      '/oidc/auth-flow/request',
       async (ctx: Koa.ParameterizedContext, next: any) => {
         return next();
       },
@@ -49,7 +54,7 @@ export class ApiTokenCtrl {
 
     // Callback for OIDC to show Authorization Code
     rootRouter.get(
-      '/api-token/callback',
+      '/oidc/auth-flow/callback',
       async (ctx: Koa.ParameterizedContext, next: any) => {
         return next();
       },
@@ -65,7 +70,7 @@ export class ApiTokenCtrl {
 
     // Fetch token by server to server call
     rootRouter.post(
-      '/api-token/exchange',
+      '/oidc/auth-flow/exchange',
       async (ctx: Koa.ParameterizedContext, next: any) => {
         return next();
       },
@@ -79,12 +84,21 @@ export class ApiTokenCtrl {
         try {
           const response = await axios.post(tokenUrl, params);
 
-          ctx.body = response.data.refresh_token;
-          const user_data = decode(response.data.access_token.split('.')[1]);
+          // revoke old token before response to the client
+          // note: the new token is still active event we revoke right after requesting a new one
+          const userId = decode(response.data.access_token.split('.')[1]).sub();
+          const query = gql`
+          mutation revokeApiToken($userId: String)  {
+            revokeApiToken(userId: $userId) {
+              id
+            }
+           }
+          `;
+          await this.graphqlClient.request(query, {userId});
 
           const data = {
             'api-token': response.data.refresh_token,
-            endpoint: config.graphqlEndpoint,
+            'endpoint': config.graphqlEndpoint,
           };
 
           ctx.body = JSON.stringify(data);
