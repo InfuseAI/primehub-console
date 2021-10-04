@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Tooltip, Table as AntTable, Modal } from 'antd';
+import { Button, Tooltip, Table as AntTable, Modal, Typography } from 'antd';
 import { RouteComponentProps } from 'react-router';
 import { withRouter } from 'react-router-dom';
 import moment from 'moment';
@@ -187,8 +187,6 @@ class ScheduleList extends React.Component<Props> {
       schedulesConnection,
       schedulesLoading,
       schedulesVariables,
-      deletePhScheduleResult,
-      runPhScheduleResult,
     } = this.props;
     const renderAction = (id: string, record) => {
       return (
@@ -214,29 +212,56 @@ class ScheduleList extends React.Component<Props> {
         title: 'Name',
         dataIndex: 'displayName',
         sorter: true,
-        render: name => (name ? name : '-'),
+        width: '30%',
+        render: name => {
+          if (!name) {
+            return '-';
+          }
+
+          return (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                maxWidth: '300px',
+              }}
+            >
+              <Tooltip placement='top' title={name}>
+                <Typography.Paragraph
+                  ellipsis={{ rows: 3 }}
+                  style={{ marginBottom: 0 }}
+                >
+                  {name}
+                </Typography.Paragraph>
+              </Tooltip>
+            </div>
+          );
+        },
       },
       {
         title: 'Recurrence',
         dataIndex: 'recurrence',
+        width: '20%',
         render: ({ type, cron }) => renderRecurrence(type, cron),
       },
       {
         title: 'Next Run',
         dataIndex: 'nextRunTime',
         sorter: true,
+        width: '20%',
         render: renderNextRunTime,
       },
       {
         title: 'Created By',
         dataIndex: 'userName',
         sorter: true,
+        width: '20%',
         render: name => (name ? name : '-'),
       },
       {
         title: 'Action',
         dataIndex: 'id',
-        width: 150,
+        width: '10%',
         render: renderAction,
       },
     ];
