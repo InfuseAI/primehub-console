@@ -83,19 +83,6 @@ export class OidcAuthenticationFlowCtrl {
 
         try {
           const response = await axios.post(tokenUrl, params);
-
-          // revoke old token before response to the client
-          // note: the new token is still active event we revoke right after requesting a new one
-          const userId = decode(response.data.access_token.split('.')[1]).sub();
-          const query = gql`
-          mutation revokeApiToken($userId: String)  {
-            revokeApiToken(userId: $userId) {
-              id
-            }
-           }
-          `;
-          await this.graphqlClient.request(query, {userId});
-
           const data = {
             'api-token': response.data.refresh_token,
             'endpoint': config.graphqlEndpoint,

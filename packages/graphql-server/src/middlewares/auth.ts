@@ -25,7 +25,7 @@ export const ShieldQuery = {
 
 export const ShieldMutation = {
   '*': isAdmin,
-  'revokeApiToken': or(isAdmin, isUser, isClient),
+  'revokeApiToken': or(isAdmin, isUser),
   'createImage': or(isAdmin, isUser),
   'updateImage': or(isAdmin, isUser),
   'rebuildImage': or(isAdmin, isUser),

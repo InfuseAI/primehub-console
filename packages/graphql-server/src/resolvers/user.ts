@@ -11,17 +11,22 @@ import {
   flatten,
   isNaN,
   isNil,
+  omit,
+  sortBy,
+  filter,
 } from 'lodash';
 import {
-  mutateRelation, parseDiskQuota, stringifyDiskQuota} from './utils';
+  mutateRelation, parseDiskQuota, stringifyDiskQuota, paginate, extractPagination, toRelay
+} from './utils';
 import { Attributes } from './attr';
-import { Context, Role } from './interface';
+import { Context } from './interface';
 import { ApolloError } from 'apollo-server';
 import { RequiredActionAlias } from 'keycloak-admin/lib/defs/requiredActionProviderRepresentation';
 import BPromise from 'bluebird';
 import * as logger from '../logger';
 import { crd as annCrdResolver } from '../resolvers/announcement';
 import moment from 'moment';
+import UserRepresentation from 'keycloak-admin/lib/defs/userRepresentation';
 import { transform as transformGroup } from './groupUtils';
 
 /**
@@ -615,18 +620,7 @@ export const resetPassword = async (root, args, context: Context) => {
 };
 
 export const revokeApiToken = async (root, args, context: Context) => {
-
-  let id = context.userId;
-
-  // When client role request revoke-token, it has set the userId as input
-  if (context.role === Role.CLIENT) {
-    const userId = args.userId || '';
-    if (userId) {
-      id = userId;
-    } else {
-      throw new ApolloError('Cannot revoke API token: userId is required when revoking by a clien role', 'USER_REVOKE_FAILED');
-    }
-  }
+  const id = context.userId;
 
   try {
     await context.kcAdminClient.users.revokeConsent({
