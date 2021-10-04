@@ -14,6 +14,7 @@ import {
   Dropdown,
   Modal,
   Button,
+  Typography,
 } from 'antd';
 import { compose } from 'recompose';
 import { useHistory } from 'react-router-dom';
@@ -349,10 +350,19 @@ function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesProps) {
         }
 
         return (
-          <>
+          <div
+            style={{ display: 'flex', alignItems: 'center', maxWidth: '700px' }}
+          >
             <Icon style={iconStyle} type='file' />
-            {name}
-          </>
+            <Tooltip placement='top' title={name}>
+              <Typography.Paragraph
+                ellipsis={{ rows: 1 }}
+                style={{ marginBottom: 0 }}
+              >
+                {name}
+              </Typography.Paragraph>
+            </Tooltip>
+          </div>
         );
       },
     },
