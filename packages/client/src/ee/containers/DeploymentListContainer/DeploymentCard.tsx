@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
 import { useHistory } from 'react-router-dom';
-import { Tag, Icon, Divider, Spin, Modal, notification } from 'antd';
+import { Tag, Icon, Divider, Spin, Modal, notification, Tooltip } from 'antd';
 
 import { useClipboard } from 'hooks/useClipboard';
 import { usePrevious } from 'hooks/usePrevious';
@@ -98,7 +98,9 @@ export function DeploymentCard({ endpoint, ...props }: Props) {
           padding: '16px 24px 0px 24px',
         }}
       >
-        <Title>{props.name}</Title>
+        <Tooltip placement='top' title={props.name}>
+          <Title>{props.name}</Title>
+        </Tooltip>
         <Tag style={{ cursor: 'auto' }} color={DEPLOYMENT_STATUS[props.status]}>
           {props.status}
         </Tag>
