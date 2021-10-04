@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { Button, Tooltip, Table as AntTable, Icon, Modal } from 'antd';
+import {
+  Button,
+  Tooltip,
+  Table as AntTable,
+  Icon,
+  Modal,
+  Typography,
+} from 'antd';
 import { RouteComponentProps } from 'react-router';
 import { Link, withRouter } from 'react-router-dom';
 import { startCase, get } from 'lodash';
@@ -35,19 +42,23 @@ const Table = styled(AntTable as any)`
 `;
 
 const renderJobName = (text, record) => (
-  <Tooltip placement='top' title={`Job ID: ${record.id}`}>
-    <Link
-      to={{
-        state: {
-          prevPathname: location.pathname,
-          prevSearch: location.search,
-        },
-        pathname: `job/${record.id}`,
-      }}
-    >
-      {text}
-    </Link>
-  </Tooltip>
+  <div style={{ display: 'flex', alignItems: 'center', maxWidth: '300px' }}>
+    <Tooltip placement='top' title={text}>
+      <Typography.Paragraph ellipsis={{ rows: 3 }} style={{ marginBottom: 0 }}>
+        <Link
+          to={{
+            state: {
+              prevPathname: location.pathname,
+              prevSearch: location.search,
+            },
+            pathname: `job/${record.id}`,
+          }}
+        >
+          {text}
+        </Link>
+      </Typography.Paragraph>
+    </Tooltip>
+  </div>
 );
 
 const renderSchedule = text =>
@@ -206,7 +217,7 @@ class JobList extends React.Component<Props> {
   };
 
   refresh = () => {
-    const { groupContext, jobsVariables, jobsRefetch } = this.props;
+    const { jobsVariables, jobsRefetch } = this.props;
     const newVariables = {
       ...jobsVariables,
       page: 1,
@@ -238,7 +249,7 @@ class JobList extends React.Component<Props> {
   };
 
   searchHandler = queryString => {
-    const { groupContext, jobsVariables, jobsRefetch } = this.props;
+    const { jobsVariables, jobsRefetch } = this.props;
     let newVariables = jobsVariables;
     if (queryString && queryString.length > 0) {
       newVariables = {
@@ -254,7 +265,7 @@ class JobList extends React.Component<Props> {
 
   handleTableChange = (pagination, _filters, sorter) => {
     const { jobsVariables, jobsRefetch } = this.props;
-    const orderBy: any = {};
+    const orderBy = {};
     if (sorter.field) {
       orderBy[sorter.field] =
         get(sorter, 'order') === 'ascend' ? 'asc' : 'desc';
@@ -268,7 +279,7 @@ class JobList extends React.Component<Props> {
 
   cloneJob = record => {
     const { groupContext, history } = this.props;
-    const data: any = {
+    const data = {
       displayName: record.displayName,
       groupId: !groupContext ? record.groupId : groupContext.id,
       groupName: !groupContext ? record.groupName : groupContext.name,
@@ -346,6 +357,7 @@ class JobList extends React.Component<Props> {
         title: 'Job name',
         dataIndex: 'displayName',
         sorter: true,
+        width: '300px',
         render: renderJobName,
       },
       {
