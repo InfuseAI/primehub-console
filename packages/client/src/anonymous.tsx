@@ -239,7 +239,7 @@ const AnonymousPage = () => {
       <Route path={`${appPrefix}invite/:token`}>
         <UserRegistration />
       </Route>
-      <Route path={`${appPrefix}api-token/callback`}>
+      <Route path={`${appPrefix}oidc/auth-flow/callback`}>
         <AuthorizationCode />
       </Route>
     </BrowserRouter>
