@@ -371,7 +371,7 @@ const listQuery = async (client: CustomResource<PhDeploymentSpec>, where: any, c
 
   // sort by updateTime
   transformedPhDeployments = orderBy(transformedPhDeployments, 'lastUpdatedTime', 'desc');
-  const searchFields = ["id", "name"];
+  const searchFields = ['id', 'name'];
   return filter(transformedPhDeployments, {where: omit(where, 'mine'), searchFields});
 };
 

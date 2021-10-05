@@ -385,7 +385,7 @@ const listQuery = async (
   groups = groups.filter(group => group.id !== everyoneGroupId);
 
   // do not need to sort, so we do pagination first and then map
-  const searchFields = ['name', 'displayName']
+  const searchFields = ['name', 'displayName'];
   if (isEmpty(order)) {
     groups = filter(groups, {where, order, searchFields});
     return {
