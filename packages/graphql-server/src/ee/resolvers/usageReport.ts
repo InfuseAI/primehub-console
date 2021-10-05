@@ -45,7 +45,7 @@ const listQuery = async (context: Context, where: any, order: any) => {
         id: 'desc'
       };
     }
-    return filter(elements, where, order);
+    return filter(elements, {where, order});
   } catch (error) {
     logger.error({
       component: logger.components.usageReport,

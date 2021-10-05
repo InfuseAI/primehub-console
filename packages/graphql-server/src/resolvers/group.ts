@@ -385,8 +385,9 @@ const listQuery = async (
   groups = groups.filter(group => group.id !== everyoneGroupId);
 
   // do not need to sort, so we do pagination first and then map
+  const searchFields = ['name', 'displayName']
   if (isEmpty(order)) {
-    groups = filter(groups, where, order);
+    groups = filter(groups, {where, order, searchFields});
     return {
       fetched: false,
       groups,
@@ -396,7 +397,7 @@ const listQuery = async (
     const fetchedGroups = await Promise.all(
       groups.map(group => context.kcAdminClient.groups.findOne({id: group.id})));
     const transformed = fetchedGroups.map(transform);
-    groups = filter(transformed, where, order, customComparators);
+    groups = filter(transformed, {where, order, searchFields, comparators: customComparators});
     return {
       fetched: true,
       groups,

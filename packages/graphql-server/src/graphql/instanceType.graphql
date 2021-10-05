@@ -71,6 +71,7 @@ input InstanceTypeWhereInput {
   id: ID
   name_contains: String
   displayName_contains: String
+  search: String
 }
 
 """Mutation input"""
