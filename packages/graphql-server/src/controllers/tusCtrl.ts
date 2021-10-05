@@ -116,6 +116,7 @@ function debug(ctx, target) {
 }
 
 const checkTusPermission = async (ctx: Koa.ParameterizedContext, next: any) => {
+
   // only verify if method is POST
   if (ctx.request.method !== 'POST') {
     return next();
@@ -126,6 +127,7 @@ const checkTusPermission = async (ctx: Koa.ParameterizedContext, next: any) => {
   // dirpath is a group path matching the pattern: groups/${group}/upload
   const uploadMetadata = ctx.headers['upload-metadata'];
   if (!uploadMetadata) {
+    console.warn('upload-metadata header not found');
     throw Boom.badRequest('upload-metadata header not found');
   }
 
@@ -133,17 +135,20 @@ const checkTusPermission = async (ctx: Koa.ParameterizedContext, next: any) => {
   const regex = new RegExp('dirpath ([^,]+),?');
   const result = regex.exec(uploadMetadata);
   if (!result) {
+    console.warn('dirpath not found in the upload-metadata header', uploadMetadata);
     throw Boom.badRequest('dirpath not found in the upload-metadata header');
   }
   const dirPath = Buffer.from(result[1], 'base64').toString();
 
   const uploadGroup = new RegExp('groups/([^/]+)/').exec(dirPath);
   if (!uploadGroup) {
+    console.warn('there is no group name in the dirpath', dirPath);
     throw Boom.badRequest('there is no group name in the dirpath');
   }
 
   const groupName = uploadGroup[1];
   if (groupName !== toGroupPath(groupName)) {
+    console.warn(`the group name in the dirpath should have no capital characters and _': ${groupName}`);
     throw Boom.badRequest(`the group name in the dirpath should have no capital characters and _': ${groupName}`);
   }
 
@@ -151,6 +156,7 @@ const checkTusPermission = async (ctx: Koa.ParameterizedContext, next: any) => {
   if (userHasGroup) {
     return next();
   }
+  console.warn('user might not have the group', groupName);
 
   throw Boom.forbidden('request not authorized');
 };
