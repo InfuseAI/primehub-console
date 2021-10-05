@@ -1,6 +1,15 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Table, Input, Modal, Icon, Tooltip, notification } from 'antd';
+import {
+  Button,
+  Table,
+  Input,
+  Modal,
+  Icon,
+  Tooltip,
+  Typography,
+  notification,
+} from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -12,6 +21,31 @@ import { errorHandler } from 'utils/errorHandler';
 import { ImagesLayout } from './Layout';
 import { ImagesQuery, DeleteImageMutation } from './images.graphql';
 import type { Image } from './types';
+
+function RenderFieldName(text?: string) {
+  if (text?.length > 35) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          maxWidth: '250px',
+        }}
+      >
+        <Tooltip placement='top' title={text}>
+          <Typography.Paragraph
+            ellipsis={{ rows: 3 }}
+            style={{ marginBottom: 0 }}
+          >
+            {text}
+          </Typography.Paragraph>
+        </Tooltip>
+      </div>
+    );
+  }
+
+  return text || '-';
+}
 
 const styles: React.CSSProperties = {
   display: 'flex',
@@ -88,7 +122,32 @@ function _ImageList({ data, ...props }: ImageListProps) {
       key: 'name',
       title: 'Name',
       sorter: true,
+      width: '20%',
       render: (image: ImageNode) => {
+        if (image?.node?.name.length > 35) {
+          return (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                maxWidth: '250px',
+              }}
+            >
+              <Tooltip placement='top' title={image.node.name}>
+                <Typography.Paragraph
+                  ellipsis={{ rows: 3 }}
+                  style={{ marginBottom: 0 }}
+                >
+                  {image.node.name}{' '}
+                  {!image.node.isReady && (
+                    <Icon type='warning' title='Image is not ready.' />
+                  )}
+                </Typography.Paragraph>
+              </Tooltip>
+            </div>
+          );
+        }
+
         if (!image.node.isReady) {
           return (
             <>
@@ -106,11 +165,14 @@ function _ImageList({ data, ...props }: ImageListProps) {
       title: 'Display Name',
       dataIndex: 'node.displayName',
       sorter: true,
+      width: '20%',
+      render: RenderFieldName,
     },
     {
       key: 'type',
       title: 'Type',
       sorter: true,
+      width: '20%',
       render: (image: ImageNode) => {
         if (image.node.type === 'both') {
           return 'Universal';
@@ -124,6 +186,8 @@ function _ImageList({ data, ...props }: ImageListProps) {
       title: 'Description',
       sorter: true,
       dataIndex: 'node.description',
+      width: '20%',
+      render: RenderFieldName,
     },
     {
       key: 'actions',

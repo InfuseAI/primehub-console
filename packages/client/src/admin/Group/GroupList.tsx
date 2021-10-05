@@ -30,7 +30,7 @@ type Props = {
   deleteGroup?: any;
 } & RouteComponentProps;
 
-function RenderFieldName(text: string) {
+function RenderFieldName(text?: string) {
   if (text?.length > 35) {
     return (
       <div
