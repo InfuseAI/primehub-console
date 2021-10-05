@@ -1,5 +1,14 @@
 import React, { useState, useCallback } from 'react';
-import { Table, Col, Layout, Button, Icon, Modal, Tooltip } from 'antd';
+import {
+  Table,
+  Col,
+  Layout,
+  Button,
+  Icon,
+  Modal,
+  Tooltip,
+  Typography,
+} from 'antd';
 import { withRouter, useHistory } from 'react-router-dom';
 import { reduce, pick } from 'lodash';
 import PageTitle from 'components/pageTitle';
@@ -19,6 +28,31 @@ import { UsersConnection, DeleteUser } from 'queries/User.graphql';
 const PAGE_SIZE = 10;
 const ButtonGroup = Button.Group;
 const { confirm } = Modal;
+
+function RenderFieldName(text?: string) {
+  if (text?.length > 35) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          maxWidth: '250px',
+        }}
+      >
+        <Tooltip placement='top' title={text}>
+          <Typography.Paragraph
+            ellipsis={{ rows: 3 }}
+            style={{ marginBottom: 0 }}
+          >
+            {text}
+          </Typography.Paragraph>
+        </Tooltip>
+      </div>
+    );
+  }
+
+  return text;
+}
 
 interface Props {
   dataSource: any;
@@ -99,6 +133,8 @@ function List(props: Props) {
       title: 'Username',
       dataIndex: 'username',
       key: 'username',
+      width: '300px',
+      render: RenderFieldName,
     },
     {
       title: 'Email',
@@ -107,7 +143,31 @@ function List(props: Props) {
     {
       title: 'Name',
       dataIndex: 'firstName',
-      render: (value, record) => `${value} ${record.lastName}`,
+      width: '300px',
+      render: (value, record) => {
+        if (value?.length + record?.lastName?.length > 35) {
+          return (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                maxWidth: '250px',
+              }}
+            >
+              <Tooltip placement='top' title={`${value} ${record.lastName}`}>
+                <Typography.Paragraph
+                  ellipsis={{ rows: 3 }}
+                  style={{ marginBottom: 0 }}
+                >
+                  {`${value} ${record.lastName}`}
+                </Typography.Paragraph>
+              </Tooltip>
+            </div>
+          );
+        }
+
+        return `${value} ${record.lastName}`;
+      },
     },
     {
       title: 'Enabled',
