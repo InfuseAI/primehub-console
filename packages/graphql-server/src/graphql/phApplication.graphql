@@ -73,6 +73,7 @@ input PhApplicationWhereInput {
   id: ID
   appName_contains: String
   groupName_in: [String]
+  search: String
 }
 
 

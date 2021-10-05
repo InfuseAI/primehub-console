@@ -229,7 +229,7 @@ const listQueryVersions = async (root, args, context: Context) => {
     const modelVersions = await Promise.all(json.model_versions.map(async m => {
       return transformVersion(m, groupId, context, mlflow, memGetPhDeployments);
     }));
-    return filter(modelVersions, where);
+    return filter(modelVersions, {where});
   } else if (json.error_code) {
     logger.error({
       component: logger.components.model,

@@ -262,6 +262,7 @@ export class Crd<SpecType> {
   private listQuery =
     async (customResource: CustomResource<SpecType>, where: any, order: any, context: Context, mode?: QueryImageMode) => {
     const rows = await customResource.list();
+    let searchFields = ['name', 'displayName', 'description'];
     let mappedRows = rows.map(row => this.propMapping(row, context));
     if (this.customResourceMethod === 'images') {
         if (mode === QueryImageMode.SYSTEM_ONLY) {
@@ -273,8 +274,9 @@ export class Crd<SpecType> {
             return !isEmpty(row.groupName);
           });
         }
+        searchFields = ['name', 'dispalyName', 'description', 'type']
     }
-    mappedRows = filter(mappedRows, where, order);
+    mappedRows = filter(mappedRows, {where, order, searchFields});
     return mappedRows;
   }
 

@@ -56,7 +56,7 @@ const listQuery = async (client: CustomResource<PhAppTemplateSpec>, where: any, 
   const transformedPhAppTemplates = await Promise.all(
     phAppTemplates.map(item => transform(item)));
 
-  return filter(transformedPhAppTemplates, where);
+  return filter(transformedPhAppTemplates, {where});
 };
 
 export const query = async (root, args, context: Context) => {

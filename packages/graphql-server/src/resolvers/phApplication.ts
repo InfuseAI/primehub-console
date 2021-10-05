@@ -173,7 +173,8 @@ const listQuery = async (client: CustomResource<PhApplicationSpec, PhApplication
     phApplications.map(item => transform(item, kcAdminClient)));
 
   order = isEmpty(order) ? {displayName: 'asc'} : order;
-  return filter(transformedPhApplications, where, order);
+  const searchFields = ['id', 'appName', 'displayName'];
+  return filter(transformedPhApplications, {where, order, searchFields});
 };
 
 export const query = async (root, args, context: Context) => {

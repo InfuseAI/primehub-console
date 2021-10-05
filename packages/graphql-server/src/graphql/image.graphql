@@ -94,6 +94,7 @@ input ImageWhereInput {
   groupName_contains: String
   type_contains: String
   description_contains: String
+  search: String
 }
 
 """Mutation input"""

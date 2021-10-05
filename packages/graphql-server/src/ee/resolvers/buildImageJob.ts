@@ -62,7 +62,7 @@ const listQuery = async (client: CustomResource<ImageSpecJobSpec>, where: any, n
 
   const imageSpecJobs = await client.list();
   const transformedimageSpecJobs = imageSpecJobs.map(job => transform(job, namespace, graphqlHost, jobLogCtrl));
-  return filter(transformedimageSpecJobs, where);
+  return filter(transformedimageSpecJobs, {where});
 };
 
 export const query = async (root, args, context: Context) => {

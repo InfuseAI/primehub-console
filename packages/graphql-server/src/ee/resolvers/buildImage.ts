@@ -69,7 +69,7 @@ const listQuery = async (imageSpecClient: CustomResource<ImageSpecSpec, ImageSpe
 
   // sort by updateTime in desc
   order = isEmpty(order) ? {updateTime: 'desc'} : order;
-  return filter(transformedImageSpecs, where, order);
+  return filter(transformedImageSpecs, {where, order});
 };
 
 export const query = async (root, args, context: Context) => {
