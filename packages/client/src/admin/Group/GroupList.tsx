@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Input, Col, Layout, Button, Tooltip } from 'antd';
+import { Modal, Input, Col, Layout, Button, Tooltip, Typography } from 'antd';
 import {
   withRouter,
   RouteComponentProps,
@@ -29,6 +29,31 @@ type Props = {
   listGroup?: any;
   deleteGroup?: any;
 } & RouteComponentProps;
+
+function RenderFieldName(text: string) {
+  if (text?.length > 35) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          maxWidth: '250px',
+        }}
+      >
+        <Tooltip placement='top' title={text}>
+          <Typography.Paragraph
+            ellipsis={{ rows: 3 }}
+            style={{ marginBottom: 0 }}
+          >
+            {text}
+          </Typography.Paragraph>
+        </Tooltip>
+      </div>
+    );
+  }
+
+  return text;
+}
 
 export function GroupList(props: Props) {
   const history = useHistory();
@@ -145,12 +170,16 @@ export function GroupList(props: Props) {
       key: 'name',
       sorter: true,
       sortOrder: reducedOrderBy.name,
+      width: '300px',
+      render: RenderFieldName,
     },
     {
       title: 'Display Name',
       dataIndex: 'displayName',
       sorter: true,
       sortOrder: reducedOrderBy.displayName,
+      width: '300px',
+      render: RenderFieldName,
     },
     {
       title: 'Share Volume Capacity',
