@@ -1,6 +1,14 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Button, Table, Modal, notification, Tooltip, Col } from 'antd';
+import {
+  Button,
+  Table,
+  Modal,
+  notification,
+  Tooltip,
+  Col,
+  Typography,
+} from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -19,7 +27,31 @@ import { errorHandler } from 'utils/errorHandler';
 import InfuseButton from 'components/infuseButton';
 import { FilterRow, FilterPlugins, ButtonCol } from 'cms-toolbar/filter';
 import Search from 'antd/lib/input/Search';
-import { useEffect, useState } from 'react';
+
+function RenderFieldName(text?: string) {
+  if (text?.length > 35) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          maxWidth: '250px',
+        }}
+      >
+        <Tooltip placement='top' title={text}>
+          <Typography.Paragraph
+            ellipsis={{ rows: 3 }}
+            style={{ marginBottom: 0 }}
+          >
+            {text}
+          </Typography.Paragraph>
+        </Tooltip>
+      </div>
+    );
+  }
+
+  return text || '-';
+}
 
 const styles: React.CSSProperties = {
   display: 'flex',
@@ -65,14 +97,6 @@ interface Props {
       };
     };
   }) => Promise<void>;
-}
-
-interface QueryVariables {
-  page: number;
-  orderBy?: {};
-  where?: {
-    name_contains?: string;
-  };
 }
 
 function _Datasets({
@@ -183,13 +207,16 @@ function _Datasets({
       title: 'Name',
       dataIndex: 'node.name',
       sorter: true,
+      width: '300px',
+      render: RenderFieldName,
     },
     {
       key: 'displayName',
       title: 'Display Name',
       dataIndex: 'node.displayName',
       sorter: true,
-      render: text => text || '-',
+      width: '300px',
+      render: RenderFieldName,
     },
     {
       key: 'type',
@@ -216,9 +243,9 @@ function _Datasets({
       key: 'description',
       title: 'Description',
       dataIndex: 'node.description',
-      width: '16.6%',
+      width: '350px',
       sorter: true,
-      render: text => text || '-',
+      render: RenderFieldName,
     },
     {
       key: 'uploadServerLink',

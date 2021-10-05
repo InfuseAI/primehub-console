@@ -49,7 +49,7 @@ function RenderFieldName(text: string) {
     );
   }
 
-  return text;
+  return text || '-';
 }
 
 const styles: React.CSSProperties = {
@@ -165,7 +165,7 @@ export function _InstanceTypes({
       title: 'Description',
       sorter: true,
       render: (instance: InstanceTypeNode) => {
-        return instance.node.description || '-';
+        return RenderFieldName(instance.node.description);
       },
     },
     {
