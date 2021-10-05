@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Button, Table, Modal, Tooltip, notification } from 'antd';
+import { Button, Table, Modal, Tooltip, Typography, notification } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -15,6 +15,31 @@ import {
 import { SecretLayout } from './Layout';
 import { SecretForm, initialFormState } from './SecretForm';
 import type { TSecret } from './types';
+
+function RenderFieldName(text: string) {
+  if (text.length > 35) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          maxWidth: '250px',
+        }}
+      >
+        <Tooltip placement='top' title={text}>
+          <Typography.Paragraph
+            ellipsis={{ rows: 3 }}
+            style={{ marginBottom: 0 }}
+          >
+            {text}
+          </Typography.Paragraph>
+        </Tooltip>
+      </div>
+    );
+  }
+
+  return text || '-';
+}
 
 const styles: React.CSSProperties = {
   display: 'flex',
@@ -74,16 +99,21 @@ function _Secrets({
       title: 'Name',
       dataIndex: 'node.name',
       sorter: (a, b) => compareString(a.node.name, b.node.name),
+      width: '25%',
+      render: RenderFieldName,
     },
     {
       key: 'display-name',
       title: 'Display Name',
       dataIndex: 'node.displayName',
       sorter: (a, b) => compareString(a.node.displayName, b.node.displayName),
+      width: '25%',
+      render: RenderFieldName,
     },
     {
       key: 'type',
       title: 'Type',
+      width: '25%',
       sorter: (a, b) => compareString(a.node.type, b.node.type),
       render: function RenderType(secret: SecretNode) {
         const secretName = {
@@ -97,7 +127,7 @@ function _Secrets({
     {
       key: 'actions',
       title: 'Actions',
-      width: '200px',
+      width: '25%',
       render: function RenderActions(secret: SecretNode) {
         return (
           <Button.Group>
