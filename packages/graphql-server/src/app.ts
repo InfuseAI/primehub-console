@@ -618,13 +618,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     }
   };
 
-  const checkIsAdmin = async (ctx: Koa.ParameterizedContext, next: any) => {
-    if (ctx.role === Role.ADMIN) {
-      return next();
-    }
-    throw Boom.forbidden('request not authorized');
-  };
-
   const checkUserGroup = async (ctx: Koa.ParameterizedContext, next: any) => {
     const canUserView = async (userId, groupId): Promise<boolean> => {
       const groups = await ctx.kcAdminClient.users.listGroups({
