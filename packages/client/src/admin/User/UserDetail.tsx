@@ -8,6 +8,8 @@ import {
   Layout,
   Icon,
   Input,
+  Tooltip,
+  Typography,
 } from 'antd';
 import {
   withRouter,
@@ -53,18 +55,64 @@ export const GroupsRelationTable = compose(
     {
       title: 'Name',
       dataIndex: 'name',
+      width: '40%',
       // eslint-disable-next-line react/display-name
       render: (text, record) => {
+        if (text?.length > 35) {
+          return (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                maxWidth: '400px',
+              }}
+            >
+              <Tooltip placement='top' title={text}>
+                <Typography.Paragraph
+                  ellipsis={{ rows: 3 }}
+                  style={{ marginBottom: 0 }}
+                >
+                  <Link to={`../group/${record.id}`}>{text}</Link>
+                </Typography.Paragraph>
+              </Tooltip>
+            </div>
+          );
+        }
         return <Link to={`../group/${record.id}`}>{text}</Link>;
       },
     },
     {
       title: 'Display Name',
       dataIndex: 'displayName',
+      width: '40%',
+      render: text => {
+        if (text?.length > 35) {
+          return (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                maxWidth: '400px',
+              }}
+            >
+              <Tooltip placement='top' title={text}>
+                <Typography.Paragraph
+                  ellipsis={{ rows: 3 }}
+                  style={{ marginBottom: 0 }}
+                >
+                  {text}
+                </Typography.Paragraph>
+              </Tooltip>
+            </div>
+          );
+        }
+        return text;
+      },
     },
     {
       title: 'CPU Quota',
       dataIndex: 'quotaCpu',
+      width: '10%',
       render: text => {
         return text === null ? '∞' : text;
       },
@@ -74,6 +122,7 @@ export const GroupsRelationTable = compose(
     {
       title: 'GPU Quota',
       dataIndex: 'quotaGpu',
+      width: '10%',
       render: text => {
         return text === null ? '∞' : text;
       },
@@ -291,7 +340,7 @@ function DetailPage(props: any) {
                   )}
                 </Form.Item>
                 <Form.Item label={'Groups'}>
-                  <div data-testid="groups">
+                  <div data-testid='groups'>
                     <GroupsRelationTable
                       onChange={handleRelationConnection}
                       value={relateGroups}
@@ -307,7 +356,9 @@ function DetailPage(props: any) {
                   >
                     Update
                   </InfuseButton>
-                  <InfuseButton onClick={onCancel} data-testid='reset-button'>Cancel</InfuseButton>
+                  <InfuseButton onClick={onCancel} data-testid='reset-button'>
+                    Cancel
+                  </InfuseButton>
                 </Form.Item>
               </Form>
             </Skeleton>

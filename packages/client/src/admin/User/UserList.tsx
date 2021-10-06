@@ -133,7 +133,7 @@ function List(props: Props) {
       title: 'Username',
       dataIndex: 'username',
       key: 'username',
-      width: '300px',
+      width: '20%',
       render: RenderFieldName,
     },
     {
@@ -143,7 +143,7 @@ function List(props: Props) {
     {
       title: 'Name',
       dataIndex: 'firstName',
-      width: '300px',
+      width: '20%',
       render: (value, record) => {
         if (value?.length + record?.lastName?.length > 35) {
           return (

@@ -1,8 +1,8 @@
 import React from 'react';
-import { get  } from 'lodash';
+import { get } from 'lodash';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
-import { Checkbox, Table } from 'antd';
+import { Checkbox, Table, Tooltip, Typography } from 'antd';
 import { GetGroupUsers } from 'queries/Group.graphql';
 
 interface Props {
@@ -11,12 +11,11 @@ interface Props {
 }
 
 class GroupSettingsMembers extends React.Component<Props> {
-
   render() {
     const { group, groupUsers } = this.props;
 
     if (!group || groupUsers.loading) {
-      return (<div>loading...</div>);
+      return <div>loading...</div>;
     }
 
     const admins = get(groupUsers, 'group.admins', []).split(',');
@@ -32,18 +31,45 @@ class GroupSettingsMembers extends React.Component<Props> {
         title: 'Username',
         dataIndex: 'username',
         key: 'username',
+        width: '80%',
+        render: text => {
+          if (text?.length > 35) {
+            return (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  maxWidth: '250px',
+                }}
+              >
+                <Tooltip placement='top' title={text}>
+                  <Typography.Paragraph
+                    ellipsis={{ rows: 3 }}
+                    style={{ marginBottom: 0 }}
+                  >
+                    {text}
+                  </Typography.Paragraph>
+                </Tooltip>
+              </div>
+            );
+          }
+
+          return text;
+        },
       },
       {
         title: 'Group Admin',
         dataIndex: 'admin',
         key: 'admin',
-        render: (value) => <Checkbox checked={value} disabled />,
+        width: '20%',
+        render: value => <Checkbox checked={value} disabled />,
       },
     ];
 
-    return <Table dataSource={users} columns={columns} style={{marginTop: 15}}/>;
+    return (
+      <Table dataSource={users} columns={columns} style={{ marginTop: 15 }} />
+    );
   }
-
 }
 
 export default compose(
@@ -62,5 +88,5 @@ export default compose(
       };
     },
     name: 'groupUsers',
-  }),
+  })
 )(GroupSettingsMembers);

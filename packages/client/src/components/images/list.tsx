@@ -7,6 +7,7 @@ import {
   Table as AntTable,
   Icon,
   Modal,
+  Typography,
 } from 'antd';
 import { RouteComponentProps } from 'react-router';
 import { Link, withRouter } from 'react-router-dom';
@@ -42,8 +43,39 @@ const Table = styled(AntTable as any)`
   }
 `;
 
-const renderImageName = (text, record) => (
-  <Tooltip placement='top' title={`Image ID: ${record.id}`}>
+const renderImageName = (text, record) => {
+  if (text?.length > 35) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          maxWidth: '250px',
+        }}
+      >
+        <Tooltip placement='top' title={text}>
+          <Typography.Paragraph
+            ellipsis={{ rows: 3 }}
+            style={{ marginBottom: 0 }}
+          >
+            <Link
+              to={{
+                state: {
+                  prevPathname: location.pathname,
+                  prevSearch: location.search,
+                },
+                pathname: `images/${record.id}/edit`,
+              }}
+            >
+              {text}
+            </Link>
+          </Typography.Paragraph>
+        </Tooltip>
+      </div>
+    );
+  }
+
+  return (
     <Link
       to={{
         state: {
@@ -55,8 +87,8 @@ const renderImageName = (text, record) => (
     >
       {text}
     </Link>
-  </Tooltip>
-);
+  );
+};
 
 const renderTimeIfValid = time => {
   if (!time) {
@@ -204,29 +236,78 @@ class ImageList extends React.Component<Props> {
         title: 'Name',
         dataIndex: 'name',
         sorter: true,
+        width: '20%',
         render: (text, record) => {
-          const { isReady } = record;
-          let result = `${text}`;
-          if (!isReady) {
-            result = (
-              <span>
-                {result} <Icon type='warning' title='Image is not ready.' />
-              </span>
+          if (text?.length > 35) {
+            return (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  maxWidth: '250px',
+                }}
+              >
+                <Tooltip placement='top' title={text}>
+                  <Typography.Paragraph
+                    ellipsis={{ rows: 3 }}
+                    style={{ marginBottom: 0 }}
+                  >
+                    {text}{' '}
+                    {!record.isReady && (
+                      <Icon type='warning' title='Image is not ready.' />
+                    )}
+                  </Typography.Paragraph>
+                </Tooltip>
+              </div>
             );
           }
-          return result;
+
+          if (!record.isReady) {
+            return (
+              <>
+                {text} <Icon type='warning' title='Image is not ready.' />
+              </>
+            );
+          }
+
+          return text;
         },
       },
       {
         title: 'Display Name',
         dataIndex: 'displayName',
         sorter: true,
+        width: '20%',
         render: renderImageName,
       },
       {
         title: 'Description',
         sorter: true,
         dataIndex: 'description',
+        render: text => {
+          if (text?.length > 35) {
+            return (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  maxWidth: '250px',
+                }}
+              >
+                <Tooltip placement='top' title={text}>
+                  <Typography.Paragraph
+                    ellipsis={{ rows: 3 }}
+                    style={{ marginBottom: 0 }}
+                  >
+                    {text}
+                  </Typography.Paragraph>
+                </Tooltip>
+              </div>
+            );
+          }
+
+          return text;
+        },
       },
       {
         title: 'Type',

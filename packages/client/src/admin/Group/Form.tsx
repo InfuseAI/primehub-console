@@ -11,6 +11,8 @@ import {
   Switch,
   Card,
   InputNumber,
+  Tooltip,
+  Typography,
 } from 'antd';
 import { isArray, get, sortBy, uniqBy } from 'lodash';
 import { FormComponentProps } from 'antd/es/form';
@@ -127,10 +129,36 @@ const UsersRelationTable = compose(
     {
       title: 'Username',
       dataIndex: 'username',
+      width: '80%',
+      render: text => {
+        if (text?.length > 35) {
+          return (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                maxWidth: '250px',
+              }}
+            >
+              <Tooltip placement='top' title={text}>
+                <Typography.Paragraph
+                  ellipsis={{ rows: 3 }}
+                  style={{ marginBottom: 0 }}
+                >
+                  {text}
+                </Typography.Paragraph>
+              </Tooltip>
+            </div>
+          );
+        }
+
+        return text;
+      },
     },
     {
       title: 'Group Admin',
       dataIndex: 'id',
+      width: '20%',
       render: (val, record) => {
         return (
           <Checkbox
@@ -148,6 +176,30 @@ const UsersRelationTable = compose(
     {
       title: 'Username',
       dataIndex: 'username',
+      render: text => {
+        if (text?.length > 35) {
+          return (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                maxWidth: '250px',
+              }}
+            >
+              <Tooltip placement='top' title={text}>
+                <Typography.Paragraph
+                  ellipsis={{ rows: 3 }}
+                  style={{ marginBottom: 0 }}
+                >
+                  {text}
+                </Typography.Paragraph>
+              </Tooltip>
+            </div>
+          );
+        }
+
+        return text;
+      },
     },
   ];
 
