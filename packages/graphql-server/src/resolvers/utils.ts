@@ -211,7 +211,7 @@ export const filter = (rows: any[], options: FilterOptions = {}) => {
         const value = where.search.toLowerCase();
         const searchFilter = row => {
           for (const fieldName of searchFields) {
-            if (row[fieldName] && row[fieldName].toLowerCase && row[fieldName].toLowerCase().includes(value)) {
+            if (row[fieldName] && row[fieldName].toLowerCase().includes(value)) {
               return true;
             }
           }
