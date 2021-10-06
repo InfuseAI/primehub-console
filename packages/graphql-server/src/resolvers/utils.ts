@@ -15,7 +15,7 @@ import {
   uniq
 } from 'lodash';
 import KcAdminClient from 'keycloak-admin';
-import { takeWhile, takeRightWhile, take, takeRight, flow, } from 'lodash/fp';
+import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
 import { EOL } from 'os';
 import { Context, Role } from './interface';
 import { keycloakMaxCount } from './constant';
