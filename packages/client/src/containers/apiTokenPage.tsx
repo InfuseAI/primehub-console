@@ -24,7 +24,7 @@ const breadcrumbs: BreadcrumbItemSetup[] = [
   {
     key: 'api-token',
     matcher: /\/api-token/,
-    title: 'API token',
+    title: 'API Token',
     tips: 'A valid token is mandatory to allow 3rd-party using PrimeHub APIs.',
     tipsLink: 'https://docs.primehub.io/docs/tasks/api-token',
   },
@@ -110,7 +110,7 @@ curl -X POST \\
     <Layout>
       <PageTitle
         breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-        title={'API token'}
+        title='API Token'
       />
       <Row style={{ margin: '16px 24px' }}>
         <Card title='Token'>
