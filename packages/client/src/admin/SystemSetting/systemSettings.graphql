@@ -56,6 +56,9 @@ mutation UpdateSystemSetting($payload: SystemUpdateInput!) {
 
     org {
       name
+      logo {
+        url
+      }
     }
 
     smtp {
