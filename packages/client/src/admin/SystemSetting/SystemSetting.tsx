@@ -151,6 +151,7 @@ function _SystemSetting({ data, ...props }: Props) {
         variables: {
           payload: {
             org: {
+              // If remove logo and no upload a new, after update still get old logo.
               logo: {
                 url: !formState.errors.logo && data.logo,
               },
@@ -214,6 +215,10 @@ function _SystemSetting({ data, ...props }: Props) {
         smtpUsername: data.system.smtp.username,
         smtpPassword: data.system.smtp.password,
       });
+
+      if (!data.system.org.logo?.url) {
+        setAddImageButtonVisible(true);
+      }
     }
   }, [data, reset]);
 
@@ -271,7 +276,7 @@ function _SystemSetting({ data, ...props }: Props) {
         }}
       >
         <form
-          id="system-settings"
+          id='system-settings'
           onSubmit={handleSubmit(onSubmit)}
           style={{
             display: 'grid',
@@ -283,33 +288,33 @@ function _SystemSetting({ data, ...props }: Props) {
           {__ENV__ === 'ce' ? (
             <></>
           ) : (
-            <Card title="PrimeHub License">
-              <Row type="flex">
+            <Card title='PrimeHub License'>
+              <Row type='flex'>
                 <Col sm={5} xs={24}>
                   <div>
                     <CustomLabel>License Status</CustomLabel>
                     <LicenseTag
-                      data-testid="license-status"
+                      data-testid='license-status'
                       status={license.licenseStatus}
                     />
                   </div>
 
                   <div style={{ marginTop: '24px' }}>
                     <CustomLabel>Expiration Date</CustomLabel>
-                    <div data-testid="license-expiredAt">
+                    <div data-testid='license-expiredAt'>
                       {moment(license.expiredAt).format('YYYY/MM/DD HH:mm')}
                     </div>
                   </div>
 
                   <div style={{ marginTop: '24px' }}>
                     <CustomLabel>Licensed To</CustomLabel>
-                    <div data-testid="license-to">{license.licensedTo}</div>
+                    <div data-testid='license-to'>{license.licensedTo}</div>
                   </div>
                 </Col>
                 <Col sm={5} xs={24}>
                   <div>
                     <CustomLabel>Utilized Nodes</CustomLabel>
-                    <div data-testid="license-maxNode">
+                    <div data-testid='license-maxNode'>
                       {get(license, 'usage.maxNode', 0)}/
                       {Number(license.maxNode) === -1 ? '∞' : license.maxNode}
                     </div>
@@ -318,7 +323,7 @@ function _SystemSetting({ data, ...props }: Props) {
                 <Col sm={5} xs={24}>
                   <div>
                     <CustomLabel>Deployed Models</CustomLabel>
-                    <div data-testid="license-maxDeploy">
+                    <div data-testid='license-maxDeploy'>
                       {get(license, 'usage.maxModelDeploy', 0)}/
                       {Number(license.maxModelDeploy) === -1
                         ? '∞'
@@ -330,15 +335,15 @@ function _SystemSetting({ data, ...props }: Props) {
             </Card>
           )}
 
-          <Card title="System Settings">
+          <Card title='System Settings'>
             <div style={{ width: '300px' }}>
               <CustomLabel>Name</CustomLabel>
               <Controller
                 control={control}
-                name="systemName"
+                name='systemName'
                 render={({ field: { onChange, value } }) => (
                   <Input
-                    data-testid="settings-systemName"
+                    data-testid='settings-systemName'
                     value={value}
                     onChange={onChange}
                   />
@@ -353,15 +358,15 @@ function _SystemSetting({ data, ...props }: Props) {
                 <>
                   {/* @ts-ignore */}
                   <Button
-                    type="primary"
-                    data-testid="add-logo"
+                    type='primary'
+                    data-testid='add-logo'
                     onClick={() => setPasteImageModalVisible(true)}
                   >
-                    <Icon type="plus" /> Add Image
+                    <Icon type='plus' /> Add Image
                   </Button>
 
                   <Modal
-                    title="Choose Image"
+                    title='Choose Image'
                     visible={pasteImageModalVisible}
                     maskClosable={false}
                     onCancel={() => {
@@ -385,7 +390,7 @@ function _SystemSetting({ data, ...props }: Props) {
                     <CustomLabel>Enter Image URL</CustomLabel>
                     <Controller
                       control={control}
-                      name="logo"
+                      name='logo'
                       rules={{
                         pattern:
                           /(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg|png))/i,
@@ -393,7 +398,7 @@ function _SystemSetting({ data, ...props }: Props) {
                       render={({ field: { value, onChange } }) => (
                         <CustomLabel>
                           <Input
-                            data-testid="settings-logo-url"
+                            data-testid='settings-logo-url'
                             value={value}
                             onChange={onChange}
                           />
@@ -402,7 +407,7 @@ function _SystemSetting({ data, ...props }: Props) {
                             <CustomLabel
                               style={{ marginTop: '8px', padding: 0 }}
                             >
-                              <Typography.Text type="danger">
+                              <Typography.Text type='danger'>
                                 Invalid image URL
                               </Typography.Text>
                             </CustomLabel>
@@ -419,7 +424,7 @@ function _SystemSetting({ data, ...props }: Props) {
                     backgroundColor: 'rgb(238, 238, 238)',
                   }}
                 >
-                  <img width="100%" src={watchedURL} />
+                  <img width='100%' src={watchedURL} />
 
                   <div
                     style={{
@@ -430,10 +435,10 @@ function _SystemSetting({ data, ...props }: Props) {
                     }}
                   >
                     <Button
-                      data-testid="remove-logo"
+                      data-testid='remove-logo'
                       onClick={() => setAddImageButtonVisible(true)}
                     >
-                      <Icon type="close" />
+                      <Icon type='close' />
                     </Button>
                   </div>
                 </div>
@@ -444,14 +449,14 @@ function _SystemSetting({ data, ...props }: Props) {
               <CustomLabel>Default User Volume Capacity</CustomLabel>
               <Controller
                 control={control}
-                name="defaultUserVolumeCapacity"
+                name='defaultUserVolumeCapacity'
                 render={({ field: { onChange } }) => (
                   <InputNumber
-                    data-testid="settings-capacity"
+                    data-testid='settings-capacity'
                     defaultValue={defaultUserVolumeCapacity}
-                    formatter={(value) => `${value} GB`}
+                    formatter={value => `${value} GB`}
                     // @ts-ignore
-                    parser={(value) => value.replace(/[^0-9.]/g, '')}
+                    parser={value => value.replace(/[^0-9.]/g, '')}
                     precision={0}
                     min={1}
                     step={1}
@@ -465,11 +470,11 @@ function _SystemSetting({ data, ...props }: Props) {
               <CustomLabel>Timezone</CustomLabel>
               <Controller
                 control={control}
-                name="timezone"
+                name='timezone'
                 render={({ field: { value, onChange } }) => (
                   <TimeZone
                     value={value}
-                    onChange={(nextTimezone) => {
+                    onChange={nextTimezone => {
                       onChange({
                         name: nextTimezone,
                         offset: timezones.find(
@@ -483,12 +488,12 @@ function _SystemSetting({ data, ...props }: Props) {
             </div>
           </Card>
 
-          <Card title="Email Settings">
+          <Card title='Email Settings'>
             <div style={{ width: '300px' }}>
               <CustomLabel>SMTP Host</CustomLabel>
               <Controller
                 control={control}
-                name="smtpHost"
+                name='smtpHost'
                 rules={{
                   required: true,
                 }}
@@ -496,13 +501,13 @@ function _SystemSetting({ data, ...props }: Props) {
                   <Input
                     value={value}
                     onChange={onChange}
-                    data-testid="smtp-host"
+                    data-testid='smtp-host'
                   />
                 )}
               />
               {formState.errors.smtpHost && (
                 <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
-                  <Typography.Text type="danger">
+                  <Typography.Text type='danger'>
                     SMTP Host is required!
                   </Typography.Text>
                 </CustomLabel>
@@ -513,10 +518,10 @@ function _SystemSetting({ data, ...props }: Props) {
               <CustomLabel>SMTP Port</CustomLabel>
               <Controller
                 control={control}
-                name="smtpPort"
+                name='smtpPort'
                 render={({ field: { onChange } }) => (
                   <InputNumber
-                    data-testid="smtp-port"
+                    data-testid='smtp-port'
                     defaultValue={smtp.port}
                     precision={0}
                     min={1}
@@ -531,10 +536,10 @@ function _SystemSetting({ data, ...props }: Props) {
               <CustomLabel>From Display Name</CustomLabel>
               <Controller
                 control={control}
-                name="smtpFromDisplayName"
+                name='smtpFromDisplayName'
                 render={({ field: { onChange, value } }) => (
                   <Input
-                    data-testid="smtp-from-display-name"
+                    data-testid='smtp-from-display-name'
                     value={value}
                     onChange={onChange}
                   />
@@ -546,22 +551,22 @@ function _SystemSetting({ data, ...props }: Props) {
               <CustomLabel>From</CustomLabel>
               <Controller
                 control={control}
-                name="smtpFrom"
+                name='smtpFrom'
                 rules={{
                   pattern: EMAIL_REGEX,
                 }}
                 render={({ field: { onChange, value } }) => (
                   <CustomLabel>
                     <Input
-                      data-testid="smtp-from"
+                      data-testid='smtp-from'
                       value={value}
                       onChange={onChange}
                     />
                     {formState.errors.smtpFrom && (
                       <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
                         <Typography.Text
-                          type="danger"
-                          data-testid="invalid-smtp-from"
+                          type='danger'
+                          data-testid='invalid-smtp-from'
                         >
                           Invalid Email
                         </Typography.Text>
@@ -576,10 +581,10 @@ function _SystemSetting({ data, ...props }: Props) {
               <CustomLabel>Reply To Display Name</CustomLabel>
               <Controller
                 control={control}
-                name="smtpReplyDisplayName"
+                name='smtpReplyDisplayName'
                 render={({ field: { onChange, value } }) => (
                   <Input
-                    data-testid="smtp-reply-display-name"
+                    data-testid='smtp-reply-display-name'
                     value={value}
                     onChange={onChange}
                   />
@@ -591,22 +596,22 @@ function _SystemSetting({ data, ...props }: Props) {
               <CustomLabel>Reply</CustomLabel>
               <Controller
                 control={control}
-                name="smtpReply"
+                name='smtpReply'
                 rules={{
                   pattern: EMAIL_REGEX,
                 }}
                 render={({ field: { onChange, value } }) => (
                   <CustomLabel>
                     <Input
-                      data-testid="smtp-reply"
+                      data-testid='smtp-reply'
                       value={value}
                       onChange={onChange}
                     />
                     {formState.errors.smtpReply && (
                       <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
                         <Typography.Text
-                          type="danger"
-                          data-testid="invalid-smtp-reply"
+                          type='danger'
+                          data-testid='invalid-smtp-reply'
                         >
                           Invalid Email
                         </Typography.Text>
@@ -621,10 +626,10 @@ function _SystemSetting({ data, ...props }: Props) {
               <CustomLabel>Envelope From</CustomLabel>
               <Controller
                 control={control}
-                name="smtpEnvelopeFrom"
+                name='smtpEnvelopeFrom'
                 render={({ field: { onChange, value } }) => (
                   <Input
-                    data-testid="smtp-envelop-from"
+                    data-testid='smtp-envelop-from'
                     value={value}
                     onChange={onChange}
                   />
@@ -637,14 +642,14 @@ function _SystemSetting({ data, ...props }: Props) {
 
               <Controller
                 control={control}
-                name="smtpEnableSSL"
+                name='smtpEnableSSL'
                 render={({ field: { onChange } }) => (
                   <Switch
-                    data-testid="smtp-enable-ssl"
+                    data-testid='smtp-enable-ssl'
                     defaultChecked={smtp.enableSSL}
                     onChange={onChange}
-                    checkedChildren="Yes"
-                    unCheckedChildren="No"
+                    checkedChildren='Yes'
+                    unCheckedChildren='No'
                   />
                 )}
               />
@@ -655,14 +660,14 @@ function _SystemSetting({ data, ...props }: Props) {
 
               <Controller
                 control={control}
-                name="smtpEnableStartTLS"
+                name='smtpEnableStartTLS'
                 render={({ field: { onChange } }) => (
                   <Switch
-                    data-testid="smtp-enable-startTLS"
+                    data-testid='smtp-enable-startTLS'
                     defaultChecked={smtp.enableStartTLS}
                     onChange={onChange}
-                    checkedChildren="Yes"
-                    unCheckedChildren="No"
+                    checkedChildren='Yes'
+                    unCheckedChildren='No'
                   />
                 )}
               />
@@ -673,14 +678,14 @@ function _SystemSetting({ data, ...props }: Props) {
 
               <Controller
                 control={control}
-                name="smtpEnableAuth"
+                name='smtpEnableAuth'
                 render={({ field: { onChange } }) => (
                   <Switch
-                    data-testid="smtp-enable-auth"
+                    data-testid='smtp-enable-auth'
                     defaultChecked={smtp.enableAuth}
                     onChange={onChange}
-                    checkedChildren="Yes"
-                    unCheckedChildren="No"
+                    checkedChildren='Yes'
+                    unCheckedChildren='No'
                   />
                 )}
               />
@@ -691,20 +696,20 @@ function _SystemSetting({ data, ...props }: Props) {
 
               <Controller
                 control={control}
-                name="smtpUsername"
+                name='smtpUsername'
                 rules={{
                   required: true,
                 }}
                 render={({ field: { onChange, value } }) => (
                   <>
                     <Input
-                      data-testid="smtp-username"
+                      data-testid='smtp-username'
                       value={value}
                       onChange={onChange}
                     />
                     {formState.errors.smtpUsername && (
                       <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
-                        <Typography.Text type="danger">
+                        <Typography.Text type='danger'>
                           Username is required!
                         </Typography.Text>
                       </CustomLabel>
@@ -719,17 +724,17 @@ function _SystemSetting({ data, ...props }: Props) {
 
               <Controller
                 control={control}
-                name="smtpPassword"
+                name='smtpPassword'
                 rules={{
                   required: true,
                 }}
                 render={({ field: { onChange, value } }) => (
-                  <Input type="password" value={value} onChange={onChange} />
+                  <Input type='password' value={value} onChange={onChange} />
                 )}
               />
               {formState.errors.smtpPassword && (
                 <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
-                  <Typography.Text type="danger">
+                  <Typography.Text type='danger'>
                     Password is required!
                   </Typography.Text>
                 </CustomLabel>
@@ -754,7 +759,7 @@ function _SystemSetting({ data, ...props }: Props) {
             Reset
           </Button>
           {/* @ts-ignore */}
-          <Button type="primary" htmlType="submit" form="system-settings">
+          <Button type='primary' htmlType='submit' form='system-settings'>
             Confirm
           </Button>
         </div>
