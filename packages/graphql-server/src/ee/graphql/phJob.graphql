@@ -75,6 +75,7 @@ input PhJobWhereInput {
   id: ID
   groupId_in: [String]
   displayName_contains: String
+  search: String
   mine: Boolean
 }
 

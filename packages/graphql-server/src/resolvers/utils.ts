@@ -20,6 +20,7 @@ import { EOL } from 'os';
 import { Context, Role } from './interface';
 import { keycloakMaxCount } from './constant';
 import GroupRepresentation from 'keycloak-admin/lib/defs/groupRepresentation';
+import { throws } from 'assert';
 const ITEMS_PER_PAGE = 10;
 
 export enum QueryImageMode {
@@ -187,12 +188,37 @@ export const toRelayWithCursor = (rows: any[], pagination?: Pagination) => {
   };
 };
 
-export const filter = (rows: any[], where?: any, order?: any, comparators?: Record<string, (row: any) => number>) => {
+interface FilterOptions {
+  where?: any;
+  order?: any;
+  comparators?: Record<string, (row: any) => number>;
+  searchFields?: any[];
+}
+
+export const filter = (rows: any[], options: FilterOptions = {}) => {
+  const {
+    where, order, comparators, searchFields,
+  } = options;
+
   if (!isEmpty(where)) {
     Object.keys(where).forEach(field => {
       if (field === 'id') {
         rows = rows.filter(row => row.id === where.id);
-      } else if (field.indexOf('contains') >= 0) {
+      } else if (field === 'search') {
+        if (!searchFields || !where.search) {
+          return;
+        }
+        const value = where.search.toLowerCase();
+        const searchFilter = row => {
+          for (const fieldName of searchFields) {
+            if (row[fieldName] && row[fieldName].toLowerCase().includes(value)) {
+              return true;
+            }
+          }
+          return false;
+        };
+        rows = rows.filter(searchFilter);
+      } else if (field.indexOf('_contains') >= 0) {
         const fieldName = field.replace('_contains', '');
         const value = where[field];
         rows = rows.filter(row => row[fieldName] && row[fieldName].includes && row[fieldName].includes(value));
@@ -200,11 +226,11 @@ export const filter = (rows: any[], where?: any, order?: any, comparators?: Reco
         const fieldName = field.replace('_in', '');
         const list: string[] = where[field] || [];
         rows = rows.filter(row => row[fieldName] && list.indexOf(row[fieldName]) >= 0);
-      } else if (field.indexOf('gt') >= 0) {
+      } else if (field.indexOf('_gt') >= 0) {
         const fieldName = field.replace('_gt', '');
         const value = where[field];
         rows = rows.filter(row => row[fieldName] && row[fieldName] > value);
-      } else if (field.indexOf('lt') >= 0) {
+      } else if (field.indexOf('_lt') >= 0) {
         const fieldName = field.replace('_lt', '');
         const value = where[field];
         rows = rows.filter(row => row[fieldName] && row[fieldName] < value);
@@ -217,7 +243,7 @@ export const filter = (rows: any[], where?: any, order?: any, comparators?: Reco
         const conditions = where[field];
         if (conditions && conditions.length > 1) {
           const hits = conditions.map(condition => {
-            return filter(rows, condition);
+            return filter(rows, {where: condition});
           });
           rows = uniq(hits.reduce((prev, next) => prev.concat(next), []));
         }

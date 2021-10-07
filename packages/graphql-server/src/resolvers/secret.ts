@@ -29,7 +29,8 @@ const listQuery = async (k8sSecret: K8sSecret, where: any, order: any) => {
   const secrets = ifDockerConfigJson ?
     await k8sSecret.find(SECRET_DOCKER_CONFIG_JSON_TYPE) :
     await k8sSecret.find(null);
-  return filter(secrets, where, order);
+  const searchFields = ['name', 'dispalyName'];
+  return filter(secrets, {where, order, searchFields});
 };
 
 export const query = async (root, args, context: Context) => {

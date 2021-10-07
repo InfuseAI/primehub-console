@@ -67,6 +67,7 @@ input PhScheduleWhereUniqueInput {
 input PhScheduleWhereInput {
   id: ID
   groupId_in: [String]
+  search: String
   displayName_contains: String
   mine: Boolean
 }

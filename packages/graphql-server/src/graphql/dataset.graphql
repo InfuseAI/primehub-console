@@ -72,6 +72,7 @@ input DatasetWhereInput {
   id: ID
   name_contains: String
   displayName_contains: String
+  search: String
 }
 
 """group relation"""

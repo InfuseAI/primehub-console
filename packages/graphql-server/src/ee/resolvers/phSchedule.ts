@@ -247,7 +247,7 @@ const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any = {}
 
   // sort by updateTime
   order = isEmpty(order) ? {updateTime: 'desc'} : order;
-  return filter(transformedPhSchedules, omit(where, 'mine'), order);
+  return filter(transformedPhSchedules, {where: omit(where, 'mine'), order, searchFields: ['id', 'displayName']});
 };
 
 export const query = async (root, args, context: Context) => {

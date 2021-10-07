@@ -315,7 +315,8 @@ const listQuery = async (client: CustomResource<PhJobSpec>, where: any = {}, ord
 
   // sort by createTime
   order = isEmpty(order) ? {createTime: 'desc'} : order;
-  return filter(transformedPhJobs, omit(where, 'mine'), order);
+  const searchFields = ['id', 'displayName'];
+  return filter(transformedPhJobs, {where: omit(where, 'mine'), order, searchFields});
 };
 
 export const query = async (root, args, context: Context) => {

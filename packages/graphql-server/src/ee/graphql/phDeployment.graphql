@@ -80,6 +80,7 @@ input PhDeploymentWhereInput {
   id: ID
   groupId_in: [String]
   name_contains: String
+  search: String
   mine: Boolean
 }
 

@@ -129,6 +129,7 @@ const listQuery = async (kcAdminClient: KcAdminClient, args: any): Promise<{
   const specifiedId = get(args, 'where.id');
   const usernameContains = get(args, 'where.username_contains');
   const emailContains = get(args, 'where.email_contains');
+  const search = get(args, 'where.search');
   let limit = parseInt(get(args, 'first') || get(args, 'last'), 10);
   if (isNaN(limit) || isNil(limit)) {
     // default limit to 10
@@ -173,6 +174,10 @@ const listQuery = async (kcAdminClient: KcAdminClient, args: any): Promise<{
 
   if (emailContains) {
     kcQuery.email = emailContains;
+  }
+
+  if (search) {
+    kcQuery.search = search;
   }
 
   const pageNotSpecifiedOrZero = !page;
