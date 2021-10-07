@@ -7,13 +7,11 @@ import {
   Table as AntTable,
   Icon,
   Modal,
-  Typography,
 } from 'antd';
 import { RouteComponentProps } from 'react-router';
 import { Link, withRouter } from 'react-router-dom';
 import { get } from 'lodash';
 import styled from 'styled-components';
-import moment from 'moment';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
@@ -21,6 +19,7 @@ import { GroupContextComponentProps } from 'context/group';
 import { UserContextComponentProps } from 'context/user';
 import { FilterRow, FilterPlugins, ButtonCol } from 'cms-toolbar/filter';
 import Breadcrumbs from 'components/share/breadcrumb';
+import { TruncateTableField } from 'utils/TruncateTableField';
 
 const breadcrumbs = [
   {
@@ -42,62 +41,6 @@ const Table = styled(AntTable as any)`
     margin-right: 16px;
   }
 `;
-
-const renderImageName = (text, record) => {
-  if (text?.length > 35) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          maxWidth: '250px',
-        }}
-      >
-        <Tooltip placement='top' title={text}>
-          <Typography.Paragraph
-            ellipsis={{ rows: 3 }}
-            style={{ marginBottom: 0 }}
-          >
-            <Link
-              to={{
-                state: {
-                  prevPathname: location.pathname,
-                  prevSearch: location.search,
-                },
-                pathname: `images/${record.id}/edit`,
-              }}
-            >
-              {text}
-            </Link>
-          </Typography.Paragraph>
-        </Tooltip>
-      </div>
-    );
-  }
-
-  return (
-    <Link
-      to={{
-        state: {
-          prevPathname: location.pathname,
-          prevSearch: location.search,
-        },
-        pathname: `images/${record.id}/edit`,
-      }}
-    >
-      {text}
-    </Link>
-  );
-};
-
-const renderTimeIfValid = time => {
-  if (!time) {
-    return '-';
-  }
-
-  const momentTime = moment(time);
-  return momentTime.isValid() ? momentTime.format('YYYY-MM-DD HH:mm:ss') : '-';
-};
 
 type ImagesConnection = {
   pageInfo: {
@@ -130,7 +73,7 @@ class ImageList extends React.Component<Props> {
   };
 
   handleCancel = (id: string) => {
-    const { imagesConnection, removeImage } = this.props;
+    const { imagesConnection } = this.props;
     const image = imagesConnection.edges.find(edge => edge.node.id === id).node;
     this.setState({ currentId: id });
     confirm({
@@ -160,7 +103,7 @@ class ImageList extends React.Component<Props> {
   };
 
   searchHandler = queryString => {
-    const { groupContext, imagesVariables, refetchImages } = this.props;
+    const { imagesVariables, refetchImages } = this.props;
     let newVariables = {
       ...imagesVariables,
       where: {
@@ -186,13 +129,7 @@ class ImageList extends React.Component<Props> {
   };
 
   handleTableChange = (pagination, _filters, sorter) => {
-    const {
-      imagesVariables,
-      refetchImages,
-      history,
-      groupContext,
-      userContext,
-    } = this.props;
+    const { imagesVariables, refetchImages } = this.props;
     const orderBy: any = {};
     if (sorter.field) {
       orderBy[sorter.field] =
@@ -206,10 +143,9 @@ class ImageList extends React.Component<Props> {
   };
 
   render() {
-    const { imagesConnection, imagesLoading, removeImage, imagesVariables } =
-      this.props;
+    const { imagesConnection, imagesLoading } = this.props;
 
-    const renderAction = (id, record) => {
+    const renderAction = id => {
       return (
         <Button.Group>
           <Tooltip placement='bottom' title='Edit'>
@@ -237,77 +173,43 @@ class ImageList extends React.Component<Props> {
         dataIndex: 'name',
         sorter: true,
         width: '20%',
-        render: (text, record) => {
-          if (text?.length > 35) {
-            return (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  maxWidth: '250px',
-                }}
-              >
-                <Tooltip placement='top' title={text}>
-                  <Typography.Paragraph
-                    ellipsis={{ rows: 3 }}
-                    style={{ marginBottom: 0 }}
-                  >
-                    {text}{' '}
-                    {!record.isReady && (
-                      <Icon type='warning' title='Image is not ready.' />
-                    )}
-                  </Typography.Paragraph>
-                </Tooltip>
-              </div>
-            );
-          }
-
-          if (!record.isReady) {
-            return (
-              <>
-                {text} <Icon type='warning' title='Image is not ready.' />
-              </>
-            );
-          }
-
-          return text;
-        },
+        render: (text, record) => (
+          <TruncateTableField text={text}>
+            <>
+              {text}{' '}
+              {!record.isReady && (
+                <Icon type='warning' title='Image is not ready.' />
+              )}
+            </>
+          </TruncateTableField>
+        ),
       },
       {
         title: 'Display Name',
         dataIndex: 'displayName',
         sorter: true,
         width: '20%',
-        render: renderImageName,
+        render: (text, record) => (
+          <TruncateTableField text={text}>
+            <Link
+              to={{
+                state: {
+                  prevPathname: location.pathname,
+                  prevSearch: location.search,
+                },
+                pathname: `images/${record.id}/edit`,
+              }}
+            >
+              {text}
+            </Link>
+          </TruncateTableField>
+        ),
       },
       {
         title: 'Description',
         sorter: true,
         dataIndex: 'description',
-        render: text => {
-          if (text?.length > 35) {
-            return (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  maxWidth: '250px',
-                }}
-              >
-                <Tooltip placement='top' title={text}>
-                  <Typography.Paragraph
-                    ellipsis={{ rows: 3 }}
-                    style={{ marginBottom: 0 }}
-                  >
-                    {text}
-                  </Typography.Paragraph>
-                </Tooltip>
-              </div>
-            );
-          }
-
-          return text;
-        },
+        render: text => <TruncateTableField text={text} />,
       },
       {
         title: 'Type',

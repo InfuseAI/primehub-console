@@ -1,20 +1,13 @@
 import * as React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import {
-  Button,
-  Table,
-  Input,
-  Modal,
-  Tooltip,
-  Typography,
-  notification,
-} from 'antd';
+import { Button, Table, Input, Modal, Tooltip, notification } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import { omit } from 'lodash';
 
 import InfuseButton from 'components/infuseButton';
+import { TruncateTableField } from 'utils/TruncateTableField';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { errorHandler } from 'utils/errorHandler';
 
@@ -26,31 +19,6 @@ import {
   DeleteInstanceTypeMutation,
 } from './instanceTypes.graphql';
 import type { TInstanceType } from './types';
-
-function RenderFieldName(text: string) {
-  if (text?.length > 35) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          maxWidth: '250px',
-        }}
-      >
-        <Tooltip placement='top' title={text}>
-          <Typography.Paragraph
-            ellipsis={{ rows: 3 }}
-            style={{ marginBottom: 0 }}
-          >
-            {text}
-          </Typography.Paragraph>
-        </Tooltip>
-      </div>
-    );
-  }
-
-  return text || '-';
-}
 
 const styles: React.CSSProperties = {
   display: 'flex',
@@ -150,7 +118,7 @@ export function _InstanceTypes({
       dataIndex: 'node.name',
       sorter: true,
       width: '300px',
-      render: RenderFieldName,
+      render: text => <TruncateTableField text={text} defaultCharacter='-' />,
     },
     {
       key: 'displayName',
@@ -158,15 +126,14 @@ export function _InstanceTypes({
       dataIndex: 'node.displayName',
       sorter: true,
       width: '300px',
-      render: RenderFieldName,
+      render: text => <TruncateTableField text={text} defaultCharacter='-' />,
     },
     {
       key: 'description',
       title: 'Description',
       sorter: true,
-      render: (instance: InstanceTypeNode) => {
-        return RenderFieldName(instance.node.description);
-      },
+      dataIndex: 'node.description',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       key: 'cpuLimit',

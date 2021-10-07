@@ -1,51 +1,18 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
-import {
-  Button,
-  Table,
-  Input,
-  Modal,
-  Icon,
-  Tooltip,
-  Typography,
-  notification,
-} from 'antd';
+import { Button, Table, Input, Modal, Icon, Tooltip, notification } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 
 import InfuseButton from 'components/infuseButton';
+import { TruncateTableField } from 'utils/TruncateTableField';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { errorHandler } from 'utils/errorHandler';
 
 import { ImagesLayout } from './Layout';
 import { ImagesQuery, DeleteImageMutation } from './images.graphql';
 import type { Image } from './types';
-
-function RenderFieldName(text?: string) {
-  if (text?.length > 35) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          maxWidth: '250px',
-        }}
-      >
-        <Tooltip placement='top' title={text}>
-          <Typography.Paragraph
-            ellipsis={{ rows: 3 }}
-            style={{ marginBottom: 0 }}
-          >
-            {text}
-          </Typography.Paragraph>
-        </Tooltip>
-      </div>
-    );
-  }
-
-  return text || '-';
-}
 
 const styles: React.CSSProperties = {
   display: 'flex',
@@ -123,42 +90,16 @@ function _ImageList({ data, ...props }: ImageListProps) {
       title: 'Name',
       sorter: true,
       width: '20%',
-      render: (image: ImageNode) => {
-        if (image?.node?.name.length > 35) {
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                maxWidth: '250px',
-              }}
-            >
-              <Tooltip placement='top' title={image.node.name}>
-                <Typography.Paragraph
-                  ellipsis={{ rows: 3 }}
-                  style={{ marginBottom: 0 }}
-                >
-                  {image.node.name}{' '}
-                  {!image.node.isReady && (
-                    <Icon type='warning' title='Image is not ready.' />
-                  )}
-                </Typography.Paragraph>
-              </Tooltip>
-            </div>
-          );
-        }
-
-        if (!image.node.isReady) {
-          return (
-            <>
-              {image.node.name}{' '}
+      render: (image: ImageNode) => (
+        <TruncateTableField text={image?.node?.name}>
+          <>
+            {image.node.name}{' '}
+            {!image.node.isReady && (
               <Icon type='warning' title='Image is not ready.' />
-            </>
-          );
-        }
-
-        return image.node.name;
-      },
+            )}
+          </>
+        </TruncateTableField>
+      ),
     },
     {
       key: 'displayName',
@@ -166,7 +107,7 @@ function _ImageList({ data, ...props }: ImageListProps) {
       dataIndex: 'node.displayName',
       sorter: true,
       width: '20%',
-      render: RenderFieldName,
+      render: text => <TruncateTableField text={text} defaultCharacter='-' />,
     },
     {
       key: 'type',
@@ -187,7 +128,7 @@ function _ImageList({ data, ...props }: ImageListProps) {
       sorter: true,
       dataIndex: 'node.description',
       width: '20%',
-      render: RenderFieldName,
+      render: text => <TruncateTableField text={text} />,
     },
     {
       key: 'actions',

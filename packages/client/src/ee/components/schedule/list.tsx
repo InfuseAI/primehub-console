@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Tooltip, Table as AntTable, Modal, Typography } from 'antd';
+import { Button, Tooltip, Table as AntTable, Modal } from 'antd';
 import { RouteComponentProps } from 'react-router';
 import { withRouter } from 'react-router-dom';
 import moment from 'moment';
@@ -13,6 +13,7 @@ import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
+import { TruncateTableField } from 'utils/TruncateTableField';
 
 const breadcrumbs = [
   {
@@ -122,7 +123,7 @@ class ScheduleList extends React.Component<Props> {
   };
 
   refresh = () => {
-    const { groupContext, schedulesVariables, schedulesRefetch } = this.props;
+    const { schedulesVariables, schedulesRefetch } = this.props;
     const newVariables = {
       ...schedulesVariables,
       page: 1,
@@ -213,30 +214,7 @@ class ScheduleList extends React.Component<Props> {
         dataIndex: 'displayName',
         sorter: true,
         width: '30%',
-        render: name => {
-          if (!name) {
-            return '-';
-          }
-
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                maxWidth: '300px',
-              }}
-            >
-              <Tooltip placement='top' title={name}>
-                <Typography.Paragraph
-                  ellipsis={{ rows: 3 }}
-                  style={{ marginBottom: 0 }}
-                >
-                  {name}
-                </Typography.Paragraph>
-              </Tooltip>
-            </div>
-          );
-        },
+        render: text => <TruncateTableField text={text} defaultCharacter='-' />,
       },
       {
         title: 'Recurrence',
@@ -256,7 +234,7 @@ class ScheduleList extends React.Component<Props> {
         dataIndex: 'userName',
         sorter: true,
         width: '20%',
-        render: name => (name ? name : '-'),
+        render: text => <TruncateTableField text={text} defaultCharacter='-' />,
       },
       {
         title: 'Action',

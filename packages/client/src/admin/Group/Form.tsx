@@ -11,8 +11,6 @@ import {
   Switch,
   Card,
   InputNumber,
-  Tooltip,
-  Typography,
 } from 'antd';
 import { isArray, get, sortBy, uniqBy } from 'lodash';
 import { FormComponentProps } from 'antd/es/form';
@@ -22,6 +20,7 @@ import CheckableInputNumber from 'cms-components/customize-number-checkbox';
 import InfuseButton from 'components/infuseButton';
 import { UsersConnection } from 'queries/User.graphql';
 import CustomRelationTable from '../share/RelationTable';
+import { TruncateTableField } from 'utils/TruncateTableField';
 
 interface User {
   id: string;
@@ -130,30 +129,7 @@ const UsersRelationTable = compose(
       title: 'Username',
       dataIndex: 'username',
       width: '80%',
-      render: text => {
-        if (text?.length > 35) {
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                maxWidth: '250px',
-              }}
-            >
-              <Tooltip placement='top' title={text}>
-                <Typography.Paragraph
-                  ellipsis={{ rows: 3 }}
-                  style={{ marginBottom: 0 }}
-                >
-                  {text}
-                </Typography.Paragraph>
-              </Tooltip>
-            </div>
-          );
-        }
-
-        return text;
-      },
+      render: text => <TruncateTableField text={text} />,
     },
     {
       title: 'Group Admin',
@@ -176,30 +152,7 @@ const UsersRelationTable = compose(
     {
       title: 'Username',
       dataIndex: 'username',
-      render: text => {
-        if (text?.length > 35) {
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                maxWidth: '250px',
-              }}
-            >
-              <Tooltip placement='top' title={text}>
-                <Typography.Paragraph
-                  ellipsis={{ rows: 3 }}
-                  style={{ marginBottom: 0 }}
-                >
-                  {text}
-                </Typography.Paragraph>
-              </Tooltip>
-            </div>
-          );
-        }
-
-        return text;
-      },
+      render: text => <TruncateTableField text={text} />,
     },
   ];
 

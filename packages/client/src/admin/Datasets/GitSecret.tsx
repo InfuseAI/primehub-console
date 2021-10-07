@@ -1,13 +1,11 @@
 import * as React from 'react';
 import { compose } from 'recompose';
-import { useHistory, withRouter, RouteComponentProps } from 'react-router-dom';
-import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
-import { errorHandler } from 'utils/errorHandler';
 import { Icon, Modal, Table, Tag } from 'antd';
 import { useState } from 'react';
 import { find, isEmpty } from 'lodash';
 import { GetSecrets } from 'queries/Datasets.graphql';
+import { TruncateTableField } from 'utils/TruncateTableField';
 
 interface TSecret {
   id: string;
@@ -50,22 +48,23 @@ function _GitSecret(props: Props) {
       key: 'name',
       title: 'Name',
       dataIndex: 'name',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       key: 'displayName',
       title: 'Display Name',
       dataIndex: 'displayName',
+      render: text => <TruncateTableField text={text} />,
     },
   ];
 
   let secretDisplayName;
   if (!gitSecretsQuery.loading && state.secretId) {
-    const secret = find(
-      gitSecretsQuery?.secrets,
-      (s) => s.id === state.secretId
-    );
+    const secret = find(gitSecretsQuery?.secrets, s => s.id === state.secretId);
     if (secret) {
-      secretDisplayName = !isEmpty(secret.displayName) ? secret.displayName : secret.name;
+      secretDisplayName = !isEmpty(secret.displayName)
+        ? secret.displayName
+        : secret.name;
     }
   }
 
@@ -102,7 +101,7 @@ function _GitSecret(props: Props) {
     onChange(updatedValue);
   };
 
-  const handleSelect = (selectedRowKeys) => {
+  const handleSelect = selectedRowKeys => {
     setState({
       ...state,
       selectedSecretId: selectedRowKeys[0],
@@ -148,19 +147,19 @@ function _GitSecret(props: Props) {
           }}
           style={{ background: '#fff', borderStyle: 'dashed' }}
         >
-          <Icon
-            type="edit"
-          />{' '}
-          Change
+          <Icon type='edit' /> Change
         </Tag>
       </div>
-      <Modal width={800} visible={state.modalVisible}
+      <Modal
+        width={800}
+        visible={state.modalVisible}
         onOk={handleModalOk}
-        onCancel={handleModalCancel}>
-        <div style={{marginTop:16}}>
+        onCancel={handleModalCancel}
+      >
+        <div style={{ marginTop: 16 }}>
           <Table
             size='small'
-            rowKey={(data) => data.id}
+            rowKey={data => data.id}
             style={{ paddingTop: 8 }}
             columns={columns}
             dataSource={gitSecretsQuery?.secrets}
@@ -174,7 +173,6 @@ function _GitSecret(props: Props) {
           />
         </div>
       </Modal>
-
     </>
   );
 }

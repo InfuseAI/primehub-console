@@ -1,14 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import {
-  Table,
-  Col,
-  Layout,
-  Button,
-  Icon,
-  Modal,
-  Tooltip,
-  Typography,
-} from 'antd';
+import { Table, Col, Layout, Button, Icon, Modal, Tooltip } from 'antd';
 import { withRouter, useHistory } from 'react-router-dom';
 import { reduce, pick } from 'lodash';
 import PageTitle from 'components/pageTitle';
@@ -22,37 +13,13 @@ import EmailForm from 'cms-toolbar/sendEmailModal';
 import { FilterRow, FilterPlugins, ButtonCol } from 'components/share';
 import Filter from 'cms-toolbar/filter';
 import { errorHandler } from 'utils/errorHandler';
+import { TruncateTableField } from 'utils/TruncateTableField';
 // graphql
 import { UsersConnection, DeleteUser } from 'queries/User.graphql';
 
 const PAGE_SIZE = 10;
 const ButtonGroup = Button.Group;
 const { confirm } = Modal;
-
-function RenderFieldName(text?: string) {
-  if (text?.length > 35) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          maxWidth: '250px',
-        }}
-      >
-        <Tooltip placement='top' title={text}>
-          <Typography.Paragraph
-            ellipsis={{ rows: 3 }}
-            style={{ marginBottom: 0 }}
-          >
-            {text}
-          </Typography.Paragraph>
-        </Tooltip>
-      </div>
-    );
-  }
-
-  return text;
-}
 
 interface Props {
   dataSource: any;
@@ -134,7 +101,7 @@ function List(props: Props) {
       dataIndex: 'username',
       key: 'username',
       width: '20%',
-      render: RenderFieldName,
+      render: text => <TruncateTableField text={text} />,
     },
     {
       title: 'Email',
@@ -144,30 +111,9 @@ function List(props: Props) {
       title: 'Name',
       dataIndex: 'firstName',
       width: '20%',
-      render: (value, record) => {
-        if (value?.length + record?.lastName?.length > 35) {
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                maxWidth: '250px',
-              }}
-            >
-              <Tooltip placement='top' title={`${value} ${record.lastName}`}>
-                <Typography.Paragraph
-                  ellipsis={{ rows: 3 }}
-                  style={{ marginBottom: 0 }}
-                >
-                  {`${value} ${record.lastName}`}
-                </Typography.Paragraph>
-              </Tooltip>
-            </div>
-          );
-        }
-
-        return `${value} ${record.lastName}`;
-      },
+      render: (text, record) => (
+        <TruncateTableField text={`${text} ${record.lastName}`} />
+      ),
     },
     {
       title: 'Enabled',

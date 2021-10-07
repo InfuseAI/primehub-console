@@ -1,18 +1,11 @@
 import React, { useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import {
-  Button,
-  Table,
-  Modal,
-  notification,
-  Tooltip,
-  Col,
-  Typography,
-} from 'antd';
+import { Button, Table, Modal, notification, Tooltip, Col } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 
+import { TruncateTableField } from 'utils/TruncateTableField';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 import {
@@ -27,31 +20,6 @@ import { errorHandler } from 'utils/errorHandler';
 import InfuseButton from 'components/infuseButton';
 import { FilterRow, FilterPlugins, ButtonCol } from 'cms-toolbar/filter';
 import Search from 'antd/lib/input/Search';
-
-function RenderFieldName(text?: string) {
-  if (text?.length > 35) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          maxWidth: '250px',
-        }}
-      >
-        <Tooltip placement='top' title={text}>
-          <Typography.Paragraph
-            ellipsis={{ rows: 3 }}
-            style={{ marginBottom: 0 }}
-          >
-            {text}
-          </Typography.Paragraph>
-        </Tooltip>
-      </div>
-    );
-  }
-
-  return text || '-';
-}
 
 const styles: React.CSSProperties = {
   display: 'flex',
@@ -208,7 +176,7 @@ function _Datasets({
       dataIndex: 'node.name',
       sorter: true,
       width: '300px',
-      render: RenderFieldName,
+      render: text => <TruncateTableField text={text} />,
     },
     {
       key: 'displayName',
@@ -216,7 +184,7 @@ function _Datasets({
       dataIndex: 'node.displayName',
       sorter: true,
       width: '300px',
-      render: RenderFieldName,
+      render: text => <TruncateTableField text={text} />,
     },
     {
       key: 'type',
@@ -243,9 +211,9 @@ function _Datasets({
       key: 'description',
       title: 'Description',
       dataIndex: 'node.description',
-      width: '350px',
+      width: '300px',
       sorter: true,
-      render: RenderFieldName,
+      render: text => <TruncateTableField text={text} />,
     },
     {
       key: 'uploadServerLink',

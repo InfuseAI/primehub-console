@@ -1,12 +1,5 @@
 import * as React from 'react';
-import {
-  Button,
-  Tooltip,
-  Table as AntTable,
-  Icon,
-  Modal,
-  Typography,
-} from 'antd';
+import { Button, Tooltip, Table as AntTable, Icon, Modal } from 'antd';
 import { RouteComponentProps } from 'react-router';
 import { Link, withRouter } from 'react-router-dom';
 import { startCase, get } from 'lodash';
@@ -21,6 +14,7 @@ import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
+import { TruncateTableField } from 'utils/TruncateTableField';
 
 const breadcrumbs = [
   {
@@ -40,26 +34,6 @@ const Table = styled(AntTable as any)`
     margin-right: 16px;
   }
 `;
-
-const renderJobName = (text, record) => (
-  <div style={{ display: 'flex', alignItems: 'center', maxWidth: '300px' }}>
-    <Tooltip placement='top' title={text}>
-      <Typography.Paragraph ellipsis={{ rows: 3 }} style={{ marginBottom: 0 }}>
-        <Link
-          to={{
-            state: {
-              prevPathname: location.pathname,
-              prevSearch: location.search,
-            },
-            pathname: `job/${record.id}`,
-          }}
-        >
-          {text}
-        </Link>
-      </Typography.Paragraph>
-    </Tooltip>
-  </div>
-);
 
 const renderSchedule = text =>
   text ? <Link to={`schedule/${text}`}>{text}</Link> : '-';
@@ -358,7 +332,21 @@ class JobList extends React.Component<Props> {
         dataIndex: 'displayName',
         sorter: true,
         width: '300px',
-        render: renderJobName,
+        render: (text, record) => (
+          <TruncateTableField text={text}>
+            <Link
+              to={{
+                state: {
+                  prevPathname: location.pathname,
+                  prevSearch: location.search,
+                },
+                pathname: `job/${record.id}`,
+              }}
+            >
+              {text}
+            </Link>
+          </TruncateTableField>
+        ),
       },
       {
         title: 'Schedule',

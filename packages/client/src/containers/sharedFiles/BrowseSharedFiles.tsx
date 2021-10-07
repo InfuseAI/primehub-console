@@ -14,7 +14,6 @@ import {
   Dropdown,
   Modal,
   Button,
-  Typography,
 } from 'antd';
 import { compose } from 'recompose';
 import { useHistory } from 'react-router-dom';
@@ -30,6 +29,7 @@ import {
   GroupContextValue,
   withGroupContext,
 } from 'context/group';
+import { TruncateTableField } from 'utils/TruncateTableField';
 import { errorHandler } from 'utils/errorHandler';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { useClipboard } from 'hooks/useClipboard';
@@ -350,19 +350,10 @@ function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesProps) {
         }
 
         return (
-          <div
-            style={{ display: 'flex', alignItems: 'center', maxWidth: '700px' }}
-          >
+          <TruncateTableField text={name} maxWidth='700px' rows={1}>
             <Icon style={iconStyle} type='file' />
-            <Tooltip placement='top' title={name}>
-              <Typography.Paragraph
-                ellipsis={{ rows: 1 }}
-                style={{ marginBottom: 0 }}
-              >
-                {name}
-              </Typography.Paragraph>
-            </Tooltip>
-          </div>
+            {name}
+          </TruncateTableField>
         );
       },
     },

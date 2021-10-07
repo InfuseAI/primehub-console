@@ -8,8 +8,6 @@ import {
   Layout,
   Icon,
   Input,
-  Tooltip,
-  Typography,
 } from 'antd';
 import {
   withRouter,
@@ -32,6 +30,7 @@ import CheckableInputNumber from 'cms-components/customize-number-checkbox';
 import CustomRelationTable from '../share/RelationTable';
 import { User, UpdateUser, UserGroups } from 'queries/User.graphql';
 import { errorHandler } from 'utils/errorHandler';
+import { TruncateTableField } from 'utils/TruncateTableField';
 
 const { TabPane } = Tabs;
 
@@ -56,58 +55,17 @@ export const GroupsRelationTable = compose(
       title: 'Name',
       dataIndex: 'name',
       width: '40%',
-      // eslint-disable-next-line react/display-name
-      render: (text, record) => {
-        if (text?.length > 35) {
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                maxWidth: '400px',
-              }}
-            >
-              <Tooltip placement='top' title={text}>
-                <Typography.Paragraph
-                  ellipsis={{ rows: 3 }}
-                  style={{ marginBottom: 0 }}
-                >
-                  <Link to={`../group/${record.id}`}>{text}</Link>
-                </Typography.Paragraph>
-              </Tooltip>
-            </div>
-          );
-        }
-        return <Link to={`../group/${record.id}`}>{text}</Link>;
-      },
+      render: (text, record) => (
+        <TruncateTableField text={text} maxWidth='400px'>
+          <Link to={`../group/${record.id}`}>{text}</Link>
+        </TruncateTableField>
+      ),
     },
     {
       title: 'Display Name',
       dataIndex: 'displayName',
       width: '40%',
-      render: text => {
-        if (text?.length > 35) {
-          return (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                maxWidth: '400px',
-              }}
-            >
-              <Tooltip placement='top' title={text}>
-                <Typography.Paragraph
-                  ellipsis={{ rows: 3 }}
-                  style={{ marginBottom: 0 }}
-                >
-                  {text}
-                </Typography.Paragraph>
-              </Tooltip>
-            </div>
-          );
-        }
-        return text;
-      },
+      render: text => <TruncateTableField text={text} maxWidth='400px' />,
     },
     {
       title: 'CPU Quota',
@@ -137,6 +95,12 @@ export const GroupsRelationTable = compose(
       dataIndex: 'name',
       sorter: true,
       sortDirections: ['descend', 'ascend'],
+      width: '40%',
+      render: (text, record) => (
+        <TruncateTableField text={text} maxWidth='400px'>
+          <Link to={`../group/${record.id}`}>{text}</Link>
+        </TruncateTableField>
+      ),
     },
     ...groupColumns.slice(1),
   ];

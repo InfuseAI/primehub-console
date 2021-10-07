@@ -2,7 +2,8 @@ import React from 'react';
 import { get } from 'lodash';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
-import { Checkbox, Table, Tooltip, Typography } from 'antd';
+import { Checkbox, Table } from 'antd';
+import { TruncateTableField } from 'utils/TruncateTableField';
 import { GetGroupUsers } from 'queries/Group.graphql';
 
 interface Props {
@@ -32,30 +33,7 @@ class GroupSettingsMembers extends React.Component<Props> {
         dataIndex: 'username',
         key: 'username',
         width: '80%',
-        render: text => {
-          if (text?.length > 35) {
-            return (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  maxWidth: '250px',
-                }}
-              >
-                <Tooltip placement='top' title={text}>
-                  <Typography.Paragraph
-                    ellipsis={{ rows: 3 }}
-                    style={{ marginBottom: 0 }}
-                  >
-                    {text}
-                  </Typography.Paragraph>
-                </Tooltip>
-              </div>
-            );
-          }
-
-          return text;
-        },
+        render: text => <TruncateTableField text={text} />,
       },
       {
         title: 'Group Admin',

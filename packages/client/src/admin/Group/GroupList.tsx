@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Input, Col, Layout, Button, Tooltip, Typography } from 'antd';
+import { Modal, Input, Col, Layout, Button, Tooltip } from 'antd';
 import {
   withRouter,
   RouteComponentProps,
@@ -18,6 +18,7 @@ import { compose } from 'recompose';
 import InfuseButton from 'components/infuseButton';
 import { FilterRow, FilterPlugins, ButtonCol } from 'components/share';
 import { errorHandler } from 'utils/errorHandler';
+import { TruncateTableField } from 'utils/TruncateTableField';
 
 const { confirm } = Modal;
 const { Search } = Input;
@@ -29,31 +30,6 @@ type Props = {
   listGroup?: any;
   deleteGroup?: any;
 } & RouteComponentProps;
-
-function RenderFieldName(text?: string) {
-  if (text?.length > 35) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          maxWidth: '250px',
-        }}
-      >
-        <Tooltip placement='top' title={text}>
-          <Typography.Paragraph
-            ellipsis={{ rows: 3 }}
-            style={{ marginBottom: 0 }}
-          >
-            {text}
-          </Typography.Paragraph>
-        </Tooltip>
-      </div>
-    );
-  }
-
-  return text;
-}
 
 export function GroupList(props: Props) {
   const history = useHistory();
@@ -171,7 +147,7 @@ export function GroupList(props: Props) {
       sorter: true,
       sortOrder: reducedOrderBy.name,
       width: '300px',
-      render: RenderFieldName,
+      render: text => <TruncateTableField text={text} />,
     },
     {
       title: 'Display Name',
@@ -179,7 +155,7 @@ export function GroupList(props: Props) {
       sorter: true,
       sortOrder: reducedOrderBy.displayName,
       width: '300px',
-      render: RenderFieldName,
+      render: text => <TruncateTableField text={text} />,
     },
     {
       title: 'Share Volume Capacity',

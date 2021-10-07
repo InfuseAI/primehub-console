@@ -18,6 +18,7 @@ import Breadcrumbs from 'components/share/breadcrumb';
 import { errorHandler } from 'utils/errorHandler';
 import InfuseButton from 'components/infuseButton';
 import GroupForm from './Form';
+import { TruncateTableField } from 'utils/TruncateTableField';
 const appPrefix = window.APP_PREFIX || '/';
 const { TabPane } = Tabs;
 
@@ -67,10 +68,12 @@ function UpdatePage(props: any) {
     {
       title: 'Display Name',
       dataIndex: 'displayName',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       title: 'Description',
       dataIndex: 'discription',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       title: 'CPU Limit',
@@ -112,6 +115,7 @@ function UpdatePage(props: any) {
     {
       title: 'Display Name',
       dataIndex: 'displayName',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       title: 'Type',
@@ -132,6 +136,7 @@ function UpdatePage(props: any) {
     {
       title: 'Description',
       dataIndex: 'discription',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       title: 'Actions',
@@ -153,6 +158,7 @@ function UpdatePage(props: any) {
     {
       title: 'Display Name',
       dataIndex: 'displayName',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       title: 'Type',
@@ -162,6 +168,7 @@ function UpdatePage(props: any) {
     {
       title: 'Description',
       dataIndex: 'discription',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       title: 'Permissions',

@@ -4,17 +4,14 @@ import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import { get, max } from 'lodash';
 import { Link, withRouter } from 'react-router-dom';
-import queryString from 'querystring';
 import { RouteComponentProps } from 'react-router';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
-import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
 import { formatTimestamp, openMLflowUI } from 'ee/components/modelMngt/common';
+import { TruncateTableField } from 'utils/TruncateTableField';
 import { QueryModels } from 'queries/Model.graphql';
-
-const PAGE_SIZE = 20;
 
 type Props = {
   getModels: {
@@ -35,25 +32,6 @@ type State = {
 };
 
 class ModelListContainer extends React.Component<Props, State> {
-  private renderName = text => {
-    if (!text) {
-      return '-';
-    }
-
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', maxWidth: '300px' }}>
-        <Tooltip placement='top' title={text}>
-          <Typography.Paragraph
-            ellipsis={{ rows: 3 }}
-            style={{ marginBottom: 0 }}
-          >
-            <Link to={`models/${encodeURIComponent(text)}`}>{text}</Link>
-          </Typography.Paragraph>
-        </Tooltip>
-      </div>
-    );
-  };
-
   private renderLatestVersion = (latestVersions, model) => {
     if (!latestVersions || !Array.isArray(latestVersions)) {
       return '-';
@@ -153,7 +131,11 @@ class ModelListContainer extends React.Component<Props, State> {
       {
         title: 'Name',
         dataIndex: 'name',
-        render: this.renderName,
+        render: text => (
+          <TruncateTableField text={text} defaultCharacter='-'>
+            <Link to={`models/${encodeURIComponent(text)}`}>{text}</Link>
+          </TruncateTableField>
+        ),
       },
       {
         title: 'Latest Version',
