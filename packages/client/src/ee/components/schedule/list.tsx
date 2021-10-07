@@ -13,6 +13,7 @@ import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
+import { TruncateTableField } from 'utils/TruncateTableField';
 
 const breadcrumbs = [
   {
@@ -122,7 +123,7 @@ class ScheduleList extends React.Component<Props> {
   };
 
   refresh = () => {
-    const { groupContext, schedulesVariables, schedulesRefetch } = this.props;
+    const { schedulesVariables, schedulesRefetch } = this.props;
     const newVariables = {
       ...schedulesVariables,
       page: 1,
@@ -187,8 +188,6 @@ class ScheduleList extends React.Component<Props> {
       schedulesConnection,
       schedulesLoading,
       schedulesVariables,
-      deletePhScheduleResult,
-      runPhScheduleResult,
     } = this.props;
     const renderAction = (id: string, record) => {
       return (
@@ -214,29 +213,33 @@ class ScheduleList extends React.Component<Props> {
         title: 'Name',
         dataIndex: 'displayName',
         sorter: true,
-        render: name => (name ? name : '-'),
+        width: '30%',
+        render: text => <TruncateTableField text={text} defaultCharacter='-' />,
       },
       {
         title: 'Recurrence',
         dataIndex: 'recurrence',
+        width: '20%',
         render: ({ type, cron }) => renderRecurrence(type, cron),
       },
       {
         title: 'Next Run',
         dataIndex: 'nextRunTime',
         sorter: true,
+        width: '20%',
         render: renderNextRunTime,
       },
       {
         title: 'Created By',
         dataIndex: 'userName',
         sorter: true,
-        render: name => (name ? name : '-'),
+        width: '20%',
+        render: text => <TruncateTableField text={text} defaultCharacter='-' />,
       },
       {
         title: 'Action',
         dataIndex: 'id',
-        width: 150,
+        width: '10%',
         render: renderAction,
       },
     ];

@@ -13,6 +13,7 @@ import EmailForm from 'cms-toolbar/sendEmailModal';
 import { FilterRow, FilterPlugins, ButtonCol } from 'components/share';
 import Filter from 'cms-toolbar/filter';
 import { errorHandler } from 'utils/errorHandler';
+import { TruncateTableField } from 'utils/TruncateTableField';
 // graphql
 import { UsersConnection, DeleteUser } from 'queries/User.graphql';
 
@@ -99,6 +100,8 @@ function List(props: Props) {
       title: 'Username',
       dataIndex: 'username',
       key: 'username',
+      width: '20%',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       title: 'Email',
@@ -107,7 +110,10 @@ function List(props: Props) {
     {
       title: 'Name',
       dataIndex: 'firstName',
-      render: (value, record) => `${value} ${record.lastName}`,
+      width: '20%',
+      render: (text, record) => (
+        <TruncateTableField text={`${text} ${record.lastName}`} />
+      ),
     },
     {
       title: 'Enabled',

@@ -20,6 +20,7 @@ import CheckableInputNumber from 'cms-components/customize-number-checkbox';
 import InfuseButton from 'components/infuseButton';
 import { UsersConnection } from 'queries/User.graphql';
 import CustomRelationTable from '../share/RelationTable';
+import { TruncateTableField } from 'utils/TruncateTableField';
 
 interface User {
   id: string;
@@ -127,10 +128,13 @@ const UsersRelationTable = compose(
     {
       title: 'Username',
       dataIndex: 'username',
+      width: '80%',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       title: 'Group Admin',
       dataIndex: 'id',
+      width: '20%',
       render: (val, record) => {
         return (
           <Checkbox
@@ -148,6 +152,7 @@ const UsersRelationTable = compose(
     {
       title: 'Username',
       dataIndex: 'username',
+      render: text => <TruncateTableField text={text} />,
     },
   ];
 

@@ -6,6 +6,7 @@ import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 
 import InfuseButton from 'components/infuseButton';
+import { TruncateTableField } from 'utils/TruncateTableField';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { errorHandler } from 'utils/errorHandler';
 
@@ -88,29 +89,31 @@ function _ImageList({ data, ...props }: ImageListProps) {
       key: 'name',
       title: 'Name',
       sorter: true,
-      render: (image: ImageNode) => {
-        if (!image.node.isReady) {
-          return (
-            <>
-              {image.node.name}{' '}
+      width: '20%',
+      render: (image: ImageNode) => (
+        <TruncateTableField text={image?.node?.name}>
+          <>
+            {image.node.name}{' '}
+            {!image.node.isReady && (
               <Icon type='warning' title='Image is not ready.' />
-            </>
-          );
-        }
-
-        return image.node.name;
-      },
+            )}
+          </>
+        </TruncateTableField>
+      ),
     },
     {
       key: 'displayName',
       title: 'Display Name',
       dataIndex: 'node.displayName',
       sorter: true,
+      width: '20%',
+      render: text => <TruncateTableField text={text} defaultCharacter='-' />,
     },
     {
       key: 'type',
       title: 'Type',
       sorter: true,
+      width: '20%',
       render: (image: ImageNode) => {
         if (image.node.type === 'both') {
           return 'Universal';
@@ -124,6 +127,8 @@ function _ImageList({ data, ...props }: ImageListProps) {
       title: 'Description',
       sorter: true,
       dataIndex: 'node.description',
+      width: '20%',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       key: 'actions',

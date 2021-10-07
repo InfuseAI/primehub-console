@@ -18,6 +18,7 @@ import { compose } from 'recompose';
 import InfuseButton from 'components/infuseButton';
 import { FilterRow, FilterPlugins, ButtonCol } from 'components/share';
 import { errorHandler } from 'utils/errorHandler';
+import { TruncateTableField } from 'utils/TruncateTableField';
 
 const { confirm } = Modal;
 const { Search } = Input;
@@ -145,12 +146,16 @@ export function GroupList(props: Props) {
       key: 'name',
       sorter: true,
       sortOrder: reducedOrderBy.name,
+      width: '300px',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       title: 'Display Name',
       dataIndex: 'displayName',
       sorter: true,
       sortOrder: reducedOrderBy.displayName,
+      width: '300px',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       title: 'Share Volume Capacity',

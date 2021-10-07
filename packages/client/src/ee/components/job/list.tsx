@@ -14,6 +14,7 @@ import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
+import { TruncateTableField } from 'utils/TruncateTableField';
 
 const breadcrumbs = [
   {
@@ -33,22 +34,6 @@ const Table = styled(AntTable as any)`
     margin-right: 16px;
   }
 `;
-
-const renderJobName = (text, record) => (
-  <Tooltip placement='top' title={`Job ID: ${record.id}`}>
-    <Link
-      to={{
-        state: {
-          prevPathname: location.pathname,
-          prevSearch: location.search,
-        },
-        pathname: `job/${record.id}`,
-      }}
-    >
-      {text}
-    </Link>
-  </Tooltip>
-);
 
 const renderSchedule = text =>
   text ? <Link to={`schedule/${text}`}>{text}</Link> : '-';
@@ -206,7 +191,7 @@ class JobList extends React.Component<Props> {
   };
 
   refresh = () => {
-    const { groupContext, jobsVariables, jobsRefetch } = this.props;
+    const { jobsVariables, jobsRefetch } = this.props;
     const newVariables = {
       ...jobsVariables,
       page: 1,
@@ -238,7 +223,7 @@ class JobList extends React.Component<Props> {
   };
 
   searchHandler = queryString => {
-    const { groupContext, jobsVariables, jobsRefetch } = this.props;
+    const { jobsVariables, jobsRefetch } = this.props;
     let newVariables = jobsVariables;
     if (queryString && queryString.length > 0) {
       newVariables = {
@@ -254,7 +239,7 @@ class JobList extends React.Component<Props> {
 
   handleTableChange = (pagination, _filters, sorter) => {
     const { jobsVariables, jobsRefetch } = this.props;
-    const orderBy: any = {};
+    const orderBy = {};
     if (sorter.field) {
       orderBy[sorter.field] =
         get(sorter, 'order') === 'ascend' ? 'asc' : 'desc';
@@ -268,7 +253,7 @@ class JobList extends React.Component<Props> {
 
   cloneJob = record => {
     const { groupContext, history } = this.props;
-    const data: any = {
+    const data = {
       displayName: record.displayName,
       groupId: !groupContext ? record.groupId : groupContext.id,
       groupName: !groupContext ? record.groupName : groupContext.name,
@@ -346,7 +331,22 @@ class JobList extends React.Component<Props> {
         title: 'Job name',
         dataIndex: 'displayName',
         sorter: true,
-        render: renderJobName,
+        width: '300px',
+        render: (text, record) => (
+          <TruncateTableField text={text}>
+            <Link
+              to={{
+                state: {
+                  prevPathname: location.pathname,
+                  prevSearch: location.search,
+                },
+                pathname: `job/${record.id}`,
+              }}
+            >
+              {text}
+            </Link>
+          </TruncateTableField>
+        ),
       },
       {
         title: 'Schedule',

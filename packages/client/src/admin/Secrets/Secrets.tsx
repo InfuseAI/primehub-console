@@ -5,6 +5,7 @@ import { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 
+import { TruncateTableField } from 'utils/TruncateTableField';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 import {
@@ -74,16 +75,21 @@ function _Secrets({
       title: 'Name',
       dataIndex: 'node.name',
       sorter: (a, b) => compareString(a.node.name, b.node.name),
+      width: '25%',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       key: 'display-name',
       title: 'Display Name',
       dataIndex: 'node.displayName',
       sorter: (a, b) => compareString(a.node.displayName, b.node.displayName),
+      width: '25%',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       key: 'type',
       title: 'Type',
+      width: '25%',
       sorter: (a, b) => compareString(a.node.type, b.node.type),
       render: function RenderType(secret: SecretNode) {
         const secretName = {
@@ -97,7 +103,7 @@ function _Secrets({
     {
       key: 'actions',
       title: 'Actions',
-      width: '200px',
+      width: '25%',
       render: function RenderActions(secret: SecretNode) {
         return (
           <Button.Group>

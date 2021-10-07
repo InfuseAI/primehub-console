@@ -121,10 +121,7 @@ export function _SecretForm({ form, data, ...props }: SecretFormProps) {
               },
             ],
           })(
-            <Input
-              disabled={props?.disabledName || false}
-              data-testid='name'
-            />
+            <Input disabled={props?.disabledName || false} data-testid='name' />
           )}
         </Form.Item>
 
@@ -223,6 +220,6 @@ export function _SecretForm({ form, data, ...props }: SecretFormProps) {
   );
 }
 
-export const SecretForm = Form.create({
+export const SecretForm = Form.create<SecretFormProps>({
   name: 'secret-form',
 })(_SecretForm);

@@ -29,6 +29,7 @@ import {
   GroupContextValue,
   withGroupContext,
 } from 'context/group';
+import { TruncateTableField } from 'utils/TruncateTableField';
 import { errorHandler } from 'utils/errorHandler';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { useClipboard } from 'hooks/useClipboard';
@@ -349,10 +350,10 @@ function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesProps) {
         }
 
         return (
-          <>
+          <TruncateTableField text={name} maxWidth='700px' rows={1}>
             <Icon style={iconStyle} type='file' />
             {name}
-          </>
+          </TruncateTableField>
         );
       },
     },

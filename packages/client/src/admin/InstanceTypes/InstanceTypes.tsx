@@ -7,6 +7,7 @@ import { compose } from 'recompose';
 import { omit } from 'lodash';
 
 import InfuseButton from 'components/infuseButton';
+import { TruncateTableField } from 'utils/TruncateTableField';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { errorHandler } from 'utils/errorHandler';
 
@@ -116,20 +117,23 @@ export function _InstanceTypes({
       title: 'Name',
       dataIndex: 'node.name',
       sorter: true,
+      width: '300px',
+      render: text => <TruncateTableField text={text} defaultCharacter='-' />,
     },
     {
       key: 'displayName',
       title: 'Display Name',
       dataIndex: 'node.displayName',
       sorter: true,
+      width: '300px',
+      render: text => <TruncateTableField text={text} defaultCharacter='-' />,
     },
     {
       key: 'description',
       title: 'Description',
       sorter: true,
-      render: (instance: InstanceTypeNode) => {
-        return instance.node.description || '-';
-      },
+      dataIndex: 'node.description',
+      render: text => <TruncateTableField text={text} />,
     },
     {
       key: 'cpuLimit',

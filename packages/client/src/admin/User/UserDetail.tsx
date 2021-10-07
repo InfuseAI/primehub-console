@@ -30,6 +30,7 @@ import CheckableInputNumber from 'cms-components/customize-number-checkbox';
 import CustomRelationTable from '../share/RelationTable';
 import { User, UpdateUser, UserGroups } from 'queries/User.graphql';
 import { errorHandler } from 'utils/errorHandler';
+import { TruncateTableField } from 'utils/TruncateTableField';
 
 const { TabPane } = Tabs;
 
@@ -53,18 +54,23 @@ export const GroupsRelationTable = compose(
     {
       title: 'Name',
       dataIndex: 'name',
-      // eslint-disable-next-line react/display-name
-      render: (text, record) => {
-        return <Link to={`../group/${record.id}`}>{text}</Link>;
-      },
+      width: '40%',
+      render: (text, record) => (
+        <TruncateTableField text={text} maxWidth='400px'>
+          <Link to={`../group/${record.id}`}>{text}</Link>
+        </TruncateTableField>
+      ),
     },
     {
       title: 'Display Name',
       dataIndex: 'displayName',
+      width: '40%',
+      render: text => <TruncateTableField text={text} maxWidth='400px' />,
     },
     {
       title: 'CPU Quota',
       dataIndex: 'quotaCpu',
+      width: '10%',
       render: text => {
         return text === null ? '∞' : text;
       },
@@ -74,6 +80,7 @@ export const GroupsRelationTable = compose(
     {
       title: 'GPU Quota',
       dataIndex: 'quotaGpu',
+      width: '10%',
       render: text => {
         return text === null ? '∞' : text;
       },
@@ -88,6 +95,12 @@ export const GroupsRelationTable = compose(
       dataIndex: 'name',
       sorter: true,
       sortDirections: ['descend', 'ascend'],
+      width: '40%',
+      render: (text, record) => (
+        <TruncateTableField text={text} maxWidth='400px'>
+          <Link to={`../group/${record.id}`}>{text}</Link>
+        </TruncateTableField>
+      ),
     },
     ...groupColumns.slice(1),
   ];
@@ -291,7 +304,7 @@ function DetailPage(props: any) {
                   )}
                 </Form.Item>
                 <Form.Item label={'Groups'}>
-                  <div data-testid="groups">
+                  <div data-testid='groups'>
                     <GroupsRelationTable
                       onChange={handleRelationConnection}
                       value={relateGroups}
@@ -307,7 +320,9 @@ function DetailPage(props: any) {
                   >
                     Update
                   </InfuseButton>
-                  <InfuseButton onClick={onCancel} data-testid='reset-button'>Cancel</InfuseButton>
+                  <InfuseButton onClick={onCancel} data-testid='reset-button'>
+                    Cancel
+                  </InfuseButton>
                 </Form.Item>
               </Form>
             </Skeleton>

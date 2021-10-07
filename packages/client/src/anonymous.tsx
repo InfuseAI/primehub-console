@@ -5,15 +5,7 @@ import NotebookViewer from 'containers/sharedFiles/NotebookView';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { appPrefix } from 'utils/env';
 import { Logo } from 'containers/sharedFiles/NotebookShareOptions';
-import {
-  Typography,
-  Layout,
-  Button,
-  Form,
-  Input,
-  Card,
-  notification,
-} from 'antd';
+import { Typography, Layout, Button, Form, Input, notification } from 'antd';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import type { FormComponentProps } from 'antd/lib/form';
 import { useClipboard } from 'hooks/useClipboard';
