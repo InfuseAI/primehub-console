@@ -51,7 +51,7 @@ const defaultGroupValue: GroupInput = {
   admins: '',
   enabledSharedVolume: false,
   enabledDeployment: false,
-  launchGroupOnly: false,
+  launchGroupOnly: true,
   sharedVolumeCapacity: 1,
   maxDeploy: null,
   quotaCpu: 0.5,

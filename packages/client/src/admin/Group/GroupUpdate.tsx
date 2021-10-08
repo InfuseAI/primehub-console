@@ -196,7 +196,7 @@ function UpdatePage(props: any) {
     const { updateGroup } = props;
     const { connect, disconnect } = data.users;
     const payload = {
-      ...omit(data, ['name', 'enabledSharedVolume', 'sharedVolumeCapacity']),
+      ...omit(data, ['name']),
       users: {
         connect: connect.map(c => {
           return {
