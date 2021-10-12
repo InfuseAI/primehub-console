@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { Table, Col, Layout, Button, Icon, Modal, Tooltip } from 'antd';
+import { Table, Col, Layout, Button, Icon, Modal, Tooltip, Input } from 'antd';
 import { withRouter, useHistory } from 'react-router-dom';
-import { reduce, pick } from 'lodash';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import Pagination from 'components/share/pagination';
@@ -11,10 +10,8 @@ import { compose } from 'recompose';
 import InfuseButton from 'components/infuseButton';
 import EmailForm from 'cms-toolbar/sendEmailModal';
 import { FilterRow, FilterPlugins, ButtonCol } from 'components/share';
-import Filter from 'cms-toolbar/filter';
 import { errorHandler } from 'utils/errorHandler';
 import { TruncateTableField } from 'utils/TruncateTableField';
-// graphql
 import { UsersConnection, DeleteUser } from 'queries/User.graphql';
 
 const PAGE_SIZE = 10;
@@ -134,25 +131,16 @@ function List(props: Props) {
     },
   ];
 
-  const searchHandler = searchDict => {
+  const searchHandler = value => {
     const { listUser } = props;
     const { refetch } = listUser;
-    const pickedCond = pick(searchDict, ['username', 'email']);
-    const reducedCond = reduce(
-      pickedCond,
-      (result, value, key) => {
-        result[`${key}_contains`] = value.contains;
-        return result;
-      },
-      {}
-    );
     const newVariables = {
       userAfter: undefined,
       userFirst: PAGE_SIZE,
       userLast: undefined,
       userBefore: '0',
       where: {
-        ...reducedCond,
+        search: value,
       },
     };
     refetch(newVariables);
@@ -211,7 +199,6 @@ function List(props: Props) {
           }}
         >
           <Button.Group>
-            {/* @ts-ignore */}
             <InfuseButton
               data-testid='mail-button'
               icon='email'
@@ -223,7 +210,6 @@ function List(props: Props) {
             >
               Send Mail
             </InfuseButton>
-            {/* @ts-ignore */}
             <InfuseButton
               data-testid='add-button'
               icon='plus'
@@ -243,21 +229,9 @@ function List(props: Props) {
         >
           <Col key='search-handler' style={{ flex: 1 }}>
             <FilterPlugins style={{ marginRight: '10px' }}>
-              <Filter
-                changeFilter={searchHandler}
-                where={props.listUser?.variables.where || {}}
-                fields={[
-                  {
-                    type: 'text',
-                    label: 'Username',
-                    key: 'username',
-                  },
-                  {
-                    type: 'text',
-                    label: 'Email',
-                    key: 'email',
-                  },
-                ]}
+              <Input.Search
+                placeholder='Search for username or email'
+                onSearch={searchHandler}
               />
             </FilterPlugins>
           </Col>

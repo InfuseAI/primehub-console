@@ -224,13 +224,14 @@ class JobList extends React.Component<Props> {
 
   searchHandler = queryString => {
     const { jobsVariables, jobsRefetch } = this.props;
-    let newVariables = jobsVariables;
+    let newVariables;
+
     if (queryString && queryString.length > 0) {
       newVariables = {
         ...jobsVariables,
         where: {
           ...jobsVariables.where,
-          displayName_contains: queryString,
+          search: queryString,
         },
       };
     }

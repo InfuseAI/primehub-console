@@ -26,7 +26,7 @@ const styles: React.CSSProperties = {
 interface QueryVariables {
   page: number;
   where?: {
-    name_contains: string;
+    search: string;
   };
   orderBy?: {
     [key: string]: 'asc' | 'desc';
@@ -133,7 +133,7 @@ function _ImageList({ data, ...props }: ImageListProps) {
     {
       key: 'actions',
       title: 'Actions',
-      width: '200px',
+      width: '100px',
       render: function RenderActions(image: ImageNode) {
         return (
           <Button.Group>
@@ -200,7 +200,7 @@ function _ImageList({ data, ...props }: ImageListProps) {
       page: 1,
       where: {
         ...variables.where,
-        name_contains: keyword,
+        search: keyword,
       },
     });
   }
@@ -231,7 +231,6 @@ function _ImageList({ data, ...props }: ImageListProps) {
             <Input.Search
               data-testid='text-filter'
               placeholder='Search by name'
-              style={{ width: 295 }}
               value={keyword}
               onChange={event => setKeyword(event.currentTarget.value)}
               onSearch={onSearch}

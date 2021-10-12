@@ -146,7 +146,7 @@ export function GroupList(props: Props) {
       key: 'name',
       sorter: true,
       sortOrder: reducedOrderBy.name,
-      width: '300px',
+      width: '250px',
       render: text => <TruncateTableField text={text} />,
     },
     {
@@ -154,7 +154,7 @@ export function GroupList(props: Props) {
       dataIndex: 'displayName',
       sorter: true,
       sortOrder: reducedOrderBy.displayName,
-      width: '300px',
+      width: '250px',
       render: text => <TruncateTableField text={text} />,
     },
     {
@@ -162,7 +162,6 @@ export function GroupList(props: Props) {
       dataIndex: 'sharedVolumeCapacity',
       sorter: true,
       sortOrder: reducedOrderBy.sharedVolumeCapacity,
-      // @ts-ignore
       visible: !modelDeploymentOnly,
       render: value => {
         if (value) {
@@ -176,7 +175,6 @@ export function GroupList(props: Props) {
       dataIndex: 'quotaCpu',
       sorter: true,
       sortOrder: reducedOrderBy.quotaCpu,
-      // @ts-ignore
       visible: !modelDeploymentOnly,
       render: text => {
         return text === null ? '∞' : text;
@@ -187,7 +185,6 @@ export function GroupList(props: Props) {
       dataIndex: 'quotaGpu',
       sorter: true,
       sortOrder: reducedOrderBy.quotaGpu,
-      // @ts-ignore
       visible: !modelDeploymentOnly,
       render: text => {
         return text === null ? '∞' : text;
@@ -216,7 +213,7 @@ export function GroupList(props: Props) {
       dataIndex: 'id',
       key: 'action',
       render: renderAction,
-      width: 200,
+      width: '100px',
     },
   ];
 
@@ -304,9 +301,9 @@ export default compose(
           props.location.search.replace(/^\?/, '')
         );
         const orderBy = JSON.parse((params.orderBy as string) || '{}');
-        const where: { name_contains?: string } = {};
+        const where: { search?: string } = {};
         if (params.s) {
-          where.name_contains = params.s;
+          where.search = params.s;
         }
         return {
           variables: {
