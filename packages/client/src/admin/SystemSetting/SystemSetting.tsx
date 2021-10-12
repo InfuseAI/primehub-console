@@ -1,6 +1,6 @@
 import * as React from 'react';
 import moment from 'moment';
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 import {
   Icon,
   Layout,
@@ -12,14 +12,14 @@ import {
   InputNumber,
   Switch,
   Modal,
-  Typography,
   notification,
   Skeleton,
+  Form,
 } from 'antd';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
-import { Controller, useForm } from 'react-hook-form';
 import { timezones } from 'react-timezone';
+import type { FormComponentProps } from 'antd/lib/form';
 
 import Breadcrumbs from 'components/share/breadcrumb';
 
@@ -50,15 +50,38 @@ function CustomLabel({
   );
 }
 
+function PageHead() {
+  return (
+    <div
+      style={{
+        background: '#fff',
+        borderBottom: '1px solid #eee',
+        padding: '16px 24px',
+      }}
+    >
+      <Breadcrumbs
+        pathList={[
+          {
+            key: 'system',
+            matcher: /\/system/,
+            title: 'System Settings',
+          },
+        ]}
+      />
+    </div>
+  );
+}
+
 const EMAIL_REGEX = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;
+const LABEL_WIDTH = { width: '300px' };
 
 const initialState = {
   systemName: '',
-  logo: '',
+  logo: null,
   defaultUserVolumeCapacity: 0,
-  timezone: undefined,
+  timezone: null,
   smtpHost: '',
-  smtpPort: undefined,
+  smtpPort: null,
   smtpFromDisplayName: '',
   smtpFrom: '',
   smtpReplyDisplayName: '',
@@ -72,7 +95,7 @@ const initialState = {
 };
 
 interface SystemInfo {
-  license?: {
+  license: {
     startedAt: Date;
     expiredAt: Date;
     maxGroup: number;
@@ -102,22 +125,22 @@ interface SystemInfo {
   };
 
   smtp: {
-    host: string;
-    port: number;
-    fromDisplayName: string | null;
-    from: string;
-    replyToDisplayName: string | null;
-    replyTo: string | null;
-    envelopeFrom: string | null;
-    enableSSL: boolean;
-    enableStartTLS: boolean;
-    enableAuth: boolean;
-    username: string;
-    password: string;
+    host?: string;
+    port?: number;
+    fromDisplayName?: string;
+    from?: string;
+    replyToDisplayName?: string;
+    replyTo?: string;
+    envelopeFrom?: string;
+    enableSSL?: boolean;
+    enableStartTLS?: boolean;
+    enableAuth?: boolean;
+    username?: string;
+    password?: string;
   };
 }
 
-interface Props {
+interface Props extends FormComponentProps {
   data: {
     loading: boolean;
     error: undefined | Error;
@@ -132,119 +155,81 @@ interface Props {
   }) => Promise<void>;
 }
 
-function _SystemSetting({ data, ...props }: Props) {
+function _SystemSetting({ form, data, ...props }: Props) {
   const [addImageButtonVisible, setAddImageButtonVisible] =
     React.useState(false);
   const [pasteImageModalVisible, setPasteImageModalVisible] =
     React.useState(false);
 
-  const { control, formState, reset, watch, handleSubmit } = useForm({
-    defaultValues: initialState,
-    mode: 'onChange',
-  });
+  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-  const watchedURL = watch('logo');
+    form.validateFields(async (err, values) => {
+      if (err) return;
 
-  async function onSubmit(data: typeof initialState) {
-    try {
-      await props.updateSystemSetting({
-        variables: {
-          payload: {
-            org: {
-              // If remove logo and no upload a new, after update still get old logo.
-              logo: {
-                url: !formState.errors.logo && data.logo,
+      const formData = omit(values, 'smtp');
+
+      const smtpData = Object.keys(values.smtp).reduce((acc, k) => {
+        if (values.smtp[k] === '') {
+          acc[k] = null;
+        } else {
+          acc[k] = values.smtp[k];
+        }
+
+        return acc;
+      }, {});
+
+      const { offset } = timezones.find(
+        ({ name }) => name === formData.timezone
+      );
+
+      try {
+        await props.updateSystemSetting({
+          variables: {
+            payload: {
+              org: {
+                // If remove logo and no upload a new, after update still get old logo.
+                logo: {
+                  url: formData.logo,
+                },
+                name: formData.systemName,
               },
-              name: data.systemName,
-            },
 
-            timezone: {
-              name: data.timezone.name,
-              offset: data.timezone.offset,
-            },
+              timezone: {
+                name: formData.timezone,
+                offset,
+              },
 
-            defaultUserVolumeCapacity: data.defaultUserVolumeCapacity,
+              defaultUserVolumeCapacity: formData.defaultUserVolumeCapacity,
 
-            smtp: {
-              host: data.smtpHost,
-              port: data.smtpPort,
-              fromDisplayName: data.smtpFromDisplayName,
-              from: data.smtpFrom,
-              replyToDisplayName: data.smtpReplyDisplayName,
-              replyTo: data.smtpReply,
-              envelopeFrom: data.smtpEnvelopeFrom,
-              enableSSL: data.smtpEnableSSL,
-              enableStartTLS: data.smtpEnableStartTLS,
-              enableAuth: data.smtpEnableAuth,
-              username: data.smtpUsername,
-              password: data.smtpPassword,
+              smtp: smtpData,
             },
           },
-        },
-      });
-    } catch (err) {
-      console.error(err);
+        });
+      } catch (err) {
+        console.error(err);
 
-      notification.error({
-        duration: 5,
-        placement: 'bottomRight',
-        message: 'Failure',
-        description: 'Failure to update, try again later.',
-      });
-    }
+        notification.error({
+          duration: 5,
+          placement: 'bottomRight',
+          message: 'Failure',
+          description: 'Failure to update, try again later.',
+        });
+      }
+    });
   }
 
   React.useEffect(() => {
-    // after fetched data, reset form default value
     if (data?.system) {
-      reset({
-        systemName: data.system.org.name,
-        logo: data.system.org.logo?.url,
-        defaultUserVolumeCapacity: data.system.defaultUserVolumeCapacity,
-        timezone: data.system.timezone,
-        smtpHost: data.system.smtp.host,
-        smtpPort: data.system.smtp.port,
-        smtpFromDisplayName: data.system.smtp.fromDisplayName,
-        smtpFrom: data.system.smtp.from,
-        smtpReplyDisplayName: data.system.smtp.replyToDisplayName,
-        smtpReply: data.system.smtp.replyTo,
-        smtpEnvelopeFrom: data.system.smtp.envelopeFrom,
-        smtpEnableSSL: data.system.smtp.enableSSL,
-        smtpEnableStartTLS: data.system.smtp.enableStartTLS,
-        smtpEnableAuth: data.system.smtp.enableAuth,
-        smtpUsername: data.system.smtp.username,
-        smtpPassword: data.system.smtp.password,
-      });
-
       if (!data.system.org.logo?.url) {
         setAddImageButtonVisible(true);
       }
     }
-  }, [data, reset]);
+  }, [data]);
 
   if (data.error) {
     return <div>Error</div>;
   }
-
-  const PageHead = () => (
-    <div
-      style={{
-        background: '#fff',
-        borderBottom: '1px solid #eee',
-        padding: '16px 24px',
-      }}
-    >
-      <Breadcrumbs
-        pathList={[
-          {
-            key: 'system',
-            matcher: /\/system/,
-            title: 'System Settings',
-          },
-        ]}
-      />
-    </div>
-  );
 
   if (data.loading) {
     return (
@@ -263,7 +248,7 @@ function _SystemSetting({ data, ...props }: Props) {
     );
   }
 
-  const { license, defaultUserVolumeCapacity, smtp } = data.system;
+  const { license } = data.system;
 
   return (
     <Layout>
@@ -275,9 +260,9 @@ function _SystemSetting({ data, ...props }: Props) {
           backgroundColor: '#fff',
         }}
       >
-        <form
+        <Form
           id='system-settings'
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={onSubmit}
           style={{
             display: 'grid',
             gridRow: 3,
@@ -285,9 +270,7 @@ function _SystemSetting({ data, ...props }: Props) {
             backgroundColor: '#fff',
           }}
         >
-          {__ENV__ === 'ce' ? (
-            <></>
-          ) : (
+          {__ENV__ !== 'ce' && (
             <Card title='PrimeHub License'>
               <Row type='flex'>
                 <Col sm={5} xs={24}>
@@ -336,27 +319,19 @@ function _SystemSetting({ data, ...props }: Props) {
           )}
 
           <Card title='System Settings'>
-            <div style={{ width: '300px' }}>
-              <CustomLabel>Name</CustomLabel>
-              <Controller
-                control={control}
-                name='systemName'
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    data-testid='settings-systemName'
-                    value={value}
-                    onChange={onChange}
-                  />
-                )}
-              />
-            </div>
+            <Form.Item label='Name' style={LABEL_WIDTH}>
+              {form.getFieldDecorator('systemName', {
+                initialValue: get(
+                  data,
+                  'system.org.name',
+                  initialState.systemName
+                ),
+              })(<Input data-testid='settings-systemName' />)}
+            </Form.Item>
 
-            <div style={{ width: '300px', marginTop: '32px' }}>
-              <CustomLabel>Logo</CustomLabel>
-
+            <Form.Item label='Logo' style={LABEL_WIDTH}>
               {addImageButtonVisible ? (
                 <>
-                  {/* @ts-ignore */}
                   <Button
                     type='primary'
                     data-testid='add-logo'
@@ -364,58 +339,6 @@ function _SystemSetting({ data, ...props }: Props) {
                   >
                     <Icon type='plus' /> Add Image
                   </Button>
-
-                  <Modal
-                    title='Choose Image'
-                    visible={pasteImageModalVisible}
-                    maskClosable={false}
-                    onCancel={() => {
-                      setPasteImageModalVisible(false);
-                      setAddImageButtonVisible(false);
-
-                      // reset to the origin url
-                      reset({
-                        logo: data.system.org.logo?.url,
-                      });
-                    }}
-                    onOk={() => {
-                      setPasteImageModalVisible(false);
-                      setAddImageButtonVisible(false);
-                    }}
-                    okButtonProps={{
-                      disabled:
-                        !watchedURL || formState.errors.logo ? true : false,
-                    }}
-                  >
-                    <CustomLabel>Enter Image URL</CustomLabel>
-                    <Controller
-                      control={control}
-                      name='logo'
-                      rules={{
-                        pattern:
-                          /(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg|png))/i,
-                      }}
-                      render={({ field: { value, onChange } }) => (
-                        <CustomLabel>
-                          <Input
-                            data-testid='settings-logo-url'
-                            value={value}
-                            onChange={onChange}
-                          />
-
-                          {formState.errors.logo && (
-                            <CustomLabel
-                              style={{ marginTop: '8px', padding: 0 }}
-                            >
-                              <Typography.Text type='danger'>
-                                Invalid image URL
-                              </Typography.Text>
-                            </CustomLabel>
-                          )}
-                        </CustomLabel>
-                      )}
-                    />
-                  </Modal>
                 </>
               ) : (
                 <div
@@ -424,7 +347,13 @@ function _SystemSetting({ data, ...props }: Props) {
                     backgroundColor: 'rgb(238, 238, 238)',
                   }}
                 >
-                  <img width='100%' src={watchedURL} />
+                  <img
+                    width='100%'
+                    alt='Logo'
+                    src={
+                      form.getFieldValue('logo') ?? data.system.org.logo?.url
+                    }
+                  />
 
                   <div
                     style={{
@@ -436,312 +365,246 @@ function _SystemSetting({ data, ...props }: Props) {
                   >
                     <Button
                       data-testid='remove-logo'
-                      onClick={() => setAddImageButtonVisible(true)}
+                      onClick={() => {
+                        setAddImageButtonVisible(true);
+                      }}
                     >
                       <Icon type='close' />
                     </Button>
                   </div>
                 </div>
               )}
-            </div>
+              <Modal
+                title='Choose Image'
+                visible={pasteImageModalVisible}
+                maskClosable={false}
+                onCancel={() => {
+                  setPasteImageModalVisible(false);
+                  setAddImageButtonVisible(false);
 
-            <div style={{ width: '300px', marginTop: '32px' }}>
-              <CustomLabel>Default User Volume Capacity</CustomLabel>
-              <Controller
-                control={control}
-                name='defaultUserVolumeCapacity'
-                render={({ field: { onChange } }) => (
-                  <InputNumber
-                    data-testid='settings-capacity'
-                    defaultValue={defaultUserVolumeCapacity}
-                    formatter={value => `${value} GB`}
-                    // @ts-ignore
-                    parser={value => value.replace(/[^0-9.]/g, '')}
-                    precision={0}
-                    min={1}
-                    step={1}
-                    onChange={onChange}
-                  />
-                )}
-              />
-            </div>
+                  form.setFieldsValue({
+                    logo: get(data, 'system.org.logo.url', initialState.logo),
+                  });
+                }}
+                onOk={() => {
+                  setPasteImageModalVisible(false);
+                  setAddImageButtonVisible(false);
+                }}
+              >
+                <Form.Item label='Enter Image URL'>
+                  {form.getFieldDecorator('logo', {
+                    initialValue: get(
+                      data,
+                      'system.org.logo.url',
+                      initialState.logo
+                    ),
+                    rules: [
+                      {
+                        pattern:
+                          /(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg|png))/i,
+                        message: 'URL is invalid',
+                      },
+                    ],
+                  })(<Input data-testid='settings-logo-url' />)}
+                </Form.Item>
+              </Modal>
+            </Form.Item>
 
-            <div style={{ width: '300px', marginTop: '32px' }}>
-              <CustomLabel>Timezone</CustomLabel>
-              <Controller
-                control={control}
-                name='timezone'
-                render={({ field: { value, onChange } }) => (
-                  <TimeZone
-                    value={value}
-                    onChange={nextTimezone => {
-                      onChange({
-                        name: nextTimezone,
-                        offset: timezones.find(
-                          ({ name }) => name === nextTimezone
-                        ).offset,
-                      });
-                    }}
-                  />
-                )}
-              />
-            </div>
+            <Form.Item label='Default User Volume Capacity' style={LABEL_WIDTH}>
+              {form.getFieldDecorator('defaultUserVolumeCapacity', {
+                initialValue: get(
+                  data,
+                  'system.defaultUserVolumeCapacity',
+                  initialState.defaultUserVolumeCapacity
+                ),
+              })(
+                <InputNumber
+                  data-testid='settings-capacity'
+                  formatter={value => `${value} GB`}
+                  parser={value => value.replace(/[^0-9.]/g, '')}
+                  precision={0}
+                  min={1}
+                  step={1}
+                />
+              )}
+            </Form.Item>
+
+            <Form.Item label='Timezone' style={LABEL_WIDTH}>
+              {form.getFieldDecorator('timezone', {
+                initialValue: get(data, 'system.timezone.name'),
+              })(
+                <TimeZone
+                  value={form.getFieldValue('timezone')}
+                  onChange={nextTimezone => {
+                    form.setFieldsValue({ timezone: nextTimezone });
+                  }}
+                />
+              )}
+            </Form.Item>
           </Card>
 
           <Card title='Email Settings'>
-            <div style={{ width: '300px' }}>
-              <CustomLabel>SMTP Host</CustomLabel>
-              <Controller
-                control={control}
-                name='smtpHost'
-                rules={{
-                  required: true,
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    value={value}
-                    onChange={onChange}
-                    data-testid='smtp-host'
-                  />
-                )}
-              />
-              {formState.errors.smtpHost && (
-                <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
-                  <Typography.Text type='danger'>
-                    SMTP Host is required!
-                  </Typography.Text>
-                </CustomLabel>
+            <Form.Item label='SMTP Host' style={LABEL_WIDTH}>
+              {form.getFieldDecorator('smtp.host', {
+                initialValue: get(
+                  data,
+                  'system.smtp.host',
+                  initialState.smtpHost
+                ),
+              })(<Input data-testid='smtp-host' />)}
+            </Form.Item>
+
+            <Form.Item label='SMTP Port' style={LABEL_WIDTH}>
+              {form.getFieldDecorator('smtp.port', {
+                initialValue: get(
+                  data,
+                  'system.smtp.port',
+                  initialState.smtpPort
+                ),
+              })(
+                <InputNumber
+                  data-testid='smtp-port'
+                  precision={0}
+                  min={1}
+                  step={1}
+                />
               )}
-            </div>
+            </Form.Item>
 
-            <div style={{ width: '300px', marginTop: '32px' }}>
-              <CustomLabel>SMTP Port</CustomLabel>
-              <Controller
-                control={control}
-                name='smtpPort'
-                render={({ field: { onChange } }) => (
-                  <InputNumber
-                    data-testid='smtp-port'
-                    defaultValue={smtp.port}
-                    precision={0}
-                    min={1}
-                    step={1}
-                    onChange={onChange}
-                  />
-                )}
-              />
-            </div>
+            <Form.Item label='From Display Name' style={LABEL_WIDTH}>
+              {form.getFieldDecorator('smtp.fromDisplayName', {
+                initialValue: get(
+                  data,
+                  'system.smtp.fromDisplayName',
+                  initialState.smtpFromDisplayName
+                ),
+              })(<Input data-testid='smtp-from-display-name' />)}
+            </Form.Item>
 
-            <div style={{ width: '300px', marginTop: '32px' }}>
-              <CustomLabel>From Display Name</CustomLabel>
-              <Controller
-                control={control}
-                name='smtpFromDisplayName'
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    data-testid='smtp-from-display-name'
-                    value={value}
-                    onChange={onChange}
-                  />
-                )}
-              />
-            </div>
+            <Form.Item label='From' style={LABEL_WIDTH}>
+              {form.getFieldDecorator('smtp.from', {
+                initialValue: get(
+                  data,
+                  'system.smtp.from',
+                  initialState.smtpFrom
+                ),
+                rules: [
+                  {
+                    pattern: EMAIL_REGEX,
+                    message: 'Invalid Email',
+                  },
+                ],
+              })(<Input data-testid='smtp-from' />)}
+            </Form.Item>
 
-            <div style={{ width: '300px', marginTop: '32px' }}>
-              <CustomLabel>From</CustomLabel>
-              <Controller
-                control={control}
-                name='smtpFrom'
-                rules={{
-                  pattern: EMAIL_REGEX,
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <CustomLabel>
-                    <Input
-                      data-testid='smtp-from'
-                      value={value}
-                      onChange={onChange}
-                    />
-                    {formState.errors.smtpFrom && (
-                      <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
-                        <Typography.Text
-                          type='danger'
-                          data-testid='invalid-smtp-from'
-                        >
-                          Invalid Email
-                        </Typography.Text>
-                      </CustomLabel>
-                    )}
-                  </CustomLabel>
-                )}
-              />
-            </div>
+            <Form.Item label='Reply To Display Name' style={LABEL_WIDTH}>
+              {form.getFieldDecorator('smtp.replyToDisplayName', {
+                initialValue: get(
+                  data,
+                  'system.smtp.replyToDisplayName',
+                  initialState.smtpReplyDisplayName
+                ),
+              })(<Input data-testid='smtp-reply-display-name' />)}
+            </Form.Item>
 
-            <div style={{ width: '300px', marginTop: '32px' }}>
-              <CustomLabel>Reply To Display Name</CustomLabel>
-              <Controller
-                control={control}
-                name='smtpReplyDisplayName'
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    data-testid='smtp-reply-display-name'
-                    value={value}
-                    onChange={onChange}
-                  />
-                )}
-              />
-            </div>
+            <Form.Item label='Reply' style={LABEL_WIDTH}>
+              {form.getFieldDecorator('smtp.replyTo', {
+                initialValue: get(
+                  data,
+                  'system.smtp.replyTo',
+                  initialState.smtpReply
+                ),
+                rules: [
+                  {
+                    pattern: EMAIL_REGEX,
+                    message: 'Invalid Email',
+                  },
+                ],
+              })(<Input data-testid='smtp-reply' />)}
+            </Form.Item>
 
-            <div style={{ width: '300px', marginTop: '32px' }}>
-              <CustomLabel>Reply</CustomLabel>
-              <Controller
-                control={control}
-                name='smtpReply'
-                rules={{
-                  pattern: EMAIL_REGEX,
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <CustomLabel>
-                    <Input
-                      data-testid='smtp-reply'
-                      value={value}
-                      onChange={onChange}
-                    />
-                    {formState.errors.smtpReply && (
-                      <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
-                        <Typography.Text
-                          type='danger'
-                          data-testid='invalid-smtp-reply'
-                        >
-                          Invalid Email
-                        </Typography.Text>
-                      </CustomLabel>
-                    )}
-                  </CustomLabel>
-                )}
-              />
-            </div>
+            <Form.Item label='Envelope From' style={LABEL_WIDTH}>
+              {form.getFieldDecorator('smtp.envelopeFrom', {
+                initialValue: get(
+                  data,
+                  'system.smtp.envelopeFrom',
+                  initialState.smtpEnvelopeFrom
+                ),
+              })(<Input data-testid='smtp-envelop-from' />)}
+            </Form.Item>
 
-            <div style={{ width: '300px', marginTop: '32px' }}>
-              <CustomLabel>Envelope From</CustomLabel>
-              <Controller
-                control={control}
-                name='smtpEnvelopeFrom'
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    data-testid='smtp-envelop-from'
-                    value={value}
-                    onChange={onChange}
-                  />
-                )}
-              />
-            </div>
-
-            <div style={{ width: '300px', marginTop: '32px' }}>
-              <CustomLabel>Enable SSL</CustomLabel>
-
-              <Controller
-                control={control}
-                name='smtpEnableSSL'
-                render={({ field: { onChange } }) => (
-                  <Switch
-                    data-testid='smtp-enable-ssl'
-                    defaultChecked={smtp.enableSSL}
-                    onChange={onChange}
-                    checkedChildren='Yes'
-                    unCheckedChildren='No'
-                  />
-                )}
-              />
-            </div>
-
-            <div style={{ width: '300px', marginTop: '32px' }}>
-              <CustomLabel>Enable StartTLS</CustomLabel>
-
-              <Controller
-                control={control}
-                name='smtpEnableStartTLS'
-                render={({ field: { onChange } }) => (
-                  <Switch
-                    data-testid='smtp-enable-startTLS'
-                    defaultChecked={smtp.enableStartTLS}
-                    onChange={onChange}
-                    checkedChildren='Yes'
-                    unCheckedChildren='No'
-                  />
-                )}
-              />
-            </div>
-
-            <div style={{ width: '300px', marginTop: '32px' }}>
-              <CustomLabel>Enable Authentication</CustomLabel>
-
-              <Controller
-                control={control}
-                name='smtpEnableAuth'
-                render={({ field: { onChange } }) => (
-                  <Switch
-                    data-testid='smtp-enable-auth'
-                    defaultChecked={smtp.enableAuth}
-                    onChange={onChange}
-                    checkedChildren='Yes'
-                    unCheckedChildren='No'
-                  />
-                )}
-              />
-            </div>
-
-            <div style={{ width: '300px', marginTop: '32px' }}>
-              <CustomLabel>Username</CustomLabel>
-
-              <Controller
-                control={control}
-                name='smtpUsername'
-                rules={{
-                  required: true,
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <>
-                    <Input
-                      data-testid='smtp-username'
-                      value={value}
-                      onChange={onChange}
-                    />
-                    {formState.errors.smtpUsername && (
-                      <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
-                        <Typography.Text type='danger'>
-                          Username is required!
-                        </Typography.Text>
-                      </CustomLabel>
-                    )}
-                  </>
-                )}
-              />
-            </div>
-
-            <div style={{ width: '300px', marginTop: '32px' }}>
-              <CustomLabel>Password</CustomLabel>
-
-              <Controller
-                control={control}
-                name='smtpPassword'
-                rules={{
-                  required: true,
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <Input type='password' value={value} onChange={onChange} />
-                )}
-              />
-              {formState.errors.smtpPassword && (
-                <CustomLabel style={{ marginTop: '8px', padding: 0 }}>
-                  <Typography.Text type='danger'>
-                    Password is required!
-                  </Typography.Text>
-                </CustomLabel>
+            <Form.Item label='Enable SSL'>
+              {form.getFieldDecorator('smtp.enableSSL', {
+                initialValue: get(
+                  data,
+                  'system.smtp.enableSSL',
+                  initialState.smtpEnableSSL
+                ),
+                valuePropName: 'checked',
+              })(
+                <Switch
+                  data-testid='smtp-enable-ssl'
+                  checkedChildren='Yes'
+                  unCheckedChildren='No'
+                />
               )}
-            </div>
+            </Form.Item>
+
+            <Form.Item label='Enable StartTLS'>
+              {form.getFieldDecorator('smtp.enableStartTLS', {
+                initialValue: get(
+                  data,
+                  'system.smtp.enableStartTLS',
+                  initialState.smtpEnableStartTLS
+                ),
+                valuePropName: 'checked',
+              })(
+                <Switch
+                  data-testid='smtp-enable-startTLS'
+                  checkedChildren='Yes'
+                  unCheckedChildren='No'
+                />
+              )}
+            </Form.Item>
+
+            <Form.Item label='Enable Authentication'>
+              {form.getFieldDecorator('smtp.enableAuth', {
+                initialValue: get(
+                  data,
+                  'system.smtp.enableAuth',
+                  initialState.smtpEnableAuth
+                ),
+                valuePropName: 'checked',
+              })(
+                <Switch
+                  data-testid='smtp-enable-auth'
+                  checkedChildren='Yes'
+                  unCheckedChildren='No'
+                />
+              )}
+            </Form.Item>
+
+            <Form.Item label='Username' style={LABEL_WIDTH}>
+              {form.getFieldDecorator('smtp.username', {
+                initialValue: get(
+                  data,
+                  'system.smtp.username',
+                  initialState.smtpUsername
+                ),
+              })(<Input data-testid='smtp-username' />)}
+            </Form.Item>
+
+            <Form.Item label='Password' style={LABEL_WIDTH}>
+              {form.getFieldDecorator('smtp.password', {
+                initialValue: get(
+                  data,
+                  'system.smtp.password',
+                  initialState.smtpPassword
+                ),
+              })(<Input type='password' />)}
+            </Form.Item>
           </Card>
-        </form>
+        </Form>
 
         <div
           style={{
@@ -752,7 +615,7 @@ function _SystemSetting({ data, ...props }: Props) {
         >
           <Button
             onClick={() => {
-              reset();
+              form.resetFields();
             }}
             style={{ marginRight: '16px' }}
           >
@@ -797,4 +660,4 @@ export const SystemSetting = compose(
       };
     },
   })
-)(_SystemSetting);
+)(Form.create({ name: 'system-settings' })(_SystemSetting));

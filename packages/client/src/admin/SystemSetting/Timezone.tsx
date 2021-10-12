@@ -4,17 +4,13 @@ import { Select } from 'antd';
 
 const Option = Select.Option;
 
-type Timezone = {
-  name: string;
-  offset: number;
-};
 interface Props {
-  value: Timezone;
+  value: string;
   onChange: (timezone: string) => void;
 }
 
 function stringifyZone(zone: { label: string; offset: number }) {
-  const ensure2Digits = (num) => (num > 9 ? `${num}` : `0${num}`);
+  const ensure2Digits = num => (num > 9 ? `${num}` : `0${num}`);
 
   return `(GMT${zone.offset < 0 ? '-' : '+'}${ensure2Digits(
     Math.floor(Math.abs(zone.offset))
@@ -22,10 +18,7 @@ function stringifyZone(zone: { label: string; offset: number }) {
 }
 
 export function TimeZone({ onChange, ...props }: Props) {
-  const [timezone, setTimeZone] = React.useState<Timezone>({
-    name: 'Asia/Taipei',
-    offset: 8,
-  });
+  const [timezone, setTimeZone] = React.useState('Asia/Taipei');
 
   React.useEffect(() => {
     if (props?.value) {
@@ -37,11 +30,11 @@ export function TimeZone({ onChange, ...props }: Props) {
     <Select
       showSearch
       style={{ width: 350 }}
-      data-testid="timezone-select"
-      placeholder="Select a timezone"
-      optionFilterProp="children"
+      data-testid='timezone-select'
+      placeholder='Select a timezone'
+      optionFilterProp='children'
       onChange={onChange}
-      value={timezone.name}
+      value={timezone}
       filterOption={(input, option) =>
         (option.props.children as string)
           .toLowerCase()
@@ -49,8 +42,8 @@ export function TimeZone({ onChange, ...props }: Props) {
       }
     >
       {timezones
-        .filter((zone) => zone.label.toLowerCase().replace(/\s+/g, ''))
-        .map((zone) => (
+        .filter(zone => zone.label.toLowerCase().replace(/\s+/g, ''))
+        .map(zone => (
           <Option
             key={zone}
             value={zone.name}

@@ -45,7 +45,7 @@ function setup() {
                 name: null,
                 size: 0,
                 url: 'https://i.imgur.com/CDz3JAY.png',
-                __typename: 'CannerImage'
+                __typename: 'CannerImage',
               },
               __typename: 'Org',
             },
@@ -250,33 +250,6 @@ describe('SystemSetting', () => {
     );
   });
 
-  it('should render system setting with close or ok button in modal', async () => {
-    const { mockRequests } = setup();
-
-    // @ts-ignore
-    global.__ENV__ = 'ee';
-
-    render(
-      <MemoryRouter>
-        <MockedProvider mocks={mockRequests}>
-          <SystemSetting />
-        </MockedProvider>
-      </MemoryRouter>
-    );
-
-    const removeLogoBtn = await screen.findByTestId('remove-logo');
-    userEvent.click(removeLogoBtn);
-
-    const addLogoBtn = screen.getByTestId('add-logo');
-    userEvent.click(addLogoBtn);
-    expect(await screen.findByText('Choose Image')).toBeInTheDocument();
-
-    userEvent.click(screen.getByText('Cancel'));
-    await waitFor(() => {
-      expect(screen.queryByText('Choose Image')).not.toBeInTheDocument();
-    });
-  });
-
   it('should render system setting with invalid email message', async () => {
     const { mockRequests } = setup();
 
@@ -295,21 +268,7 @@ describe('SystemSetting', () => {
     userEvent.clear(smtpFrom);
     userEvent.type(smtpFrom, 'AAA');
 
-    await waitFor(() => {
-      expect(screen.getByTestId('invalid-smtp-from')).toHaveTextContent(
-        'Invalid Email'
-      );
-    });
-
-    const smtpReply = await screen.findByTestId('smtp-reply');
-    userEvent.clear(smtpReply);
-    userEvent.type(smtpReply, 'BBB');
-
-    await waitFor(() => {
-      expect(screen.getByTestId('invalid-smtp-reply')).toHaveTextContent(
-        'Invalid Email'
-      );
-    });
+    expect(await screen.findByText('Invalid Email')).toBeInTheDocument();
   });
 
   it('should not render system setting license status when license is CE', async () => {
