@@ -46,7 +46,7 @@ type QueryVariables = {
   where?: {
     id: string;
     mine?: boolean;
-    name_contains?: string;
+    search?: string;
     groupId_in?: string[];
   };
 };
@@ -84,7 +84,7 @@ function CommonPageTitle() {
 
   return (
     <PageTitle
-      title="Model Deployments"
+      title='Model Deployments'
       breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
     />
   );
@@ -127,13 +127,13 @@ function DeploymentListContainer({ groups, phDeployments, ...props }: Props) {
       ...variables,
       where: {
         ...variables.where,
-        name_contains: keyword,
+        search: keyword,
       },
     });
   }
 
   if (groupContext) {
-    const group = groups.find((group) => group.id === groupContext.id);
+    const group = groups.find(group => group.id === groupContext.id);
 
     if (!group) {
       return (
@@ -141,9 +141,9 @@ function DeploymentListContainer({ groups, phDeployments, ...props }: Props) {
           <CommonPageTitle />
           <PageBody>
             <Alert
-              message="Group not found"
+              message='Group not found'
               description={`Group ${groupContext.name} is not found or not authorized.`}
-              type="error"
+              type='error'
               showIcon
             />
           </PageBody>
@@ -157,9 +157,9 @@ function DeploymentListContainer({ groups, phDeployments, ...props }: Props) {
           <CommonPageTitle />
           <PageBody>
             <Alert
-              message="Feature not available"
-              description="Model Deployment is not enabled for this group. Please contact your administrator to enable it."
-              type="warning"
+              message='Feature not available'
+              description='Model Deployment is not enabled for this group. Please contact your administrator to enable it.'
+              type='warning'
               showIcon
             />
           </PageBody>
@@ -189,7 +189,7 @@ function DeploymentListContainer({ groups, phDeployments, ...props }: Props) {
           <Checkbox
             disabled={phDeployments.loading}
             checked={isDeployedByMe}
-            onChange={(event) => {
+            onChange={event => {
               const isChecked = event.target.checked;
               setIsDeployedByme(isChecked);
 
@@ -218,7 +218,7 @@ function DeploymentListContainer({ groups, phDeployments, ...props }: Props) {
           </Checkbox>
 
           <Divider
-            type="vertical"
+            type='vertical'
             style={{ height: '30px', margin: '0 8px 0 0' }}
           />
 
@@ -230,8 +230,8 @@ function DeploymentListContainer({ groups, phDeployments, ...props }: Props) {
           </InfuseButton>
           {/* @ts-ignore */}
           <InfuseButton
-            icon="plus"
-            type="primary"
+            icon='plus'
+            type='primary'
             onClick={() => history.push(`deployments/create`)}
           >
             Create Deployment
@@ -246,10 +246,10 @@ function DeploymentListContainer({ groups, phDeployments, ...props }: Props) {
           }}
         >
           <Search
-            placeholder="Search by name"
+            placeholder='Search by name'
             style={{ width: 295 }}
             value={keyword}
-            onChange={(event) => setKeyword(event.currentTarget.value)}
+            onChange={event => setKeyword(event.currentTarget.value)}
             onSearch={searchHandler}
           />
           <InfuseButton
@@ -269,7 +269,7 @@ function DeploymentListContainer({ groups, phDeployments, ...props }: Props) {
                 ...variables,
                 where: {
                   ...variables.where,
-                  name_contains: '',
+                  search: '',
                 },
               });
             }}
@@ -281,32 +281,34 @@ function DeploymentListContainer({ groups, phDeployments, ...props }: Props) {
 
       <Spin spinning={phDeployments.loading}>
         <div style={{ padding: '16px' }}>
-          <Row gutter={24} type="flex">
-            {phDeployments?.phDeploymentsConnection?.edges.filter((edge) => edge.node?.name).map((edge) => {
-              return (
-                <Col
-                  xs={24}
-                  md={12}
-                  xl={8}
-                  key={edge.cursor}
-                  style={{ marginBottom: 16 }}
-                >
-                  <DeploymentCard
-                    {...edge.node}
-                    onStart={() => {
-                      props.startPhApp({
-                        variables: { where: { id: edge.node.id } },
-                      });
-                    }}
-                    onStop={() => {
-                      props.stopPhApp({
-                        variables: { where: { id: edge.node.id } },
-                      });
-                    }}
-                  />
-                </Col>
-              );
-            })}
+          <Row gutter={24} type='flex'>
+            {phDeployments?.phDeploymentsConnection?.edges
+              .filter(edge => edge.node?.name)
+              .map(edge => {
+                return (
+                  <Col
+                    xs={24}
+                    md={12}
+                    xl={8}
+                    key={edge.cursor}
+                    style={{ marginBottom: 16 }}
+                  >
+                    <DeploymentCard
+                      {...edge.node}
+                      onStart={() => {
+                        props.startPhApp({
+                          variables: { where: { id: edge.node.id } },
+                        });
+                      }}
+                      onStop={() => {
+                        props.stopPhApp({
+                          variables: { where: { id: edge.node.id } },
+                        });
+                      }}
+                    />
+                  </Col>
+                );
+              })}
           </Row>
 
           <Pagination

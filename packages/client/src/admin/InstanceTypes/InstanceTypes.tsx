@@ -54,7 +54,7 @@ interface InstanceTypeConnection {
 interface QueryVariables {
   page: number;
   where?: {
-    name_contains: string;
+    search: string;
   };
   orderBy?: {
     [key: string]: 'asc' | 'desc';
@@ -117,7 +117,7 @@ export function _InstanceTypes({
       title: 'Name',
       dataIndex: 'node.name',
       sorter: true,
-      width: '300px',
+      width: '250px',
       render: text => <TruncateTableField text={text} defaultCharacter='-' />,
     },
     {
@@ -125,7 +125,7 @@ export function _InstanceTypes({
       title: 'Display Name',
       dataIndex: 'node.displayName',
       sorter: true,
-      width: '300px',
+      width: '250px',
       render: text => <TruncateTableField text={text} defaultCharacter='-' />,
     },
     {
@@ -156,7 +156,7 @@ export function _InstanceTypes({
     {
       key: 'actions',
       title: 'Actions',
-      width: '200px',
+      width: '100px',
       render: function RenderActions(instance: InstanceTypeNode) {
         return (
           <Button.Group>
@@ -225,7 +225,7 @@ export function _InstanceTypes({
       page: 1,
       where: {
         ...variables.where,
-        name_contains: keyword,
+        search: keyword,
       },
     });
   }

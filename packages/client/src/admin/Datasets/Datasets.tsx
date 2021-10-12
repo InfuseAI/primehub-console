@@ -37,7 +37,7 @@ type DatasetNode = {
 
 interface Props {
   datasetQuery: {
-    refetch: (variables: any) => Promise<void>;
+    refetch: (variables?: any) => Promise<void>;
     error: Error | undefined;
     loading: boolean;
     variables: any;
@@ -89,22 +89,22 @@ function _Datasets({
     }
   }
 
-  async function handleSearch(searchString) {
+  function handleSearch(searchString) {
     const variables = {
       ...datasetQuery.variables,
       page: 1,
       where: {
-        name_contains: searchString,
+        search: searchString,
       },
     };
     datasetQuery.refetch(variables);
   }
 
-  async function handleAdd() {
+  function handleAdd() {
     history.push(`${appPrefix}admin/dataset?operator=create`);
   }
 
-  async function handleTableChange(pagination, filters, sorter) {
+  function handleTableChange(pagination, filters, sorter) {
     const variables = {
       ...datasetQuery.variables,
       page: pagination.current,
@@ -175,7 +175,7 @@ function _Datasets({
       title: 'Name',
       dataIndex: 'node.name',
       sorter: true,
-      width: '300px',
+      width: '250px',
       render: text => <TruncateTableField text={text} />,
     },
     {
@@ -183,7 +183,15 @@ function _Datasets({
       title: 'Display Name',
       dataIndex: 'node.displayName',
       sorter: true,
-      width: '300px',
+      width: '250px',
+      render: text => <TruncateTableField text={text} />,
+    },
+    {
+      key: 'description',
+      title: 'Description',
+      dataIndex: 'node.description',
+      width: '250px',
+      sorter: true,
       render: text => <TruncateTableField text={text} />,
     },
     {
@@ -208,14 +216,6 @@ function _Datasets({
       },
     },
     {
-      key: 'description',
-      title: 'Description',
-      dataIndex: 'node.description',
-      width: '300px',
-      sorter: true,
-      render: text => <TruncateTableField text={text} />,
-    },
-    {
       key: 'uploadServerLink',
       title: 'Upload Server',
       dataIndex: 'node.uploadServerLink',
@@ -234,7 +234,7 @@ function _Datasets({
     {
       key: 'actions',
       title: 'Actions',
-      width: '200px',
+      width: '100px',
       render: function RenderActions(dataset: DatasetNode) {
         return (
           <Button.Group>
