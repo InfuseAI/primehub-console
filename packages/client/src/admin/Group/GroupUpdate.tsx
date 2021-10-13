@@ -27,7 +27,6 @@ function UpdatePage(props: any) {
   const { loading } = getGroup;
   const group = get(getGroup, 'group', {});
   const everyoneGroup = get(getGroup, 'everyoneGroup', {});
-  const location = useLocation();
   const history = useHistory();
   const params = useParams<{ id: string; activeKey?: string }>();
   const { activeKey = 'info' } = params;
