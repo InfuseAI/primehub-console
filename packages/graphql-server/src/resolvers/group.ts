@@ -457,7 +457,10 @@ export const typeResolvers = {
   users: async (parent, args, context: Context) => {
     try {
       return context.kcAdminClient.groups.listMembers({
-        id: parent.id
+        id: parent.id,
+        // the keycloak default maximum results size is 100,
+        // it's broken our GroupUser relation picker (wrong state if a group picked over 100 members)
+        max: 9999
       });
     } catch (err) {
       return [];
