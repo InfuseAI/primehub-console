@@ -391,7 +391,7 @@ const listQuery = async (
 
   // do not need to sort, so we do pagination first and then map
   const searchFields = ['name', 'displayName'];
-  if (isEmpty(order)) {
+  if (isEmpty(order) && isEmpty(where?.search)) {
     groups = filter(groups, {where, order, searchFields});
     return {
       fetched: false,
