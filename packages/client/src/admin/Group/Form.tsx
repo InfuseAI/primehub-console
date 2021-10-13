@@ -220,7 +220,7 @@ function GroupForm(props: Props) {
     form.validateFields(async (err, values) => {
       if (err) return;
       const data = pickBy(values, (value, key) => {
-        return form.isFieldTouched(key);
+        return type === 'create' || form.isFieldTouched(key);
       });
       const result: Partial<GroupInput> = {
         ...data,
