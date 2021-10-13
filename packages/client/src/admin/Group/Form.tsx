@@ -12,7 +12,7 @@ import {
   Card,
   InputNumber,
 } from 'antd';
-import { isArray, get, sortBy, uniqBy } from 'lodash';
+import { isArray, get, sortBy, uniqBy, pickBy } from 'lodash';
 import { FormComponentProps } from 'antd/es/form';
 import PHTooltip from 'components/share/toolTip';
 import Feature, { FeatureEE } from 'components/share/feature';
@@ -64,7 +64,7 @@ const defaultGroupValue: GroupInput = {
 };
 
 interface Props extends FormComponentProps {
-  onSubmit: (data: GroupInput, relateUsers?: any[]) => void;
+  onSubmit: (data: Partial<GroupInput>, relateUsers?: any[]) => void;
   onCancel: () => void;
   initialValue?: GroupInput;
   loading?: boolean;
@@ -219,8 +219,11 @@ function GroupForm(props: Props) {
     e.preventDefault();
     form.validateFields(async (err, values) => {
       if (err) return;
-      const result = {
-        ...values,
+      const data = pickBy(values, (value, key) => {
+        return type === 'create' || form.isFieldTouched(key);
+      });
+      const result: Partial<GroupInput> = {
+        ...data,
         admins: groupAdmins,
         users: connections,
       };

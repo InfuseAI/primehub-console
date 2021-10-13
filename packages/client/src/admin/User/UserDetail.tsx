@@ -16,7 +16,7 @@ import {
   useHistory,
   Link,
 } from 'react-router-dom';
-import { get, isArray, sortBy } from 'lodash';
+import { get, isArray, sortBy, pickBy } from 'lodash';
 import { RouteComponentProps } from 'react-router';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
@@ -197,10 +197,13 @@ function DetailPage(props: any) {
     e.preventDefault();
     form.validateFields(async (err, values) => {
       if (err) return;
+      const data = pickBy(values, (value, key) => {
+        return form.isFieldTouched(key);
+      });
       updateUser({
         variables: {
           payload: {
-            ...values,
+            ...data,
             groups: connections,
           },
         },
