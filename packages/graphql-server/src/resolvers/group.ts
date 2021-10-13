@@ -287,6 +287,11 @@ export const onPhAppDeleted = async (context: Context, phApplication: PhApplicat
   });
   const mlflowTrackingUri = getFromAttr('mlflow-tracking-uri', group.attributes, null);
   const svcEndpoints = phApplication?.svcEndpoints || [];
+
+  if (!mlflowTrackingUri) {
+    return;
+  }
+
   if (!find(svcEndpoints, svcEndpoint => mlflowTrackingUri.startsWith(`http://${svcEndpoint}`))) {
     return;
   }
