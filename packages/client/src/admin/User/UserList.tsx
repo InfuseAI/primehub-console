@@ -230,6 +230,7 @@ function List(props: Props) {
           <Col key='search-handler' style={{ flex: 1 }}>
             <FilterPlugins style={{ marginRight: '10px' }}>
               <Input.Search
+                data-testid='text-filter-username'
                 placeholder='Search for username or email'
                 onSearch={searchHandler}
               />
