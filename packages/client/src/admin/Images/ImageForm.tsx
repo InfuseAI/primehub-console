@@ -262,7 +262,10 @@ function _ImageForm({
   }, [data]);
 
   useEffect(() => {
-    if (window.customImageSetup) {
+    if (
+      window.enableCustomImage &&
+      window.customImageSetup?.toLowerCase() === 'true'
+    ) {
       setIsRegistyConfigured(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

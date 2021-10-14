@@ -12,7 +12,7 @@ declare global {
     enableCustomImage?: boolean;
     disableMode?: boolean;
     disableGroup?: boolean;
-    customImageSetup?: boolean;
+    customImageSetup?: string;
     enableUploadServer?: boolean;
     disableEnableSharedVolume?: boolean;
     isUserAdmin?: boolean;
