@@ -155,13 +155,15 @@ class ScheduleList extends React.Component<Props> {
   };
 
   searchHandler = queryString => {
-    const { groupContext, schedulesVariables, schedulesRefetch } = this.props;
+    const { schedulesVariables, schedulesRefetch } = this.props;
+    let newVariables;
+
     if (queryString && queryString.length > 0) {
-      const newVariables = {
+      newVariables = {
         ...schedulesVariables,
         where: {
           ...schedulesVariables.where,
-          displayName_contains: queryString,
+          search: queryString,
         },
       };
     }

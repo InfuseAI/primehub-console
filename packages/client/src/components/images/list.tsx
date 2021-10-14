@@ -108,7 +108,7 @@ class ImageList extends React.Component<Props> {
       ...imagesVariables,
       where: {
         ...imagesVariables.where,
-        _or: [],
+        search: '',
       },
     };
     if (queryString && queryString.length > 0) {
@@ -116,12 +116,7 @@ class ImageList extends React.Component<Props> {
         ...imagesVariables,
         where: {
           ...imagesVariables.where,
-          _or: [
-            { name_contains: queryString },
-            { displayName_contains: queryString },
-            { description_contains: queryString },
-            { type_contains: queryString },
-          ],
+          search: queryString,
         },
       };
     }

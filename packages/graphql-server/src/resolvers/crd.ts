@@ -274,7 +274,7 @@ export class Crd<SpecType> {
             return !isEmpty(row.groupName);
           });
         }
-        searchFields = ['name', 'dispalyName', 'description', 'type'];
+        searchFields = ['name', 'displayName', 'description', 'type'];
     }
     mappedRows = filter(mappedRows, {where, order, searchFields});
     return mappedRows;
