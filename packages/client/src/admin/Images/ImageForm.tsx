@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useReducer } from 'react';
 import styled from 'styled-components';
 import {
+  Alert,
   Button,
   Checkbox,
   Form,
@@ -168,6 +169,7 @@ function _ImageForm({
   const [enabledSelectSecret, setEnabledSelectSecret] = useState(false);
   const [enabledURLForGpu, setEnabledURLForGpu] = useState(false);
   const [buildDetailVisible, setBuildDetailVisible] = useState(false);
+  const [isRegistyConfigured, setIsRegistyConfigured] = useState(false);
   const [pullSecret, setPullSecret] = useState('');
   const [toggleRadioGroup, setToggleRadioGroup] =
     useState<'existingOne' | 'customImage'>('existingOne');
@@ -258,6 +260,16 @@ function _ImageForm({
       dispatchUserGroups({ type: 'GROUPS', groups: data.groups });
     }
   }, [data]);
+
+  useEffect(() => {
+    if (
+      window.enableCustomImage &&
+      window.customImageSetup?.toLowerCase() === 'true'
+    ) {
+      setIsRegistyConfigured(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -352,6 +364,27 @@ function _ImageForm({
             })(<Input data-testid='description' />)}
           </Form.Item>
 
+          {!isRegistyConfigured && (
+            <Alert
+              message='Warning'
+              type='warning'
+              showIcon
+              description={
+                <span>
+                  Image registry not found. Please set up your image registry
+                  using Image Builder.{' '}
+                  <a
+                    href='https://docs.primehub.io/docs/getting_started/configure-image-builder'
+                    target='_blank'
+                    rel='noreferrer'
+                  >
+                    More Info.
+                  </a>
+                </span>
+              }
+            />
+          )}
+
           <Form.Item>
             <Radio.Group
               value={toggleRadioGroup}
@@ -361,7 +394,11 @@ function _ImageForm({
               <Radio data-testid='existing-one' value='existingOne'>
                 Use Existing One
               </Radio>
-              <Radio data-testid='custom-image' value='customImage'>
+              <Radio
+                data-testid='custom-image'
+                value='customImage'
+                disabled={!isRegistyConfigured}
+              >
                 Build Custom Image
               </Radio>
             </Radio.Group>
