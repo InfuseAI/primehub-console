@@ -335,6 +335,8 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     });
     const eeMiddleware = createEETraitMiddleware({
       config,
+      createKcAdminClient,
+      getAccessToken: () => tokenSyncer.getAccessToken(),
       crdClient,
     });
     telemetry.addTraitMiddleware(middleware, eeMiddleware);
