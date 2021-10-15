@@ -1,4 +1,4 @@
-import { get, find } from 'lodash';
+import { get, find, isEmpty } from 'lodash';
 import { ApolloError } from 'apollo-server';
 import fetch from 'node-fetch';
 import KcAdminClient from 'keycloak-admin';
@@ -10,7 +10,10 @@ import * as logger from '../../logger';
 import { ErrorCodes } from '../../errorCodes';
 import { memoize } from '../../cache/memoize';
 import { query as phDeploymentQuery } from './phDeployment';
+import { Config } from '../../config';
+import AbortController from 'abort-controller';
 const { NOT_AUTH_ERROR, INTERNAL_ERROR } = ErrorCodes;
+
 
 // mlflow api endpoints
 const API_ENDPOINT_MODEL_LIST = '/api/2.0/preview/mlflow/registered-models/list';
@@ -23,17 +26,28 @@ const TRACKING_URI_NOT_FOUND = 'TRACKING_URI_NOT_FOUND';
 const MLFLOW_SETTING_NOT_FOUND = 'MLFLOW_SETTING_NOT_FOUND';
 
 const requestApi = async (trackingUri: string, endpoint: string, auth = null, params = {}) => {
-  const url = new URL(`${trackingUri}${endpoint}`);
-  Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+  const controller = new AbortController();
+  const timeout = setTimeout(() => {
+    controller.abort();
+  }, 10000);
 
-  const init: any = {};
-  if (auth) {
-    init.headers = {
-      Authorization: auth,
+  try {
+    const url = new URL(`${trackingUri}${endpoint}`);
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+    const init: any = {
+      signal: controller.signal,
     };
+    if (auth) {
+      init.headers = {
+        Authorization: auth,
+      };
+    }
+    const response = await fetch(url, init);
+    return response.json();
+  } finally {
+    clearTimeout(timeout);
   }
-  const response = await fetch(url, init);
-  return response.json();
 };
 
 const getGroupId = async (groupName: string, kcAdminClient: KcAdminClient) => {
@@ -249,4 +263,42 @@ export const queryVersions = async (root, args, context: Context) => {
 export const connectionQueryVersions = async (root, args, context: Context) => {
   const modelVersions = await listQueryVersions(root, args, context);
   return toRelay(modelVersions, extractPagination(args));
+};
+
+interface ModelTelemetryMetrics {
+  groupsMLflowEnabled: number;
+  models: number;
+}
+export const getModelsTelemetry = async (config: Config,  kcAdminClient: KcAdminClient): Promise<ModelTelemetryMetrics> => {
+  let groups = await kcAdminClient.groups.find({max: 100000});
+  groups = groups.filter(group => group.id !== config.keycloakEveryoneGroupId);
+  const results = await Promise.all(groups.map(async group => {
+    try {
+      const mlflow = await getMLflowSetting(group.name, kcAdminClient);
+      if (!mlflow || isEmpty(mlflow.trackingUri)) {
+        return {
+          groupsMLflowEnabled: 0,
+          models: 0,
+        };
+      }
+      const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_MODEL_LIST, getAuth(mlflow));
+      return {
+        groupsMLflowEnabled: 1,
+        models: json.registered_models.length,
+      };
+    } catch (e) {
+      return {
+        groupsMLflowEnabled: 0,
+        models: 0,
+      };
+    }
+  }));
+
+  const metric = results.reduce((acc, value) => {
+    acc.groupsMLflowEnabled += value.groupsMLflowEnabled;
+    acc.models += value.models;
+    return acc;
+  }, {models: 0, groupsMLflowEnabled: 0});
+
+  return metric;
 };
