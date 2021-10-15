@@ -2,6 +2,7 @@ import { Config } from '../config';
 import Koa from 'koa';
 import { gql, GraphQLClient } from 'graphql-request';
 import Router from 'koa-router';
+import bodyParser from 'koa-bodyparser';
 
 interface InvitationProxyOptions {
   config: Config;
@@ -113,7 +114,7 @@ export class InvitationCtrl {
   }
 
   public mount(staticPath: string, rootRouter: Router) {
-    rootRouter.post(`/invite`, this.createUserFromInvitation);
+    rootRouter.post(`/invite`, bodyParser(), this.createUserFromInvitation);
 
     rootRouter.get(
       '/invite/*',

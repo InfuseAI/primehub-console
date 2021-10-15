@@ -20,7 +20,6 @@ import errorHandler from './errorHandler';
 // logger
 import * as logger from './logger';
 import { InvitationCtrl } from './invitation';
-import bodyParser from 'koa-bodyparser';
 import { OidcAuthenticationFlowCtrl } from './oidc/auth-flow';
 
 export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
@@ -102,7 +101,6 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
     ? koaMount(config.appPrefix, serve(path.resolve(__dirname, '../../client/dist'), {gzip: true, index: false}))
     : serve(path.resolve(__dirname, '../../client/dist'), {gzip: true, index: false});
   app.use(serveClientStatic);
-  app.use(bodyParser());
 
   // router
   const rootRouter = new Router({
