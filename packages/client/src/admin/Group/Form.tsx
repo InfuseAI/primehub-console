@@ -222,6 +222,11 @@ function GroupForm(props: Props) {
       const data = pickBy(values, (value, key) => {
         return type === 'create' || form.isFieldTouched(key);
       });
+
+      if (type === 'update' && data.enabledSharedVolume) {
+        data.sharedVolumeCapacity = values.sharedVolumeCapacity;
+      }
+
       const result: Partial<GroupInput> = {
         ...data,
         admins: groupAdmins,
