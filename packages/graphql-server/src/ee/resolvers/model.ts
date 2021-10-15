@@ -1,4 +1,4 @@
-import { get, find } from 'lodash';
+import { get, find, isEmpty } from 'lodash';
 import { ApolloError } from 'apollo-server';
 import fetch from 'node-fetch';
 import KcAdminClient from 'keycloak-admin';
@@ -252,42 +252,40 @@ export const connectionQueryVersions = async (root, args, context: Context) => {
   return toRelay(modelVersions, extractPagination(args));
 };
 
-interface ModelTelemetry {
-  groupsMLflowEnabled: number,
-  models: number,
+interface ModelTelemetryMetrics {
+  groupsMLflowEnabled: number;
+  models: number;
 }
-export const getModelsTelemetry = async (config: Config,  kcAdminClient: KcAdminClient): Promise<ModelTelemetry> => {
+export const getModelsTelemetry = async (config: Config,  kcAdminClient: KcAdminClient): Promise<ModelTelemetryMetrics> => {
   let groups = await kcAdminClient.groups.find({max: 100000});
-  groups = groups.filter(group => group.id != config.keycloakEveryoneGroupId);
+  groups = groups.filter(group => group.id !== config.keycloakEveryoneGroupId);
   const results = await Promise.all(groups.map(async group => {
     try {
-      const mlflow = await getMLflowSetting(group.name, kcAdminClient)
-      if (!mlflow) {
+      const mlflow = await getMLflowSetting(group.name, kcAdminClient);
+      if (!mlflow || isEmpty(mlflow.trackingUri)) {
         return {
           groupsMLflowEnabled: 0,
           models: 0,
-        }
+        };
       }
       const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_MODEL_LIST, getAuth(mlflow));
       return {
         groupsMLflowEnabled: 1,
         models: json.registered_models.length,
-      }
-
+      };
     } catch (e) {
       return {
         groupsMLflowEnabled: 0,
         models: 0,
-      }
+      };
     }
   }));
-  console.log(results);
 
+  const metric = results.reduce((acc, value) => {
+    acc.groupsMLflowEnabled += value.groupsMLflowEnabled;
+    acc.models += value.models;
+    return acc;
+  }, {models: 0, groupsMLflowEnabled: 0});
 
-  const groupsMLflowEnabled = groups.length;
-  const models = 0;
-  return {
-    groupsMLflowEnabled,
-    models,
-  }
-}
+  return metric;
+};
