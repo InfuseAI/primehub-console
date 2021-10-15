@@ -10,6 +10,7 @@ import * as logger from '../../logger';
 import { ErrorCodes } from '../../errorCodes';
 import { memoize } from '../../cache/memoize';
 import { query as phDeploymentQuery } from './phDeployment';
+import { Config } from '../../config';
 const { NOT_AUTH_ERROR, INTERNAL_ERROR } = ErrorCodes;
 
 // mlflow api endpoints
@@ -250,3 +251,43 @@ export const connectionQueryVersions = async (root, args, context: Context) => {
   const modelVersions = await listQueryVersions(root, args, context);
   return toRelay(modelVersions, extractPagination(args));
 };
+
+interface ModelTelemetry {
+  groupsMLflowEnabled: number,
+  models: number,
+}
+export const getModelsTelemetry = async (config: Config,  kcAdminClient: KcAdminClient): Promise<ModelTelemetry> => {
+  let groups = await kcAdminClient.groups.find({max: 100000});
+  groups = groups.filter(group => group.id != config.keycloakEveryoneGroupId);
+  const results = await Promise.all(groups.map(async group => {
+    try {
+      const mlflow = await getMLflowSetting(group.name, kcAdminClient)
+      if (!mlflow) {
+        return {
+          groupsMLflowEnabled: 0,
+          models: 0,
+        }
+      }
+      const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_MODEL_LIST, getAuth(mlflow));
+      return {
+        groupsMLflowEnabled: 1,
+        models: json.registered_models.length,
+      }
+
+    } catch (e) {
+      return {
+        groupsMLflowEnabled: 0,
+        models: 0,
+      }
+    }
+  }));
+  console.log(results);
+
+
+  const groupsMLflowEnabled = groups.length;
+  const models = 0;
+  return {
+    groupsMLflowEnabled,
+    models,
+  }
+}
