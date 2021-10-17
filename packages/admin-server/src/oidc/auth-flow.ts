@@ -4,6 +4,7 @@ import Router from 'koa-router';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { gql, GraphQLClient } from 'graphql-request';
+import bodyParser from 'koa-bodyparser';
 
 interface OidcAuthenticationFlow {
   config: Config;
@@ -71,9 +72,7 @@ export class OidcAuthenticationFlowCtrl {
     // Fetch token by server to server call
     rootRouter.post(
       '/oidc/auth-flow/exchange',
-      async (ctx: Koa.ParameterizedContext, next: any) => {
-        return next();
-      },
+      bodyParser(),
       async ctx => {
         const config = this.config;
         const { code } = ctx.request.body;
