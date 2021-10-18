@@ -99,7 +99,14 @@ class ImageListContainer extends React.Component<Props> {
 
     const {history, getImagesConnection} = this.props;
     const search = queryString.stringify(payloadWithStringWhere);
-    await getImagesConnection.refetch(payload);
+    if (history.location.search === `?${search}`) {
+      await getImagesConnection.refetch(payload);
+    } else {
+      history.replace({
+        pathname: 'images',
+        search,
+      });
+    }
   }
 
   render() {

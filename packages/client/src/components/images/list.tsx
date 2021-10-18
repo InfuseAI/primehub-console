@@ -8,15 +8,12 @@ import {
   Icon,
   Modal,
 } from 'antd';
-import { RouteComponentProps } from 'react-router';
-import { Link, withRouter } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { get } from 'lodash';
 import styled from 'styled-components';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
-import { GroupContextComponentProps } from 'context/group';
-import { UserContextComponentProps } from 'context/user';
 import { FilterRow, FilterPlugins, ButtonCol } from 'cms-toolbar/filter';
 import Breadcrumbs from 'components/share/breadcrumb';
 import { TruncateTableField } from 'utils/TruncateTableField';
@@ -34,8 +31,7 @@ const breadcrumbs = [
 
 const Search = Input.Search;
 
-const { confirm } = Modal;
-const Table = styled(AntTable as any)`
+const Table = styled(AntTable)`
   background: white;
   .ant-pagination.ant-table-pagination {
     margin-right: 16px;
@@ -55,55 +51,22 @@ type ImagesConnection = {
   }>;
 };
 
-type Props = RouteComponentProps &
-  GroupContextComponentProps &
-  UserContextComponentProps & {
-    groups: Array<any>;
-    imagesLoading: boolean;
-    imagesError: any;
-    imagesConnection: ImagesConnection;
-    imagesVariables: any;
-    refetchImages?: Function;
-    removeImage: Function;
-  };
+interface Props {
+  groups: Array<any>;
+  imagesLoading: boolean;
+  imagesError: any;
+  imagesConnection: ImagesConnection;
+  imagesVariables: any;
+  refetchImages?: (variables: any) => Promise<void>;
+  removeImage: (id: string) => Promise<void>;
+}
 
-class ImageList extends React.Component<Props> {
-  state = {
-    currentId: null,
-  };
+function ImageList({ imagesConnection, imagesLoading, ...props }: Props) {
+  const history = useHistory();
 
-  handleCancel = (id: string) => {
-    const { imagesConnection } = this.props;
-    const image = imagesConnection.edges.find(edge => edge.node.id === id).node;
-    this.setState({ currentId: id });
-    confirm({
-      title: `Cancel`,
-      content: `Do you want to cancel '${image.displayName || image.name}'?`,
-      iconType: 'info-circle',
-      okText: 'Yes',
-      cancelText: 'No',
-      maskClosable: true,
-    });
-  };
+  function onSearch(queryString) {
+    const { imagesVariables, refetchImages } = props;
 
-  createGroupImage = () => {
-    const { history } = this.props;
-    history.push(`images/create`);
-  };
-
-  editGroupImage = id => {
-    const { history } = this.props;
-    history.push(`images/${id}/edit`);
-  };
-
-  removeGroupImage = async id => {
-    const { removeImage, refetchImages, imagesVariables } = this.props;
-    await removeImage(id);
-    refetchImages(imagesVariables);
-  };
-
-  searchHandler = queryString => {
-    const { imagesVariables, refetchImages } = this.props;
     let newVariables = {
       ...imagesVariables,
       where: {
@@ -111,6 +74,7 @@ class ImageList extends React.Component<Props> {
         search: '',
       },
     };
+
     if (queryString && queryString.length > 0) {
       newVariables = {
         ...imagesVariables,
@@ -120,55 +84,34 @@ class ImageList extends React.Component<Props> {
         },
       };
     }
-    refetchImages(newVariables);
-  };
 
-  handleTableChange = (pagination, _filters, sorter) => {
-    const { imagesVariables, refetchImages } = this.props;
-    const orderBy: any = {};
+    refetchImages(newVariables);
+  }
+
+  function handleTableChange(pagination, _filters, sorter) {
+    const { imagesVariables, refetchImages } = props;
+    const orderBy = {};
+
     if (sorter.field) {
       orderBy[sorter.field] =
         get(sorter, 'order') === 'ascend' ? 'asc' : 'desc';
     }
+
     refetchImages({
       ...imagesVariables,
       page: pagination.current,
       orderBy,
     });
-  };
+  }
 
-  render() {
-    const { imagesConnection, imagesLoading } = this.props;
-
-    const renderAction = id => {
-      return (
-        <Button.Group>
-          <Tooltip placement='bottom' title='Edit'>
-            <Button
-              icon='edit'
-              onClick={() => {
-                this.editGroupImage(id);
-              }}
-            />
-          </Tooltip>
-          <Tooltip placement='bottom' title='Delete'>
-            <Button
-              icon='delete'
-              onClick={() => {
-                this.removeGroupImage(id);
-              }}
-            />
-          </Tooltip>
-        </Button.Group>
-      );
-    };
-    const columns = [
-      {
-        title: 'Name',
-        dataIndex: 'name',
-        sorter: true,
-        width: '20%',
-        render: (text, record) => (
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      sorter: true,
+      width: '20%',
+      render: function RenderName(text, record) {
+        return (
           <TruncateTableField text={text}>
             <>
               {text}{' '}
@@ -177,14 +120,16 @@ class ImageList extends React.Component<Props> {
               )}
             </>
           </TruncateTableField>
-        ),
+        );
       },
-      {
-        title: 'Display Name',
-        dataIndex: 'displayName',
-        sorter: true,
-        width: '20%',
-        render: (text, record) => (
+    },
+    {
+      title: 'Display Name',
+      dataIndex: 'displayName',
+      sorter: true,
+      width: '20%',
+      render: function RenderDisplayName(text, record) {
+        return (
           <TruncateTableField text={text}>
             <Link
               to={{
@@ -198,87 +143,123 @@ class ImageList extends React.Component<Props> {
               {text}
             </Link>
           </TruncateTableField>
-        ),
+        );
       },
-      {
-        title: 'Description',
-        sorter: true,
-        dataIndex: 'description',
-        render: text => <TruncateTableField text={text} />,
+    },
+    {
+      title: 'Description',
+      sorter: true,
+      dataIndex: 'description',
+      render: text => <TruncateTableField text={text} />,
+    },
+    {
+      title: 'Type',
+      sorter: true,
+      dataIndex: 'type',
+      render: value => {
+        if (!value) {
+          return '-';
+        }
+        if (value === 'both') {
+          return 'Universal';
+        }
+        return value.toUpperCase();
       },
-      {
-        title: 'Type',
-        sorter: true,
-        dataIndex: 'type',
-        render: value => {
-          if (!value) {
-            return '-';
-          }
-          if (value === 'both') {
-            return 'Universal';
-          }
-          return value.toUpperCase();
-        },
+    },
+    {
+      title: 'Actions',
+      dataIndex: 'id',
+      key: 'actions',
+      render: function RenderActions(id, { name, displayName }) {
+        return (
+          <Button.Group>
+            <Tooltip placement='bottom' title='Edit'>
+              <Button
+                icon='edit'
+                onClick={() => {
+                  history.push(`images/${id}/edit`);
+                }}
+              />
+            </Tooltip>
+            <Tooltip placement='bottom' title='Delete'>
+              <Button
+                icon='delete'
+                onClick={() => {
+                  Modal.confirm({
+                    title: 'Delete Image',
+                    content: (
+                      <>
+                        Are you sure to delete{' '}
+                        <strong>{displayName || name}</strong>?
+                      </>
+                    ),
+                    okText: 'Yes',
+                    maskClosable: true,
+                    onOk: async () => {
+                      try {
+                        await props.removeImage(id);
+                        props.refetchImages(props.imagesVariables);
+                      } catch (err) {
+                        console.error(err);
+                      }
+                    },
+                  });
+                }}
+              />
+            </Tooltip>
+          </Button.Group>
+        );
       },
-      {
-        title: 'Actions',
-        dataIndex: 'id',
-        key: 'actions',
-        render: renderAction,
-        width: 200,
-      },
-    ];
+      width: 200,
+    },
+  ];
 
-    return (
-      <>
-        <PageTitle
-          breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-          title={'Images'}
-        />
-        <PageBody>
-          <FilterRow align='bottom' style={{ marginBottom: 16, marginTop: 16 }}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                alignItems: 'flex-end',
-              }}
-            >
-              <InfuseButton
-                icon='plus'
-                onClick={this.createGroupImage}
-                style={{ marginRight: 16, width: 120 }}
-                type='primary'
-              >
-                New Image
-              </InfuseButton>
-            </div>
-            <ButtonCol>
-              <Col>
-                <FilterPlugins style={{ marginRight: '10px' }}>
-                  <Search
-                    placeholder={`Search Image`}
-                    onSearch={this.searchHandler}
-                  />
-                </FilterPlugins>
-              </Col>
-            </ButtonCol>
-          </FilterRow>
-          <Table
-            loading={imagesLoading}
-            dataSource={imagesConnection.edges.map(edge => edge.node)}
-            columns={columns}
-            rowKey='id'
-            pagination={{
-              current: get(imagesConnection, 'pageInfo.currentPage', 0),
-              total: get(imagesConnection, 'pageInfo.totalPage', 0) * 10,
+  return (
+    <>
+      <PageTitle
+        breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
+        title={'Images'}
+      />
+      <PageBody>
+        <FilterRow align='bottom' style={{ marginBottom: 16, marginTop: 16 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'flex-end',
             }}
-            onChange={this.handleTableChange}
-          />
-        </PageBody>
-      </>
-    );
-  }
+          >
+            <InfuseButton
+              icon='plus'
+              onClick={() => history.push(`images/create`)}
+              style={{ marginRight: 16, width: 120 }}
+              type='primary'
+            >
+              New Image
+            </InfuseButton>
+          </div>
+          <ButtonCol>
+            <Col>
+              <FilterPlugins style={{ marginRight: '10px' }}>
+                <Search placeholder={`Search Image`} onSearch={onSearch} />
+              </FilterPlugins>
+            </Col>
+          </ButtonCol>
+        </FilterRow>
+        <Table
+          loading={imagesLoading}
+          dataSource={imagesConnection.edges.map(edge => edge.node)}
+          columns={columns}
+          rowKey='id'
+          pagination={{
+            current: get(imagesConnection, 'pageInfo.currentPage', 0),
+            total: get(imagesConnection, 'pageInfo.totalPage', 0) * 10,
+          }}
+          onChange={handleTableChange}
+        />
+      </PageBody>
+    </>
+  );
 }
 
-export default withRouter(ImageList);
+export default ImageList;
