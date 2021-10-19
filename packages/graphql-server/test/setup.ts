@@ -12,7 +12,7 @@ const expect = chai.expect;
 
 import { createSandbox, destroySandbox } from './sandbox';
 // import app
-import { createApp } from '../src/ee/app';
+import { AppEE } from '../src/ee/app';
 
 before(async () => {
   // setup testing realm and related env
@@ -22,7 +22,7 @@ before(async () => {
 
   // create app
   const PORT = 4000;
-  const {app, server} = await createApp();
+  const {app, server} = await new AppEE().create();
   const httpServer = http.createServer(app.callback());
   const requester = chai.request(httpServer).keepOpen();
   (global as any).graphqlRequest = async (query, variables, authorzation?) => {
