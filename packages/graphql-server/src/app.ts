@@ -9,23 +9,11 @@ import views from 'koa-views';
 import serve from 'koa-static';
 import Router from 'koa-router';
 import morgan from 'koa-morgan';
-import * as GraphQLJSON from 'graphql-type-json';
 import { makeExecutableSchema } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
 import url from 'url';
 import CrdClient, { InstanceTypeSpec, ImageSpec } from './crdClient/crdClientImpl';
-import * as system from './resolvers/system';
-import * as user from './resolvers/user';
-import * as group from './resolvers/group';
-import * as secret from './resolvers/secret';
-import * as store from './resolvers/store';
-import * as phApplication from './resolvers/phApplication';
-import * as phAppTemplate from './resolvers/phAppTemplate';
-import * as notebook from './resolvers/notebook';
-import { crd as instanceType} from './resolvers/instanceType';
-import { crd as dataset, regenerateUploadSecret} from './resolvers/dataset';
-import { crd as image} from './resolvers/image';
-import { crd as ann} from './resolvers/announcement';
+
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import { ErrorCodes } from './errorCodes';
 import basicAuth from 'basic-auth';
@@ -75,85 +63,10 @@ import { mountStoreCtrl } from './controllers/storeCtrl';
 import { Telemetry } from './utils/telemetry';
 import { createDefaultTraitMiddleware } from './utils/telemetryTraits';
 import { isGroupBelongUser } from './utils/groupCheck';
-import * as invitation from './resolvers/invitation';
+import { resolvers } from './resolvers';
 
 // The GraphQL schema
 const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
-
-// A map of functions which return data for the schema.
-export const resolvers = {
-  Query: {
-    system: system.query,
-    me: user.me,
-    user: user.queryOne,
-    users: user.query,
-    usersConnection: user.connectionQuery,
-    group: group.queryOne,
-    groups: group.query,
-    groupsConnection: group.connectionQuery,
-    secret: secret.queryOne,
-    secrets: secret.query,
-    secretsConnection: secret.connectionQuery,
-    files: store.query,
-    sharedFile: store.querySharedFile,
-    phApplication: phApplication.queryOne,
-    phApplications: phApplication.query,
-    phApplicationsConnection: phApplication.connectionQuery,
-    phAppTemplate: phAppTemplate.queryOne,
-    phAppTemplates: phAppTemplate.query,
-    invitation: invitation.queryInvitation,
-    ...instanceType.resolvers(),
-    ...dataset.resolvers(),
-    ...image.resolvers(),
-    ...ann.resolvers(),
-  },
-  Mutation: {
-    updateSystem: system.update,
-    createUser: user.create,
-    updateUser: user.update,
-    deleteUser: user.destroy,
-    revokeApiToken: user.revokeApiToken,
-    sendEmail: user.sendEmail,
-    sendMultiEmail: user.sendMultiEmail,
-    resetPassword: user.resetPassword,
-    createGroup: group.create,
-    updateGroup: group.update,
-    deleteGroup: group.destroy,
-    createSecret: secret.create,
-    updateSecret: secret.update,
-    deleteSecret: secret.destroy,
-    regenerateUploadServerSecret: regenerateUploadSecret,
-    deleteFiles: store.destroy,
-    shareFile: store.share,
-    unshareFile: store.unshare,
-    createPhApplication: phApplication.create,
-    updatePhApplication: phApplication.update,
-    deletePhApplication: phApplication.destroy,
-    startPhApplication: phApplication.start,
-    stopPhApplication: phApplication.stop,
-    importPhAppTemplateFromURL: phAppTemplate.importFromURL,
-    notifyNotebookEvent: notebook.notifyNotebookEvent,
-    ...instanceType.resolveInMutation(),
-    ...dataset.resolveInMutation(),
-    ...image.resolveInMutation(),
-    ...ann.resolveInMutation(),
-    createInvitation: invitation.createInvitation,
-    createUserFromInvitation: invitation.createUserFromInvitation,
-  },
-  System: {
-    smtp: system.querySmtp,
-  },
-  User: user.typeResolvers,
-  Group: group.typeResolvers,
-  ...instanceType.typeResolver(),
-  ...dataset.typeResolver(),
-  ...image.typeResolver(),
-  ...ann.typeResolver(),
-  PhApplication: phApplication.typeResolvers,
-
-  // scalars
-  JSON: GraphQLJSON
-};
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer, config: Config}> => {
   const config = createConfig();

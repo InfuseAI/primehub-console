@@ -9,24 +9,14 @@ import views from 'koa-views';
 import serve from 'koa-static';
 import Router from 'koa-router';
 import morgan from 'koa-morgan';
-import * as GraphQLJSON from 'graphql-type-json';
 import { makeExecutableSchema, mergeSchemas } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
 import request from 'request';
 import url from 'url';
 
 import CrdClient, { InstanceTypeSpec, ImageSpec, client as kubeClient, kubeConfig } from '../crdClient/crdClientImpl';
-import * as system from '../resolvers/system';
-import * as license from './resolvers/license';
-import * as buildImage from './resolvers/buildImage';
-import * as buildImageJob from './resolvers/buildImageJob';
-import * as phJob from './resolvers/phJob';
-import * as phSchedule from './resolvers/phSchedule';
-import * as phDeployment from './resolvers/phDeployment';
-import * as usageReport from './resolvers/usageReport';
-import * as model from './resolvers/model';
-import * as invitation from '../resolvers/invitation';
-import { resolvers as ceResolvers } from '../app';
+import { resolvers as ceResolvers } from '../resolvers';
+import { eeResolvers } from './resolvers';
 import { crd as instanceType} from '../resolvers/instanceType';
 import { crd as image} from '../resolvers/image';
 import Agent, { HttpsAgent } from 'agentkeepalive';
@@ -89,68 +79,6 @@ import { isGroupBelongUser } from '../utils/groupCheck';
 const typeDefs = gql(importSchema(path.resolve(__dirname, '../graphql/index.graphql')));
 // The EE GraphQL schema
 const typeDefsEE = gql(importSchema(path.resolve(__dirname, './graphql/ee.graphql')));
-
-const eeResolvers = {
-  Query: {
-    system: system.query,
-    buildImage: buildImage.queryOne,
-    buildImages: buildImage.query,
-    buildImagesConnection: buildImage.connectionQuery,
-    buildImageJob: buildImageJob.queryOne,
-    buildImageJobs: buildImageJob.query,
-    buildImageJobsConnection: buildImageJob.connectionQuery,
-    phJob: phJob.queryOne,
-    phJobs: phJob.query,
-    phJobsConnection: phJob.connectionQuery,
-    phSchedule: phSchedule.queryOne,
-    phSchedules: phSchedule.query,
-    phSchedulesConnection: phSchedule.connectionQuery,
-    phDeployment: phDeployment.queryOne,
-    phDeploymentAvail: phDeployment.available,
-    phDeployments: phDeployment.query,
-    phDeploymentsConnection: phDeployment.connectionQuery,
-    usageReports: usageReport.query,
-    usageReportsConnection: usageReport.connectionQuery,
-    license: license.query,
-    mlflow: model.queryMLflow,
-    model: model.queryOne,
-    models: model.query,
-    modelVersion: model.queryVersion,
-    modelVersions: model.queryVersions,
-    modelVersionsConnection: model.connectionQueryVersions,
-  },
-  Mutation: {
-    createBuildImage: buildImage.create,
-    updateBuildImage: buildImage.update,
-    deleteBuildImage: buildImage.destroy,
-    createPhJob: phJob.create,
-    rerunPhJob: phJob.rerun,
-    cancelPhJob: phJob.cancel,
-    notifyPhJobEvent: phJob.notifyJobEvent,
-    cleanupPhJobArtifact: phJob.artifactCleanUp,
-    createPhSchedule: phSchedule.create,
-    updatePhSchedule: phSchedule.update,
-    deletePhSchedule: phSchedule.destroy,
-    runPhSchedule: phSchedule.run,
-    createPhDeployment: phDeployment.create,
-    updatePhDeployment: phDeployment.update,
-    deletePhDeployment: phDeployment.destroy,
-    deployPhDeployment: phDeployment.deploy,
-    stopPhDeployment: phDeployment.stop,
-    createPhDeploymentClient: phDeployment.createClient,
-    deletePhDeploymentClient: phDeployment.destroyClient,
-  },
-  System: {
-    smtp: system.querySmtp,
-    license: system.queryLicense,
-  },
-  BuildImage: buildImage.typeResolvers,
-  PhJob: phJob.typeResolvers,
-  PhSchedule: phSchedule.typeResolvers,
-  PhDeployment: phDeployment.typeResolvers,
-  // scalars
-  JSON: GraphQLJSON
-};
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer, config: Config}> => {
   const config = createConfig();

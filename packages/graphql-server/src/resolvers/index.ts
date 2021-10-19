@@ -1,0 +1,86 @@
+import * as system from './system';
+import * as user from './user';
+import * as group from './group';
+import { crd as instanceType} from './instanceType';
+import { crd as dataset, regenerateUploadSecret} from './dataset';
+import { crd as image} from './image';
+import * as secret from './secret';
+import * as store from './store';
+import * as phApplication from './phApplication';
+import * as phAppTemplate from './phAppTemplate';
+import * as notebook from './notebook';
+import * as invitation from './invitation';
+
+import * as GraphQLJSON from 'graphql-type-json';
+
+// A map of functions which return data for the schema.
+export const resolvers = {
+  Query: {
+    system: system.query,
+    me: user.me,
+    user: user.queryOne,
+    users: user.query,
+    usersConnection: user.connectionQuery,
+    group: group.queryOne,
+    groups: group.query,
+    groupsConnection: group.connectionQuery,
+    secret: secret.queryOne,
+    secrets: secret.query,
+    secretsConnection: secret.connectionQuery,
+    files: store.query,
+    sharedFile: store.querySharedFile,
+    phApplication: phApplication.queryOne,
+    phApplications: phApplication.query,
+    phApplicationsConnection: phApplication.connectionQuery,
+    phAppTemplate: phAppTemplate.queryOne,
+    phAppTemplates: phAppTemplate.query,
+    invitation: invitation.queryInvitation,
+    ...instanceType.resolvers(),
+    ...dataset.resolvers(),
+    ...image.resolvers(),
+  },
+  Mutation: {
+    updateSystem: system.update,
+    createUser: user.create,
+    updateUser: user.update,
+    deleteUser: user.destroy,
+    revokeApiToken: user.revokeApiToken,
+    sendEmail: user.sendEmail,
+    sendMultiEmail: user.sendMultiEmail,
+    resetPassword: user.resetPassword,
+    createGroup: group.create,
+    updateGroup: group.update,
+    deleteGroup: group.destroy,
+    createSecret: secret.create,
+    updateSecret: secret.update,
+    deleteSecret: secret.destroy,
+    regenerateUploadServerSecret: regenerateUploadSecret,
+    deleteFiles: store.destroy,
+    shareFile: store.share,
+    unshareFile: store.unshare,
+    createPhApplication: phApplication.create,
+    updatePhApplication: phApplication.update,
+    deletePhApplication: phApplication.destroy,
+    startPhApplication: phApplication.start,
+    stopPhApplication: phApplication.stop,
+    importPhAppTemplateFromURL: phAppTemplate.importFromURL,
+    notifyNotebookEvent: notebook.notifyNotebookEvent,
+    ...instanceType.resolveInMutation(),
+    ...dataset.resolveInMutation(),
+    ...image.resolveInMutation(),
+    createInvitation: invitation.createInvitation,
+    createUserFromInvitation: invitation.createUserFromInvitation,
+  },
+  System: {
+    smtp: system.querySmtp,
+  },
+  User: user.typeResolvers,
+  Group: group.typeResolvers,
+  ...instanceType.typeResolver(),
+  ...dataset.typeResolver(),
+  ...image.typeResolver(),
+  PhApplication: phApplication.typeResolvers,
+
+  // scalars
+  JSON: GraphQLJSON
+};
