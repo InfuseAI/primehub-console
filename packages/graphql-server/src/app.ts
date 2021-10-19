@@ -13,6 +13,8 @@ import { makeExecutableSchema } from 'graphql-tools';
 import { applyMiddleware } from 'graphql-middleware';
 import url from 'url';
 import CrdClient, { InstanceTypeSpec, ImageSpec } from './crdClient/crdClientImpl';
+import { crd as instanceType} from './resolvers/instanceType';
+import { crd as image} from './resolvers/image';
 
 import Agent, { HttpsAgent } from 'agentkeepalive';
 import { ErrorCodes } from './errorCodes';
@@ -63,10 +65,7 @@ import { mountStoreCtrl } from './controllers/storeCtrl';
 import { Telemetry } from './utils/telemetry';
 import { createDefaultTraitMiddleware } from './utils/telemetryTraits';
 import { isGroupBelongUser } from './utils/groupCheck';
-import { resolvers } from './resolvers';
-
-// The GraphQL schema
-const typeDefs = gql(importSchema(path.resolve(__dirname, './graphql/index.graphql')));
+import { resolvers, schema } from './resolvers';
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer, config: Config}> => {
   const config = createConfig();
@@ -229,10 +228,6 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
   }
 
   // apollo server
-  const schema: any = makeExecutableSchema({
-    typeDefs: typeDefs as any,
-    resolvers
-  });
   const getUserRoleAndKcAdminClient = async (apiToken: string, tokenPayload: any) => {
     let role;
     let kcAdminClient;
@@ -261,7 +256,7 @@ export const createApp = async (): Promise<{app: Koa, server: ApolloServer, conf
     introspection: config.graphqlPlayground,
     tracing: config.apolloTracing,
     debug: true,
-    schema: schemaWithMiddleware as any,
+    schema: applyMiddleware(schema, authMiddleware),
     context: async ({ ctx }: { ctx: Koa.Context }) => {
       let userId: string;
       let username: string;

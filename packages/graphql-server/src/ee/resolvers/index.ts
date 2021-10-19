@@ -1,3 +1,4 @@
+import path from 'path';
 import * as system from '../../resolvers/system';
 import * as license from './license';
 import * as buildImage from './buildImage';
@@ -8,8 +9,12 @@ import * as phDeployment from './phDeployment';
 import * as usageReport from './usageReport';
 import * as model from './model';
 import * as GraphQLJSON from 'graphql-type-json';
+import { makeExecutableSchema, mergeSchemas } from 'graphql-tools';
+import { gql } from 'apollo-server';
+import { importSchema } from 'graphql-import';
+import { resolvers as ceResolvers } from '../../resolvers';
 
-export const eeResolvers = {
+const eeResolvers = {
   Query: {
     system: system.query,
     buildImage: buildImage.queryOne,
@@ -70,3 +75,23 @@ export const eeResolvers = {
   // scalars
   JSON: GraphQLJSON
 };
+
+// Schema for CE version
+const ceSchema = makeExecutableSchema({
+  typeDefs: gql(importSchema(path.resolve(__dirname, '../../graphql/index.graphql'))),
+  resolvers: ceResolvers as any,
+});
+
+// Schema for EE version
+const eeSchema = makeExecutableSchema({
+  typeDefs: gql(importSchema(path.resolve(__dirname, '../graphql/ee.graphql'))),
+  resolvers: eeResolvers as any,
+});
+
+// Merge CE/EE schema
+export const schema: any = mergeSchemas({
+  schemas: [
+    ceSchema,
+    eeSchema,
+  ],
+});

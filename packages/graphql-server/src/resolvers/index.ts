@@ -1,3 +1,4 @@
+import path from 'path';
 import * as system from './system';
 import * as user from './user';
 import * as group from './group';
@@ -12,6 +13,9 @@ import * as notebook from './notebook';
 import * as invitation from './invitation';
 
 import * as GraphQLJSON from 'graphql-type-json';
+import { gql } from 'apollo-server';
+import { importSchema } from 'graphql-import';
+import { makeExecutableSchema } from 'graphql-tools';
 
 // A map of functions which return data for the schema.
 export const resolvers = {
@@ -84,3 +88,8 @@ export const resolvers = {
   // scalars
   JSON: GraphQLJSON
 };
+
+export const schema: any = makeExecutableSchema({
+  typeDefs: gql(importSchema(path.resolve(__dirname, '../graphql/index.graphql'))),
+  resolvers,
+});
