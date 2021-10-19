@@ -11,7 +11,9 @@ import { ErrorCodes } from '../../errorCodes';
 import { memoize } from '../../cache/memoize';
 import { query as phDeploymentQuery } from './phDeployment';
 import { Config } from '../../config';
+import AbortController from 'abort-controller';
 const { NOT_AUTH_ERROR, INTERNAL_ERROR } = ErrorCodes;
+
 
 // mlflow api endpoints
 const API_ENDPOINT_MODEL_LIST = '/api/2.0/preview/mlflow/registered-models/list';
@@ -24,17 +26,28 @@ const TRACKING_URI_NOT_FOUND = 'TRACKING_URI_NOT_FOUND';
 const MLFLOW_SETTING_NOT_FOUND = 'MLFLOW_SETTING_NOT_FOUND';
 
 const requestApi = async (trackingUri: string, endpoint: string, auth = null, params = {}) => {
-  const url = new URL(`${trackingUri}${endpoint}`);
-  Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+  const controller = new AbortController();
+  const timeout = setTimeout(() => {
+    controller.abort();
+  }, 10000);
 
-  const init: any = {};
-  if (auth) {
-    init.headers = {
-      Authorization: auth,
+  try {
+    const url = new URL(`${trackingUri}${endpoint}`);
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+    const init: any = {
+      signal: controller.signal,
     };
+    if (auth) {
+      init.headers = {
+        Authorization: auth,
+      };
+    }
+    const response = await fetch(url, init);
+    return response.json();
+  } finally {
+    clearTimeout(timeout);
   }
-  const response = await fetch(url, init);
-  return response.json();
 };
 
 const getGroupId = async (groupName: string, kcAdminClient: KcAdminClient) => {
