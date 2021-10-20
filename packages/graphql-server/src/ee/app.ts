@@ -1,6 +1,5 @@
 import Koa, {Context} from 'koa';
-import { ApolloServer, gql, ApolloError } from 'apollo-server-koa';
-import { importSchema } from 'graphql-import';
+import { ApolloServer, ApolloError } from 'apollo-server-koa';
 import path from 'path';
 import KcAdminClient from 'keycloak-admin';
 import { get, isEmpty } from 'lodash';
@@ -73,6 +72,7 @@ import { Telemetry } from '../utils/telemetry';
 import { createDefaultTraitMiddleware } from '../utils/telemetryTraits';
 import { createEETraitMiddleware } from './utils/telemetryTraits';
 import { isGroupBelongUser } from '../utils/groupCheck';
+import { App as AppCE } from '../app';
 
 export const createApp = async (): Promise<{app: Koa, server: ApolloServer, config: Config}> => {
   const config = createConfig();
@@ -695,4 +695,22 @@ function configureUsageReport(rootRouter: Router, host: string, uriPrefix: strin
       ctx.body = req;
     }
   );
+}
+
+
+export class AppEE extends AppCE {
+  onCreateSchema() {
+    return schema;
+  }
+
+  async onContext ({ ctx }: { ctx: Koa.Context }) {
+    const context = await super.onContext({ctx})
+    return {
+      ...context,
+    }
+  }
+
+  mountControllers(rootRouter: Router) {
+    super.mountControllers(rootRouter);
+  }
 }
