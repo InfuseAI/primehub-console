@@ -28,10 +28,6 @@ export class PodLogs {
     this.appPrefix = appPrefix || '';
   }
 
-  public jupyterHubRoute = '/logs/jupyterhub';
-  public imageSpecJobRoute = '/logs/images/:imageId/job';
-  public phApplicationPodRoute = '/logs/pods/:podName';
-
   public streamJupyterHubLogs = async (ctx: ParameterizedContext) => {
     const {
       follow,
@@ -62,7 +58,6 @@ export class PodLogs {
 
   public streamImageSpecJobLogs = async (ctx: ParameterizedContext, next: any) => {
     const { role, params, username, kcAdminClient } = ctx;
-
     const { imageId } = params;
 
     const image = await this.crdClient.images.get(imageId);
@@ -89,7 +84,7 @@ export class PodLogs {
   }
 
   public getPhApplicationPodEndpoint = (podName: string) => {
-    return `${this.appPrefix || ''}/logs/pods/${podName}`;
+    return `${this.appPrefix || ''}/logs/phapplications/${podName}`;
   }
 
   public streamPhApplicationPodLogs = async (ctx: ParameterizedContext) => {
@@ -111,7 +106,7 @@ export class PodLogs {
 
   public mount(rootRouter: Router, authenticateMiddleware: Middleware) {
     rootRouter.get('/logs/jupyterhub', authenticateMiddleware, this.streamJupyterHubLogs);
-    rootRouter.get('/logs/images/:imageId/job', authenticateMiddleware, this.streamImageSpecJobLogs); // groupAdminMiddleware,
-    rootRouter.get('/logs/pods/:podName', authenticateMiddleware, this.streamPhApplicationPodLogs); // checkUserGroup,
+    rootRouter.get('/logs/images/:imageId/job', authenticateMiddleware, this.streamImageSpecJobLogs);
+    rootRouter.get('/logs/phapplications/:podName', authenticateMiddleware, this.streamPhApplicationPodLogs); // checkUserGroup,
   }
 }

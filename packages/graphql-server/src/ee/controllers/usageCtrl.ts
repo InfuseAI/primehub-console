@@ -1,21 +1,26 @@
+import Boom from 'boom';
+import { Middleware, ParameterizedContext } from 'koa';
 import Router from 'koa-router';
 import request from 'request';
 import config from '../../config';
+import { Role } from '../../resolvers/interface';
+import * as logger from '../../logger';
+import { kubeConfig } from '../../crdClient/crdClientImpl';
 
-export class UsageCtrl {
-  mount(rootRouter: Router) {
-    this.configureUsageReport(rootRouter,
-      config.usageReportAPIHost, '/report/monthly', authenticateMiddleware, checkIsAdmin);
-    this.configureUsageReport(rootRouter,
-      config.usageReportAPIHost, '/report/monthly/details', authenticateMiddleware, checkIsAdmin);
+const checkIsAdmin = async (ctx: ParameterizedContext, next: any) => {
+  if (ctx.role === Role.ADMIN) {
+    return next();
   }
+  throw Boom.forbidden('request not authorized');
+};
 
-  configureUsageReport(rootRouter: Router, host: string, uriPrefix: string, authenticateMiddleware: any, checkIsAdmin: any) {
+export const mountUsageCtrl = (rootRouter: Router, usageReportAPIHost: string, authenticateMiddleware: Middleware) => {
+  const configureUsageReport = (uriPrefix: string) => {
     rootRouter.get(uriPrefix + '/:year/:month', authenticateMiddleware, checkIsAdmin,
       async ctx => {
         const requestOptions: request.Options = {
           method: 'GET',
-          uri: host + uriPrefix + '/' + ctx.params.year + '/' + ctx.params.month,
+          uri: usageReportAPIHost + uriPrefix + '/' + ctx.params.year + '/' + ctx.params.month,
         };
         kubeConfig.applyToRequest(requestOptions);
         const req = request(requestOptions);
@@ -32,5 +37,8 @@ export class UsageCtrl {
         ctx.body = req;
       }
     );
-  }
-}
+  };
+
+  configureUsageReport('/report/monthly');
+  configureUsageReport('/report/monthly/details');
+};

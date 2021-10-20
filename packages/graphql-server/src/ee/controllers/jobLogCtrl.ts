@@ -1,9 +1,12 @@
 import CrdClientImpl, { kubeConfig, client as kubeClient } from '../../crdClient/crdClientImpl';
-import { ParameterizedContext } from 'koa';
+import { Middleware, ParameterizedContext } from 'koa';
 import { Stream } from 'stream';
 import * as logger from '../../logger';
 import PersistLog from '../../utils/persistLog';
 import { getStream as getK8SLogStream } from '../../utils/k8sLog';
+import Router from 'koa-router';
+import { Role } from '../../resolvers/interface';
+import Boom from 'boom';
 
 const MODEL = 'model';
 
@@ -17,7 +20,7 @@ export class JobLogCtrl {
     namespace,
     crdClient,
     appPrefix,
-    persistLog
+    persistLog,
   }: {
     namespace: string,
     crdClient: CrdClientImpl,
@@ -30,10 +33,24 @@ export class JobLogCtrl {
     this.persistLog = persistLog;
   }
 
+  private canUserView = async (kcAdminClient, userId, groupId): Promise<boolean> => {
+    const groups = await kcAdminClient.users.listGroups({
+      id: userId
+    });
+    const groupIds = groups.map(u => u.id);
+    if (groupIds.indexOf(groupId) >= 0) { return true; }
+    return false;
+  }
+
   public streamLogs = async (ctx: ParameterizedContext) => {
+    const {role} = ctx;
     const {follow, tailLines} = ctx.query;
     const namespace = ctx.params.namespace || this.namespace;
     const jobId = ctx.params.jobId;
+    if (role !== Role.ADMIN) {
+      throw Boom.forbidden('request not authorized');
+    }
+
     const job = await this.crdClient.imageSpecJobs.get(jobId);
     const podName = job.status.podName;
     const stream = getK8SLogStream(namespace, podName, {follow, tailLines});
@@ -51,11 +68,21 @@ export class JobLogCtrl {
   }
 
   public streamPhJobLogs = async (ctx: ParameterizedContext) => {
+    const {kcAdminClient, userId} = ctx;
     const {follow, tailLines, persist} = ctx.query;
     const namespace = ctx.params.namespace || this.namespace;
     const jobId = ctx.params.jobId;
     const phjob = await this.crdClient.phJobs.get(jobId, namespace);
     const podName = phjob.status.podName;
+    const resource = await this.crdClient.phJobs.get(jobId, namespace);
+
+    if (resource.spec.groupId === '') {
+      throw Boom.notFound();
+    }
+
+    if (await this.canUserView(kcAdminClient, userId, resource.spec.groupId) === false) {
+      throw Boom.forbidden('request not authorized');
+    }
 
     let stream: Stream;
     if (this.persistLog && persist === 'true') {
@@ -81,9 +108,23 @@ export class JobLogCtrl {
   }
 
   public streamPhDeploymentLogs = async (ctx: ParameterizedContext) => {
+    const {kcAdminClient, userId} = ctx;
     const {follow, tailLines} = ctx.query;
     const namespace = ctx.params.namespace || this.namespace;
     const podName = ctx.params.podName;
+    const pod = await kubeClient.api.v1.namespace(namespace).pods(podName).get();
+    const phDeploymentName = pod.body.metadata.labels['primehub.io/phdeployment'] || '';
+    if (phDeploymentName === '') { throw Boom.notFound(); }
+    const resource = await this.crdClient.phDeployments.get(phDeploymentName, namespace);
+
+    if (resource.spec.groupId === '') {
+      throw Boom.notFound();
+    }
+
+    if (await this.canUserView(kcAdminClient, userId, resource.spec.groupId) === false) {
+      throw Boom.forbidden('request not authorized');
+    }
+
     const stream = getK8SLogStream(namespace, podName, {container: MODEL, follow, tailLines});
     stream.on('error', err => {
       logger.error({
@@ -119,5 +160,11 @@ export class JobLogCtrl {
 
   public getPhDeploymentEndpoint = (namespace: string, podName: string) => {
     return `${this.appPrefix || ''}/logs/namespaces/${namespace}/phdeployments/${podName}`;
+  }
+
+  public mount(rootRouter: Router, authenticateMiddleware: Middleware) {
+    rootRouter.get(this.getRoute() as string, authenticateMiddleware, this.streamLogs);
+    rootRouter.get(this.getPhJobRoute(), authenticateMiddleware, this.streamPhJobLogs);
+    rootRouter.get(this.getPhDeploymentRoute(), authenticateMiddleware, this.streamPhDeploymentLogs);
   }
 }

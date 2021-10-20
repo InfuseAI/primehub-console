@@ -41,7 +41,6 @@ import Boom from 'boom';
 
 // graphql middlewares
 import { permissions as authMiddleware } from './middlewares/auth';
-import groupAdminMiddleware from './middlewares/groupAdmin';
 import TokenSyncer from './oidc/syncer';
 import K8sSecret from './k8sResource/k8sSecret';
 import K8sDatasetPvc from './k8sResource/k8sDatasetPvc';
@@ -59,8 +58,7 @@ import { mountTusCtrl } from './controllers/tusCtrl';
 import { mountStoreCtrl } from './controllers/storeCtrl';
 import { Telemetry } from './utils/telemetry';
 import { createDefaultTraitMiddleware } from './utils/telemetryTraits';
-import { isGroupBelongUser } from './utils/groupCheck';
-import { resolvers, schema } from './resolvers';
+import { schema } from './resolvers';
 import { Client as MinioClient } from 'minio';
 
 // export const createApp = async (): Promise<{app: Koa, server: ApolloServer, config: Config}> => {
@@ -562,36 +560,6 @@ export class App {
     rootRouter.get('/', async (ctx: any) => {
       return ctx.redirect(`${config.appPrefix || ''}/graphql`);
     });
-
-    // ctrl
-    const checkUserGroup = async (ctx: Koa.Context, next: any) => {
-      const canUserView = async (userId, groupId): Promise<boolean> => {
-        const groups = await ctx.kcAdminClient.users.listGroups({
-          id: userId
-        });
-        const groupIds = groups.map(u => u.id);
-        if (groupIds.indexOf(groupId) >= 0) { return true; }
-        return false;
-      };
-
-      if (ctx.request.path.match(`${config.appPrefix || ''}/logs/pods/[^/]+`)) {
-        return next();
-      }
-
-      let fileDownloadAPIPrefix = `${config.appPrefix || ''}/files/`;
-      if (ctx.request.path.startsWith(fileDownloadAPIPrefix)) {
-        fileDownloadAPIPrefix = fileDownloadAPIPrefix + 'groups/';
-        const groupName = ctx.request.path.split(fileDownloadAPIPrefix).pop().split('/')[0];
-        if (!ctx.request.path.startsWith(fileDownloadAPIPrefix) ||
-            await isGroupBelongUser(ctx, ctx.userId, groupName) === false) {
-          throw Boom.forbidden('request not authorized');
-        } else {
-          return next();
-        }
-      }
-
-      throw Boom.forbidden('request not authorized');
-    };
 
     // Notebook Log
     this.podLogs.mount(rootRouter, this.authenticateMiddleware);
