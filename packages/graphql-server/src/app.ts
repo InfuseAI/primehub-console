@@ -603,7 +603,7 @@ export class App {
 
     if (config.enableStore) {
       // store file download api
-      mountStoreCtrl(rootRouter, this.authenticateMiddleware, checkUserGroup, this.mClient, this.storeBucket);
+      mountStoreCtrl(rootRouter, config.appPrefix, this.authenticateMiddleware, this.mClient, this.storeBucket);
 
       // shared space proxy to tusd
       const tusProxyPath = `${staticPath}tus`;
