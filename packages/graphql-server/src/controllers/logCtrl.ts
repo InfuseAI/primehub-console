@@ -1,8 +1,12 @@
-import { ParameterizedContext } from 'koa';
+import { Middleware, ParameterizedContext } from 'koa';
 import * as logger from '../logger';
 import { escapePodName } from '../utils/escapism';
 import { getStream as getK8SLogStream } from '../utils/k8sLog';
 import CrdClientImpl, { client as kubeClient } from '../crdClient/crdClientImpl';
+import Router from 'koa-router';
+import { isAdmin, isGroupAdmin } from '../resolvers/utils';
+import { Role } from '../resolvers/interface';
+import Boom from 'boom';
 
 export class PodLogs {
 
@@ -56,9 +60,18 @@ export class PodLogs {
     return `${this.appPrefix || ''}/logs/images/${imageId}/job`;
   }
 
-  public streamImageSpecJobLogs = async (ctx: ParameterizedContext) => {
+  public streamImageSpecJobLogs = async (ctx: ParameterizedContext, next: any) => {
+    const { role, params, username, kcAdminClient } = ctx;
+
+    const { imageId } = params;
+
+    const image = await this.crdClient.images.get(imageId);
+    const groupName = image.spec.groupName;
+    if (role !== Role.ADMIN && role !== Role.CLIENT && await !isGroupAdmin(username, groupName, kcAdminClient)) {
+      throw Boom.forbidden('request not authorized');
+    }
+
     const {follow, tailLines} = ctx.query;
-    const imageId = ctx.params.imageId;
     const imageSpecJob = await this.crdClient.imageSpecJobs.get(imageId);
     const podName = imageSpecJob.status.podName;
     const stream = getK8SLogStream(this.namespace, podName, {follow, tailLines});
@@ -94,5 +107,11 @@ export class PodLogs {
       ctx.res.end();
     });
     ctx.body = stream;
+  }
+
+  public mount(rootRouter: Router, authenticateMiddleware: Middleware) {
+    rootRouter.get('/logs/jupyterhub', authenticateMiddleware, this.streamJupyterHubLogs);
+    rootRouter.get('/logs/images/:imageId/job', authenticateMiddleware, this.streamImageSpecJobLogs); // groupAdminMiddleware,
+    rootRouter.get('/logs/pods/:podName', authenticateMiddleware, this.streamPhApplicationPodLogs); // checkUserGroup,
   }
 }

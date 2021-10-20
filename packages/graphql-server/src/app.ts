@@ -76,13 +76,13 @@ export class App {
   httpsAgent: HttpsAgent;
   oidcClient;
   oidcTokenVerifier;
-  createKcAdminClient: (tokenIssuer?: string) => KcAdminClient
+  createKcAdminClient: (tokenIssuer?: string) => KcAdminClient;
   crdClient: CrdClient;
   tokenSyncer: TokenSyncer;
   apiTokenCache: ApiTokenCache;
   storeBucket;
   mClient: MinioClient;
-  podLogs;
+  podLogs: PodLogs;
   imageCache;
   instCache;
   telemetry;
@@ -90,7 +90,21 @@ export class App {
   app: Koa;
 
   create = async (): Promise<{app: Koa, server: ApolloServer, config: Config}> => {
+    await this.createComponents();
+    await this.createTelemetry();
+    await this.createApolloServer();
+    await this.createKoaServer();
+    return {
+      config: this.config,
+      server: this.server,
+      app: this.app,
+    };
+  }
 
+  /**
+   * @override
+   */
+  async createComponents() {
     const config = this.config = createConfig();
 
     // gitsync secret client
@@ -225,54 +239,29 @@ export class App {
       }
     });
     observer.observe();
+  }
 
-    // create telemetry
+  /**
+   * @override
+   */
+  async createTelemetry() {
+    const config = this.config;
     let telemetry;
     if (config.enableTelemetry) {
       telemetry = new Telemetry(config.keycloakClientSecret);
       const middleware = createDefaultTraitMiddleware({
         config,
         createKcAdminClient: this.createKcAdminClient,
-        getAccessToken: () => tokenSyncer.getAccessToken(),
-        crdClient,
+        getAccessToken: () => this.tokenSyncer.getAccessToken(),
+        crdClient: this.crdClient,
       });
       telemetry.addTraitMiddleware(middleware);
       telemetry.start();
     }
     this.telemetry = telemetry;
-
-    this.createApolloServer();
-    this.createKoaServer();
-    return {
-      config,
-      server: this.server,
-      app: this.app,
-    };
   }
 
-  // apollo server
-  getUserRoleAndKcAdminClient = async (apiToken: string, tokenPayload: any) => {
-    let role;
-    let kcAdminClient;
-    const roles = get(tokenPayload, ['resource_access', 'realm-management', 'roles'], []);
-    if (roles.indexOf('realm-admin') >= 0) {
-      role = Role.ADMIN;
-      kcAdminClient = this.createKcAdminClient(tokenPayload.iss);
-      kcAdminClient.setAccessToken(apiToken);
-    } else {
-      role = Role.USER;
-
-      // also, we need admin token to access keycloak api
-      // this part rely on authMiddleware to control the permission
-      // todo: maybe we can use other api to access personal account data?
-      const accessToken = await this.tokenSyncer.getAccessToken();
-      kcAdminClient = this.createKcAdminClient();
-      kcAdminClient.setAccessToken(accessToken);
-    }
-    return [ role, kcAdminClient ];
-  };
-
-  createApolloServer() {
+  async createApolloServer() {
     const server = new ApolloServer({
       playground: this.config.graphqlPlayground,
       // if playground is enabled, so should introspection
@@ -280,7 +269,7 @@ export class App {
       tracing: this.config.apolloTracing,
       debug: true,
       schema: applyMiddleware(this.onCreateSchema(), authMiddleware),
-      context: async ({ctx}) => await this.onContext({ctx}),
+      context: async ({ctx}) => this.onContext({ctx}),  // force to use arrow function to get the correct 'this'
       formatError: (error: any) => {
         let errorCode: string;
         let errorMessage: string;
@@ -322,103 +311,37 @@ export class App {
     this.server = server;
   }
 
+  /**
+   * @override
+   */
   onCreateSchema() {
     return schema;
   }
 
-  async onContext ({ ctx }: { ctx: Koa.Context }) {
-    let userId: string;
-    let username: string;
-    let role: Role = Role.NOT_AUTH;
+  /**
+   * @override
+   */
+  async onContext({ ctx }: { ctx: Koa.Context }) {
     let getInstanceType: (name: string) => Promise<Item<InstanceTypeSpec>>;
     let getImage: (name: string) => Promise<Item<ImageSpec>>;
-
-    let kcAdminClient: KcAdminClient;
     const config = this.config;
     const keycloakClientId = config.keycloakClientId;
-    const {authorization = ''}: {authorization?: string} = ctx.header;
     const useCache = ctx.headers['x-primehub-use-cache'];
     const isJobClient = ctx.headers['x-primehub-job'];
     const minioClient = this.mClient;
 
-    // if a token is brought in bearer
-    // the request could come from jupyterHub or cms
-    // jupyterHub would use sharedGraphqlSecretKey and cms will use accessToken from refresh_token grant flow
-    if (authorization.indexOf('Bearer') >= 0) {
-      let apiToken = authorization.replace('Bearer ', '');
-
-      // if config.sharedGraphqlSecretKey is set and apiToken equals to it
-      if (!isEmpty(config.sharedGraphqlSecretKey) && config.sharedGraphqlSecretKey === apiToken) {
-        // since it's from jupyterHub
-        // we use batch for crd resource get method
-        const accessToken = await this.tokenSyncer.getAccessToken();
-        kcAdminClient = this.createKcAdminClient();
-        kcAdminClient.setAccessToken(accessToken);
+    const { kcAdminClient, username, userId, role } = await this.authenticate(ctx);
+    if (role === Role.CLIENT) {
+      getInstanceType = this.instCache.get;
+      getImage = this.imageCache.get;
+    } else {
+      // if request comes from /jobs or other pages not cms
+      // performance would be important.
+      // We'll use cache here
+      if (isJobClient || useCache) {
         getInstanceType = this.instCache.get;
         getImage = this.imageCache.get;
-        username = userId = 'jupyterHub';
-        role = Role.CLIENT;
-      } else {
-        // Either config.sharedGraphqlSecretKey not set, or not a sharedGraphqlSecretKey request
-        // we verify the token with oidc public key
-        let tokenPayload;
-        let checkOfflineToken = false;
-
-        try {
-          tokenPayload = await this.oidcTokenVerifier.verify(apiToken);
-          if (tokenPayload.typ === 'Offline') {
-            checkOfflineToken = true;
-          }
-        } catch (err) {
-          // in keycloak8, the offline token JWT is always verified failed.
-          checkOfflineToken = true;
-        }
-
-        if (checkOfflineToken) {
-          // API Token is a offline token. Refresh it to get the real access token
-          apiToken = await this.apiTokenCache.getAccessToken(apiToken);
-          tokenPayload = await this.oidcTokenVerifier.verify(apiToken);
-        }
-
-        userId = tokenPayload.sub;
-        username = tokenPayload.preferred_username;
-
-        // check if user is admin
-        [role, kcAdminClient] = await this.getUserRoleAndKcAdminClient(apiToken, tokenPayload);
-
-        // if request comes from /jobs or other pages not cms
-        // performance would be important.
-        // We'll use cache here
-        if (isJobClient || useCache) {
-          getInstanceType = this.instCache.get;
-          getImage = this.imageCache.get;
-        }
       }
-    } else if (config.keycloakGrantType === 'password'
-        && authorization.indexOf('Basic') >= 0
-    ) {
-      // basic auth and specified grant type to password
-      // used for test
-      const credentials = basicAuth(ctx.req);
-      if (!credentials || !credentials.name || !credentials.pass) {
-        throw Boom.forbidden('basic auth not valid');
-      }
-      username = credentials.name;
-      role = Role.ADMIN;
-
-      // use password grant type if specified, or basic auth provided
-      kcAdminClient = this.createKcAdminClient();
-      await kcAdminClient.auth({
-        username: credentials.name,
-        password: credentials.pass,
-        clientId: config.keycloakClientId,
-        clientSecret: config.keycloakClientSecret,
-        grantType: 'password',
-      });
-      const token = new Token(await kcAdminClient.getAccessToken());
-      userId = token.getContent().sub;
-    } else {
-      throw Boom.forbidden('request not authorized');
     }
 
     // cache layer
@@ -515,36 +438,49 @@ export class App {
     const rootRouter = new Router({
       prefix: config.appPrefix
     });
-    this.mountControllers(rootRouter)
+    this.mountControllers(rootRouter);
     app.use(rootRouter.routes());
     this.server.applyMiddleware({ app, path: config.appPrefix ? `${config.appPrefix}/graphql` : '/graphql' });
     this.app = app;
   }
 
-  mountControllers(rootRouter: Router) {
+  /**
+   * Authenticate the request from 'Authorizaiotion' header. Return the user information and keycloak client.
+   */
+  async authenticate(ctx: Koa.Context): Promise<{
+    userId: string;
+    username: string;
+    role: Role;
+    kcAdminClient: KcAdminClient;
+  }> {
+    const {authorization = ''}: {authorization?: string} = ctx.header;
     const config = this.config;
-    const staticPath = config.appPrefix ? `${config.appPrefix}/` : '/';
+    let kcAdminClient: KcAdminClient;
+    let userId: string;
+    let username: string;
+    let role: Role = Role.NOT_AUTH;
 
-    // redirect
-    rootRouter.get('/', async (ctx: any) => {
-      return ctx.redirect(`${config.appPrefix || ''}/graphql`);
-    });
-
-    // ctrl
-    const authenticateMiddleware = async (ctx: Koa.ParameterizedContext, next: any) => {
-      const {authorization = ''}: {authorization?: string} = ctx.header;
-
-      if (authorization.indexOf('Bearer') < 0) {
-        throw Boom.forbidden('request not authorized');
-      }
-
+    // if a token is brought in bearer
+    // the request could come from internal service (CLIENT) or user's request (UESR or ADMIN)
+    // jupyterHub would use sharedGraphqlSecretKey and cms will use accessToken from refresh_token grant flow
+    if (authorization.indexOf('Bearer') >= 0) {
       let apiToken = authorization.replace('Bearer ', '');
 
+      // if config.sharedGraphqlSecretKey is set and apiToken equals to it
       if (!isEmpty(config.sharedGraphqlSecretKey) && config.sharedGraphqlSecretKey === apiToken) {
-        return next();
+        // since it's from jupyterHub
+        // we use batch for crd resource get method
+        const accessToken = await this.tokenSyncer.getAccessToken();
+        kcAdminClient = this.createKcAdminClient();
+        kcAdminClient.setAccessToken(accessToken);
+        username = userId = 'jupyterHub';
+        role = Role.CLIENT;
       } else {
+        // Either config.sharedGraphqlSecretKey not set, or not a sharedGraphqlSecretKey request
+        // we verify the token with oidc public key
         let tokenPayload;
         let checkOfflineToken = false;
+
         try {
           tokenPayload = await this.oidcTokenVerifier.verify(apiToken);
           if (tokenPayload.typ === 'Offline') {
@@ -561,15 +497,74 @@ export class App {
           tokenPayload = await this.oidcTokenVerifier.verify(apiToken);
         }
 
-        // check if user is admin
-        [ctx.role, ctx.kcAdminClient] = await this.getUserRoleAndKcAdminClient(apiToken, tokenPayload);
-        ctx.userId = tokenPayload.sub;
-        ctx.username = tokenPayload.preferred_username;
-        return next();
-      }
-    };
+        userId = tokenPayload.sub;
+        username = tokenPayload.preferred_username;
 
-    const checkUserGroup = async (ctx: Koa.ParameterizedContext, next: any) => {
+        const roles = get(tokenPayload, ['resource_access', 'realm-management', 'roles'], []);
+        if (roles.indexOf('realm-admin') >= 0) {
+          role = Role.ADMIN;
+          kcAdminClient = this.createKcAdminClient(tokenPayload.iss);
+          kcAdminClient.setAccessToken(apiToken);
+        } else {
+          role = Role.USER;
+          const accessToken = await this.tokenSyncer.getAccessToken();
+          kcAdminClient = this.createKcAdminClient();
+          kcAdminClient.setAccessToken(accessToken);
+        }
+      }
+    } else if (config.keycloakGrantType === 'password'
+      && authorization.indexOf('Basic') >= 0) {
+      // basic auth and specified grant type to password
+      // used for test
+      const credentials = basicAuth(ctx.req);
+      if (!credentials || !credentials.name || !credentials.pass) {
+        throw Boom.forbidden('basic auth not valid');
+      }
+      username = credentials.name;
+      role = Role.ADMIN;
+
+      // use password grant type if specified, or basic auth provided
+      kcAdminClient = this.createKcAdminClient();
+      await kcAdminClient.auth({
+        username: credentials.name,
+        password: credentials.pass,
+        clientId: config.keycloakClientId,
+        clientSecret: config.keycloakClientSecret,
+        grantType: 'password',
+      });
+      const token = new Token(await kcAdminClient.getAccessToken());
+      userId = token.getContent().sub;
+    } else {
+      throw Boom.forbidden('request not authorized');
+    }
+    return { kcAdminClient, username, userId, role };
+  }
+
+  authenticateMiddleware = async (ctx: Koa.Context, next: any) => {
+    const auth = await this.authenticate(ctx);
+    ctx.role = auth.role;
+    ctx.kcAdminClient = auth.kcAdminClient;
+    ctx.userId = auth.userId;
+    ctx.username = auth.username;
+
+    return next();
+  }
+
+  /**
+   *
+   * @override
+   */
+  mountControllers(rootRouter: Router) {
+    const config = this.config;
+    const staticPath = config.appPrefix ? `${config.appPrefix}/` : '/';
+
+    // redirect
+    rootRouter.get('/', async (ctx: any) => {
+      return ctx.redirect(`${config.appPrefix || ''}/graphql`);
+    });
+
+    // ctrl
+    const checkUserGroup = async (ctx: Koa.Context, next: any) => {
       const canUserView = async (userId, groupId): Promise<boolean> => {
         const groups = await ctx.kcAdminClient.users.listGroups({
           id: userId
@@ -599,13 +594,7 @@ export class App {
     };
 
     // Notebook Log
-    rootRouter.get(this.podLogs.jupyterHubRoute, authenticateMiddleware, this.podLogs.streamJupyterHubLogs);
-
-    // ImageSpecJob Log
-    rootRouter.get(this.podLogs.imageSpecJobRoute, authenticateMiddleware, groupAdminMiddleware, this.podLogs.streamImageSpecJobLogs);
-
-    // PhApplication Pod Log
-    rootRouter.get(this.podLogs.phApplicationPodRoute, authenticateMiddleware, checkUserGroup, this.podLogs.streamPhApplicationPodLogs);
+    this.podLogs.mount(rootRouter, this.authenticateMiddleware);
 
     // health check
     rootRouter.get('/health', async ctx => {
@@ -614,11 +603,11 @@ export class App {
 
     if (config.enableStore) {
       // store file download api
-      mountStoreCtrl(rootRouter, authenticateMiddleware, checkUserGroup, this.mClient, this.storeBucket);
+      mountStoreCtrl(rootRouter, this.authenticateMiddleware, checkUserGroup, this.mClient, this.storeBucket);
 
       // shared space proxy to tusd
       const tusProxyPath = `${staticPath}tus`;
-      mountTusCtrl(rootRouter, tusProxyPath, config, authenticateMiddleware);
+      mountTusCtrl(rootRouter, tusProxyPath, config, this.authenticateMiddleware);
     }
   }
-};
+}

@@ -10,7 +10,7 @@ const crdClient = new CrdClient({
   namespace
 });
 
-export const groupAdminMiddleware = async (ctx: Koa.ParameterizedContext, next: any) => {
+export const groupAdminMiddleware = async (ctx: Koa.Context, next: any) => {
   const { params, username, kcAdminClient } = ctx;
 
   const { imageId } = params;
