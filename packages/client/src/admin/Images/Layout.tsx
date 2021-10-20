@@ -18,8 +18,8 @@ export function ImagesLayout({ children }: { children: React.ReactNode }) {
               matcher: /\/image/,
               title: 'Images',
               link: '/image',
-              tips: 'Group Admin can find/add/build group-specific images here',
-              tipsLink: 'https://docs.primehub.io/docs/group-image',
+              tips: 'Images are working environments of instances. Admin can find and manage images.',
+              tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-image',
             },
           ]}
         />
