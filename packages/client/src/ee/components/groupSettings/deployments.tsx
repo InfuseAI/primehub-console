@@ -85,7 +85,7 @@ class GroupSettingsDeployments extends React.Component<Props, State> {
     const { group } = this.state;
     return (
       <>
-        <GroupSettingsAlert />
+        <GroupSettingsAlert groupId={group.id}/>
         <Form>
           <FeatureEE>
             <Row style={{ marginTop: 5, marginLeft: 5, marginRight: 5 }}>
