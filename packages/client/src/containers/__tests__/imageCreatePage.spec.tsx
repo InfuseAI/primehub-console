@@ -36,7 +36,7 @@ const AllTheProviders = ({ children }) => {
 describe('ImageCreateForm Container', () => {
   it('Should render create page properly', async () => {
     // @ts-ignore
-    global.customImageSetup = 'true';
+    global.customImageSetup = true;
     render(<ImageCreatePage />, { wrapper: AllTheProviders });
     expect(await screen.findByText('Container Image URL')).toBeInTheDocument();
   });

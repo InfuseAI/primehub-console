@@ -14,7 +14,6 @@ const createEnvVariablesSetup = () => (ctx: Context, next: Next) => {
     : '/oidc/request-api-token';
   ctx.state.disableMode = config.readOnlyOnInstanceTypeAndImage;
   ctx.state.enableDatasetUpload = config.enableDatasetUpload;
-  ctx.state.enableCustomImage = config.enableCustomImage;
   ctx.state.enableMaintenanceNotebook = config.enableMaintenanceNotebook;
   ctx.state.enableGrafana = config.enableGrafana;
   ctx.state.enableUsageReport = config.enableUsageReport;
