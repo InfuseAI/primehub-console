@@ -13,7 +13,6 @@ const VISIBLE_ITEMS = {
   instanceType: true,
   secret: true,
   system: true,
-  apps: true,
 
   // Control by global or tier variable
   image: false,
@@ -21,6 +20,7 @@ const VISIBLE_ITEMS = {
   dataset: false,
   jupyterhub: false,
   usageReport: false,
+  apps: false,
 };
 
 const EXTERNAL_LINKS = {
@@ -76,6 +76,7 @@ export function AdminSidebar() {
         dataset: true,
         jupyterhub: true,
         usageReport: true,
+        apps: true,
       }));
     }
 
@@ -86,6 +87,7 @@ export function AdminSidebar() {
         dataset: true,
         jupyterhub: true,
         usageReport: true,
+        apps: true,
       }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
