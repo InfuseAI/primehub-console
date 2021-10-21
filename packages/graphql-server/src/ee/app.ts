@@ -1,6 +1,7 @@
 import Koa from 'koa';
 import Router from 'koa-router';
 import { schema } from './resolvers';
+import { permissions as authMiddleware } from './middlewares/auth';
 import { JobLogCtrl } from './controllers/jobLogCtrl';
 import { PhJobCacheList } from './crdClient/phJobCacheList';
 import JobArtifactCleaner from './utils/jobArtifactCleaner';
@@ -10,6 +11,7 @@ import { createDefaultTraitMiddleware } from '../utils/telemetryTraits';
 import { createEETraitMiddleware } from './utils/telemetryTraits';
 import { App as AppCE } from '../app';
 import { mountUsageCtrl, } from './controllers/usageCtrl';
+import { applyMiddleware } from 'graphql-middleware';
 
 export class AppEE extends AppCE {
   persistLog: PersistLog;
@@ -78,8 +80,8 @@ export class AppEE extends AppCE {
   /**
    * @override
    */
-  onCreateSchema() {
-    return schema;
+  createSchema() {
+    return applyMiddleware(schema, authMiddleware);
   }
 
   /**

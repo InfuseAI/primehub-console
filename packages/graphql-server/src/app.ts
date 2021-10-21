@@ -263,7 +263,7 @@ export class App {
       introspection: this.config.graphqlPlayground,
       tracing: this.config.apolloTracing,
       debug: true,
-      schema: applyMiddleware(this.onCreateSchema(), authMiddleware),
+      schema: this.createSchema(),
       context: async ({ctx}) => this.onContext({ctx}),  // force to use arrow function to get the correct 'this'
       formatError: (error: any) => {
         let errorCode: string;
@@ -309,10 +309,13 @@ export class App {
   /**
    * Supposed to be overriden by EE
    */
-  onCreateSchema() {
-    return schema;
+  createSchema() {
+    return applyMiddleware(schema, authMiddleware);
   }
 
+  /**
+   * Supposed to be overriden by EE
+   */
   async onContext({ ctx }: { ctx: Koa.Context }) {
     let getInstanceType: (name: string) => Promise<Item<InstanceTypeSpec>>;
     let getImage: (name: string) => Promise<Item<ImageSpec>>;
