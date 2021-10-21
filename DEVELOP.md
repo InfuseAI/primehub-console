@@ -2,7 +2,7 @@
 
 ## Develop on local
 
-We recommend to use node version 12 lts for primehub-console development, you can use [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md) to install and manage different node runtime on the local machine.
+We recommend to use node version 12 LTS for primehub-console development, you can use [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md) to install and manage different node runtime on the local machine.
 
 ```shell
 $ nvm install v12
@@ -21,7 +21,7 @@ $ yarn install
 In PrimeHub Console, we have 4 sub components in `packages`, the web server, graphql server, front-end client and watcher.
 All components can run as a standalone server for test individual, you also can combine them together as a complete primehub-console on the local machine.
 
-### Graphql dev server
+### GraphQL dev server
 
 #### Prerequisite
 
@@ -47,7 +47,7 @@ For graphql local server, we need an exist primehub cluster includes all primehu
    - KC_CLIENT_SECRET: client secret
    - KC_CLIENT_ID: client id
    - SHARED_GRAPHQL_SECRET_KEY: secret key to request read-only graphql with. Client should put this shared key in header `Authorization: "Bearer <SHARED_GRAPHQL_SECRET_KEY>"`
-   - APP_PREFIX: ex: `/admin
+   - APP_PREFIX: ex: `/admin`
      You can check the graphql deployment's env setup as an example for local enviroment setup in your local cluster by following command
 
    ```shell
@@ -78,7 +78,7 @@ For graphql local server, we need an exist primehub cluster includes all primehu
 
 ### Server
 
-Graphql API and hosting cms pages
+GraphQL API and hosting cms pages
 
 ### Client
 
@@ -93,7 +93,7 @@ Graphql API and hosting cms pages
 
 ## Env variables
 
-### Graphql-server
+### GraphQL-server
 
 - KC_API_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. Ex: 'http://127.0.0.1:8080/auth'. For API usage.
 - KC_OIDC_BASEURL: BaseUrl of keycloak, should be postfix with `/auth`. For oidc usage.
@@ -103,20 +103,20 @@ Graphql API and hosting cms pages
 - KC_GRANT_TYPE: `password` or `authorization_code`
 - KC_CLIENT_SECRET: client secret
 - KC_CLIENT_ID: client id
-- KC_MAX_SOCKETS: Maximum number of sockets to allow per host. Default = 80
-- KC_MAX_FREE_SOCKETS: Maximum number of sockets (per host) to leave open in a free state. Default = 10
+- KC_MAX_SOCKETS: Maximum number of sockets to allow per host. `Default = 80`
+- KC_MAX_FREE_SOCKETS: Maximum number of sockets (per host) to leave open in a free state. `Default = 10`
 - KC_ROLE_PREFIX: Prefix will be append at role when creating custom resource, for example: `cluster-1:ds:dataset` if `KC_ROLE_PREFIX` = `cluster-1`.
 - SHARED_GRAPHQL_SECRET_KEY: secret key to request read-only graphql with. Client should put this shared key in header `Authorization: "Bearer <SHARED_GRAPHQL_SECRET_KEY>"`
 - APP_PREFIX: ex: `/admin`
 - CMS_APP_PREFIX: the `APP_PREFIX` env setup in `admin-server`
-- APOLLO_TRACING: (boolean) default: false
-- GRAPHQL_PLAYGROUND: (boolean) default: false
+- APOLLO_TRACING: (boolean) default: `false`
+- GRAPHQL_PLAYGROUND: (boolean) default: `false`
 - DEFAULT_USER_VOLUME_CAPACITY: (string) default: `20G`
 - PRIMEHUB_GROUP_SC: for pvc
 - PRIMEHUB_FEATURE_DATASET_UPLOAD: enable upload feature or not
 - GRAPHQL_HOST: graphql public host, ex: `https://test.graphql.com:8080`
 - MAX_GROUP: (int) default: 999, Maximum number of user group
-- EXPIRED: (string) default: invalid
+- EXPIRED: (string) default: `invalid`
 - LICENSED_TO: (string) License destination
 - STARTED_AT: (string) License started time
 - EXPIRED_AT: (string) License end time
@@ -132,8 +132,8 @@ Graphql API and hosting cms pages
 - KC_EVERYONE_GROUP_ID: the everyone group id in keycloak
 - CANNER_LOCALE: language of cms, default to `en`
 - CANNER_CMS_HOST: cms host, default to `http://localhost:3000`, DO NOT postfix with a slash.
-- KC_MAX_SOCKETS: Maximum number of sockets to allow per host. Default = 80
-- KC_MAX_FREE_SOCKETS: Maximum number of sockets (per host) to leave open in a free state. Default = 10
+- KC_MAX_SOCKETS: Maximum number of sockets to allow per host. `Default = 80`
+- KC_MAX_FREE_SOCKETS: Maximum number of sockets (per host) to leave open in a free state. `Default = 10`
 - GRAPHQL_ENDPOINT: graphql endpoint, format: `http://localhost:3001/graphql`
 - APP_PREFIX: ex: `/admin`
 - PRIMEHUB_FEATURE_USER_PORTAL: (boolean) default: `false`
@@ -152,8 +152,8 @@ Graphql API and hosting cms pages
 - K8S_CRD_NAMESPACE: specify what namespace to use for crd
 - KC_CLIENT_SECRET: client secret
 - KC_CLIENT_ID: client id
-- KC_MAX_SOCKETS: Maximum number of sockets to allow per host. Default = 80
-- KC_MAX_FREE_SOCKETS: Maximum number of sockets (per host) to leave open in a free state. Default = 10
+- KC_MAX_SOCKETS: Maximum number of sockets to allow per host. `Default = 80`
+- KC_MAX_FREE_SOCKETS: Maximum number of sockets (per host) to leave open in a free state. `Default = 10`
 - KC_ROLE_PREFIX: Prefix will be append at role when creating custom resource, for example: `cluster-1:ds:dataset` if `KC_ROLE_PREFIX` = `cluster-1`.
 
 ## Build
@@ -174,7 +174,7 @@ $ npm run start:prod
 
 ## Test
 
-### Graphql-server
+### GraphQL-server
 
 **Unit test**
 
