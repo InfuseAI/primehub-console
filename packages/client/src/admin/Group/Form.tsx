@@ -406,6 +406,31 @@ function GroupForm(props: Props) {
                 {form.getFieldDecorator('quotaCpu', {
                   initialValue: initialValue.quotaCpu,
                   getValueFromEvent: (refId, action, val) => val,
+                  rules: [
+                    {
+                      validator: (_, value, callback) => {
+                        const groupCpuQuota =
+                          form.getFieldValue('projectQuotaCpu');
+
+                        // project cpu quota is unlimted
+                        if (groupCpuQuota === null) {
+                          return true;
+                        }
+
+                        if (value > groupCpuQuota) {
+                          return callback(
+                            'The User CPU Quota has to be ≤ Group CPU Quota'
+                          );
+                        } else {
+                          form.setFieldsValue({
+                            projectQuotaCpu: groupCpuQuota,
+                          });
+                        }
+
+                        return true;
+                      },
+                    },
+                  ],
                 })(
                   <CheckableInputNumber
                     data-testid='group/quotaCpu'
@@ -419,6 +444,31 @@ function GroupForm(props: Props) {
                 {form.getFieldDecorator('quotaGpu', {
                   initialValue: initialValue.quotaGpu,
                   getValueFromEvent: (refId, action, val) => val,
+                  rules: [
+                    {
+                      validator: (_, value, callback) => {
+                        const groupGpuQuota =
+                          form.getFieldValue('projectQuotaGpu');
+
+                        // project gpu qutoa is unlimted
+                        if (groupGpuQuota === null) {
+                          return true;
+                        }
+
+                        if (value > groupGpuQuota) {
+                          return callback(
+                            'The User GPU Quota has to be ≤ Group GPU Quota'
+                          );
+                        } else {
+                          form.setFieldsValue({
+                            projectQuotaGpu: groupGpuQuota,
+                          });
+                        }
+
+                        return true;
+                      },
+                    },
+                  ],
                 })(
                   <CheckableInputNumber
                     data-testid='group/quotaGpu'
@@ -432,6 +482,31 @@ function GroupForm(props: Props) {
                 {form.getFieldDecorator('quotaMemory', {
                   initialValue: initialValue.quotaMemory,
                   getValueFromEvent: (refId, action, val) => val,
+                  rules: [
+                    {
+                      validator: (_, value, callback) => {
+                        const groupMemoryQuota =
+                          form.getFieldValue('projectQuotaMemory');
+
+                        // project memory qutoa is unlimted
+                        if (groupMemoryQuota === null) {
+                          return true;
+                        }
+
+                        if (value > groupMemoryQuota) {
+                          return callback(
+                            'The User Memory Quota has to be ≤ Group Memory Quota'
+                          );
+                        } else {
+                          form.setFieldsValue({
+                            projectQuotaMemory: groupMemoryQuota,
+                          });
+                        }
+
+                        return true;
+                      },
+                    },
+                  ],
                 })(
                   <CheckableInputNumber
                     data-testid='group/quotaMemory'
@@ -449,6 +524,30 @@ function GroupForm(props: Props) {
                 {form.getFieldDecorator('projectQuotaCpu', {
                   initialValue: initialValue.projectQuotaCpu,
                   getValueFromEvent: (refId, action, val) => val,
+                  rules: [
+                    {
+                      validator: (_, value, callback) => {
+                        const userCpuQuota = form.getFieldValue('quotaCpu');
+
+                        // project cpu quota or user cpu quota is unlimted
+                        if (value === null || userCpuQuota === null) {
+                          return true;
+                        }
+
+                        if (value < userCpuQuota) {
+                          return callback(
+                            'The Group CPU Quota has to be ≥ User CPU Quota'
+                          );
+                        } else {
+                          form.setFieldsValue({
+                            quotaCpu: userCpuQuota,
+                          });
+                        }
+
+                        return true;
+                      },
+                    },
+                  ],
                 })(
                   <CheckableInputNumber
                     data-testid='group/projectQuotaCpu'
@@ -462,6 +561,30 @@ function GroupForm(props: Props) {
                 {form.getFieldDecorator('projectQuotaGpu', {
                   initialValue: initialValue.projectQuotaGpu,
                   getValueFromEvent: (refId, action, val) => val,
+                  rules: [
+                    {
+                      validator: (_, value, callback) => {
+                        const userGpuQuota = form.getFieldValue('quotaGpu');
+
+                        // project gpu quota or user gpu quota is unlimted
+                        if (value === null || userGpuQuota === null) {
+                          return true;
+                        }
+
+                        if (value < userGpuQuota) {
+                          return callback(
+                            'The Group GPU Quota  has to be ≥ User GPU Quota'
+                          );
+                        } else {
+                          form.setFieldsValue({
+                            quotaGpu: userGpuQuota,
+                          });
+                        }
+
+                        return true;
+                      },
+                    },
+                  ],
                 })(
                   <CheckableInputNumber
                     data-testid='group/projectQuotaGpu'
@@ -475,6 +598,31 @@ function GroupForm(props: Props) {
                 {form.getFieldDecorator('projectQuotaMemory', {
                   initialValue: initialValue.projectQuotaMemory,
                   getValueFromEvent: (refId, action, val) => val,
+                  rules: [
+                    {
+                      validator: (_, value, callback) => {
+                        const userMemoryQuota =
+                          form.getFieldValue('quotaMemory');
+
+                        // project memory quota or user memory quota is unlimted
+                        if (value === null || userMemoryQuota === null) {
+                          return true;
+                        }
+
+                        if (value < userMemoryQuota) {
+                          return callback(
+                            'The Group Memory Quota  has to be ≥ User Memory Quota'
+                          );
+                        } else {
+                          form.setFieldsValue({
+                            quotaMemory: userMemoryQuota,
+                          });
+                        }
+
+                        return true;
+                      },
+                    },
+                  ],
                 })(
                   <CheckableInputNumber
                     data-testid='group/projectQuotaMemory'
