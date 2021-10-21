@@ -285,6 +285,7 @@ interface FileItem {
 
 interface BrowseSharedFilesProps {
   path: string;
+  enabledPHFS: boolean;
   data?: {
     error: Error | undefined;
     loading: boolean;
@@ -310,13 +311,17 @@ interface BrowseSharedFilesProps {
   }) => Promise<{ data: { deleteFiles: number } }>;
 }
 
-function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesProps) {
+function BrowseSharedFiles({
+  data,
+  enabledPHFS,
+  path,
+  ...props
+}: BrowseSharedFilesProps) {
   const history = useHistory();
 
   const { appPrefix } = useRoutePrefix();
   const { name: groupName } = useContext(GroupContext);
 
-  const [enabledPHFS, setEndabledPHFS] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [previewFilePath, setPreviewFilePath] = useState('');
@@ -451,14 +456,6 @@ function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesProps) {
     }
   }
 
-  useEffect(() => {
-    if (typeof window === undefined) return;
-
-    if (window?.enablePhfs) {
-      setEndabledPHFS(true);
-    }
-  }, []);
-
   if (!enabledPHFS) {
     return (
       <Alert
@@ -519,7 +516,7 @@ function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesProps) {
         ) : (
           <BreadcrumbPaths
             path={path}
-            refetchFiles={data.refetch}
+            refetchFiles={data?.refetch}
             onCreate={() => {
               setIsEditing(true);
             }}
@@ -537,7 +534,7 @@ function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesProps) {
       </div>
 
       <Table
-        rowKey={data => data.name}
+        rowKey={data => data?.name}
         loading={data?.loading}
         dataSource={get(data, 'files.items', [])}
         columns={columns}
@@ -601,7 +598,11 @@ function BrowseSharedFiles({ data, path, ...props }: BrowseSharedFilesProps) {
 export default compose(
   withGroupContext,
   graphql(GET_FILES, {
-    options: (props: { path: string; groupContext: GroupContextValue }) => ({
+    options: (props: {
+      path: string;
+      enabledPHFS: boolean;
+      groupContext: GroupContextValue;
+    }) => ({
       variables: {
         where: {
           phfsPrefix: props.path,
@@ -611,6 +612,7 @@ export default compose(
       fetchPolicy: 'cache-and-network',
       onError: errorHandler,
     }),
+    skip: props => !props.enabledPHFS,
   }),
   graphql(DELETE_FILES, {
     options: (props: { path: string; groupContext: GroupContextValue }) => ({

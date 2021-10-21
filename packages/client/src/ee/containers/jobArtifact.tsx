@@ -123,12 +123,11 @@ export default graphql(GET_PH_JOB_ARTIFACT, {
   options: (props: Props) => ({
     variables: {
       where: {
-        id: props.jobId
-      }
+        id: props.jobId,
+      },
     },
     fetchPolicy: 'network-only',
     onError: errorHandler,
-    skip: !isArtifactEnabled(),
-    })
-  })
-(JobArtifactContainer);
+  }),
+  skip: !isArtifactEnabled(),
+})(JobArtifactContainer);

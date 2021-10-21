@@ -77,9 +77,6 @@ function setup() {
 
 describe('BrowseSharedFiles', () => {
   it('should render browse shared files with error messages', async () => {
-    // @ts-ignore
-    global.enablePhfs = true;
-
     const { TestProvider } = setup();
 
     render(
@@ -95,7 +92,7 @@ describe('BrowseSharedFiles', () => {
               enabledSharedVolume: false,
             }}
           >
-            <BrowseSharedFiles path='/' />
+            <BrowseSharedFiles enabledPHFS path='/' />
           </GroupContext.Provider>
         </MockedProvider>
       </TestProvider>
@@ -105,16 +102,13 @@ describe('BrowseSharedFiles', () => {
   });
 
   it('should render browse shared files with fetched data', async () => {
-    // @ts-ignore
-    global.enablePhfs = true;
-
     const { TestProvider, mockRequests, mockGroups } = setup();
 
     render(
       <TestProvider>
         <MockedProvider mocks={mockRequests}>
           <GroupContext.Provider value={mockGroups}>
-            <BrowseSharedFiles path='/' />
+            <BrowseSharedFiles enabledPHFS path='/' />
           </GroupContext.Provider>
         </MockedProvider>
       </TestProvider>
@@ -124,16 +118,13 @@ describe('BrowseSharedFiles', () => {
   });
 
   it('should render browse shared files with unenabled phfs alert message', () => {
-    // @ts-ignore
-    global.enablePhfs = false;
-
     const { TestProvider, mockRequests, mockGroups } = setup();
 
     render(
       <TestProvider>
         <MockedProvider mocks={mockRequests}>
           <GroupContext.Provider value={mockGroups}>
-            <BrowseSharedFiles path='/' />
+            <BrowseSharedFiles enabledPHFS={false} path='/' />
           </GroupContext.Provider>
         </MockedProvider>
       </TestProvider>
