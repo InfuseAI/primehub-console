@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import Breadcrumbs from 'components/share/breadcrumb';
@@ -9,6 +9,15 @@ import BrowseSharedFiles from './BrowseSharedFiles';
 
 function ShareFilesPage() {
   const params = useParams<{ groupName: string; phfsPrefix: string }>();
+  const [enabledPHFS, setEndabledPHFS] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === undefined) return;
+
+    if (window?.enablePhfs) {
+      setEndabledPHFS(true);
+    }
+  }, []);
 
   return (
     <>
@@ -30,7 +39,10 @@ function ShareFilesPage() {
         }
       />
       <PageBody>
-        <BrowseSharedFiles path={params?.phfsPrefix || ''} />
+        <BrowseSharedFiles
+          path={params?.phfsPrefix || ''}
+          enabledPHFS={enabledPHFS}
+        />
       </PageBody>
     </>
   );

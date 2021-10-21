@@ -1,10 +1,9 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
-import {graphql} from 'react-apollo';
-import {errorHandler} from 'utils/errorHandler';
-import {get} from 'lodash';
-import {appPrefix} from 'utils/env';
-import { Button, Table, Alert, Tooltip, Icon } from 'antd';
+import { graphql } from 'react-apollo';
+import { errorHandler } from 'utils/errorHandler';
+import { get } from 'lodash';
+import { Button, Alert, Tooltip, Icon } from 'antd';
 import styled from 'styled-components';
 import LineChart from 'ee/components/shared/lineChart';
 
@@ -262,7 +261,7 @@ export default graphql(GET_PH_JOB_MONITORING, {
     fetchPolicy: 'network-only',
     pollInterval: 10000,
     onError: errorHandler,
-    skip: !isMonitoringEnabled(),
-    })
-  })
+  }),
+  skip: !isMonitoringEnabled(),
+})
 (JobMonitoringContainer);
