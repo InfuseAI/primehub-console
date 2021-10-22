@@ -56,13 +56,14 @@ export class PodLogs {
     return `${this.appPrefix || ''}/logs/images/${imageId}/job`;
   }
 
-  public streamImageSpecJobLogs = async (ctx: ParameterizedContext, next: any) => {
+  public streamImageSpecJobLogs = async (ctx: ParameterizedContext) => {
     const { role, params, username, kcAdminClient } = ctx;
     const { imageId } = params;
 
     const image = await this.crdClient.images.get(imageId);
     const groupName = image.spec.groupName;
-    if (role !== Role.ADMIN && role !== Role.CLIENT && await !isGroupAdmin(username, groupName, kcAdminClient)) {
+    const checkIsGroupAdmin = await isGroupAdmin(username, groupName, kcAdminClient);
+    if (role !== Role.ADMIN && role !== Role.CLIENT && !checkIsGroupAdmin) {
       throw Boom.forbidden('request not authorized');
     }
 

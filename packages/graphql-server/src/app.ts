@@ -201,7 +201,7 @@ export class App {
       this.storeBucket = config.storeBucket;
       this.mClient = createMinioClient(config.storeEndpoint, config.storeAccessKey, config.storeSecretKey);
     }
-    const podLogs = this.podLogs = new PodLogs({
+    this.podLogs = new PodLogs({
       namespace: config.k8sCrdNamespace,
       crdClient,
       appPrefix: config.appPrefix
