@@ -109,19 +109,8 @@ function List(props: Props) {
       title: 'Name',
       width: '20%',
       render: ({firstName, lastName}) => {
-        if (isEmpty(firstName) && isEmpty(lastName)) {
-          return null;
-        }
-        
-        if (isEmpty(firstName) && !isEmpty(lastName)) {
-          return <TruncateTableField text={lastName} />;
-        }
-        
-        if (!isEmpty(firstName) && isEmpty(lastName)) {
-          return <TruncateTableField text={firstName} />;
-        }
-        
-        return <TruncateTableField text={`${firstName} ${lastName}`} />;
+        const result = (`${firstName || ''} ${lastName || ''}`).trim();
+        return <TruncateTableField text={result} />;
       },
     },
     {
