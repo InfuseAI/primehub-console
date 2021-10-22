@@ -43,9 +43,7 @@ export interface Config {
   readOnlyOnInstanceTypeAndImage?: boolean;
   enableDatasetUpload: boolean;
 
-  // image builder
-  // TODO: need rename variable to image builder for consistently
-  enableCustomImage: boolean;
+  // custom image
   // image builder should have registry setup, use env.PRIMEHUB_CUSTOM_IMAGE_REGISTRY_ENDPOINT to determine it.
   customImageSetup: boolean;
 
@@ -102,7 +100,6 @@ const defaultConfigs = {
   enableUserPortal: false,
   readOnlyOnInstanceTypeAndImage: false,
   enableDatasetUpload: false,
-  enableCustomImage: false,
   enableMaintenanceNotebook: false,
   enableUsageReport: false,
   enableGrafana: false,
@@ -178,7 +175,6 @@ export const createConfig = (): Config => {
     primehubVersion: process.env.PH_VERSION,
     // Feature Flags
     enableDatasetUpload: getEnvBoolean('PRIMEHUB_FEATURE_DATASET_UPLOAD', false),
-    enableCustomImage: getEnvBoolean('PRIMEHUB_FEATURE_CUSTOM_IMAGE', false),
     enableMaintenanceNotebook: getEnvBoolean('PRIMEHUB_FEATURE_MAINTENANCE_NOTEBOOK', false),
     enableGrafana: getEnvBoolean('PRIMEHUB_FEATURE_GRAFANA', false),
     enableUsageReport: getEnvBoolean('PRIMEHUB_FEATURE_USAGE', false),
