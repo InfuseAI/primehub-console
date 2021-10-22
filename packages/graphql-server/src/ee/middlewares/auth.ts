@@ -40,7 +40,6 @@ export const permissions = shield({
     deletePhDeployment: or(isAdmin, isUser),
     stopPhDeployment: or(isAdmin, isUser),
     deployPhDeployment: or(isAdmin, isUser),
-    createUserFromInvitation: or(isClient, isAdmin),
   },
 }, {
   allowExternalErrors: true
