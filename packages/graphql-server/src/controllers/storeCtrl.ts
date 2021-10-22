@@ -15,20 +15,6 @@ export const mountStoreCtrl = (router: Router,
                                authenticateMiddleware: Middleware,
                                minioClient: Client,
                                storeBucket: string) => {
-  const checkPermission = async (ctx, path) => {
-    let fileDownloadAPIPrefix = `${appPrefix || ''}/files/`;
-    if (path.startsWith(fileDownloadAPIPrefix)) {
-      throw Boom.forbidden('request not authorized');
-    }
-
-    fileDownloadAPIPrefix = fileDownloadAPIPrefix + 'groups/';
-    const groupName = path.split(fileDownloadAPIPrefix).pop().split('/')[0];
-    if (!ctx.request.path.startsWith(fileDownloadAPIPrefix) ||
-        await isGroupBelongUser(ctx, ctx.userId, groupName) === false) {
-      throw Boom.forbidden('request not authorized');
-    }
-  };
-
   const downloadFile = async (ctx, path) => {
     let download = false;
     if ('download' in ctx.request.query && ctx.request.query.download === '1') {
@@ -72,10 +58,17 @@ export const mountStoreCtrl = (router: Router,
   };
 
   router.get('/files/(.*)', authenticateMiddleware, async ctx => {
-    const objectPath = decodeURIComponent(ctx.request.path.split('/groups').pop());
-    const path = `groups${objectPath}`;
-    await checkPermission(ctx, path);
-    await downloadFile(ctx, path);
+    const objectPath = ctx.params[0];
+    const [first, groupName] = objectPath.split('/');
+    if (first !== 'groups' || !groupName) {
+      throw Boom.forbidden('request not authorized');
+    }
+
+    if (await isGroupBelongUser(ctx, ctx.userId, groupName) === false) {
+      throw Boom.forbidden('request not authorized');
+    }
+
+    await downloadFile(ctx, objectPath);
   });
 
   router.get('/share/:hash', async ctx => {
