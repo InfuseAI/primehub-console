@@ -26,14 +26,12 @@ beforeEach(() => {
   // @ts-ignore
   global.modelDeploymentOnly = false;
   // @ts-ignore
-  global.customImageSetup = 'true';
-  // @ts-ignore
-  global.enableCustomImage = true;
+  global.customImageSetup = true;
 });
 
 afterEach(() => {
   // @ts-ignore
-  global.customImageSetup = 'false';
+  global.customImageSetup = false;
 });
 
 describe('ImageAdd', () => {
@@ -84,7 +82,7 @@ describe('ImageAdd', () => {
 
   it('should render create image with disabled custom build image option', () => {
     // @ts-ignore
-    global.customImageSetup = 'false';
+    global.customImageSetup = false;
     const { TestProvider } = setup();
 
     render(
@@ -99,9 +97,9 @@ describe('ImageAdd', () => {
     expect(true).toBe(true);
   });
 
-  it('should disabled custom build image option when `enableCustomImage` is disabled', () => {
+  it('should disabled custom build image option when `customImageSetup` is disabled', () => {
     // @ts-ignore
-    global.enableCustomImage = false;
+    global.customImageSetup = false;
     const { TestProvider } = setup();
 
     render(
