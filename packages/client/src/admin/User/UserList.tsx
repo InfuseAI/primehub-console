@@ -12,7 +12,6 @@ import EmailForm from 'cms-toolbar/sendEmailModal';
 import { FilterRow, FilterPlugins, ButtonCol } from 'components/share';
 import { errorHandler } from 'utils/errorHandler';
 import { TruncateTableField } from 'utils/TruncateTableField';
-import { isEmpty } from 'lodash';
 import { UsersConnection, DeleteUser } from 'queries/User.graphql';
 
 const PAGE_SIZE = 10;
