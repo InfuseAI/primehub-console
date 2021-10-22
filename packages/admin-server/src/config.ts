@@ -68,6 +68,8 @@ export interface Config {
   // PrimeHub App
   enableApp: boolean;
   enableTelemetry: boolean;
+  // NPS Survey
+  enableNPSSurvey: boolean;
   // maximux group
   licenseStatus: string;
   maxGroup: number;
@@ -115,6 +117,7 @@ const defaultConfigs = {
   enableJobMonitoring: false,
   enableApp: true,
   enableTelemetry: false,
+  enableNPSSurvey: false,
   licenseStatus: 'invalid',
   maxGroup: 999,
   jobDefaultActiveDeadlineSeconds: 86400,
@@ -190,6 +193,7 @@ export const createConfig = (): Config => {
     enableJobMonitoring: getEnvBoolean('PRIMEHUB_FEATURE_JOB_MONITORING', false),
     enableApp: getEnvBoolean('PRIMEHUB_FEATURE_APP', true),
     enableTelemetry: getEnvBoolean('PRIMEHUB_FEATURE_TELEMETRY', false),
+    enableNPSSurvey: getEnvBoolean('ENABLE_NPS_SURVEY', false),
   });
 
   const env = process.env.NODE_ENV || 'development';

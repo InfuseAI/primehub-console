@@ -39,16 +39,42 @@ const CommunityList = props => {
   );
 };
 
-const PageChangeTracker = props => {
-  if (primehubCE !== true) {
-    return <></>;
-  }
+const initSurvey = () => {
+  (() => {
+    window.SS_WIDGET_TOKEN = 'tt-6da14e';
+    window.SS_ACCOUNT = 'infuseai.surveysparrow.com';
+    window.SS_SURVEY_NAME = 'PrimeHub';
+    if (!document.getElementById('ss-widget')) {
+      const launcher = () => {
+        launcher.update(arguments);
+      };
+      launcher.args = [];
+      launcher.update = e => {
+        launcher.args.push(e);
+      };
+      window.SparrowLauncher = launcher;
+      const s = document.getElementsByTagName('script');
+      const c = s[s.length - 1];
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.async = !0;
+      script.id = 'ss-widget';
+      script.src = [
+        'https://',
+        'infuseai.surveysparrow.com/widget/',
+        window.SS_WIDGET_TOKEN,
+      ].join('');
+      c.parentNode.insertBefore(script, c);
+    }
+  })();
+};
 
+const NPSSurvey = () => {
+  return <div id='ss_survey_widget'></div>;
+};
+
+const PageChangeTracker = () => {
   const analytics = window.analytics || null;
-  if (analytics == null) {
-    return <></>;
-  }
-
   const location = useLocation();
   const [visible, setVisible] = useState(false);
   const [promptType, setPromptType] = useState('modal');
@@ -58,6 +84,24 @@ const PageChangeTracker = props => {
     location: '',
     prompt: 0,
   });
+
+  useEffect(() => {
+    updatePageChange();
+  }, [location]);
+
+  useEffect(() => {
+    if (visible && window.enableNPSSurvey) {
+      initSurvey();
+    }
+  }, [visible]);
+
+  if (primehubCE !== true && !window.enableNPSSurvey) {
+    return <></>;
+  }
+
+  if (analytics == null) {
+    return <></>;
+  }
 
   const updatePageChange = () => {
     const { collected, location, prompt, pageChanges } = event;
@@ -76,7 +120,7 @@ const PageChangeTracker = props => {
       event.location = href;
     }
 
-    if (prompt >= 2) {
+    if (prompt >= 2 && !window.enableNPSSurvey) {
       setPromptType('notification');
       setVisible(true);
       event.prompt += 1;
@@ -93,10 +137,6 @@ const PageChangeTracker = props => {
     event.pageChanges += 1;
     setEvent(event);
   };
-
-  useEffect(() => {
-    updatePageChange();
-  }, [location]);
 
   const userTakeAction = (shareTo: string) => {
     const s = event;
@@ -118,6 +158,7 @@ const PageChangeTracker = props => {
         key='prompt-modal'
         title={title}
         visible={visible}
+        width={820}
         onCancel={() => {
           setVisible(false);
         }}
@@ -133,6 +174,7 @@ const PageChangeTracker = props => {
           </Button>,
         ]}
       >
+        {window.enableNPSSurvey ? <NPSSurvey /> : <></>}
         <CommunityList userTakeAction={userTakeAction} />
       </Modal>
     );
