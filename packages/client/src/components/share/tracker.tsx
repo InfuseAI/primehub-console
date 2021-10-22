@@ -85,24 +85,6 @@ const PageChangeTracker = () => {
     prompt: 0,
   });
 
-  useEffect(() => {
-    updatePageChange();
-  }, [location]);
-
-  useEffect(() => {
-    if (visible && window.enableNPSSurvey) {
-      initSurvey();
-    }
-  }, [visible]);
-
-  if (primehubCE !== true && !window.enableNPSSurvey) {
-    return <></>;
-  }
-
-  if (analytics == null) {
-    return <></>;
-  }
-
   const updatePageChange = () => {
     const { collected, location, prompt, pageChanges } = event;
     if (collected === true) {
@@ -148,6 +130,25 @@ const PageChangeTracker = () => {
   };
 
   const title = 'Thanks for using PrimeHub! Anything you want to share?';
+
+  useEffect(() => {
+    updatePageChange();
+  }, [location]);
+
+  useEffect(() => {
+    if (visible && window.enableNPSSurvey) {
+      initSurvey();
+    }
+  }, [visible]);
+
+  if (primehubCE !== true && !window.enableNPSSurvey) {
+    return <></>;
+  }
+
+  if (analytics == null) {
+    return <></>;
+  }
+
   if (visible !== true || event.collected) {
     return <></>;
   }
