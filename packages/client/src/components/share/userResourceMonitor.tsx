@@ -33,13 +33,13 @@ class UserResourceMonitor extends React.Component<Props> {
           <tbody>
             <tr className='light-large-font'>
               <td>
-                {groupContext.quotaCpu || '-'}
+                {groupContext.quotaCpu || '∞'}
               </td>
               <td>
-                {groupContext.quotaMemory || '-'}
+                {groupContext.quotaMemory || '∞'}
               </td>
               <td>
-                {groupContext.quotaGpu || '-'}
+                {groupContext.quotaGpu || '∞'}
               </td>
             </tr>
             <tr>
