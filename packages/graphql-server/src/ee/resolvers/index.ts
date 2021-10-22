@@ -16,7 +16,6 @@ import { resolvers as ceResolvers } from '../../resolvers';
 
 const eeResolvers = {
   Query: {
-    system: system.query,
     buildImage: buildImage.queryOne,
     buildImages: buildImage.query,
     buildImagesConnection: buildImage.connectionQuery,
