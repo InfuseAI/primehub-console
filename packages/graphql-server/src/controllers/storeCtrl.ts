@@ -7,7 +7,7 @@ import * as logger from '../logger';
 import { Stream } from 'stream';
 import getStream from 'get-stream';
 import { last } from 'lodash';
-import Boom = require('boom');
+import Boom from 'boom';
 import { isGroupBelongUser } from '../utils/groupCheck';
 
 export const mountStoreCtrl = (router: Router,
@@ -74,7 +74,7 @@ export const mountStoreCtrl = (router: Router,
   router.get('/files/(.*)', authenticateMiddleware, async ctx => {
     const objectPath = decodeURIComponent(ctx.request.path.split('/groups').pop());
     const path = `groups${objectPath}`;
-    checkPermission(ctx, path);
+    await checkPermission(ctx, path);
     await downloadFile(ctx, path);
   });
 

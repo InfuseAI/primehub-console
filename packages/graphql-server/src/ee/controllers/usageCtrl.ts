@@ -7,7 +7,7 @@ import { Role } from '../../resolvers/interface';
 import * as logger from '../../logger';
 import { kubeConfig } from '../../crdClient/crdClientImpl';
 
-const checkIsAdmin = async (ctx: ParameterizedContext, next: any) => {
+const checkIsAdmin = (ctx: ParameterizedContext, next: any) => {
   if (ctx.role === Role.ADMIN) {
     return next();
   }
@@ -17,7 +17,7 @@ const checkIsAdmin = async (ctx: ParameterizedContext, next: any) => {
 export const mountUsageCtrl = (rootRouter: Router, usageReportAPIHost: string, authenticateMiddleware: Middleware) => {
   const configureUsageReport = (uriPrefix: string) => {
     rootRouter.get(uriPrefix + '/:year/:month', authenticateMiddleware, checkIsAdmin,
-      async ctx => {
+      ctx => {
         const requestOptions: request.Options = {
           method: 'GET',
           uri: usageReportAPIHost + uriPrefix + '/' + ctx.params.year + '/' + ctx.params.month,
