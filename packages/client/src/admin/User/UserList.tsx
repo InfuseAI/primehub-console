@@ -108,7 +108,7 @@ function List(props: Props) {
       title: 'Name',
       width: '20%',
       render: ({firstName, lastName}) => {
-        const result = (`${firstName || ''} ${lastName || ''}`).trim();
+        const result = (`Hi ${firstName || ''} ${lastName || ''}`).trim();
         return <TruncateTableField text={result} />;
       },
     },
