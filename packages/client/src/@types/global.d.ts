@@ -39,5 +39,6 @@ declare global {
     SS_ACCOUNT?: string;
     SS_SURVEY_NAME?: string;
     SparrowLauncher?: any;
+    analytics?: any;
   }
 }

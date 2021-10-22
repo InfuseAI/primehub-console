@@ -1,7 +1,8 @@
 import { useLocation } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { useLocalStorage } from 'hooks/useLocalStorage';
-import { Modal, Button, Icon, notification } from 'antd';
+import { Modal, Button, Icon, notification, Spin } from 'antd';
+import { delay } from 'lodash';
 
 const CommunityList = props => {
   const { userTakeAction } = props;
@@ -39,11 +40,20 @@ const CommunityList = props => {
   );
 };
 
+const waitUntilElementExists = (selector, callback) => {
+  const el = document.querySelector(selector);
+  if (el) {
+    return callback(el);
+  }
+  setTimeout(() => waitUntilElementExists(selector, callback), 500);
+};
+
 const initSurvey = () => {
   (() => {
     window.SS_WIDGET_TOKEN = 'tt-6da14e';
     window.SS_ACCOUNT = 'infuseai.surveysparrow.com';
     window.SS_SURVEY_NAME = 'PrimeHub';
+    const surveyLoading = document.getElementById('survey_loading');
     if (!document.getElementById('ss-widget')) {
       const launcher = () => {
         launcher.update(arguments);
@@ -64,13 +74,40 @@ const initSurvey = () => {
         'infuseai.surveysparrow.com/widget/',
         window.SS_WIDGET_TOKEN,
       ].join('');
+      script.addEventListener('load', () => {
+        waitUntilElementExists('#ss_widget_frame', () => {
+          delay(() => surveyLoading.remove(), 500);
+        });
+      });
       c.parentNode.insertBefore(script, c);
     }
   })();
 };
 
 const NPSSurvey = () => {
-  return <div id='ss_survey_widget'></div>;
+  useEffect(() => {
+    initSurvey();
+  }, []);
+  return (
+    <div style={{ height: '420px', overflow: 'hidden' }}>
+      <div id='ss_survey_widget'>
+        <div
+          id='survey_loading'
+          style={{
+            width: '100%',
+            height: '420px',
+            textAlign: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+          }}
+        >
+          <Spin tip='Loading'></Spin>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const PageChangeTracker = () => {
@@ -134,12 +171,6 @@ const PageChangeTracker = () => {
   useEffect(() => {
     updatePageChange();
   }, [location]);
-
-  useEffect(() => {
-    if (visible && window.enableNPSSurvey) {
-      initSurvey();
-    }
-  }, [visible]);
 
   if (primehubCE !== true && !window.enableNPSSurvey) {
     return <></>;
