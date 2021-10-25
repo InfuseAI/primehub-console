@@ -402,6 +402,10 @@ export const update = async (root, args, context: Context) => {
     id: userId
   });
 
+  if (!user) {
+    throw new ApolloError('user does not exist', 'USER_NOT_EXIST');
+  }
+
   // merge attrs
   const attrs = new Attributes({
     keycloakAttr: user.attributes,
