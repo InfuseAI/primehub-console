@@ -12,7 +12,6 @@ import {
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import { withRouter, useHistory } from 'react-router-dom';
-import queryString from 'querystring';
 import { RouteComponentProps } from 'react-router';
 
 import Breadcrumbs from 'components/share/breadcrumb';
@@ -35,7 +34,7 @@ import {
   stopPhDeploymentMutation,
 } from './deployment.graphql';
 
-const PAGE_SIZE = 12;
+const DEFAULT_PAGE_SIZE = 12;
 const Search = Input.Search;
 
 type QueryVariables = {
@@ -76,7 +75,7 @@ function CommonPageTitle() {
       key: 'list',
       matcher: /\/deployments/,
       title: 'Deployments',
-      link: '/deployments?page=1',
+      link: '/deployments',
       tips: 'Users can deploy and serve models as services here.',
       tipsLink: 'https://docs.primehub.io/docs/model-deployment-feature',
     },
@@ -101,10 +100,10 @@ function DeploymentListContainer({ groups, phDeployments, ...props }: Props) {
     const before = phDeploymentsConnection.pageInfo.startCursor;
 
     refetch({
-      last: PAGE_SIZE,
+      last: DEFAULT_PAGE_SIZE,
       before,
-      first: null,
-      after: null,
+      first: undefined,
+      after: undefined,
     });
   }
 
@@ -113,10 +112,10 @@ function DeploymentListContainer({ groups, phDeployments, ...props }: Props) {
     const after = phDeploymentsConnection.pageInfo.endCursor;
 
     refetch({
-      first: PAGE_SIZE,
+      first: DEFAULT_PAGE_SIZE,
       after,
-      last: null,
-      before: null,
+      last: undefined,
+      before: undefined,
     });
   }
 
@@ -330,22 +329,18 @@ export default compose(
   withRouter,
   withGroupContext,
   graphql(DeploymentsQuery, {
-    options: (props: Props) => {
-      const params = queryString.parse(
-        props.location.search.replace(/^\?/, '')
-      );
-      const { groupContext } = props;
-      const where = JSON.parse((params.where as string) || '{}');
-
-      if (groupContext) {
-        where.groupId_in = [groupContext.id];
-      }
+    options: ({ groupContext, location, ...props }: Props) => {
+      const querystring = new URLSearchParams(location.search);
+      const pageSize = Number(querystring.get('first')) || DEFAULT_PAGE_SIZE;
 
       return {
         variables: {
-          first: PAGE_SIZE,
-          where,
+          first: pageSize,
+          where: {
+            groupId_in: [groupContext.id],
+          },
         },
+        onError: errorHandler,
         fetchPolicy: 'cache-and-network',
       };
     },
