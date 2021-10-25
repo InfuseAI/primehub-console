@@ -296,7 +296,7 @@ function _SystemSetting({ form, data, ...props }: Props) {
                 </Col>
                 <Col sm={5} xs={24}>
                   <div>
-                    <CustomLabel>Utilized Nodes</CustomLabel>
+                    <CustomLabel>Nodes</CustomLabel>
                     <div data-testid='license-maxNode'>
                       {get(license, 'usage.maxNode', 0)}/
                       {Number(license.maxNode) === -1 ? '∞' : license.maxNode}
@@ -305,7 +305,16 @@ function _SystemSetting({ form, data, ...props }: Props) {
                 </Col>
                 <Col sm={5} xs={24}>
                   <div>
-                    <CustomLabel>Deployed Models</CustomLabel>
+                    <CustomLabel>Groups</CustomLabel>
+                    <div data-testid='license-maxGroup'>
+                      {get(license, 'usage.maxGroup', 0)}/
+                      {Number(license.maxGroup) === -1 ? '∞' : license.maxGroup}
+                    </div>
+                  </div>
+                </Col>
+                <Col sm={5} xs={24}>
+                  <div>
+                    <CustomLabel>Deployments</CustomLabel>
                     <div data-testid='license-maxDeploy'>
                       {get(license, 'usage.maxModelDeploy', 0)}/
                       {Number(license.maxModelDeploy) === -1

@@ -127,6 +127,9 @@ describe('SystemSetting', () => {
     expect(await screen.findByTestId('license-maxDeploy')).toHaveTextContent(
       '109/1000'
     );
+    expect(await screen.findByTestId('license-maxGroup')).toHaveTextContent(
+      '68/9999'
+    );
   });
 
   it('[Settings] should render system setting with fetched data', async () => {
