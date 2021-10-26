@@ -161,7 +161,6 @@ export default compose(
         const { history } = props;
         history.push({
           pathname: `../deployments`,
-          search: queryString.stringify({ first: 8 }),
         });
         notification.success({
           duration: 10,
