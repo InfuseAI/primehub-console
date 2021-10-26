@@ -19,6 +19,7 @@ declare global {
     enableLogPersistence?: boolean;
     enableJobArtifact?: boolean;
     enableJobMonitoring?: boolean;
+    enableNPSSurvey?: boolean;
 
     everyoneGroupId?: string;
     primehubVersion: string;
@@ -34,5 +35,10 @@ declare global {
     cmsHost?: string;
     refreshTokenExp?: number;
     accessTokenExp?: number;
+    SS_WIDGET_TOKEN?: string;
+    SS_ACCOUNT?: string;
+    SS_SURVEY_NAME?: string;
+    SparrowLauncher?: any;
+    analytics?: any;
   }
 }

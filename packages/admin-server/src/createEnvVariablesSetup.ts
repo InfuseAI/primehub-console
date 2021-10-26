@@ -38,6 +38,7 @@ const createEnvVariablesSetup = () => (ctx: Context, next: Next) => {
   ctx.state.apiTokenExhangeCode = '';
 
   ctx.state.enableTelemetry = config.enableTelemetry;
+  ctx.state.enableNPSSurvey = config.enableNPSSurvey;
   ctx.state.primehubAnonymousId = md5(config.keycloakClientSecret);
 
   // referrer
