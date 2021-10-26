@@ -112,7 +112,7 @@ export default class ResourceMonitor extends React.Component<Props, State> {
                   <tr>
                     <td>Deployments</td>
                     <td>{groupContext.deploymentsUsage}</td>
-                    <td>{groupContext.maxDeploy}</td>
+                    <td>{groupContext.maxDeploy == null ? '∞' : groupContext.maxDeploy}</td>
                   </tr>
                 </tbody>
               </Table>
