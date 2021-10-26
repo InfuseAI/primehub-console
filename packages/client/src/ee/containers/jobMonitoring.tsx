@@ -91,17 +91,18 @@ class JobMonitoringContainer extends React.Component<Props> {
   }
 
   shouldComponentUpdate = (nextProps, nextState) => {
+    if (!this.props.data || !nextProps.data) {
+      return false;
+    }
     if ((!this.props.data.phJob && nextProps.data.phJob) || (this.props.data.phJob && nextProps.data.phJob && this.state.period === null)) {
       this.state.period = Object.keys(periods)[0];
       return true;
     }
     if (this.state.period !== nextState.period) { return true; }
-    if (nextProps.data.phJob
-      && nextProps.data.phJob.monitoring
-      && nextProps.data.phJob.monitoring.datasets
-      && this.props.data.phJob
-      && this.props.data.phJob.monitoring
-      && this.props.data.phJob.monitoring.datasets) {
+    if (
+      nextProps.data?.phJob?.monitoring?.datasets &&
+      this.props.data?.phJob?.monitoring?.datasets
+    ) {
       const period = this.state.period;
       const thisDatasets = this.props.data.phJob.monitoring.datasets;
       const nextDatasets = nextProps.data.phJob.monitoring.datasets;
