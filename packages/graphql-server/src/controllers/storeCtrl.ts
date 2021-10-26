@@ -7,10 +7,12 @@ import * as logger from '../logger';
 import { Stream } from 'stream';
 import getStream from 'get-stream';
 import { last } from 'lodash';
+import Boom from 'boom';
+import { isGroupBelongUser } from '../utils/groupCheck';
 
 export const mountStoreCtrl = (router: Router,
+                               appPrefix: string,
                                authenticateMiddleware: Middleware,
-                               checkUserGroup: Middleware,
                                minioClient: Client,
                                storeBucket: string) => {
   const downloadFile = async (ctx, path) => {
@@ -55,10 +57,18 @@ export const mountStoreCtrl = (router: Router,
     }
   };
 
-  router.get('/files/(.*)', authenticateMiddleware, checkUserGroup, async ctx => {
-    const objectPath = decodeURIComponent(ctx.request.path.split('/groups').pop());
-    const path = `groups${objectPath}`;
-    await downloadFile(ctx, path);
+  router.get('/files/(.*)', authenticateMiddleware, async ctx => {
+    const objectPath = ctx.params[0];
+    const [first, groupName] = objectPath.split('/');
+    if (first !== 'groups' || !groupName) {
+      throw Boom.forbidden('request not authorized');
+    }
+
+    if (await isGroupBelongUser(ctx, ctx.userId, groupName) === false) {
+      throw Boom.forbidden('request not authorized');
+    }
+
+    await downloadFile(ctx, objectPath);
   });
 
   router.get('/share/:hash', async ctx => {

@@ -1,8 +1,8 @@
-import {createApp} from '../app';
+import {AppEE} from '../app';
 import * as logger from '../../logger';
 const port = process.env.NODE_PORT || 3001;
 
-createApp().then(({app, server, config}) => {
+new AppEE().create().then(({app, server, config}) => {
   app.listen(port, () => {
     if (config.env === 'production') {
       logger.info({
