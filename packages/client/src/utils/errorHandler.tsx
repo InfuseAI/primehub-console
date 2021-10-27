@@ -4,7 +4,7 @@ import { notification } from 'antd';
 export function errorHandler(e) {
   // get the first error
   let errorCode;
-  let message;
+  let message = 'Something wrong... :(';
   let description;
   // from networkError
   if (e.networkError) {

@@ -4,7 +4,7 @@ import { createConfig } from '../../config';
 
 const config = createConfig();
 const LICENSE_ERROR = 'LICENSE_ERROR';
-const LICENSE_QUOTA_EXCEEDED = 'LICENSE_QUOTA_EXCEEDED';
+const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
 
 export const validateLicense = () => {
     const status = config.licenseStatus.toLowerCase();
@@ -30,6 +30,6 @@ export const validateModelDeployQuota = async (context: Context, excludeId = '')
   const deploys = await crdClient.phDeployments.list();
   const deployed = deploys.filter(d => d.spec.stop === false).filter(d => d.metadata.name !== excludeId);
   if (deployed.length >= Math.ceil(1.1 * config.maxModelDeploy)) {
-    throw new ApolloError('Number of running model deployments exceeds license limitation', LICENSE_QUOTA_EXCEEDED);
+    throw new ApolloError('Number of running model deployments exceeds license limitation', EXCEED_QUOTA_ERROR);
   }
 };
