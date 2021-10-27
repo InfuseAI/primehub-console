@@ -123,7 +123,7 @@ export default class ResourceMonitor extends React.Component<Props, State> {
             <Card style={{ overflow: 'auto' }}>
               <h3>Datasets</h3>
               {datasets.length ? (
-                <ul>
+                <ul style={{ marginLeft: '20px' }}>
                   {datasets.map(dataset => (<li>{get(dataset, 'displayName')}</li>))}
                 </ul>
               ) : (
