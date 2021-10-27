@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {Card} from 'antd';
-import {get, unionBy} from 'lodash';
+import { Card } from 'antd';
+import { get, unionBy } from 'lodash';
 import styled from 'styled-components';
 
 interface Props {
@@ -67,10 +67,9 @@ export default class ResourceMonitor extends React.Component<Props, State> {
       const allGroups = get(fetchedResult, 'data.me.groups', []);
       const groups = allGroups
         .filter(group => group.id !== everyoneGroupId)
-        .filter(group => !groupContext || groupContext.id === group.id );
-      const group = groups
-        .find(group => group.id === groupId);
-      this.setState({groupContext: group});
+        .filter(group => !groupContext || groupContext.id === group.id);
+      const group = groups.find(group => group.id === groupId);
+      this.setState({ groupContext: group });
     }
   }
 
@@ -80,69 +79,61 @@ export default class ResourceMonitor extends React.Component<Props, State> {
     if (groupContext) {
       const datasets = unionBy(
         get(groupContext, 'datasets', []),
-        globalDatasets,
+        globalDatasets
       );
       return (
         <>
-            <Card style={{overflow: 'auto', ...style}}>
-              <h3>Group Resource</h3>
-              <Table>
-                <thead>
+          <Card style={{ overflow: 'auto', ...style }}>
+            <h3>Group Resource</h3>
+            <Table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Used</th>
+                  <th>Limit</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>CPU</td>
+                  <td>{groupContext.resourceStatus.cpuUsage}</td>
+                  <td>{groupContext.projectQuotaCpu == null ? '∞' : groupContext.projectQuotaCpu}</td>
+                </tr>
+                <tr>
+                  <td>Memory</td>
+                  <td>{groupContext.resourceStatus.memUsage} GB</td>
+                  <td>{groupContext.projectQuotaMemory == null ? '∞' : `${groupContext.projectQuotaMemory} GB`} </td>
+                </tr>
+                <tr>
+                  <td>GPU</td>
+                  <td>{groupContext.resourceStatus.gpuUsage}</td>
+                  <td>{groupContext.projectQuotaGpu == null ? '∞' : groupContext.projectQuotaGpu}</td>
+                </tr>
+                {showDeployment && (
                   <tr>
-                    <th>Type</th>
-                    <th>Used</th>
-                    <th>Limit</th>
+                    <td>Deployments</td>
+                    <td>{groupContext.deploymentsUsage}</td>
+                    <td>{groupContext.maxDeploy == null ? '∞' : groupContext.maxDeploy}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>CPU</td>
-                    <td>{groupContext.resourceStatus.cpuUsage}</td>
-                    <td>{groupContext.projectQuotaCpu == null ? '∞' : groupContext.projectQuotaCpu}</td>
-                  </tr>
-                  <tr>
-                    <td>Memory</td>
-                    <td>{groupContext.resourceStatus.memUsage} GB</td>
-                    <td>{groupContext.projectQuotaMemory == null ? '∞' : `${groupContext.projectQuotaMemory} GB`} </td>
-                  </tr>
-                  <tr>
-                    <td>GPU</td>
-                    <td>{groupContext.resourceStatus.gpuUsage}</td>
-                    <td>{groupContext.projectQuotaGpu == null ? '∞' : groupContext.projectQuotaGpu}</td>
-                  </tr>
-                  {showDeployment && (
-                    <tr>
-                      <td>Deployments</td>
-                      <td>{groupContext.deploymentsUsage}</td>
-                      <td>{groupContext.maxDeploy == null ? '∞' : groupContext.maxDeploy}</td>
-                    </tr>
-                  )}
-                </tbody>
-              </Table>
-            </Card>
-            {
-              (showDataset) ? (
-                <Card style={{overflow: 'auto'}}>
-                  <h3>Datasets</h3>
-                  {
-                    datasets.length ? (
-                    <ul>
-                      {
-                        datasets.map(dataset =>(<li>{get(dataset, 'displayName')}</li>))
-                      }
-                    </ul>
-                    ) : (
-                      <div> No available dataset </div>
-                    )
-                  }
-                </Card>
+                )}
+              </tbody>
+            </Table>
+          </Card>
+          {showDataset && (
+            <Card style={{ overflow: 'auto' }}>
+              <h3>Datasets</h3>
+              {datasets.length ? (
+                <ul>
+                  {datasets.map(dataset => (<li>{get(dataset, 'displayName')}</li>))}
+                </ul>
               ) : (
-                <></>
-              )
-            }
+                <div> No available dataset </div>
+              )}
+            </Card>
+          )}
         </>
       );
     }
-    return <Card loading={true} style={{overflow: 'auto'}}></Card>
+    return <Card loading={true} style={{ overflow: 'auto' }}></Card>
   }
 }
