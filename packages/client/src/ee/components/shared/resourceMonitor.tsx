@@ -6,6 +6,7 @@ import styled from 'styled-components';
 interface Props {
   groupContext: any;
   refetchGroup: () => void;
+  showDeployment?: boolean;
   showDataset?: boolean;
   globalDatasets?: Array<Record<string, any>>;
   selectedGroup: string;
@@ -74,7 +75,7 @@ export default class ResourceMonitor extends React.Component<Props, State> {
   }
 
   render() {
-    const { showDataset, globalDatasets, style } = this.props;
+    const { showDeployment, showDataset, globalDatasets, style } = this.props;
     const { groupContext } = this.state;
     if (groupContext) {
       const datasets = unionBy(
@@ -109,11 +110,13 @@ export default class ResourceMonitor extends React.Component<Props, State> {
                     <td>{groupContext.resourceStatus.gpuUsage}</td>
                     <td>{groupContext.projectQuotaGpu == null ? '∞' : groupContext.projectQuotaGpu}</td>
                   </tr>
-                  <tr>
-                    <td>Deployments</td>
-                    <td>{groupContext.deploymentsUsage}</td>
-                    <td>{groupContext.maxDeploy == null ? '∞' : groupContext.maxDeploy}</td>
-                  </tr>
+                  {showDeployment && (
+                    <tr>
+                      <td>Deployments</td>
+                      <td>{groupContext.deploymentsUsage}</td>
+                      <td>{groupContext.maxDeploy == null ? '∞' : groupContext.maxDeploy}</td>
+                    </tr>
+                  )}
                 </tbody>
               </Table>
             </Card>

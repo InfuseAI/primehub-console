@@ -662,6 +662,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
               selectedGroup={selectedGroup}
               groupContext={groupContext}
               refetchGroup={refetchGroup}
+              showDeployment={true}
             />
           </Col>
         </Row>
