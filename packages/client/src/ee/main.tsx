@@ -17,6 +17,7 @@ import ListContainer from 'containers/ListContainer';
 import SharedFilesPage from 'containers/sharedFiles/SharedFilesPage';
 import JobDetailContainer from 'ee/containers/jobDetail';
 import JobCreatePage from 'ee/containers/jobCreatePage';
+import JobWithRecurringJob from 'ee/components/JobWithRecurringJob';
 import JobListContainer from 'ee/containers/JobListContainer';
 import ScheduleDetailContainer from 'ee/containers/scheduleDetail';
 import ScheduleCreatePage from 'ee/containers/ScheduleCreatePage';
@@ -105,6 +106,12 @@ class Main extends React.Component {
             </Route>
 
             {/* Job Submission */}
+            <Route path={`${appPrefix}g/:groupName/next-job`} exact>
+              <JobWithRecurringJob tab="job" />
+            </Route>
+            <Route path={`${appPrefix}g/:groupName/next-recurringJob`} exact>
+              <JobWithRecurringJob tab="recurringJob" />
+            </Route>
             <Route path={`${appPrefix}g/:groupName/job`} exact>
               <ListContainer Com={JobListContainer} />
             </Route>
