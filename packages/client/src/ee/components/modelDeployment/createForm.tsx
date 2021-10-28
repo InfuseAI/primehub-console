@@ -486,7 +486,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
               {this.renderDeploymentIdFormItem(id)}
               <Row gutter={16}>
                 <Col span={12}>
-                  <Form.Item label={<span>Model Image <PHTooltip tipText='Model Image is an image integrated a model file into, which can be deployed as a service.' tipLink='https://docs.primehub.io/docs/model-deployment-language-wrapper-intro' placement='right' style={{margintLeft: 8}}/></span>}>
+                  <Form.Item label={<span>Model Image <PHTooltip tipText='Model image is an image with integrated model file into, which can be deployed as a service.' tipLink='https://docs.primehub.io/docs/model-deployment-language-wrapper-intro' placement='right' style={{margintLeft: 8}}/></span>}>
                     {form.getFieldDecorator('modelImage', {
                       rules: [
                         { whitespace: true, required: true, message: 'Please input a model image url!' },
