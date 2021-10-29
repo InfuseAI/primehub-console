@@ -124,6 +124,8 @@ const listQuery = async (kcAdminClient: KcAdminClient, args: any): Promise<{
     hasPreviousPage: boolean,
     startCursor: string | null,
     endCursor: string | null,
+    currentPage?: number | null,
+    totalPage?: number | null
   }
 }> => {
   const specifiedId = get(args, 'where.id');
@@ -135,7 +137,10 @@ const listQuery = async (kcAdminClient: KcAdminClient, args: any): Promise<{
     // default limit to 10
     limit = 10;
   }
-  const page = parseInt(get(args, 'after') || get(args, 'before'), 10);
+  let page = parseInt(get(args, 'after') || get(args, 'before'), 10);
+  if (get(args, 'page') >= 0) {
+    page = get(args, 'page') - 1;
+  }
 
   // if front-end try to fetch users with limit=0
   if (limit === 0) {
@@ -188,6 +193,8 @@ const listQuery = async (kcAdminClient: KcAdminClient, args: any): Promise<{
   }
 
   let users = await kcAdminClient.users.find(kcQuery);
+  const totalUsers = await kcAdminClient.users.count();
+
   // see if we are at first page
   const startCursor = pageNotSpecifiedOrZero ? null : page - 1;
 
@@ -214,6 +221,8 @@ const listQuery = async (kcAdminClient: KcAdminClient, args: any): Promise<{
       hasPreviousPage: startCursor !== null,
       startCursor: isNil(startCursor) ? null : startCursor.toString(),
       endCursor: isNil(endCursor) ? null : endCursor.toString(),
+      currentPage: page + 1,
+      totalPage: Math.ceil(totalUsers / limit)
     }
   };
 };

@@ -3,7 +3,6 @@
 # import Group, GroupOrderByInput, GroupConnection, GroupWhereInput, GroupWhereUniqueInput, GroupCreateInput, GroupUpdateInput from "./group.graphql"
 # import InstanceType, InstanceTypeOrderByInput, InstanceTypeConnection, InstanceTypeWhereInput, InstanceTypeWhereUniqueInput, InstanceTypeCreateInput, InstanceTypeUpdateInput from "./instanceType.graphql"
 # import QueryImageMode, Image, ImageOrderByInput, ImageConnection, GroupImageConnection, ImageWhereInput, ImageWhereUniqueInput, ImageCreateInput, ImageUpdateInput, GroupImageDeleteInput from "./image.graphql"
-# import Announcement, AnnouncementConnection, AnnouncementWhereInput, AnnouncementWhereUniqueInput, AnnouncementCreateInput, AnnouncementUpdateInput from "./announcement.graphql"
 # import Dataset, DatasetOrderByInput, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretOrderByInput, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
 # import StoreFileList, StoreFileWhereInput, StoreFileListOptionInput, StoreFileDeleteOptionInput from "./store.graphql"
@@ -25,6 +24,7 @@ type Query {
     where: UserWhereInput
     before: String
     after: String
+    page: Int
     first: Int
     last: Int
     userOrderBy: UsersOrderBy
@@ -33,6 +33,7 @@ type Query {
     where: UserWhereInput
     before: String
     after: String
+    page: Int
     first: Int
     last: Int
     userOrderBy: UsersOrderBy
@@ -123,23 +124,6 @@ type Query {
     last: Int
   ): GroupImageConnection!
 
-  """Announcement"""
-  announcement(where: AnnouncementWhereUniqueInput!): Announcement
-  announcements(
-    where: AnnouncementWhereInput
-    before: String
-    after: String
-    first: Int
-    last: Int
-  ): [Announcement]!
-  announcementsConnection(
-    where: AnnouncementWhereInput
-    before: String
-    after: String
-    first: Int
-    last: Int
-  ): AnnouncementConnection!
-
   """Dataset"""
   dataset(where: DatasetWhereUniqueInput!): Dataset
   datasets(
@@ -200,6 +184,7 @@ type Query {
     after: String
     first: Int
     last: Int
+    page: Int
     orderBy: PhApplicationOrderBy
   ): [PhApplication]!
   phApplicationsConnection(
@@ -208,6 +193,7 @@ type Query {
     after: String
     first: Int
     last: Int
+    page: Int
     orderBy: PhApplicationOrderBy
   ): PhApplicationsConnection!
 
@@ -218,6 +204,7 @@ type Query {
     after: String
     first: Int
     last: Int
+    page: Int
   ): [PhAppTemplate]!
 
   """Invitation"""
@@ -260,11 +247,6 @@ type Mutation {
   deleteImage(where: ImageWhereUniqueInput!): Image
   rebuildImage(data: ImageSpecUpdateInput!, where: ImageWhereUniqueInput!): Image
   cancelImageBuild(where: ImageWhereUniqueInput!): Image
-
-  """Announcement"""
-  createAnnouncement(data: AnnouncementCreateInput!): Announcement!
-  updateAnnouncement(data: AnnouncementUpdateInput!, where: AnnouncementWhereUniqueInput!): Announcement
-  deleteAnnouncement(where: AnnouncementWhereUniqueInput): Announcement
 
   """Dataset"""
   createDataset(data: DatasetCreateInput!): DatasetMutationResponse!
