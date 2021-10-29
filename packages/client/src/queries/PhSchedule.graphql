@@ -1,0 +1,62 @@
+fragment PhScheduleInfo on PhSchedule {
+  id
+  displayName
+  invalid
+  message
+  command
+  groupId
+  groupName
+  image
+  userId
+  userName
+  nextRunTime
+  activeDeadlineSeconds
+  recurrence {
+    type
+    cron
+  }
+  instanceType {
+    id
+    name
+    displayName
+    cpuLimit
+    memoryLimit
+    gpuLimit
+  }
+}
+
+query PhSchedulesConnection(
+  $where: PhScheduleWhereInput
+  $page: Int
+  $orderBy: PhScheduleOrderByInput
+) {
+  phSchedulesConnection(where: $where, page: $page, orderBy: $orderBy) {
+    edges {
+      cursor
+      node {
+        id
+        ...PhScheduleInfo
+      }
+    }
+    pageInfo {
+      totalPage
+      currentPage
+    }
+  }
+}
+
+mutation RunPhSchedule($where: PhScheduleWhereUniqueInput!) {
+  runPhSchedule(where: $where) {
+    job {
+      id
+      displayName
+    }
+  }
+}
+
+
+mutation DeletePhSchedule($where: PhScheduleWhereUniqueInput!) {
+  deletePhSchedule(where: $where) {
+    id
+  }
+}

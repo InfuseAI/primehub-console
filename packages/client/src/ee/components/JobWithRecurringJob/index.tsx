@@ -1,29 +1,32 @@
 import React, { useContext, useEffect, useReducer } from 'react';
 import get from 'lodash/get';
-import { Link, useHistory } from 'react-router-dom';
-import { Checkbox, Input, Tabs, Modal } from 'antd';
+import { useHistory } from 'react-router-dom';
+import { Checkbox, Input, Tabs, Modal, notification } from 'antd';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import { withRouter, RouteComponentProps } from 'react-router';
 
+import Breadcrumbs from 'components/share/breadcrumb';
+import PageTitle from 'components/pageTitle';
+import PageBody from 'components/pageBody';
+import InfuseButton from 'components/infuseButton';
 import {
   GroupContext,
   GroupContextValue,
   withGroupContext,
 } from 'context/group';
 import { useRoutePrefix } from 'hooks/useRoutePrefix/useRoutePrefix';
-
-import Breadcrumbs from 'components/share/breadcrumb';
-import PageTitle from 'components/pageTitle';
-import PageBody from 'components/pageBody';
-import InfuseButton from 'components/infuseButton';
-import { errorHandler } from 'utils/errorHandler';
-
 import {
   PhJobsConnection,
   rerunPhJob,
   cancelPhJob,
 } from 'queries/PhJob.graphql';
+import {
+  PhSchedulesConnection,
+  RunPhSchedule,
+  DeletePhSchedule,
+} from 'queries/PhSchedule.graphql';
+import { errorHandler } from 'utils/errorHandler';
 
 import {
   Job,
@@ -32,17 +35,27 @@ import {
   JobActionVariables,
   RerunJob,
 } from './JobList';
+import {
+  RecurringJobList,
+  ScheduleConnections,
+  ScheduleActionVariables,
+  RunSchedule,
+} from './RecurringJobList';
+import type { ActionInfo } from './types';
 
 type TabPanelKey = 'job' | 'recurringJob';
 
 interface Props extends RouteComponentProps {
   groupContext: GroupContextValue;
   tab: TabPanelKey;
-  jobs: JobConnections;
+  jobs?: JobConnections;
   rerunPhJob: (variables: JobActionVariables) => Promise<RerunJob>;
   cancelPhJob: (variables: JobActionVariables) => Promise<{ id: string }>;
-  // TODO: types
-  // schedule: any;
+  recurringJobs?: ScheduleConnections;
+  runPhSchedule: (variables: ScheduleActionVariables) => Promise<RunSchedule>;
+  deletePhSchedule: (
+    variables: ScheduleActionVariables
+  ) => Promise<{ id: string }>;
 }
 
 type State = {
@@ -84,7 +97,7 @@ function reducer(state: State, action: Actions) {
   }
 }
 
-function JobWithRecurringJob({ tab, jobs, ...props }: Props) {
+function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
   const [state, dispatch] = useReducer(reducer, {
     tab: 'job',
     keyword: '',
@@ -97,13 +110,7 @@ function JobWithRecurringJob({ tab, jobs, ...props }: Props) {
 
   const routePrefix = `${appPrefix}g/${groupContext.name}`;
 
-  function onRerunJob({
-    id,
-    displayName,
-  }: {
-    id: string;
-    displayName: string;
-  }) {
+  function onRerunJob({ id, displayName }: ActionInfo) {
     Modal.confirm({
       title: 'Rerun Job',
       content: (
@@ -115,19 +122,18 @@ function JobWithRecurringJob({ tab, jobs, ...props }: Props) {
       okText: 'Yes',
       cancelText: 'No',
       maskClosable: true,
-      onOk() {
-        props.rerunPhJob({ variables: { where: { id } } });
+      onOk: async () => {
+        try {
+          await props.rerunPhJob({ variables: { where: { id } } });
+        } catch (err) {
+          console.error(err);
+          errorHandler(err);
+        }
       },
     });
   }
 
-  function onCancelJob({
-    id,
-    displayName,
-  }: {
-    id: string;
-    displayName: string;
-  }) {
+  function onCancelJob({ id, displayName }: ActionInfo) {
     Modal.confirm({
       title: 'Cancel Job',
       content: (
@@ -139,8 +145,13 @@ function JobWithRecurringJob({ tab, jobs, ...props }: Props) {
       okText: 'Yes',
       cancelText: 'No',
       maskClosable: true,
-      onOk() {
-        props.cancelPhJob({ variables: { where: { id } } });
+      onOk: async () => {
+        try {
+          await props.cancelPhJob({ variables: { where: { id } } });
+        } catch (err) {
+          console.error(err);
+          errorHandler(err);
+        }
       },
     });
   }
@@ -162,59 +173,175 @@ function JobWithRecurringJob({ tab, jobs, ...props }: Props) {
     );
   }
 
-  function onSearch() {
-    if (state.tab === 'job') {
-      jobs.refetch({
-        ...jobs.variables,
-        page: 1,
-        where: {
-          ...jobs.variables.where,
-          search: state.keyword,
+  async function onRunRecurringJob({
+    id,
+    displayName,
+  }: ActionInfo): Promise<void> {
+    try {
+      const { data } = await props.runPhSchedule({
+        variables: {
+          where: {
+            id,
+          },
         },
       });
 
-      const nextParams = new URLSearchParams(history.location.search);
-      nextParams.set('keyword', state.keyword);
+      const modal = Modal.success({
+        title: 'Success',
+        maskClosable: true,
+        content: (
+          <div>
+            <b>{displayName}</b> has been submitted! You can
+            <a
+              onClick={() => {
+                props.history.push(`job/${data.runPhSchedule.job.id}`);
+                modal.destroy();
+              }}
+            >
+              {' '}
+              <u>view your job details here.</u>
+            </a>
+          </div>
+        ),
+      });
+    } catch (err) {
+      console.error(err);
+      errorHandler(err);
+    }
+  }
 
-      history.replace({
-        pathname: history.location.pathname,
-        search: nextParams.toString(),
+  function onDeleteRecurringJob({ id, displayName }: ActionInfo) {
+    Modal.confirm({
+      title: 'Delete',
+      content: (
+        <>
+          Are you sure you want to delete <b>{displayName}</b>?
+        </>
+      ),
+      iconType: 'info-circle',
+      okText: 'Yes',
+      cancelText: 'No',
+      maskClosable: true,
+      onOk: async () => {
+        try {
+          await props.deletePhSchedule({
+            variables: {
+              where: {
+                id,
+              },
+            },
+          });
+
+          notification.success({
+            duration: 5,
+            placement: 'bottomRight',
+            message: 'Deleted successfully!',
+            description: (
+              <>
+                Your schedule <b>{displayName}</b> have been deleted.
+              </>
+            ),
+          });
+        } catch (err) {
+          console.error(err);
+          errorHandler(err);
+        }
+      },
+    });
+  }
+
+  function onSearch() {
+    if (state.tab === 'job') {
+      jobs?.refetch({
+        ...jobs?.variables,
+        page: 1,
+        where: {
+          ...jobs?.variables.where,
+          search: state.keyword,
+        },
       });
     }
+
+    if (state.tab === 'recurringJob') {
+      recurringJobs?.refetch({
+        ...recurringJobs?.variables,
+        page: 1,
+        where: {
+          ...recurringJobs?.variables.where,
+          search: state.keyword,
+        },
+      });
+    }
+
+    const nextParams = new URLSearchParams(history.location.search);
+    nextParams.set('keyword', state.keyword);
+
+    history.replace({
+      pathname: history.location.pathname,
+      search: nextParams.toString(),
+    });
   }
 
   function onSearchByMine(value: boolean) {
     if (state.tab === 'job') {
-      jobs.refetch({
-        ...jobs.variables,
+      jobs?.refetch({
+        ...jobs?.variables,
         page: 1,
         where: {
-          ...jobs.variables.where,
+          ...jobs?.variables.where,
           mine: value,
         },
       });
+    }
 
-      const nextParams = new URLSearchParams(history.location.search);
-      nextParams.set('mine', String(value));
-
-      history.replace({
-        pathname: history.location.pathname,
-        search: nextParams.toString(),
+    if (state.tab === 'recurringJob') {
+      recurringJobs?.refetch({
+        ...recurringJobs?.variables,
+        page: 1,
+        where: {
+          ...recurringJobs?.variables.where,
+          mine: value,
+        },
       });
     }
+
+    const nextParams = new URLSearchParams(history.location.search);
+    nextParams.set('mine', String(value));
+
+    history.replace({
+      pathname: history.location.pathname,
+      search: nextParams.toString(),
+    });
   }
 
   // Toggle to different panels by routes changed.
   useEffect(() => {
     dispatch({ type: 'TAB', value: tab });
-  }, [tab]);
+  }, [jobs, tab]);
 
   useEffect(() => {
+    let page;
+    let orderBy;
+    let keyword;
+    let mine;
+
     const searchParams = new URLSearchParams(history.location.search);
-    const page = String(jobs.variables.page) || searchParams.get('page');
-    const orderBy = jobs.variables.orderBy || searchParams.get('orderBy');
-    const keyword = jobs.variables.where.search || searchParams.get('keyword');
-    const mine = String(jobs.variables.where.mine) || searchParams.get('mine');
+
+    if (state.tab === 'job') {
+      page = String(jobs?.variables.page) || searchParams.get('page');
+      orderBy = jobs?.variables.orderBy || searchParams.get('orderBy');
+      keyword = jobs?.variables.where.search || searchParams.get('keyword');
+      mine = String(jobs?.variables.where.mine) || searchParams.get('mine');
+    }
+
+    if (state.tab === 'recurringJob') {
+      page = String(recurringJobs?.variables.page) || searchParams.get('page');
+      orderBy = recurringJobs?.variables.orderBy || searchParams.get('orderBy');
+      keyword =
+        recurringJobs?.variables.where.search || searchParams.get('keyword');
+      mine =
+        String(recurringJobs?.variables.where.mine) || searchParams.get('mine');
+    }
 
     const params: {
       page: string;
@@ -225,7 +352,7 @@ function JobWithRecurringJob({ tab, jobs, ...props }: Props) {
       page,
     };
 
-    if (Object.keys(orderBy).length > 0) {
+    if (orderBy && Object.keys(orderBy).length > 0) {
       params.orderBy = JSON.stringify(orderBy);
     }
 
@@ -241,7 +368,7 @@ function JobWithRecurringJob({ tab, jobs, ...props }: Props) {
       pathname: history.location.pathname,
       search: new URLSearchParams(params).toString(),
     });
-  }, [history, jobs.variables]);
+  }, [history, state.tab, jobs?.variables, recurringJobs?.variables]);
 
   return (
     <>
@@ -283,10 +410,10 @@ function JobWithRecurringJob({ tab, jobs, ...props }: Props) {
           <InfuseButton
             onClick={() => {
               if (state.tab === 'job') {
-                jobs.refetch();
+                jobs?.refetch();
               }
               if (state.tab === 'recurringJob') {
-                // recurringJob.refetch();
+                recurringJobs?.refetch();
               }
             }}
           >
@@ -344,14 +471,18 @@ function JobWithRecurringJob({ tab, jobs, ...props }: Props) {
         >
           <Tabs.TabPane tab='Jobs' key='job'>
             <JobList
-              {...jobs}
+              data={jobs}
               onRerunJob={onRerunJob}
               onCancelJob={onCancelJob}
               onCloneJob={onCloneJob}
             />
           </Tabs.TabPane>
           <Tabs.TabPane tab='Recurring Jobs' key='recurringJob'>
-            <Link to={`${routePrefix}/next-recurringJob`}>recurring Jobs</Link>
+            <RecurringJobList
+              data={recurringJobs}
+              onRunRecurringJob={onRunRecurringJob}
+              onDeleteRecurringJob={onDeleteRecurringJob}
+            />
           </Tabs.TabPane>
         </Tabs>
       </PageBody>
@@ -360,6 +491,7 @@ function JobWithRecurringJob({ tab, jobs, ...props }: Props) {
 }
 
 function getCurrentQueryVariables({
+  tab,
   location,
   groupContext,
   ...props
@@ -384,7 +516,7 @@ function getCurrentQueryVariables({
     return {
       refetchQueries: [
         {
-          query: PhJobsConnection,
+          query: tab === 'job' ? PhJobsConnection : PhSchedulesConnection,
           variables,
         },
       ],
@@ -402,9 +534,17 @@ function getCurrentQueryVariables({
 export default compose(
   withRouter,
   withGroupContext,
+
+  // PhJob
   graphql(PhJobsConnection, {
     name: 'jobs',
     options: getCurrentQueryVariables,
+    skip: (props: Props) => {
+      // skip query when tab is recurring job
+      if (props.tab === 'recurringJob') {
+        return true;
+      }
+    },
   }),
   graphql(rerunPhJob, {
     name: 'rerunPhJob',
@@ -413,6 +553,28 @@ export default compose(
   }),
   graphql(cancelPhJob, {
     name: 'cancelPhJob',
+    options: (props: Props) =>
+      getCurrentQueryVariables({ ...props, mutation: true }),
+  }),
+
+  // PhSchedule
+  graphql(PhSchedulesConnection, {
+    name: 'recurringJobs',
+    options: getCurrentQueryVariables,
+    skip: (props: Props) => {
+      // skip query when tab is job
+      if (props.tab === 'job') {
+        return true;
+      }
+    },
+  }),
+  graphql(RunPhSchedule, {
+    name: 'runPhSchedule',
+    options: (props: Props) =>
+      getCurrentQueryVariables({ ...props, mutation: true }),
+  }),
+  graphql(DeletePhSchedule, {
+    name: 'deletePhSchedule',
     options: (props: Props) =>
       getCurrentQueryVariables({ ...props, mutation: true }),
   })

@@ -4,10 +4,12 @@ import get from 'lodash/get';
 import startCase from 'lodash/startCase';
 import { Link } from 'react-router-dom';
 import { Button, Tooltip, Table, Icon } from 'antd';
-import type { ColumnProps } from 'antd/lib/table';
+import type { ColumnProps, SorterResult } from 'antd/lib/table';
 
 import { TruncateTableField } from 'utils/TruncateTableField';
 import { Phase, getActionByPhase } from 'ee/components/job/phase';
+
+import type { ActionInfo } from './types';
 
 function computeDuration(start: Moment, finish: Moment) {
   if (!start || !finish) {
@@ -127,15 +129,7 @@ export type JobConnections = {
   refetch: (variables?: JobQueryVariables) => Promise<void>;
   loading: boolean;
   error: Error | undefined;
-  onRerunJob: ({ id, displayName }: JobActionInfo) => void;
-  onCancelJob: ({ id, displayName }: JobActionInfo) => void;
-  onCloneJob: (job: Job) => void;
 };
-
-interface JobActionInfo {
-  id: string;
-  displayName: string;
-}
 
 export type JobActionVariables = {
   variables: {
@@ -151,7 +145,14 @@ export type RerunJob = {
   };
 };
 
-export function JobList({ phJobsConnection, ...props }: JobConnections) {
+interface JobListProps {
+  data: JobConnections;
+  onRerunJob: ({ id, displayName }: ActionInfo) => void;
+  onCancelJob: ({ id, displayName }: ActionInfo) => void;
+  onCloneJob: (job: Job) => void;
+}
+
+export function JobList({ data, ...props }: JobListProps) {
   const columns: ColumnProps<JobNode>[] = [
     {
       title: 'Status',
@@ -307,9 +308,13 @@ export function JobList({ phJobsConnection, ...props }: JobConnections) {
     },
   ];
 
-  function handleTableChange(pagination, filters, sorter) {
+  function handleTableChange(
+    pagination: { current: number; total: number; pageSize: number },
+    _,
+    sorter: SorterResult<JobNode>
+  ) {
     const variables: JobQueryVariables = {
-      ...props.variables,
+      ...data.variables,
       page: pagination.current,
     };
 
@@ -323,7 +328,7 @@ export function JobList({ phJobsConnection, ...props }: JobConnections) {
       variables.orderBy = {};
     }
 
-    props.refetch(variables);
+    data.refetch(variables);
   }
 
   return (
@@ -331,11 +336,11 @@ export function JobList({ phJobsConnection, ...props }: JobConnections) {
       rowKey={data => data.node.id}
       columns={columns}
       loading={get(props, 'loading', false)}
-      dataSource={get(phJobsConnection, 'edges', [])}
+      dataSource={get(data, 'phJobsConnection.edges', [])}
       onChange={handleTableChange}
       pagination={{
-        current: get(phJobsConnection, 'pageInfo.currentPage', 1),
-        total: get(phJobsConnection, 'pageInfo.totalPage', 1) * 10,
+        current: get(data, 'phJobsConnection.pageInfo.currentPage', 1),
+        total: get(data, 'phJobsConnection.pageInfo.totalPage', 1) * 10,
       }}
     />
   );

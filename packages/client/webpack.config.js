@@ -91,7 +91,7 @@ function getEntry(env) {
   return entryMap[version];
 }
 
-module.exports = (env) => {
+module.exports = env => {
   const { mode: currentEnv } = env;
   const isDev = currentEnv === 'development';
   const entryPage = getEntry(env);
@@ -133,7 +133,7 @@ module.exports = (env) => {
       minimize: false,
     },
     performance: {
-      hints: false
+      hints: false,
     },
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.graphql'],
@@ -154,6 +154,7 @@ module.exports = (env) => {
         queries: path.resolve(__dirname, 'src/queries'),
         schema: path.resolve(__dirname, 'schema'),
         hooks: path.resolve(__dirname, 'src/hooks'),
+        admin: path.resolve(__dirname, 'src/admin'),
       },
     },
     devServer: {
