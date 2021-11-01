@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo';
 import { Icon, Modal, Table, Tag } from 'antd';
 import { useState } from 'react';
 import { find, isEmpty } from 'lodash';
-import { GetSecrets } from 'queries/Datasets.graphql';
+import { GetSecrets } from 'queries/Volumes.graphql';
 import { TruncateTableField } from 'utils/TruncateTableField';
 
 interface TSecret {

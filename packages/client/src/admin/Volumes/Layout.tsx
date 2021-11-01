@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Breadcrumbs from 'components/share/breadcrumb';
 
-export function DatasetLayout({
+export function VolumeLayout({
   page,
   children,
 }: {
@@ -25,11 +25,11 @@ export function DatasetLayout({
         <Breadcrumbs
           pathList={[
             {
-              key: 'dataset',
-              matcher: /\/dataset/,
-              title: 'Datasets',
-              link: '/dataset',
-              tips: 'Admin can manage datasets and control the access to them.',
+              key: 'volume',
+              matcher: /\/volume/,
+              title: 'Volumes',
+              link: '/volume',
+              tips: 'Admin can manage volumes and control the access to them.',
               tipsLink,
             },
           ]}

@@ -8,7 +8,7 @@ type Props = {
 }
 
 export function MountRoot(props: Props) {
-  const { name, root = '/datasets' } = props;
+  const { name, root = '/volumes' } = props;
   return (
     <>
       <Input

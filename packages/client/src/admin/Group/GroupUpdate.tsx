@@ -58,7 +58,7 @@ function UpdatePage(props: any) {
     'id'
   );
 
-  const datasetsSource = uniqBy(
+  const volumesSource = uniqBy(
     get(everyoneGroup, 'datasets', []).concat(get(group, 'datasets', [])),
     'id'
   );
@@ -153,7 +153,7 @@ function UpdatePage(props: any) {
     },
   ];
 
-  const datasetsColumns = [
+  const volumesColumns = [
     {
       title: 'Display Name',
       dataIndex: 'displayName',
@@ -184,7 +184,7 @@ function UpdatePage(props: any) {
           <Button
             icon={'edit'}
             data-testid='edit-button'
-            onClick={() => history.push(`${appPrefix}admin/dataset/${value}`)}
+            onClick={() => history.push(`${appPrefix}admin/volume/${value}`)}
           ></Button>
         );
       },
@@ -282,12 +282,12 @@ function UpdatePage(props: any) {
           {__ENV__ === 'modelDeploy' ? (
             <></>
           ) : (
-            <TabPane key='datasets' tab='Datasets' data-testid='tabs-dataset'>
-              <Card title={'Datasets'}>
+            <TabPane key='volumes' tab='Volumes' data-testid='tabs-volume'>
+              <Card title={'Volumes'}>
                 <List
                   loading={loading}
-                  columns={datasetsColumns}
-                  dataSource={datasetsSource}
+                  columns={volumesColumns}
+                  dataSource={volumesSource}
                 />
               </Card>
             </TabPane>

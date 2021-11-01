@@ -1,5 +1,5 @@
-query GetDatasets($page: Int, $orderBy: DatasetOrderByInput, $where: DatasetWhereInput) {
-  datasetsConnection(
+query GetVolumes($page: Int, $orderBy: DatasetOrderByInput, $where: DatasetWhereInput) {
+  volumesConnection: datasetsConnection(
     page: $page
     orderBy: $orderBy
     where: $where
@@ -22,8 +22,8 @@ query GetDatasets($page: Int, $orderBy: DatasetOrderByInput, $where: DatasetWher
   }
 }
 
-query DatasetQuery($where: DatasetWhereUniqueInput!) {
-  dataset(where: $where) {
+query VolumeQuery($where: DatasetWhereUniqueInput!) {
+  volume: dataset(where: $where) {
     id
     name
     displayName
@@ -67,8 +67,8 @@ query DatasetQuery($where: DatasetWhereUniqueInput!) {
   }
 }
 
-mutation UpdateDatasetMutation($payload: DatasetUpdateInput!, $where: DatasetWhereUniqueInput!) {
-  updateDataset(data: $payload, where: $where) {
+mutation UpdateVolumeMutation($payload: DatasetUpdateInput!, $where: DatasetWhereUniqueInput!) {
+  updateVolume: updateDataset(data: $payload, where: $where) {
     id
     uploadServerSecret {
       username
@@ -77,14 +77,14 @@ mutation UpdateDatasetMutation($payload: DatasetUpdateInput!, $where: DatasetWhe
   }
 }
 
-mutation CreateDatasetMutation($payload: DatasetCreateInput!) {
-  createDataset(data: $payload) {
+mutation CreateVolumeMutation($payload: DatasetCreateInput!) {
+  createVolume: createDataset(data: $payload) {
     id
   }
 }
 
-mutation DeleteDatasetMutation($where: DatasetWhereUniqueInput!) {
-  deleteDataset(where: $where) {
+mutation DeleteVolumeMutation($where: DatasetWhereUniqueInput!) {
+  deleteVolume: deleteDataset(where: $where) {
     id
   }
 }

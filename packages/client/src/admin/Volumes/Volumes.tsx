@@ -9,13 +9,13 @@ import { TruncateTableField } from 'utils/TruncateTableField';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 import {
-  GetDatasets,
-  CreateDatasetMutation,
-  DeleteDatasetMutation,
-} from 'queries/Datasets.graphql';
-import { DatasetLayout } from './Layout';
-import { DatasetForm } from './DatasetForm';
-import type { TDataset, TDatasetForm } from './types';
+  GetVolumes,
+  CreateVolumeMutation,
+  DeleteVolumeMutation,
+} from 'queries/Volumes.graphql';
+import { VolumeLayout } from './Layout';
+import { VolumeForm } from './VolumeForm';
+import type { TVolume, TVolumeForm } from './types';
 import { errorHandler } from 'utils/errorHandler';
 import InfuseButton from 'components/infuseButton';
 import { FilterRow, FilterPlugins, ButtonCol } from 'cms-toolbar/filter';
@@ -30,33 +30,33 @@ const styles: React.CSSProperties = {
   backgroundColor: '#fff',
 };
 
-type DatasetNode = {
+type VolumeNode = {
   cursor: string;
-  node: Pick<TDataset, 'id' | 'name' | 'displayName'>;
+  node: Pick<TVolume, 'id' | 'name' | 'displayName'>;
 };
 
 interface Props {
-  datasetQuery: {
+  volumeQuery: {
     refetch: (variables?: any) => Promise<void>;
     error: Error | undefined;
     loading: boolean;
     variables: any;
-    datasetsConnection?: {
-      edges: DatasetNode[];
+    volumesConnection?: {
+      edges: VolumeNode[];
       pageInfo: {
         currentPage: number;
         totalPage: number;
       };
     };
   };
-  createDatasetMutation: ({
+  createVolumeMutation: ({
     variables,
   }: {
     variables: {
-      payload: Partial<TDatasetForm>;
+      payload: Partial<TVolumeForm>;
     };
-  }) => Promise<{ data: { createDataset: { id: string } } }>;
-  deleteDatasetMutation: ({
+  }) => Promise<{ data: { createVolume: { id: string } } }>;
+  deleteVolumeMutation: ({
     variables,
   }: {
     variables: {
@@ -67,10 +67,10 @@ interface Props {
   }) => Promise<void>;
 }
 
-function _Datasets({
-  datasetQuery,
-  createDatasetMutation,
-  deleteDatasetMutation,
+function _Volumes({
+  volumeQuery,
+  createVolumeMutation,
+  deleteVolumeMutation,
 }: Props) {
   const { appPrefix } = useRoutePrefix();
   const history = useHistory();
@@ -78,35 +78,35 @@ function _Datasets({
   const querystring = new URLSearchParams(location.search);
 
   useEffect(() => {
-    if (datasetQuery.error) {
-      errorHandler(datasetQuery.error);
+    if (volumeQuery.error) {
+      errorHandler(volumeQuery.error);
     }
-  }, [datasetQuery.error]);
+  }, [volumeQuery.error]);
 
-  if (datasetQuery.error) {
-    if (!datasetQuery?.datasetsConnection) {
-      return <div>Failure to load datasets.</div>;
+  if (volumeQuery.error) {
+    if (!volumeQuery?.volumesConnection) {
+      return <div>Failure to load volumes.</div>;
     }
   }
 
   function handleSearch(searchString) {
     const variables = {
-      ...datasetQuery.variables,
+      ...volumeQuery.variables,
       page: 1,
       where: {
         search: searchString,
       },
     };
-    datasetQuery.refetch(variables);
+    volumeQuery.refetch(variables);
   }
 
   function handleAdd() {
-    history.push(`${appPrefix}admin/dataset?operator=create`);
+    history.push(`${appPrefix}admin/volume?operator=create`);
   }
 
   function handleTableChange(pagination, filters, sorter) {
     const variables = {
-      ...datasetQuery.variables,
+      ...volumeQuery.variables,
       page: pagination.current,
       orderBy: !sorter.columnKey
         ? {}
@@ -114,23 +114,23 @@ function _Datasets({
             [sorter.columnKey]: sorter.order === 'ascend' ? 'asc' : 'desc',
           },
     };
-    datasetQuery.refetch(variables);
+    volumeQuery.refetch(variables);
   }
 
   async function handleSubmit(data) {
     try {
       const {
         data: {
-          createDataset: { id },
+          createVolume: { id },
         },
-      } = await createDatasetMutation({
+      } = await createVolumeMutation({
         variables: {
           payload: data,
         },
       });
-      history.push(`${appPrefix}admin/dataset`);
+      history.push(`${appPrefix}admin/volume`);
 
-      await datasetQuery.refetch();
+      await volumeQuery.refetch();
       notification.success({
         duration: 5,
         placement: 'bottomRight',
@@ -140,7 +140,7 @@ function _Datasets({
             Your changes have been saved. Click{' '}
             <span
               style={{ color: '#365abd', cursor: 'pointer' }}
-              onClick={() => history.push(`${appPrefix}admin/dataset/${id}`)}
+              onClick={() => history.push(`${appPrefix}admin/volume/${id}`)}
             >
               here
             </span>{' '}
@@ -155,21 +155,21 @@ function _Datasets({
 
   if (querystring && querystring.get('operator') === 'create') {
     return (
-      <DatasetLayout page='create'>
+      <VolumeLayout page='create'>
         <div style={styles}>
-          <DatasetForm onSubmit={handleSubmit} />
+          <VolumeForm onSubmit={handleSubmit} />
         </div>
-      </DatasetLayout>
+      </VolumeLayout>
     );
   }
 
-  const { loading, datasetsConnection = {} } = datasetQuery;
+  const { loading, volumesConnection = {} } = volumeQuery;
 
-  const { edges = [], pageInfo = {} } = datasetsConnection;
+  const { edges = [], pageInfo = {} } = volumesConnection;
 
   const { currentPage, totalPage } = pageInfo;
 
-  const columns: Array<ColumnProps<DatasetNode>> = [
+  const columns: Array<ColumnProps<VolumeNode>> = [
     {
       key: 'name',
       title: 'Name',
@@ -200,7 +200,7 @@ function _Datasets({
       dataIndex: 'node.type',
       sorter: true,
       render: text => {
-        const datasetType = {
+        const volumeType = {
           pv: 'Persistent Volume',
           nfs: 'NFS',
           hostPath: 'Host Path',
@@ -208,8 +208,8 @@ function _Datasets({
           env: 'Env',
         };
 
-        if (datasetType[text]) {
-          return datasetType[text];
+        if (volumeType[text]) {
+          return volumeType[text];
         }
 
         return '';
@@ -235,7 +235,7 @@ function _Datasets({
       key: 'actions',
       title: 'Actions',
       width: '100px',
-      render: function RenderActions(dataset: DatasetNode) {
+      render: function RenderActions(volume: VolumeNode) {
         return (
           <Button.Group>
             <Tooltip placement='bottom' title='Edit'>
@@ -243,7 +243,7 @@ function _Datasets({
                 data-testid='edit-button'
                 icon='edit'
                 onClick={() => {
-                  history.push(`${appPrefix}admin/dataset/${dataset.node.id}`);
+                  history.push(`${appPrefix}admin/volume/${volume.node.id}`);
                 }}
               />
             </Tooltip>
@@ -253,24 +253,24 @@ function _Datasets({
                 icon='delete'
                 onClick={() => {
                   Modal.confirm({
-                    title: 'Delete Dataset',
+                    title: 'Delete Volume',
                     maskClosable: true,
                     content: (
                       <>
                         Are you sure to delete{' '}
-                        <strong>{dataset.node.displayName}</strong> dataset?
+                        <strong>{volume.node.displayName}</strong> volume?
                       </>
                     ),
                     okText: 'Yes',
                     onOk: async () => {
-                      await deleteDatasetMutation({
+                      await deleteVolumeMutation({
                         variables: {
                           where: {
-                            id: dataset.node.id,
+                            id: volume.node.id,
                           },
                         },
                       });
-                      await datasetQuery.refetch();
+                      await volumeQuery.refetch();
                     },
                   });
                 }}
@@ -284,8 +284,8 @@ function _Datasets({
 
   return (
     <>
-      <DatasetLayout page='list'>
-        <div data-testid='dataset' style={styles}>
+      <VolumeLayout page='list'>
+        <div data-testid='volume' style={styles}>
           <FilterRow align='bottom' style={{ marginBottom: 16, marginTop: 16 }}>
             <div
               style={{
@@ -309,7 +309,7 @@ function _Datasets({
                 <FilterPlugins style={{ marginRight: '10px' }}>
                   <Search
                     data-testid='text-filter'
-                    placeholder={`Search Dataset`}
+                    placeholder={`Search Volume`}
                     onSearch={handleSearch}
                   />
                 </FilterPlugins>
@@ -329,14 +329,14 @@ function _Datasets({
             dataSource={edges}
           />
         </div>
-      </DatasetLayout>
+      </VolumeLayout>
     </>
   );
 }
 
-export const Datasets = compose(
-  graphql(GetDatasets, {
-    name: 'datasetQuery',
+export const Volumes = compose(
+  graphql(GetVolumes, {
+    name: 'volumeQuery',
     options: () => {
       return {
         fetchPolicy: 'cache-and-network',
@@ -348,10 +348,10 @@ export const Datasets = compose(
       };
     },
   }),
-  graphql(CreateDatasetMutation, {
-    name: 'createDatasetMutation',
+  graphql(CreateVolumeMutation, {
+    name: 'createVolumeMutation',
   }),
-  graphql(DeleteDatasetMutation, {
-    name: 'deleteDatasetMutation',
+  graphql(DeleteVolumeMutation, {
+    name: 'deleteVolumeMutation',
   })
-)(_Datasets);
+)(_Volumes);

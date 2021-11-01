@@ -17,7 +17,7 @@ const VISIBLE_ITEMS = {
   // Control by global or tier variable
   image: false,
   buildImage: false,
-  dataset: false,
+  volume: false,
   jupyterhub: false,
   usageReport: false,
   apps: false,
@@ -73,7 +73,7 @@ export function AdminSidebar() {
         ...prev,
         image: true,
         buildImage: true,
-        dataset: true,
+        volume: true,
         jupyterhub: true,
         usageReport: true,
         apps: true,
@@ -84,7 +84,7 @@ export function AdminSidebar() {
       setVisible(prev => ({
         ...prev,
         image: true,
-        dataset: true,
+        volume: true,
         jupyterhub: true,
         usageReport: true,
         apps: true,

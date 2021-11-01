@@ -92,13 +92,13 @@ const dict = {
     volumeName: 'Volume Name',
     volumeSize: 'Volume Size',
     uploadServerLink: 'Upload Server',
-    'dataset.enableUploadServer': 'Enable Upload Server',
-    'dataset.regenerateSecretModalTitle':
+    'volume.enableUploadServer': 'Enable Upload Server',
+    'volume.regenerateSecretModalTitle':
       'Regenerate secret successfully, please memorize the secret below',
-    'dataset.enableUploadServerModalTitle':
+    'volume.enableUploadServerModalTitle':
       'Enable upload server successfully, please memorize the secret below.',
-    'dataset.regenerateSecretErrorModalTitle': `Sorry.`,
-    'dataset.regenerateSecretErrorModalContent': `Something went wrong, we cloudn't regenerate secret.`,
+    'volume.regenerateSecretErrorModalTitle': `Sorry.`,
+    'volume.regenerateSecretErrorModalContent': `Something went wrong, we cloudn't regenerate secret.`,
     nfsServer: 'NFS Server',
     nfsPath: 'NFS Path',
     hostPath: 'Host Path',

@@ -4,13 +4,13 @@ import { Select, Input, Icon, InputNumber, Form, Row, Col, Switch } from 'antd';
 import { get } from 'lodash';
 import { appPrefix } from 'utils/env';
 
-import { DatasetPvProvisioning, DatasetType, TDataset, TDatasetForm } from './types';
+import { VolumePvProvisioning, VolumeType, TVolume, TVolumeForm } from './types';
 import EnvVariables from './EnvVariables';
 import { FormComponentProps } from 'antd/lib/form/Form';
 import InfuseButton from 'components/infuseButton';
 import EnableUploadServer from './EnableUploadServer';
 import { GitSecret } from './GitSecret';
-import { DatasetGroupsRelationTable } from './DatasetGroupsRelationTable';
+import { VolumeGroupsRelationTable } from './VolumeGroupsRelationTable';
 import { MountRoot } from './MountRoot';
 import styled from 'styled-components';
 import PHTooltip from 'components/share/toolTip';
@@ -22,8 +22,8 @@ const StyledFormItem = styled<any>(Form.Item)`
 `;
 
 interface Props extends FormComponentProps {
-  onSubmit?: (data: Partial<TDatasetForm>) => Promise<void>;
-  initialValue: TDataset;
+  onSubmit?: (data: Partial<TVolumeForm>) => Promise<void>;
+  initialValue: TVolume;
   editMode?: boolean;
 }
 
@@ -36,7 +36,7 @@ const StyledForm = styled(Form)`
   }
 `;
 
-function _DatasetForm(props: Props) {
+function _VolumeForm(props: Props) {
   const { editMode, form } = props;
   const initialValue = {
     description: '',
@@ -47,9 +47,9 @@ function _DatasetForm(props: Props) {
     const { form, onSubmit, editMode } = props;
     e.preventDefault();
 
-    form.validateFields(async (err, values: Partial<TDatasetForm>) => {
+    form.validateFields(async (err, values: Partial<TVolumeForm>) => {
       if (err) return;
-      const data: Partial<TDatasetForm> = {};
+      const data: Partial<TVolumeForm> = {};
 
       data.name = values.name;
       if (form.isFieldTouched('displayName'))
@@ -87,13 +87,13 @@ function _DatasetForm(props: Props) {
     });
   }
 
-  const renderPvDataset = () => {
+  const renderPvVolume = () => {
     const name = form.getFieldValue('name') || initialValue?.name;
     const pvProvisioning = form.getFieldValue('pvProvisioning') || initialValue?.pvProvisioning;
 
     return (
       <>
-        <div data-testid='dataset/pvProvisioning'>
+        <div data-testid='volume/pvProvisioning'>
           <Form.Item label='Provisioning'>
             {form.getFieldDecorator('pvProvisioning', {
               initialValue: initialValue?.pvProvisioning,
@@ -113,15 +113,15 @@ function _DatasetForm(props: Props) {
         </div>
 
         {!editMode ? null : (
-          <div data-testid='dataset/volumeName'>
+          <div data-testid='volume/volumeName'>
             <Form.Item label='Volume Name'>
               <Input disabled value={name} />
             </Form.Item>
           </div>)
         }
 
-        {pvProvisioning !== DatasetPvProvisioning.AUTO ? null : (
-          <div data-testid='dataset/volumeSize'>
+        {pvProvisioning !== VolumePvProvisioning.AUTO ? null : (
+          <div data-testid='volume/volumeSize'>
             <Form.Item label='Volume Size'>
               {form.getFieldDecorator('volumeSize', {
                 initialValue: initialValue?.volumeSize || 1,
@@ -147,10 +147,10 @@ function _DatasetForm(props: Props) {
       </>);
   }
 
-  const renderNfsDataset = () => {
+  const renderNfsVolume = () => {
     return (
       <>
-        <div data-testid='dataset/nfsServer'>
+        <div data-testid='volume/nfsServer'>
           <Form.Item label={`NFS Server`}>
             {form.getFieldDecorator('nfsServer', {
               initialValue: initialValue?.nfsServer,
@@ -170,7 +170,7 @@ function _DatasetForm(props: Props) {
           </Form.Item>
         </div>
 
-        <div data-testid='dataset/nfsPath'>
+        <div data-testid='volume/nfsPath'>
           <Form.Item label={`NFS Path`}>
             {form.getFieldDecorator('nfsPath', {
               initialValue: initialValue?.nfsPath,
@@ -192,10 +192,10 @@ function _DatasetForm(props: Props) {
       </>);
   }
 
-  const renderHostPathDataset = () => {
+  const renderHostPathVolume = () => {
     return (
       <>
-        <div data-testid='dataset/hostPath'>
+        <div data-testid='volume/hostPath'>
           <Form.Item label={`Host Path`}>
             {form.getFieldDecorator('hostPath', {
               initialValue: initialValue?.hostPath,
@@ -219,10 +219,10 @@ function _DatasetForm(props: Props) {
       </>);
   }
 
-  const renderGitDataset = () => {
+  const renderGitVolume = () => {
     return (
       <>
-        <div data-testid='dataset/url'>
+        <div data-testid='volume/url'>
           <Form.Item label={`URL`}>
             {form.getFieldDecorator('url', {
               initialValue: initialValue?.url,
@@ -236,7 +236,7 @@ function _DatasetForm(props: Props) {
           </Form.Item>
         </div>
 
-        <div data-testid='dataset/secret'>
+        <div data-testid='volume/secret'>
           <Form.Item label={`Secret`}>
             {form.getFieldDecorator('secret', {
               initialValue: {},
@@ -246,10 +246,10 @@ function _DatasetForm(props: Props) {
       </>);
   }
 
-  const renderEnvDataset = () => {
+  const renderEnvVolume = () => {
     return (
       <>
-        <div data-testid='dataset/variables'>
+        <div data-testid='volume/variables'>
           <Form.Item label={`Variables`}>
             {form.getFieldDecorator('variables', {
               initialValue: initialValue?.variables || {},
@@ -278,36 +278,36 @@ function _DatasetForm(props: Props) {
   let allowWritable = false;
   let mountRootVisible = false;
   let enableUpdateServerVisible = false;
-  if (type === DatasetType.PV) {
-    typeSepcificItems = renderPvDataset();
+  if (type === VolumeType.PV) {
+    typeSepcificItems = renderPvVolume();
     allowWritable = true;
     mountRootVisible = true;
     enableUpdateServerVisible = true;
-  } else if (type === DatasetType.NFS) {
-    typeSepcificItems = renderNfsDataset();
+  } else if (type === VolumeType.NFS) {
+    typeSepcificItems = renderNfsVolume();
     allowWritable = true;
     mountRootVisible = true;
     enableUpdateServerVisible = true;
-  } else if (type === DatasetType.HOSTPATH) {
-    typeSepcificItems = renderHostPathDataset();
+  } else if (type === VolumeType.HOSTPATH) {
+    typeSepcificItems = renderHostPathVolume();
     allowWritable = true;
     mountRootVisible = true;
     enableUpdateServerVisible = true;
-  } else if (type === DatasetType.GIT) {
-    typeSepcificItems = renderGitDataset();
-  } else if (type === DatasetType.ENV) {
-    typeSepcificItems = renderEnvDataset();
+  } else if (type === VolumeType.GIT) {
+    typeSepcificItems = renderGitVolume();
+  } else if (type === VolumeType.ENV) {
+    typeSepcificItems = renderEnvVolume();
   }
 
   return (
-    <div data-testid='dataset'>
+    <div data-testid='volume'>
       <InfuseButton>
-        <Link to={`${appPrefix}admin/dataset`}><Icon type='arrow-left' /> Back</Link>
+        <Link to={`${appPrefix}admin/volume`}><Icon type='arrow-left' /> Back</Link>
       </InfuseButton>
       <StyledForm onSubmit={handleSubmit}>
         <Row>
           <Col>
-            <div data-testid='dataset/name'>
+            <div data-testid='volume/name'>
               <Form.Item label='Name'>
                 {form.getFieldDecorator('name', {
                   initialValue: initialValue?.name,
@@ -318,28 +318,28 @@ function _DatasetForm(props: Props) {
                       message: `lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.`,
                     }
                   ],
-                })(<Input data-testid='dataset/input-name' disabled={editMode} />)}
+                })(<Input data-testid='volume/input-name' disabled={editMode} />)}
               </Form.Item>
             </div>
 
-            <div data-testid='dataset/displayName'>
+            <div data-testid='volume/displayName'>
               <Form.Item label={`Display Name`}>
                 {form.getFieldDecorator('displayName', {
                   initialValue: initialValue?.displayName,
-                })(<Input data-testid='dataset/input-displayName' />)}
+                })(<Input data-testid='volume/input-displayName' />)}
               </Form.Item>
             </div>
 
-            <div data-testid='dataset/description'>
+            <div data-testid='volume/description'>
               <Form.Item label='Description'>
                 {form.getFieldDecorator('description', {
                   initialValue: initialValue?.description,
-                })(<Input data-testid='dataset/input-description' />)}
+                })(<Input data-testid='volume/input-description' />)}
               </Form.Item>
             </div>
 
             { editMode && mountRootVisible &&
-              <div data-testid='dataset/mountRoot'>
+              <div data-testid='volume/mountRoot'>
                 <Form.Item label='Mount Root'>
                   <MountRoot name={name} />
                 </Form.Item>
@@ -351,8 +351,8 @@ function _DatasetForm(props: Props) {
                 <span>
                   Global{' '}
                   <PHTooltip
-                    tipText='When Global, everyone can access this Dataset.'
-                    tipLink='https://docs.primehub.io/docs/guide_manual/admin-dataset#groups-access-control'
+                    tipText='When Global, everyone can access this Volume.'
+                    tipLink='https://docs.primehub.io/docs/guide_manual/admin-volume#groups-access-control'
                     placement='right'
                   />
                 </span>
@@ -361,10 +361,10 @@ function _DatasetForm(props: Props) {
               {form.getFieldDecorator('global', {
                 valuePropName: 'checked',
                 initialValue: get(initialValue, 'global', true),
-              })(<Switch unCheckedChildren='No' data-testid='dataset/global' />)}
+              })(<Switch unCheckedChildren='No' data-testid='volume/global' />)}
             </StyledFormItem>
 
-            <div data-testid='dataset/displayName'>
+            <div data-testid='volume/displayName'>
               <Form.Item label='Type'>
                 {form.getFieldDecorator('type', {
                   initialValue: initialValue?.type,
@@ -388,7 +388,7 @@ function _DatasetForm(props: Props) {
             {typeSepcificItems}
 
             {editMode && enableUpdateServerVisible &&
-              <div data-testid='dataset/enableUploadServer'>
+              <div data-testid='volume/enableUploadServer'>
                 <Form.Item label='Enable Upload Server'>
                   {form.getFieldDecorator('enableUploadServer', {
                     initialValue: initialValue?.enableUploadServer || false,
@@ -399,11 +399,11 @@ function _DatasetForm(props: Props) {
               </div>
             }
 
-            <div data-testid='dataset/groups'>
+            <div data-testid='volume/groups'>
               {form.getFieldDecorator('groups', {
                 initialValue: {},
               })(
-                <DatasetGroupsRelationTable
+                <VolumeGroupsRelationTable
                   groups={initialValue?.groups}
                   allowWritable={allowWritable}
                   allowReadOnly={!form.getFieldValue('global')}
@@ -421,7 +421,7 @@ function _DatasetForm(props: Props) {
                 Confirm
               </InfuseButton>
               <InfuseButton data-testid='reset-button'>
-              <Link to={`${appPrefix}admin/dataset`}>Cancel</Link>
+              <Link to={`${appPrefix}admin/volume`}>Cancel</Link>
               </InfuseButton>
             </Form.Item>
           </Col>
@@ -431,4 +431,4 @@ function _DatasetForm(props: Props) {
   );
 }
 
-export const DatasetForm =  Form.create<Props>()(_DatasetForm);
+export const VolumeForm =  Form.create<Props>()(_VolumeForm);

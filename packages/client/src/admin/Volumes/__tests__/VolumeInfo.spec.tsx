@@ -1,20 +1,19 @@
 import * as React from 'react';
-import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route } from 'react-router-dom';
 import { MockedProvider } from 'react-apollo/test-utils';
 
 import { render, screen, waitFor } from 'test/test-utils';
 
-import { DatasetInfo } from '../DatasetInfo';
-import { DatasetQuery } from 'queries/Datasets.graphql';
+import { VolumeInfo } from '../VolumeInfo';
+import { VolumeQuery } from 'queries/Volumes.graphql';
 import { IntlProvider } from 'react-intl';
 
 function setup() {
   function TestProvider({ children }: { children: React.ReactNode }) {
     return (
       <IntlProvider locale='en'>
-        <MemoryRouter initialEntries={['/admin/dataset/dataset-test']}>
-          <Route path='/admin/dataset/:id'>{children}</Route>
+        <MemoryRouter initialEntries={['/admin/volume/volume-test']}>
+          <Route path='/admin/volume/:id'>{children}</Route>
         </MemoryRouter>
       </IntlProvider>
     );
@@ -25,67 +24,67 @@ function setup() {
   };
 }
 
-function makeMockRequest(dataset) {
+function makeMockRequest(volume) {
   return [
     {
       request: {
-        query: DatasetQuery,
+        query: VolumeQuery,
         variables: {
           where: {
-            id: 'dataset-test',
+            id: 'volume-test',
           },
         },
       },
       result: {
         data: {
-          dataset,
+          volume: volume,
         },
       },
     },
   ];
 }
 
-describe('DatasetInfo', () => {
-  it('should render dataset with error message', async () => {
+describe('VolumeInfo', () => {
+  it('should render volume with error message', async () => {
     const { TestProvider } = setup();
 
     render(
       <TestProvider>
         <MockedProvider mocks={[]}>
-          <DatasetInfo />
+          <VolumeInfo />
         </MockedProvider>
       </TestProvider>
     );
 
     expect(
-      await screen.findByText('Failure to load datasets.')
+      await screen.findByText('Failure to load volumes.')
     ).toBeInTheDocument();
   });
 
-  it('should render dataset information', async () => {
+  it('should render volume information', async () => {
     const { TestProvider } = setup();
-    const dataset = {
-      id: 'dataset-test',
+    const volume = {
+      id: 'volume-test',
       name: 'name',
       displayName: 'displayName',
       description: 'description',
       type: 'env',
     };
-    const mockRequests = makeMockRequest(dataset);
+    const mockRequests = makeMockRequest(volume);
 
     render(
       <TestProvider>
         <MockedProvider mocks={mockRequests}>
-          <DatasetInfo fetchPolicy='no-cache' />
+          <VolumeInfo fetchPolicy='no-cache' />
         </MockedProvider>
       </TestProvider>
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('dataset'));
-      expect(screen.getByTestId('dataset/input-name')).toHaveValue(dataset.name);
-      expect(screen.getByTestId('dataset/input-displayName')).toHaveDisplayValue(dataset.displayName);
-      expect(screen.getByTestId('dataset/input-description')).toHaveDisplayValue(dataset.description);
+      expect(screen.getByTestId('volume'));
+      expect(screen.getByTestId('volume/input-name')).toHaveValue(volume.name);
+      expect(screen.getByTestId('volume/input-displayName')).toHaveDisplayValue(volume.displayName);
+      expect(screen.getByTestId('volume/input-description')).toHaveDisplayValue(volume.description);
     });
   });
 });

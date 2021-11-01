@@ -18,7 +18,7 @@ export function SecretLayout({ children }: { children: React.ReactNode }) {
               matcher: /\/secret/,
               title: 'Secrets',
               link: '/secret',
-              tips: 'Secrets are credentials of authorizations to certain images anddatasets. Admin can find and manage secrets here.',
+              tips: 'Secrets are credentials of authorizations to certain images and volumes. Admin can find and manage secrets here.',
               tipsLink:
                 'https://docs.primehub.io/docs/guide_manual/admin-secret',
             },
