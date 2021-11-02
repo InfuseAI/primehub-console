@@ -6,6 +6,7 @@
 # import Dataset, DatasetOrderByInput, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretOrderByInput, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
 # import StoreFileList, StoreFileWhereInput, StoreFileListOptionInput, StoreFileDeleteOptionInput from "./store.graphql"
+# import DatasetV2 from "./datasetV2.graphql"
 # import PhApplication, PhApplicationWhereInput, PhApplicationWhereUniqueInput, PhApplicationCreateInput, PhApplicationUpdateInput, PhApplicationOrderBy from "./phApplication.graphql"
 # import PhAppTemplate, PhAppTemplateWhereInput, PhAppTemplateWhereUniqueInput from "./phAppTemplate.graphql"
 # import NotebookNotifyEventInput from "./notebook.graphql"
@@ -176,6 +177,17 @@ type Query {
     where: SharedFileWhereUniqueInput!
   ): SharedFile!
 
+  """DatasetV2"""
+  datasetV2(where: DatasetV2WhereUniqueInput!): DatasetV2!
+  datasetV2Connection(
+    where: DatasetV2WhereInput
+    page: Int
+  ): DatasetV2Connection!
+  datasetV2Files(
+    where: DatasetV2FileWhereInput!
+    options: DatasetV2FileListOptionInput
+  ): StoreFileList!
+
   """PhApplication"""
   phApplication(where: PhApplicationWhereUniqueInput!): PhApplication
   phApplications(
@@ -258,6 +270,11 @@ type Mutation {
   deleteFiles(where: StoreFileWhereInput!, options: StoreFileDeleteOptionInput): Int
   shareFile(where: SharedFileWhereUniqueInput!): SharedFile!
   unshareFile(where: SharedFileWhereUniqueInput!): SharedFile
+
+  """DatasetV2"""
+  createDatasetV2(data: DatasetV2CreateInput!): DatasetV2!
+  updateDatasetV2(data: DatasetV2UpdateInput!, where: DatasetV2WhereUniqueInput!): DatasetV2
+  deleteDatasetV2(where: DatasetV2WhereUniqueInput!): DatasetV2
 
   """PhApplication"""
   createPhApplication(data: PhApplicationCreateInput!): PhApplication!

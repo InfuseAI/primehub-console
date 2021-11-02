@@ -51,7 +51,7 @@ const listQuery = async (context: Context, prefix: string, limit: number, recurs
   return listObjects;
 };
 
-const generatePrefixForQuery = (groupName: string, phfsPrefix: string, recursive: boolean) => {
+export const generatePrefixForQuery = (groupName: string, phfsPrefix: string, recursive: boolean) => {
   if (!phfsPrefix.startsWith('/')) {
     phfsPrefix = '/'  + phfsPrefix;
   }

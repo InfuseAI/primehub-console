@@ -1,0 +1,57 @@
+# import PageInfo from "common.graphql"
+
+type DatasetV2 {
+  name: String!
+  createdBy: String
+  createdAt: String
+  updatedAt: String
+  tags: JSON
+}
+
+"""An edge in a connection."""
+type DatasetV2Edge {
+  """The item at the end of the edge."""
+  node: DatasetV2!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+type DatasetV2Connection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [DatasetV2Edge]!
+}
+
+input DatasetV2CreateInput {
+  name: String!
+  tags: JSON
+}
+
+input DatasetV2UpdateInput {
+  tags: JSON
+}
+
+input DatasetV2WhereInput {
+  groupName: String!
+  prefix: String!
+}
+
+input DatasetV2WhereUniqueInput {
+  name: String!
+  groupName: String!
+  prefix: String!
+}
+
+input DatasetV2FileWhereInput {
+  name: String!
+  groupName: String!
+  prefix: String!
+}
+
+input DatasetV2FileListOptionInput {
+  limit: Int
+  recursive: Boolean
+}
