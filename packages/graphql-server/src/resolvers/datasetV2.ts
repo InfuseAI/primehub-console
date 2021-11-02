@@ -3,12 +3,10 @@ import { ApolloError } from 'apollo-server';
 import { Context } from './interface';
 import * as logger from '../logger';
 import { toRelay, extractPagination } from './utils';
-import { toGroupPath, isGroupBelongUser } from '../utils/groupCheck';
+import { isGroupBelongUser } from '../utils/groupCheck';
 import { generatePrefixForQuery } from './store';
 
 import { ErrorCodes } from '../errorCodes';
-import { createHash } from 'crypto';
-import { Readable, Stream } from 'stream';
 const {NOT_AUTH_ERROR, INTERNAL_ERROR, RESOURCE_NOT_FOUND} = ErrorCodes;
 
 const DATASET_FOLDER = 'datasets';
