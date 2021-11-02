@@ -49,7 +49,6 @@
     "@koa/cors": "^2.2.1",
     "@kubernetes/client-node": "^0.14.3",
     "@types/lru-cache": "^5.1.0",
-    "@types/minio": "7.0.11",
     "abort-controller": "^3.0.0",
     "agentkeepalive": "^3.5.1",
     "analytics-node": "^3.4.0-beta.3",
