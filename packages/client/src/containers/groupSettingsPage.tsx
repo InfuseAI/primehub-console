@@ -58,11 +58,11 @@ class GroupSettingsPage extends React.Component<Props> {
         <PageBody style={{ flex: '1 1 0%' }}>
           <Tabs style={{ height: '100%' }}>
             <Tabs.TabPane key='info' tab='Information'>
-              <GroupSettingsAlert groupId={group.id}/>
+              <GroupSettingsAlert groupId={group.id} />
               <GroupSettingsInfo group={group} />
             </Tabs.TabPane>
             <Tabs.TabPane key='members' tab='Members'>
-              <GroupSettingsAlert groupId={group.id}/>
+              <GroupSettingsAlert groupId={group.id} />
               <GroupSettingsMembers group={group} />
             </Tabs.TabPane>
             {extraTabs && extraTabs.length
