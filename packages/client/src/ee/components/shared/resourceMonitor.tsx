@@ -127,7 +127,7 @@ export default class ResourceMonitor extends React.Component<Props, State> {
                   {datasets.map(dataset => (<li>{get(dataset, 'displayName')}</li>))}
                 </ul>
               ) : (
-                <div> No available dataset </div>
+                <div> No available volume </div>
               )}
             </Card>
           )}
