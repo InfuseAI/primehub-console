@@ -18,6 +18,7 @@ class GroupSettingsMembers extends React.Component<Props> {
     const admins = get(group, 'admins', []).split(',');
     const users = get(group, 'users', []).map(user => {
       return {
+        id: user.id,
         username: user.username,
         admin: admins.includes(user.username),
       };
@@ -41,7 +42,12 @@ class GroupSettingsMembers extends React.Component<Props> {
     ];
 
     return (
-      <Table dataSource={users} columns={columns} style={{ marginTop: 15 }} />
+      <Table
+        dataSource={users}
+        rowKey='id'
+        columns={columns}
+        style={{ marginTop: 15 }}
+      />
     );
   }
 }
