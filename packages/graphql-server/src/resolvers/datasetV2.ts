@@ -12,12 +12,13 @@ const {NOT_AUTH_ERROR, INTERNAL_ERROR, RESOURCE_NOT_FOUND} = ErrorCodes;
 const DATASET_FOLDER = 'datasets';
 const DATASET_METADATA = '.dataset';
 
-interface DatasetV2 {
+interface DatasetV2Metadata {
   name: string;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
   tags: any;
+  size: number;
 }
 
 const checkPermission = async (context: Context, groupName: string) => {
@@ -33,16 +34,16 @@ const getDatasetPrefix = (groupName: string, prefix: string) => {
   return `${modifiedPrefixes.fullPrefix}${DATASET_FOLDER}/`;
 };
 
-const getMetadata = async (name: string, groupName: string, prefix: string, context: Context) => {
+const getMetadata = async (id: string, groupName: string, prefix: string, context: Context) => {
   const {minioClient, storeBucket} = context;
 
-  const objectName = `${getDatasetPrefix(groupName, prefix)}${name}/${DATASET_METADATA}`;
+  const objectName = `${getDatasetPrefix(groupName, prefix)}${id}/${DATASET_METADATA}`;
   try {
     await minioClient.statObject(storeBucket, objectName);
   } catch (err) {
     throw new ApolloError('failed to get dataset', RESOURCE_NOT_FOUND, err);
   }
-  const object = new Promise<DatasetV2>((resolve, reject) => {
+  const object = new Promise<DatasetV2Metadata>((resolve, reject) => {
     const arr = [];
     minioClient.getObject(storeBucket, objectName, (err, stream) => {
       if (err) {
@@ -81,7 +82,8 @@ const listDatasets = async (objectPrefix: string, context: Context) => {
     const arr = [];
     const stream = minioClient.listObjectsV2(storeBucket, objectPrefix);
     stream.on('data', obj => {
-      arr.push(obj);
+      const id = obj.prefix.replace(objectPrefix, '').slice(0, -1);
+      arr.push({ id, ...obj });
     });
     stream.on('error', err => {
       reject(err);
@@ -95,21 +97,26 @@ const listDatasets = async (objectPrefix: string, context: Context) => {
 };
 
 export const query = async (root, args, context: Context) => {
-  const {name, groupName, prefix} = args.where;
-  return getMetadata(name, groupName, prefix, context);
+  const {id, groupName, prefix} = args.where;
+  await checkPermission(context, groupName);
+
+  const metadata = await getMetadata(id, groupName, prefix, context);
+  return { id, ...metadata };
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
-  const {groupName, prefix} = args.where;
+  const {groupName, prefix, search} = args.where;
+  await checkPermission(context, groupName);
 
   const objectPrefix = getDatasetPrefix(groupName, prefix);
-  const list = await listDatasets(objectPrefix, context);
+  let list = await listDatasets(objectPrefix, context);
+  if (search) {
+    list = list.filter(obj => obj.id.includes(search));
+  }
   const datasets = await Promise.all(list.map(async obj => {
-    const name = obj.prefix.replace(objectPrefix, '').slice(0, -1);
-    const metadata = await getMetadata(name, groupName, prefix, context);
+    const metadata = await getMetadata(obj.id, groupName, prefix, context);
     return {
-      // for cursor
-      id: name,
+      id: obj.id,
       ...metadata,
     };
   }));
