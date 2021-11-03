@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, RouteProps } from 'react-router-dom';
 import { SystemSetting } from '../SystemSetting';
 import { UserList, UserDetail, UserAdd } from '../User';
-import { Datasets, DatasetInfo } from '../Datasets';
+import { Volumes, VolumeInfo } from '../Volumes';
 import GroupList from '../Group/GroupList';
 import GroupAdd from '../Group/GroupAdd';
 import GroupUpdate from '../Group/GroupUpdate';
@@ -20,7 +20,7 @@ export const ROUTES = [
   'instanceType',
   'image',
   'buildImage',
-  'dataset',
+  'volume',
   'secret',
   'jupyterhub',
   'usageReport',
@@ -123,19 +123,19 @@ export const routes = [
     component: ImageInfo,
   },
   {
-    key: 'dataset',
-    path: 'admin/dataset',
+    key: 'volume',
+    path: 'admin/volume',
     enabled: true,
-    name: 'Datasets',
+    name: 'Volumes',
     exact: true,
-    component: Datasets,
+    component: Volumes,
   },
   {
-    key: 'dataset-id',
-    path: 'admin/dataset/:id',
+    key: 'volume-id',
+    path: 'admin/volume/:id',
     enabled: true,
-    name: 'Datasets',
-    component: DatasetInfo,
+    name: 'Volumes',
+    component: VolumeInfo,
   },
   {
     key: 'secret',

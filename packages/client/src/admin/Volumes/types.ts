@@ -1,4 +1,4 @@
-export enum DatasetType {
+export enum VolumeType {
   PV = 'pv',
   HOSTPATH = 'hostPath',
   NFS = 'nfs',
@@ -6,17 +6,17 @@ export enum DatasetType {
   ENV = 'env',
 }
 
-export enum DatasetPvProvisioning {
+export enum VolumePvProvisioning {
   AUTO = 'auto',
   MANUAL = 'manual',
 }
 
-type _DatasetBase = {
+type _VolumeBase = {
   id: string;
   name: string;
   displayName: string;
   description: string;
-  type: DatasetType;
+  type: VolumeType;
 
   // Persistence Volume
   pvProvisioning: boolean;
@@ -42,26 +42,26 @@ type _DatasetBase = {
   global: boolean;
 };
 
-// Dataset query response
-export type TDatasetGroups = {
+// Volume query response
+export type TVolumeGroups = {
   id: string;
   name: string;
   displayName: string;
   writable: boolean;
 }[];
 
-export type TDataset = _DatasetBase & {
+export type TVolume = _VolumeBase & {
   // GitSync
   secret: {
     id: string;
   };
 
   // Group Association
-  groups: TDatasetGroups;
+  groups: TVolumeGroups;
 }
 
 // Used for query
-export type TDatasetOrderByInput = {
+export type TVolumeOrderByInput = {
   name: string;
   displayName: string;
   type: string;
@@ -69,21 +69,21 @@ export type TDatasetOrderByInput = {
   uploadServerLink: string;
 };
 
-export type TDatasetWhereInput = {
+export type TVolumeWhereInput = {
   id: string;
   name_contains: string;
   displayName_contains: string;
 };
 
 // Mutation
-export type TDatasetFormSecret = {
+export type TVolumeFormSecret = {
   connect: {
     id: string;
   };
   disconnect: boolean;
 }
 
-export type TDatasetFormGroups = {
+export type TVolumeFormGroups = {
   connect: {
     id: string;
     writable: string;
@@ -93,12 +93,12 @@ export type TDatasetFormGroups = {
   }[];
 }
 
-export type TDatasetForm = _DatasetBase & {
-  secret: TDatasetFormSecret;
-  groups: TDatasetFormGroups;
+export type TVolumeForm = _VolumeBase & {
+  secret: TVolumeFormSecret;
+  groups: TVolumeFormGroups;
 };
 
-export type DatasetMutationResponse = {
+export type VolumeMutationResponse = {
   id: string;
   uploadServerSecret: {
     username: string;

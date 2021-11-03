@@ -4,7 +4,7 @@ import { Mutation } from 'react-apollo';
 import { injectIntl } from 'react-intl';
 import { get, isPlainObject } from 'lodash';
 import uploadServerSecretModal from './UploadServerSecretModal';
-import { RegenerateUploadServerSecretMutation } from 'queries/Datasets.graphql';
+import { RegenerateUploadServerSecretMutation } from 'queries/Volumes.graphql';
 
 interface Props {
   intl?: any;
@@ -67,17 +67,17 @@ export default class EnableUploadServer extends React.Component<Props, State> {
             if (isPlainObject(secret) && secret.username && secret.password) {
               uploadServerSecretModal({
                 title: intl.formatMessage({
-                  id: 'dataset.regenerateSecretModalTitle',
+                  id: 'volume.regenerateSecretModalTitle',
                 }),
                 secret,
               });
             } else {
               Modal.error({
                 title: intl.formatMessage({
-                  id: 'dataset.regenerateSecretErrorModalTitle',
+                  id: 'volume.regenerateSecretErrorModalTitle',
                 }),
                 content: intl.formatMessage({
-                  id: 'dataset.regenerateSecretErrorModalContent',
+                  id: 'volume.regenerateSecretErrorModalContent',
                 }),
                 maskClosable: true,
               });
@@ -86,10 +86,10 @@ export default class EnableUploadServer extends React.Component<Props, State> {
           onError={() => {
             Modal.error({
               title: intl.formatMessage({
-                id: 'dataset.regenerateSecretErrorModalTitle',
+                id: 'volume.regenerateSecretErrorModalTitle',
               }),
               content: intl.formatMessage({
-                id: 'dataset.regenerateSecretErrorModalContent',
+                id: 'volume.regenerateSecretErrorModalContent',
               }),
               maskClosable: true,
             });

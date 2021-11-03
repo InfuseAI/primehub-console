@@ -6,15 +6,15 @@ import { difference } from 'lodash';
 import RelationPicker from '../share/RelationPicker';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { TDatasetFormGroups, TDatasetGroups } from './types';
+import { TVolumeFormGroups, TVolumeGroups } from './types';
 import { Link } from 'react-router-dom';
 import { TruncateTableField } from 'utils/TruncateTableField';
-import { GetGroups } from 'queries/Datasets.graphql';
+import { GetGroups } from 'queries/Volumes.graphql';
 
 interface Props {
-  groups: TDatasetGroups;
-  value: TDatasetFormGroups;
-  onChange: (TDatasetFormGroups) => void;
+  groups: TVolumeGroups;
+  value: TVolumeFormGroups;
+  onChange: (TVolumeFormGroups) => void;
   allowReadOnly?: boolean;
   allowWritable?: boolean;
   groupsQuery: {
@@ -25,7 +25,7 @@ interface Props {
   };
 }
 
-function _DatasetGroupsRelationTable(props: Props) {
+function _VolumeGroupsRelationTable(props: Props) {
   const {
     groups = [],
     allowWritable = false,
@@ -203,7 +203,7 @@ function _DatasetGroupsRelationTable(props: Props) {
   );
 }
 
-export const DatasetGroupsRelationTable = compose(
+export const VolumeGroupsRelationTable = compose(
   graphql(GetGroups, {
     name: 'groupsQuery',
     options: () => {
@@ -212,4 +212,4 @@ export const DatasetGroupsRelationTable = compose(
       };
     },
   })
-)(_DatasetGroupsRelationTable);
+)(_VolumeGroupsRelationTable);

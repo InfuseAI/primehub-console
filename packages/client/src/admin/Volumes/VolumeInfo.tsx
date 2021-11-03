@@ -7,10 +7,10 @@ import { graphql } from 'react-apollo';
 
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
-import { DatasetLayout } from './Layout';
-import { DatasetForm, initialFormState } from './DatasetForm';
-import { DatasetQuery, UpdateDatasetMutation } from 'queries/Datasets.graphql';
-import type { TDataset } from './types';
+import { VolumeLayout } from './Layout';
+import { VolumeForm, initialFormState } from './VolumeForm';
+import { VolumeQuery, UpdateVolumeMutation } from 'queries/Volumes.graphql';
+import type { TVolume } from './types';
 import { pick } from 'lodash';
 import uploadServerSecretModal from 'cms-components/uploadServerSecretModal';
 import { errorHandler } from 'utils/errorHandler';
@@ -18,36 +18,36 @@ import { errorHandler } from 'utils/errorHandler';
 interface Props extends RouteComponentProps<{ id: string }> {
   intl: any;
   fetchPolicy: string;
-  datasetQuery: {
+  volumeQuery: {
     error: Error | undefined;
     loading: boolean;
-    dataset?: TDataset;
+    volume?: TVolume;
   };
-  updateDatasetMutation: ({
+  updateVolumeMutation: ({
     variables,
   }: {
     variables: {
-      payload: Partial<TDataset>;
-      where: Pick<TDataset, 'id'>;
+      payload: Partial<TVolume>;
+      where: Pick<TVolume, 'id'>;
     };
   }) => Promise<void>;
 }
 
-function _DatasetInfo({ datasetQuery, updateDatasetMutation, intl }: Props) {
+function _VolumeInfo({ volumeQuery, updateVolumeMutation, intl }: Props) {
   const history = useHistory();
   const { appPrefix } = useRoutePrefix();
 
-  if (datasetQuery.error) {
-    return <div>Failure to load datasets.</div>;
+  if (volumeQuery.error) {
+    return <div>Failure to load volumes.</div>;
   }
 
-  if (datasetQuery.loading) {
+  if (volumeQuery.loading) {
     return <Skeleton />
   }
 
-  async function onSubmit(data: TDataset) {
+  async function onSubmit(data: TVolume) {
     try {
-      const result = await updateDatasetMutation({
+      const result = await updateVolumeMutation({
         variables: {
           payload: data,
           where: {
@@ -56,22 +56,22 @@ function _DatasetInfo({ datasetQuery, updateDatasetMutation, intl }: Props) {
         },
       });
 
-      const secret = result?.data?.updateDataset?.uploadServerSecret;
+      const secret = result?.data?.updateVolume?.uploadServerSecret;
       if (secret) {
         uploadServerSecretModal({
-          title: intl.formatMessage({id: 'dataset.regenerateSecretModalTitle'}),
+          title: intl.formatMessage({id: 'volume.regenerateSecretModalTitle'}),
           secret,
         });
       }
 
-      history.push(`${appPrefix}admin/dataset`);
+      history.push(`${appPrefix}admin/volume`);
     } catch (err) {
       errorHandler(err);
     }
   }
 
   return (
-    <DatasetLayout page="edit">
+    <VolumeLayout page="edit">
       <div
         style={{
           margin: '16px',
@@ -79,31 +79,31 @@ function _DatasetInfo({ datasetQuery, updateDatasetMutation, intl }: Props) {
           backgroundColor: '#fff',
         }}
       >
-        <DatasetForm initialValue={datasetQuery?.dataset} editMode onSubmit={onSubmit} />
+        <VolumeForm initialValue={volumeQuery?.volume} editMode onSubmit={onSubmit} />
       </div>
-    </DatasetLayout>
+    </VolumeLayout>
   );
 }
 
-export const DatasetInfo = compose(
+export const VolumeInfo = compose(
   injectIntl,
   withRouter,
-  graphql(DatasetQuery, {
-    name: 'datasetQuery',
+  graphql(VolumeQuery, {
+    name: 'volumeQuery',
     options: ({ match, fetchPolicy }: Props) => {
-      const datasetId = match.params.id;
+      const volumeId = match.params.id;
 
       return {
         fetchPolicy: fetchPolicy ? fetchPolicy : 'cache-and-network',
         variables: {
           where: {
-            id: datasetId,
+            id: volumeId,
           },
         },
       };
     },
   }),
-  graphql(UpdateDatasetMutation, {
-    name: 'updateDatasetMutation',
+  graphql(UpdateVolumeMutation, {
+    name: 'updateVolumeMutation',
   })
-)(_DatasetInfo);
+)(_VolumeInfo);
