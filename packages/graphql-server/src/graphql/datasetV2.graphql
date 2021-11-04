@@ -6,7 +6,7 @@ type DatasetV2 {
   createdBy: String
   createdAt: String
   updatedAt: String
-  tags: JSON
+  tags: [String]
   size: Float
 }
 
@@ -30,30 +30,29 @@ type DatasetV2Connection {
 input DatasetV2CreateInput {
   id: String!
   name: String
-  tags: JSON
+  groupName: String!
+  tags: [String]
 }
 
 input DatasetV2UpdateInput {
   name: String
-  tags: JSON
+  groupName: String!
+  tags: [String]
 }
 
 input DatasetV2WhereInput {
   groupName: String!
-  prefix: String!
   search: String
 }
 
 input DatasetV2WhereUniqueInput {
   id: String!
   groupName: String!
-  prefix: String!
 }
 
 input DatasetV2FileWhereInput {
   id: String!
   groupName: String!
-  prefix: String!
 }
 
 input DatasetV2FileListOptionInput {
