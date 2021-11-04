@@ -39,6 +39,7 @@ import GroupSettingsJobs from 'ee/components/groupSettings/jobs';
 import GroupSettingsDeployments from 'ee/components/groupSettings/deployments';
 import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
 import DatasetBrowser from 'containers/Datasets/DatasetBrowser';
+import DatasetListContainer from 'containers/DatasetListContainer';
 
 const client = createGraphqlClient({
   fakeData,
@@ -70,10 +71,30 @@ class Main extends React.Component {
                 <SharedFilesPage />
               </Route>
 
+<<<<<<< HEAD
               {/* Shared Files */}
               <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
                 <SharedFilesPage />
               </Route>
+=======
+            {/* Datasets */}
+            <Route path={`${appPrefix}g/:groupName/datasets`} exact>
+              <ListContainer Com={DatasetListContainer} />
+            </Route>
+
+            {/* Group Images management*/}
+            <Route path={`${appPrefix}g/:groupName/images`} exact>
+              <ListContainer Com={ImageListContainer} />
+            </Route>
+            <Route path={`${appPrefix}g/:groupName/images/create`} exact>
+              <ImageCreatePage />
+            </Route>
+            <Route
+              path={`${appPrefix}g/:groupName/images/:imageId/edit`}
+              exact
+              component={ImageEditPage}
+            />
+>>>>>>> cf0c6f54 (Implement dataset sidebar item and list container)
 
               {/* Group Images management*/}
               <Route path={`${appPrefix}g/:groupName/images`} exact>
