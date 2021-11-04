@@ -8,9 +8,9 @@ import PageBody from 'components/pageBody';
 import { Browser } from 'components/Browser/Browser';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
-function ShareFilesPage() {
-  const { groupName, phfsPrefix } =
-    useParams<{ groupName: string; phfsPrefix: string }>();
+function DatasetBrowser() {
+  const { dataset, path, groupName } =
+    useParams<{ groupName: string; path: string; dataset: string }>();
   const [enabledPHFS, setEndabledPHFS] = useState(false);
   const { appPrefix } = useRoutePrefix();
   const history = useHistory();
@@ -24,23 +24,23 @@ function ShareFilesPage() {
   }, []);
 
   const handleChangePath = path => {
-    history.push(`${appPrefix}g/${groupName}/browse${path}`);
+    history.push(`${appPrefix}g/${groupName}/datasets/${dataset}${path}`);
   };
 
   return (
     <>
       <PageTitle
-        title='Shared Files'
+        title='Datasets'
         breadcrumb={
           <Breadcrumbs
             pathList={[
               {
                 key: 'browse',
-                matcher: /\/browse/,
-                title: 'Shared Files',
+                matcher: /.*/,
+                title: 'Datasets',
                 link: '/browse',
-                tips: 'Users can share files in this PHFS storage with group members.',
-                tipsLink: 'https://docs.primehub.io/docs/shared-files',
+                tips: '',
+                tipsLink: '#',
               },
             ]}
           />
@@ -48,9 +48,9 @@ function ShareFilesPage() {
       />
       <PageBody>
         <Browser
-          title={groupName}
-          basePath=''
-          path={phfsPrefix || '/'}
+          title={dataset}
+          basePath={`datasets/${dataset}`}
+          path={path || '/'}
           enabledPHFS={enabledPHFS}
           onChange={handleChangePath}
         />
@@ -59,4 +59,4 @@ function ShareFilesPage() {
   );
 }
 
-export default ShareFilesPage;
+export default DatasetBrowser;

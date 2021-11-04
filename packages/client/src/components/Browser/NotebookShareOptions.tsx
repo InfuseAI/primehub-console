@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './nbviewer.css';
 
-import styled from 'styled-components';
-import logo from 'images/primehub-logo-w.svg';
 import { Button, Divider, Icon, Input, Switch } from 'antd';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
@@ -139,17 +137,6 @@ function ShareSwitch({ data, ...props }: ShareSwitchProps) {
     </div>
   );
 }
-
-const headerHeight = 64;
-export const Logo = styled.div`
-  background-image: url(${logo});
-  background-color: #373d62;
-  background-size: 65%;
-  background-position: 14px 13px;
-  background-repeat: no-repeat;
-  width: 200px;
-  height: ${headerHeight}px;
-`;
 
 function SharingOptions({ data, ...props }: SharingOptionsProps) {
   const [shareVisible, setShareVisible] = useState(false);
