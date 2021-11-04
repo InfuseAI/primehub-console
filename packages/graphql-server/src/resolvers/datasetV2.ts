@@ -4,7 +4,7 @@ import { Context } from './interface';
 import * as logger from '../logger';
 import { toRelay, extractPagination } from './utils';
 import { isGroupBelongUser } from '../utils/groupCheck';
-import { generatePrefixForQuery } from './store';
+import { generatePrefixForQuery, query as queryStore } from './store';
 
 import { ErrorCodes } from '../errorCodes';
 import { Readable } from 'stream';
@@ -116,6 +116,18 @@ export const query = async (root, args, context: Context) => {
   return { id, ...metadata };
 };
 
+export const queryFile = async (root, args, context: Context) => {
+  const { id, groupName, prefix } = args.where;
+  return queryStore(
+    root,
+    {
+      where: { groupName, phfsPrefix: `${DATASET_FOLDER}/${id}/${prefix}` },
+      options: args.options,
+    },
+    context
+  );
+};
+
 export const connectionQuery = async (root, args, context: Context) => {
   const { groupName, prefix, search } = args.where;
   await checkPermission(context, groupName);
@@ -221,7 +233,10 @@ export const destroy = async (root, args, context: Context) => {
   }
 
   try {
-    const objects = await getDatasetObjects(context, id, groupName, true);
+    const objects = await getDatasetObjects(context, id, groupName, {
+      recursive: true,
+      limit: 0,
+    });
     await minioClient.removeObjects(storeBucket, objects);
     await minioClient.removeObject(storeBucket, metadataPath);
   } catch (err) {
@@ -242,7 +257,10 @@ const getDatasetObjects = async (
   context: Context,
   id: string,
   groupName: string,
-  recursive: boolean = false
+  options: { recursive: boolean; limit: number } = {
+    recursive: false,
+    limit: 0,
+  }
 ) => {
   const metadataPath = toDataPath(groupName, id);
   const dataPath = toDataPath(groupName, id, false);
@@ -250,7 +268,11 @@ const getDatasetObjects = async (
   const { minioClient, storeBucket } = context;
   return new Promise<any[]>((resolve, reject) => {
     const fileList = [];
-    const stream = minioClient.listObjectsV2(storeBucket, dataPath, recursive);
+    const stream = minioClient.listObjectsV2(
+      storeBucket,
+      dataPath,
+      options.recursive
+    );
     stream.on('data', obj => {
       fileList.push(obj.name);
     });
@@ -261,6 +283,10 @@ const getDatasetObjects = async (
       const indexOfMetadata = fileList.indexOf(metadataPath);
       if (indexOfMetadata >= 0) {
         fileList.splice(indexOfMetadata, 1);
+      }
+      if (fileList.length > options.limit) {
+        resolve(fileList.slice(0, options.limit));
+        return;
       }
       resolve(fileList);
     });
