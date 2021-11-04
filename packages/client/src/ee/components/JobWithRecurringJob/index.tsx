@@ -1,10 +1,9 @@
 import React, { useContext, useEffect, useReducer } from 'react';
 import get from 'lodash/get';
-import { useHistory } from 'react-router-dom';
+import { useHistory, withRouter, RouteComponentProps } from 'react-router-dom';
 import { Checkbox, Input, Tabs, Modal, notification } from 'antd';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
-import { withRouter, RouteComponentProps } from 'react-router';
 
 import Breadcrumbs from 'components/share/breadcrumb';
 import PageTitle from 'components/pageTitle';
@@ -235,7 +234,7 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
           notification.success({
             duration: 5,
             placement: 'bottomRight',
-            message: 'Deleted successfully!',
+            message: 'Deleted Successfully!',
             description: (
               <>
                 Your schedule <b>{displayName}</b> have been deleted.
@@ -401,7 +400,7 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
         >
           <InfuseButton
             icon='plus'
-            onClick={() => console.log('New Job & Schedule')}
+            onClick={() => history.push('job/create')}
             style={{ marginRight: '16px' }}
             type='primary'
           >
