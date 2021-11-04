@@ -10,7 +10,12 @@ import { ErrorCodes } from '../errorCodes';
 import { Readable } from 'stream';
 import moment from 'moment';
 
-const { NOT_AUTH_ERROR, INTERNAL_ERROR, RESOURCE_NOT_FOUND, RESOURCE_CONFLICT } = ErrorCodes;
+const {
+  NOT_AUTH_ERROR,
+  INTERNAL_ERROR,
+  RESOURCE_NOT_FOUND,
+  RESOURCE_CONFLICT,
+} = ErrorCodes;
 
 const DATASET_FOLDER = 'datasets';
 const DATASET_METADATA = '.dataset';
@@ -159,7 +164,7 @@ export const create = async (root, args, context: Context) => {
   const name = args.data.name || id;
   await checkPermission(context, groupName);
 
-  const dataPath = `${getDatasetPrefix(groupName)}${id}/${DATASET_METADATA}`;
+  const dataPath = toDataPath(groupName, id);
   const metadata = {
     name,
     tags,
@@ -169,11 +174,50 @@ export const create = async (root, args, context: Context) => {
     size: 0,
   };
 
-  // check if file available
   if (await isObjectExisting(minioClient, storeBucket, dataPath)) {
-    throw new ApolloError(`failed to create dataset, ${name} has already created`, RESOURCE_CONFLICT);
+    throw new ApolloError(
+      `failed to create dataset, ${name} has already created`,
+      RESOURCE_CONFLICT
+    );
   }
 
+  await putMetaData(context, dataPath, metadata);
+  return { id, ...metadata };
+};
+
+export const update = async (root, args, context: Context) => {
+  const { id, groupName } = args.where;
+  await checkPermission(context, groupName);
+
+  const existingMetadata = await getMetadata(id, groupName, context);
+  const metadata = {
+    ...existingMetadata,
+    ...args.data,
+    updatedAt: moment().utc().toISOString(),
+  };
+
+  if (metadata.name === null) {
+    metadata.name = id;
+  }
+
+  if (!metadata.tags) {
+    metadata.tags = [];
+  }
+
+  await putMetaData(context, toDataPath(groupName, id), metadata);
+  return { id, ...metadata };
+};
+
+function toDataPath(groupName: any, id: any) {
+  return `${getDatasetPrefix(groupName)}${id}/${DATASET_METADATA}`;
+}
+
+async function putMetaData(
+  context: Context,
+  dataPath: string,
+  metadata: DatasetV2Metadata
+) {
+  const { minioClient, storeBucket } = context;
   const content = (Readable as any).from([JSON.stringify(metadata)]);
   try {
     await minioClient.putObject(storeBucket, dataPath, content);
@@ -192,6 +236,4 @@ export const create = async (root, args, context: Context) => {
       throw new ApolloError('failed to create dataset', INTERNAL_ERROR);
     }
   }
-
-  return {id, ...metadata};
-};
+}
