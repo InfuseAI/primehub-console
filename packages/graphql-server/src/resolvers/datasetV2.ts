@@ -67,7 +67,7 @@ const getMetadata = async (id: string, groupName: string, context: Context) => {
           resolve(JSON.parse(Buffer.concat(arr).toString()));
         } catch (error) {
           logger.error({
-            component: 'DatasetV2',
+            component: logger.components.datasetV2,
             resource: objectName,
             type: 'DATASET_GET_OBJECT',
             stacktrace: error.stack,
@@ -142,7 +142,7 @@ const isObjectExisting = async (minioClient, storeBucket, path) => {
       return false;
     } else {
       logger.error({
-        component: logger.components.store,
+        component: logger.components.datasetV2,
         type: 'DATASET_STAT',
         resource: path,
         stacktrace: err.stack,
@@ -151,7 +151,7 @@ const isObjectExisting = async (minioClient, storeBucket, path) => {
       throw new ApolloError('failed to check file existing', INTERNAL_ERROR);
     }
   }
-}
+};
 
 export const create = async (root, args, context: Context) => {
   const { minioClient, storeBucket } = context;
@@ -179,19 +179,19 @@ export const create = async (root, args, context: Context) => {
     await minioClient.putObject(storeBucket, dataPath, content);
   } catch (err) {
     if (err.code === 'NotFound') {
-      throw new ApolloError('failed to share store object', RESOURCE_NOT_FOUND);
+      throw new ApolloError('failed to create dataset', RESOURCE_NOT_FOUND);
     } else {
       logger.error({
-        component: logger.components.store,
-        type: 'STORE_SHARE_OBJECT',
+        component: logger.components.datasetV2,
+        resource: dataPath,
+        content,
+        type: 'DATASET_PUT_OBJECT',
         stacktrace: err.stack,
         message: err.message,
       });
-      throw new ApolloError('failed to share file', INTERNAL_ERROR);
+      throw new ApolloError('failed to create dataset', INTERNAL_ERROR);
     }
   }
 
   return {id, ...metadata};
 };
-
-
