@@ -208,8 +208,70 @@ export const update = async (root, args, context: Context) => {
   return { id, ...metadata };
 };
 
-function toDataPath(groupName: any, id: any) {
-  return `${getDatasetPrefix(groupName)}${id}/${DATASET_METADATA}`;
+export const destroy = async (root, args, context: Context) => {
+  const { id, groupName } = args.where;
+  await checkPermission(context, groupName);
+
+  const metadataPath = toDataPath(groupName, id);
+  const dataPath = toDataPath(groupName, id, false);
+  const { minioClient, storeBucket } = context;
+
+  if (!(await isObjectExisting(minioClient, storeBucket, metadataPath))) {
+    throw new ApolloError('failed to delete dataset', RESOURCE_NOT_FOUND);
+  }
+
+  try {
+    const objects = await getDatasetObjects(context, id, groupName, true);
+    await minioClient.removeObjects(storeBucket, objects);
+    await minioClient.removeObject(storeBucket, metadataPath);
+  } catch (err) {
+    logger.error({
+      component: logger.components.datasetV2,
+      type: 'DATASET_REMOVE_OBJECTS',
+      resource: dataPath,
+      stacktrace: err.stack,
+      message: err.message,
+    });
+    throw new ApolloError('failed to remove dataset objects', INTERNAL_ERROR);
+  }
+
+  return { id };
+};
+
+const getDatasetObjects = async (
+  context: Context,
+  id: string,
+  groupName: string,
+  recursive: boolean = false
+) => {
+  const metadataPath = toDataPath(groupName, id);
+  const dataPath = toDataPath(groupName, id, false);
+
+  const { minioClient, storeBucket } = context;
+  return new Promise<any[]>((resolve, reject) => {
+    const fileList = [];
+    const stream = minioClient.listObjectsV2(storeBucket, dataPath, recursive);
+    stream.on('data', obj => {
+      fileList.push(obj.name);
+    });
+    stream.on('error', err => {
+      reject(err);
+    });
+    stream.on('end', () => {
+      const indexOfMetadata = fileList.indexOf(metadataPath);
+      if (indexOfMetadata >= 0) {
+        fileList.splice(indexOfMetadata, 1);
+      }
+      resolve(fileList);
+    });
+  });
+};
+
+function toDataPath(groupName: any, id: any, includeMeata: boolean = true) {
+  if (includeMeata) {
+    return `${getDatasetPrefix(groupName)}${id}/${DATASET_METADATA}`;
+  }
+  return `${getDatasetPrefix(groupName)}${id}/`;
 }
 
 async function putMetaData(
