@@ -4,13 +4,13 @@ import { get, unionBy } from 'lodash';
 import styled from 'styled-components';
 
 interface Props {
-  groupContext: any;
+  groupContext?: any;
   refetchGroup: () => void;
   showDeployment?: boolean;
   showDataset?: boolean;
   globalDatasets?: Array<Record<string, any>>;
   selectedGroup: string;
-  style: any;
+  style?: any;
 }
 
 interface State {
