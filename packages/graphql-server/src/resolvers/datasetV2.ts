@@ -133,11 +133,8 @@ export const connectionQuery = async (root, args, context: Context) => {
   await checkPermission(context, groupName);
 
   const objectPrefix = getDatasetPrefix(groupName);
-  let list = await listDatasets(objectPrefix, context);
-  if (search) {
-    list = list.filter(obj => obj.id.includes(search));
-  }
-  const datasets = await Promise.all(
+  const list = await listDatasets(objectPrefix, context);
+  let datasets = await Promise.all(
     list.map(async obj => {
       const metadata = await getMetadata(obj.id, groupName, context);
       return {
@@ -146,6 +143,9 @@ export const connectionQuery = async (root, args, context: Context) => {
       };
     })
   );
+  if (search) {
+    datasets = datasets.filter(obj => obj.name.includes(search));
+  }
 
   return toRelay(datasets, extractPagination(args));
 };
