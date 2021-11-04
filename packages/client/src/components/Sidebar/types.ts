@@ -23,6 +23,7 @@ export const PATH_KEY_LIST = [
   'models',
   'deployments',
   'browse',
+  'datasets',
   'images',
   'apps',
   'settings',
@@ -123,6 +124,20 @@ export const sidebarList: SidebarList = [
   {
     title: 'Shared Files',
     subPath: 'browse',
+    icon: iconShareFiles,
+    enabledIn: [FEATURES.CE, FEATURES.EE, FEATURES.DEPLOY],
+    style: {
+      width: 'auto',
+      height: 17,
+      marginLeft: '3px',
+      marginRight: '-1px',
+      marginTop: '-3px',
+    },
+  },
+  {
+    title: 'Datasets',
+    subPath: 'datasets',
+    // TODO: change icon
     icon: iconShareFiles,
     enabledIn: [FEATURES.CE, FEATURES.EE, FEATURES.DEPLOY],
     style: {
