@@ -31,6 +31,7 @@ export enum components {
   telemetry = 'Telemetry',
   store = 'Store',
   model = 'Model',
+  datasetV2 = 'DatasetV2',
 }
 
 export const log = (levelType: level = level.info, payload?: any) => {
