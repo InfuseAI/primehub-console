@@ -35,6 +35,7 @@ export const resolvers = {
     files: store.query,
     sharedFile: store.querySharedFile,
     datasetV2: datasetV2.query,
+    datasetV2Files: datasetV2.queryFile,
     datasetV2Connection: datasetV2.connectionQuery,
     phApplication: phApplication.queryOne,
     phApplications: phApplication.query,
