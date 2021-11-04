@@ -274,7 +274,7 @@ type Mutation {
   """DatasetV2"""
   createDatasetV2(data: DatasetV2CreateInput!): DatasetV2!
   updateDatasetV2(data: DatasetV2UpdateInput!, where: DatasetV2WhereUniqueInput!): DatasetV2
-  deleteDatasetV2(where: DatasetV2WhereUniqueInput!): DatasetV2
+  deleteDatasetV2(where: DatasetV2WhereUniqueInput!): DatasetV2!
 
   """PhApplication"""
   createPhApplication(data: PhApplicationCreateInput!): PhApplication!

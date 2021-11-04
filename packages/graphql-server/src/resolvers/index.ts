@@ -67,6 +67,7 @@ export const resolvers = {
     unshareFile: store.unshare,
     createDatasetV2: datasetV2.create,
     updateDatasetV2: datasetV2.update,
+    deleteDatasetV2: datasetV2.destroy,
     createPhApplication: phApplication.create,
     updatePhApplication: phApplication.update,
     deletePhApplication: phApplication.destroy,
