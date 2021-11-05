@@ -45,6 +45,27 @@ query PhSchedulesConnection(
   }
 }
 
+query PhSchedule($where: PhScheduleWhereUniqueInput!) {
+  phSchedule(where: $where) {
+    id
+    displayName
+    command
+    groupId
+    groupName
+    image
+    activeDeadlineSeconds
+    recurrence {
+      type
+      cron
+    }
+    instanceType {
+      id
+      name
+      displayName
+    }
+  }
+}
+
 mutation RunPhSchedule($where: PhScheduleWhereUniqueInput!) {
   runPhSchedule(where: $where) {
     job {

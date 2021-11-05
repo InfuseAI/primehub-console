@@ -1,4 +1,10 @@
-import React, { FormEvent, useContext, useEffect, useReducer } from 'react';
+import React, {
+  ReactNode,
+  FormEvent,
+  useContext,
+  useEffect,
+  useReducer,
+} from 'react';
 import get from 'lodash/get';
 import gql from 'graphql-tag';
 import unionBy from 'lodash/unionBy';
@@ -40,7 +46,7 @@ import type { Image } from 'admin/Images';
 import type { CreateJobVariables, CreateScheduleVariables } from './types';
 import { errorHandler } from 'utils/errorHandler';
 
-const breadcrumbs = [
+const defaultBreadcrumbs = [
   {
     key: 'list',
     matcher: /\/job/,
@@ -96,7 +102,7 @@ const initialState = {
   displayName: '',
   command: '',
   activeDeadlineSeconds: 86400,
-  executeThisJob: 'job',
+  executeOptions: 'job',
   recurrence: {
     cron: '',
     type: RecurrenceType.Inactive,
@@ -112,7 +118,7 @@ type FormState = {
   displayName: string;
   command: string;
   activeDeadlineSeconds: number;
-  executeThisJob: 'job' | 'jobAndSchedule' | 'schedule';
+  executeOptions: 'job' | 'jobAndSchedule' | 'schedule';
   recurrence: {
     cron: string;
     type: RecurrenceType;
@@ -152,6 +158,18 @@ type JobFormProps = FormComponentProps<FormState> & {
   }: {
     variables: { data: CreateScheduleVariables };
   }) => Promise<{ id: string }>;
+
+  breadcrumbs?: ReactNode;
+
+  /*
+   * Re-use this form for editing schedule detail.
+   */
+  editSchedule?: boolean;
+
+  /*
+   * Given schedule detail information.
+   */
+  data?: State;
 };
 
 type State = {
@@ -166,6 +184,7 @@ type State = {
   images: Array<Omit<Image, 'logEndpoint' | 'imageSpec' | 'jobStatus'>>;
   activeDeadlineSeconds: number;
   radioValues: Record<'instanceType' | 'image', string>;
+  isEditingRecurringJob?: boolean;
 };
 
 type Actions =
@@ -174,7 +193,8 @@ type Actions =
   | { type: 'EVERYONE_GROUP'; value: State['everyoneGroup'] }
   | { type: 'IMAGES'; value: State['images'] }
   | { type: 'ACTIVE_DEADLINE_SECONDS'; value: State['activeDeadlineSeconds'] }
-  | { type: 'RADIO_VALUES'; value: State['radioValues'] };
+  | { type: 'RADIO_VALUES'; value: State['radioValues'] }
+  | { type: 'IS_EDITING_RECURRING_JOB'; value: State['isEditingRecurringJob'] };
 
 function reducer(state: State, action: Actions) {
   switch (action.type) {
@@ -211,6 +231,12 @@ function reducer(state: State, action: Actions) {
         ...state,
         radioValues: action.value,
       };
+
+    case 'IS_EDITING_RECURRING_JOB':
+      return {
+        ...state,
+        isEditingRecurringJob: action.value,
+      };
   }
 }
 
@@ -226,14 +252,19 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
       instanceType: '',
       image: '',
     },
+    isEditingRecurringJob: false,
   });
 
   const { appPrefix } = useRoutePrefix();
   const history = useHistory();
   const params = new URLSearchParams(history.location.search);
   const routePrefix = `${appPrefix}g/${groupContext.name}`;
-  const defaultValue = JSON.parse(params.get('defaultValue'));
-  const formState = defaultValue || initialState;
+
+  const fromURLParams = JSON.parse(params.get('defaultValue'));
+
+  // Creating form initial state: If `props.data` has value means is editing a recurring job,
+  // otherwise, checking URL parameters has values if clone from another job.
+  const formState = props?.data || fromURLParams || initialState;
 
   useEffect(() => {
     if (typeof window === undefined) return;
@@ -278,17 +309,24 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
     });
   }, [currentUser, groupContext]);
 
+  useEffect(() => {
+    // Editing recurring job
+    if (props.data) {
+      dispatch({ type: 'IS_EDITING_RECURRING_JOB', value: true });
+    }
+  }, [props.data]);
+
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     form.validateFields(
-      async (err, { executeThisJob, ...values }: FormState) => {
+      async (err, { executeOptions, ...values }: FormState) => {
         if (err) {
           return;
         }
 
         try {
-          if (executeThisJob === 'job') {
+          if (executeOptions === 'job') {
             await props.createPhJob({
               variables: {
                 data: values as CreateJobVariables,
@@ -296,7 +334,7 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
             });
           }
 
-          if (executeThisJob === 'jobAndSchedule') {
+          if (executeOptions === 'jobAndSchedule') {
             // create and run jub & schedule
             await props.createPhJob({
               variables: {
@@ -310,7 +348,7 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
             });
           }
 
-          if (executeThisJob === 'schedule') {
+          if (executeOptions === 'schedule') {
             // create and run schedule
             await props.createPhSchedule({
               variables: {
@@ -330,12 +368,13 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
     );
   }
 
+  console.log({ state, formState });
+
   return (
     <>
-      <PageTitle
-        breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
-        title={'New Job'}
-      />
+      {props?.breadcrumbs ?? (
+        <PageTitle breadcrumb={<Breadcrumbs pathList={defaultBreadcrumbs} />} />
+      )}
 
       <Form onSubmit={onSubmit} style={{ margin: '16px' }}>
         <Row gutter={16}>
@@ -614,10 +653,15 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
                 )}
               </Form.Item>
 
-              <Form.Item label='Execute this Job'>
-                {form.getFieldDecorator('executeThisJob', {
+              <Form.Item
+                label='Execute this Job'
+                style={{
+                  display: state.isEditingRecurringJob ? 'none' : 'block',
+                }}
+              >
+                {form.getFieldDecorator('executeOptions', {
                   // Due to adding a new field so add fallback value here.
-                  initialValue: formState.executeThisJob || 'job',
+                  initialValue: formState.executeOptions || 'job',
                   rules: [{ required: true }],
                 })(
                   <Radio.Group>
@@ -630,8 +674,9 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
                 )}
               </Form.Item>
 
-              {(form.getFieldValue('executeThisJob') === 'jobAndSchedule' ||
-                form.getFieldValue('executeThisJob') === 'schedule') && (
+              {(form.getFieldValue('executeOptions') === 'jobAndSchedule' ||
+                form.getFieldValue('executeOptions') === 'schedule' ||
+                state.isEditingRecurringJob) && (
                 <Form.Item
                   label={
                     <>
@@ -682,7 +727,7 @@ export default compose(
   }),
   graphql(
     gql`
-      query system {
+      query {
         system {
           timezone {
             name

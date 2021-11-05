@@ -19,6 +19,7 @@ import JobDetailContainer from 'ee/containers/jobDetail';
 // import JobCreatePage from 'ee/containers/jobCreatePage';
 import JobWithRecurringJob from 'ee/components/JobWithRecurringJob';
 import JobCreatePage from 'ee/components/JobWithRecurringJob/JobForm';
+import EditRecurringJob from 'ee/components/JobWithRecurringJob/EditRecurringJob';
 import JobListContainer from 'ee/containers/JobListContainer';
 import ScheduleDetailContainer from 'ee/containers/scheduleDetail';
 import ScheduleCreatePage from 'ee/containers/ScheduleCreatePage';
@@ -137,6 +138,9 @@ class Main extends React.Component {
               exact
               component={ScheduleDetailContainer}
             />
+            <Route path={`${appPrefix}g/:groupName/recurringJob/:recurringJobId`} exact>
+              <EditRecurringJob />
+            </Route>
 
             {/* Model Management */}
             <Route path={`${appPrefix}g/:groupName/models`} exact>

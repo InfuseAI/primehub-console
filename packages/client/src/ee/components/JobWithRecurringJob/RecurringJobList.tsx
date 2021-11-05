@@ -2,6 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import get from 'lodash/get';
 import { Button, Tooltip, Table } from 'antd';
+import { useHistory } from 'react-router-dom';
 import type { ColumnProps, SorterResult } from 'antd/lib/table';
 
 import { TruncateTableField } from 'utils/TruncateTableField';
@@ -97,6 +98,8 @@ interface RecurringJobListProps {
 }
 
 export function RecurringJobList({ data, ...props }: RecurringJobListProps) {
+  const history = useHistory();
+
   const columns: ColumnProps<ScheduleNode>[] = [
     {
       title: 'Name',
@@ -176,8 +179,9 @@ export function RecurringJobList({ data, ...props }: RecurringJobListProps) {
             <Tooltip placement='bottom' title='Edit'>
               <Button
                 icon='edit'
-                // TODO: edit recurring job
-                // onClick={}
+                onClick={() => {
+                  history.push(`recurringJob/${node.id}`);
+                }}
               />
             </Tooltip>
             <Tooltip placement='bottom' title='Delete'>

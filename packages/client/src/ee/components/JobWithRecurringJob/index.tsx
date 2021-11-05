@@ -237,7 +237,7 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
             message: 'Deleted Successfully!',
             description: (
               <>
-                Your schedule <b>{displayName}</b> have been deleted.
+                Your recurring job <b>{displayName}</b> have been deleted.
               </>
             ),
           });
@@ -407,6 +407,7 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
             New Job
           </InfuseButton>
           <InfuseButton
+            disabled={jobs?.loading || recurringJobs?.loading}
             onClick={() => {
               if (state.tab === 'job') {
                 jobs?.refetch();

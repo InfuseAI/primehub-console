@@ -335,7 +335,7 @@ export function JobList({ data, ...props }: JobListProps) {
     <Table
       rowKey={data => data.node.id}
       columns={columns}
-      loading={get(props, 'loading', false)}
+      loading={get(data, 'loading', false)}
       dataSource={get(data, 'phJobsConnection.edges', [])}
       onChange={handleTableChange}
       pagination={{
