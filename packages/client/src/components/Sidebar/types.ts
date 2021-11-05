@@ -138,7 +138,6 @@ export const sidebarList: SidebarList = [
     subPath: 'apps',
     icon: iconApps,
     enabledIn: [FEATURES.CE, FEATURES.EE],
-    stage: 'beta',
     style: {
       width: 'auto',
       height: 20,
