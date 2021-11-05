@@ -4,13 +4,15 @@ import { Table, Tag, Input, Alert, Pagination } from 'antd';
 import type { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
-import { withRouter } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { RouteComponentProps } from 'react-router';
 
 import Breadcrumbs from 'components/share/breadcrumb';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
+import { TruncateTableField } from 'utils/TruncateTableField';
+
 import {
   GroupContext,
   GroupContextComponentProps,
@@ -24,7 +26,7 @@ const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 10;
 const Search = Input.Search;
 
-interface Dataset {
+export interface Dataset {
   id: string;
   name: string;
   createdBy: string;
@@ -53,7 +55,9 @@ interface QueryVariables {
 }
 
 type Props = {
-  groups: any[];
+  groups: Array<{
+    id: string;
+  }>;
   datasets: {
     error?: Error | undefined;
     loading: boolean;
@@ -149,6 +153,21 @@ function DatasetListContainer({ groups, datasets, ...props }: Props) {
       key: 'name',
       // TODO: implement sorter
       sorter: true,
+      render: (text, record) => (
+        <TruncateTableField text={text}>
+          <Link
+            to={{
+              state: {
+                prevPathname: location.pathname,
+                prevSearch: location.search,
+              },
+              pathname: `datasets/${record.id}`,
+            }}
+          >
+            {text}
+          </Link>
+        </TruncateTableField>
+      ),
     },
     {
       title: 'Created By',
