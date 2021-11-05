@@ -28,3 +28,8 @@ query GetDatasets(
     }
   }
 }
+
+query DatasetQuery($where: DatasetV2WhereUniqueInput!){
+  datasetV2(where: $where) {
+    ...DatasetMetadata
+}}
