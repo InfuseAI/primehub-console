@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, useState, useRef } from 'react';
 import gql from 'graphql-tag';
 import moment from 'moment';
 import styled from 'styled-components';
@@ -324,11 +324,17 @@ function Browser(props: BrowseInternalProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [previewFilePath, setPreviewFilePath] = useState('');
+  const refSearch = useRef();
 
   const changePath = (_path: string) => {
     const newPath = joinAndNormalize(_path);
     if (newPath === path) {
       data?.refetch();
+    }
+
+    if (!isEmpty(searchText)) {
+      setSearchText('');
+      (refSearch as any).current?.input.setValue('');
     }
 
     if (onChange) {
@@ -531,6 +537,7 @@ function Browser(props: BrowseInternalProps) {
         )}
 
         <Input.Search
+          ref={refSearch}
           placeholder='Search file'
           onChange={e => {
             setSearchText(e.target.value);
