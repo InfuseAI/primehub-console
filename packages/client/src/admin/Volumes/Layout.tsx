@@ -10,8 +10,8 @@ export function VolumeLayout({
 }) {
   const tipsLink =
     page === 'create'
-      ? 'https://docs.primehub.io/docs/guide_manual/admin-dataset#creating-new-dataset'
-      : 'https://docs.primehub.io/docs/guide_manual/admin-dataset';
+      ? 'https://docs.primehub.io/docs/guide_manual/admin-volume#creating-new-volume'
+      : 'https://docs.primehub.io/docs/guide_manual/admin-volume';
 
   return (
     <>
