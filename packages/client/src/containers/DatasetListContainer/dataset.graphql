@@ -33,3 +33,9 @@ query DatasetQuery($where: DatasetV2WhereUniqueInput!){
   datasetV2(where: $where) {
     ...DatasetMetadata
 }}
+
+mutation CreateDatasetMutation($payload: DatasetV2CreateInput!) {
+  createDatasetV2(data: $payload) {
+    ...DatasetMetadata
+  }
+}

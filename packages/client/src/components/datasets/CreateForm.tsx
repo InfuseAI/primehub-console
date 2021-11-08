@@ -1,35 +1,49 @@
 import * as React from 'react';
-import { Tag, Icon, Button, Input, Modal } from 'antd';
+import { Tag, Tooltip, Icon, Button, Input, Modal } from 'antd';
 
-type Props = {
+interface Props {
   visible: boolean;
   onClose: () => void;
-  onSubmit: () => void;
-};
+  onSubmit: (data: { id: string; name: string; tags: string[] }) => void;
+}
 
 export function DatasetCreateForm({ visible, onClose, onSubmit }: Props) {
-  const [ inputVisible, setInputVisible ] = React.useState(false);
-  const [ inputValue, setInputValue] = React.useState('');
-  const [ tags, setTags ] = React.useState([]);
+  const [name, setName] = React.useState('');
+  const [id, setId] = React.useState('');
+  const [inputVisible, setInputVisible] = React.useState(false);
+  const [inputValue, setInputValue] = React.useState('');
+  const [tags, setTags] = React.useState([]);
   const inputRef = React.useRef(null);
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     if (inputVisible) {
       inputRef.current?.input.focus();
     }
   }, [inputVisible]);
 
+  function genId(value: string) {
+    if (value === '') {
+      return '';
+    }
+    const normalizedName = value.trim().replace(/[\W_]/g, '-').toLowerCase();
+    const randomString = Math.random()
+      .toString(36)
+      .substring(6)
+      .substring(0, 5);
+    return `${normalizedName}-${randomString}`;
+  }
+
   function handleClose(removedTag) {
     setTags(prevTags => prevTags.filter(t => t !== removedTag));
-  };
+  }
 
   function showInput() {
     setInputVisible(true);
-  };
+  }
 
   function handleInputChange(e) {
     setInputValue(e.target.value);
-  };
+  }
 
   function handleInputConfirm() {
     setInputVisible(false);
@@ -37,7 +51,7 @@ export function DatasetCreateForm({ visible, onClose, onSubmit }: Props) {
     if (inputValue && tags.indexOf(inputValue) === -1) {
       setTags(prevTags => [...prevTags, inputValue]);
     }
-  };
+  }
 
   return (
     <Modal
@@ -62,25 +76,25 @@ export function DatasetCreateForm({ visible, onClose, onSubmit }: Props) {
               textAlign: 'left',
             }}
           >
-            Dataset ID: dataset-example-e38fab
+            Dataset ID: {id}
           </div>
-          <Button
-            type='default'
-            onClick={onClose}
-          >
+          <Button type='default' onClick={onClose}>
             Cancel
           </Button>
           <Button
             type='primary'
-            onClick={() => {
-              console.log('create!');
-              onSubmit({ tags });
+            disabled={id.length === 0}
+            onClick={async () => {
+              await onSubmit({ id, name, tags });
+              setId('');
+              setName('');
+              setTags([]);
               onClose();
             }}
           >
             Create Dataset
           </Button>
-        </div>
+        </div>,
       ]}
       onCancel={onClose}
     >
@@ -92,7 +106,16 @@ export function DatasetCreateForm({ visible, onClose, onSubmit }: Props) {
       >
         Dataset Name
       </div>
-      <Input placeholder={'Enter Dataset Name'}/>
+      <Input
+        placeholder={'Enter Dataset Name'}
+        value={name}
+        onChange={e => {
+          const generatedId = genId(e.target.value);
+          setId(generatedId);
+          setName(e.target.value);
+          console.log(generatedId);
+        }}
+      />
       <div
         style={{
           fontWeight: 500,
@@ -108,7 +131,7 @@ export function DatasetCreateForm({ visible, onClose, onSubmit }: Props) {
           flexWrap: 'wrap',
         }}
       >
-        {tags.map((tag, index) => {
+        {tags.map(tag => {
           const isLongTag = tag.length > 20;
           const tagElem = (
             <Tag key={tag} closable={true} onClose={() => handleClose(tag)}>
@@ -125,8 +148,8 @@ export function DatasetCreateForm({ visible, onClose, onSubmit }: Props) {
         })}
         <Input
           ref={inputRef}
-          type="text"
-          size="small"
+          type='text'
+          size='small'
           style={{
             display: inputVisible ? 'inline-block' : 'none',
             width: 78,
@@ -137,8 +160,15 @@ export function DatasetCreateForm({ visible, onClose, onSubmit }: Props) {
           onBlur={handleInputConfirm}
           onPressEnter={handleInputConfirm}
         />
-        <Tag onClick={showInput} style={{ display: inputVisible ? 'none' : 'inline-block', background: '#fff', borderStyle: 'dashed' }}>
-          <Icon type="plus" /> New Tag
+        <Tag
+          onClick={showInput}
+          style={{
+            display: inputVisible ? 'none' : 'inline-block',
+            background: '#fff',
+            borderStyle: 'dashed',
+          }}
+        >
+          <Icon type='plus' /> New Tag
         </Tag>
       </div>
     </Modal>
