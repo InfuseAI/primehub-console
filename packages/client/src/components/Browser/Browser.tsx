@@ -20,7 +20,7 @@ import { graphql } from 'react-apollo';
 import { get, isEmpty } from 'lodash';
 import type { ColumnProps } from 'antd/lib/table';
 
-import Uploader from 'components/Browser/uploader';
+import Uploader from 'components/Browser/Uploader';
 import iconMore from 'images/icon-more.svg';
 import {
   GroupContext,
