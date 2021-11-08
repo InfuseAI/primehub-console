@@ -20,32 +20,14 @@ import {
 } from 'context/group';
 import { errorHandler } from 'utils/errorHandler';
 
+import { Dataset, DatasetConnection } from 'components/datasets/common';
+import { DatasetCreateForm } from 'components/datasets/createForm';
 import { GetDatasets } from './dataset.graphql';
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 10;
 const Search = Input.Search;
 
-export interface Dataset {
-  id: string;
-  name: string;
-  createdBy: string;
-  createdAt: string;
-  updatedAt: string;
-  tags: string[];
-  size: number;
-}
-
-interface DatasetConnection {
-  pageInfo: {
-    currentPage?: number;
-    totalPage?: number;
-  };
-  edges: Array<{
-    cursor: string;
-    node: Dataset;
-  }>;
-}
 interface QueryVariables {
   where: {
     groupName: string;
@@ -87,6 +69,11 @@ function CommonPageTitle() {
 function DatasetListContainer({ groups, datasets, ...props }: Props) {
   const groupContext = React.useContext(GroupContext);
   const [keyword, setKeyword] = React.useState('');
+  const [modalVisible, setModalVisible] = React.useState(false);
+
+  function onSubmit(data) {
+    console.log(data);
+  }
 
   function onPageChanged(page) {
     const { refetch, variables } = datasets;
@@ -217,6 +204,7 @@ function DatasetListContainer({ groups, datasets, ...props }: Props) {
             type='primary'
             onClick={() => {
               console.log('create');
+              setModalVisible(true);
             }}
           >
             New Dataset
@@ -249,6 +237,7 @@ function DatasetListContainer({ groups, datasets, ...props }: Props) {
             rowKey='id'
             pagination={false}
           />
+          <DatasetCreateForm visible={modalVisible} onClose={() => setModalVisible(false) } onSubmit={onSubmit} />
         </div>
         <div
           style={{
