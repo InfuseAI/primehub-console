@@ -378,10 +378,9 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
             pathList={[
               {
                 key: 'job-list',
-                // FIXME: matcher name
-                matcher: /\/next-(job|recurringJob)/,
+                matcher: /\/(job|recurringJob)/,
                 title: 'Jobs',
-                link: '/next-job',
+                link: '/job',
                 tips: 'Users can submit time-consuming tasks as jobs here.',
                 tipsLink:
                   'https://docs.primehub.io/docs/job-submission-feature',
@@ -465,8 +464,7 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
           onTabClick={tab => {
             dispatch({ type: 'TOGGLE', value: tab });
 
-            // FIXME: route name
-            history.replace(`${routePrefix}/next-${tab}`);
+            history.replace(`${routePrefix}/${tab}`);
           }}
         >
           <Tabs.TabPane tab='Jobs' key='job'>

@@ -357,9 +357,7 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
             });
           }
 
-          // Back to job list page
-          // FIXME: route name
-          history.push(`${routePrefix}/next-job`);
+          history.push(`${routePrefix}/job`);
         } catch (err) {
           console.error(err);
           errorHandler(err);

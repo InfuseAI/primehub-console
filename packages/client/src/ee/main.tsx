@@ -16,14 +16,9 @@ import Jupyterhub from 'containers/JupyterHubPage';
 import ListContainer from 'containers/ListContainer';
 import SharedFilesPage from 'containers/sharedFiles/SharedFilesPage';
 import JobDetailContainer from 'ee/containers/jobDetail';
-// import JobCreatePage from 'ee/containers/jobCreatePage';
 import JobWithRecurringJob from 'ee/components/JobWithRecurringJob';
 import JobCreatePage from 'ee/components/JobWithRecurringJob/JobForm';
 import EditRecurringJob from 'ee/components/JobWithRecurringJob/EditRecurringJob';
-import JobListContainer from 'ee/containers/JobListContainer';
-import ScheduleDetailContainer from 'ee/containers/scheduleDetail';
-import ScheduleCreatePage from 'ee/containers/ScheduleCreatePage';
-import ScheduleListContainer from 'ee/containers/scheduleList';
 import ModelListContainer from 'ee/containers/modelList';
 import ModelDetail from 'ee/containers/ModelDetail';
 import ModelVersionDetailContainer from 'ee/containers/modelVersionDetail';
@@ -108,14 +103,8 @@ class Main extends React.Component {
             </Route>
 
             {/* Job Submission */}
-            <Route path={`${appPrefix}g/:groupName/next-job`} exact>
-              <JobWithRecurringJob tab="job" />
-            </Route>
-            <Route path={`${appPrefix}g/:groupName/next-recurringJob`} exact>
-              <JobWithRecurringJob tab="recurringJob" />
-            </Route>
             <Route path={`${appPrefix}g/:groupName/job`} exact>
-              <ListContainer Com={JobListContainer} />
+              <JobWithRecurringJob tab="job" />
             </Route>
             <Route path={`${appPrefix}g/:groupName/job/create`} exact>
               <JobCreatePage />
@@ -125,19 +114,9 @@ class Main extends React.Component {
               exact
               component={JobDetailContainer}
             />
-
-            {/* Job Scheduler */}
-            <Route path={`${appPrefix}g/:groupName/schedule`} exact>
-              <ListContainer Com={ScheduleListContainer} />
+            <Route path={`${appPrefix}g/:groupName/recurringJob`} exact>
+              <JobWithRecurringJob tab="recurringJob" />
             </Route>
-            <Route path={`${appPrefix}g/:groupName/schedule/create`} exact>
-              <ScheduleCreatePage />
-            </Route>
-            <Route
-              path={`${appPrefix}g/:groupName/schedule/:scheduleId`}
-              exact
-              component={ScheduleDetailContainer}
-            />
             <Route path={`${appPrefix}g/:groupName/recurringJob/:recurringJobId`} exact>
               <EditRecurringJob />
             </Route>
