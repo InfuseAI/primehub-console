@@ -7,6 +7,7 @@ import { graphql } from 'react-apollo';
 import { errorHandler } from 'utils/errorHandler';
 import { compose } from 'recompose';
 import { useClipboard } from 'hooks/useClipboard';
+import { Logo } from 'components/share/Logo';
 
 interface ShareAndUnShareVariables {
   variables: {

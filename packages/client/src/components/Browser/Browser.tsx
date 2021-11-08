@@ -17,11 +17,10 @@ import {
 } from 'antd';
 import { compose } from 'recompose';
 import { graphql } from 'react-apollo';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import type { ColumnProps } from 'antd/lib/table';
 
 import Uploader from 'components/Browser/uploader';
-import InfuseButton from 'components/infuseButton';
 import iconMore from 'images/icon-more.svg';
 import {
   GroupContext,
@@ -102,11 +101,13 @@ function BreadcrumbPaths({
   path,
   changePath,
   onCreate,
+  style,
 }: {
   title: string;
   path: string;
   onCreate: () => void;
   changePath: (path) => void;
+  style?: React.CSSProperties;
 }) {
   const paths = joinAndNormalize(path).split('/');
   const items = [];
@@ -120,7 +121,7 @@ function BreadcrumbPaths({
               changePath('/');
             }}
           >
-            {title} =.=
+            {title}
           </a>
         </Breadcrumb.Item>
       );
@@ -153,7 +154,7 @@ function BreadcrumbPaths({
     }
   });
 
-  return <Breadcrumb>{items}</Breadcrumb>;
+  return <Breadcrumb style={style}>{items}</Breadcrumb>;
 }
 
 function ShareFileActions({
@@ -279,6 +280,8 @@ export interface BrowserProps {
   path: string;
   enabledPHFS: boolean;
   onChange?: (path: string) => void;
+  uploading: boolean;
+  onUploadingChange?: (boolean) => void;
 }
 
 interface BrowseInternalProps extends GroupContextComponentProps, BrowserProps {
@@ -308,13 +311,13 @@ interface BrowseInternalProps extends GroupContextComponentProps, BrowserProps {
 }
 
 function _Browser(props: BrowseInternalProps) {
-  const { data, enabledPHFS, title, onChange } = props;
+  const { data, enabledPHFS, title, onChange, uploading, onUploadingChange } = props;
   const path = joinAndNormalize(props.path);
 
   const { name: groupName } = useContext(GroupContext);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const [previewFilePath, setPreviewFilePath] = useState('');
 
   const changePath = (_path: string) => {
@@ -418,9 +421,17 @@ function _Browser(props: BrowseInternalProps) {
     },
   ];
 
+  let dataSource: any[] = get(data, 'files.items', []);
+  if (!isEmpty(searchText)) {
+    dataSource = dataSource.filter(item => item.name.includes(searchText))
+  }
+
   function onFilesDeleted(phfsPrefix: string, { name }: FileItem) {
     const isFolder = name.endsWith('/');
-    const path = `${joinAndNormalize(phfsPrefix)}/${name}`;
+    let path = `${phfsPrefix}${name}`;
+    if (path.startsWith('/')) {
+      path = path.substring(1);
+    }
 
     try {
       Modal.confirm({
@@ -465,9 +476,10 @@ function _Browser(props: BrowseInternalProps) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex' }}>
         {isEditing ? (
           <Input.Search
+            style={{ flex: '1' }}
             autoFocus
             enterButton='Confirm'
             defaultValue={path}
@@ -498,6 +510,12 @@ function _Browser(props: BrowseInternalProps) {
           />
         ) : (
           <BreadcrumbPaths
+            style={{
+              flex: '1',
+              justifyContent: 'space-between',
+              overflowX: 'auto',
+              whiteSpace: 'nowrap',
+            }}
             title={title}
             path={path}
             onCreate={() => {
@@ -507,20 +525,19 @@ function _Browser(props: BrowseInternalProps) {
           />
         )}
 
-        <InfuseButton
-          icon='upload'
-          type='primary'
-          style={{ marginLeft: 16 }}
-          onClick={() => setIsUploading(true)}
-        >
-          Upload
-        </InfuseButton>
+        <Input.Search
+          placeholder='Search file'
+          onChange={e => {
+            setSearchText(e.target.value);
+          }}
+          style={{ width: 200, marginLeft: 16 }}
+        />
       </div>
 
       <Table
         rowKey={data => data?.name}
         loading={data?.loading}
-        dataSource={get(data, 'files.items', [])}
+        dataSource={dataSource}
         columns={columns}
         pagination={{
           hideOnSinglePage: false,
@@ -532,13 +549,13 @@ function _Browser(props: BrowseInternalProps) {
 
       <Modal
         title='Upload'
-        visible={isUploading}
+        visible={uploading}
         footer={[
           <Button
             key='ok'
             type='primary'
             onClick={() => {
-              setIsUploading(false);
+              onUploadingChange(false);
               data?.refetch();
             }}
           >
@@ -546,7 +563,7 @@ function _Browser(props: BrowseInternalProps) {
           </Button>,
         ]}
         onCancel={() => {
-          setIsUploading(false);
+          onUploadingChange(false);
         }}
       >
         <Uploader dirPath={get(data, 'files.prefix', '')} />

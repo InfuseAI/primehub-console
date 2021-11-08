@@ -7,6 +7,7 @@ import PageBody from 'components/pageBody';
 
 import { Browser } from 'components/Browser/Browser';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
+import InfuseButton from 'components/infuseButton';
 
 function ShareFilesPage() {
   const { groupName, phfsPrefix } =
@@ -14,6 +15,7 @@ function ShareFilesPage() {
   const [enabledPHFS, setEndabledPHFS] = useState(false);
   const { appPrefix } = useRoutePrefix();
   const history = useHistory();
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (typeof window === undefined) return;
@@ -47,12 +49,33 @@ function ShareFilesPage() {
         }
       />
       <PageBody>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'flex-end',
+            marginBottom: 16,
+          }}
+        >
+          <InfuseButton
+            icon='upload'
+            type='primary'
+            style={{ marginLeft: 16 }}
+            onClick={() => {
+              setUploading(true);
+            }}
+          >
+            Upload Files
+          </InfuseButton>
+        </div>
         <Browser
           title={groupName}
           basePath=''
           path={phfsPrefix || '/'}
           enabledPHFS={enabledPHFS}
           onChange={handleChangePath}
+          uploading={uploading}
+          onUploadingChange={uploading => setUploading(uploading)}
         />
       </PageBody>
     </>
