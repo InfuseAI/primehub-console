@@ -223,10 +223,6 @@ function ShareFileActions({
     actions.push(ViewFile);
   }
 
-  if (/\.([a-zA-Z]+)$/i.test(props.name)) {
-    actions.push(DownloadFile);
-  }
-
   if (props.name.endsWith('ipynb')) {
     actions.push(
       <Menu.Item
@@ -238,6 +234,9 @@ function ShareFileActions({
         View file
       </Menu.Item>
     );
+  }
+
+  if (/\.([a-zA-Z]+)$/i.test(props.name)) {
     actions.push(DownloadFile);
   }
 
