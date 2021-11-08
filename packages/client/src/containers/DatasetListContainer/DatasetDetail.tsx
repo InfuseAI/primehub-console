@@ -27,7 +27,7 @@ type Props = {
 }> &
   GroupContextComponentProps;
 
-function DatasetDetailContainer({ getDataset, ...props }) {
+function Detail({ getDataset, ...props }) {
   if (getDataset.error) {
     return <div>Failure to load dataset.</div>;
   }
@@ -146,7 +146,7 @@ function DatasetDetailContainer({ getDataset, ...props }) {
   );
 }
 
-export default compose(
+export const DatasetDetail = compose(
   withGroupContext,
   graphql(DatasetQuery, {
     options: ({ groupContext, match }: Props) => ({
@@ -160,4 +160,4 @@ export default compose(
     }),
     name: 'getDataset',
   })
-)(DatasetDetailContainer);
+)(Detail);
