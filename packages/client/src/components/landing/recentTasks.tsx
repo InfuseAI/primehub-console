@@ -9,7 +9,7 @@ import { withGroupContext, GroupContextComponentProps } from 'context/group';
 import styled from 'styled-components';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
-import type { Phase } from 'ee/components/job/phase';
+import type { JobPhase } from 'ee/components/JobWithRecurringJob/types';
 
 const { Title, Text } = Typography;
 
@@ -56,7 +56,7 @@ type Props = {
   getPhDeploymentsConnection: any;
 } & GroupContextComponentProps;
 
-const JOB_PHASE_COLOR: Partial<Record<Phase, string>> = {
+const JOB_PHASE_COLOR: Partial<Record<JobPhase, string>> = {
   Running: 'blue',
   Succeeded: 'green',
   Failed: 'red',

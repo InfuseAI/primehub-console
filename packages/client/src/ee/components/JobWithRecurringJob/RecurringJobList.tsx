@@ -6,12 +6,9 @@ import { useHistory } from 'react-router-dom';
 import type { ColumnProps, SorterResult } from 'antd/lib/table';
 
 import { TruncateTableField } from 'utils/TruncateTableField';
-import {
-  RecurrenceType,
-  renderRecurrence,
-} from 'ee/components/schedule/recurrence';
-
 import type { TInstanceType } from 'admin/InstanceTypes/types';
+
+import { RecurrenceType, renderRecurrence } from './Recurrence';
 import type { Job } from './JobList';
 import type { ActionInfo } from './types';
 

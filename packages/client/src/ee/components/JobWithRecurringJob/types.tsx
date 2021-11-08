@@ -1,3 +1,12 @@
+export type JobPhase =
+  | 'Pending'
+  | 'Preparing'
+  | 'Running'
+  | 'Succeeded'
+  | 'Failed'
+  | 'Cancelled'
+  | 'Unknown';
+
 export interface ActionInfo {
   id: string;
   displayName: string;

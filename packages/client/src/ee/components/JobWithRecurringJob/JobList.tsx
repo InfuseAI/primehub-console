@@ -1,5 +1,5 @@
 import React from 'react';
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 import get from 'lodash/get';
 import startCase from 'lodash/startCase';
 import { Link } from 'react-router-dom';
@@ -7,64 +7,13 @@ import { Button, Tooltip, Table, Icon } from 'antd';
 import type { ColumnProps, SorterResult } from 'antd/lib/table';
 
 import { TruncateTableField } from 'utils/TruncateTableField';
-import { Phase, getActionByPhase } from 'ee/components/job/phase';
 
-import type { ActionInfo } from './types';
-
-function computeDuration(start: Moment, finish: Moment) {
-  if (!start || !finish) {
-    return '-';
-  }
-
-  function ensureFormat(str) {
-    str = str < 0 ? 0 : str;
-    str = String(str);
-    return str.length === 1 ? `0${str}` : str;
-  }
-
-  const duration = moment.duration(finish.diff(start));
-  const hour = ensureFormat(Math.floor(duration.asHours()));
-  const minutes = ensureFormat(duration.minutes());
-  const seconds = ensureFormat(duration.seconds());
-
-  return `${hour}:${minutes}:${seconds}`;
-}
-
-function renderTimeIfValid(time: string) {
-  if (!time) {
-    return '-';
-  }
-
-  const momentTime = moment(time);
-  return momentTime.isValid() ? momentTime.format('YYYY-MM-DD HH:mm:ss') : '-';
-}
-
-function getCreateTimeAndFinishTime(
-  startTime: string,
-  finishTime: string,
-  phase: Phase
-) {
-  switch (phase) {
-    case Phase.Pending:
-    case Phase.Preparing:
-      return {
-        startTime: '-',
-        finishTime: '-',
-      };
-
-    case Phase.Running:
-      return {
-        startTime: renderTimeIfValid(startTime),
-        finishTime: '-',
-      };
-
-    default:
-      return {
-        startTime: renderTimeIfValid(startTime),
-        finishTime: renderTimeIfValid(finishTime),
-      };
-  }
-}
+import {
+  computeDuration,
+  getCreateTimeAndFinishTime,
+  getActionByPhase,
+} from './utils';
+import type { ActionInfo, JobPhase } from './types';
 
 export type Job = {
   id: string;
@@ -85,7 +34,7 @@ export type Job = {
   };
   userId: string;
   userName: string;
-  phase: Phase;
+  phase: JobPhase;
   reason: string;
   message: string;
   createTime: string;

@@ -32,19 +32,25 @@ import Breadcrumbs from 'components/share/breadcrumb';
 import PageTitle from 'components/pageTitle';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 import NumberWithSelectMultipler from 'cms-components/customize-number-with_select_multiplier';
-import RecurrenceInput, {
-  RecurrenceType,
-  recurrenceValidator,
-} from 'ee/components/schedule/recurrence';
 import { GroupContext, withGroupContext } from 'context/group';
 import { CurrentUser } from 'queries/User.graphql';
+import { errorHandler } from 'utils/errorHandler';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { sortNameByAlphaBet } from 'utils/sorting';
 import type { TInstanceType } from 'admin/InstanceTypes';
 import type { Image } from 'admin/Images';
 
+import RecurrenceInput, {
+  RecurrenceType,
+  recurrenceValidator,
+} from './Recurrence';
+import {
+  transformImages,
+  getImageType,
+  dashOrNumber,
+  stringifyZone,
+} from './utils';
 import type { CreateJobVariables, CreateScheduleVariables } from './types';
-import { errorHandler } from 'utils/errorHandler';
 
 const defaultBreadcrumbs = [
   {
@@ -366,8 +372,6 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
     );
   }
 
-  console.log({ state, formState });
-
   return (
     <>
       {props?.breadcrumbs ?? (
@@ -522,10 +526,9 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
                             )
                           ).map(image => {
                             const isGroupImage =
-                              image &&
-                              image.spec &&
-                              image.spec.groupName &&
-                              image.spec.groupName.length > 0;
+                              (image?.spec?.groupName as string)?.length > 0
+                                ? true
+                                : false;
 
                             const label =
                               (image.isReady ? '' : '(Not Ready) ') +
@@ -785,44 +788,4 @@ function Label(props: {
   }
 
   return <span>{props.defaultLabel}</span>;
-}
-
-function transformImages(images, instanceType) {
-  const gpuInstance = Boolean(instanceType?.gpuLimit);
-
-  return images.map(image => {
-    return {
-      ...image,
-      __disabled:
-        !image.isReady ||
-        (!gpuInstance && (image.type || '').toLowerCase() === 'gpu'),
-    };
-  });
-}
-
-function getImageType(image) {
-  const imageType = (image.type || '').toLowerCase();
-
-  switch (imageType) {
-    case 'gpu':
-      return 'GPU';
-    case 'cpu':
-      return 'CPU';
-    case 'both':
-      return 'Universal';
-    default:
-      return 'Unknown';
-  }
-}
-
-function dashOrNumber(value: string | null) {
-  return value === null ? '-' : value;
-}
-
-function stringifyZone({ name, offset }: { name: string; offset: number }) {
-  const ensure2Digits = num => (num > 9 ? `${num}` : `0${num}`);
-
-  return `GMT${offset < 0 ? '-' : '+'}${ensure2Digits(
-    Math.floor(Math.abs(offset))
-  )}:${ensure2Digits(Math.abs((offset % 1) * 60))}, ${name}`;
 }

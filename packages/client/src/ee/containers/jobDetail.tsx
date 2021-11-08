@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo';
 import { RouteComponentProps } from 'react-router-dom';
 import { compose } from 'recompose';
 
-import JobDetail from 'ee/components/job/detail';
+import JobDetail from 'ee/components/JobWithRecurringJob/JobDetail';
 import { errorHandler } from 'utils/errorHandler';
 import { appPrefix } from 'utils/env';
 import { rerunPhJob, cancelPhJob, phJob } from 'queries/PhJob.graphql';

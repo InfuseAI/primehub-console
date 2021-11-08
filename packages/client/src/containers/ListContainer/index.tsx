@@ -6,20 +6,18 @@ import queryString from 'querystring';
 import { withRouter } from 'react-router';
 import { RouteComponentProps } from 'react-router-dom';
 
-import withPath, { PathComponentProps } from 'ee/components/job/withPath';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
 import { CurrentUser } from 'queries/User.graphql';
 
-type Props = RouteComponentProps &
-  PathComponentProps & {
-    currentUser: any;
-    groupContext: GroupContextComponentProps;
-    Com: React.ElementType;
-  };
+type Props = RouteComponentProps & {
+  currentUser: any;
+  groupContext: GroupContextComponentProps;
+  Com: React.ElementType;
+};
 
 function ListContainer({ groupContext, currentUser, Com }: Props) {
   if (currentUser.loading) {
-    return <div data-testid="loading" />;
+    return <div data-testid='loading' />;
   }
 
   if (currentUser.error) {
@@ -28,7 +26,7 @@ function ListContainer({ groupContext, currentUser, Com }: Props) {
 
   const everyoneGroupId = window.EVERYONE_GROUP_ID;
   const groups = get(currentUser, 'me.groups', []).filter(
-    (group) => group.id !== everyoneGroupId
+    group => group.id !== everyoneGroupId
   );
 
   return <Com groups={groups} groupContext={groupContext} />;
@@ -36,7 +34,6 @@ function ListContainer({ groupContext, currentUser, Com }: Props) {
 
 export default compose(
   withRouter,
-  withPath,
   withGroupContext,
   graphql(CurrentUser, {
     alias: 'withCurrentUser',
