@@ -39,8 +39,7 @@ import GroupSettingsJobs from 'ee/components/groupSettings/jobs';
 import GroupSettingsDeployments from 'ee/components/groupSettings/deployments';
 import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
 import DatasetBrowser from 'containers/Datasets/DatasetBrowser';
-import DatasetListContainer from 'containers/DatasetListContainer';
-import DatasetDetailContainer from 'containers/DatasetListContainer/detail';
+import { DatasetList, DatasetDetail } from 'containers/DatasetListContainer';
 
 const client = createGraphqlClient({
   fakeData,
@@ -80,12 +79,12 @@ class Main extends React.Component {
 =======
             {/* Datasets */}
             <Route path={`${appPrefix}g/:groupName/datasets`} exact>
-              <ListContainer Com={DatasetListContainer} />
+              <ListContainer Com={DatasetList} />
             </Route>
             <Route
               path={`${appPrefix}g/:groupName/datasets/:datasetId`}
               exact
-              component={DatasetDetailContainer}
+              component={DatasetDetail}
             />
 
             {/* Group Images management*/}
