@@ -13,8 +13,8 @@ import Field from 'components/share/field';
 import { humanFileSize } from 'utils/index';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 
-import { Dataset } from 'components/datasets/common';
 import { DatasetQuery } from './dataset.graphql';
+import { Dataset, InputVariables } from 'components/datasets/common';
 
 type Props = {
   getDataset: {
