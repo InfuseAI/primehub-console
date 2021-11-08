@@ -18,3 +18,18 @@ export interface DatasetConnection {
     node: Dataset;
   }>;
 }
+
+export interface QueryVariables {
+  where: {
+    groupName: string;
+    search?: string;
+  };
+  page?: number;
+}
+
+export interface InputVariables {
+  id: string;
+  name: string;
+  groupName: string;
+  tags: string[];
+}

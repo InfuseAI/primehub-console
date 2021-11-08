@@ -1,6 +1,6 @@
 import * as React from 'react';
 import moment from 'moment';
-import { notification, Table, Tag, Input, Alert, Pagination } from 'antd';
+import { notification, Button, Tooltip, Table, Tag, Input, Alert, Pagination } from 'antd';
 import type { ColumnProps } from 'antd/lib/table';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
@@ -20,28 +20,18 @@ import {
 } from 'context/group';
 import { errorHandler } from 'utils/errorHandler';
 
-import { Dataset, DatasetConnection } from 'components/datasets/common';
-import { DatasetCreateForm } from 'components/datasets/createForm';
+import {
+  Dataset,
+  DatasetConnection,
+  QueryVariables,
+  InputVariables,
+} from 'components/datasets/common';
+import { DatasetCreateForm } from 'components/datasets/CreateForm';
 import { GetDatasets, CreateDatasetMutation } from './dataset.graphql';
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 10;
 const Search = Input.Search;
-
-interface QueryVariables {
-  where: {
-    groupName: string;
-    search?: string;
-  };
-  page?: number;
-}
-
-interface InputVariables {
-  id: string;
-  name: string;
-  groupName: string;
-  tags: string[];
-}
 
 type Props = {
   groups: Array<{
@@ -85,7 +75,7 @@ function List({ groups, datasets, createDataset }: Props) {
   const [keyword, setKeyword] = React.useState('');
   const [modalVisible, setModalVisible] = React.useState(false);
 
-  async function onSubmit(data) {
+  async function onSubmit(data: InputVariables) {
     const { refetch, variables } = datasets;
 
     console.log(data);
@@ -102,7 +92,6 @@ function List({ groups, datasets, createDataset }: Props) {
       where: variables.where,
       page: variables.page,
     });
-
   }
 
   function onPageChanged(page) {
@@ -126,6 +115,24 @@ function List({ groups, datasets, createDataset }: Props) {
     });
   }
 
+  function renderName(text, record) {
+    return (
+      <TruncateTableField text={text}>
+        <Link
+          to={{
+            state: {
+              prevPathname: location.pathname,
+              prevSearch: location.search,
+            },
+            pathname: `datasets/${record.id}`,
+          }}
+        >
+          {text}
+        </Link>
+      </TruncateTableField>
+    );
+  }
+
   function renderTags(text, record) {
     return (
       <>
@@ -133,6 +140,22 @@ function List({ groups, datasets, createDataset }: Props) {
           <Tag key={index}>{tag}</Tag>
         ))}
       </>
+    );
+  }
+
+  function renderAction(id: string) {
+    return (
+      <Button.Group>
+        <Tooltip placement='bottom' title='Delete'>
+          <Button
+            icon='delete'
+            onClick={() => {
+              // TODO: add action item
+              console.log('delete', id);
+            }}
+          />
+        </Tooltip>
+      </Button.Group>
     );
   }
 
@@ -170,21 +193,7 @@ function List({ groups, datasets, createDataset }: Props) {
       key: 'name',
       // TODO: implement sorter
       sorter: true,
-      render: (text, record) => (
-        <TruncateTableField text={text}>
-          <Link
-            to={{
-              state: {
-                prevPathname: location.pathname,
-                prevSearch: location.search,
-              },
-              pathname: `datasets/${record.id}`,
-            }}
-          >
-            {text}
-          </Link>
-        </TruncateTableField>
-      ),
+      render: renderName,
     },
     {
       title: 'Created By',
@@ -207,9 +216,9 @@ function List({ groups, datasets, createDataset }: Props) {
     },
     {
       key: 'action',
+      dataIndex: 'id',
       align: 'right',
-      // TODO: add action item
-      render: () => <></>,
+      render: renderAction,
     },
   ];
 
