@@ -5,7 +5,7 @@ import Breadcrumbs from 'components/share/breadcrumb';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 
-import { Browser } from 'components/Browser/Browser';
+import Browser from 'components/Browser/Browser';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import InfuseButton from 'components/infuseButton';
 

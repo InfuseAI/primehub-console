@@ -90,6 +90,7 @@ function joinAndNormalize(...paths: string[]) {
    * 2. Always have tailing slash
    */
   const path = paths
+    .filter(s => s)
     .flatMap(s => s.split('/'))
     .filter(s => s.length > 0)
     .join('/');
@@ -275,12 +276,12 @@ interface FileItem {
 }
 
 export interface BrowserProps {
-  title: string;
-  basePath: string;
-  path: string;
-  enabledPHFS: boolean;
+  title?: string;
+  basePath?: string;
+  path?: string;
+  enabledPHFS?: boolean;
   onChange?: (path: string) => void;
-  uploading: boolean;
+  uploading?: boolean;
   onUploadingChange?: (boolean) => void;
 }
 
@@ -310,8 +311,12 @@ interface BrowseInternalProps extends GroupContextComponentProps, BrowserProps {
   }) => Promise<{ data: { deleteFiles: number } }>;
 }
 
-function _Browser(props: BrowseInternalProps) {
-  const { data, enabledPHFS, title, onChange, uploading, onUploadingChange } = props;
+function Browser(props: BrowseInternalProps) {
+  const { data, enabledPHFS, title, onChange, uploading, onUploadingChange } = {
+    title: '<root>',
+    uploading: false,
+    ...props,
+  };
   const path = joinAndNormalize(props.path);
 
   const { name: groupName } = useContext(GroupContext);
@@ -596,7 +601,7 @@ function _Browser(props: BrowseInternalProps) {
   );
 }
 
-export const Browser: React.FunctionComponent<BrowserProps> = compose(
+export default compose(
   withGroupContext,
   graphql(GET_FILES, {
     options: (props: BrowseInternalProps) => ({
@@ -628,4 +633,4 @@ export const Browser: React.FunctionComponent<BrowserProps> = compose(
     }),
     name: 'deleteFiles',
   })
-)(_Browser);
+)(Browser) as React.FunctionComponent<BrowserProps>;
