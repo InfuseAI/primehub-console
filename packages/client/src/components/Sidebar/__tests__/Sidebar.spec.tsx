@@ -40,7 +40,6 @@ describe('Sidebar Component', () => {
     expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Notebooks')).toBeInTheDocument();
     expect(screen.getByText('Jobs')).toBeInTheDocument();
-    expect(screen.getByText('Schedule')).toBeInTheDocument();
     expect(screen.getByText('Models')).toBeInTheDocument();
     expect(screen.getByText('Deployments')).toBeInTheDocument();
     expect(screen.getByText('Shared Files')).toBeInTheDocument();
@@ -71,7 +70,6 @@ describe('Sidebar Component', () => {
     expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Notebooks')).toBeInTheDocument();
     expect(screen.getByText('Jobs')).toBeInTheDocument();
-    expect(screen.getByText('Schedule')).toBeInTheDocument();
     expect(screen.getByText('Models')).toBeInTheDocument();
     expect(screen.getByText('Deployments')).toBeInTheDocument();
     expect(screen.getByText('Shared Files')).toBeInTheDocument();
@@ -105,7 +103,6 @@ describe('Sidebar Component', () => {
     expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Notebooks')).toBeInTheDocument();
     expect(screen.getByText('Jobs')).toBeInTheDocument();
-    expect(screen.getByText('Schedule')).toBeInTheDocument();
     expect(screen.getByText('Models')).toBeInTheDocument();
     expect(screen.getByText('Deployments')).toBeInTheDocument();
     expect(screen.getByText('Shared Files')).toBeInTheDocument();
@@ -158,10 +155,6 @@ describe('Sidebar Component', () => {
     expect(screen.getByText('Notebooks')).toBeInTheDocument();
     expect(screen.getByText('Jobs')).toBeInTheDocument();
     expect(screen.getByText('Jobs').nextElementSibling.textContent).toBe('pro');
-    expect(screen.getByText('Schedule')).toBeInTheDocument();
-    expect(screen.getByText('Schedule').nextElementSibling.textContent).toBe(
-      'pro'
-    );
     expect(screen.getByText('Models')).toBeInTheDocument();
     expect(screen.getByText('Models').nextElementSibling.textContent).toBe(
       'pro'
