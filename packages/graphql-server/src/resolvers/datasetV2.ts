@@ -179,7 +179,7 @@ export const create = async (root, args, context: Context) => {
   const dataPath = toDataPath(groupName, id);
   const metadata = {
     name,
-    tags,
+    tags: tags || [],
     createdBy: context.username,
     createdAt: moment().utc().toISOString(),
     updatedAt: moment().utc().toISOString(),
