@@ -39,3 +39,9 @@ mutation CreateDatasetMutation($payload: DatasetV2CreateInput!) {
     ...DatasetMetadata
   }
 }
+
+mutation UpdateDatasetMutation($payload: DatasetV2UpdateInput!, $where: DatasetV2WhereUniqueInput!) {
+  updateDatasetV2(data: $payload, where: $where) {
+    ...DatasetMetadata
+  }
+}
