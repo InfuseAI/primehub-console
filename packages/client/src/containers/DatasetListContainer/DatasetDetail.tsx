@@ -45,7 +45,6 @@ function _DatasetDetail({ getDataset, updateDataset }) {
   async function onSubmit(data: Partial<InputVariables>) {
     const { refetch, variables } = getDataset;
 
-    console.log(pick(data, ['name', 'tags']));
     await updateDataset({
       variables: {
         payload: {
@@ -110,7 +109,6 @@ function _DatasetDetail({ getDataset, updateDataset }) {
                   icon=''
                   type='default'
                   onClick={() => {
-                    console.log('edit');
                     setModalVisible(true);
                   }}
                 >
@@ -204,9 +202,9 @@ export const DatasetDetail = compose(
         },
       },
       onCompleted: (data: any) => {
-        const name = data.updateDatasetV2.name;
+        const dataset = data.updateDatasetV2;
         notification.success({
-          message: `Dataset '${name}' has been updated.`,
+          message: `Dataset '${dataset.name}' (${dataset.id}) has been updated.`,
           duration: 5,
           placement: 'bottomRight',
         });

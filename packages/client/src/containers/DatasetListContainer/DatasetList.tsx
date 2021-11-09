@@ -105,7 +105,6 @@ function _DatasetList({
   async function onSubmit(data: InputVariables) {
     const { refetch, variables } = datasets;
 
-    console.log(data);
     await createDataset({
       variables: {
         payload: {
@@ -179,25 +178,40 @@ function _DatasetList({
             onClick={() => {
               confirm({
                 title: `Delete`,
-                content: `Are you sure you want to delete '${record.name}'?`,
+                content: (
+                  <>
+                    Are you sure you want to delete <b>{record.name}</b>?
+                  </>
+                ),
                 iconType: 'info-circle',
                 okText: 'Yes',
                 cancelText: 'No',
                 maskClosable: true,
                 onOk: async () => {
-                  await deleteDataset({
-                    variables: {
-                      where: {
-                        id: record.id,
-                        groupName: groupContext.name,
+                  try {
+                    await deleteDataset({
+                      variables: {
+                        where: {
+                          id: record.id,
+                          groupName: groupContext.name,
+                        },
                       },
-                    },
-                  });
-                  const { refetch, variables } = datasets;
-                  refetch({
-                    where: variables.where,
-                    page: variables.page,
-                  });
+                    });
+
+                    notification.success({
+                      message: `Dataset '${record.name}' (${record.id}) has been deleted.`,
+                      duration: 5,
+                      placement: 'bottomRight',
+                    });
+
+                    const { refetch, variables } = datasets;
+                    refetch({
+                      where: variables.where,
+                      page: variables.page,
+                    });
+                  } catch (err) {
+                    errorHandler(err);
+                  }
                 },
               });
             }}
@@ -289,7 +303,6 @@ function _DatasetList({
             icon='plus'
             type='primary'
             onClick={() => {
-              console.log('create');
               setModalVisible(true);
             }}
           >
@@ -370,9 +383,9 @@ export const DatasetList = compose(
   graphql(CreateDatasetMutation, {
     options: {
       onCompleted: (data: any) => {
-        const name = data.createDatasetV2.name;
+        const dataset = data.createDatasetV2;
         notification.success({
-          message: `Dataset '${name}' has been created.`,
+          message: `Dataset '${dataset.name}' (${dataset.id}) has been created.`,
           duration: 5,
           placement: 'bottomRight',
         });
@@ -382,17 +395,6 @@ export const DatasetList = compose(
     name: 'createDataset',
   }),
   graphql(DeleteDatasetMutation, {
-    options: {
-      onCompleted: (data: any) => {
-        const id = data.deleteDatasetV2.id;
-        notification.success({
-          message: `Dataset ID '${id}' has been deleted.`,
-          duration: 5,
-          placement: 'bottomRight',
-        });
-      },
-      onError: errorHandler,
-    },
     name: 'deleteDataset',
   })
 )(_DatasetList);
