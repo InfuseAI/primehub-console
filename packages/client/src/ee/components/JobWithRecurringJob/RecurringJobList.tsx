@@ -9,8 +9,7 @@ import { TruncateTableField } from 'utils/TruncateTableField';
 import type { TInstanceType } from 'admin/InstanceTypes/types';
 
 import { RecurrenceType, renderRecurrence } from './Recurrence';
-import type { Job } from './JobList';
-import type { ActionInfo } from './types';
+import type { ActionInfo, Job } from './types';
 
 export type Schedule = {
   id: string;

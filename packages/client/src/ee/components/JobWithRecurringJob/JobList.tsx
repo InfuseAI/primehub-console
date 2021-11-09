@@ -13,35 +13,7 @@ import {
   getCreateTimeAndFinishTime,
   getActionByPhase,
 } from './utils';
-import type { ActionInfo, JobPhase } from './types';
-
-export type Job = {
-  id: string;
-  displayName: string;
-  cancel: null;
-  command: string;
-  groupId: string;
-  groupName: string;
-  schedule: string;
-  image: string;
-  instanceType: {
-    id: string;
-    name: string;
-    displayName: string;
-    cpuLimit: number;
-    memoryLimit: number;
-    gpuLimit: string;
-  };
-  userId: string;
-  userName: string;
-  phase: JobPhase;
-  reason: string;
-  message: string;
-  createTime: string;
-  startTime: string;
-  finishTime: string;
-  logEndpoint: string;
-};
+import type { ActionInfo, Job } from './types';
 
 export type JobNode = {
   cursor: string;
@@ -78,20 +50,6 @@ export type JobConnections = {
   refetch: (variables?: JobQueryVariables) => Promise<void>;
   loading: boolean;
   error: Error | undefined;
-};
-
-export type JobActionVariables = {
-  variables: {
-    where: {
-      id: string;
-    };
-  };
-};
-
-export type RerunJob = {
-  data: {
-    rerunJob: Job;
-  };
 };
 
 interface JobListProps {

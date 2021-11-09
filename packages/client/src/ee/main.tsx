@@ -15,9 +15,9 @@ import { listEE } from 'components/Sidebar';
 import Jupyterhub from 'containers/JupyterHubPage';
 import ListContainer from 'containers/ListContainer';
 import SharedFilesPage from 'containers/sharedFiles/SharedFilesPage';
-import JobDetailContainer from 'ee/containers/jobDetail';
 import JobWithRecurringJob from 'ee/components/JobWithRecurringJob';
 import JobCreatePage from 'ee/components/JobWithRecurringJob/JobForm';
+import JobDetail from 'ee/components/JobWithRecurringJob/JobDetail';
 import EditRecurringJob from 'ee/components/JobWithRecurringJob/EditRecurringJob';
 import ModelListContainer from 'ee/containers/modelList';
 import ModelDetail from 'ee/containers/ModelDetail';
@@ -107,7 +107,7 @@ class Main extends React.Component {
                 />
               </Route>
 
-              {/* Job Submission */}
+              {/* Job & Recurring Job */}
               <Route path={`${appPrefix}g/:groupName/job`} exact>
                 <JobWithRecurringJob tab='job' />
               </Route>
@@ -115,9 +115,9 @@ class Main extends React.Component {
                 <JobCreatePage />
               </Route>
               <Route
-                path={`${appPrefix}g/:groupName/job/:jobId`}
                 exact
-                component={JobDetailContainer}
+                path={`${appPrefix}g/:groupName/job/:jobId`}
+                component={JobDetail}
               />
               <Route path={`${appPrefix}g/:groupName/recurringJob`} exact>
                 <JobWithRecurringJob tab='recurringJob' />

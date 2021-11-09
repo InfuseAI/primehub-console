@@ -27,20 +27,14 @@ import {
 } from 'queries/PhSchedule.graphql';
 import { errorHandler } from 'utils/errorHandler';
 
-import {
-  Job,
-  JobList,
-  JobConnections,
-  JobActionVariables,
-  RerunJob,
-} from './JobList';
+import { JobList, JobConnections } from './JobList';
 import {
   RecurringJobList,
   ScheduleConnections,
   ScheduleActionVariables,
   RunSchedule,
 } from './RecurringJobList';
-import type { ActionInfo } from './types';
+import type { ActionInfo, Job, JobActionVariables, RerunJob } from './types';
 
 type TabPanelKey = 'job' | 'recurringJob';
 
@@ -158,8 +152,8 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
   function onCloneJob(job: Job) {
     const data = {
       displayName: job.displayName,
-      groupId: !groupContext ? job.groupId : groupContext.id,
-      groupName: !groupContext ? job.groupName : groupContext.name,
+      groupId: job.groupId,
+      groupName: job.groupName,
       instanceTypeId: get(job, 'instanceType.id'),
       instanceTypeName:
         get(job, 'instanceType.displayName') || get(job, 'instanceType.name'),
