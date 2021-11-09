@@ -45,3 +45,9 @@ mutation UpdateDatasetMutation($payload: DatasetV2UpdateInput!, $where: DatasetV
     ...DatasetMetadata
   }
 }
+
+mutation DeleteDatasetMutation($where: DatasetV2WhereUniqueInput!) {
+  deleteDatasetV2(where: $where) {
+    id
+  }
+}
