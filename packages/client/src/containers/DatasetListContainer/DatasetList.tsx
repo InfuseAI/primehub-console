@@ -1,33 +1,48 @@
 import * as React from 'react';
 import moment from 'moment';
-import { notification, Button, Tooltip, Table, Tag, Input, Alert, Pagination } from 'antd';
-import type { ColumnProps } from 'antd/lib/table';
+import {
+  Alert,
+  Button,
+  Input,
+  Modal,
+  Pagination,
+  Table,
+  Tag,
+  Tooltip,
+  notification,
+} from 'antd';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
-import { Link, withRouter } from 'react-router-dom';
-import { RouteComponentProps } from 'react-router';
+import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
+import type { ColumnProps } from 'antd/lib/table';
 
 import Breadcrumbs from 'components/share/breadcrumb';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import { TruncateTableField } from 'utils/TruncateTableField';
+import { errorHandler } from 'utils/errorHandler';
 
 import {
   GroupContext,
   GroupContextComponentProps,
   withGroupContext,
 } from 'context/group';
-import { errorHandler } from 'utils/errorHandler';
 
 import {
   Dataset,
   DatasetConnection,
-  QueryVariables,
   InputVariables,
+  QueryVariables,
 } from 'components/datasets/common';
 import { DatasetCreateForm } from 'components/datasets/CreateForm';
-import { GetDatasets, CreateDatasetMutation } from './dataset.graphql';
+import {
+  CreateDatasetMutation,
+  DeleteDatasetMutation,
+  GetDatasets,
+} from './dataset.graphql';
+
+const { confirm } = Modal;
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 10;
@@ -51,6 +66,13 @@ type Props = {
       payload: InputVariables;
     };
   }) => Promise<void>;
+  deleteDataset: ({
+    variables,
+  }: {
+    variables: {
+      where: { id: string; groupName: string };
+    };
+  }) => Promise<void>;
 } & RouteComponentProps &
   GroupContextComponentProps;
 
@@ -70,7 +92,12 @@ function CommonPageTitle() {
   return <PageTitle breadcrumb={<Breadcrumbs pathList={breadcrumbs} />} />;
 }
 
-function _DatasetList({ groups, datasets, createDataset }: Props) {
+function _DatasetList({
+  groups,
+  datasets,
+  createDataset,
+  deleteDataset,
+}: Props) {
   const groupContext = React.useContext(GroupContext);
   const [keyword, setKeyword] = React.useState('');
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -143,15 +170,36 @@ function _DatasetList({ groups, datasets, createDataset }: Props) {
     );
   }
 
-  function renderAction(id: string) {
+  function renderAction(record) {
     return (
       <Button.Group>
         <Tooltip placement='bottom' title='Delete'>
           <Button
             icon='delete'
             onClick={() => {
-              // TODO: add action item
-              console.log('delete', id);
+              confirm({
+                title: `Delete`,
+                content: `Are you sure you want to delete '${record.name}'?`,
+                iconType: 'info-circle',
+                okText: 'Yes',
+                cancelText: 'No',
+                maskClosable: true,
+                onOk: async () => {
+                  await deleteDataset({
+                    variables: {
+                      where: {
+                        id: record.id,
+                        groupName: groupContext.name,
+                      },
+                    },
+                  });
+                  const { refetch, variables } = datasets;
+                  refetch({
+                    where: variables.where,
+                    page: variables.page,
+                  });
+                },
+              });
             }}
           />
         </Tooltip>
@@ -216,7 +264,6 @@ function _DatasetList({ groups, datasets, createDataset }: Props) {
     },
     {
       key: 'action',
-      dataIndex: 'id',
       align: 'right',
       render: renderAction,
     },
@@ -333,5 +380,19 @@ export const DatasetList = compose(
       onError: errorHandler,
     },
     name: 'createDataset',
+  }),
+  graphql(DeleteDatasetMutation, {
+    options: {
+      onCompleted: (data: any) => {
+        const id = data.deleteDatasetV2.id;
+        notification.success({
+          message: `Dataset ID '${id}' has been deleted.`,
+          duration: 5,
+          placement: 'bottomRight',
+        });
+      },
+      onError: errorHandler,
+    },
+    name: 'deleteDataset',
   })
 )(_DatasetList);
