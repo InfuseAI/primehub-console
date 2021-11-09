@@ -74,9 +74,9 @@ function DatasetBrowser() {
               basePath={`datasets/${dataset}`}
               path={path || '/'}
               enabledPHFS={enabledPHFS}
-              onChange={handleChangePath}
+              onChangePath={handleChangePath}
               uploading={uploading}
-              onUploadingChange={uploading => {
+              onUploadingChange={(uploading: boolean) => {
                 setUploading(uploading);
               }}
             />

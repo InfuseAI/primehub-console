@@ -1,5 +1,4 @@
-import React, { ReactNode } from 'react';
-import { MemoryRouter, Route } from 'react-router-dom';
+import React from 'react';
 import { MockedProvider } from 'react-apollo/test-utils';
 
 import { render, screen } from 'test/test-utils';
@@ -60,18 +59,9 @@ function setup() {
     },
   ];
 
-  function TestProvider({ children }: { children: ReactNode }) {
-    return (
-      <MemoryRouter initialEntries={['/g/InfuseAICat/browse']}>
-        <Route path='/g/:groupName/browse/:phfsPrefix*'>{children}</Route>
-      </MemoryRouter>
-    );
-  }
-
   return {
     mockRequests,
     mockGroups,
-    TestProvider,
   };
 }
 
