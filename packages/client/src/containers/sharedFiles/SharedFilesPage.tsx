@@ -73,7 +73,7 @@ function ShareFilesPage() {
           basePath=''
           path={phfsPrefix || '/'}
           enabledPHFS={enabledPHFS}
-          onChange={handleChangePath}
+          onChangePath={handleChangePath}
           uploading={uploading}
           onUploadingChange={uploading => setUploading(uploading)}
         />
