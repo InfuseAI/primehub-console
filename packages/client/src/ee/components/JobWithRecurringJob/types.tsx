@@ -35,6 +35,18 @@ export type JobPhase =
   | 'Cancelled'
   | 'Unknown';
 
+export type RecurrenceType =
+  | 'inactive'
+  | 'daily'
+  | 'weekly'
+  | 'monthly'
+  | 'custom';
+
+export type Recurrence = {
+  type: RecurrenceType;
+  cron: string;
+};
+
 export interface ActionInfo {
   id: string;
   displayName: string;

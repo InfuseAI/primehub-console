@@ -1,6 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import get from 'lodash/get';
+import startCase from 'lodash/startCase';
 import { Button, Tooltip, Table } from 'antd';
 import { useHistory } from 'react-router-dom';
 import type { ColumnProps, SorterResult } from 'antd/lib/table';
@@ -8,16 +9,12 @@ import type { ColumnProps, SorterResult } from 'antd/lib/table';
 import { TruncateTableField } from 'utils/TruncateTableField';
 import type { TInstanceType } from 'admin/InstanceTypes/types';
 
-import { RecurrenceType, renderRecurrence } from './Recurrence';
-import type { ActionInfo, Job } from './types';
+import type { ActionInfo, Job, Recurrence } from './types';
 
 export type Schedule = {
   id: string;
   displayName: string;
-  recurrence: {
-    type: RecurrenceType;
-    cron: string;
-  };
+  recurrence: Recurrence;
   invalid: boolean;
   message: string;
   command: string;
@@ -112,7 +109,17 @@ export function RecurringJobList({ data, ...props }: RecurringJobListProps) {
       title: 'Recurrence',
       dataIndex: 'node.recurrence',
       width: '20%',
-      render: ({ type, cron }) => renderRecurrence(type, cron),
+      render: ({ type, cron }: Recurrence) => {
+        switch (type) {
+          case 'custom':
+            return cron;
+          case 'daily':
+          case 'monthly':
+          case 'weekly':
+          case 'inactive':
+            return startCase(type);
+        }
+      },
     },
     {
       title: 'Next Run',

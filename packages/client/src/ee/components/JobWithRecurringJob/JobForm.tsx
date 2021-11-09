@@ -40,17 +40,18 @@ import { sortNameByAlphaBet } from 'utils/sorting';
 import type { TInstanceType } from 'admin/InstanceTypes';
 import type { Image } from 'admin/Images';
 
-import RecurrenceInput, {
-  RecurrenceType,
-  recurrenceValidator,
-} from './Recurrence';
+import { RecurrenceInput, recurrenceValidator } from './RecurrenceInput';
 import {
   transformImages,
   getImageType,
   dashOrNumber,
   stringifyZone,
 } from './utils';
-import type { CreateJobVariables, CreateScheduleVariables } from './types';
+import type {
+  CreateJobVariables,
+  CreateScheduleVariables,
+  RecurrenceType,
+} from './types';
 
 const defaultBreadcrumbs = [
   {
@@ -111,7 +112,7 @@ const initialState = {
   executeOptions: 'job',
   recurrence: {
     cron: '',
-    type: RecurrenceType.Inactive,
+    type: 'inactive',
   },
 };
 
@@ -690,9 +691,10 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
                     // Due to adding a new field so add fallback value here.
                     initialValue: formState.recurrence || {
                       cron: '',
-                      type: RecurrenceType.Inactive,
+                      type: 'incative',
                     },
                     rules: [{ validator: recurrenceValidator }],
+                    // @ts-ignore component receive props from decorator
                   })(<RecurrenceInput />)}
                 </Form.Item>
               )}
