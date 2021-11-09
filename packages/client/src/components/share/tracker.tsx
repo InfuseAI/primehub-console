@@ -115,6 +115,7 @@ const PageChangeTracker = () => {
   const location = useLocation();
   const [visible, setVisible] = useState(false);
   const [promptType, setPromptType] = useState('modal');
+  const [showNPSForm, setShowNPSForm] = useState(false);
   const [event, setEvent] = useLocalStorage('primehub:ce:collector', {
     pageChanges: 0,
     collected: false,
@@ -148,6 +149,7 @@ const PageChangeTracker = () => {
       setVisible(true);
       event.prompt += 1;
     } else if (prompt === 1 && pageChanges >= 30) {
+      setShowNPSForm(true);
       setPromptType('modal');
       setVisible(true);
       event.prompt += 1;
@@ -206,7 +208,7 @@ const PageChangeTracker = () => {
           </Button>,
         ]}
       >
-        {window.enableNPSSurvey ? <NPSSurvey /> : <></>}
+        {(window.enableNPSSurvey && showNPSForm)? <NPSSurvey /> : <></>}
         <CommunityList userTakeAction={userTakeAction} />
       </Modal>
     );
