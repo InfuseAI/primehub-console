@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { Tabs, Tag, Row, Col, Spin } from 'antd';
+import { notification, Tabs, Tag, Row, Col, Spin } from 'antd';
 import { graphql } from 'react-apollo';
 import { RouteComponentProps } from 'react-router-dom';
 import { compose } from 'recompose';
 import moment from 'moment';
+import { pick } from 'lodash';
 
 import Breadcrumbs from 'components/share/breadcrumb';
 import PageTitle from 'components/pageTitle';
@@ -11,10 +12,16 @@ import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import Field from 'components/share/field';
 import { humanFileSize } from 'utils/index';
-import { GroupContextComponentProps, withGroupContext } from 'context/group';
+import {
+  GroupContext,
+  GroupContextComponentProps,
+  withGroupContext,
+} from 'context/group';
+import { errorHandler } from 'utils/errorHandler';
 
-import { DatasetQuery } from './dataset.graphql';
 import { Dataset, InputVariables } from 'components/datasets/common';
+import { DatasetCreateForm } from 'components/datasets/CreateForm';
+import { DatasetQuery, UpdateDatasetMutation } from './dataset.graphql';
 
 type Props = {
   getDataset: {
@@ -27,9 +34,30 @@ type Props = {
 }> &
   GroupContextComponentProps;
 
-function Detail({ getDataset, ...props }) {
+function _DatasetDetail({ getDataset, updateDataset }) {
+  const groupContext = React.useContext(GroupContext);
+  const [modalVisible, setModalVisible] = React.useState(false);
+
   if (getDataset.error) {
     return <div>Failure to load dataset.</div>;
+  }
+
+  async function onSubmit(data: Partial<InputVariables>) {
+    const { refetch, variables } = getDataset;
+
+    console.log(pick(data, ['name', 'tags']));
+    await updateDataset({
+      variables: {
+        payload: {
+          ...pick(data, ['name', 'tags']),
+          groupName: groupContext.name,
+        },
+      },
+    });
+
+    refetch({
+      where: variables.where,
+    });
   }
 
   const dataset = getDataset?.datasetV2 || {};
@@ -55,7 +83,7 @@ function Detail({ getDataset, ...props }) {
       <PageTitle breadcrumb={<Breadcrumbs pathList={breadcrumbs} />} />
       <PageBody>
         <Spin spinning={getDataset.loading}>
-          <Tabs defaultActiveKey='information'>
+          <Tabs defaultActiveKey='data'>
             <Tabs.TabPane key='data' tab='Data'>
               data
             </Tabs.TabPane>
@@ -83,6 +111,7 @@ function Detail({ getDataset, ...props }) {
                   type='default'
                   onClick={() => {
                     console.log('edit');
+                    setModalVisible(true);
                   }}
                 >
                   Edit
@@ -140,6 +169,12 @@ function Detail({ getDataset, ...props }) {
               </div>
             </Tabs.TabPane>
           </Tabs>
+          <DatasetCreateForm
+            dataset={dataset}
+            visible={modalVisible}
+            onClose={() => setModalVisible(false)}
+            onSubmit={onSubmit}
+          />
         </Spin>
       </PageBody>
     </>
@@ -159,5 +194,25 @@ export const DatasetDetail = compose(
       fetchPolicy: 'cache-and-network',
     }),
     name: 'getDataset',
+  }),
+  graphql(UpdateDatasetMutation, {
+    options: ({ groupContext, match }: Props) => ({
+      variables: {
+        where: {
+          id: match.params.datasetId,
+          groupName: groupContext.name,
+        },
+      },
+      onCompleted: (data: any) => {
+        const name = data.updateDatasetV2.name;
+        notification.success({
+          message: `Dataset '${name}' has been updated.`,
+          duration: 5,
+          placement: 'bottomRight',
+        });
+      },
+      onError: errorHandler,
+    }),
+    name: 'updateDataset',
   })
-)(Detail);
+)(_DatasetDetail);

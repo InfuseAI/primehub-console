@@ -70,7 +70,7 @@ function CommonPageTitle() {
   return <PageTitle breadcrumb={<Breadcrumbs pathList={breadcrumbs} />} />;
 }
 
-function List({ groups, datasets, createDataset }: Props) {
+function _DatasetList({ groups, datasets, createDataset }: Props) {
   const groupContext = React.useContext(GroupContext);
   const [keyword, setKeyword] = React.useState('');
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -334,4 +334,4 @@ export const DatasetList = compose(
     },
     name: 'createDataset',
   })
-)(List);
+)(_DatasetList);

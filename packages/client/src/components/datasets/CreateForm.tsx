@@ -1,19 +1,34 @@
 import * as React from 'react';
 import { Tag, Tooltip, Icon, Button, Input, Modal } from 'antd';
+import { Dataset } from './common';
 
 interface Props {
+  dataset?: Pick<Dataset, 'id' | 'name' | 'tags'>;
   visible: boolean;
   onClose: () => void;
   onSubmit: (data: { id: string; name: string; tags: string[] }) => void;
 }
 
-export function DatasetCreateForm({ visible, onClose, onSubmit }: Props) {
-  const [name, setName] = React.useState('');
+export function DatasetCreateForm({
+  dataset,
+  visible,
+  onClose,
+  onSubmit,
+}: Props) {
   const [id, setId] = React.useState('');
+  const [name, setName] = React.useState('');
+  const [tags, setTags] = React.useState([]);
   const [inputVisible, setInputVisible] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
-  const [tags, setTags] = React.useState([]);
   const inputRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (dataset?.id) {
+      setId(dataset.id);
+      setName(dataset.name);
+      setTags(dataset.tags);
+    }
+  }, [dataset]);
 
   React.useEffect(() => {
     if (inputVisible) {
@@ -55,7 +70,7 @@ export function DatasetCreateForm({ visible, onClose, onSubmit }: Props) {
 
   return (
     <Modal
-      title='New Dataset'
+      title={`${dataset?.id ? 'Edit' : 'New'} Dataset`}
       maskClosable={false}
       width={580}
       visible={visible}
@@ -83,16 +98,18 @@ export function DatasetCreateForm({ visible, onClose, onSubmit }: Props) {
           </Button>
           <Button
             type='primary'
-            disabled={id.length === 0}
+            disabled={id.length === 0 || name.length === 0}
             onClick={async () => {
               await onSubmit({ id, name, tags });
-              setId('');
-              setName('');
-              setTags([]);
+              if (!dataset) {
+                setId('');
+                setName('');
+                setTags([]);
+              }
               onClose();
             }}
           >
-            Create Dataset
+            {dataset?.id ? 'Update Information' : 'Create Dataset'}
           </Button>
         </div>,
       ]}
@@ -110,10 +127,10 @@ export function DatasetCreateForm({ visible, onClose, onSubmit }: Props) {
         placeholder={'Enter Dataset Name'}
         value={name}
         onChange={e => {
-          const generatedId = genId(e.target.value);
-          setId(generatedId);
+          if (!dataset) {
+            setId(genId(e.target.value));
+          }
           setName(e.target.value);
-          console.log(generatedId);
         }}
       />
       <div
