@@ -107,7 +107,7 @@ function BreadcrumbPaths({
   title: string;
   path: string;
   onCreate: () => void;
-  changePath: (path) => void;
+  changePath: (path: string) => void;
   style?: React.CSSProperties;
 }) {
   const paths = joinAndNormalize(path).split('/');
@@ -280,9 +280,9 @@ export interface BrowserProps {
   basePath?: string;
   path?: string;
   enabledPHFS?: boolean;
-  onChange?: (path: string) => void;
+  onChangePath?: (path: string) => void;
   uploading?: boolean;
-  onUploadingChange?: (boolean) => void;
+  onUploadingChange?: (status: boolean) => void;
 }
 
 interface BrowseInternalProps extends GroupContextComponentProps, BrowserProps {
@@ -312,7 +312,7 @@ interface BrowseInternalProps extends GroupContextComponentProps, BrowserProps {
 }
 
 function Browser(props: BrowseInternalProps) {
-  const { data, enabledPHFS, title, onChange, uploading, onUploadingChange } = {
+  const { data, enabledPHFS, title, onChangePath: onChange, uploading, onUploadingChange } = {
     title: '<root>',
     uploading: false,
     ...props,
@@ -432,11 +432,6 @@ function Browser(props: BrowseInternalProps) {
     },
   ];
 
-  let dataSource: any[] = get(data, 'files.items', []);
-  if (!isEmpty(searchText)) {
-    dataSource = dataSource.filter(item => item.name.includes(searchText))
-  }
-
   function onFilesDeleted(phfsPrefix: string, { name }: FileItem) {
     const isFolder = name.endsWith('/');
     let path = `${phfsPrefix}${name}`;
@@ -483,6 +478,11 @@ function Browser(props: BrowseInternalProps) {
         type='warning'
       />
     );
+  }
+
+  let dataSource: FileItem[] = get(data, 'files.items', []);
+  if (!isEmpty(searchText)) {
+    dataSource = dataSource.filter(item => item.name.includes(searchText));
   }
 
   return (
@@ -640,4 +640,4 @@ export default compose(
     }),
     name: 'deleteFiles',
   })
-)(Browser) as React.FunctionComponent<BrowserProps>;
+)(Browser);
