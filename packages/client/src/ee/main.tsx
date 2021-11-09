@@ -41,7 +41,7 @@ import GroupSettingsJobs from 'ee/components/groupSettings/jobs';
 import GroupSettingsDeployments from 'ee/components/groupSettings/deployments';
 import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
 import DatasetBrowser from 'containers/Datasets/DatasetBrowser';
-import { DatasetList, DatasetDetail } from 'containers/DatasetListContainer';
+import { DatasetList, DatasetDetail } from 'containers/Datasets';
 
 const client = createGraphqlClient({
   fakeData,

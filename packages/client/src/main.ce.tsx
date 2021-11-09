@@ -25,7 +25,7 @@ import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
 import GroupSettingsPage from 'containers/groupSettingsPage';
 import PageChangeTracker from 'components/share/tracker';
-import { DatasetList, DatasetDetail } from 'containers/DatasetListContainer';
+import { DatasetList, DatasetDetail } from 'containers/Datasets';
 
 const client = createGraphqlClient({
   fakeData,
