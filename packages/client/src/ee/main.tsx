@@ -51,24 +51,24 @@ class Main extends React.Component {
       <BrowserRouter>
         <Route path={`${appPrefix}g/`}>
           <ApolloProvider client={client}>
-          <MainPage
-            sidebarItems={listEE}
-            notification={<LicenseWarningBanner />}
-          >
-            {/* Jupyterhub */}
-            <Route path={`${appPrefix}g/:groupName/hub`} exact>
-              <Jupyterhub />
-            </Route>
+            <MainPage
+              sidebarItems={listEE}
+              notification={<LicenseWarningBanner />}
+            >
+              {/* Jupyterhub */}
+              <Route path={`${appPrefix}g/:groupName/hub`} exact>
+                <Jupyterhub />
+              </Route>
 
-            {/* Dataset Browser */}
-            <Route path={`${appPrefix}g/:groupName/datasets/:dataset/:path*`}>
-              <DatasetBrowser />
-            </Route>
+              {/* Dataset Browser */}
+              <Route path={`${appPrefix}g/:groupName/datasets/:dataset/:path*`}>
+                <DatasetBrowser />
+              </Route>
 
-            {/* Shared Files */}
-            <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
-              <SharedFilesPage />
-            </Route>
+              {/* Shared Files */}
+              <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
+                <SharedFilesPage />
+              </Route>
 
               {/* Shared Files */}
               <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>

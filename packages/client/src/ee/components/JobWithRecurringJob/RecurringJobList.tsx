@@ -9,34 +9,26 @@ import type { ColumnProps, SorterResult } from 'antd/lib/table';
 import { TruncateTableField } from 'utils/TruncateTableField';
 import type { TInstanceType } from 'admin/InstanceTypes/types';
 
-import type { ActionInfo, Job, Recurrence } from './types';
+import type {
+  ActionInfo,
+  Job,
+  Recurrence,
+  RecurringJob as TRecurringJob,
+} from './types';
 
-export type Schedule = {
-  id: string;
-  displayName: string;
-  recurrence: Recurrence;
-  invalid: boolean;
-  message: string;
-  command: string;
-  groupId: string;
-  groupName: string;
-  image: string;
+interface RecurringJob extends Omit<TRecurringJob, 'instanceType'> {
   instanceType: Pick<
     TInstanceType,
     'id' | 'name' | 'displayName' | 'cpuLimit' | 'memoryLimit' | 'gpuLimit'
   >;
-  userId: string;
-  userName: string;
-  nextRunTime: string | null;
-  activeDeadlineSeconds: number;
-};
+}
 
-export type ScheduleNode = {
+export type RecurringJobNode = {
   cursor: string;
-  node: Schedule;
+  node: RecurringJob;
 };
 
-export type ScheduleQueryVariables = {
+export type RecurringJobQueryVariables = {
   where?: {
     id?: string;
     groupId_in?: string[];
@@ -54,21 +46,21 @@ export type ScheduleQueryVariables = {
   page?: number;
 };
 
-export type ScheduleConnections = {
-  variables: ScheduleQueryVariables;
+export type RecurringJobConnections = {
+  variables: RecurringJobQueryVariables;
   phSchedulesConnection?: {
-    edges: ScheduleNode[];
+    edges: RecurringJobNode[];
     pageInfo: {
       currentPage: number;
       totalPage: number;
     };
   };
-  refetch: (variables?: ScheduleQueryVariables) => Promise<void>;
+  refetch: (variables?: RecurringJobQueryVariables) => Promise<void>;
   loading: boolean;
   error: Error | undefined;
 };
 
-export type ScheduleActionVariables = {
+export type RecurringJobActionVariables = {
   variables: {
     where: {
       id: string;
@@ -76,7 +68,7 @@ export type ScheduleActionVariables = {
   };
 };
 
-export type RunSchedule = {
+export type RunRecurringJob = {
   data: {
     runPhSchedule: {
       job: Pick<Job, 'id' | 'displayName'>;
@@ -85,7 +77,7 @@ export type RunSchedule = {
 };
 
 interface RecurringJobListProps {
-  data?: ScheduleConnections;
+  data?: RecurringJobConnections;
   onRunRecurringJob: ({ id, displayName }: ActionInfo) => void;
   onDeleteRecurringJob: ({ id, displayName }: ActionInfo) => void;
 }
@@ -93,13 +85,13 @@ interface RecurringJobListProps {
 export function RecurringJobList({ data, ...props }: RecurringJobListProps) {
   const history = useHistory();
 
-  const columns: ColumnProps<ScheduleNode>[] = [
+  const columns: ColumnProps<RecurringJobNode>[] = [
     {
       title: 'Name',
       key: 'displayName',
       sorter: true,
       width: '30%',
-      render: function RenderName({ node }: ScheduleNode) {
+      render: function RenderName({ node }: RecurringJobNode) {
         return (
           <TruncateTableField text={node.displayName} defaultCharacter='-' />
         );
@@ -126,7 +118,7 @@ export function RecurringJobList({ data, ...props }: RecurringJobListProps) {
       key: 'nextRunTime',
       sorter: true,
       width: '20%',
-      render: function RenderNextRun({ node }: ScheduleNode) {
+      render: function RenderNextRun({ node }: RecurringJobNode) {
         const time = node.nextRunTime;
 
         if (node.invalid) {
@@ -157,14 +149,14 @@ export function RecurringJobList({ data, ...props }: RecurringJobListProps) {
       key: 'userName',
       sorter: true,
       width: '20%',
-      render: function RenderUsername({ node }: ScheduleNode) {
+      render: function RenderUsername({ node }: RecurringJobNode) {
         return <TruncateTableField text={node.userName} defaultCharacter='-' />;
       },
     },
     {
       title: 'Action',
       width: '150px',
-      render: function RenderAction({ node }: ScheduleNode) {
+      render: function RenderAction({ node }: RecurringJobNode) {
         return (
           <Button.Group>
             <Tooltip placement='bottom' title='Run'>
@@ -207,9 +199,9 @@ export function RecurringJobList({ data, ...props }: RecurringJobListProps) {
   function handleTableChange(
     pagination: { current: number; total: number; pageSize: number },
     _,
-    sorter: SorterResult<ScheduleNode>
+    sorter: SorterResult<RecurringJobNode>
   ) {
-    const variables: ScheduleQueryVariables = {
+    const variables: RecurringJobQueryVariables = {
       ...data.variables,
       page: pagination.current,
     };

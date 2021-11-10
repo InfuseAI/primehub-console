@@ -1,3 +1,5 @@
+import type { TInstanceType } from 'admin/InstanceTypes';
+
 export type Job = {
   id: string;
   displayName: string;
@@ -24,6 +26,23 @@ export type Job = {
   startTime: string;
   finishTime: string;
   logEndpoint: string;
+};
+
+export type RecurringJob = {
+  id: string;
+  displayName: string;
+  invalid: boolean;
+  message: string;
+  command: string;
+  groupId: string;
+  groupName: string;
+  image: string;
+  userId: string;
+  userName: string;
+  nextRunTime: string | null;
+  activeDeadlineSeconds: number;
+  recurrence: Recurrence;
+  instanceType: TInstanceType;
 };
 
 export type JobPhase =

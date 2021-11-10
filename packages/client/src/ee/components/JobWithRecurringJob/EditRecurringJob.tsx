@@ -1,35 +1,51 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import omit from 'lodash/omit';
 import { Spin } from 'antd';
 import { compose } from 'recompose';
 import { graphql } from 'react-apollo';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
+import { withRouter, RouteComponentProps, useHistory } from 'react-router-dom';
 
 import Breadcrumbs from 'components/share/breadcrumb';
 import PageTitle from 'components/pageTitle';
-import { PhSchedule } from 'queries/PhSchedule.graphql';
+import { PhSchedule, UpdatePhSchedule } from 'queries/PhSchedule.graphql';
+
+import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 import JobForm from './JobForm';
-import type { Schedule } from './RecurringJobList';
+import type { RecurringJob } from './types';
+import { GroupContext } from 'context/group';
 
 interface Props extends RouteComponentProps<{ recurringJobId: string }> {
   data: {
     loading: boolean;
     error: Error | undefined;
     phSchedule?: Omit<
-      Schedule,
+      RecurringJob,
       'invalid' | 'message' | 'userId' | 'userName' | 'nextRunTime'
     >;
   };
+  updatePhSchedule: ({
+    variables,
+  }: {
+    variables: {
+      data: Record<string, unknown>;
+      where: {
+        id: string;
+      };
+    };
+  }) => Promise<{ id: string }>;
 }
 
-function EditRecurringJob({ data }: Props) {
+function EditRecurringJob({ data, updatePhSchedule }: Props) {
+  const { name: groupName } = useContext(GroupContext);
+  const { appPrefix } = useRoutePrefix();
+  const history = useHistory();
   const breadcrumbs = [
     {
-      key: 'list',
+      key: 'recurringJob',
       matcher: /\/recurringJob/,
-      title: 'Jobs',
-      link: '/job',
+      title: 'Recurring Job',
+      link: '/recurringJob',
     },
     {
       key: 'detail',
@@ -41,10 +57,36 @@ function EditRecurringJob({ data }: Props) {
     },
   ];
 
+  async function onUpdateRecurringJob({
+    id,
+    data,
+  }: {
+    id: string;
+    data: Record<string, unknown>;
+  }) {
+    try {
+      await updatePhSchedule({
+        variables: {
+          data,
+          where: {
+            id,
+          },
+        },
+      });
+
+      history.push(`${appPrefix}g/${groupName}/recurringJob`);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   return (
     <Spin spinning={data.loading}>
       <JobForm
         editSchedule
+        onUpdateRecurringJob={({ id, data }) =>
+          onUpdateRecurringJob({ id, data })
+        }
         breadcrumbs={
           <PageTitle breadcrumb={<Breadcrumbs pathList={breadcrumbs} />} />
         }
@@ -77,5 +119,8 @@ export default compose(
         fetchPolicy: 'cache-and-network',
       };
     },
+  }),
+  graphql(UpdatePhSchedule, {
+    name: 'updatePhSchedule',
   })
 )(EditRecurringJob);

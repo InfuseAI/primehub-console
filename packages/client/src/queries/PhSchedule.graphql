@@ -75,6 +75,15 @@ mutation RunPhSchedule($where: PhScheduleWhereUniqueInput!) {
   }
 }
 
+mutation UpdatePhSchedule(
+  $data: PhScheduleUpdateInput!
+  $where: PhScheduleWhereUniqueInput!
+) {
+  updatePhSchedule(data: $data, where: $where) {
+    id
+  }
+}
+
 
 mutation DeletePhSchedule($where: PhScheduleWhereUniqueInput!) {
   deletePhSchedule(where: $where) {

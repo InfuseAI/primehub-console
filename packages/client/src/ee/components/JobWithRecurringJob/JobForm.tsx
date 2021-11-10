@@ -101,6 +101,7 @@ python /project/group-a/train.py \\
 `;
 
 type FormState = {
+  id?: string;
   groupId: string;
   instanceTypeId: string;
   instanceType: string;
@@ -113,6 +114,7 @@ type FormState = {
   recurrence: {
     cron: string;
     type: RecurrenceType;
+    __typename?: string;
   };
 };
 
@@ -160,7 +162,15 @@ type JobFormProps = FormComponentProps<FormState> & {
   /*
    * Given schedule detail information.
    */
-  data?: State;
+  data?: FormState;
+
+  onUpdateRecurringJob?: ({
+    id,
+    data,
+  }: {
+    id: string;
+    data: Record<string, unknown>;
+  }) => void;
 };
 
 type State = {
@@ -333,38 +343,49 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
         }
 
         try {
-          if (executeOptions === 'job') {
-            await props.createPhJob({
-              variables: {
-                data: values as CreateJobVariables,
-              },
+          if (state.isEditingRecurringJob) {
+            await props.onUpdateRecurringJob({
+              id: props.data.id,
+              data: omit(values, 'recurrence.__typename'),
             });
-          }
+          } else {
+            if (executeOptions === 'job') {
+              await props.createPhJob({
+                variables: {
+                  data: values as CreateJobVariables,
+                },
+              });
 
-          if (executeOptions === 'jobAndSchedule') {
-            // create and run jub & schedule
-            await props.createPhJob({
-              variables: {
-                data: omit(values, 'recurrence') as CreateJobVariables,
-              },
-            });
-            await props.createPhSchedule({
-              variables: {
-                data: values as CreateScheduleVariables,
-              },
-            });
-          }
+              history.push(`${routePrefix}/job`);
+            }
 
-          if (executeOptions === 'schedule') {
-            // create and run schedule
-            await props.createPhSchedule({
-              variables: {
-                data: values as CreateScheduleVariables,
-              },
-            });
-          }
+            if (executeOptions === 'jobAndSchedule') {
+              // create and run jub & schedule
+              await props.createPhJob({
+                variables: {
+                  data: omit(values, 'recurrence') as CreateJobVariables,
+                },
+              });
+              await props.createPhSchedule({
+                variables: {
+                  data: values as CreateScheduleVariables,
+                },
+              });
 
-          history.push(`${routePrefix}/job`);
+              history.push(`${routePrefix}/job`);
+            }
+
+            if (executeOptions === 'schedule') {
+              // create and run schedule
+              await props.createPhSchedule({
+                variables: {
+                  data: values as CreateScheduleVariables,
+                },
+              });
+
+              history.push(`${routePrefix}/recurringJob`);
+            }
+          }
         } catch (err) {
           console.error(err);
           errorHandler(err);
@@ -727,6 +748,9 @@ export default compose(
   withGroupContext,
   graphql(CurrentUser, {
     name: 'currentUser',
+    options: () => ({
+      onError: errorHandler,
+    }),
   }),
   graphql(
     gql`
@@ -741,6 +765,9 @@ export default compose(
     `,
     {
       name: 'systemInfo',
+      options: () => ({
+        onError: errorHandler,
+      }),
     }
   ),
   graphql(
@@ -751,12 +778,7 @@ export default compose(
         }
       }
     `,
-    {
-      name: 'createPhJob',
-      options: () => ({
-        onError: errorHandler,
-      }),
-    }
+    { name: 'createPhJob' }
   ),
   graphql(
     gql`
@@ -766,12 +788,7 @@ export default compose(
         }
       }
     `,
-    {
-      name: 'createPhSchedule',
-      options: () => ({
-        onError: errorHandler,
-      }),
-    }
+    { name: 'createPhSchedule' }
   )
 )(Form.create<JobFormProps>()(JobForm));
 

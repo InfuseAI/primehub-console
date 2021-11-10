@@ -29,9 +29,9 @@ import { errorHandler } from 'utils/errorHandler';
 import { JobList, JobConnections } from './JobList';
 import {
   RecurringJobList,
-  ScheduleConnections,
-  ScheduleActionVariables,
-  RunSchedule,
+  RecurringJobConnections,
+  RecurringJobActionVariables,
+  RunRecurringJob,
 } from './RecurringJobList';
 import type { ActionInfo, Job, JobActionVariables, RerunJob } from './types';
 
@@ -43,10 +43,12 @@ interface Props extends RouteComponentProps {
   jobs?: JobConnections;
   rerunPhJob: (variables: JobActionVariables) => Promise<RerunJob>;
   cancelPhJob: (variables: JobActionVariables) => Promise<{ id: string }>;
-  recurringJobs?: ScheduleConnections;
-  runPhSchedule: (variables: ScheduleActionVariables) => Promise<RunSchedule>;
+  recurringJobs?: RecurringJobConnections;
+  runPhSchedule: (
+    variables: RecurringJobActionVariables
+  ) => Promise<RunRecurringJob>;
   deletePhSchedule: (
-    variables: ScheduleActionVariables
+    variables: RecurringJobActionVariables
   ) => Promise<{ id: string }>;
 }
 
