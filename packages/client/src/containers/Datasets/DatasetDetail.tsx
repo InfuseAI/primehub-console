@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { notification, Tabs, Tag, Row, Col, Spin } from 'antd';
 import { graphql } from 'react-apollo';
-import { RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps, useParams, useHistory } from 'react-router-dom';
 import { compose } from 'recompose';
 import moment from 'moment';
 import { pick } from 'lodash';
@@ -11,6 +11,8 @@ import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import InfuseButton from 'components/infuseButton';
 import Field from 'components/share/field';
+import Browser from 'components/Browser/Browser';
+import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { humanFileSize } from 'utils/index';
 import {
   GroupContext,
@@ -36,7 +38,12 @@ type Props = {
 
 function _DatasetDetail({ getDataset, updateDataset }) {
   const groupContext = React.useContext(GroupContext);
+  const history = useHistory();
+  const { appPrefix } = useRoutePrefix();
+  const { path, groupName } = useParams<{ groupName: string; path: string }>();
   const [modalVisible, setModalVisible] = React.useState(false);
+  const [uploading, setUploading] = React.useState(false);
+  const [tabKey, setTabKey] = React.useState('data');
 
   if (getDataset.error) {
     return <div>Failure to load dataset.</div>;
@@ -59,6 +66,11 @@ function _DatasetDetail({ getDataset, updateDataset }) {
     });
   }
 
+  const handleChangePath = path => {
+    history.push(`${appPrefix}g/${groupName}/datasets/${dataset.id}${path}`);
+  };
+
+  const enabledPHFS = window?.enablePhfs || false;
   const dataset = getDataset?.datasetV2 || {};
   const breadcrumbs = [
     {
@@ -77,14 +89,41 @@ function _DatasetDetail({ getDataset, updateDataset }) {
     },
   ];
 
+  const uploadButton = (
+    <InfuseButton
+      icon='upload'
+      type='primary'
+      style={{ marginLeft: 16 }}
+      onClick={() => {
+        setUploading(true);
+      }}
+    >
+      Upload Files
+    </InfuseButton>
+  );
+
   return (
     <>
       <PageTitle breadcrumb={<Breadcrumbs pathList={breadcrumbs} />} />
       <PageBody>
         <Spin spinning={getDataset.loading}>
-          <Tabs defaultActiveKey='data'>
+          <Tabs
+            defaultActiveKey='data'
+            tabBarExtraContent={tabKey === 'data' ? uploadButton : undefined}
+            onChange={key => setTabKey(key)}
+          >
             <Tabs.TabPane key='data' tab='Data'>
-              data
+              <Browser
+                title={dataset.id}
+                basePath={`datasets/${dataset.id}`}
+                path={path || '/'}
+                enabledPHFS={enabledPHFS}
+                onChangePath={handleChangePath}
+                uploading={uploading}
+                onUploadingChange={(uploading: boolean) => {
+                  setUploading(uploading);
+                }}
+              />
             </Tabs.TabPane>
             <Tabs.TabPane key='information' tab='Information'>
               <div
