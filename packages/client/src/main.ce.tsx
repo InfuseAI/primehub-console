@@ -55,7 +55,7 @@ class Main extends React.Component {
                 <ListContainer Com={DatasetList} />
               </Route>
               <Route
-                path={`${appPrefix}g/:groupName/datasets/:datasetId`}
+                path={`${appPrefix}g/:groupName/datasets/:datasetId/:path*`}
                 exact
                 component={DatasetDetail}
               />

@@ -40,7 +40,6 @@ import GroupSettingsPage from 'containers/groupSettingsPage';
 import GroupSettingsJobs from 'ee/components/groupSettings/jobs';
 import GroupSettingsDeployments from 'ee/components/groupSettings/deployments';
 import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
-import DatasetBrowser from 'containers/Datasets/DatasetBrowser';
 import { DatasetList, DatasetDetail } from 'containers/Datasets';
 
 const client = createGraphqlClient({
@@ -63,11 +62,6 @@ class Main extends React.Component {
               <Jupyterhub />
             </Route>
 
-            {/* Dataset Browser */}
-            <Route path={`${appPrefix}g/:groupName/datasets/:dataset/:path*`}>
-              <DatasetBrowser />
-            </Route>
-
             {/* Shared Files */}
             <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
               <SharedFilesPage />
@@ -78,7 +72,7 @@ class Main extends React.Component {
               <ListContainer Com={DatasetList} />
             </Route>
             <Route
-              path={`${appPrefix}g/:groupName/datasets/:datasetId`}
+              path={`${appPrefix}g/:groupName/datasets/:datasetId/:path*`}
               exact
               component={DatasetDetail}
             />
