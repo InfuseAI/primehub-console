@@ -116,7 +116,7 @@ export const query = async (root, args, context: Context) => {
   return { id, ...metadata };
 };
 
-export const queryFile = async (root, args, context: Context) => {
+export const queryFile = async (root, args, context: Context): Promise<any> => {
   const { id, groupName, prefix } = args.where;
   return queryStore(
     root,
