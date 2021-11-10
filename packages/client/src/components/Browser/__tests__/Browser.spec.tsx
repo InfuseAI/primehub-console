@@ -102,16 +102,14 @@ describe('BrowseSharedFiles', () => {
   });
 
   it('should render browse shared files with unenabled phfs alert message', () => {
-    const { TestProvider, mockRequests, mockGroups } = setup();
+    const { mockRequests, mockGroups } = setup();
 
     render(
-      <TestProvider>
-        <MockedProvider mocks={mockRequests}>
-          <GroupContext.Provider value={mockGroups}>
-            <Browser enabledPHFS={false} path='/' />
-          </GroupContext.Provider>
-        </MockedProvider>
-      </TestProvider>
+      <MockedProvider mocks={mockRequests}>
+        <GroupContext.Provider value={mockGroups}>
+          <Browser enabledPHFS={false} path='/' />
+        </GroupContext.Provider>
+      </MockedProvider>
     );
 
     expect(
