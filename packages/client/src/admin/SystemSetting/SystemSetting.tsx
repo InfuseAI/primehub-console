@@ -630,7 +630,7 @@ function _SystemSetting({ form, data, ...props }: Props) {
           >
             Reset
           </Button>
-          {/* @ts-ignore */}
+
           <Button type='primary' htmlType='submit' form='system-settings'>
             Confirm
           </Button>

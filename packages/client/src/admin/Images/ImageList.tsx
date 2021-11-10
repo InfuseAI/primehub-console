@@ -210,7 +210,6 @@ function _ImageList({ data, ...props }: ImageListProps) {
       <div style={styles}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            {/* @ts-ignore */}
             <Button
               data-testid='add-button'
               type='primary'

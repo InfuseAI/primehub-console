@@ -251,7 +251,6 @@ export function GroupList(props: Props) {
             alignItems: 'flex-end',
           }}
         >
-          {/* @ts-ignore */}
           <InfuseButton
             data-testid='add-button'
             icon='plus'

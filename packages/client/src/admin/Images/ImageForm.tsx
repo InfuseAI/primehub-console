@@ -627,10 +627,10 @@ function _ImageForm({
         <div
           style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end' }}
         >
-          {/* @ts-ignore */}
           <Button type='primary' htmlType='submit' data-testid='confirm-button'>
             Confirm
           </Button>
+
           <Button
             data-testid='reset-button'
             onClick={() => {
@@ -713,7 +713,6 @@ function _ImageForm({
                     justifyContent: 'flex-end',
                   }}
                 >
-                  {/* @ts-ignore */}
                   <Button
                     type='primary'
                     onClick={() => {
@@ -765,7 +764,6 @@ function _ImageForm({
                     justifyContent: 'flex-end',
                   }}
                 >
-                  {/* @ts-ignore */}
                   <Button
                     type='primary'
                     onClick={() => setBuildDetailVisible(false)}

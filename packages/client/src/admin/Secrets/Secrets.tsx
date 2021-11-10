@@ -245,7 +245,6 @@ function _Secrets({
               data-testid='add-button'
               type='primary'
               icon='plus'
-              // @ts-ignore
               disabled={secretQuery.loading}
               onClick={() =>
                 history.push(`${appPrefix}admin/secret?operator=create`)

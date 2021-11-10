@@ -49,7 +49,6 @@ export function NodeSelectorList({
       )}
 
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        {/* @ts-ignore */}
         <Button
           data-testid='add-field-button'
           type='dashed'

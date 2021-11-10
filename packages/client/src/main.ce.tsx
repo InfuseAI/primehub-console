@@ -32,17 +32,16 @@ const client = createGraphqlClient({
 });
 
 class Main extends React.Component {
-
   render() {
     return (
       <BrowserRouter>
         <Route path={`${appPrefix}g/`}>
           <ApolloProvider client={client}>
             <MainPage sidebarItems={listCE}>
-            {/* Jupyterhub */}
-            <Route path={`${appPrefix}g/:groupName/hub`} exact>
-              <Jupyterhub />
-            </Route>
+              {/* Jupyterhub */}
+              <Route path={`${appPrefix}g/:groupName/hub`} exact>
+                <Jupyterhub />
+              </Route>
 
               {/* Shared Files */}
               <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
@@ -142,7 +141,6 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       placement: 'bottomRight',
       duration: null,
       btn: (
-        // @ts-ignore
         <Button
           type='primary'
           onClick={() =>

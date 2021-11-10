@@ -5,7 +5,6 @@ import {
   Form,
   Input,
   InputNumber,
-  Icon,
   Popconfirm,
   Spin,
   Switch,
@@ -392,7 +391,6 @@ export function _InstanceTypeForm({
                       min={0}
                       precision={1}
                       step={0.5}
-                      // @ts-ignore
                       parser={value => value.replace(/[^0-9.]/g, '')}
                       style={{ width: '105px' }}
                     />
@@ -419,7 +417,6 @@ export function _InstanceTypeForm({
                       precision={1}
                       step={1}
                       formatter={value => `${value} GB`}
-                      // @ts-ignore
                       parser={value => value.replace(/[^0-9.]/g, '')}
                       style={{ width: '105px' }}
                     />
@@ -546,7 +543,6 @@ export function _InstanceTypeForm({
 
                           return null;
                         }}
-                        // @ts-ignore
                         parser={value => value.replace(/[^0-9.]/g, '')}
                         disabled={!advanceFeature.enableMemoryRequest}
                         style={{ marginLeft: '8px', width: '130px' }}
@@ -621,7 +617,6 @@ export function _InstanceTypeForm({
                 marginBottom: '16px',
               }}
             >
-              {/* @ts-ignore */}
               <Button
                 data-testid='create-toleration'
                 type='primary'
@@ -764,7 +759,6 @@ export function _InstanceTypeForm({
               </Button>
 
               <div style={{ display: 'flex', gap: '16px' }}>
-                {/* @ts-ignore */}
                 <Button
                   data-testid='confirm-button'
                   type='primary'
