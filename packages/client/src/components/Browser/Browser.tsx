@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, useState, useRef } from 'react';
 import gql from 'graphql-tag';
 import moment from 'moment';
 import styled from 'styled-components';
@@ -16,17 +16,15 @@ import {
   Button,
 } from 'antd';
 import { compose } from 'recompose';
-import { useHistory } from 'react-router-dom';
 import { graphql } from 'react-apollo';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import type { ColumnProps } from 'antd/lib/table';
 
-import Uploader from 'components/sharedFiles/uploader';
-import InfuseButton from 'components/infuseButton';
+import Uploader from 'components/Browser/Uploader';
 import iconMore from 'images/icon-more.svg';
 import {
   GroupContext,
-  GroupContextValue,
+  GroupContextComponentProps,
   withGroupContext,
 } from 'context/group';
 import { TruncateTableField } from 'utils/TruncateTableField';
@@ -34,7 +32,7 @@ import { errorHandler } from 'utils/errorHandler';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { useClipboard } from 'hooks/useClipboard';
 
-import NotebookViewer from './NotebookView';
+import NotebookViewer from 'components/NotebookView/NotebookView';
 import SharingOptions from './NotebookShareOptions';
 
 export const GET_FILES = gql`
@@ -85,37 +83,34 @@ function humanFileSize(bytes, si = false, dp = 1) {
   return bytes.toFixed(dp) + ' ' + units[u];
 }
 
-function normalizedPath(path = '/') {
+function joinAndNormalize(...paths: string[]) {
   /**
-   * Normalize the path to the format '/this/is/a/path/
+   * Join and normalize the paths to the format '/this/is/a/path/
    * 1. Always have leading slash
    * 2. Always have tailing slash
    */
-  if (!path.startsWith('/')) {
-    path = `/${path}`;
-  }
-
-  if (!path.endsWith('/')) {
-    path = `${path}/`;
-  }
-
-  return path;
+  const path = paths
+    .filter(s => s)
+    .flatMap(s => s.split('/'))
+    .filter(s => s.length > 0)
+    .join('/');
+  return path.length > 0 ? `/${path}/` : '/';
 }
 
 function BreadcrumbPaths({
+  title,
   path,
+  changePath,
   onCreate,
-  refetchFiles,
+  style,
 }: {
+  title: string;
   path: string;
   onCreate: () => void;
-  refetchFiles: () => Promise<void>;
+  changePath: (path: string) => void;
+  style?: React.CSSProperties;
 }) {
-  const history = useHistory();
-  const { name } = useContext(GroupContext);
-  const { appPrefix } = useRoutePrefix();
-
-  const paths = normalizedPath(path).split('/');
+  const paths = joinAndNormalize(path).split('/');
   const items = [];
 
   paths.forEach((path, i) => {
@@ -123,12 +118,11 @@ function BreadcrumbPaths({
       items.push(
         <Breadcrumb.Item key={i}>
           <a
-            onClick={async () => {
-              history.push(`${appPrefix}g/${name}/browse`);
-              await refetchFiles();
+            onClick={() => {
+              changePath('/');
             }}
           >
-            {name}
+            {title}
           </a>
         </Breadcrumb.Item>
       );
@@ -136,10 +130,9 @@ function BreadcrumbPaths({
       items.push(
         <Breadcrumb.Item
           key={i}
-          onClick={async () => {
+          onClick={() => {
             const targetPath = paths.slice(0, i + 1).join('/');
-            history.push(`${appPrefix}g/${name}/browse${targetPath}`);
-            await refetchFiles();
+            changePath(targetPath);
           }}
         >
           <a>{path}</a>
@@ -162,16 +155,16 @@ function BreadcrumbPaths({
     }
   });
 
-  return <Breadcrumb>{items}</Breadcrumb>;
+  return <Breadcrumb style={style}>{items}</Breadcrumb>;
 }
 
 function ShareFileActions({
   prefix,
-  path,
+  phfsPrefix,
   ...props
 }: FileItem & {
   prefix: string;
-  path: string;
+  phfsPrefix: string;
   onDelete: () => void;
   onPreviewFile: (path: string) => void;
 }) {
@@ -200,7 +193,7 @@ function ShareFileActions({
     <Menu.Item
       key='Copy Uri'
       onClick={() => {
-        copyName(`phfs://${normalizedPath(path)}${props.name}`);
+        copyName(`phfs://${joinAndNormalize(phfsPrefix)}${props.name}`);
       }}
     >
       Copy PHFS URI
@@ -282,9 +275,17 @@ interface FileItem {
   lastModified: string;
 }
 
-interface BrowseSharedFilesProps {
-  path: string;
-  enabledPHFS: boolean;
+export interface BrowserProps {
+  title?: string;
+  basePath?: string;
+  path?: string;
+  enabledPHFS?: boolean;
+  onChangePath?: (path: string) => void;
+  uploading?: boolean;
+  onUploadingChange?: (status: boolean) => void;
+}
+
+interface BrowseInternalProps extends GroupContextComponentProps, BrowserProps {
   data?: {
     error: Error | undefined;
     loading: boolean;
@@ -310,20 +311,36 @@ interface BrowseSharedFilesProps {
   }) => Promise<{ data: { deleteFiles: number } }>;
 }
 
-function BrowseSharedFiles({
-  data,
-  enabledPHFS,
-  path,
-  ...props
-}: BrowseSharedFilesProps) {
-  const history = useHistory();
+function Browser(props: BrowseInternalProps) {
+  const { data, enabledPHFS, title, onChangePath: onChange, uploading, onUploadingChange } = {
+    title: '<root>',
+    uploading: false,
+    ...props,
+  };
+  const path = joinAndNormalize(props.path);
 
-  const { appPrefix } = useRoutePrefix();
   const { name: groupName } = useContext(GroupContext);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const [previewFilePath, setPreviewFilePath] = useState('');
+  const refSearch = useRef();
+
+  const changePath = (_path: string) => {
+    const newPath = joinAndNormalize(_path);
+    if (newPath === path) {
+      data?.refetch();
+    }
+
+    if (!isEmpty(searchText)) {
+      setSearchText('');
+      (refSearch as any).current?.input.setValue('');
+    }
+
+    if (onChange) {
+      onChange(newPath);
+    }
+  };
 
   const columns: ColumnProps<FileItem>[] = [
     {
@@ -341,10 +358,8 @@ function BrowseSharedFiles({
               <a
                 style={{ color: 'rgba(0, 0, 0, 0.65)' }}
                 onClick={() => {
-                  const prefixPath = history.location.pathname;
                   const appendPath = name.replace('/', '');
-
-                  history.push(`${prefixPath}/${appendPath}`);
+                  changePath(`${path}${appendPath}`);
                 }}
               >
                 {name}
@@ -397,15 +412,19 @@ function BrowseSharedFiles({
       key: 'action',
       align: 'right',
       width: 30,
-      render: function RednerActions(item: FileItem) {
+      render: function RenderActions(item: FileItem) {
+        const {
+          files: { prefix, phfsPrefix },
+        } = data;
+
         return (
           <ShareFileActions
             {...item}
-            prefix={get(data, 'files.prefix', '')}
-            path={path}
+            prefix={prefix}
+            phfsPrefix={phfsPrefix}
             onPreviewFile={path => setPreviewFilePath(path)}
             onDelete={() => {
-              onFilesDeleted(item);
+              onFilesDeleted(phfsPrefix, item);
             }}
           />
         );
@@ -413,15 +432,12 @@ function BrowseSharedFiles({
     },
   ];
 
-  function onFilesDeleted({ name }: FileItem) {
-    const basePath = `${appPrefix}g/${groupName}/browse`;
+  function onFilesDeleted(phfsPrefix: string, { name }: FileItem) {
     const isFolder = name.endsWith('/');
-    const isGroupRootFolder = history.location.pathname === basePath;
-
-    const targetDeletePath = `${history.location.pathname.replace(
-      `${basePath}/`,
-      ''
-    )}/`;
+    let path = `${phfsPrefix}${name}`;
+    if (path.startsWith('/')) {
+      path = path.substring(1);
+    }
 
     try {
       Modal.confirm({
@@ -432,9 +448,7 @@ function BrowseSharedFiles({
             variables: {
               where: {
                 groupName,
-                phfsPrefix: isGroupRootFolder
-                  ? name
-                  : `${targetDeletePath}${name}`,
+                phfsPrefix: path,
               },
               options: {
                 recursive: isFolder,
@@ -466,17 +480,20 @@ function BrowseSharedFiles({
     );
   }
 
+  let dataSource: FileItem[] = get(data, 'files.items', []);
+  if (!isEmpty(searchText)) {
+    dataSource = dataSource.filter(item => item.name.includes(searchText));
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex' }}>
         {isEditing ? (
           <Input.Search
+            style={{ flex: '1' }}
             autoFocus
             enterButton='Confirm'
-            defaultValue={`${history.location.pathname.replace(
-              `${appPrefix}g/${groupName}/browse`,
-              ''
-            )}/`}
+            defaultValue={path}
             onBlur={() => {
               setTimeout(() => {
                 setIsEditing(false);
@@ -484,23 +501,13 @@ function BrowseSharedFiles({
             }}
             onSearch={value => {
               setIsEditing(false);
-              const basePath = `${appPrefix}g/${groupName}/browse`;
 
               if (value === '') {
-                history.push(basePath);
+                changePath(value);
                 return;
               }
 
               if (value.length > 1000) {
-                notification.error({
-                  message: 'Path contains consecutive slashes.',
-                  duration: 10,
-                  placement: 'bottomRight',
-                });
-                return;
-              }
-
-              if (value.includes('//')) {
                 notification.error({
                   message: 'Path too long. (length > 1000)',
                   duration: 10,
@@ -509,33 +516,40 @@ function BrowseSharedFiles({
                 return;
               }
 
-              history.push(`${basePath}${value}`);
+              changePath(value);
             }}
           />
         ) : (
           <BreadcrumbPaths
+            style={{
+              flex: '1',
+              justifyContent: 'space-between',
+              overflowX: 'auto',
+              whiteSpace: 'nowrap',
+            }}
+            title={title}
             path={path}
-            refetchFiles={data?.refetch}
             onCreate={() => {
               setIsEditing(true);
             }}
+            changePath={changePath}
           />
         )}
 
-        <InfuseButton
-          icon='upload'
-          type='primary'
-          style={{ marginLeft: 16 }}
-          onClick={() => setIsUploading(true)}
-        >
-          Upload
-        </InfuseButton>
+        <Input.Search
+          ref={refSearch}
+          placeholder='Search file'
+          onChange={e => {
+            setSearchText(e.target.value);
+          }}
+          style={{ width: 200, marginLeft: 16 }}
+        />
       </div>
 
       <Table
         rowKey={data => data?.name}
         loading={data?.loading}
-        dataSource={get(data, 'files.items', [])}
+        dataSource={dataSource}
         columns={columns}
         pagination={{
           hideOnSinglePage: false,
@@ -547,13 +561,13 @@ function BrowseSharedFiles({
 
       <Modal
         title='Upload'
-        visible={isUploading}
+        visible={uploading}
         footer={[
           <Button
             key='ok'
             type='primary'
             onClick={() => {
-              setIsUploading(false);
+              onUploadingChange(false);
               data?.refetch();
             }}
           >
@@ -561,7 +575,7 @@ function BrowseSharedFiles({
           </Button>,
         ]}
         onCancel={() => {
-          setIsUploading(false);
+          onUploadingChange(false);
         }}
       >
         <Uploader dirPath={get(data, 'files.prefix', '')} />
@@ -597,14 +611,10 @@ function BrowseSharedFiles({
 export default compose(
   withGroupContext,
   graphql(GET_FILES, {
-    options: (props: {
-      path: string;
-      enabledPHFS: boolean;
-      groupContext: GroupContextValue;
-    }) => ({
+    options: (props: BrowseInternalProps) => ({
       variables: {
         where: {
-          phfsPrefix: props.path,
+          phfsPrefix: joinAndNormalize(props.basePath, props.path),
           groupName: props.groupContext.name,
         },
       },
@@ -614,14 +624,14 @@ export default compose(
     skip: props => !props.enabledPHFS,
   }),
   graphql(DELETE_FILES, {
-    options: (props: { path: string; groupContext: GroupContextValue }) => ({
+    options: (props: BrowseInternalProps) => ({
       onError: errorHandler,
       refetchQueries: [
         {
           query: GET_FILES,
           variables: {
             where: {
-              phfsPrefix: props.path,
+              phfsPrefix: joinAndNormalize(props.basePath, props.path),
               groupName: props.groupContext.name,
             },
           },
@@ -630,4 +640,4 @@ export default compose(
     }),
     name: 'deleteFiles',
   })
-)(BrowseSharedFiles);
+)(Browser);

@@ -1,11 +1,10 @@
-import React, { ReactNode } from 'react';
-import { MemoryRouter, Route } from 'react-router-dom';
+import React from 'react';
 import { MockedProvider } from 'react-apollo/test-utils';
 
 import { render, screen } from 'test/test-utils';
 import { GroupContext } from 'context/group';
 
-import BrowseSharedFiles, { GET_FILES } from '../BrowseSharedFiles';
+import Browser, { GET_FILES } from '../Browser';
 
 function setup() {
   const mockGroups = {
@@ -60,74 +59,57 @@ function setup() {
     },
   ];
 
-  function TestProvider({ children }: { children: ReactNode }) {
-    return (
-      <MemoryRouter initialEntries={['/g/InfuseAICat/browse']}>
-        <Route path='/g/:groupName/browse/:phfsPrefix*'>{children}</Route>
-      </MemoryRouter>
-    );
-  }
-
   return {
     mockRequests,
     mockGroups,
-    TestProvider,
   };
 }
 
 describe('BrowseSharedFiles', () => {
   it('should render browse shared files with error messages', async () => {
-    const { TestProvider } = setup();
-
     render(
-      <TestProvider>
-        <MockedProvider mocks={[]}>
-          <GroupContext.Provider
-            value={{
-              id: 'test-group',
-              displayName: 'InfuseAICat',
-              name: 'InfuseAICat',
-              admins: 'test',
-              enabledDeployment: false,
-              enabledSharedVolume: false,
-            }}
-          >
-            <BrowseSharedFiles enabledPHFS path='/' />
-          </GroupContext.Provider>
-        </MockedProvider>
-      </TestProvider>
+      <MockedProvider mocks={[]}>
+        <GroupContext.Provider
+          value={{
+            id: 'test-group',
+            displayName: 'InfuseAICat',
+            name: 'InfuseAICat',
+            admins: 'test',
+            enabledDeployment: false,
+            enabledSharedVolume: false,
+          }}
+        >
+          <Browser enabledPHFS path='/' />
+        </GroupContext.Provider>
+      </MockedProvider>
     );
 
     expect(await screen.findByText('Server Error')).toBeInTheDocument();
   });
 
   it('should render browse shared files with fetched data', async () => {
-    const { TestProvider, mockRequests, mockGroups } = setup();
+    const { mockRequests, mockGroups } = setup();
 
     render(
-      <TestProvider>
-        <MockedProvider mocks={mockRequests}>
-          <GroupContext.Provider value={mockGroups}>
-            <BrowseSharedFiles enabledPHFS path='/' />
-          </GroupContext.Provider>
-        </MockedProvider>
-      </TestProvider>
+      <MockedProvider mocks={mockRequests}>
+        <GroupContext.Provider value={mockGroups}>
+          <Browser enabledPHFS path='/' />
+        </GroupContext.Provider>
+      </MockedProvider>
     );
 
     expect(await screen.findByText('pj/')).toBeInTheDocument();
   });
 
   it('should render browse shared files with unenabled phfs alert message', () => {
-    const { TestProvider, mockRequests, mockGroups } = setup();
+    const { mockRequests, mockGroups } = setup();
 
     render(
-      <TestProvider>
-        <MockedProvider mocks={mockRequests}>
-          <GroupContext.Provider value={mockGroups}>
-            <BrowseSharedFiles enabledPHFS={false} path='/' />
-          </GroupContext.Provider>
-        </MockedProvider>
-      </TestProvider>
+      <MockedProvider mocks={mockRequests}>
+        <GroupContext.Provider value={mockGroups}>
+          <Browser enabledPHFS={false} path='/' />
+        </GroupContext.Provider>
+      </MockedProvider>
     );
 
     expect(

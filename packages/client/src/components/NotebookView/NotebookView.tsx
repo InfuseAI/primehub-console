@@ -6,7 +6,7 @@ import Markdown from 'react-markdown';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 
 import { Icon, Affix } from 'antd';
-import { Logo } from 'containers/sharedFiles/NotebookShareOptions';
+import { Logo } from 'components/share/Logo';
 
 const messageNotebook = `{
   "cells": [

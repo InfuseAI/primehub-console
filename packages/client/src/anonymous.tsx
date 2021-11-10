@@ -1,10 +1,10 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import { useParams } from 'react-router-dom';
-import NotebookViewer from 'containers/sharedFiles/NotebookView';
+import NotebookViewer from 'components/NotebookView/NotebookView';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { appPrefix } from 'utils/env';
-import { Logo } from 'containers/sharedFiles/NotebookShareOptions';
+import { Logo } from 'components/share/Logo';
 import { Typography, Layout, Button, Form, Input, notification } from 'antd';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import type { FormComponentProps } from 'antd/lib/form';

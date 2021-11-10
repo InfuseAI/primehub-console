@@ -24,7 +24,7 @@
     "build:model_deploy": "npm run clean && webpack --env mode=production schema=modelDeploy --progress",
     "clean": "rimraf dist",
     "lint": "eslint .",
-    "start": "webpack serve --env mode=development schema=ee --progress",
+    "start": "webpack serve --env mode=development schema=ee --progress --devtool source-map",
     "start:ce": "webpack serve --env mode=development schema=ce --progress",
     "start:model_deploy": "webpack serve --env mode=development schema=modelDeploy --progress",
     "test": "jest",
