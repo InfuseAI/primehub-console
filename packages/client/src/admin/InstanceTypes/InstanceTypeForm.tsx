@@ -120,13 +120,42 @@ type UserGroupsAction =
   | { type: 'GROUPS'; groups: Groups[] }
   | { type: 'CONNECTIONS'; connect: Groups[]; disconnect: Groups[] };
 
+function FormButtons() {
+  const history = useHistory();
+  const { appPrefix } = useRoutePrefix();
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        marginTop: '24px',
+        justifyContent: 'flex-end',
+        gap: '8px',
+      }}
+    >
+      <div style={{ display: 'flex', gap: '16px' }}>
+        <Button data-testid='confirm-button' type='primary' htmlType='submit'>
+          Confirm
+        </Button>
+        <Button
+          data-testid='reset-button'
+          onClick={() => {
+            history.push(`${appPrefix}admin/instanceType`);
+          }}
+        >
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function _InstanceTypeForm({
   loading = false,
   form,
   data,
   ...props
 }: InstanceTypeFormProps) {
-  const [activePanel, setActivePanel] = React.useState('1');
   const [tolerations, setTolerations] = React.useState([]);
   const [nodeList, setNodeList] = React.useState<string[][]>([]);
   const [globalStatus, setGlobalStatus] = React.useState(true);
@@ -333,7 +362,7 @@ export function _InstanceTypeForm({
           });
         }}
       >
-        <Tabs activeKey={activePanel} onTabClick={tab => setActivePanel(tab)}>
+        <Tabs>
           {/* Basic */}
           <Tabs.TabPane tab='Basic Info' key='1'>
             <Spin spinning={loading}>
@@ -592,20 +621,10 @@ export function _InstanceTypeForm({
                     />
                   </Form.Item>
                 )}
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <Button
-                    data-testid='next1-button'
-                    icon='arrow-right'
-                    onClick={() =>
-                      setActivePanel(prev => String(Number(prev) + 1))
-                    }
-                  >
-                    Next
-                  </Button>
-                </div>
               </div>
             </Spin>
+
+            <FormButtons />
           </Tabs.TabPane>
 
           {/* Tolerations */}
@@ -707,28 +726,7 @@ export function _InstanceTypeForm({
               />
             )}
 
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                marginTop: '16px',
-                gap: '8px',
-              }}
-            >
-              <Button
-                icon='arrow-left'
-                onClick={() => setActivePanel(prev => String(Number(prev) - 1))}
-              >
-                Basic Info
-              </Button>
-              <Button
-                data-testid='next2-button'
-                icon='arrow-right'
-                onClick={() => setActivePanel(prev => String(Number(prev) + 1))}
-              >
-                Next
-              </Button>
-            </div>
+            <FormButtons />
           </Tabs.TabPane>
 
           {/* Node Selector */}
@@ -743,39 +741,7 @@ export function _InstanceTypeForm({
               />
             )}
 
-            <div
-              style={{
-                display: 'flex',
-                marginTop: '24px',
-                justifyContent: 'space-between',
-                gap: '8px',
-              }}
-            >
-              <Button
-                icon='arrow-left'
-                onClick={() => setActivePanel(prev => String(Number(prev) - 1))}
-              >
-                Tolerations
-              </Button>
-
-              <div style={{ display: 'flex', gap: '16px' }}>
-                <Button
-                  data-testid='confirm-button'
-                  type='primary'
-                  htmlType='submit'
-                >
-                  Confirm
-                </Button>
-                <Button
-                  data-testid='reset-button'
-                  onClick={() => {
-                    history.push(`${appPrefix}admin/instanceType`);
-                  }}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
+            <FormButtons />
           </Tabs.TabPane>
 
           {form.getFieldDecorator('id', {
