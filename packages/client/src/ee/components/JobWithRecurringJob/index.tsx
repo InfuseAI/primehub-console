@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useReducer } from 'react';
-import get from 'lodash/get';
 import { useHistory, withRouter, RouteComponentProps } from 'react-router-dom';
 import { Checkbox, Input, Tabs, Modal, notification } from 'antd';
 import { graphql } from 'react-apollo';
@@ -40,7 +39,7 @@ type TabPanelKey = 'job' | 'recurringJob';
 
 interface Props extends RouteComponentProps {
   groupContext: GroupContextValue;
-  tab: TabPanelKey;
+  tab?: TabPanelKey;
   jobs?: JobConnections;
   rerunPhJob: (variables: JobActionVariables) => Promise<RerunJob>;
   cancelPhJob: (variables: JobActionVariables) => Promise<{ id: string }>;
@@ -91,17 +90,17 @@ function reducer(state: State, action: Actions) {
 }
 
 function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
+  const { name: groupName } = useContext(GroupContext);
   const [state, dispatch] = useReducer(reducer, {
     tab: 'job',
     keyword: '',
     isSubmittedByMe: false,
   });
-  const groupContext = useContext(GroupContext);
 
   const history = useHistory();
   const { appPrefix } = useRoutePrefix();
 
-  const routePrefix = `${appPrefix}g/${groupContext.name}`;
+  const routePrefix = `${appPrefix}g/${groupName}`;
 
   function onRerunJob({ id, displayName }: ActionInfo) {
     Modal.confirm({
@@ -117,7 +116,13 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
       maskClosable: true,
       onOk: async () => {
         try {
-          await props.rerunPhJob({ variables: { where: { id } } });
+          await props.rerunPhJob({
+            variables: {
+              where: {
+                id,
+              },
+            },
+          });
         } catch (err) {
           console.error(err);
           errorHandler(err);
@@ -140,7 +145,13 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
       maskClosable: true,
       onOk: async () => {
         try {
-          await props.cancelPhJob({ variables: { where: { id } } });
+          await props.cancelPhJob({
+            variables: {
+              where: {
+                id,
+              },
+            },
+          });
         } catch (err) {
           console.error(err);
           errorHandler(err);
@@ -154,9 +165,8 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
       displayName: job.displayName,
       groupId: job.groupId,
       groupName: job.groupName,
-      instanceTypeId: get(job, 'instanceType.id'),
-      instanceTypeName:
-        get(job, 'instanceType.displayName') || get(job, 'instanceType.name'),
+      instanceTypeId: job.instanceType.id,
+      instanceTypeName: job.instanceType.displayName || job.instanceType.name,
       image: job.image,
       command: job.command,
     };
@@ -400,13 +410,18 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
             New Job
           </InfuseButton>
           <InfuseButton
-            disabled={jobs?.loading || recurringJobs?.loading}
-            onClick={() => {
-              if (state.tab === 'job') {
-                jobs?.refetch();
-              }
-              if (state.tab === 'recurringJob') {
-                recurringJobs?.refetch();
+            loading={jobs?.loading || recurringJobs?.loading}
+            onClick={async () => {
+              try {
+                if (state.tab === 'job') {
+                  await jobs?.refetch();
+                }
+                if (state.tab === 'recurringJob') {
+                  await recurringJobs?.refetch();
+                }
+              } catch (err) {
+                console.error(err);
+                errorHandler(err);
               }
             }}
           >

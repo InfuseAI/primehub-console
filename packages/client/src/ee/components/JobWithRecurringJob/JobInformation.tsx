@@ -105,11 +105,7 @@ function renderMessage(job?: Job) {
 }
 
 function renderFinishTime(job?: Job) {
-  if (!job) {
-    return '-';
-  }
-
-  if (job.phase === 'Running') {
+  if (!job || job.phase === 'Running') {
     return '-';
   }
 
@@ -119,11 +115,7 @@ function renderFinishTime(job?: Job) {
 }
 
 function finishTimeFromNow(job?: Job) {
-  if (!job) {
-    return '-';
-  }
-
-  if (job.phase === 'Running') {
+  if (!job || job.phase === 'Running') {
     return '-';
   }
 
@@ -131,7 +123,7 @@ function finishTimeFromNow(job?: Job) {
 }
 
 interface Props {
-  job: Job | undefined;
+  job?: Job;
   rerunPhJob: (id: string) => void;
   cancelPhJob: (id: string) => void;
   cloneJob: (job: Job) => void;

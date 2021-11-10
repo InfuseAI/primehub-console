@@ -56,7 +56,7 @@ export type ScheduleQueryVariables = {
 
 export type ScheduleConnections = {
   variables: ScheduleQueryVariables;
-  phSchedulesConnection: {
+  phSchedulesConnection?: {
     edges: ScheduleNode[];
     pageInfo: {
       currentPage: number;
@@ -85,7 +85,7 @@ export type RunSchedule = {
 };
 
 interface RecurringJobListProps {
-  data: ScheduleConnections;
+  data?: ScheduleConnections;
   onRunRecurringJob: ({ id, displayName }: ActionInfo) => void;
   onDeleteRecurringJob: ({ id, displayName }: ActionInfo) => void;
 }

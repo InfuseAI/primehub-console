@@ -40,7 +40,7 @@ export type JobQueryVariables = {
 
 export type JobConnections = {
   variables: JobQueryVariables;
-  phJobsConnection: {
+  phJobsConnection?: {
     edges: JobNode[];
     pageInfo: {
       currentPage: number;
@@ -53,7 +53,7 @@ export type JobConnections = {
 };
 
 interface JobListProps {
-  data: JobConnections;
+  data?: JobConnections;
   onRerunJob: ({ id, displayName }: ActionInfo) => void;
   onCancelJob: ({ id, displayName }: ActionInfo) => void;
   onCloneJob: (job: Job) => void;

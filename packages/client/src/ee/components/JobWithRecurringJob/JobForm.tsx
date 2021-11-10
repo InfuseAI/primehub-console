@@ -100,22 +100,6 @@ python /project/group-a/train.py \\
   --parameter_2 value_2
 `;
 
-const initialState = {
-  groupId: '',
-  instanceTypeId: '',
-  instanceType: '',
-  instanceTypeName: '',
-  image: '',
-  displayName: '',
-  command: '',
-  activeDeadlineSeconds: 86400,
-  executeOptions: 'job',
-  recurrence: {
-    cron: '',
-    type: 'inactive',
-  },
-};
-
 type FormState = {
   groupId: string;
   instanceTypeId: string;
@@ -247,6 +231,22 @@ function reducer(state: State, action: Actions) {
   }
 }
 
+const initialState: FormState = {
+  groupId: '',
+  instanceTypeId: '',
+  instanceType: '',
+  instanceTypeName: '',
+  image: '',
+  displayName: '',
+  command: '',
+  activeDeadlineSeconds: 86400,
+  executeOptions: 'job',
+  recurrence: {
+    cron: '',
+    type: 'inactive',
+  },
+};
+
 function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
   const groupContext = useContext(GroupContext);
   const [state, dispatch] = useReducer(reducer, {
@@ -317,7 +317,7 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
   }, [currentUser, groupContext]);
 
   useEffect(() => {
-    // Editing recurring job
+    // Props have `data` property represent is editing recurring job
     if (props.data) {
       dispatch({ type: 'IS_EDITING_RECURRING_JOB', value: true });
     }
@@ -694,7 +694,7 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
                       type: 'incative',
                     },
                     rules: [{ validator: recurrenceValidator }],
-                    // @ts-ignore component receive props from decorator
+                    // @ts-ignore component will receive props from decorator
                   })(<RecurrenceInput />)}
                 </Form.Item>
               )}
