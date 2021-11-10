@@ -57,7 +57,7 @@ export const mountStoreCtrl = (router: Router,
     }
   };
 
-  router.get('/files/(.*)', authenticateMiddleware, async ctx => {
+  router.get('/files/(.*)', authenticateMiddleware, async (ctx: any) => {
     const objectPath = ctx.params[0];
     const [first, groupName] = objectPath.split('/');
     if (first !== 'groups' || !groupName) {
@@ -69,6 +69,33 @@ export const mountStoreCtrl = (router: Router,
     }
 
     await downloadFile(ctx, objectPath);
+  });
+
+  router.post('/files/(.*)', authenticateMiddleware, async (ctx: any) => {
+    const objectPath = ctx.params[0];
+    const [first, groupName] = objectPath.split('/');
+    if (first !== 'groups' || !groupName) {
+      throw Boom.forbidden('request not authorized');
+    }
+
+    if (await isGroupBelongUser(ctx, ctx.userId, groupName) === false) {
+      throw Boom.forbidden('request not authorized');
+    }
+
+    try {
+      const result = await minioClient.putObject(storeBucket, objectPath, ctx.req);
+      ctx.body = {
+        success: true,
+      };
+    } catch (error) {
+      logger.error({
+        component: logger.components.internal,
+        type: 'MINIO_PUT_OBJECT_ERROR',
+        code: error.code,
+        message: error.message
+      });
+      return ctx.status = 500;
+    }
   });
 
   router.get('/share/:hash', async ctx => {
