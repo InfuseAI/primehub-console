@@ -108,12 +108,42 @@ const listDatasets = async (objectPrefix: string, context: Context) => {
   return objects;
 };
 
+export const getDatasetSize = async (
+  id: string,
+  groupName: string,
+  context: Context
+): Promise<number> => {
+  const { minioClient, storeBucket } = context;
+
+  const datasetSize = new Promise<number>((resolve, reject) => {
+    let totalSize = 0;
+    const objPrefix = `${getDatasetPrefix(groupName)}${id}/`;
+    const stream = minioClient.listObjectsV2(storeBucket, objPrefix, true);
+    stream.on('data', obj => {
+      if (obj.name !== (objPrefix + DATASET_METADATA)) {
+        totalSize += obj.size;
+      }
+    });
+    stream.on('error', err => {
+      reject(err);
+    });
+    stream.on('end', () => {
+      resolve(totalSize);
+    });
+  });
+
+  return datasetSize;
+};
+
 export const query = async (root, args, context: Context) => {
   const { id, groupName } = args.where;
   await checkPermission(context, groupName);
 
   const metadata = await getMetadata(id, groupName, context);
-  return { id, ...metadata };
+  const size = async () => {
+    return getDatasetSize(id, groupName, context);
+  };
+  return { id, ...metadata, size };
 };
 
 export const queryFile = async (root, args, context: Context): Promise<any> => {
