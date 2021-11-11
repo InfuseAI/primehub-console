@@ -1,4 +1,5 @@
 import { ApolloError } from 'apollo-server';
+import { isEmpty } from 'lodash';
 
 import { Context } from './interface';
 import * as logger from '../logger';
@@ -53,7 +54,14 @@ const getMetadata = async (id: string, groupName: string, context: Context) => {
   try {
     await minioClient.statObject(storeBucket, objectName);
   } catch (err) {
-    throw new ApolloError('failed to get dataset', RESOURCE_NOT_FOUND, err);
+    logger.error({
+      component: logger.components.datasetV2,
+      resource: objectName,
+      type: 'DATASET_GET_OBJECT',
+      stacktrace: err.stack,
+      message: err.message,
+    });
+    return {};
   }
   const object = new Promise<DatasetV2Metadata>((resolve, reject) => {
     const arr = [];
@@ -94,6 +102,7 @@ const listDatasets = async (objectPrefix: string, context: Context) => {
     const arr = [];
     const stream = minioClient.listObjectsV2(storeBucket, objectPrefix);
     stream.on('data', obj => {
+      if (!obj.prefix) { return; }
       const id = obj.prefix.replace(objectPrefix, '').slice(0, -1);
       arr.push({ id, ...obj });
     });
@@ -166,15 +175,19 @@ export const connectionQuery = async (root, args, context: Context) => {
   const list = await listDatasets(objectPrefix, context);
   let datasets = await Promise.all(
     list.map(async obj => {
-      const metadata = await getMetadata(obj.id, groupName, context);
+      const metadata: any = await getMetadata(obj.id, groupName, context);
+      if (isEmpty(metadata)) {
+        return {};
+      }
       return {
         id: obj.id,
         ...metadata,
       };
     })
   );
+  datasets = datasets.filter((obj: any) => obj.id);
   if (search) {
-    datasets = datasets.filter(obj => obj.name.includes(search));
+    datasets = datasets.filter((obj: any) => obj.name.includes(search));
   }
 
   return toRelay(datasets, extractPagination(args));
