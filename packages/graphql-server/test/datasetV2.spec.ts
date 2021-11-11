@@ -223,7 +223,8 @@ describe('dataset v2 graphql', function () {
         },
       }
     );
-    expect('RESOURCE_NOT_FOUND').to.be.eq(getResult[0].extensions.code);
+
+    expect('RESOURCE_NOT_FOUND').to.be.eq(getResult[0]?.extensions?.code);
 
     const afterDeleteList = await listObjects(
       this.minioClient,
