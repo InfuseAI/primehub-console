@@ -149,6 +149,9 @@ export const query = async (root, args, context: Context) => {
   await checkPermission(context, groupName);
 
   const metadata = await getMetadata(id, groupName, context);
+  if (isEmpty(metadata)) {
+    throw new ApolloError('failed to get dataset', RESOURCE_NOT_FOUND);
+  }
   const size = async () => {
     return getDatasetSize(id, groupName, context);
   };
