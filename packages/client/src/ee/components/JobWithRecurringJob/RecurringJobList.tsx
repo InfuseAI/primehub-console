@@ -3,7 +3,6 @@ import moment from 'moment';
 import get from 'lodash/get';
 import startCase from 'lodash/startCase';
 import { Button, Tooltip, Table } from 'antd';
-import { useHistory } from 'react-router-dom';
 import type { ColumnProps, SorterResult } from 'antd/lib/table';
 
 import { TruncateTableField } from 'utils/TruncateTableField';
@@ -12,6 +11,7 @@ import type { TInstanceType } from 'admin/InstanceTypes/types';
 import type {
   ActionInfo,
   Job,
+  PageInfo,
   Recurrence,
   RecurringJob as TRecurringJob,
 } from './types';
@@ -50,10 +50,7 @@ export type RecurringJobConnections = {
   variables: RecurringJobQueryVariables;
   phSchedulesConnection?: {
     edges: RecurringJobNode[];
-    pageInfo: {
-      currentPage: number;
-      totalPage: number;
-    };
+    pageInfo: PageInfo;
   };
   refetch: (variables?: RecurringJobQueryVariables) => Promise<void>;
   loading: boolean;
@@ -79,12 +76,11 @@ export type RunRecurringJob = {
 interface RecurringJobListProps {
   data?: RecurringJobConnections;
   onRunRecurringJob: ({ id, displayName }: ActionInfo) => void;
+  onEditRecurringJob: (id: string) => void;
   onDeleteRecurringJob: ({ id, displayName }: ActionInfo) => void;
 }
 
 export function RecurringJobList({ data, ...props }: RecurringJobListProps) {
-  const history = useHistory();
-
   const columns: ColumnProps<RecurringJobNode>[] = [
     {
       title: 'Name',
@@ -161,6 +157,7 @@ export function RecurringJobList({ data, ...props }: RecurringJobListProps) {
           <Button.Group>
             <Tooltip placement='bottom' title='Run'>
               <Button
+                data-testid={`run-${node.displayName}-recurring-job`}
                 icon='caret-right'
                 onClick={() =>
                   props.onRunRecurringJob({
@@ -173,14 +170,16 @@ export function RecurringJobList({ data, ...props }: RecurringJobListProps) {
             </Tooltip>
             <Tooltip placement='bottom' title='Edit'>
               <Button
+                data-testid={`edit-${node.displayName}-recurring-job`}
                 icon='edit'
                 onClick={() => {
-                  history.push(`recurringJob/${node.id}`);
+                  props.onEditRecurringJob(node.id);
                 }}
               />
             </Tooltip>
             <Tooltip placement='bottom' title='Delete'>
               <Button
+                data-testid={`delete-${node.displayName}-recurring-job`}
                 icon='delete'
                 onClick={() =>
                   props.onDeleteRecurringJob({
@@ -221,6 +220,9 @@ export function RecurringJobList({ data, ...props }: RecurringJobListProps) {
 
   return (
     <Table
+      data-testid={
+        data?.loading ? 'loading-recurring-job-list' : 'recurring-job-list'
+      }
       rowKey={data => data.node.id}
       columns={columns}
       loading={get(data, 'loading', false)}

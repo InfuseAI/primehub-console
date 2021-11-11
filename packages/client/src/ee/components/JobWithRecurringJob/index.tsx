@@ -489,6 +489,9 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
           <Tabs.TabPane tab='Recurring Jobs' key='recurringJob'>
             <RecurringJobList
               data={recurringJobs}
+              onEditRecurringJob={(id: string) =>
+                history.push(`recurringJob/${id}`)
+              }
               onRunRecurringJob={onRunRecurringJob}
               onDeleteRecurringJob={onDeleteRecurringJob}
             />

@@ -97,3 +97,8 @@ export interface CreateJobVariables {
 export interface CreateScheduleVariables extends CreateJobVariables {
   recurrence: { cron: string; type: string };
 }
+
+export type PageInfo = {
+  totalPage: number;
+  currentPage: number;
+};

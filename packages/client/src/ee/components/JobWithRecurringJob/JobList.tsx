@@ -13,7 +13,7 @@ import {
   getCreateTimeAndFinishTime,
   getActionByPhase,
 } from './utils';
-import type { ActionInfo, Job } from './types';
+import type { ActionInfo, Job, PageInfo } from './types';
 
 export type JobNode = {
   cursor: string;
@@ -42,10 +42,7 @@ export type JobConnections = {
   variables: JobQueryVariables;
   phJobsConnection?: {
     edges: JobNode[];
-    pageInfo: {
-      currentPage: number;
-      totalPage: number;
-    };
+    pageInfo: PageInfo;
   };
   refetch: (variables?: JobQueryVariables) => Promise<void>;
   loading: boolean;
@@ -177,6 +174,7 @@ export function JobList({ data, ...props }: JobListProps) {
             {action.toLowerCase() === 'cancel' ? (
               <Tooltip placement='bottom' title='Cancel'>
                 <Button
+                  data-testid={`cancel-${node.displayName}-job`}
                   icon='close-circle'
                   onClick={() =>
                     props.onCancelJob({
@@ -191,6 +189,7 @@ export function JobList({ data, ...props }: JobListProps) {
                 <Tooltip key='re-run' placement='bottom' title='Re-run'>
                   <Button
                     key='re-run'
+                    data-testid={`rerun-${node.displayName}-job`}
                     icon='caret-right'
                     onClick={() =>
                       props.onRerunJob({
@@ -203,6 +202,7 @@ export function JobList({ data, ...props }: JobListProps) {
                 <Tooltip key='clone' placement='bottom' title='Clone'>
                   <Button
                     key='clone-job'
+                    data-testid={`clone-${node.displayName}-job`}
                     icon='copy'
                     onClick={() => props.onCloneJob(node)}
                   />
@@ -240,6 +240,7 @@ export function JobList({ data, ...props }: JobListProps) {
 
   return (
     <Table
+      data-testid={data?.loading ? 'loading-job-list' : 'job-list'}
       rowKey={data => data.node.id}
       columns={columns}
       loading={get(data, 'loading', false)}
