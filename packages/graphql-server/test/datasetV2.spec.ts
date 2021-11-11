@@ -172,6 +172,29 @@ describe('dataset v2 graphql', function () {
       payload: { groupName: GROUP_NAME, id: datasetId },
     });
 
+    // create a file in the dataset
+    const content = Buffer.from('i am the data', 'utf-8');
+    const mc: Client = this.minioClient;
+    await mc.putObject(
+      BUCKET_NAME,
+      `groups/${GROUP_NAME}/datasets/${datasetId}/file-1.txt`,
+      content
+    );
+    await mc.putObject(
+      BUCKET_NAME,
+      `groups/${GROUP_NAME}/datasets/${datasetId}/file-2.txt`,
+      content
+    );
+
+    const beforeDeleteList = await listObjects(
+      this.minioClient,
+      BUCKET_NAME,
+      `groups/${GROUP_NAME}/datasets/${datasetId}/`
+    );
+    expect(3, 'there is 3 files {.dataset and two data files}').to.be.eq(
+      beforeDeleteList.length
+    );
+
     const result = await this.graphqlRequest(
       `mutation DeleteDatasetMutation($where: DatasetV2WhereUniqueInput!) {
       deleteDatasetV2(where: $where) {
@@ -201,6 +224,16 @@ describe('dataset v2 graphql', function () {
       }
     );
     expect('RESOURCE_NOT_FOUND').to.be.eq(getResult[0].extensions.code);
+
+    const afterDeleteList = await listObjects(
+      this.minioClient,
+      BUCKET_NAME,
+      `groups/${GROUP_NAME}/datasets/${datasetId}/`
+    );
+
+    expect(0, 'there is no files after deletion').to.be.eq(
+      afterDeleteList.length
+    );
   });
 });
 
@@ -322,4 +355,26 @@ function streamToString(stream): Promise<string> {
 
 function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function listObjects(
+  mc: Client,
+  bucket: string,
+  prefix: string
+): Promise<any[]> {
+  const objects = new Promise<any[]>((resolve, reject) => {
+    const arr = [];
+    const stream = mc.listObjectsV2(bucket, prefix);
+    stream.on('data', obj => {
+      console.log('listObjects', obj);
+      arr.push(obj);
+    });
+    stream.on('error', err => {
+      reject(err);
+    });
+    stream.on('end', () => {
+      resolve(arr);
+    });
+  });
+  return objects;
 }
