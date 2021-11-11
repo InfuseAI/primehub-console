@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: primehub-console-test-keycloak
+  name: keycloak
+spec:
+  selector:
+    matchLabels:
+      app: primehub-console-test-keycloak
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: primehub-console-test-keycloak
+    spec:
+      containers:
+      - image: jboss/keycloak:8.0.1
+        imagePullPolicy: IfNotPresent
+        name: keycloak
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        env:
+        - name: KEYCLOAK_USER
+          value: keycloak
+        - name: KEYCLOAK_PASSWORD
+          value: keycloak
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: primehub-console-test-minio
+  name: minio
+spec:
+  selector:
+    matchLabels:
+      app: primehub-console-test-minio
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: primehub-console-test-minio
+    spec:
+      containers:
+      - image: minio/minio:latest
+        imagePullPolicy: IfNotPresent
+        args: ["server", "/data"]
+        name: minio
+        ports:
+        - containerPort: 9000
+          name: http
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        env:
+        - name: KEYCLOAK_USER
+          value: keycloak
+        - name: KEYCLOAK_PASSWORD
+          value: keycloak
