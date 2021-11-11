@@ -1,7 +1,6 @@
 import iconHome from 'images/icon-home.svg';
 import iconJupyterHub from 'images/icon-jupyterhub.svg';
 import iconJobs from 'images/icon-jobs.svg';
-import iconSchedule from 'images/icon-schedule.svg';
 import iconModels from 'images/icon-models.svg';
 import iconDeployments from 'images/icon-deployments.svg';
 import iconImages from 'images/icon-images.png';
@@ -78,19 +77,6 @@ export const sidebarList: SidebarList = [
       marginLeft: '1px',
       marginRight: '-1px',
       marginTop: '-3px',
-    },
-  },
-  {
-    title: 'Schedule',
-    subPath: 'schedule',
-    icon: iconSchedule,
-    enabledIn: [FEATURES.EE],
-    style: {
-      width: 'auto',
-      height: 15,
-      marginLeft: '2px',
-      marginRight: '-1px',
-      marginTop: '-5px',
     },
   },
   {

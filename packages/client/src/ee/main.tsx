@@ -15,12 +15,10 @@ import { listEE } from 'components/Sidebar';
 import Jupyterhub from 'containers/JupyterHubPage';
 import ListContainer from 'containers/ListContainer';
 import SharedFilesPage from 'containers/sharedFiles/SharedFilesPage';
-import JobDetailContainer from 'ee/containers/jobDetail';
-import JobCreatePage from 'ee/containers/jobCreatePage';
-import JobListContainer from 'ee/containers/JobListContainer';
-import ScheduleDetailContainer from 'ee/containers/scheduleDetail';
-import ScheduleCreatePage from 'ee/containers/ScheduleCreatePage';
-import ScheduleListContainer from 'ee/containers/scheduleList';
+import JobWithRecurringJob from 'ee/components/JobWithRecurringJob';
+import JobCreatePage from 'ee/components/JobWithRecurringJob/JobForm';
+import JobDetail from 'ee/components/JobWithRecurringJob/JobDetail';
+import EditRecurringJob from 'ee/components/JobWithRecurringJob/EditRecurringJob';
 import ModelListContainer from 'ee/containers/modelList';
 import ModelDetail from 'ee/containers/ModelDetail';
 import ModelVersionDetailContainer from 'ee/containers/modelVersionDetail';
@@ -53,150 +51,150 @@ class Main extends React.Component {
       <BrowserRouter>
         <Route path={`${appPrefix}g/`}>
           <ApolloProvider client={client}>
-          <MainPage
-            sidebarItems={listEE}
-            notification={<LicenseWarningBanner />}
-          >
-            {/* Jupyterhub */}
-            <Route path={`${appPrefix}g/:groupName/hub`} exact>
-              <Jupyterhub />
-            </Route>
-
-            {/* Dataset Browser */}
-            <Route path={`${appPrefix}g/:groupName/datasets/:dataset/:path*`}>
-              <DatasetBrowser />
-            </Route>
-
-            {/* Shared Files */}
-            <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
-              <SharedFilesPage />
-            </Route>
-
-            {/* Group Images management*/}
-            <Route path={`${appPrefix}g/:groupName/images`} exact>
-              <ListContainer Com={ImageListContainer} />
-            </Route>
-            <Route path={`${appPrefix}g/:groupName/images/create`} exact>
-              <ImageCreatePage />
-            </Route>
-            <Route
-              path={`${appPrefix}g/:groupName/images/:imageId/edit`}
-              exact
-              component={ImageEditPage}
-            />
-
-            {/* Group Settings */}
-            <Route path={`${appPrefix}g/:groupName/settings`}>
-              <GroupSettingsPage
-                extraTabs={[
-                  { component: GroupSettingsJobs, key: 'jobs', tab: 'Jobs' },
-                  {
-                    component: GroupSettingsDeployments,
-                    key: 'deployments',
-                    tab: 'Deployments',
-                  },
-                  {
-                    component: GroupSettingsMLflow,
-                    key: 'mlflow',
-                    tab: 'MLflow',
-                  },
-                ]}
-              />
-            </Route>
-
-            {/* Job Submission */}
-            <Route path={`${appPrefix}g/:groupName/job`} exact>
-              <ListContainer Com={JobListContainer} />
-            </Route>
-            <Route path={`${appPrefix}g/:groupName/job/create`} exact>
-              <JobCreatePage />
-            </Route>
-            <Route
-              path={`${appPrefix}g/:groupName/job/:jobId`}
-              exact
-              component={JobDetailContainer}
-            />
-
-            {/* Job Scheduler */}
-            <Route path={`${appPrefix}g/:groupName/schedule`} exact>
-              <ListContainer Com={ScheduleListContainer} />
-            </Route>
-            <Route path={`${appPrefix}g/:groupName/schedule/create`} exact>
-              <ScheduleCreatePage />
-            </Route>
-            <Route
-              path={`${appPrefix}g/:groupName/schedule/:scheduleId`}
-              exact
-              component={ScheduleDetailContainer}
-            />
-
-            {/* Model Management */}
-            <Route path={`${appPrefix}g/:groupName/models`} exact>
-              <ListContainer Com={ModelListContainer} />
-            </Route>
-            <Route
-              path={`${appPrefix}g/:groupName/models/:modelName`}
-              exact
-              component={ModelDetail}
-            />
-            <Route
-              path={`${appPrefix}g/:groupName/models/:modelName/versions/:version`}
-              exact
-              component={ModelVersionDetailContainer}
-            />
-
-            {/* Model Deployment */}
-            <Route path={`${appPrefix}g/:groupName/deployments`} exact>
-              <ListContainer Com={DeploymentListContainer} />
-            </Route>
-            <Route path={`${appPrefix}g/:groupName/deployments/create`} exact>
-              <DeploymentCreatePage />
-            </Route>
-            <Route
-              path={`${appPrefix}g/:groupName/deployments/:deploymentId`}
-              exact
-              component={DeploymentDetailContainer}
-            />
-            <Route
-              path={`${appPrefix}g/:groupName/deployments/:deploymentId/edit`}
-              exact
+            <MainPage
+              sidebarItems={listEE}
+              notification={<LicenseWarningBanner />}
             >
-              <DeploymentEditPage />
-            </Route>
+              {/* Jupyterhub */}
+              <Route path={`${appPrefix}g/:groupName/hub`} exact>
+                <Jupyterhub />
+              </Route>
 
-            {/* Apps */}
-            <Route path={`${appPrefix}g/:groupName/apps`} exact>
-              <ListContainer Com={AppListContainer} />
-            </Route>
-            <Route
-              path={`${appPrefix}g/:groupName/apps/store`}
-              exact
-              component={AppStore}
-            />
-            <Route
-              path={`${appPrefix}g/:groupName/apps/create`}
-              exact
-              component={AppCreate}
-            />
-            <Route
-              path={`${appPrefix}g/:groupName/apps/create/:templateId`}
-              exact
-              component={AppCreate}
-            />
-            <Route
-              path={`${appPrefix}g/:groupName/apps/:appId`}
-              exact
-              component={AppDetail}
-            />
-            <Route
-              path={`${appPrefix}g/:groupName/apps/:appId/edit`}
-              exact
-              component={AppEdit}
-            />
-          </MainPage>
-        </ApolloProvider>
+              {/* Dataset Browser */}
+              <Route path={`${appPrefix}g/:groupName/datasets/:dataset/:path*`}>
+                <DatasetBrowser />
+              </Route>
+
+              {/* Shared Files */}
+              <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
+                <SharedFilesPage />
+              </Route>
+
+              {/* Shared Files */}
+              <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
+                <SharedFilesPage />
+              </Route>
+
+              {/* Group Images management*/}
+              <Route path={`${appPrefix}g/:groupName/images`} exact>
+                <ListContainer Com={ImageListContainer} />
+              </Route>
+              <Route path={`${appPrefix}g/:groupName/images/create`} exact>
+                <ImageCreatePage />
+              </Route>
+              <Route
+                path={`${appPrefix}g/:groupName/images/:imageId/edit`}
+                exact
+                component={ImageEditPage}
+              />
+
+              {/* Group Settings */}
+              <Route path={`${appPrefix}g/:groupName/settings`}>
+                <GroupSettingsPage
+                  extraTabs={[
+                    { component: GroupSettingsJobs, key: 'jobs', tab: 'Jobs' },
+                    {
+                      component: GroupSettingsDeployments,
+                      key: 'deployments',
+                      tab: 'Deployments',
+                    },
+                    {
+                      component: GroupSettingsMLflow,
+                      key: 'mlflow',
+                      tab: 'MLflow',
+                    },
+                  ]}
+                />
+              </Route>
+
+              {/* Job & Recurring Job */}
+              <Route path={`${appPrefix}g/:groupName/job`} exact>
+                <JobWithRecurringJob tab='job' />
+              </Route>
+              <Route path={`${appPrefix}g/:groupName/job/create`} exact>
+                <JobCreatePage />
+              </Route>
+              <Route
+                exact
+                path={`${appPrefix}g/:groupName/job/:jobId`}
+                component={JobDetail}
+              />
+              <Route path={`${appPrefix}g/:groupName/recurringJob`} exact>
+                <JobWithRecurringJob tab='recurringJob' />
+              </Route>
+              <Route
+                path={`${appPrefix}g/:groupName/recurringJob/:recurringJobId`}
+                exact
+              >
+                <EditRecurringJob />
+              </Route>
+
+              {/* Model Management */}
+              <Route path={`${appPrefix}g/:groupName/models`} exact>
+                <ListContainer Com={ModelListContainer} />
+              </Route>
+              <Route
+                path={`${appPrefix}g/:groupName/models/:modelName`}
+                exact
+                component={ModelDetail}
+              />
+              <Route
+                path={`${appPrefix}g/:groupName/models/:modelName/versions/:version`}
+                exact
+                component={ModelVersionDetailContainer}
+              />
+
+              {/* Model Deployment */}
+              <Route path={`${appPrefix}g/:groupName/deployments`} exact>
+                <ListContainer Com={DeploymentListContainer} />
+              </Route>
+              <Route path={`${appPrefix}g/:groupName/deployments/create`} exact>
+                <DeploymentCreatePage />
+              </Route>
+              <Route
+                path={`${appPrefix}g/:groupName/deployments/:deploymentId`}
+                exact
+                component={DeploymentDetailContainer}
+              />
+              <Route
+                path={`${appPrefix}g/:groupName/deployments/:deploymentId/edit`}
+                exact
+              >
+                <DeploymentEditPage />
+              </Route>
+
+              {/* Apps */}
+              <Route path={`${appPrefix}g/:groupName/apps`} exact>
+                <ListContainer Com={AppListContainer} />
+              </Route>
+              <Route
+                path={`${appPrefix}g/:groupName/apps/store`}
+                exact
+                component={AppStore}
+              />
+              <Route
+                path={`${appPrefix}g/:groupName/apps/create`}
+                exact
+                component={AppCreate}
+              />
+              <Route
+                path={`${appPrefix}g/:groupName/apps/create/:templateId`}
+                exact
+                component={AppCreate}
+              />
+              <Route
+                path={`${appPrefix}g/:groupName/apps/:appId`}
+                exact
+                component={AppDetail}
+              />
+              <Route
+                path={`${appPrefix}g/:groupName/apps/:appId/edit`}
+                exact
+                component={AppEdit}
+              />
+            </MainPage>
+          </ApolloProvider>
         </Route>
-
       </BrowserRouter>
     );
   }
@@ -241,7 +239,7 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       btn: (
         // @ts-ignore
         <Button
-          type="primary"
+          type='primary'
           onClick={() =>
             window.location.replace(`${window.APP_PREFIX}oidc/logout`)
           }
