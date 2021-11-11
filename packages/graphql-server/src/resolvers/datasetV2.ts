@@ -120,7 +120,7 @@ export const getDatasetSize = async (
     const objPrefix = `${getDatasetPrefix(groupName)}${id}/`;
     const stream = minioClient.listObjectsV2(storeBucket, objPrefix, true);
     stream.on('data', obj => {
-      if (obj.name !== (objPrefix + DATASET_METADATA)) {
+      if (obj.name !== objPrefix + DATASET_METADATA) {
         totalSize += obj.size;
       }
     });
@@ -314,7 +314,7 @@ const getDatasetObjects = async (
       if (indexOfMetadata >= 0) {
         fileList.splice(indexOfMetadata, 1);
       }
-      if (fileList.length > options.limit) {
+      if (options.limit > 0 && fileList.length > options.limit) {
         resolve(fileList.slice(0, options.limit));
         return;
       }
