@@ -315,15 +315,33 @@ export function _InstanceTypeForm({
 
           form.validateFields((err, values: InstanceTypeFormState) => {
             if (err) {
-              let errorMessages = '';
+              const fieldsMap = {
+                nodeList: 'Node Selector',
+              };
+
+              const errorMessages = [];
               Object.keys(err).map(key => {
-                errorMessages += `${get(err, `${key}.errors[0].message`)}\n`;
+                if (Array.isArray(get(err, `${key}`))) {
+                  errorMessages.push(
+                    <>
+                      🔸 {fieldsMap[key] ?? key} has errors
+                      <br />
+                    </>
+                  );
+                } else {
+                  errorMessages.push(
+                    <>
+                      🔸 {get(err, `${key}.errors[0].message`)}
+                      <br />
+                    </>
+                  );
+                }
               });
 
               notification.error({
                 duration: 5,
                 placement: 'bottomRight',
-                message: `Failure`,
+                message: `Failure to create instance`,
                 description: errorMessages,
               });
 

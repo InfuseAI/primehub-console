@@ -23,7 +23,9 @@ export function TolerationModalForm({
 }: Props) {
   const disabledOK =
     !currentToleration?.key ||
-    (currentToleration?.operator === 'Equal' && !currentToleration?.value);
+    (currentToleration?.operator === 'Equal' && !currentToleration?.value) ||
+    props.form.getFieldError('toleration-key')?.length > 0 ||
+    false;
 
   React.useEffect(() => {
     if (type === 'create') {
@@ -35,6 +37,7 @@ export function TolerationModalForm({
   return (
     <Modal
       title={type ? 'Create Toleration' : 'Edit Toleration'}
+      maskClosable={false}
       visible={visible}
       okButtonProps={{ disabled: disabledOK }}
       onOk={() => props.onOk()}
