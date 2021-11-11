@@ -23,7 +23,7 @@ import {
   PhSchedulesConnection,
   RunPhSchedule,
   DeletePhSchedule,
-} from 'queries/PhSchedule.graphql';
+} from 'queries/PhRecurringJob.graphql';
 import { errorHandler } from 'utils/errorHandler';
 
 import { JobList, JobConnections } from './JobList';
@@ -255,7 +255,7 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
     });
   }
 
-  function onSearch() {
+  function onSearchJob() {
     if (state.tab === 'job') {
       jobs?.refetch({
         ...jobs?.variables,
@@ -431,44 +431,6 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
           </InfuseButton>
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: '0.5rem',
-            marginTop: '16px',
-          }}
-        >
-          <Input.Search
-            data-testid='search-by-text'
-            placeholder='Search Jobs'
-            value={state.keyword}
-            onSearch={onSearch}
-            onChange={event =>
-              dispatch({ type: 'KEYWORD', value: event.currentTarget.value })
-            }
-          />
-          <Checkbox
-            style={{
-              border: '1px solid #d9d9d9',
-              borderRadius: 4,
-              padding: '4.5px 8px',
-              width: '190px',
-            }}
-            checked={state.isSubmittedByMe}
-            onChange={event => {
-              const value = event.target.checked;
-              dispatch({
-                type: 'IS_SUBMITTED_BY_ME',
-                value,
-              });
-              onSearchByMine(value);
-            }}
-          >
-            Submitted By Me
-          </Checkbox>
-        </div>
-
         <Tabs
           style={{ paddingTop: 8 }}
           activeKey={state.tab}
@@ -481,6 +443,22 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
           <Tabs.TabPane tab='Jobs' key='job'>
             <JobList
               data={jobs}
+              searchJob={
+                <SearchJobs
+                  state={state}
+                  onSearchJob={onSearchJob}
+                  onSearchByMine={onSearchByMine}
+                  onChangeKeyword={value =>
+                    dispatch({ type: 'KEYWORD', value })
+                  }
+                  onChangeIsCheck={value =>
+                    dispatch({
+                      type: 'IS_SUBMITTED_BY_ME',
+                      value,
+                    })
+                  }
+                />
+              }
               onRerunJob={onRerunJob}
               onCancelJob={onCancelJob}
               onCloneJob={onCloneJob}
@@ -489,6 +467,22 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
           <Tabs.TabPane tab='Recurring Jobs' key='recurringJob'>
             <RecurringJobList
               data={recurringJobs}
+              searchJob={
+                <SearchJobs
+                  state={state}
+                  onSearchJob={onSearchJob}
+                  onSearchByMine={onSearchByMine}
+                  onChangeKeyword={value =>
+                    dispatch({ type: 'KEYWORD', value })
+                  }
+                  onChangeIsCheck={value =>
+                    dispatch({
+                      type: 'IS_SUBMITTED_BY_ME',
+                      value,
+                    })
+                  }
+                />
+              }
               onEditRecurringJob={(id: string) =>
                 history.push(`recurringJob/${id}`)
               }
@@ -499,6 +493,56 @@ function JobWithRecurringJob({ tab, jobs, recurringJobs, ...props }: Props) {
         </Tabs>
       </PageBody>
     </>
+  );
+}
+
+function SearchJobs({
+  state,
+  onSearchJob,
+  onSearchByMine,
+  onChangeKeyword,
+  onChangeIsCheck,
+}: {
+  state: State;
+  onSearchJob: () => void;
+  onSearchByMine: (checked: boolean) => void;
+  onChangeKeyword: (keyword: string) => void;
+  onChangeIsCheck: (checked: boolean) => void;
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        gap: '0.5rem',
+        marginTop: '16px',
+        marginBottom: '32px',
+      }}
+    >
+      <Input.Search
+        data-testid='search-by-text'
+        placeholder='Search Jobs'
+        value={state.keyword}
+        onSearch={onSearchJob}
+        onChange={event => onChangeKeyword(event.currentTarget.value)}
+      />
+      <Checkbox
+        style={{
+          border: '1px solid #d9d9d9',
+          borderRadius: 4,
+          padding: '4.5px 8px',
+          width: '190px',
+        }}
+        checked={state.isSubmittedByMe}
+        onChange={event => {
+          const value = event.target.checked;
+          onChangeIsCheck(value);
+          onSearchByMine(value);
+        }}
+      >
+        Submitted By Me
+      </Checkbox>
+    </div>
   );
 }
 

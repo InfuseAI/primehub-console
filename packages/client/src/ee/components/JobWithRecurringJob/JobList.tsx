@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import moment from 'moment';
 import get from 'lodash/get';
 import startCase from 'lodash/startCase';
@@ -51,6 +51,7 @@ export type JobConnections = {
 
 interface JobListProps {
   data?: JobConnections;
+  searchJob?: React.ReactNode;
   onRerunJob: ({ id, displayName }: ActionInfo) => void;
   onCancelJob: ({ id, displayName }: ActionInfo) => void;
   onCloneJob: (job: Job) => void;
@@ -89,13 +90,19 @@ export function JobList({ data, ...props }: JobListProps) {
       },
     },
     {
-      title: 'Schedule',
+      title: 'Recurrence',
       dataIndex: 'node.schedule',
       key: 'schedule',
       sorter: true,
       render: text => {
         if (text) {
-          return <Link to={`schedule/${text}`}>{text}</Link>;
+          const replaceToRecurrence = text.replace('schedule', 'recurrence');
+
+          return (
+            <Link to={`recurringJob/${replaceToRecurrence}`}>
+              {replaceToRecurrence}
+            </Link>
+          );
         }
 
         return '-';
@@ -239,17 +246,20 @@ export function JobList({ data, ...props }: JobListProps) {
   }
 
   return (
-    <Table
-      data-testid={data?.loading ? 'loading-job-list' : 'job-list'}
-      rowKey={data => data.node.id}
-      columns={columns}
-      loading={get(data, 'loading', false)}
-      dataSource={get(data, 'phJobsConnection.edges', [])}
-      onChange={handleTableChange}
-      pagination={{
-        current: get(data, 'phJobsConnection.pageInfo.currentPage', 1),
-        total: get(data, 'phJobsConnection.pageInfo.totalPage', 1) * 10,
-      }}
-    />
+    <>
+      {props?.searchJob}
+      <Table
+        data-testid={data?.loading ? 'loading-job-list' : 'job-list'}
+        rowKey={data => data.node.id}
+        columns={columns}
+        loading={get(data, 'loading', false)}
+        dataSource={get(data, 'phJobsConnection.edges', [])}
+        onChange={handleTableChange}
+        pagination={{
+          current: get(data, 'phJobsConnection.pageInfo.currentPage', 1),
+          total: get(data, 'phJobsConnection.pageInfo.totalPage', 1) * 10,
+        }}
+      />
+    </>
   );
 }

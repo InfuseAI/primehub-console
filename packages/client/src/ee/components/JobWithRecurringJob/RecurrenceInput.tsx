@@ -5,7 +5,7 @@ import { isValidCron } from 'cron-validator';
 import type { RecurrenceType } from './types';
 
 const recurrenceOptions = [
-  { value: 'inactive', text: 'Inactive' },
+  { value: 'inactive', text: 'On Demand' },
   { value: 'daily', text: 'Every Day (at 4:00am)' },
   { value: 'weekly', text: 'Every Week (Sundays at 4:00am)' },
   { value: 'monthly', text: 'Every Month (on the 1st at 4:00am)' },

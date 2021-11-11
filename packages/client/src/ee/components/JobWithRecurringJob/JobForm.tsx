@@ -21,7 +21,6 @@ import {
   Radio,
   Row,
   Tooltip,
-  Typography,
 } from 'antd';
 import { compose } from 'recompose';
 import { graphql } from 'react-apollo';
@@ -404,9 +403,7 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
         <Row gutter={16}>
           <Col xs={24} sm={16} lg={16}>
             <Card>
-              <Typography.Title level={3}>
-                Environment Settings
-              </Typography.Title>
+              <h4>Environment Settings</h4>
 
               <Divider />
 
@@ -596,7 +593,7 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
             </Card>
 
             <Card style={{ marginTop: '16px' }}>
-              <Typography.Title level={3}>Job Details</Typography.Title>
+              <h4>Job Details</h4>
 
               <Divider />
 
@@ -712,7 +709,7 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
                     // Due to adding a new field so add fallback value here.
                     initialValue: formState.recurrence || {
                       cron: '',
-                      type: 'incative',
+                      type: 'inactive',
                     },
                     rules: [{ validator: recurrenceValidator }],
                     // @ts-ignore component will receive props from decorator

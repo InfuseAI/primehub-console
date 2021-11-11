@@ -7,13 +7,14 @@ import { withRouter, RouteComponentProps, useHistory } from 'react-router-dom';
 
 import Breadcrumbs from 'components/share/breadcrumb';
 import PageTitle from 'components/pageTitle';
-import { PhSchedule, UpdatePhSchedule } from 'queries/PhSchedule.graphql';
+import { PhSchedule, UpdatePhSchedule } from 'queries/PhRecurringJob.graphql';
 
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 import JobForm from './JobForm';
 import type { RecurringJob } from './types';
 import { GroupContext } from 'context/group';
+import { errorHandler } from 'utils/errorHandler';
 
 interface Props extends RouteComponentProps<{ recurringJobId: string }> {
   data: {
@@ -113,9 +114,13 @@ export default compose(
       return {
         variables: {
           where: {
-            id: match.params.recurringJobId,
+            // TODO: Due to change name from `schedule` to `recurrence`,
+            // so `recurringJobId` content should replace to `scheduleId`, otherwise query result is empty.
+            // The best soultion should update backend API related naming.
+            id: match.params.recurringJobId.replace('recurrence', 'schedule'),
           },
         },
+        onError: errorHandler,
         fetchPolicy: 'cache-and-network',
       };
     },

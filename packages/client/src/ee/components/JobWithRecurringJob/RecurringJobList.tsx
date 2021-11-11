@@ -1,7 +1,6 @@
-import React from 'react';
+import * as React from 'react';
 import moment from 'moment';
 import get from 'lodash/get';
-import startCase from 'lodash/startCase';
 import { Button, Tooltip, Table } from 'antd';
 import type { ColumnProps, SorterResult } from 'antd/lib/table';
 
@@ -75,6 +74,7 @@ export type RunRecurringJob = {
 
 interface RecurringJobListProps {
   data?: RecurringJobConnections;
+  searchJob?: React.ReactNode;
   onRunRecurringJob: ({ id, displayName }: ActionInfo) => void;
   onEditRecurringJob: (id: string) => void;
   onDeleteRecurringJob: ({ id, displayName }: ActionInfo) => void;
@@ -105,7 +105,7 @@ export function RecurringJobList({ data, ...props }: RecurringJobListProps) {
           case 'monthly':
           case 'weekly':
           case 'inactive':
-            return startCase(type);
+            return 'On Demand';
         }
       },
     },
@@ -219,19 +219,22 @@ export function RecurringJobList({ data, ...props }: RecurringJobListProps) {
   }
 
   return (
-    <Table
-      data-testid={
-        data?.loading ? 'loading-recurring-job-list' : 'recurring-job-list'
-      }
-      rowKey={data => data.node.id}
-      columns={columns}
-      loading={get(data, 'loading', false)}
-      dataSource={get(data, 'phSchedulesConnection.edges', [])}
-      onChange={handleTableChange}
-      pagination={{
-        current: get(data, 'phSchedulesConnection.pageInfo.currentPage', 1),
-        total: get(data, 'phSchedulesConnection.pageInfo.totalPage', 1) * 10,
-      }}
-    />
+    <>
+      {props?.searchJob}
+      <Table
+        data-testid={
+          data?.loading ? 'loading-recurring-job-list' : 'recurring-job-list'
+        }
+        rowKey={data => data.node.id}
+        columns={columns}
+        loading={get(data, 'loading', false)}
+        dataSource={get(data, 'phSchedulesConnection.edges', [])}
+        onChange={handleTableChange}
+        pagination={{
+          current: get(data, 'phSchedulesConnection.pageInfo.currentPage', 1),
+          total: get(data, 'phSchedulesConnection.pageInfo.totalPage', 1) * 10,
+        }}
+      />
+    </>
   );
 }
