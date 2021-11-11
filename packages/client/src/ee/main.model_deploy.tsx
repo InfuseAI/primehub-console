@@ -24,6 +24,7 @@ import DeploymentEditPage from 'ee/containers/deploymentEditPage';
 import GroupSettingsPage from 'containers/groupSettingsPage';
 import GroupSettingsDeployments from 'ee/components/groupSettings/deployments';
 import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
+import { DatasetList, DatasetDetail } from 'containers/Datasets';
 
 const client = createGraphqlClient({
   fakeData,
@@ -44,6 +45,17 @@ class Main extends React.Component {
               <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
                 <SharedFilesPage />
               </Route>
+
+              {/* Datasets */}
+              <Route path={`${appPrefix}g/:groupName/datasets`} exact>
+                <ListContainer Com={DatasetList} />
+              </Route>
+              <Route
+                path={`${appPrefix}g/:groupName/datasets/:datasetId/:path*`}
+                exact
+                component={DatasetDetail}
+              />
+
               {/* Group Settings */}
               <Route path={`${appPrefix}g/:groupName/settings`}>
                 <GroupSettingsPage
