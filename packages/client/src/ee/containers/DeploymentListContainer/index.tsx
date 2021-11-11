@@ -227,7 +227,7 @@ function DeploymentListContainer({ groups, phDeployments, ...props }: Props) {
           >
             Refresh
           </InfuseButton>
-          {/* @ts-ignore */}
+
           <InfuseButton
             icon='plus'
             type='primary'

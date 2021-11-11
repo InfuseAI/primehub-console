@@ -139,7 +139,6 @@ const tokenSyncWorker = new BackgroundTokenSyncer({
       placement: 'bottomRight',
       duration: null,
       btn: (
-        // @ts-ignore
         <Button
           type='primary'
           onClick={() =>

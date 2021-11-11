@@ -390,7 +390,6 @@ class JobList extends React.Component<Props> {
               alignItems: 'flex-end',
             }}
           >
-            {/* @ts-ignore */}
             <InfuseButton
               icon='plus'
               onClick={this.createPhJob}
@@ -399,7 +398,6 @@ class JobList extends React.Component<Props> {
             >
               New Job
             </InfuseButton>
-            {/* @ts-ignore */}
             <InfuseButton onClick={this.refresh}>Refresh</InfuseButton>
           </div>
           <Filter

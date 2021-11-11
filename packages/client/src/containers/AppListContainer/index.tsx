@@ -236,7 +236,7 @@ class AppListContainer extends React.Component<Props, State> {
               App Settings
             </a>
           )}
-          {/* @ts-ignore */}
+
           <InfuseButton
             icon='plus'
             type='primary'
