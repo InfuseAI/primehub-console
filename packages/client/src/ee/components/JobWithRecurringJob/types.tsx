@@ -15,7 +15,7 @@ export type Job = {
     displayName: string;
     cpuLimit: number;
     memoryLimit: number;
-    gpuLimit: string;
+    gpuLimit: number;
   };
   userId: string;
   userName: string;
