@@ -108,10 +108,10 @@ const listDatasets = async (objectPrefix: string, context: Context) => {
   return objects;
 };
 
-export const getDatasetSize = async (id: string, groupName: string, context: Context): Promise<Number> => {
+export const getDatasetSize = async (id: string, groupName: string, context: Context): Promise<number> => {
   const {minioClient, storeBucket} = context;
 
-  const datasetSize = new Promise<Number>((resolve, reject) => {
+  const datasetSize = new Promise<number>((resolve, reject) => {
     let totalSize = 0;
     const stream = minioClient.listObjectsV2(storeBucket, getDatasetPrefix(groupName), true);
     stream.on('data', obj => {
@@ -133,9 +133,10 @@ export const query = async (root, args, context: Context) => {
   await checkPermission(context, groupName);
 
   const metadata = await getMetadata(id, groupName, context);
-  const size = await getDatasetSize(id, groupName, context);  // TODO: should it be lazy-evaluation
-  
-  return { id, size, ...metadata };
+  const size = async () => {
+    return getDatasetSize(id, groupName, context);
+  };
+  return { id, ...metadata, size };
 };
 
 export const queryFile = async (root, args, context: Context): Promise<any> => {
