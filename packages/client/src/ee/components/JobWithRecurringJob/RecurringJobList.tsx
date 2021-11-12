@@ -1,6 +1,7 @@
 import * as React from 'react';
 import moment from 'moment';
 import get from 'lodash/get';
+import startCase from 'lodash/startCase';
 import { Button, Tooltip, Table } from 'antd';
 import type { ColumnProps, SorterResult } from 'antd/lib/table';
 
@@ -105,7 +106,11 @@ export function RecurringJobList({ data, ...props }: RecurringJobListProps) {
           case 'monthly':
           case 'weekly':
           case 'inactive':
-            return 'On Demand';
+            if (type === 'inactive') {
+              return 'On Demand';
+            }
+
+            return startCase(type);
         }
       },
     },
