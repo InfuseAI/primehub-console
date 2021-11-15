@@ -25,6 +25,7 @@ import ImageCreatePage from 'containers/imageCreatePage';
 import ImageListContainer from 'containers/imageList';
 import GroupSettingsPage from 'containers/groupSettingsPage';
 import PageChangeTracker from 'components/share/tracker';
+import { DatasetList, DatasetDetail } from 'containers/Datasets';
 
 const client = createGraphqlClient({
   fakeData,
@@ -47,6 +48,16 @@ class Main extends React.Component {
               <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
                 <SharedFilesPage />
               </Route>
+
+              {/* Datasets */}
+              <Route path={`${appPrefix}g/:groupName/datasets`} exact>
+                <ListContainer Com={DatasetList} />
+              </Route>
+              <Route
+                path={`${appPrefix}g/:groupName/datasets/:datasetId/:path*`}
+                exact
+                component={DatasetDetail}
+              />
 
               {/* Group Images management*/}
               <Route path={`${appPrefix}g/:groupName/images`} exact>

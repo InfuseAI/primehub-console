@@ -7,6 +7,7 @@ import { crd as dataset, regenerateUploadSecret} from './dataset';
 import { crd as image} from './image';
 import * as secret from './secret';
 import * as store from './store';
+import * as datasetV2 from './datasetV2';
 import * as phApplication from './phApplication';
 import * as phAppTemplate from './phAppTemplate';
 import * as notebook from './notebook';
@@ -33,6 +34,9 @@ export const resolvers = {
     secretsConnection: secret.connectionQuery,
     files: store.query,
     sharedFile: store.querySharedFile,
+    datasetV2: datasetV2.query,
+    datasetV2Files: datasetV2.queryFile,
+    datasetV2Connection: datasetV2.connectionQuery,
     phApplication: phApplication.queryOne,
     phApplications: phApplication.query,
     phApplicationsConnection: phApplication.connectionQuery,
@@ -62,6 +66,9 @@ export const resolvers = {
     deleteFiles: store.destroy,
     shareFile: store.share,
     unshareFile: store.unshare,
+    createDatasetV2: datasetV2.create,
+    updateDatasetV2: datasetV2.update,
+    deleteDatasetV2: datasetV2.destroy,
     createPhApplication: phApplication.create,
     updatePhApplication: phApplication.update,
     deletePhApplication: phApplication.destroy,

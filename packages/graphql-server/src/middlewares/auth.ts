@@ -21,6 +21,8 @@ export const ShieldQuery = {
   'groupImagesConnection': or(isAdmin, isUser, isClient),
   'files': or(isAdmin, isUser),
   'sharedFile': or(isAdmin, isUser),
+  'datasetV2': or(isAdmin, isUser),
+  'datasetV2Connection': or(isAdmin, isUser),
 };
 
 export const ShieldMutation = {

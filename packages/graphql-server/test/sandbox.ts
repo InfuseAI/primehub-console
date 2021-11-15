@@ -35,7 +35,8 @@ const mClient = createMinioClient('http://127.0.0.1:9000', 'minioadmin', 'minioa
 mClient.makeBucket('test', '', function(err) {
   if (err) return console.log('Error creating bucket.', err)
   console.log('Bucket created successfully.')
-})
+});
+(global as any).minioClient = mClient;
 
 const inCluster = (process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT);
 
@@ -204,6 +205,7 @@ export const createSandbox = async () => {
 
   // assign user to test group
   (global as any).addUserToGroup(testGroup.id, user.id);
+  (global as any).currentUser = user;
 
 
   // create new client

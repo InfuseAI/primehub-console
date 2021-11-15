@@ -5,6 +5,7 @@ import iconModels from 'images/icon-models.svg';
 import iconDeployments from 'images/icon-deployments.svg';
 import iconImages from 'images/icon-images.png';
 import iconShareFiles from 'images/icon-files.svg';
+import iconDatasets from 'images/icon-datasets.svg';
 import iconApps from 'images/icon-apps.svg';
 import iconSettings from 'images/icon-settings.svg';
 
@@ -22,6 +23,7 @@ export const PATH_KEY_LIST = [
   'models',
   'deployments',
   'browse',
+  'datasets',
   'images',
   'apps',
   'settings',
@@ -116,6 +118,19 @@ export const sidebarList: SidebarList = [
       height: 17,
       marginLeft: '3px',
       marginRight: '-1px',
+      marginTop: '-3px',
+    },
+  },
+  {
+    title: 'Datasets',
+    subPath: 'datasets',
+    icon: iconDatasets,
+    enabledIn: [FEATURES.CE, FEATURES.EE, FEATURES.DEPLOY],
+    style: {
+      width: 'auto',
+      height: 20,
+      marginLeft: '0px',
+      marginRight: '-4px',
       marginTop: '-3px',
     },
   },

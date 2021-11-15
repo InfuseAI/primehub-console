@@ -1,0 +1,53 @@
+fragment DatasetMetadata on DatasetV2 {
+  id
+  name
+  createdBy
+  createdAt
+  updatedAt
+  tags
+  size
+}
+
+query GetDatasets(
+  $where: DatasetV2WhereInput
+  $page: Int
+) {
+  datasetV2Connection(
+    where: $where
+    page: $page
+  ) {
+    edges {
+      node {
+        ...DatasetMetadata
+      }
+      cursor
+    }
+    pageInfo {
+      currentPage
+      totalPage
+    }
+  }
+}
+
+query DatasetQuery($where: DatasetV2WhereUniqueInput!){
+  datasetV2(where: $where) {
+    ...DatasetMetadata
+}}
+
+mutation CreateDatasetMutation($payload: DatasetV2CreateInput!) {
+  createDatasetV2(data: $payload) {
+    ...DatasetMetadata
+  }
+}
+
+mutation UpdateDatasetMutation($payload: DatasetV2UpdateInput!, $where: DatasetV2WhereUniqueInput!) {
+  updateDatasetV2(data: $payload, where: $where) {
+    ...DatasetMetadata
+  }
+}
+
+mutation DeleteDatasetMutation($where: DatasetV2WhereUniqueInput!) {
+  deleteDatasetV2(where: $where) {
+    id
+  }
+}

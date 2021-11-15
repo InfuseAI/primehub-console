@@ -38,7 +38,7 @@ import GroupSettingsPage from 'containers/groupSettingsPage';
 import GroupSettingsJobs from 'ee/components/groupSettings/jobs';
 import GroupSettingsDeployments from 'ee/components/groupSettings/deployments';
 import GroupSettingsMLflow from 'ee/components/groupSettings/mlflow';
-import DatasetBrowser from 'containers/Datasets/DatasetBrowser';
+import { DatasetList, DatasetDetail } from 'containers/Datasets';
 
 const client = createGraphqlClient({
   fakeData,
@@ -60,20 +60,33 @@ class Main extends React.Component {
                 <Jupyterhub />
               </Route>
 
-              {/* Dataset Browser */}
-              <Route path={`${appPrefix}g/:groupName/datasets/:dataset/:path*`}>
-                <DatasetBrowser />
-              </Route>
-
               {/* Shared Files */}
               <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
                 <SharedFilesPage />
               </Route>
 
-              {/* Shared Files */}
-              <Route path={`${appPrefix}g/:groupName/browse/:phfsPrefix*`}>
-                <SharedFilesPage />
+              {/* Datasets */}
+              <Route path={`${appPrefix}g/:groupName/datasets`} exact>
+                <ListContainer Com={DatasetList} />
               </Route>
+              <Route
+                path={`${appPrefix}g/:groupName/datasets/:datasetId/:path*`}
+                exact
+                component={DatasetDetail}
+              />
+
+              {/* Group Images management*/}
+              <Route path={`${appPrefix}g/:groupName/images`} exact>
+                <ListContainer Com={ImageListContainer} />
+              </Route>
+              <Route path={`${appPrefix}g/:groupName/images/create`} exact>
+                <ImageCreatePage />
+              </Route>
+              <Route
+                path={`${appPrefix}g/:groupName/images/:imageId/edit`}
+                exact
+                component={ImageEditPage}
+              />
 
               {/* Group Images management*/}
               <Route path={`${appPrefix}g/:groupName/images`} exact>
