@@ -2,7 +2,7 @@ export enum VolumeType {
   PV = 'pv',
   HOSTPATH = 'hostPath',
   NFS = 'nfs',
-  GIT = 'gitSync',
+  GIT = 'git',
   ENV = 'env',
 }
 

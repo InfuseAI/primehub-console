@@ -75,7 +75,7 @@ function _VolumeForm(props: Props) {
         data.nfsPath = values.nfsPath;
       } else if (values.type === 'hostPath') {
         data.hostPath = values.hostPath;
-      } else if (values.type === 'gitSync') {
+      } else if (values.type === 'git') {
         data.url = values.url;
         if (form.isFieldTouched('secret'))
           data.secret = values.secret;
@@ -379,7 +379,7 @@ function _VolumeForm(props: Props) {
                     <Select.Option value="pv">Persistent Volume</Select.Option>
                     <Select.Option value="nfs">NFS</Select.Option>
                     <Select.Option value="hostPath">Host Path</Select.Option>
-                    <Select.Option value="gitSync">Git Sync</Select.Option>
+                    <Select.Option value="git">Git Sync</Select.Option>
                     <Select.Option value="env">Env</Select.Option>
                   </Select>
                 )}

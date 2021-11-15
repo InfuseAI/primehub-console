@@ -44,7 +44,7 @@ function setup() {
                   name: 'volume-git',
                   displayName: 'gitsync volume',
                   description: '',
-                  type: 'gitSync',
+                  type: 'git',
                   uploadServerLink: null,
                   __typename: 'Volume',
                 },

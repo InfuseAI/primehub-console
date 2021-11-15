@@ -133,7 +133,7 @@ describe('dataset graphql', function() {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
       global: true,
-      type: 'gitSync',
+      type: 'git',
       url: faker.internet.url()
     };
     const mutation = await this.graphqlRequest(`
@@ -190,7 +190,7 @@ describe('dataset graphql', function() {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
       global: false,
-      type: 'gitSync',
+      type: 'git',
       url: faker.internet.url()
     };
     const mutation = await this.graphqlRequest(`
@@ -337,7 +337,7 @@ describe('dataset graphql', function() {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
       global: true,
-      type: 'gitSync',
+      type: 'git',
       url: faker.internet.url()
     };
     const mutation = await this.graphqlRequest(`
@@ -386,7 +386,7 @@ describe('dataset graphql', function() {
         displayName: faker.internet.userName(),
         description: faker.lorem.sentence(),
         global: false,
-        type: 'gitSync',
+        type: 'git',
         url: faker.internet.url()
       }
     });
@@ -397,7 +397,7 @@ describe('dataset graphql', function() {
       displayName: faker.internet.userName(),
       description: faker.lorem.sentence(),
       global: false,
-      type: 'gitSync',
+      type: 'git',
       url: faker.internet.url()
     };
     const mutation = await this.graphqlRequest(`
@@ -438,7 +438,7 @@ describe('dataset graphql', function() {
         displayName: faker.internet.userName(),
         description: faker.lorem.sentence(),
         global: false,
-        type: 'gitSync',
+        type: 'git',
         url: faker.internet.url()
       }
     });
