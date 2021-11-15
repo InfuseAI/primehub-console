@@ -114,7 +114,7 @@ export const createMapping = (data: any) => {
   const hostPathProp = data.hostPath
     ? {hostPath: {path: data.hostPath}}
     : {};
-  const annotations: any = (data.type === 'git')
+  const annotations: any = (data.type === 'gitSync')
     ? {'primehub-gitsync': 'true'}
     : {};
 
@@ -175,7 +175,7 @@ export const updateMapping = (data: any) => {
   // gitsync annotation
   let annotations: any = {};
   // update to git type
-  if (data.type === 'git') {
+  if (data.type === 'gitSync') {
     annotations = {annotations: {'primehub-gitsync': 'true'}};
   } else if (!isUndefined(data.type)) {
     // set to other type

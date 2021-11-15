@@ -28,7 +28,7 @@ export const datasets = [
     "name": "git",
     "displayName": "gitsync dataset",
     "description": "",
-    "type": "git",
+    "type": "gitSync",
     "pvProvisioning": "auto",
     "volumeName": "git",
     "volumeSize": null,
