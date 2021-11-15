@@ -9,6 +9,15 @@ interface Props {
   onSubmit: (data: { id: string; name: string; tags: string[] }) => void;
 }
 
+function genId(value: string) {
+  if (value === '') {
+    return '';
+  }
+  const normalizedName = value.trim().replace(/[\W_]/g, '-').toLowerCase();
+  const randomString = Math.random().toString(36).substring(6).substring(0, 5);
+  return `${normalizedName}-${randomString}`;
+}
+
 export function DatasetCreateForm({
   dataset,
   visible,
@@ -35,18 +44,6 @@ export function DatasetCreateForm({
       inputRef.current?.input.focus();
     }
   }, [inputVisible]);
-
-  function genId(value: string) {
-    if (value === '') {
-      return '';
-    }
-    const normalizedName = value.trim().replace(/[\W_]/g, '-').toLowerCase();
-    const randomString = Math.random()
-      .toString(36)
-      .substring(6)
-      .substring(0, 5);
-    return `${normalizedName}-${randomString}`;
-  }
 
   function handleClose(removedTag) {
     setTags(prevTags => prevTags.filter(t => t !== removedTag));

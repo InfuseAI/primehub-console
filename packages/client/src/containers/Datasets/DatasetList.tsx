@@ -48,7 +48,9 @@ const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 10;
 const Search = Input.Search;
 
-type Props = {
+interface Props
+  extends RouteComponentProps<{ datasetId: string }>,
+    GroupContextComponentProps {
   groups: Array<{
     id: string;
   }>;
@@ -73,8 +75,7 @@ type Props = {
       where: { id: string; groupName: string };
     };
   }) => Promise<void>;
-} & RouteComponentProps &
-  GroupContextComponentProps;
+}
 
 function CommonPageTitle() {
   const breadcrumbs = [
@@ -199,7 +200,15 @@ function _DatasetList({
                     });
 
                     notification.success({
-                      message: `Dataset '${record.name}' (${record.id}) has been deleted.`,
+                      message: (
+                        <>
+                          Dataset{' '}
+                          <b>
+                            {record.name} ({record.id})
+                          </b>{' '}
+                          has been deleted.
+                        </>
+                      ),
                       duration: 5,
                       placement: 'bottomRight',
                     });
@@ -385,7 +394,15 @@ export const DatasetList = compose(
       onCompleted: (data: any) => {
         const dataset = data.createDatasetV2;
         notification.success({
-          message: `Dataset '${dataset.name}' (${dataset.id}) has been created.`,
+          message: (
+            <>
+              Dataset{' '}
+              <b>
+                {dataset.name} ({dataset.id})
+              </b>{' '}
+              has been created.
+            </>
+          ),
           duration: 5,
           placement: 'bottomRight',
         });

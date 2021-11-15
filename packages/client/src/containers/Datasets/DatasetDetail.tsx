@@ -25,16 +25,15 @@ import { Dataset, InputVariables } from 'components/datasets/common';
 import { DatasetCreateForm } from 'components/datasets/CreateForm';
 import { DatasetQuery, UpdateDatasetMutation } from './dataset.graphql';
 
-type Props = {
+interface Props
+  extends RouteComponentProps<{ datasetId: string }>,
+    GroupContextComponentProps {
   getDataset: {
     error?: Error | undefined;
     loading: boolean;
     datasetV2: Dataset;
   };
-} & RouteComponentProps<{
-  datasetId: string;
-}> &
-  GroupContextComponentProps;
+}
 
 function _DatasetDetail({ getDataset, updateDataset }) {
   const groupContext = React.useContext(GroupContext);
@@ -243,7 +242,15 @@ export const DatasetDetail = compose(
       onCompleted: (data: any) => {
         const dataset = data.updateDatasetV2;
         notification.success({
-          message: `Dataset '${dataset.name}' (${dataset.id}) has been updated.`,
+          message: (
+            <>
+              Dataset{' '}
+              <b>
+                {dataset.name} ({dataset.id})
+              </b>{' '}
+              has been updated.
+            </>
+          ),
           duration: 5,
           placement: 'bottomRight',
         });
