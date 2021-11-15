@@ -35,9 +35,14 @@ export default class BaseImageRow extends React.Component<Props, State> {
   }
 
   onSelect = (value: string) => {
-    const secret = defaultTo(get(this.secretDict, value), '');
+    const url = value.split('__')[1]
+    const secret = defaultTo(get(this.secretDict, url), '');
     const {form} = this.props;
-    form.setFieldsValue({'imageSpec.pullSecret': secret});
+
+    form.setFieldsValue({
+      'imageSpec.baseImage': url,
+      'imageSpec.pullSecret': secret
+    });
   }
 
   getDataSource() {
@@ -67,7 +72,7 @@ export default class BaseImageRow extends React.Component<Props, State> {
       }
     })))
     .filter(text => text.indexOf(searchText) > -1)
-    .map(text => {
+    .map((text, i) => {
       const index = text.indexOf(searchText);
       const name = <span>
         {text.substr(0, index)}
@@ -75,7 +80,9 @@ export default class BaseImageRow extends React.Component<Props, State> {
         {text.substr(index + searchText.length)}
       </span>;
       return (
-        <Option value={this.urlDict[text]} key={this.urlDict[text]}>
+        // Added a prefix `__` into value make option is independent
+        // ref bug: https://github.com/ant-design/ant-design/issues/11909
+        <Option key={`${i}__${text}}`} value={`${i}__${this.urlDict[text]}`}>
           {name}
         </Option>
       );
