@@ -13,7 +13,13 @@ import {
 } from 'antd';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
-import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
+import {
+  Link,
+  withRouter,
+  RouteComponentProps,
+  useHistory,
+} from 'react-router-dom';
+import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import type { ColumnProps } from 'antd/lib/table';
 
 import Breadcrumbs from 'components/share/breadcrumb';
@@ -100,6 +106,8 @@ function _DatasetList({
   deleteDataset,
 }: Props) {
   const groupContext = React.useContext(GroupContext);
+  const history = useHistory();
+  const { appPrefix } = useRoutePrefix();
   const [keyword, setKeyword] = React.useState('');
   const [modalVisible, setModalVisible] = React.useState(false);
 
@@ -347,7 +355,12 @@ function _DatasetList({
           />
           <DatasetCreateForm
             visible={modalVisible}
-            onClose={() => setModalVisible(false)}
+            onClose={datasetId => {
+              setModalVisible(false);
+              history.push(
+                `${appPrefix}g/${groupContext.name}/datasets/${datasetId}/`
+              );
+            }}
             onSubmit={onSubmit}
           />
         </div>

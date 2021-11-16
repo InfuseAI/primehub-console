@@ -7,7 +7,7 @@ import { Dataset } from './common';
 interface Props {
   dataset?: Pick<Dataset, 'id' | 'name' | 'tags'>;
   visible: boolean;
-  onClose: () => void;
+  onClose: (datasetId: string) => void;
   onSubmit: (data: { id: string; name: string; tags: string[] }) => void;
 }
 
@@ -70,11 +70,12 @@ export function DatasetCreateForm({
   }
 
   function resetAndClose() {
+    const datasetId = id;
     setId('');
     setName('');
     setTags([]);
     setStep(1);
-    onClose();
+    onClose(datasetId);
   }
 
   return (
