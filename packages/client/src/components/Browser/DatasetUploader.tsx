@@ -128,7 +128,7 @@ function _DatasetUploader(props: Props) {
             return false;
           }
           upload
-            .abort(false)
+            .abort(true)
             .then(async () => {
               return true;
             })

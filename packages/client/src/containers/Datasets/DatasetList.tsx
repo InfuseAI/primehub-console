@@ -357,7 +357,7 @@ function _DatasetList({
             visible={modalVisible}
             onClose={datasetId => {
               setModalVisible(false);
-              history.push(
+              datasetId && history.push(
                 `${appPrefix}g/${groupContext.name}/datasets/${datasetId}/`
               );
             }}

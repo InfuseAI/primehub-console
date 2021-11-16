@@ -69,13 +69,20 @@ export function DatasetCreateForm({
     }
   }
 
-  function resetAndClose() {
-    const datasetId = id;
+  function resetAndClose(datasetId: string) {
     setId('');
     setName('');
     setTags([]);
     setStep(1);
     onClose(datasetId);
+  }
+
+  function cancelAndClose() {
+    if (dataset) {
+      setName(dataset.name);
+      setTags(dataset.tags);
+    }
+    onClose(null);
   }
 
   return (
@@ -104,7 +111,7 @@ export function DatasetCreateForm({
             >
               Dataset ID: {id}
             </div>
-            <Button type='default' onClick={onClose}>
+            <Button type='default' onClick={cancelAndClose}>
               Cancel
             </Button>
             <Button
@@ -115,7 +122,7 @@ export function DatasetCreateForm({
                 if (!dataset) {
                   setStep(2);
                 } else {
-                  onClose();
+                  onClose(null);
                 }
               }}
             >
@@ -123,7 +130,7 @@ export function DatasetCreateForm({
             </Button>
           </div>,
         ]}
-        onCancel={onClose}
+        onCancel={cancelAndClose}
       >
         <div
           style={{
@@ -205,11 +212,11 @@ export function DatasetCreateForm({
         width={580}
         visible={visible && step === 2}
         footer={[
-          <Button key='done' type='primary' onClick={resetAndClose}>
+          <Button key='done' type='primary' onClick={() => resetAndClose(id)}>
             Done
           </Button>,
         ]}
-        onCancel={resetAndClose}
+        onCancel={() => resetAndClose(null)}
       >
         <DatasetUploader groupName={groupName} datasetId={id} />
       </Modal>
