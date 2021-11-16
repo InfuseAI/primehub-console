@@ -73,6 +73,7 @@ export function DatasetCreateForm({
     setId('');
     setName('');
     setTags([]);
+    setStep(1);
     onClose();
   }
 
@@ -203,16 +204,13 @@ export function DatasetCreateForm({
         width={580}
         visible={visible && step === 2}
         footer={[
-          <Button key='upload-later' type='default' onClick={resetAndClose}>
-            Upload Later
-          </Button>,
           <Button key='done' type='primary' onClick={resetAndClose}>
             Done
           </Button>,
         ]}
         onCancel={resetAndClose}
       >
-        <DatasetUploader dirPath={`groups/${groupName}/datasets/${id}/`} />
+        <DatasetUploader groupName={groupName} datasetId={id} />
       </Modal>
     </>
   );
