@@ -144,7 +144,7 @@ export function _SecretForm({ form, data, ...props }: SecretFormProps) {
               onChange={value => setSecretType(value as SecretType)}
               disabled={props?.disabledName || false}
             >
-              <Select.Option value='opaque'>Git Volume</Select.Option>
+              <Select.Option value='opaque'>Git Sync</Select.Option>
               <Select.Option value='kubernetes'>Image Pull</Select.Option>
             </Select>
           )}

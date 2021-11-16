@@ -204,7 +204,7 @@ function _Volumes({
           pv: 'Persistent Volume',
           nfs: 'NFS',
           hostPath: 'Host Path',
-          git: 'Git',
+          git: 'Git Sync',
           env: 'Env',
         };
 

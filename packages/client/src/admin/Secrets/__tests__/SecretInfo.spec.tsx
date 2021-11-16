@@ -86,7 +86,7 @@ describe('SecretInfo', () => {
         'csr-foobarrr'
       );
       expect(screen.getByTestId('secret-type')).toHaveTextContent(
-        'Git Volume'
+        'Git Sync'
       );
     });
   });

@@ -379,7 +379,7 @@ function _VolumeForm(props: Props) {
                     <Select.Option value="pv">Persistent Volume</Select.Option>
                     <Select.Option value="nfs">NFS</Select.Option>
                     <Select.Option value="hostPath">Host Path</Select.Option>
-                    <Select.Option value="git">Git</Select.Option>
+                    <Select.Option value="git">Git Sync</Select.Option>
                     <Select.Option value="env">Env</Select.Option>
                   </Select>
                 )}

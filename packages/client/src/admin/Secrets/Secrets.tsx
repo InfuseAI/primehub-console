@@ -93,7 +93,7 @@ function _Secrets({
       sorter: (a, b) => compareString(a.node.type, b.node.type),
       render: function RenderType(secret: SecretNode) {
         const secretName = {
-          opaque: 'Git Volume',
+          opaque: 'Git Sync',
           kubernetes: 'Image Pull',
         };
 
