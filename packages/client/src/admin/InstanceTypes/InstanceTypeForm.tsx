@@ -120,7 +120,8 @@ type UserGroupsAction =
   | { type: 'GROUPS'; groups: Groups[] }
   | { type: 'CONNECTIONS'; connect: Groups[]; disconnect: Groups[] };
 
-function FormButtons() {
+function FormButtons(props: { name: string }) {
+  const { name } = props;
   const history = useHistory();
   const { appPrefix } = useRoutePrefix();
 
@@ -134,11 +135,15 @@ function FormButtons() {
       }}
     >
       <div style={{ display: 'flex', gap: '16px' }}>
-        <Button data-testid='confirm-button' type='primary' htmlType='submit'>
+        <Button
+          data-testid={`confirm-button-${name}`}
+          type='primary'
+          htmlType='submit'
+        >
           Confirm
         </Button>
         <Button
-          data-testid='reset-button'
+          data-testid={`reset-button-${name}`}
           onClick={() => {
             history.push(`${appPrefix}admin/instanceType`);
           }}
@@ -642,7 +647,7 @@ export function _InstanceTypeForm({
               </div>
             </Spin>
 
-            <FormButtons />
+            <FormButtons name='basic' />
           </Tabs.TabPane>
 
           {/* Tolerations */}
@@ -744,7 +749,7 @@ export function _InstanceTypeForm({
               />
             )}
 
-            <FormButtons />
+            <FormButtons name='tolerations' />
           </Tabs.TabPane>
 
           {/* Node Selector */}
@@ -759,7 +764,7 @@ export function _InstanceTypeForm({
               />
             )}
 
-            <FormButtons />
+            <FormButtons name='node-selector' />
           </Tabs.TabPane>
 
           {form.getFieldDecorator('id', {
