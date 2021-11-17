@@ -1,5 +1,5 @@
 import { ApolloError } from 'apollo-server';
-import { isEmpty } from 'lodash';
+import { find, isEmpty } from 'lodash';
 
 import { Context } from './interface';
 import * as logger from '../logger';
@@ -14,6 +14,7 @@ import moment from 'moment';
 const {
   NOT_AUTH_ERROR,
   INTERNAL_ERROR,
+  REQUEST_BODY_INVALID,
   RESOURCE_NOT_FOUND,
   RESOURCE_CONFLICT,
 } = ErrorCodes;
@@ -22,12 +23,10 @@ const DATASET_FOLDER = 'datasets';
 const DATASET_METADATA = '.dataset';
 
 interface DatasetV2Metadata {
-  name: string;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
   tags: string[];
-  size: number;
 }
 
 const checkPermission = async (context: Context, groupName: string) => {
@@ -155,7 +154,7 @@ export const query = async (root, args, context: Context) => {
   const size = async () => {
     return getDatasetSize(id, groupName, context);
   };
-  return { id, ...metadata, size };
+  return { ...metadata, id, name: id, size };
 };
 
 export const queryFile = async (root, args, context: Context): Promise<any> => {
@@ -171,7 +170,7 @@ export const queryFile = async (root, args, context: Context): Promise<any> => {
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
-  const { groupName, prefix, search } = args.where;
+  const { groupName, search } = args.where;
   await checkPermission(context, groupName);
 
   const objectPrefix = getDatasetPrefix(groupName);
@@ -183,14 +182,24 @@ export const connectionQuery = async (root, args, context: Context) => {
         return {};
       }
       return {
-        id: obj.id,
         ...metadata,
+        id: obj.id,
+        name: obj.id,
       };
     })
   );
   datasets = datasets.filter((obj: any) => obj.id);
   if (search) {
-    datasets = datasets.filter((obj: any) => obj.name.includes(search));
+    datasets = datasets.filter((obj: any) => {
+      if (obj.id.includes(search)) {
+        return true;
+      }
+      const tags = obj.tags as string[];
+      if (tags && find(tags, tag => tag.includes(search))) {
+        return true;
+      }
+      return false;
+    });
   }
 
   return toRelay(datasets, extractPagination(args));
@@ -224,13 +233,19 @@ export const create = async (root, args, context: Context) => {
 
   const dataPath = toDataPath(groupName, id);
   const metadata = {
-    name,
     tags: tags || [],
     createdBy: context.username,
     createdAt: moment().utc().toISOString(),
     updatedAt: moment().utc().toISOString(),
-    size: 0,
   };
+
+  const re = /^[A-Za-z0-9_.-]+$/;
+  if (!re.exec(id)) {
+    throw new ApolloError(
+      `failed to create dataset, invalid id: "${id}"`,
+      REQUEST_BODY_INVALID
+    );
+  }
 
   if (await isObjectExisting(minioClient, storeBucket, dataPath)) {
     throw new ApolloError(
@@ -240,7 +255,7 @@ export const create = async (root, args, context: Context) => {
   }
 
   await putMetaData(context, dataPath, metadata);
-  return { id, ...metadata };
+  return { ...metadata, id, name: id };
 };
 
 export const update = async (root, args, context: Context) => {
@@ -263,7 +278,7 @@ export const update = async (root, args, context: Context) => {
   }
 
   await putMetaData(context, toDataPath(groupName, id), metadata);
-  return { id, ...metadata };
+  return { ...metadata, id, name: id };
 };
 
 export const destroy = async (root, args, context: Context) => {
@@ -339,7 +354,7 @@ const getDatasetObjects = async (
   });
 };
 
-function toDataPath(groupName: any, id: any, includeMeata: boolean = true) {
+function toDataPath(groupName: any, id: any, includeMeata = true) {
   if (includeMeata) {
     return `${getDatasetPrefix(groupName)}${id}/${DATASET_METADATA}`;
   }
