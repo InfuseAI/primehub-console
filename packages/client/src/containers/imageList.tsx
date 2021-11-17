@@ -111,9 +111,14 @@ class ImageListContainer extends React.Component<Props> {
 
   render() {
     const {history, groupContext, userContext, getImagesConnection, groups } = this.props;
-    //if (userContext && !get(userContext, 'isCurrentGroupAdmin', false)){
-      //history.push(`../home`);
-    //}
+    if (
+      userContext &&
+      !get(userContext, 'isCurrentGroupAdmin', false) &&
+      !window.isUserAdmin
+    ) {
+      history.push(`../home`);
+    }
+
     return (
       <ImageList
         groupContext={groupContext}
