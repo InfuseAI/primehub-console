@@ -24,9 +24,10 @@ interface Props {
     text: string | React.ReactNode;
     tag: string;
   };
+  installable?: boolean;
 }
 
-export function AppCard({ template }: Props) {
+export function AppCard({ template, installable = true }: Props) {
   return (
     <Card
       style={{
@@ -69,11 +70,13 @@ export function AppCard({ template }: Props) {
         <Button href={`${template.docLink}`} target='_blank'>
           <Icon type='read' /> About
         </Button>
-        <Button type='primary'>
-          <Link to={`create/${template.id}`}>
-            <Icon type='plus' /> Install to PrimeHub
-          </Link>
-        </Button>
+        {installable && (
+          <Button type='primary'>
+            <Link to={`create/${template.id}`}>
+              <Icon type='plus' /> Install to PrimeHub
+            </Link>
+          </Button>
+        )}
       </div>
     </Card>
   );

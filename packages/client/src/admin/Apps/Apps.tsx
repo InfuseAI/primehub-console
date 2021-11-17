@@ -210,6 +210,7 @@ function _Apps({ getPhAppTemplates, ...props }: Props) {
                 style={{ marginBottom: 16 }}
               >
                 <AppCard
+                  installable={false}
                   template={{
                     ...appTemplate,
                     text,
