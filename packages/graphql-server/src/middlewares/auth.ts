@@ -43,6 +43,9 @@ export const ShieldMutation = {
   'stopPhApplication': or(isAdmin, isUser),
   'notifyNotebookEvent': or(isClient),
   'createUserFromInvitation': or(isClient, isAdmin),
+  'createDatasetV2': or(isAdmin, isUser),
+  'updateDatasetV2': or(isAdmin, isUser),
+  'deleteDatasetV2': or(isAdmin, isUser),
 };
 
 export const permissions = shield({
