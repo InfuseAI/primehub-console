@@ -39,7 +39,8 @@ function _DatasetDetail({ getDataset, updateDataset }) {
   const groupContext = React.useContext(GroupContext);
   const history = useHistory();
   const { appPrefix } = useRoutePrefix();
-  const { path, groupName } = useParams<{ groupName: string; path: string }>();
+  const { path, datasetId, groupName } =
+    useParams<{ groupName: string; datasetId: string; path: string }>();
   const [modalVisible, setModalVisible] = React.useState(false);
   const [uploading, setUploading] = React.useState(false);
   const [tabKey, setTabKey] = React.useState('data');
@@ -66,7 +67,7 @@ function _DatasetDetail({ getDataset, updateDataset }) {
   }
 
   const handleChangePath = path => {
-    history.push(`${appPrefix}g/${groupName}/datasets/${dataset.id}${path}`);
+    history.push(`${appPrefix}g/${groupName}/datasets/${datasetId}${path}`);
   };
 
   const enabledPHFS = window?.enablePhfs || false;
@@ -81,7 +82,7 @@ function _DatasetDetail({ getDataset, updateDataset }) {
     {
       key: 'detail',
       matcher: /\/datasets\/([\w-_])+/,
-      title: `Dataset: ${dataset.name}`,
+      title: `Dataset: ${datasetId}`,
       tips: 'View the detailed information.',
       // TODO: add doc link
       tipsLink: '',
@@ -113,7 +114,7 @@ function _DatasetDetail({ getDataset, updateDataset }) {
           >
             <Tabs.TabPane key='data' tab='Data'>
               <Browser
-                title={dataset.id}
+                title={datasetId}
                 basePath={`datasets/${dataset.id}`}
                 path={path || '/'}
                 enabledPHFS={enabledPHFS}

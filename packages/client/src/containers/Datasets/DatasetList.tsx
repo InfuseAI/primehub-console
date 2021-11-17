@@ -1,7 +1,6 @@
 import * as React from 'react';
 import moment from 'moment';
 import {
-  Alert,
   Button,
   Input,
   Modal,
@@ -206,11 +205,7 @@ function _DatasetList({
                     notification.success({
                       message: (
                         <>
-                          Dataset{' '}
-                          <b>
-                            {record.name} ({record.id})
-                          </b>{' '}
-                          has been deleted.
+                          Dataset <b>{record.id}</b> has been deleted.
                         </>
                       ),
                       duration: 5,
