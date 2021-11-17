@@ -1,21 +1,20 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
-import {get} from 'lodash';
-import {notification} from 'antd';
-import {graphql} from 'react-apollo';
-import {compose} from 'recompose';
-import {withRouter} from 'react-router-dom';
+import { get } from 'lodash';
+import { notification } from 'antd';
+import { graphql } from 'react-apollo';
+import { compose } from 'recompose';
+import { withRouter } from 'react-router-dom';
 import queryString from 'querystring';
-import {RouteComponentProps} from 'react-router';
+import { RouteComponentProps } from 'react-router';
 import ImageList from 'components/images/list';
-import {errorHandler} from 'utils/errorHandler';
-import {Group} from 'ee/components/shared/groupFilter';
-import {appPrefix} from 'utils/env';
-import {withGroupContext, GroupContextComponentProps } from 'context/group';
-import {withUserContext, UserContextComponentProps } from 'context/user';
+import { errorHandler } from 'utils/errorHandler';
+import { Group } from 'ee/components/shared/groupFilter';
+import { withGroupContext, GroupContextComponentProps } from 'context/group';
+import { withUserContext, UserContextComponentProps } from 'context/user';
 
 export const ImageFragment = gql`
-  fragment ImageInfo on Image{
+  fragment ImageInfo on Image {
     id
     displayName
     description
@@ -41,11 +40,15 @@ export const ImageFragment = gql`
         pip
       }
     }
- }
+  }
 `;
 
 export const GET_IMAGES_CONNECTION = gql`
-  query groupImagesConnection($where: ImageWhereInput, $page: Int, $orderBy: ImageOrderByInput) {
+  query groupImagesConnection(
+    $where: ImageWhereInput
+    $page: Int
+    $orderBy: ImageOrderByInput
+  ) {
     groupImagesConnection(where: $where, page: $page, orderBy: $orderBy) {
       pageInfo {
         totalPage
@@ -74,30 +77,29 @@ export const DELETE_IMAGE = gql`
 type Props = {
   getImagesConnection?: any;
   deleteImage?: any;
-  groups: Array<Group>;
-} & RouteComponentProps & GroupContextComponentProps & UserContextComponentProps;
+  groups: Group[];
+} & RouteComponentProps &
+  GroupContextComponentProps &
+  UserContextComponentProps;
 
 class ImageListContainer extends React.Component<Props> {
-  componentDidMount = () =>{
-  }
-
-  removeImage = async (id) => {
-    const {deleteImage, groupContext} = this.props;
+  removeImage = async id => {
+    const { deleteImage } = this.props;
     await deleteImage({
       variables: {
-        where: {id},
-      }
-    })
-  }
+        where: { id },
+      },
+    });
+  };
 
-  refetchImages = async (payload) => {
-    const payloadWithStringWhere = {...payload};
+  refetchImages = async payload => {
+    const payloadWithStringWhere = { ...payload };
     if (payloadWithStringWhere.where)
       payloadWithStringWhere.where = JSON.stringify(payload.where);
     if (payloadWithStringWhere.orderBy)
       payloadWithStringWhere.orderBy = JSON.stringify(payload.orderBy || {});
 
-    const {history, getImagesConnection} = this.props;
+    const { history, getImagesConnection } = this.props;
     const search = queryString.stringify(payloadWithStringWhere);
     if (history.location.search === `?${search}`) {
       await getImagesConnection.refetch(payload);
@@ -107,10 +109,11 @@ class ImageListContainer extends React.Component<Props> {
         search,
       });
     }
-  }
+  };
 
   render() {
-    const {history, groupContext, userContext, getImagesConnection, groups } = this.props;
+    const { history, groupContext, userContext, getImagesConnection, groups } =
+      this.props;
     if (
       userContext &&
       !get(userContext, 'isCurrentGroupAdmin', false) &&
@@ -124,7 +127,12 @@ class ImageListContainer extends React.Component<Props> {
         groupContext={groupContext}
         imagesLoading={getImagesConnection.loading}
         imagesError={getImagesConnection.error}
-        imagesConnection={getImagesConnection.groupImagesConnection || {pageInfo: {}, edges: []}}
+        imagesConnection={
+          getImagesConnection.groupImagesConnection || {
+            pageInfo: {},
+            edges: [],
+          }
+        }
         imagesVariables={getImagesConnection.variables}
         removeImage={this.removeImage}
         refetchImages={this.refetchImages}
@@ -140,35 +148,36 @@ export default compose(
   withGroupContext,
   graphql(GET_IMAGES_CONNECTION, {
     options: (props: Props) => {
-      const params = queryString.parse(props.location.search.replace(/^\?/, ''));
-      const {groupContext} = props;
-      const where = JSON.parse(params.where as string || '{}');
+      const params = queryString.parse(
+        props.location.search.replace(/^\?/, '')
+      );
+      const { groupContext } = props;
+      const where = JSON.parse((params.where as string) || '{}');
       if (groupContext) {
         where.groupName_contains = groupContext.name;
       }
       return {
         variables: {
           where,
-          orderBy: JSON.parse(params.orderBy as string || '{}'),
+          orderBy: JSON.parse((params.orderBy as string) || '{}'),
           page: Number(params.page || 1),
         },
-        fetchPolicy: 'cache-and-network'
-      }
+        fetchPolicy: 'cache-and-network',
+      };
     },
-    name: 'getImagesConnection'
+    name: 'getImagesConnection',
   }),
   graphql(DELETE_IMAGE, {
-    options: (props: Props) => ({
+    options: () => ({
       onCompleted: (data: any) => {
-        const {history} = props;
         notification.success({
           duration: 10,
           placement: 'bottomRight',
-          message: `Image "${data.deleteImage.name}" has been deleted.`
-        })
+          message: `Image "${data.deleteImage.name}" has been deleted.`,
+        });
       },
-      onError: errorHandler
+      onError: errorHandler,
     }),
-    name: 'deleteImage'
-  }),
-)(ImageListContainer)
+    name: 'deleteImage',
+  })
+)(ImageListContainer);
