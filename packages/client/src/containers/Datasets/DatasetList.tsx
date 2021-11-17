@@ -57,9 +57,6 @@ const Search = Input.Search;
 interface Props
   extends RouteComponentProps<{ datasetId: string }>,
     GroupContextComponentProps {
-  groups: Array<{
-    id: string;
-  }>;
   datasets: {
     error?: Error | undefined;
     loading: boolean;
@@ -100,7 +97,6 @@ function CommonPageTitle() {
 }
 
 function _DatasetList({
-  groups,
   datasets,
   createDataset,
   deleteDataset,
@@ -238,31 +234,8 @@ function _DatasetList({
     );
   }
 
-  if (groupContext) {
-    const group = groups.find(group => group.id === groupContext.id);
-
-    if (!group) {
-      return (
-        <>
-          <CommonPageTitle />
-          <PageBody>
-            <Alert
-              message='Group not found'
-              description={`Group ${groupContext.name} is not found or not authorized.`}
-              type='error'
-              showIcon
-            />
-          </PageBody>
-        </>
-      );
-    }
-  }
-
   if (datasets.error) {
     return <div>Failure to load datasets.</div>;
-  }
-  if (!datasets.datasetV2Connection) {
-    return <></>;
   }
 
   const columns: Array<ColumnProps<Dataset>> = [
@@ -301,6 +274,8 @@ function _DatasetList({
   ];
 
   const connection = datasets.datasetV2Connection;
+  const dataSource = connection ? connection.edges.map(edge => edge.node) : [];
+  const total = connection?.pageInfo?.totalPage * DEFAULT_PAGE_SIZE;
 
   return (
     <>
@@ -348,7 +323,7 @@ function _DatasetList({
         >
           <Table
             loading={datasets.loading}
-            dataSource={connection.edges.map(edge => edge.node)}
+            dataSource={dataSource}
             columns={columns}
             rowKey='id'
             pagination={false}
@@ -372,7 +347,7 @@ function _DatasetList({
           }}
         >
           <Pagination
-            total={connection.pageInfo?.totalPage * DEFAULT_PAGE_SIZE}
+            total={total}
             onChange={onPageChanged}
           />
         </div>
