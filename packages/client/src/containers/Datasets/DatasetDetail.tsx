@@ -22,7 +22,7 @@ import {
 import { errorHandler } from 'utils/errorHandler';
 
 import { Dataset, InputVariables } from 'components/datasets/common';
-import { DatasetCreateForm } from 'components/datasets/CreateForm';
+import DatasetCreateForm from 'components/datasets/CreateForm';
 import { DatasetQuery, UpdateDatasetMutation } from './dataset.graphql';
 
 interface Props
@@ -54,7 +54,7 @@ function _DatasetDetail({ getDataset, updateDataset }) {
     await updateDataset({
       variables: {
         payload: {
-          ...pick(data, ['name', 'tags']),
+          ...pick(data, ['tags']),
           groupName: groupContext.name,
         },
       },
@@ -160,12 +160,6 @@ function _DatasetDetail({ getDataset, updateDataset }) {
                       labelCol={4}
                       valueCol={20}
                       label='Dataset Name'
-                      value={dataset.name}
-                    />
-                    <Field
-                      labelCol={4}
-                      valueCol={20}
-                      label='Dataset ID'
                       value={dataset.id}
                     />
                     <Field
@@ -178,7 +172,7 @@ function _DatasetDetail({ getDataset, updateDataset }) {
                       labelCol={4}
                       valueCol={20}
                       label='Last Modified'
-                      value={moment(dataset.updatedAT).format(
+                      value={moment(dataset.updatedAt).format(
                         'YYYY-MM-DD HH:mm:ss'
                       )}
                     />
@@ -244,11 +238,7 @@ export const DatasetDetail = compose(
         notification.success({
           message: (
             <>
-              Dataset{' '}
-              <b>
-                {dataset.name} ({dataset.id})
-              </b>{' '}
-              has been updated.
+              Dataset <b>{dataset.id}</b> has been updated.
             </>
           ),
           duration: 5,

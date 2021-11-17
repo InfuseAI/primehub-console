@@ -29,7 +29,6 @@ export interface QueryVariables {
 
 export interface InputVariables {
   id: string;
-  name: string;
   groupName: string;
   tags: string[];
 }

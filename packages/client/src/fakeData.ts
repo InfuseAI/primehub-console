@@ -11,6 +11,7 @@ import models from './fakeData/models';
 import modelVersions from './fakeData/modelVersions';
 import phApplications from './fakeData/phApplications';
 import phAppTemplates from './fakeData/phAppTemplates';
+import { datasetsV2 } from './fakeData/datasetsV2';
 import { groups, mlflow } from './fakeData/groups';
 import { system } from './fakeData/system';
 
@@ -47,6 +48,7 @@ export const fakeData = {
   phDeployments,
   phApplications,
   phAppTemplates,
+  datasetsV2,
   license,
   files,
   system,
@@ -68,6 +70,7 @@ export const schema = {
   modelVersions: { type: 'array', items: { type: 'object' } },
   phApplications: { type: 'array', items: { type: 'object' } },
   phAppTemplates: { type: 'array', items: { type: 'object' } },
+  datasetsV2: { type: 'array', items: { type: 'object' } },
   license: { type: 'object' },
   files: { type: 'object' },
   system: { type: 'object' },

@@ -41,7 +41,7 @@ import {
   InputVariables,
   QueryVariables,
 } from 'components/datasets/common';
-import { DatasetCreateForm } from 'components/datasets/CreateForm';
+import DatasetCreateForm from 'components/datasets/CreateForm';
 import {
   CreateDatasetMutation,
   DeleteDatasetMutation,
@@ -409,11 +409,7 @@ export const DatasetList = compose(
         notification.success({
           message: (
             <>
-              Dataset{' '}
-              <b>
-                {dataset.name} ({dataset.id})
-              </b>{' '}
-              has been created.
+              Dataset <b>{dataset.id}</b> has been created.
             </>
           ),
           duration: 5,
