@@ -17,7 +17,7 @@ const findTimezone = () => {
     offset: 0,
   };
 };
-const DEFAULT_TIMEZONE = findTimezone();
+export const DEFAULT_TIMEZONE = findTimezone();
 
 export const createDefaultSystemSettings = (defaultUserVolumeCapacity: string) => ({
   org: {

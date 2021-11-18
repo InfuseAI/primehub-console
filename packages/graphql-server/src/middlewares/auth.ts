@@ -3,6 +3,7 @@ import { isAdmin, isClient, isUser, isGroupAdmin } from '../utils/roles';
 export const ShieldQuery = {
   '*': isAdmin,
   'system': or(isAdmin, isClient),
+  'timezone': or(isAdmin, isClient, isUser),
   'me': or(isAdmin, isUser),
   'user': or(isAdmin, isClient),
   'group': or(isAdmin, isGroupAdmin, isClient),
