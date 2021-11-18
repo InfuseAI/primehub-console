@@ -240,7 +240,7 @@ function reducer(state: State, action: Actions) {
   }
 }
 
-const initialState: FormState = {
+const initialState: Partial<FormState> = {
   groupId: '',
   instanceTypeId: '',
   instanceType: '',
@@ -248,7 +248,6 @@ const initialState: FormState = {
   image: '',
   displayName: '',
   command: '',
-  activeDeadlineSeconds: 86400,
   executeOptions: 'job',
   recurrence: {
     cron: '',
