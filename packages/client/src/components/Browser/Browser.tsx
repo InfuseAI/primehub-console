@@ -280,9 +280,11 @@ export interface BrowserProps {
   basePath?: string;
   path?: string;
   enabledPHFS?: boolean;
-  onChangePath?: (path: string) => void;
+  onPathChange?: (path: string) => void;
   uploading?: boolean;
   onUploadingChange?: (status: boolean) => void;
+  onFileUpload?: () => void;
+  onFileDelete?: () => void;
 }
 
 interface BrowseInternalProps extends GroupContextComponentProps, BrowserProps {
@@ -312,7 +314,7 @@ interface BrowseInternalProps extends GroupContextComponentProps, BrowserProps {
 }
 
 function Browser(props: BrowseInternalProps) {
-  const { data, enabledPHFS, title, onChangePath: onChange, uploading, onUploadingChange } = {
+  const { data, enabledPHFS, title, onPathChange: onChange, uploading, onUploadingChange } = {
     title: '<root>',
     uploading: false,
     ...props,
@@ -424,7 +426,7 @@ function Browser(props: BrowseInternalProps) {
             phfsPrefix={phfsPrefix}
             onPreviewFile={path => setPreviewFilePath(path)}
             onDelete={() => {
-              onFilesDeleted(phfsPrefix, item);
+              handleFileDelete(phfsPrefix, item);
             }}
           />
         );
@@ -432,7 +434,7 @@ function Browser(props: BrowseInternalProps) {
     },
   ];
 
-  function onFilesDeleted(phfsPrefix: string, { name }: FileItem) {
+  function handleFileDelete(phfsPrefix: string, { name }: FileItem) {
     const isFolder = name.endsWith('/');
     let path = `${phfsPrefix}${name}`;
     if (path.startsWith('/')) {
@@ -462,6 +464,9 @@ function Browser(props: BrowseInternalProps) {
             duration: 5,
             placement: 'bottomRight',
           });
+          if (props.onFileDelete) {
+            props.onFileDelete();
+          }
         },
       });
     } catch (err) {
@@ -590,7 +595,15 @@ function Browser(props: BrowseInternalProps) {
           onUploadingChange(false);
         }}
       >
-        <Uploader dirPath={get(data, 'files.prefix', '')} />
+        <Uploader
+          key={path}
+          dirPath={get(data, 'files.prefix', '')}
+          onFileUpload={() => {
+            if (props.onFileUpload) {
+              props.onFileUpload();
+            }
+          }}
+        />
       </Modal>
 
       {previewFilePath && (

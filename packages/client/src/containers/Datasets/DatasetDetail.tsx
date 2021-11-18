@@ -36,13 +36,13 @@ interface Props
 }
 
 function _DatasetDetail({ getDataset, updateDataset }) {
-  const groupContext = React.useContext(GroupContext);
   const history = useHistory();
   const { appPrefix } = useRoutePrefix();
   const { path, datasetId, groupName } =
     useParams<{ groupName: string; datasetId: string; path: string }>();
   const [modalVisible, setModalVisible] = React.useState(false);
   const [uploading, setUploading] = React.useState(false);
+  const [fileUploaded, setFileUploaded] = React.useState(false);
   const [tabKey, setTabKey] = React.useState('data');
 
   if (getDataset.error) {
@@ -52,22 +52,61 @@ function _DatasetDetail({ getDataset, updateDataset }) {
   async function onSubmit(data: Partial<InputVariables>) {
     const { refetch, variables } = getDataset;
 
-    await updateDataset({
-      variables: {
-        payload: {
-          ...pick(data, ['tags']),
-          groupName: groupContext.name,
+    try {
+      await updateDataset({
+        variables: {
+          payload: {
+            ...pick(data, ['tags']),
+          },
         },
-      },
-    });
+      });
 
-    refetch({
-      where: variables.where,
-    });
+      notification.success({
+        message: (
+          <>
+            Dataset <b>{datasetId}</b> has been updated.
+          </>
+        ),
+        duration: 5,
+        placement: 'bottomRight',
+      });
+
+      await refetch({
+        where: variables.where,
+      });
+    } catch (e) {
+      errorHandler(e);
+    }
   }
 
-  const handleChangePath = path => {
+  const handlePathChange = path => {
     history.push(`${appPrefix}g/${groupName}/datasets/${datasetId}${path}`);
+  };
+
+  const handleUploadingChange = uploading => {
+    if (!uploading) {
+      // Update the lastModified in metadata
+      if (fileUploaded) {
+        updateDataset({
+          variables: {
+            payload: {},
+          },
+        });
+      }
+      setFileUploaded(false);
+    }
+    setUploading(uploading);
+  };
+
+  const handleFileUpload = () => {
+    setFileUploaded(true);
+  };
+  const hnanleFileDelete = () => {
+    updateDataset({
+      variables: {
+        payload: {},
+      },
+    });
   };
 
   const enabledPHFS = window?.enablePhfs || false;
@@ -114,15 +153,16 @@ function _DatasetDetail({ getDataset, updateDataset }) {
           >
             <Tabs.TabPane key='data' tab='Data'>
               <Browser
+                key='browser'
                 title={datasetId}
                 basePath={`datasets/${dataset.id}`}
                 path={path || '/'}
                 enabledPHFS={enabledPHFS}
-                onChangePath={handleChangePath}
+                onPathChange={handlePathChange}
                 uploading={uploading}
-                onUploadingChange={(uploading: boolean) => {
-                  setUploading(uploading);
-                }}
+                onUploadingChange={handleUploadingChange}
+                onFileUpload={handleFileUpload}
+                onFileDelete={hnanleFileDelete}
               />
             </Tabs.TabPane>
             <Tabs.TabPane key='information' tab='Information'>
@@ -234,19 +274,6 @@ export const DatasetDetail = compose(
           groupName: groupContext.name,
         },
       },
-      onCompleted: (data: any) => {
-        const dataset = data.updateDatasetV2;
-        notification.success({
-          message: (
-            <>
-              Dataset <b>{dataset.id}</b> has been updated.
-            </>
-          ),
-          duration: 5,
-          placement: 'bottomRight',
-        });
-      },
-      onError: errorHandler,
     }),
     name: 'updateDataset',
   })
