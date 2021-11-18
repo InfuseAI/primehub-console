@@ -185,6 +185,7 @@ export const connectionQuery = async (root, args, context: Context) => {
         ...metadata,
         id: obj.id,
         name: obj.id,
+        size: undefined, //intensionally zero, because calculate size is slow.
       };
     })
   );
@@ -255,7 +256,7 @@ export const create = async (root, args, context: Context) => {
   }
 
   await putMetaData(context, dataPath, metadata);
-  return { ...metadata, id, name: id };
+  return { ...metadata, id, name: id, size: 0 };
 };
 
 export const update = async (root, args, context: Context) => {
@@ -278,7 +279,10 @@ export const update = async (root, args, context: Context) => {
   }
 
   await putMetaData(context, toDataPath(groupName, id), metadata);
-  return { ...metadata, id, name: id };
+  const size = async () => {
+    return getDatasetSize(id, groupName, context);
+  };
+  return { ...metadata, id, name: id, size };
 };
 
 export const destroy = async (root, args, context: Context) => {
