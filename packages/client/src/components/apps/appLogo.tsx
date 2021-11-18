@@ -5,11 +5,11 @@ import styled from 'styled-components';
 export const SpanLogo = styled.span`
   display: inline-block;
   height: 64px;
+  width: 64px;
   line-height: 52px;
   padding: 5px;
   border: 1px solid #ccc;
   border-radius: 9px;
-  overflow: hidden;
   img {
     width: 54px !important;
   }
@@ -17,7 +17,7 @@ export const SpanLogo = styled.span`
 
 interface Props {
   src: string;
-  style: any;
+  style?: any;
 }
 
 class AppLogo extends React.Component<Props> {
@@ -26,14 +26,16 @@ class AppLogo extends React.Component<Props> {
     e.currentTarget.closest('span').style.backgroundColor = 'rgb(215 222 242)';
   }
   render() {
-    let {src} = this.props;
-    const {style} = this.props;
-    src  = src && src.length > 0 ? src : defaultLogo;
+    let { src } = this.props;
+    const { style } = this.props;
+    src = src && src.length > 0 ? src : defaultLogo;
     return (
-      <SpanLogo style={{
-        backgroundColor: src === defaultLogo ? 'rgb(215 222 242)' : null,
-        ...style
-      }}>
+      <SpanLogo
+        style={{
+          backgroundColor: src === defaultLogo ? 'rgb(215 222 242)' : null,
+          ...style,
+        }}
+      >
         <img src={src} onError={this.onError} />
       </SpanLogo>
     );

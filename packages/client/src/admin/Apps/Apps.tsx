@@ -1,32 +1,18 @@
 import * as React from 'react';
 import { get } from 'lodash';
-import {
-  Icon,
-  Layout,
-  Card,
-  Row,
-  Col,
-  Button,
-  Input,
-  Typography,
-  Tag,
-  Divider,
-  notification,
-} from 'antd';
+import { Layout, Row, Col, Button, Input, notification } from 'antd';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 
 import { errorHandler } from 'utils/errorHandler';
 import Breadcrumbs from 'components/share/breadcrumb';
 import PhAppTemplate from 'interfaces/phAppTemplate';
-import { ActionBtn, ClearBoth, Left } from 'components/apps/detail';
+import { AppCard } from 'components/AppCard';
 import { GetPhAppTemplates } from 'queries/PhAppTemplate.graphql';
-import AppLogo from 'components/apps/appLogo';
 
 import { ImportPhAppTemplateFromURL } from './apps.graphql';
 
 const { Search } = Input;
-const { Text } = Typography;
 
 const GITHUB_REGEX =
   /^https?:\/\/github.com\/([A-Za-z0-9._-]+\/[A-Za-z0-9._-]+)\/blob\/(.+)/;
@@ -214,25 +200,24 @@ function _Apps({ getPhAppTemplates, ...props }: Props) {
               );
 
             return (
-              <Col xs={24} span={12} md={12} xxl={8} key={appTemplate.id} style={{ marginBottom: 16 }}>
-                <Card style={{ borderRadius: '4px' }}>
-                  <Left>
-                    <AppLogo src={appTemplate.icon} style={{ marginRight: '8px' }}/>
-                  </Left>
-                  <h2 style={{ margin: '4px 0 0' }}>{text} <Text type='secondary' style={{ fontSize: 12 }}>{appTemplate.version}</Text></h2>
-                  <Tag>{imageTag}</Tag>
-                  <ClearBoth/>
-                  <div>{desc}</div>
-                  <Divider style={{ margin: '8px 0' }}/>
-                  <div style={{ marginBottom: 0 }}>
-                    <Left>
-                      <ActionBtn href={`${appTemplate.docLink}`} target='_blank'>
-                        <Icon type='read' /> App Documents
-                      </ActionBtn>
-                    </Left>
-                    <ClearBoth />
-                  </div>
-                </Card>
+              <Col
+                key={appTemplate.id}
+                xs={24}
+                span={12}
+                md={12}
+                xl={8}
+                xxl={8}
+                style={{ marginBottom: 16 }}
+              >
+                <AppCard
+                  installable={false}
+                  template={{
+                    ...appTemplate,
+                    text,
+                    description: desc,
+                    tag: imageTag,
+                  }}
+                />
               </Col>
             );
           })}
