@@ -54,7 +54,7 @@ function _DatasetUploader(props: Props) {
     };
     upload.options.onProgress = (bytesUploaded, bytesTotal) => {
       const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
-      onProgress({ percent: +percentage }, file);
+      onProgress({ percent: Number(percentage) }, file);
     };
     upload.options.onSuccess = () => {
       file.done = true;
