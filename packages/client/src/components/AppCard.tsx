@@ -1,6 +1,5 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 import { Button, Card, Divider, Tag, Typography, Icon } from 'antd';
 
 import AppLogo from 'components/apps/appLogo';
@@ -25,9 +24,10 @@ interface Props {
     tag: string;
   };
   installable?: boolean;
+  onInstall?: () => void;
 }
 
-export function AppCard({ template, installable = true }: Props) {
+export function AppCard({ template, installable = true, ...props }: Props) {
   return (
     <Card
       style={{
@@ -71,10 +71,8 @@ export function AppCard({ template, installable = true }: Props) {
           <Icon type='read' /> About
         </Button>
         {installable && (
-          <Button type='primary'>
-            <Link to={`create/${template.id}`}>
-              <Icon type='plus' /> Install to PrimeHub
-            </Link>
+          <Button type='primary' onClick={() => props?.onInstall()}>
+            <Icon type='plus' /> Install to PrimeHub
           </Button>
         )}
       </div>

@@ -3,6 +3,7 @@ import { Divider, Col, Row, Input } from 'antd';
 import { get } from 'lodash';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 import PageTitle from 'components/pageTitle';
 import Breadcrumbs from 'components/share/breadcrumb';
 import PageBody from 'components/pageBody';
@@ -28,7 +29,7 @@ const breadcrumbs = [
   },
 ];
 
-interface Props {
+interface Props extends RouteComponentProps {
   getPhAppTemplates: any;
 }
 
@@ -155,6 +156,9 @@ class AppStore extends React.Component<Props, State> {
                         description: desc,
                         tag: imageTag,
                       }}
+                      onInstall={() => {
+                        this.props.history.push(`create/${appTemplate.id}`);
+                      }}
                     />
                   </Col>
                 );
@@ -168,6 +172,7 @@ class AppStore extends React.Component<Props, State> {
 }
 
 export default compose(
+  withRouter,
   graphql(GetPhAppTemplates, {
     name: 'getPhAppTemplates',
     alias: 'withPhAppTemplates',
