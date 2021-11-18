@@ -484,6 +484,18 @@ function Browser(props: BrowseInternalProps) {
   if (!isEmpty(searchText)) {
     dataSource = dataSource.filter(item => item.name.includes(searchText));
   }
+  dataSource = dataSource.filter(item => {
+    // exculdess
+    if (item.name === '.dataset') {
+      return false;
+    }
+    // search
+    if (!isEmpty(searchText) && !item.name.includes(searchText)) {
+      return false;
+    }
+
+    return true;
+  });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
