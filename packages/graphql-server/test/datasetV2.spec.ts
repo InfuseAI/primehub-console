@@ -11,7 +11,7 @@ const expect = chai.expect;
 const BUCKET_NAME = 'test';
 const GROUP_NAME = 'test';
 
-describe('dataset v2 graphql', function () {
+describe('dataset v2 graphql', function() {
   before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.currentUser = (global as any).currentUser;
@@ -117,13 +117,8 @@ describe('dataset v2 graphql', function () {
 
     // create 30 datasets => will be 3 pages
     for (let i = 0; i < 30; i++) {
-      let datasetId;
-      if (i + 1 < 10) {
-        datasetId = `0${i + 1}`;
-      } else {
-        datasetId = `${i + 1}`;
-      }
-      const result = await createDataset(this.graphqlRequest, {
+      const datasetId = i + 1 < 10 ? `0${i + 1}` : `${i + 1}`;
+      await createDataset(this.graphqlRequest, {
         payload: { groupName: GROUP_NAME, id: datasetId },
       });
     }
@@ -239,7 +234,7 @@ describe('dataset v2 graphql', function () {
 });
 
 async function listDatasets(graphqlRequest, page: number, search: string) {
-  return await graphqlRequest(
+  return graphqlRequest(
     `query GetDatasets($page: Int, $where: DatasetV2WhereInput) {
       datasetV2Connection(page: $page, where: $where) {
         edges {
@@ -261,10 +256,10 @@ async function listDatasets(graphqlRequest, page: number, search: string) {
       }
     }`,
     {
-      page: page,
+      page,
       where: {
         groupName: GROUP_NAME,
-        search: search,
+        search,
       },
     }
   );
@@ -277,7 +272,7 @@ function removeAllDatasetFiles(mc: Client) {
     true,
     ''
   );
-  stream.on('data', async function (obj) {
+  stream.on('data', async obj => {
     await mc.removeObject(BUCKET_NAME, obj.name);
   });
 }
@@ -287,7 +282,7 @@ async function updateDataset(
   whereCriteria: { id: string; groupName: string },
   payload: { groupName: string; tags?: string[]; name?: string }
 ) {
-  return await graphqlRequest(
+  return graphqlRequest(
     `
       mutation UpdateDatasetV2Mutation($payload: DatasetV2UpdateInput!, $where: DatasetV2WhereUniqueInput!) {
         updateDatasetV2(data: $payload, where: $where) {
@@ -302,7 +297,7 @@ async function updateDataset(
       }
       `,
     {
-      payload: payload,
+      payload,
       where: whereCriteria,
     }
   );
@@ -314,7 +309,7 @@ async function createDataset(
     payload: { id: string; groupName: string; tags?: string[]; name?: string };
   }
 ) {
-  return await graphqlRequest(
+  return graphqlRequest(
     `
       mutation CreateDatasetMutation($payload: DatasetV2CreateInput!) {
         createDatasetV2(data: $payload) {

@@ -185,7 +185,7 @@ export const connectionQuery = async (root, args, context: Context) => {
         ...metadata,
         id: obj.id,
         name: obj.id,
-        size: undefined, //intensionally zero, because calculate size is slow.
+        size: undefined, // intensionally zero, because calculate size is slow.
       };
     })
   );
