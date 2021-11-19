@@ -54,7 +54,7 @@ describe('dataset v2 graphql', function() {
     // verify result data
     const { id, name, createdBy, tags, size } = result.createDatasetV2;
     expect(id).to.be.eq(datasetId);
-    expect(name).to.be.eq(datasetId); // default name will be the id
+    expect(name).to.be.eq(datasetId);
     expect(createdBy).to.be.eq(this.currentUser.username);
     expect(tags).deep.eq([]);
     expect(size).to.be.eq(0);
@@ -65,12 +65,16 @@ describe('dataset v2 graphql', function() {
       GROUP_NAME,
       datasetId
     );
-    expect(result.createDatasetV2).deep.eq({ id, ...metadata });
+    expect(result.createDatasetV2).deep.eq({
+      id,
+      name: id,
+      size: 0,
+      ...metadata,
+    });
   });
 
   it('update dataset', async () => {
     const datasetId = newId();
-    const datasetName = newId();
     const whereCriteria = {
       id: datasetId,
       groupName: GROUP_NAME,
@@ -91,7 +95,6 @@ describe('dataset v2 graphql', function() {
       this.graphqlRequest,
       whereCriteria,
       {
-        name: datasetName,
         groupName: GROUP_NAME,
         tags: null,
       }
@@ -101,7 +104,7 @@ describe('dataset v2 graphql', function() {
     const { id, name, createdBy, tags, size, createdAt, updatedAt } =
       updatedDataset.updateDatasetV2;
     expect(id).to.be.eq(datasetId);
-    expect(name).to.be.eq(datasetName); // name could be different with id
+    expect(name).to.be.eq(datasetId);
     expect(createdBy).to.be.eq(this.currentUser.username);
     expect(tags).deep.eq([]); // update tags to null will be []
     expect(size).to.be.eq(0);
@@ -306,7 +309,7 @@ async function updateDataset(
 async function createDataset(
   graphqlRequest,
   variables: {
-    payload: { id: string; groupName: string; tags?: string[]; name?: string };
+    payload: { id: string; groupName: string; tags?: string[] };
   }
 ) {
   return graphqlRequest(
