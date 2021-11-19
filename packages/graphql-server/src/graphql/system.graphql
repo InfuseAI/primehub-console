@@ -1,6 +1,6 @@
 # import CannerImage, CannerImageInput from "common.graphql"
 # import License from "../ee/graphql/license.graphql"
-# import Timezzone from "./timezone.graphql"
+# import Timezone from "./timezone.graphql"
 
 type Org {
   name: String
