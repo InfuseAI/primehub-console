@@ -107,8 +107,6 @@ function _DatasetList({
   const [modalVisible, setModalVisible] = React.useState(false);
 
   async function onSubmit(data: InputVariables) {
-    const { refetch, variables } = datasets;
-
     try {
       await createDataset({
         variables: {
@@ -117,11 +115,6 @@ function _DatasetList({
             groupName: groupContext.name,
           },
         },
-      });
-
-      refetch({
-        where: variables.where,
-        page: variables.page,
       });
     } catch (e) {
       errorHandler(e);
@@ -293,6 +286,7 @@ function _DatasetList({
           }}
         >
           <InfuseButton
+            data-testid='add-button'
             icon='plus'
             type='primary'
             onClick={() => {
@@ -399,3 +393,4 @@ export const DatasetList = compose(
     name: 'deleteDataset',
   })
 )(_DatasetList);
+

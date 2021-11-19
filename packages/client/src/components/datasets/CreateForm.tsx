@@ -55,6 +55,7 @@ export function DatasetCreateForm({
               Cancel
             </Button>
             <Button
+              data-testid='create-dataset-button'
               type='primary'
               disabled={submitDisabled}
               onClick={async () => {
@@ -92,7 +93,7 @@ export function DatasetCreateForm({
                   message: `alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`,
                 },
               ],
-            })(<Input disabled={!!dataset} />)}
+            })(<Input data-testid='dataset-name' disabled={!!dataset} />)}
           </Form.Item>
           <Form.Item label={`Tags`} style={{ marginBottom: '8px' }}>
             {form.getFieldDecorator('tags', {
@@ -106,7 +107,12 @@ export function DatasetCreateForm({
         width={580}
         visible={visible && step === 2}
         footer={[
-          <Button key='done' type='primary' onClick={() => resetAndClose(id)}>
+          <Button
+            data-testid='upload-done-button'
+            key='done'
+            type='primary'
+            onClick={() => resetAndClose(id)}
+          >
             Done
           </Button>,
         ]}

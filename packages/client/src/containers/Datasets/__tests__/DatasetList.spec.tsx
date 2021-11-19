@@ -4,11 +4,12 @@ import { MockedProvider } from 'react-apollo/test-utils';
 
 import { DatasetList } from '..';
 import { GroupContextValue, GroupContext } from 'context/group';
-import { render, screen } from 'test/test-utils';
+import { fireEvent, render, screen, waitFor } from 'test/test-utils';
 
-import { GetDatasets } from '../dataset.graphql';
+import { GetDatasets, CreateDatasetMutation } from '../dataset.graphql';
 import { groups as mockGroups } from '../../../fakeData/groups';
 import { datasetsV2 } from '../../../fakeData/datasetsV2';
+import userEvent from '@testing-library/user-event';
 
 function setup() {
   const mockGroupContext: GroupContextValue = {
@@ -49,6 +50,32 @@ function setup() {
               __typename: 'PageInfo',
             },
             __typename: 'DatasetV2Connection',
+          },
+        },
+      },
+    },
+    {
+      request: {
+        query: CreateDatasetMutation,
+        variables: {
+          payload: {
+            id: 'dataset-new',
+            tags: [],
+            groupName: mockGroupContext.name,
+          },
+        },
+      },
+      result: {
+        data: {
+          createDatasetV2: {
+            id: 'dataset-new',
+            name: 'dataset-new',
+            createdBy: 'phadmin',
+            createdAt: '2021-11-19T08:49:14.763Z',
+            updatedAt: '2021-11-19T08:49:14.763Z',
+            tags: [],
+            size: 0,
+            __typename: 'DatasetV2',
           },
         },
       },
@@ -96,6 +123,44 @@ describe('Datasets V2 List', () => {
     expect(await screen.findByText('Dataset One')).toBeInTheDocument();
     expect(await screen.findByText('Dataset Two')).toBeInTheDocument();
     expect(await screen.findByText('Dataset Three')).toBeInTheDocument();
+    screen.debug();
   });
 });
 
+describe('Create Dataset V2', () => {
+  it('should create new dataset', async () => {
+    const { mockGroupContext, mockRequests } = setup();
+    // @ts-ignore
+    window.graphqlEndpoint = 'http://download.primehub.io/graphql';
+
+    render(
+      <MemoryRouter>
+        <MockedProvider mocks={mockRequests}>
+          <GroupContext.Provider value={mockGroupContext}>
+            <DatasetList groups={mockGroups} />
+          </GroupContext.Provider>
+        </MockedProvider>
+      </MemoryRouter>
+    );
+
+    const addButton = await screen.findByTestId('add-button');
+    expect(addButton).toBeInTheDocument();
+
+    userEvent.click(addButton);
+    const createButton = await screen.findByTestId('create-dataset-button');
+    expect(createButton).toBeInTheDocument();
+    expect(createButton).toBeDisabled();
+
+    const inputName = await screen.findByTestId('dataset-name');
+    fireEvent.change(inputName, { target: { value: 'dataset-new' } });
+
+    expect(createButton).not.toBeDisabled();
+    // screen.debug();
+    userEvent.click(createButton);
+
+    await waitFor(() => {
+      const doneButton = screen.getByTestId('upload-done-button');
+      expect(doneButton).toBeInTheDocument();
+    });
+  });
+});
