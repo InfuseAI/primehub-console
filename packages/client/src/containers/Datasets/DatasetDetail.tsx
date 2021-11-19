@@ -76,6 +76,8 @@ function _DatasetDetail({ getDataset, updateDataset }) {
       });
     } catch (e) {
       errorHandler(e);
+      // throw it so that the model know something wrong
+      throw e;
     }
   }
 
@@ -150,6 +152,7 @@ function _DatasetDetail({ getDataset, updateDataset }) {
             defaultActiveKey='data'
             tabBarExtraContent={tabKey === 'data' ? uploadButton : undefined}
             onChange={key => setTabKey(key)}
+            animated={false}
           >
             <Tabs.TabPane key='data' tab='Data'>
               <Browser

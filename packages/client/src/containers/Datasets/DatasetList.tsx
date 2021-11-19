@@ -109,19 +109,25 @@ function _DatasetList({
   async function onSubmit(data: InputVariables) {
     const { refetch, variables } = datasets;
 
-    await createDataset({
-      variables: {
-        payload: {
-          ...data,
-          groupName: groupContext.name,
+    try {
+      await createDataset({
+        variables: {
+          payload: {
+            ...data,
+            groupName: groupContext.name,
+          },
         },
-      },
-    });
+      });
 
-    refetch({
-      where: variables.where,
-      page: variables.page,
-    });
+      refetch({
+        where: variables.where,
+        page: variables.page,
+      });
+    } catch (e) {
+      errorHandler(e);
+      // throw it so that the model know something wrong.
+      throw e;
+    }
   }
 
   function onPageChanged(page) {
@@ -386,7 +392,6 @@ export const DatasetList = compose(
           placement: 'bottomRight',
         });
       },
-      onError: errorHandler,
     },
     name: 'createDataset',
   }),

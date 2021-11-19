@@ -1,23 +1,17 @@
 import * as React from 'react';
-import { Tag, Tooltip, Icon, Button, Input, Modal } from 'antd';
+import { Button, Input, Modal, Form } from 'antd';
 import { useParams } from 'react-router-dom';
 import { DatasetUploader } from 'components/Browser/DatasetUploader';
 import { Dataset } from './common';
+import { FormComponentProps } from 'antd/lib/form';
+import DatasetTags from './DatasetTags';
+import { isEmpty } from 'lodash';
 
-interface Props {
-  dataset?: Pick<Dataset, 'id' | 'name' | 'tags'>;
+interface Props extends FormComponentProps {
+  dataset?: Pick<Dataset, 'id' | 'tags'>;
   visible: boolean;
   onClose: (datasetId: string) => void;
-  onSubmit: (data: { id: string; name: string; tags: string[] }) => void;
-}
-
-function genId(value: string) {
-  if (value === '') {
-    return '';
-  }
-  const normalizedName = value.trim().replace(/[\W_]/g, '-').toLowerCase();
-  const randomString = Math.random().toString(36).substring(6).substring(0, 5);
-  return `${normalizedName}-${randomString}`;
+  onSubmit: (data: { id: string; tags: string[] }) => Promise<void>;
 }
 
 export function DatasetCreateForm({
@@ -25,71 +19,27 @@ export function DatasetCreateForm({
   visible,
   onClose,
   onSubmit,
+  form,
 }: Props) {
   const { groupName } = useParams<{ groupName: string }>();
   const [id, setId] = React.useState('');
-  const [name, setName] = React.useState('');
-  const [tags, setTags] = React.useState([]);
   const [step, setStep] = React.useState(1);
-  const [inputVisible, setInputVisible] = React.useState(false);
-  const [inputValue, setInputValue] = React.useState('');
-  const inputRef = React.useRef(null);
-
-  React.useEffect(() => {
-    if (dataset?.id) {
-      setId(dataset.id);
-      setName(dataset.name);
-      setTags(dataset.tags);
-    }
-  }, [dataset]);
-
-  React.useEffect(() => {
-    if (inputVisible) {
-      inputRef.current?.input.focus();
-    }
-  }, [inputVisible]);
-
-  function handleClose(removedTag) {
-    setTags(prevTags => prevTags.filter(t => t !== removedTag));
-  }
-
-  function showInput() {
-    setInputVisible(true);
-  }
-
-  function handleInputChange(e) {
-    setInputValue(e.target.value);
-  }
-
-  function handleInputConfirm() {
-    setInputVisible(false);
-    setInputValue('');
-    if (inputValue && tags.indexOf(inputValue) === -1) {
-      setTags(prevTags => [...prevTags, inputValue]);
-    }
-  }
+  const submitDisabled =
+    isEmpty(form.getFieldValue('id')) || !isEmpty(form.getFieldError('id'));
 
   function resetAndClose(datasetId: string) {
-    setId('');
-    setName('');
-    setTags([]);
     setStep(1);
     onClose(datasetId);
   }
 
   function cancelAndClose() {
-    if (dataset) {
-      setName(dataset.name);
-      setTags(dataset.tags);
-    }
     onClose(null);
   }
 
   return (
     <>
       <Modal
-        title={`${dataset?.id ? 'Edit Dataset' : 'New Dataset (Step 1 of 2)'}`}
-        maskClosable={false}
+        title={`${dataset?.id ? 'Edit' : 'New'} Dataset`}
         width={580}
         visible={visible && step === 1}
         footer={[
@@ -97,33 +47,28 @@ export function DatasetCreateForm({
             key='create-form-footer'
             style={{
               display: 'flex',
+              justifyContent: 'right',
               padding: '2px 8px',
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                flex: 1,
-                margin: 'auto',
-                color: '#a4a4a4',
-                textAlign: 'left',
-              }}
-            >
-              Dataset ID: {id}
-            </div>
             <Button type='default' onClick={cancelAndClose}>
               Cancel
             </Button>
             <Button
               type='primary'
-              disabled={id.length === 0 || name.length === 0}
+              disabled={submitDisabled}
               onClick={async () => {
-                await onSubmit({ id, name, tags });
-                if (!dataset) {
-                  setStep(2);
-                } else {
-                  onClose(null);
-                }
+                form.validateFields(async (err, values) => {
+                  if (err) return;
+                  setId(values.id);
+                  await onSubmit(values);
+                  if (!dataset) {
+                    setStep(2);
+                  } else {
+                    onClose(null);
+                  }
+                  form.resetFields();
+                });
               }}
             >
               {dataset?.id ? 'Update Information' : 'Create Dataset'}
@@ -132,83 +77,32 @@ export function DatasetCreateForm({
         ]}
         onCancel={cancelAndClose}
       >
-        <div
-          style={{
-            fontWeight: 500,
-            padding: '8px 0',
-          }}
-        >
-          Dataset Name
-        </div>
-        <Input
-          placeholder={'Enter Dataset Name'}
-          value={name}
-          onChange={e => {
-            if (!dataset) {
-              setId(genId(e.target.value));
-            }
-            setName(e.target.value);
-          }}
-        />
-        <div
-          style={{
-            fontWeight: 500,
-            padding: '8px 0',
-          }}
-        >
-          Tags
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-          }}
-        >
-          {tags.map(tag => {
-            const isLongTag = tag.length > 20;
-            const tagElem = (
-              <Tag key={tag} closable={true} onClose={() => handleClose(tag)}>
-                {isLongTag ? `${tag.slice(0, 20)}...` : tag}
-              </Tag>
-            );
-            return isLongTag ? (
-              <Tooltip title={tag} key={tag}>
-                {tagElem}
-              </Tooltip>
-            ) : (
-              tagElem
-            );
-          })}
-          <Input
-            ref={inputRef}
-            type='text'
-            size='small'
-            style={{
-              display: inputVisible ? 'inline-block' : 'none',
-              width: 78,
-              height: 20,
-            }}
-            value={inputValue}
-            onChange={handleInputChange}
-            onBlur={handleInputConfirm}
-            onPressEnter={handleInputConfirm}
-          />
-          <Tag
-            onClick={showInput}
-            style={{
-              display: inputVisible ? 'none' : 'inline-block',
-              background: '#fff',
-              borderStyle: 'dashed',
-            }}
-          >
-            <Icon type='plus' /> New Tag
-          </Tag>
-        </div>
+        <Form>
+          <Form.Item label={`Dataset Name`} style={{ marginBottom: '8px' }}>
+            {form.getFieldDecorator('id', {
+              initialValue: dataset?.id || '',
+              rules: [
+                {
+                  whitespace: true,
+                  required: true,
+                  message: 'Please input a name!',
+                },
+                {
+                  pattern: /^[a-zA-Z0-9][a-zA-Z0-9-_]*$/,
+                  message: `alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`,
+                },
+              ],
+            })(<Input disabled={!!dataset} />)}
+          </Form.Item>
+          <Form.Item label={`Tags`} style={{ marginBottom: '8px' }}>
+            {form.getFieldDecorator('tags', {
+              initialValue: dataset?.tags || [],
+            })(<DatasetTags />)}
+          </Form.Item>
+        </Form>
       </Modal>
       <Modal
         title={'Upload Files (Step 2 of 2)'}
-        maskClosable={false}
         width={580}
         visible={visible && step === 2}
         footer={[
@@ -223,3 +117,5 @@ export function DatasetCreateForm({
     </>
   );
 }
+
+export default Form.create<Props>()(DatasetCreateForm);
