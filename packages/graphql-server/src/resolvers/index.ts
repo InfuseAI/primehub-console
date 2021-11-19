@@ -1,5 +1,6 @@
 import path from 'path';
 import * as system from './system';
+import * as timezone from './timezone';
 import * as user from './user';
 import * as group from './group';
 import { crd as instanceType} from './instanceType';
@@ -22,6 +23,7 @@ import { makeExecutableSchema } from 'graphql-tools';
 export const resolvers = {
   Query: {
     system: system.query,
+    timezone: timezone.query,
     me: user.me,
     user: user.queryOne,
     users: user.query,
