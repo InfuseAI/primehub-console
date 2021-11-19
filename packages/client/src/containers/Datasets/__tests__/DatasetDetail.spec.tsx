@@ -77,10 +77,10 @@ describe('Datasets V2 Detail', () => {
     fireEvent.click(screen.getByText('Information'));
 
     expect(await screen.findByText('Dataset Name')).toBeInTheDocument();
-    expect(await screen.findByText('Dataset ID')).toBeInTheDocument();
     expect(await screen.findByText('foo')).toBeInTheDocument();
     expect(await screen.findByText('bar')).toBeInTheDocument();
     expect(await screen.findByText('one')).toBeInTheDocument();
     expect(await screen.findByText('phadmin')).toBeInTheDocument();
   });
 });
+

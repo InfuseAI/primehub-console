@@ -62,28 +62,6 @@ function setup() {
 }
 
 describe('Datasets V2 List', () => {
-  it('should render did not authorized group message', async () => {
-    const { mockGroupContext, mockRequests } = setup();
-    const withFakeGroup = {
-      ...mockGroupContext,
-      id: 'fake-group',
-    };
-
-    render(
-      <MemoryRouter>
-        <MockedProvider mocks={mockRequests}>
-          <GroupContext.Provider value={withFakeGroup}>
-            <DatasetList groups={mockGroups} />
-          </GroupContext.Provider>
-        </MockedProvider>
-      </MemoryRouter>
-    );
-
-    expect(
-      await screen.findByText('Group group1 is not found or not authorized.')
-    ).toBeInTheDocument();
-  });
-
   it('should render datasets with error message', async () => {
     const { mockGroupContext } = setup();
 
@@ -120,3 +98,4 @@ describe('Datasets V2 List', () => {
     expect(await screen.findByText('Dataset Three')).toBeInTheDocument();
   });
 });
+
