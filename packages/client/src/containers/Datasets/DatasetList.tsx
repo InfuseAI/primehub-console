@@ -326,10 +326,16 @@ function _DatasetList({
           <DatasetCreateForm
             visible={modalVisible}
             onClose={datasetId => {
+              const { refetch } = datasets;
+
               setModalVisible(false);
-              datasetId && history.push(
-                `${appPrefix}g/${groupContext.name}/datasets/${datasetId}/`
-              );
+              if (datasetId) {
+                history.push(
+                  `${appPrefix}g/${groupContext.name}/datasets/${datasetId}/`
+                );
+              } else {
+                refetch();
+              }
             }}
             onSubmit={onSubmit}
           />
