@@ -71,7 +71,11 @@ export function AppCard({ template, installable = true, ...props }: Props) {
           <Icon type='read' /> About
         </Button>
         {installable && (
-          <Button type='primary' onClick={() => props?.onInstall()}>
+          <Button
+            type='primary'
+            data-testid={template.id}
+            onClick={() => props?.onInstall()}
+          >
             <Icon type='plus' /> Install to PrimeHub
           </Button>
         )}
