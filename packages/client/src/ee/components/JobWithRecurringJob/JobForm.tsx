@@ -133,11 +133,9 @@ type JobFormProps = FormComponentProps<FormState> & {
   systemInfo: {
     loading: boolean;
     error: Error | undefined;
-    system: {
-      timezone: {
-        name: string;
-        offset: number;
-      };
+    timezone: {
+      name: string;
+      offset: number;
     };
   };
   createPhJob: ({
@@ -700,8 +698,7 @@ function JobForm({ currentUser, systemInfo, form, ...props }: JobFormProps) {
                 <Form.Item
                   label={
                     <>
-                      Recurrence Options (
-                      {stringifyZone(systemInfo.system.timezone)})
+                      Recurrence Options ({stringifyZone(systemInfo.timezone)})
                     </>
                   }
                 >
@@ -752,11 +749,9 @@ export default compose(
   graphql(
     gql`
       query {
-        system {
-          timezone {
-            name
-            offset
-          }
+        timezone {
+          name
+          offset
         }
       }
     `,
