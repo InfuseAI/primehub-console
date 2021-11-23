@@ -486,11 +486,8 @@ function Browser(props: BrowseInternalProps) {
   }
 
   let dataSource: FileItem[] = get(data, 'files.items', []);
-  if (!isEmpty(searchText)) {
-    dataSource = dataSource.filter(item => item.name.includes(searchText));
-  }
   dataSource = dataSource.filter(item => {
-    // exculdess
+    // excludes
     if (item.name === '.dataset') {
       return false;
     }
