@@ -32,14 +32,12 @@ import { isGroupNameAvailable } from '../utils/groupCheck';
 import { isUserAdmin } from './user';
 import { PhApplication } from './phApplication';
 
-interface Group {
-  id: string;
-  name: string;
-}
-
 type GroupDeletionCallback = (
   context: Context,
-  group: Group,
+  group: {
+    id: string;
+    name: string;
+  },
   dryrun: boolean
 ) => Promise<number>;
 
@@ -56,7 +54,10 @@ export const registerGroupDeletionCallback = (
 
 const deleteAllGroupResources = async (
   context: Context,
-  group: Group,
+  group: {
+    id: string;
+    name: string;
+  },
   dryrun: boolean
 ) => {
   const promises = Object.entries(deletionCallacks).map(
@@ -365,12 +366,43 @@ export const destroy = async (root, args, context: Context) => {
   const groupId = args.where.id;
   const kcAdminClient = context.kcAdminClient;
   const group = await kcAdminClient.groups.findOne({
-    id: groupId
+    id: groupId,
   });
+
+  // Delete the group
   await kcAdminClient.groups.del({
-    id: groupId
+    id: groupId,
   });
+
+  // Delete the shared volume of this group
   await context.k8sGroupPvc.delete(group.name);
+
+  // Delete resources in this group
+  const transformedGroup = transform(group);
+  deleteAllGroupResources(context, transformedGroup, false)
+    .then(result => {
+      logger.info({
+        component: logger.components.group,
+        type: 'DELETE_GROUP_RESOURCES',
+        userId: context.userId,
+        username: context.username,
+        id: group.id,
+        name: group.name,
+        groupResourcesDeleted: result,
+      });
+    })
+    .catch(err => {
+      logger.info({
+        component: logger.components.group,
+        type: 'DELETE_GROUP_RESOURCES_FAILED',
+        userId: context.userId,
+        username: context.username,
+        id: group.id,
+        name: group.name,
+        message: err.message,
+        stack: err.stack,
+      });
+    });
 
   logger.info({
     component: logger.components.group,
@@ -378,10 +410,8 @@ export const destroy = async (root, args, context: Context) => {
     userId: context.userId,
     username: context.username,
     id: group.id,
+    name: group.name,
   });
-
-  const transformedGroup: Group = transform(group);
-  await deleteAllGroupResources(context, transformedGroup, false);
 
   return transformedGroup;
 };
@@ -397,7 +427,7 @@ export const groupResourcesToBeDeleted = async (
     id: groupId,
   });
 
-  const transformedGroup: Group = transform(group);
+  const transformedGroup = transform(group);
   return await deleteAllGroupResources(context, transformedGroup, true);
 };
 
