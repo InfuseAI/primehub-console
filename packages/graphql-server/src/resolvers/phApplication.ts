@@ -356,7 +356,7 @@ export const destroy = async (root, args, context: Context) => {
     type: 'DELETE',
     userId: context.userId,
     username: context.username,
-    id: id,
+    id,
   });
 
   // reset the mlflow setting if the current setting is linked to deleted app.

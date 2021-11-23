@@ -428,7 +428,7 @@ export const groupResourcesToBeDeleted = async (
   });
 
   const transformedGroup = transform(group);
-  return await deleteAllGroupResources(context, transformedGroup, true);
+  return deleteAllGroupResources(context, transformedGroup, true);
 };
 
 /**

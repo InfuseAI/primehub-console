@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import Router from 'koa-router';
-import { schema } from './resolvers';
+import { schema, registerGroupDeletionCallbacks } from './resolvers';
 import { permissions as authMiddleware } from './middlewares/auth';
 import { JobLogCtrl } from './controllers/jobLogCtrl';
 import { PhJobCacheList } from './crdClient/phJobCacheList';
@@ -12,7 +12,6 @@ import { createEETraitMiddleware } from './utils/telemetryTraits';
 import { App as AppCE } from '../app';
 import { mountUsageCtrl, } from './controllers/usageCtrl';
 import { applyMiddleware } from 'graphql-middleware';
-import { registerGroupDeletionCallbacks } from './resolvers';
 
 export class AppEE extends AppCE {
   persistLog: PersistLog;
