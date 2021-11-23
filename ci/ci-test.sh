@@ -51,6 +51,7 @@ setup_k3d() {
   mkdir -p ~/.kube
   cp $(k3d get kubeconfig ${CLUSTER_NAME}) ~/.kube/config || true
 
+  echo "kube context: $(kubectl config current-context)"
   echo "waiting for nodes ready"
   until kubectl get nodes | grep ' Ready'
   do

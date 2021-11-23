@@ -1,45 +1,43 @@
-import React from 'react'
-import Uppy from '@uppy/core'
-import Tus from '@uppy/tus'
-import { Dashboard } from '@uppy/react'
+import React, { useState } from 'react';
+import Uppy from '@uppy/core';
+import Tus from '@uppy/tus';
+import { Dashboard } from '@uppy/react';
 import '@uppy/core/dist/style.css';
 import '@uppy/dashboard/dist/style.css';
 import { getAccessToken } from 'utils/env';
 
 interface Props {
-  dirPath: String
-};
+  dirPath: string;
+  onFileUpload?: () => void;
+}
 
-export default (props: Props) => {
-  const { dirPath } = props;
-  let graphqlEndpoint = window.absGraphqlEndpoint
+export default function Uploader(props: Props) {
+  const { dirPath, onFileUpload } = props;
+  const graphqlEndpoint = window.absGraphqlEndpoint
     ? window.absGraphqlEndpoint
     : window.graphqlEndpoint;
-  const endpoint = graphqlEndpoint.replace('/graphql', '/tus')
+  const endpoint = graphqlEndpoint.replace('/graphql', '/tus');
 
   const headers = {
-    authorization: `Bearer ${getAccessToken()}`
+    authorization: `Bearer ${getAccessToken()}`,
   };
-  const uppy = Uppy({
-    autoProceed: true
-  });
 
-  uppy
-    .use(Tus, {
-      endpoint,
-      headers
-    })
-    .setMeta({dirpath: dirPath});
-  uppy
-    .on('complete', (result) => {
-      const url = result.successful[0].uploadURL
-      console.log('Upload compelete!', url, result.successful);
+  function createUppy() {
+    const uppy = Uppy({ autoProceed: true });
+    uppy
+      .use(Tus, {
+        endpoint,
+        headers,
+      })
+      .setMeta({ dirpath: dirPath });
+    uppy.on('upload-success', () => {
+      if (onFileUpload) {
+        onFileUpload();
+      }
     });
-  return (
-    <Dashboard
-      inline={true}
-      width={850}
-      uppy={uppy}
-    />
-  )
+    return uppy;
+  }
+  const [uppy] = useState(createUppy());
+
+  return <Dashboard width={850} uppy={uppy} />;
 }

@@ -1,6 +1,5 @@
 export interface Dataset {
   id: string;
-  name: string;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
@@ -29,7 +28,6 @@ export interface QueryVariables {
 
 export interface InputVariables {
   id: string;
-  name: string;
   groupName: string;
   tags: string[];
 }

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import moment from 'moment';
 import {
-  Alert,
   Button,
   Input,
   Modal,
@@ -41,7 +40,7 @@ import {
   InputVariables,
   QueryVariables,
 } from 'components/datasets/common';
-import { DatasetCreateForm } from 'components/datasets/CreateForm';
+import DatasetCreateForm from 'components/datasets/CreateForm';
 import {
   CreateDatasetMutation,
   DeleteDatasetMutation,
@@ -57,9 +56,6 @@ const Search = Input.Search;
 interface Props
   extends RouteComponentProps<{ datasetId: string }>,
     GroupContextComponentProps {
-  groups: Array<{
-    id: string;
-  }>;
   datasets: {
     error?: Error | undefined;
     loading: boolean;
@@ -100,7 +96,6 @@ function CommonPageTitle() {
 }
 
 function _DatasetList({
-  groups,
   datasets,
   createDataset,
   deleteDataset,
@@ -112,21 +107,20 @@ function _DatasetList({
   const [modalVisible, setModalVisible] = React.useState(false);
 
   async function onSubmit(data: InputVariables) {
-    const { refetch, variables } = datasets;
-
-    await createDataset({
-      variables: {
-        payload: {
-          ...data,
-          groupName: groupContext.name,
+    try {
+      await createDataset({
+        variables: {
+          payload: {
+            ...data,
+            groupName: groupContext.name,
+          },
         },
-      },
-    });
-
-    refetch({
-      where: variables.where,
-      page: variables.page,
-    });
+      });
+    } catch (e) {
+      errorHandler(e);
+      // throw it so that the model know something wrong.
+      throw e;
+    }
   }
 
   function onPageChanged(page) {
@@ -210,11 +204,7 @@ function _DatasetList({
                     notification.success({
                       message: (
                         <>
-                          Dataset{' '}
-                          <b>
-                            {record.name} ({record.id})
-                          </b>{' '}
-                          has been deleted.
+                          Dataset <b>{record.id}</b> has been deleted.
                         </>
                       ),
                       duration: 5,
@@ -238,31 +228,8 @@ function _DatasetList({
     );
   }
 
-  if (groupContext) {
-    const group = groups.find(group => group.id === groupContext.id);
-
-    if (!group) {
-      return (
-        <>
-          <CommonPageTitle />
-          <PageBody>
-            <Alert
-              message='Group not found'
-              description={`Group ${groupContext.name} is not found or not authorized.`}
-              type='error'
-              showIcon
-            />
-          </PageBody>
-        </>
-      );
-    }
-  }
-
   if (datasets.error) {
     return <div>Failure to load datasets.</div>;
-  }
-  if (!datasets.datasetV2Connection) {
-    return <></>;
   }
 
   const columns: Array<ColumnProps<Dataset>> = [
@@ -301,6 +268,8 @@ function _DatasetList({
   ];
 
   const connection = datasets.datasetV2Connection;
+  const dataSource = connection ? connection.edges.map(edge => edge.node) : [];
+  const total = connection?.pageInfo?.totalPage * DEFAULT_PAGE_SIZE;
 
   return (
     <>
@@ -317,6 +286,7 @@ function _DatasetList({
           }}
         >
           <InfuseButton
+            data-testid='add-button'
             icon='plus'
             type='primary'
             onClick={() => {
@@ -348,7 +318,7 @@ function _DatasetList({
         >
           <Table
             loading={datasets.loading}
-            dataSource={connection.edges.map(edge => edge.node)}
+            dataSource={dataSource}
             columns={columns}
             rowKey='id'
             pagination={false}
@@ -356,10 +326,16 @@ function _DatasetList({
           <DatasetCreateForm
             visible={modalVisible}
             onClose={datasetId => {
+              const { refetch } = datasets;
+
               setModalVisible(false);
-              datasetId && history.push(
-                `${appPrefix}g/${groupContext.name}/datasets/${datasetId}/`
-              );
+              if (datasetId) {
+                history.push(
+                  `${appPrefix}g/${groupContext.name}/datasets/${datasetId}/`
+                );
+              } else {
+                refetch();
+              }
             }}
             onSubmit={onSubmit}
           />
@@ -372,7 +348,7 @@ function _DatasetList({
           }}
         >
           <Pagination
-            total={connection.pageInfo?.totalPage * DEFAULT_PAGE_SIZE}
+            total={total}
             onChange={onPageChanged}
           />
         </div>
@@ -409,18 +385,13 @@ export const DatasetList = compose(
         notification.success({
           message: (
             <>
-              Dataset{' '}
-              <b>
-                {dataset.name} ({dataset.id})
-              </b>{' '}
-              has been created.
+              Dataset <b>{dataset.id}</b> has been created.
             </>
           ),
           duration: 5,
           placement: 'bottomRight',
         });
       },
-      onError: errorHandler,
     },
     name: 'createDataset',
   }),
@@ -428,3 +399,4 @@ export const DatasetList = compose(
     name: 'deleteDataset',
   })
 )(_DatasetList);
+

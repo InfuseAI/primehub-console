@@ -39,8 +39,8 @@
     "test": "npm run test:integration",
     "test:build": "TEST=true tslint --format verbose \"src/**/*.ts\" && npm run build:dryrun && npm run build:dryrun",
     "test:e2e": "TEST=true cucumber-js ./test/features/*.feature  --require ./test/features/support/**/*.ts --require-module ts-node/register",
-    "test:grep": "TEST=true mocha -r ts-node/register --exit --timeout 600000 --file \"test/setup.ts\" --recursive",
-    "test:integration": "TEST=true mocha -r ts-node/register --exit --timeout 600000 --file \"test/setup.ts\"  --recursive \"test/**/*.spec.ts\"",
+    "test:grep": "[ $(kubectl config current-context) = 'k3d-primehub' ] && TEST=true mocha -r ts-node/register --exit --timeout 600000 --file \"test/setup.ts\" --recursive",
+    "test:integration": "[ $(kubectl config current-context) = 'k3d-primehub' ] && TEST=true mocha -r ts-node/register --exit --timeout 600000 --file \"test/setup.ts\"  --recursive \"test/**/*.spec.ts\"",
     "test:unit": "TEST=true mocha -r ts-node/register --timeout 600000 --recursive \"test/**/*-unit.spec.ts\"",
     "watch": "npm run build -- --watch",
     "watch:test": "npm run test -- --watch"

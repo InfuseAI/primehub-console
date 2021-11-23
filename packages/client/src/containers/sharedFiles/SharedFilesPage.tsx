@@ -25,7 +25,7 @@ function ShareFilesPage() {
     }
   }, []);
 
-  const handleChangePath = path => {
+  const handlePathChange = path => {
     history.push(`${appPrefix}g/${groupName}/browse${path}`);
   };
 
@@ -73,7 +73,7 @@ function ShareFilesPage() {
           basePath=''
           path={phfsPrefix || '/'}
           enabledPHFS={enabledPHFS}
-          onChangePath={handleChangePath}
+          onPathChange={handlePathChange}
           uploading={uploading}
           onUploadingChange={uploading => setUploading(uploading)}
         />

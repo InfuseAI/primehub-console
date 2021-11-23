@@ -29,14 +29,12 @@ type DatasetV2Connection {
 
 input DatasetV2CreateInput {
   id: String!
-  name: String
   groupName: String!
   tags: [String]
 }
 
 input DatasetV2UpdateInput {
-  name: String
-  groupName: String!
+  groupName: String
   tags: [String]
 }
 
