@@ -106,5 +106,5 @@ export const schema: any = makeExecutableSchema({
 });
 
 export const registerGroupDeletionCallbacks = () => {
-  registerGroupDeletionCallback('apps', async () => 0);
+  registerGroupDeletionCallback('apps', phApplication.destroyByGroup);
 };

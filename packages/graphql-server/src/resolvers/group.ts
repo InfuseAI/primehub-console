@@ -37,20 +37,31 @@ interface Group {
   name: string;
 }
 
-type GroupDeletionCallback = (group: Group, dryrun: boolean) => Promise<number>;
+type GroupDeletionCallback = (
+  context: Context,
+  group: Group,
+  dryrun: boolean
+) => Promise<number>;
 
 const deletionCallacks: {
   [key: string]: GroupDeletionCallback;
 } = {};
 
-export const registerGroupDeletionCallback = (key:string, callback:GroupDeletionCallback) => {
+export const registerGroupDeletionCallback = (
+  key: string,
+  callback: GroupDeletionCallback
+) => {
   deletionCallacks[key] = callback;
 };
 
-const deleteAllGroupResources = async (group: Group, dryrun: boolean) => {
+const deleteAllGroupResources = async (
+  context: Context,
+  group: Group,
+  dryrun: boolean
+) => {
   const promises = Object.entries(deletionCallacks).map(
     async ([key, callback]) => ({
-      [key]: await callback(group, dryrun),
+      [key]: await callback(context, group, dryrun),
     })
   );
 
@@ -370,10 +381,16 @@ export const destroy = async (root, args, context: Context) => {
   });
 
   const transformedGroup: Group = transform(group);
+  await deleteAllGroupResources(context, transformedGroup, false);
+
   return transformedGroup;
 };
 
-export const groupResourcesToBeDeleted = async (root, args, context: Context) => {
+export const groupResourcesToBeDeleted = async (
+  root,
+  args,
+  context: Context
+) => {
   const groupId = args.where.id;
   const kcAdminClient = context.kcAdminClient;
   const group = await kcAdminClient.groups.findOne({
@@ -381,7 +398,7 @@ export const groupResourcesToBeDeleted = async (root, args, context: Context) =>
   });
 
   const transformedGroup: Group = transform(group);
-  return await deleteAllGroupResources(transformedGroup, true);
+  return await deleteAllGroupResources(context, transformedGroup, true);
 };
 
 /**

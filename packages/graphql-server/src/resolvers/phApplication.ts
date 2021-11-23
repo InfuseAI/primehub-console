@@ -13,6 +13,7 @@ import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
 import {createConfig} from '../config';
 import { onPhAppDeleted } from './group';
+import * as logger from '../logger';
 
 const config = createConfig();
 
@@ -345,10 +346,61 @@ export const destroy = async (root, args, context: Context) => {
 
   await context.crdClient.phApplications.del(id);
 
-  // reset the mlflow setting if the current setting is linked to deleted app.
-  await onPhAppDeleted(context, await transform(phApplication, context.kcAdminClient));
+  const transformedPhApplication = await transform(
+    phApplication,
+    context.kcAdminClient
+  );
 
-  return {id};
+  logger.info({
+    component: logger.components.phApplication,
+    type: 'DELETE',
+    userId: context.userId,
+    username: context.username,
+    id: id,
+  });
+
+  // reset the mlflow setting if the current setting is linked to deleted app.
+  await onPhAppDeleted(context, transformedPhApplication);
+
+  return { id };
+};
+
+export const destroyByGroup = async (
+  context: Context,
+  group: { id: string; name: string },
+  dryrun: boolean
+) => {
+  const { crdClient } = context;
+  // tslint:disable-next-line:max-line-length
+  const phApplications = await listQuery(
+    crdClient.phApplications,
+    null,
+    null,
+    context
+  );
+
+  let count = 0;
+  for (const phApplication of phApplications) {
+    if (phApplication.groupName !== group.name) {
+      continue;
+    }
+
+    if (!dryrun) {
+      await context.crdClient.phApplications.del(phApplication.id);
+    }
+
+    logger.info({
+      component: logger.components.phApplication,
+      type: 'DELETE',
+      userId: context.userId,
+      username: context.username,
+      id: phApplication.id,
+    });
+
+    count++;
+  }
+
+  return count;
 };
 
 const toggleApplication = async (isStop: boolean, args, context: Context) => {
