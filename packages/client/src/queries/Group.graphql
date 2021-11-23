@@ -37,6 +37,15 @@ query GroupsConnection($page: Int, $orderBy: GroupOrderByInput, $where: GroupWhe
   }
 }
 
+query GroupResourcesToBeDeleted($where: GroupWhereUniqueInput!) {
+  groupResourcesToBeDeleted(where: $where) {
+    apps
+    jobs
+    schedules
+    deployments
+  }
+}
+
 mutation DeleteGroup($where: GroupWhereUniqueInput!) {
   deleteGroup(where: $where) {
     id
