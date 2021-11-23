@@ -96,13 +96,7 @@ export function JobList({ data, ...props }: JobListProps) {
       sorter: true,
       render: text => {
         if (text) {
-          const replaceToRecurrence = text.replace('schedule', 'recurrence');
-
-          return (
-            <Link to={`recurringJob/${replaceToRecurrence}`}>
-              {replaceToRecurrence}
-            </Link>
-          );
+          return <Link to={`recurringJob/${text}`}>{text}</Link>;
         }
 
         return '-';
