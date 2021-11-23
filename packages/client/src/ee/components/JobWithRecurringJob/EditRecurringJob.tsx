@@ -114,10 +114,7 @@ export default compose(
       return {
         variables: {
           where: {
-            // TODO: Due to change name from `schedule` to `recurrence`,
-            // so `recurringJobId` content should replace to `scheduleId`, otherwise query result is empty.
-            // The best soultion should update backend API related naming.
-            id: match.params.recurringJobId.replace('recurrence', 'schedule'),
+            id: match.params.recurringJobId,
           },
         },
         onError: errorHandler,
