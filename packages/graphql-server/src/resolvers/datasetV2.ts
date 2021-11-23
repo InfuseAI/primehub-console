@@ -29,6 +29,13 @@ interface DatasetV2Metadata {
   tags: string[];
 }
 
+const checkMinioClient = async (context: Context) => {
+  const { minioClient, storeBucket } = context;
+  if (!minioClient || !storeBucket) {
+    throw new ApolloError('PrimeHub Store is not enabled', INTERNAL_ERROR);
+  }
+};
+
 const checkPermission = async (context: Context, groupName: string) => {
   const { userId } = context;
   const viewable = await isGroupBelongUser(context, userId, groupName);
@@ -144,6 +151,7 @@ export const getDatasetSize = async (
 };
 
 export const query = async (root, args, context: Context) => {
+  await checkMinioClient(context);
   const { id, groupName } = args.where;
   await checkPermission(context, groupName);
 
@@ -158,6 +166,7 @@ export const query = async (root, args, context: Context) => {
 };
 
 export const queryFile = async (root, args, context: Context): Promise<any> => {
+  await checkMinioClient(context);
   const { id, groupName, prefix } = args.where;
   return queryStore(
     root,
@@ -170,6 +179,7 @@ export const queryFile = async (root, args, context: Context): Promise<any> => {
 };
 
 export const connectionQuery = async (root, args, context: Context) => {
+  await checkMinioClient(context);
   const { groupName, search } = args.where;
   await checkPermission(context, groupName);
 
@@ -227,6 +237,7 @@ const isObjectExisting = async (minioClient, storeBucket, path) => {
 };
 
 export const create = async (root, args, context: Context) => {
+  await checkMinioClient(context);
   const { minioClient, storeBucket } = context;
   const { id, groupName, tags } = args.data;
   const name = args.data.name || id;
@@ -260,6 +271,7 @@ export const create = async (root, args, context: Context) => {
 };
 
 export const update = async (root, args, context: Context) => {
+  await checkMinioClient(context);
   const { id, groupName } = args.where;
   await checkPermission(context, groupName);
 
@@ -286,6 +298,7 @@ export const update = async (root, args, context: Context) => {
 };
 
 export const destroy = async (root, args, context: Context) => {
+  await checkMinioClient(context);
   const { id, groupName } = args.where;
   await checkPermission(context, groupName);
 
