@@ -98,7 +98,7 @@ export const schema: any = mergeSchemas({
 });
 
 export const registerGroupDeletionCallbacks = () => {
-  registerGroupDeletionCallback('jobs', async () => 0);
+  registerGroupDeletionCallback('jobs', phJob.destroyByGroup);
   registerGroupDeletionCallback('schedules', phSchedule.destroyByGroup);
-  registerGroupDeletionCallback('deployments', async () => 0);
+  registerGroupDeletionCallback('deployments', phDeployment.destroyByGroup);
 };

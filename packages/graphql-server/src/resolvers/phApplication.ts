@@ -371,36 +371,44 @@ export const destroyByGroup = async (
   dryrun: boolean
 ) => {
   const { crdClient } = context;
-  // tslint:disable-next-line:max-line-length
-  const phApplications = await listQuery(
-    crdClient.phApplications,
-    null,
-    null,
-    context
-  );
+  const phApplications = await crdClient.phApplications.list();
+  const transformedPhApplications = phApplications.map(item => ({
+    id: item.metadata.name,
+    groupName: item.spec.groupName || '',
+  }));
 
-  let count = 0;
-  for (const phApplication of phApplications) {
-    if (phApplication.groupName !== group.name) {
+  let counter = 0;
+
+  for (const application of transformedPhApplications) {
+    if (application.groupName !== group.name) {
       continue;
     }
 
     if (!dryrun) {
-      await context.crdClient.phApplications.del(phApplication.id);
+      const payload = {
+        component: logger.components.phApplication,
+        userId: context.userId,
+        username: context.username,
+        id: application.id,
+      };
+      try {
+        await context.crdClient.phApplications.del(application.id);
+        logger.info({
+          ...payload,
+          type: 'DELETE',
+        });
+      } catch (err) {
+        logger.error({
+          ...payload,
+          type: 'DELETE_FAILED',
+          message: err.message,
+          stack: err.stack,
+        });
+      }
     }
-
-    logger.info({
-      component: logger.components.phApplication,
-      type: 'DELETE',
-      userId: context.userId,
-      username: context.username,
-      id: phApplication.id,
-    });
-
-    count++;
+    counter++;
   }
-
-  return count;
+  return counter;
 };
 
 const toggleApplication = async (isStop: boolean, args, context: Context) => {

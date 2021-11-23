@@ -402,9 +402,12 @@ export const destroyByGroup = async (
 ) => {
   const { crdClient } = context;
   const phSchedules = await crdClient.phSchedules.list();
-  const transformedPhSchedules = await Promise.all(
-    phSchedules.map(schedule => transform(schedule))
-  );
+  const transformedPhSchedules = phSchedules.map(item => ({
+    id: item.metadata.name,
+    groupId: item.spec.jobTemplate.spec.groupId,
+    groupName: item.spec.jobTemplate.spec.groupName || '',
+  }));
+
   let counter = 0;
 
   for (const schedule of transformedPhSchedules) {
@@ -413,14 +416,26 @@ export const destroyByGroup = async (
     }
 
     if (!dryrun) {
-      await context.crdClient.phSchedules.del(schedule.id);
-      logger.info({
+      const payload = {
         component: logger.components.phSchedule,
-        type: 'DELETE',
         userId: context.userId,
         username: context.username,
         id: schedule.id,
-      });
+      };
+      try {
+        await context.crdClient.phSchedules.del(schedule.id);
+        logger.info({
+          ...payload,
+          type: 'DELETE',
+        });
+      } catch (err) {
+        logger.error({
+          ...payload,
+          type: 'DELETE_FAILED',
+          message: err.message,
+          stack: err.stack,
+        });
+      }
     }
     counter++;
   }
