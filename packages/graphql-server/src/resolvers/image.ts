@@ -19,15 +19,13 @@ const config = createConfig();
 
 const adminAuthorization = async ({data, context}: {data: any, context: any}): Promise<void> => {
   const {username, kcAdminClient} = context;
-  if (data && data.groupName) {
-    if (!(await isGroupAdmin(username, data.groupName, kcAdminClient))) {
-      throw new ApolloError('Not authorise', NOT_AUTH_ERROR);
-    }
-  } else {
-    if (!isAdmin(context)) {
-      throw new ApolloError('Not authorise', NOT_AUTH_ERROR);
-    }
+  if (isAdmin(context)) {
+    return;
   }
+  if (data && data.groupName && (await isGroupAdmin(username, data.groupName, kcAdminClient))) {
+    return;
+  }
+  throw new ApolloError('Not authorise', NOT_AUTH_ERROR);
 };
 
 const beforeDelete = async ({data, context}: {data: any, context: any}): Promise<any> => {
