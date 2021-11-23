@@ -99,6 +99,6 @@ export const schema: any = mergeSchemas({
 
 export const registerGroupDeletionCallbacks = () => {
   registerGroupDeletionCallback('jobs', async () => 0);
-  registerGroupDeletionCallback('schedules', async () => 0);
+  registerGroupDeletionCallback('schedules', phSchedule.destroyByGroup);
   registerGroupDeletionCallback('deployments', async () => 0);
 };
