@@ -55,6 +55,16 @@ type Group {
   mlflow: MLflowSetting
 }
 
+type GroupResourcesToBeDeleted {
+  # CE
+  apps: Int
+
+  # EE
+  jobs: Int
+  schedules: Int
+  deployments: Int
+}
+
 """order"""
 input GroupOrderByInput {
   name: String

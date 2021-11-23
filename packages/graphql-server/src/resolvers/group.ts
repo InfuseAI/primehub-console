@@ -32,6 +32,32 @@ import { isGroupNameAvailable } from '../utils/groupCheck';
 import { isUserAdmin } from './user';
 import { PhApplication } from './phApplication';
 
+interface Group {
+  id: string;
+  name: string;
+}
+
+type GroupDeletionCallback = (group: Group, dryrun: boolean) => Promise<number>;
+
+const deletionCallacks: {
+  [key: string]: GroupDeletionCallback;
+} = {};
+
+export const registerGroupDeletionCallback = (key:string, callback:GroupDeletionCallback) => {
+  deletionCallacks[key] = callback;
+};
+
+const deleteAllGroupResources = async (group: Group, dryrun: boolean) => {
+  const promises = Object.entries(deletionCallacks).map(
+    async ([key, callback]) => ({
+      [key]: await callback(group, dryrun),
+    })
+  );
+
+  const results = await Promise.all(promises);
+  return Object.assign({}, ...results);
+};
+
 const config = createConfig();
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
@@ -340,10 +366,22 @@ export const destroy = async (root, args, context: Context) => {
     type: 'DELETE',
     userId: context.userId,
     username: context.username,
-    id: group.id
+    id: group.id,
   });
 
-  return transform(group);
+  const transformedGroup: Group = transform(group);
+  return transformedGroup;
+};
+
+export const groupResourcesToBeDeleted = async (root, args, context: Context) => {
+  const groupId = args.where.id;
+  const kcAdminClient = context.kcAdminClient;
+  const group = await kcAdminClient.groups.findOne({
+    id: groupId,
+  });
+
+  const transformedGroup: Group = transform(group);
+  return await deleteAllGroupResources(transformedGroup, true);
 };
 
 /**

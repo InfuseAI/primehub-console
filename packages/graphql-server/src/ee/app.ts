@@ -12,6 +12,7 @@ import { createEETraitMiddleware } from './utils/telemetryTraits';
 import { App as AppCE } from '../app';
 import { mountUsageCtrl, } from './controllers/usageCtrl';
 import { applyMiddleware } from 'graphql-middleware';
+import { registerGroupDeletionCallbacks } from './resolvers';
 
 export class AppEE extends AppCE {
   persistLog: PersistLog;
@@ -50,6 +51,9 @@ export class AppEE extends AppCE {
 
     // phJob
     this.phJobCacheList = new PhJobCacheList(config.k8sCrdNamespace);
+
+    // Group deletion callbacks
+    registerGroupDeletionCallbacks();
   }
 
   /**

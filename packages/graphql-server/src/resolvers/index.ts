@@ -18,6 +18,7 @@ import * as GraphQLJSON from 'graphql-type-json';
 import { gql } from 'apollo-server';
 import { importSchema } from 'graphql-import';
 import { makeExecutableSchema } from 'graphql-tools';
+import { registerGroupDeletionCallback } from './group';
 
 // A map of functions which return data for the schema.
 export const resolvers = {
@@ -31,6 +32,7 @@ export const resolvers = {
     group: group.queryOne,
     groups: group.query,
     groupsConnection: group.connectionQuery,
+    groupResourcesToBeDeleted: group.groupResourcesToBeDeleted,
     secret: secret.queryOne,
     secrets: secret.query,
     secretsConnection: secret.connectionQuery,
@@ -102,3 +104,7 @@ export const schema: any = makeExecutableSchema({
   typeDefs: gql(importSchema(path.resolve(__dirname, '../graphql/index.graphql'))),
   resolvers,
 });
+
+export const registerGroupDeletionCallbacks = () => {
+  registerGroupDeletionCallback('apps', async () => 0);
+};
