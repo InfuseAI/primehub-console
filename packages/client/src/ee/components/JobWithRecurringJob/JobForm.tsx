@@ -108,7 +108,7 @@ type FormState = {
   image: string;
   displayName: string;
   command: string;
-  activeDeadlineSeconds: number;
+  activeDeadlineSeconds?: number;
   executeOptions: 'job' | 'jobAndSchedule' | 'schedule';
   recurrence: {
     cron: string;
@@ -240,7 +240,7 @@ function reducer(state: State, action: Actions) {
   }
 }
 
-const initialState: Partial<FormState> = {
+const initialState: FormState = {
   groupId: '',
   instanceTypeId: '',
   instanceType: '',
