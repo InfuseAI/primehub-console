@@ -108,7 +108,7 @@ type FormState = {
   image: string;
   displayName: string;
   command: string;
-  activeDeadlineSeconds: number;
+  activeDeadlineSeconds?: number;
   executeOptions: 'job' | 'jobAndSchedule' | 'schedule';
   recurrence: {
     cron: string;
@@ -246,7 +246,6 @@ const initialState: FormState = {
   image: '',
   displayName: '',
   command: '',
-  activeDeadlineSeconds: 86400,
   executeOptions: 'job',
   recurrence: {
     cron: '',
