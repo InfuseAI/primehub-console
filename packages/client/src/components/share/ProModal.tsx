@@ -73,7 +73,7 @@ const CurrentRow = styled(ActionRow)`
 const ProModal = (props: any) => {
   const { visible, onOk, onCancel } = props;
   const ceFeatures = ['Notebook', 'Shared Files', 'Apps'];
-  const eeFeatures = ['Jobs', 'Schedule Jobs', 'Models', 'Deployments'];
+  const eeFeatures = ['Jobs', 'Recurring Jobs', 'Models', 'Deployments'];
   const FeatureItem = (props: any) => {
     const { children, key, available } = props;
     return (
