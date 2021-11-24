@@ -459,7 +459,7 @@ export const destroyByGroup = async (
   const transformedPhJobs = phJobs.map(item => ({
     id: item.metadata.name,
     groupId: item.spec.groupId,
-    groupName: item.spec.groupName || '',
+    groupName: item.spec.groupName,
   }));
 
   let counter = 0;

@@ -374,7 +374,7 @@ export const destroyByGroup = async (
   const phApplications = await crdClient.phApplications.list();
   const transformedPhApplications = phApplications.map(item => ({
     id: item.metadata.name,
-    groupName: item.spec.groupName || '',
+    groupName: item.spec.groupName,
   }));
 
   let counter = 0;

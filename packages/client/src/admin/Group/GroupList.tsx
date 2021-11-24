@@ -91,20 +91,17 @@ export function GroupList(props: Props) {
       const resourceCount = Object.values(resources)
         .filter(value => typeof value === 'number')
         .reduce((prev, curr) => prev + curr, 0);
-      const messageForDeleted =
-        resourceCount > 0 ? (
-          <>
-            You'll permenently lose your:
-            <ul style={{ marginBottom: 0 }}>
-              {resources.jobs ? <li>{resources.jobs} Jobs</li> : <></>}
-              {resources.schedules ? <li>{resources.schedules} Recurring Jobs</li> : <></>}
-              {resources.apps ? <li>{resources.apps} Apps</li> : <></>}
-              {resources.deployments ? <li>{resources.deployments} Deployemnts</li> : <></>}
-            </ul>
-          </>
-        ) : (
-          <></>
-        );
+      const messageForDeleted = resourceCount > 0 && (
+        <>
+          You'll permanently lose your:
+          <ul style={{ marginBottom: 0 }}>
+            {resources.jobs ? <li>{resources.jobs} Jobs</li> : <></>}
+            {resources.schedules ? <li>{resources.schedules} Recurring Jobs</li> : <></>}
+            {resources.apps ? <li>{resources.apps} Apps</li> : <></>}
+            {resources.deployments ? <li>{resources.deployments} Deployemnts</li> : <></>}
+          </ul>
+        </>
+      );
 
       confirm({
         title: `Do you really want to delete this group?`,
