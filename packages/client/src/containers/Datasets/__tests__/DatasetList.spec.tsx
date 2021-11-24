@@ -122,9 +122,9 @@ describe('Datasets V2 List', () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByText('Dataset One')).toBeInTheDocument();
-    expect(await screen.findByText('Dataset Two')).toBeInTheDocument();
-    expect(await screen.findByText('Dataset Three')).toBeInTheDocument();
+    expect(await screen.findByText('dataset-one')).toBeInTheDocument();
+    expect(await screen.findByText('dataset-two')).toBeInTheDocument();
+    expect(await screen.findByText('dataset-three')).toBeInTheDocument();
     screen.debug();
   });
 });
