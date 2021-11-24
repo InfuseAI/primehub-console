@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import Router from 'koa-router';
-import { schema } from './resolvers';
+import { schema, registerGroupDeletionCallbacks } from './resolvers';
 import { permissions as authMiddleware } from './middlewares/auth';
 import { JobLogCtrl } from './controllers/jobLogCtrl';
 import { PhJobCacheList } from './crdClient/phJobCacheList';
@@ -50,6 +50,9 @@ export class AppEE extends AppCE {
 
     // phJob
     this.phJobCacheList = new PhJobCacheList(config.k8sCrdNamespace);
+
+    // Group deletion callbacks
+    registerGroupDeletionCallbacks();
   }
 
   /**

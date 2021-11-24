@@ -11,20 +11,26 @@ import { reduce, get } from 'lodash';
 import PageTitle from 'components/pageTitle';
 import PageBody from 'components/pageBody';
 import Breadcrumbs from 'components/share/breadcrumb';
-import { GroupsConnection, DeleteGroup } from 'queries/Group.graphql';
+import {
+  GroupsConnection,
+  GroupResourcesToBeDeleted,
+  DeleteGroup,
+} from 'queries/Group.graphql';
 import queryString from 'querystring';
-import { graphql } from 'react-apollo';
+import { graphql, withApollo } from 'react-apollo';
 import { compose } from 'recompose';
 import InfuseButton from 'components/infuseButton';
 import { FilterRow, FilterPlugins, ButtonCol } from 'components/share';
 import { errorHandler } from 'utils/errorHandler';
 import { TruncateTableField } from 'utils/TruncateTableField';
+import ApolloClient from 'apollo-client';
 
 const { confirm } = Modal;
 const { Search } = Input;
 const ButtonGroup = Button.Group;
 
 type Props = {
+  client: ApolloClient<any>;
   dataSource: any;
   loading?: boolean;
   listGroup?: any;
@@ -71,28 +77,55 @@ export function GroupList(props: Props) {
   const edit = id => {
     history.push(`group/${id}`);
   };
-  const remove = (id, record) => {
+  const remove = async (id, record, client) => {
     const { deleteGroup } = props;
-    const { name } = record;
-    confirm({
-      title: `Delete Group`,
-      content: (
-        <span>
-          Do you really want to delete group: "<b>{name}</b>"?
-        </span>
-      ),
-      iconType: 'info-circle',
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
-      maskClosable: true,
-      onOk() {
-        return deleteGroup({ variables: { where: { id } } });
-      },
-    });
+    const variables = { where: { id } };
+    try {
+      const result = await client.query({
+        query: GroupResourcesToBeDeleted,
+        fetchPolicy: 'no-cache',
+        variables,
+      });
+
+      const resources = result.data?.groupResourcesToBeDeleted;
+      const resourceCount = Object.values(resources)
+        .filter(value => typeof value === 'number')
+        .reduce((prev, curr) => prev + curr, 0);
+      const messageForDeleted = resourceCount > 0 && (
+        <>
+          You'll permanently lose your:
+          <ul style={{ marginBottom: 0 }}>
+            {resources.jobs ? <li>{resources.jobs} Jobs</li> : <></>}
+            {resources.schedules ? <li>{resources.schedules} Recurring Jobs</li> : <></>}
+            {resources.apps ? <li>{resources.apps} Apps</li> : <></>}
+            {resources.deployments ? <li>{resources.deployments} Deployemnts</li> : <></>}
+          </ul>
+        </>
+      );
+
+      confirm({
+        title: `Do you really want to delete this group?`,
+        content: (
+          <span>
+            All resources associated to this group will be deleted. {messageForDeleted}
+          </span>
+        ),
+        iconType: 'info-circle',
+        okText: 'Yes',
+        okType: 'danger',
+        cancelText: 'No',
+        maskClosable: true,
+        onOk() {
+          return deleteGroup({ variables });
+        },
+      });
+    } catch (err) {
+      errorHandler(err);
+    }
   };
 
   const renderAction = (id, record) => {
+    const { client } = props;
     return (
       <ButtonGroup>
         <Tooltip placement='bottom' title='Edit'>
@@ -107,7 +140,7 @@ export function GroupList(props: Props) {
             icon='delete'
             data-testid='delete-button'
             disabled={DISABLE_GROUP === true}
-            onClick={() => remove(id, record)}
+            onClick={() => remove(id, record, client)}
           />
         </Tooltip>
       </ButtonGroup>
@@ -293,6 +326,7 @@ export function GroupList(props: Props) {
 
 export default compose(
   withRouter,
+  withApollo,
   graphql(GroupsConnection, {
     options: (props: RouteComponentProps) => {
       try {
@@ -333,12 +367,13 @@ export default compose(
     alias: 'withDeleteGroup',
   })
 )(props => {
-  const { listGroup, deleteGroup } = props;
+  const { listGroup, deleteGroup, client } = props;
   const { group, loading } = listGroup;
   const dataSource = group ? group.edges.map(edge => edge.node) : [];
   return (
     <React.Fragment>
       <GroupList
+        client={client}
         dataSource={dataSource}
         listGroup={listGroup}
         deleteGroup={deleteGroup}

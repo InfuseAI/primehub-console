@@ -23,6 +23,7 @@ export enum components {
   secret = 'Secret',
   buildImage = 'BuildImage',
   phJob = 'PhJob',
+  phSchedule = 'PhSchedule',
   phDeployment = 'PhDeployment',
   phApplication = 'PhApplication',
   internal = 'Internal',

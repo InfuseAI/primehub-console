@@ -55,7 +55,9 @@ export interface PhScheduleMutationInput {
 }
 
 // tslint:disable-next-line:max-line-length
-export const transform = async (item: Item<PhScheduleSpec, PhScheduleStatus>, namespace: string, graphqlHost: string, kcAdminClient: KeycloakAdminClient): Promise<PhSchedule> => {
+export const transform = async (
+  item: Item<PhScheduleSpec, PhScheduleStatus>
+): Promise<PhSchedule> => {
   const jobTemplate = item.spec.jobTemplate;
   return {
     id: item.metadata.name,
@@ -226,7 +228,7 @@ const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any = {}
   const {namespace, graphqlHost, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phSchedule = await client.get(where.id);
-    const transformed = await transform(phSchedule, namespace, graphqlHost, kcAdminClient);
+    const transformed = await transform(phSchedule);
     const viewable = await canUserViewSchedule(currentUserId, transformed, context);
     if (!viewable) {
       throw new ApolloError('user not auth', NOT_AUTH_ERROR);
@@ -236,7 +238,7 @@ const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any = {}
 
   const phSchedules = await client.list();
   const transformedPhSchedules = await Promise.all(
-    phSchedules.map(schedule => transform(schedule, namespace, graphqlHost, kcAdminClient)));
+    phSchedules.map(schedule => transform(schedule)));
 
   if (where && where.mine) {
     where.userId_eq = currentUserId;
@@ -269,7 +271,7 @@ export const queryOne = async (root, args, context: Context) => {
   const {crdClient, userId: currentUserId} = context;
   const phSchedule = await crdClient.phSchedules.get(id);
   const transformed =
-    await transform(phSchedule, context.namespace, context.graphqlHost, context.kcAdminClient);
+    await transform(phSchedule);
   const viewable = await canUserViewSchedule(currentUserId, transformed, context);
   if (!viewable) {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
@@ -286,7 +288,7 @@ export const create = async (root, args, context: Context) => {
     throw new ApolloError('user not auth', NOT_AUTH_ERROR);
   }
   const phSchedule = await createSchedule(context, data);
-  return transform(phSchedule, context.namespace, context.graphqlHost, context.kcAdminClient);
+  return transform(phSchedule);
 };
 
 export const update = async (root, args, context: Context) => {
@@ -338,7 +340,7 @@ export const update = async (root, args, context: Context) => {
     }
   };
   const updatedSchedule = await context.crdClient.phSchedules.patch(args.where.id, {metadata, spec});
-  return transform(updatedSchedule, context.namespace, context.graphqlHost, context.kcAdminClient);
+  return transform(updatedSchedule);
 };
 
 export const run = async (root, args, context: Context) => {
@@ -382,5 +384,60 @@ export const destroy = async (root, args, context: Context) => {
   }
 
   await context.crdClient.phSchedules.del(id);
+  logger.info({
+    component: logger.components.phSchedule,
+    type: 'DELETE',
+    userId: context.userId,
+    username: context.username,
+    id: phSchedule.metadata.name,
+  });
+
   return {id};
+};
+
+export const destroyByGroup = async (
+  context: Context,
+  group: { id: string; name: string },
+  dryrun: boolean
+) => {
+  const { crdClient } = context;
+  const phSchedules = await crdClient.phSchedules.list();
+  const transformedPhSchedules = phSchedules.map(item => ({
+    id: item.metadata.name,
+    groupId: item.spec.jobTemplate.spec.groupId,
+    groupName: item.spec.jobTemplate.spec.groupName || '',
+  }));
+
+  let counter = 0;
+
+  for (const schedule of transformedPhSchedules) {
+    if (schedule.groupId !== group.id && schedule.groupName !== group.name) {
+      continue;
+    }
+
+    if (!dryrun) {
+      const payload = {
+        component: logger.components.phSchedule,
+        userId: context.userId,
+        username: context.username,
+        id: schedule.id,
+      };
+      try {
+        await context.crdClient.phSchedules.del(schedule.id);
+        logger.info({
+          ...payload,
+          type: 'DELETE',
+        });
+      } catch (err) {
+        logger.error({
+          ...payload,
+          type: 'DELETE_FAILED',
+          message: err.message,
+          stack: err.stack,
+        });
+      }
+    }
+    counter++;
+  }
+  return counter;
 };

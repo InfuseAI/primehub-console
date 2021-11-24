@@ -13,6 +13,7 @@ import { makeExecutableSchema, mergeSchemas } from 'graphql-tools';
 import { gql } from 'apollo-server';
 import { importSchema } from 'graphql-import';
 import { resolvers as ceResolvers } from '../../resolvers';
+import { registerGroupDeletionCallback } from '../../resolvers/group';
 
 const eeResolvers = {
   Query: {
@@ -95,3 +96,9 @@ export const schema: any = mergeSchemas({
     eeSchema,
   ],
 });
+
+export const registerGroupDeletionCallbacks = () => {
+  registerGroupDeletionCallback('jobs', phJob.destroyByGroup);
+  registerGroupDeletionCallback('schedules', phSchedule.destroyByGroup);
+  registerGroupDeletionCallback('deployments', phDeployment.destroyByGroup);
+};

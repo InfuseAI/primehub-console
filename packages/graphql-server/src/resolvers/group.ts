@@ -32,6 +32,44 @@ import { isGroupNameAvailable } from '../utils/groupCheck';
 import { isUserAdmin } from './user';
 import { PhApplication } from './phApplication';
 
+type GroupDeletionCallback = (
+  context: Context,
+  group: {
+    id: string;
+    name: string;
+  },
+  dryrun: boolean
+) => Promise<number>;
+
+const deletionCallacks: {
+  [key: string]: GroupDeletionCallback;
+} = {};
+
+export const registerGroupDeletionCallback = (
+  key: string,
+  callback: GroupDeletionCallback
+) => {
+  deletionCallacks[key] = callback;
+};
+
+const deleteAllGroupResources = async (
+  context: Context,
+  group: {
+    id: string;
+    name: string;
+  },
+  dryrun: boolean
+) => {
+  const promises = Object.entries(deletionCallacks).map(
+    async ([key, callback]) => ({
+      [key]: await callback(context, group, dryrun),
+    })
+  );
+
+  const results = await Promise.all(promises);
+  return Object.assign({}, ...results);
+};
+
 const config = createConfig();
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
@@ -328,22 +366,69 @@ export const destroy = async (root, args, context: Context) => {
   const groupId = args.where.id;
   const kcAdminClient = context.kcAdminClient;
   const group = await kcAdminClient.groups.findOne({
-    id: groupId
+    id: groupId,
   });
+
+  // Delete the group
   await kcAdminClient.groups.del({
-    id: groupId
+    id: groupId,
   });
+
+  // Delete the shared volume of this group
   await context.k8sGroupPvc.delete(group.name);
+
+  // Delete resources in this group
+  const transformedGroup = transform(group);
+  deleteAllGroupResources(context, transformedGroup, false)
+    .then(result => {
+      logger.info({
+        component: logger.components.group,
+        type: 'DELETE_GROUP_RESOURCES',
+        userId: context.userId,
+        username: context.username,
+        id: group.id,
+        name: group.name,
+        groupResourcesDeleted: result,
+      });
+    })
+    .catch(err => {
+      logger.info({
+        component: logger.components.group,
+        type: 'DELETE_GROUP_RESOURCES_FAILED',
+        userId: context.userId,
+        username: context.username,
+        id: group.id,
+        name: group.name,
+        message: err.message,
+        stack: err.stack,
+      });
+    });
 
   logger.info({
     component: logger.components.group,
     type: 'DELETE',
     userId: context.userId,
     username: context.username,
-    id: group.id
+    id: group.id,
+    name: group.name,
   });
 
-  return transform(group);
+  return transformedGroup;
+};
+
+export const groupResourcesToBeDeleted = async (
+  root,
+  args,
+  context: Context
+) => {
+  const groupId = args.where.id;
+  const kcAdminClient = context.kcAdminClient;
+  const group = await kcAdminClient.groups.findOne({
+    id: groupId,
+  });
+
+  const transformedGroup = transform(group);
+  return deleteAllGroupResources(context, transformedGroup, true);
 };
 
 /**

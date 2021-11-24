@@ -448,3 +448,49 @@ export const notifyJobEvent = async (root, args, context: Context) => {
   }
   return 0;
 };
+
+export const destroyByGroup = async (
+  context: Context,
+  group: { id: string; name: string },
+  dryrun: boolean
+) => {
+  const { crdClient } = context;
+  const phJobs = await crdClient.phJobs.list();
+  const transformedPhJobs = phJobs.map(item => ({
+    id: item.metadata.name,
+    groupId: item.spec.groupId,
+    groupName: item.spec.groupName,
+  }));
+
+  let counter = 0;
+  for (const job of transformedPhJobs) {
+    if (job.groupId !== group.id && job.groupName !== group.name) {
+      continue;
+    }
+
+    if (!dryrun) {
+      const payload = {
+        component: logger.components.phJob,
+        userId: context.userId,
+        username: context.username,
+        id: job.id,
+      };
+      try {
+        await context.crdClient.phJobs.del(job.id);
+        logger.info({
+          ...payload,
+          type: 'DELETE',
+        });
+      } catch (err) {
+        logger.error({
+          ...payload,
+          type: 'DELETE_FAILED',
+          message: err.message,
+          stack: err.stack,
+        });
+      }
+    }
+    counter++;
+  }
+  return counter;
+};

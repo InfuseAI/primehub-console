@@ -533,6 +533,55 @@ export const destroy = async (root, args, context: Context) => {
   return {id};
 };
 
+export const destroyByGroup = async (
+  context: Context,
+  group: { id: string; name: string },
+  dryrun: boolean
+) => {
+  const { crdClient } = context;
+  const phDeployments = await crdClient.phDeployments.list();
+  const transformedPhDeployments = phDeployments.map(item => ({
+    id: item.metadata.name,
+    groupId: item.spec.groupId,
+    groupName: item.spec.groupName,
+  }));
+
+  let counter = 0;
+  for (const deployment of transformedPhDeployments) {
+    if (
+      deployment.groupId !== group.id &&
+      deployment.groupName !== group.name
+    ) {
+      continue;
+    }
+
+    if (!dryrun) {
+      const payload = {
+        component: logger.components.phDeployment,
+        userId: context.userId,
+        username: context.username,
+        id: deployment.id,
+      };
+      try {
+        await context.crdClient.phDeployments.del(deployment.id);
+        logger.info({
+          ...payload,
+          type: 'DELETE',
+        });
+      } catch (err) {
+        logger.error({
+          ...payload,
+          type: 'DELETE_FAILED',
+          message: err.message,
+          stack: err.stack,
+        });
+      }
+    }
+    counter++;
+  }
+  return counter;
+};
+
 export const available = async (root, args, context: Context) => {
   const {crdClient} = context;
   const where = args && args.where;

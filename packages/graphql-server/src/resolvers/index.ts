@@ -31,6 +31,7 @@ export const resolvers = {
     group: group.queryOne,
     groups: group.query,
     groupsConnection: group.connectionQuery,
+    groupResourcesToBeDeleted: group.groupResourcesToBeDeleted,
     secret: secret.queryOne,
     secrets: secret.query,
     secretsConnection: secret.connectionQuery,
@@ -102,3 +103,7 @@ export const schema: any = makeExecutableSchema({
   typeDefs: gql(importSchema(path.resolve(__dirname, '../graphql/index.graphql'))),
   resolvers,
 });
+
+export const registerGroupDeletionCallbacks = () => {
+  group.registerGroupDeletionCallback('apps', phApplication.destroyByGroup);
+};

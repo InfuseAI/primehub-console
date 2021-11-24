@@ -58,7 +58,7 @@ import { mountTusCtrl } from './controllers/tusCtrl';
 import { mountStoreCtrl } from './controllers/storeCtrl';
 import { Telemetry } from './utils/telemetry';
 import { createDefaultTraitMiddleware } from './utils/telemetryTraits';
-import { schema } from './resolvers';
+import { registerGroupDeletionCallbacks, schema } from './resolvers';
 import { Client as MinioClient } from 'minio';
 
 export class App {
@@ -234,6 +234,9 @@ export class App {
       }
     });
     observer.observe();
+
+    // Group deletion callbacks
+    registerGroupDeletionCallbacks();
   }
 
   /**

@@ -13,6 +13,7 @@ import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
 import {createConfig} from '../config';
 import { onPhAppDeleted } from './group';
+import * as logger from '../logger';
 
 const config = createConfig();
 
@@ -345,10 +346,69 @@ export const destroy = async (root, args, context: Context) => {
 
   await context.crdClient.phApplications.del(id);
 
-  // reset the mlflow setting if the current setting is linked to deleted app.
-  await onPhAppDeleted(context, await transform(phApplication, context.kcAdminClient));
+  const transformedPhApplication = await transform(
+    phApplication,
+    context.kcAdminClient
+  );
 
-  return {id};
+  logger.info({
+    component: logger.components.phApplication,
+    type: 'DELETE',
+    userId: context.userId,
+    username: context.username,
+    id,
+  });
+
+  // reset the mlflow setting if the current setting is linked to deleted app.
+  await onPhAppDeleted(context, transformedPhApplication);
+
+  return { id };
+};
+
+export const destroyByGroup = async (
+  context: Context,
+  group: { id: string; name: string },
+  dryrun: boolean
+) => {
+  const { crdClient } = context;
+  const phApplications = await crdClient.phApplications.list();
+  const transformedPhApplications = phApplications.map(item => ({
+    id: item.metadata.name,
+    groupName: item.spec.groupName,
+  }));
+
+  let counter = 0;
+
+  for (const application of transformedPhApplications) {
+    if (application.groupName !== group.name) {
+      continue;
+    }
+
+    if (!dryrun) {
+      const payload = {
+        component: logger.components.phApplication,
+        userId: context.userId,
+        username: context.username,
+        id: application.id,
+      };
+      try {
+        await context.crdClient.phApplications.del(application.id);
+        logger.info({
+          ...payload,
+          type: 'DELETE',
+        });
+      } catch (err) {
+        logger.error({
+          ...payload,
+          type: 'DELETE_FAILED',
+          message: err.message,
+          stack: err.stack,
+        });
+      }
+    }
+    counter++;
+  }
+  return counter;
 };
 
 const toggleApplication = async (isStop: boolean, args, context: Context) => {

@@ -62,6 +62,7 @@ type Query {
     first: Int
     last: Int
   ): GroupConnection!
+  groupResourcesToBeDeleted(where: GroupWhereUniqueInput!): GroupResourcesToBeDeleted
 
   """InstanceType"""
   instanceType(where: InstanceTypeWhereUniqueInput!): InstanceType
