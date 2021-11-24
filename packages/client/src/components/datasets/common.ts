@@ -24,6 +24,11 @@ export interface QueryVariables {
     search?: string;
   };
   page?: number;
+  orderBy?: {
+    id?: string;
+    createdBy?: string;
+    updatedAt?: string;
+  };
 }
 
 export interface InputVariables {
