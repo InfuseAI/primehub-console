@@ -95,11 +95,7 @@ function CommonPageTitle() {
   return <PageTitle breadcrumb={<Breadcrumbs pathList={breadcrumbs} />} />;
 }
 
-function _DatasetList({
-  datasets,
-  createDataset,
-  deleteDataset,
-}: Props) {
+function _DatasetList({ datasets, createDataset, deleteDataset }: Props) {
   const groupContext = React.useContext(GroupContext);
   const history = useHistory();
   const { appPrefix } = useRoutePrefix();
@@ -165,9 +161,19 @@ function _DatasetList({
   function renderTags(text, record) {
     return (
       <>
-        {record.tags?.map((tag, index) => (
-          <Tag key={index}>{tag}</Tag>
-        ))}
+        {record.tags?.map(tag => {
+          const isLongTag = tag.length > 20;
+          const tagElem = (
+            <Tag key={tag}>{isLongTag ? `${tag.slice(0, 20)}...` : tag}</Tag>
+          );
+          return isLongTag ? (
+            <Tooltip title={tag} key={tag}>
+              {tagElem}
+            </Tooltip>
+          ) : (
+            tagElem
+          );
+        })}
       </>
     );
   }
@@ -347,10 +353,7 @@ function _DatasetList({
             justifyContent: 'flex-end',
           }}
         >
-          <Pagination
-            total={total}
-            onChange={onPageChanged}
-          />
+          <Pagination total={total} onChange={onPageChanged} />
         </div>
       </PageBody>
     </>
@@ -399,4 +402,3 @@ export const DatasetList = compose(
     name: 'deleteDataset',
   })
 )(_DatasetList);
-
