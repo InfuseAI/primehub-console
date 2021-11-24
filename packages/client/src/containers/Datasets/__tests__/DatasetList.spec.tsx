@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route } from 'react-router-dom';
 import { MockedProvider } from 'react-apollo/test-utils';
 
 import { DatasetList } from '..';
@@ -134,10 +134,12 @@ describe('Create Dataset V2', () => {
     window.graphqlEndpoint = 'http://download.primehub.io/graphql';
 
     render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={[`/g/${mockGroupContext.id}/datasets`]}>
         <MockedProvider mocks={mockRequests}>
           <GroupContext.Provider value={mockGroupContext}>
-            <DatasetList groups={mockGroups} />
+            <Route path={`/g/:groupName/datasets`} exact>
+              <DatasetList groups={mockGroups} />
+            </Route>
           </GroupContext.Provider>
         </MockedProvider>
       </MemoryRouter>

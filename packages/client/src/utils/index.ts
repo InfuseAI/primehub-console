@@ -38,3 +38,6 @@ export const humanFileSize = (bytes, si = false, dp = 1): string => {
 
   return bytes.toFixed(dp) + ' ' + units[u];
 }
+
+export const toGroupPath = (groupName: string) =>
+  groupName.replace(/_/g, '-').toLowerCase();

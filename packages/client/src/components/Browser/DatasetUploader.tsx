@@ -6,6 +6,7 @@ import { compose } from 'recompose';
 import { Upload, Icon } from 'antd';
 import { errorHandler } from 'utils/errorHandler';
 import { getAccessToken } from 'utils/env';
+import { toGroupPath } from 'utils/index';
 
 const { Dragger } = Upload;
 
@@ -40,7 +41,7 @@ function _DatasetUploader(props: Props) {
     ? window.absGraphqlEndpoint
     : window.graphqlEndpoint;
   const endpoint = graphqlEndpoint.replace('/graphql', '/tus');
-  const dirpath = `groups/${groupName}/datasets/${datasetId}/`;
+  const dirpath = `groups/${toGroupPath(groupName)}/datasets/${datasetId}/`;
 
   React.useEffect(() => {
     setFiles([]);
