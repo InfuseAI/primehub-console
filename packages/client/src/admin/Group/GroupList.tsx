@@ -97,7 +97,7 @@ export function GroupList(props: Props) {
             You'll permenently lose your:
             <ul style={{ marginBottom: 0 }}>
               {resources.jobs ? <li>{resources.jobs} Jobs</li> : <></>}
-              {resources.schedules ? <li>{resources.schedules} Schedules</li> : <></>}
+              {resources.schedules ? <li>{resources.schedules} Recurring Jobs</li> : <></>}
               {resources.apps ? <li>{resources.apps} Apps</li> : <></>}
               {resources.deployments ? <li>{resources.deployments} Deployemnts</li> : <></>}
             </ul>
