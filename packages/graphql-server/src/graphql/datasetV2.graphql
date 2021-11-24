@@ -48,6 +48,12 @@ input DatasetV2WhereUniqueInput {
   groupName: String!
 }
 
+input DatasetV2OrderByInput {
+  id: String
+  createdBy: String
+  updatedAt: String
+}
+
 input DatasetV2FileWhereInput {
   id: String!
   groupName: String!
