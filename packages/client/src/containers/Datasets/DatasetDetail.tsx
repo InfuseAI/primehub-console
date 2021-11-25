@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { notification, Tabs, Tag, Row, Col, Spin } from 'antd';
+import { notification, Tabs, Tag, Tooltip, Row, Col, Spin } from 'antd';
 import { graphql } from 'react-apollo';
 import { RouteComponentProps, useParams, useHistory } from 'react-router-dom';
 import { compose } from 'recompose';
@@ -229,9 +229,21 @@ function _DatasetDetail({ getDataset, updateDataset }) {
                       labelCol={4}
                       valueCol={20}
                       label='Tags'
-                      value={dataset.tags?.map((tag, index) => (
-                        <Tag key={index}>{tag}</Tag>
-                      ))}
+                      value={dataset.tags?.map(tag => {
+                        const isLongTag = tag.length > 20;
+                        const tagElem = (
+                          <Tag key={tag}>
+                            {isLongTag ? `${tag.slice(0, 20)}...` : tag}
+                          </Tag>
+                        );
+                        return isLongTag ? (
+                          <Tooltip title={tag} key={tag}>
+                            {tagElem}
+                          </Tooltip>
+                        ) : (
+                          tagElem
+                        );
+                      })}
                     />
                     <Field
                       labelCol={4}
