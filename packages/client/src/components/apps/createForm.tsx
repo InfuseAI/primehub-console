@@ -254,7 +254,7 @@ class AppCreateForm extends React.Component<Props, State> {
 
     const reloadEnvBtn = (
       <span onClick={this.reloadDefaultEnv} style={{cursor: 'pointer', marginLeft: '2px'}}>
-        <Icon type='redo' style={{color: '#5b7cc9'}} title='Reload App default environments'/>
+        <Icon type='undo' style={{color: '#5b7cc9'}} title='Reload App default environments'/>
       </span>
     );
 
