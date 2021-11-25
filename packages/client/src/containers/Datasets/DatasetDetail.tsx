@@ -45,6 +45,11 @@ function _DatasetDetail({ getDataset, updateDataset }) {
   const [fileUploaded, setFileUploaded] = React.useState(false);
   const [tabKey, setTabKey] = React.useState('data');
 
+  if (!window?.enablePhfs) {
+    history.push('../home');
+    return <></>;
+  }
+
   if (getDataset.error) {
     return <div>Failure to load dataset.</div>;
   }
@@ -268,6 +273,7 @@ export const DatasetDetail = compose(
       fetchPolicy: 'cache-and-network',
     }),
     name: 'getDataset',
+    skip: () => !window?.enablePhfs,
   }),
   graphql(UpdateDatasetMutation, {
     options: ({ groupContext, match }: Props) => ({

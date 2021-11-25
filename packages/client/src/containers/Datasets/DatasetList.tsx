@@ -1,6 +1,7 @@
 import * as React from 'react';
 import moment from 'moment';
 import {
+  Alert,
   Button,
   Input,
   Modal,
@@ -105,6 +106,25 @@ function _DatasetList({
   const { appPrefix } = useRoutePrefix();
   const [keyword, setKeyword] = React.useState('');
   const [modalVisible, setModalVisible] = React.useState(false);
+
+  if (!window?.enablePhfs) {
+    return (
+      <>
+        <CommonPageTitle />
+
+        <PageBody>
+          <div>
+            <Alert
+              showIcon
+              message='Warning'
+              description='PHFS is not enabled. Please tell your administrator to enable it.'
+              type='warning'
+            />
+          </div>
+        </PageBody>
+      </>
+    );
+  }
 
   async function onSubmit(data: InputVariables) {
     try {
@@ -377,6 +397,7 @@ export const DatasetList = compose(
       };
     },
     name: 'datasets',
+    skip: () => !window?.enablePhfs,
   }),
   graphql(CreateDatasetMutation, {
     options: {

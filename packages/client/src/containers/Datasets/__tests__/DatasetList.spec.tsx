@@ -91,6 +91,7 @@ function setup() {
 describe('Datasets V2 List', () => {
   it('should render datasets with error message', async () => {
     const { mockGroupContext } = setup();
+    window.enablePhfs = true;
 
     render(
       <MemoryRouter>
@@ -109,6 +110,7 @@ describe('Datasets V2 List', () => {
 
   it('should render datasets', async () => {
     const { mockGroupContext, mockRequests } = setup();
+    window.enablePhfs = true;
 
     render(
       <MemoryRouter>
@@ -132,6 +134,7 @@ describe('Create Dataset V2', () => {
     const { mockGroupContext, mockRequests } = setup();
     // @ts-ignore
     window.graphqlEndpoint = 'http://download.primehub.io/graphql';
+    window.enablePhfs = true;
 
     render(
       <MemoryRouter initialEntries={[`/g/${mockGroupContext.id}/datasets`]}>
