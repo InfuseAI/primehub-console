@@ -222,7 +222,7 @@ export function JobInformation({ job, ...props }: Props) {
               <th>Status</th>
               <th>Duration</th>
               <th>Finished</th>
-              <th>Schedule</th>
+              <th>Recurrence</th>
               <th>User</th>
             </tr>
           </thead>

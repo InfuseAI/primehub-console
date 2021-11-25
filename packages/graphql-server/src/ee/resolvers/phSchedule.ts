@@ -88,7 +88,7 @@ export const transform = async (
 // utils
 const createScheduleName = () => {
   // generate string like: 201912301200-gxzhaz
-  return `schedule-${Math.random().toString(36).slice(2, 8)}`;
+  return `recurrence-${Math.random().toString(36).slice(2, 8)}`;
 };
 
 const createSchedule = async (context: Context, data: PhScheduleMutationInput) => {
