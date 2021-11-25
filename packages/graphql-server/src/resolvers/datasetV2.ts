@@ -3,7 +3,7 @@ import { find, isEmpty } from 'lodash';
 
 import { Context } from './interface';
 import * as logger from '../logger';
-import { toRelay, extractPagination } from './utils';
+import { toRelay, extractPagination, filter } from './utils';
 import { isGroupBelongUser } from '../utils/groupCheck';
 import { generatePrefixForQuery, query as queryStore } from './store';
 
@@ -211,6 +211,9 @@ export const connectionQuery = async (root, args, context: Context) => {
       }
       return false;
     });
+  }
+  if (args.orderBy) {
+    datasets = filter(datasets, {order: args.orderBy});
   }
 
   return toRelay(datasets, extractPagination(args));

@@ -185,6 +185,7 @@ type Query {
   datasetV2Connection(
     where: DatasetV2WhereInput
     page: Int
+    orderBy: DatasetV2OrderByInput
   ): DatasetV2Connection!
   datasetV2Files(
     where: DatasetV2FileWhereInput!

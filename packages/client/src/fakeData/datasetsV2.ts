@@ -1,7 +1,7 @@
 export const datasetsV2 = [
 	{
 		id: 'a1-ml3qa',
-		name: 'a1',
+		name: 'a1-ml3qa',
 		createdBy: 'phadmin',
 		createdAt: '2021-11-08T10:38:45.006Z',
 		updatedAt: '2021-11-08T10:38:45.006Z',
@@ -11,7 +11,7 @@ export const datasetsV2 = [
 	},
 	{
 		id: 'a2-9malk',
-		name: 'a2',
+		name: 'a2-9malk',
 		createdBy: 'phadmin',
 		createdAt: '2021-11-08T10:39:32.855Z',
 		updatedAt: '2021-11-08T10:39:32.855Z',
@@ -21,7 +21,7 @@ export const datasetsV2 = [
 	},
 	{
 		id: 'a3-hgrdm',
-		name: 'a3',
+		name: 'a3-hgrdm',
 		createdBy: 'phadmin',
 		createdAt: '2021-11-10T09:04:26.630Z',
 		updatedAt: '2021-11-10T09:04:26.630Z',
@@ -31,7 +31,7 @@ export const datasetsV2 = [
 	},
 	{
 		id: 'a4-kswvd',
-		name: 'a4',
+		name: 'a4-kswvd',
 		createdBy: 'phadmin',
 		createdAt: '2021-11-08T10:42:46.237Z',
 		updatedAt: '2021-11-08T10:42:46.238Z',
@@ -40,8 +40,8 @@ export const datasetsV2 = [
 		__typename: 'DatasetV2',
 	},
 	{
-		id: 'dataset-one-040t9',
-		name: 'Dataset One',
+		id: 'dataset-one',
+		name: 'dataset-one',
 		createdBy: 'phadmin',
 		createdAt: '2021-11-10T08:58:10.525Z',
 		updatedAt: '2021-11-10T08:58:10.527Z',
@@ -50,8 +50,8 @@ export const datasetsV2 = [
 		__typename: 'DatasetV2',
 	},
 	{
-		id: 'dataset-three-qeamw',
-		name: 'Dataset Three',
+		id: 'dataset-three',
+		name: 'dataset-three',
 		createdBy: 'phadmin',
 		createdAt: '2021-11-10T09:03:59.954Z',
 		updatedAt: '2021-11-10T09:03:59.954Z',
@@ -60,8 +60,8 @@ export const datasetsV2 = [
 		__typename: 'DatasetV2',
 	},
 	{
-		id: 'dataset-two-4fv4l',
-		name: 'Dataset Two',
+		id: 'dataset-two',
+		name: 'dataset-two',
 		createdBy: 'phadmin',
 		createdAt: '2021-11-10T09:03:41.512Z',
 		updatedAt: '2021-11-10T09:03:41.512Z',
@@ -71,7 +71,7 @@ export const datasetsV2 = [
 	},
 	{
 		id: 'qq1-1kgja',
-		name: 'qq1',
+		name: 'qq1-1kgja',
 		createdBy: 'phadmin',
 		createdAt: '2021-11-08T10:15:30.155Z',
 		updatedAt: '2021-11-08T10:15:30.156Z',
@@ -81,7 +81,7 @@ export const datasetsV2 = [
 	},
 	{
 		id: 'qq2-p41xn',
-		name: 'qq2',
+		name: 'qq2-p41xn',
 		createdBy: 'phadmin',
 		createdAt: '2021-11-08T10:19:56.615Z',
 		updatedAt: '2021-11-08T10:19:56.615Z',
@@ -91,7 +91,7 @@ export const datasetsV2 = [
 	},
 	{
 		id: 'qq3-jf43o',
-		name: 'qq3',
+		name: 'qq3-jf43o',
 		createdBy: 'phadmin',
 		createdAt: '2021-11-08T10:23:59.293Z',
 		updatedAt: '2021-11-08T10:23:59.293Z',

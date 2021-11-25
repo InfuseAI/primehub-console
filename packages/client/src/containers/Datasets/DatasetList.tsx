@@ -101,6 +101,7 @@ function _DatasetList({ datasets, createDataset, deleteDataset }: Props) {
   const history = useHistory();
   const { appPrefix } = useRoutePrefix();
   const [keyword, setKeyword] = React.useState('');
+  const [orderBy, setOrderBy] = React.useState({});
   const [modalVisible, setModalVisible] = React.useState(false);
 
   if (!window?.enablePhfs) {
@@ -145,6 +146,7 @@ function _DatasetList({ datasets, createDataset, deleteDataset }: Props) {
     refetch({
       where: variables.where,
       page,
+      orderBy,
     });
   }
 
@@ -157,6 +159,7 @@ function _DatasetList({ datasets, createDataset, deleteDataset }: Props) {
         search: keyword,
       },
       page: DEFAULT_PAGE,
+      orderBy,
     });
   }
 
@@ -241,6 +244,7 @@ function _DatasetList({ datasets, createDataset, deleteDataset }: Props) {
                     refetch({
                       where: variables.where,
                       page: variables.page,
+                      orderBy,
                     });
                   } catch (err) {
                     errorHandler(err);
@@ -261,9 +265,8 @@ function _DatasetList({ datasets, createDataset, deleteDataset }: Props) {
   const columns: Array<ColumnProps<Dataset>> = [
     {
       title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      // TODO: implement sorter
+      dataIndex: 'id',
+      key: 'id',
       sorter: true,
       render: renderName,
     },
@@ -296,6 +299,7 @@ function _DatasetList({ datasets, createDataset, deleteDataset }: Props) {
   const connection = datasets.datasetV2Connection;
   const dataSource = connection ? connection.edges.map(edge => edge.node) : [];
   const total = connection?.pageInfo?.totalPage * DEFAULT_PAGE_SIZE;
+  const current = connection?.pageInfo?.currentPage || DEFAULT_PAGE;
 
   return (
     <>
@@ -348,6 +352,20 @@ function _DatasetList({ datasets, createDataset, deleteDataset }: Props) {
             columns={columns}
             rowKey='id'
             pagination={false}
+            onChange={(pagination, filters, sorter) => {
+              if (sorter?.order) {
+                const order = {
+                  [sorter.field]: sorter.order.replace(/end$/, ''),
+                };
+                setOrderBy(order);
+                const { refetch, variables } = datasets;
+                refetch({
+                  where: variables.where,
+                  page: variables.page,
+                  orderBy: order,
+                });
+              }
+            }}
           />
           <DatasetCreateForm
             visible={modalVisible}
@@ -373,7 +391,11 @@ function _DatasetList({ datasets, createDataset, deleteDataset }: Props) {
             justifyContent: 'flex-end',
           }}
         >
-          <Pagination total={total} onChange={onPageChanged} />
+          <Pagination
+            current={current}
+            total={total}
+            onChange={onPageChanged}
+          />
         </div>
       </PageBody>
     </>

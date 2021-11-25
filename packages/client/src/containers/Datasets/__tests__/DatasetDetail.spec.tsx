@@ -19,7 +19,7 @@ function setup() {
     enabledDeployment: true,
   };
 
-  const id = 'dataset-one-040t9';
+  const id = 'dataset-one';
   const mockRouteProps = {
     match: {
       params: {
@@ -83,4 +83,3 @@ describe('Datasets V2 Detail', () => {
     expect(await screen.findByText('phadmin')).toBeInTheDocument();
   });
 });
-
