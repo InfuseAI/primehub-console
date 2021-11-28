@@ -167,7 +167,7 @@ const expectGroupResourcesDeleted = async (
   }
 };
 
-describe.only('group graphql for group resources deletion', function () {
+describe.only('group graphql for group resources deletion', () => {
   before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;

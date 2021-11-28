@@ -34,9 +34,9 @@ const masterRealmCred = {
 
 console.log('Creating minio bucket for test');
 const mClient = createMinioClient('http://127.0.0.1:9000', 'minioadmin', 'minioadmin');
-mClient.makeBucket('test', '', function(err) {
-  if (err) return console.log('Error creating bucket.', err)
-  console.log('Bucket created successfully.')
+mClient.makeBucket('test', '', err => {
+  if (err) return console.log('Error creating bucket.', err);
+  console.log('Bucket created successfully.');
 });
 (global as any).minioClient = mClient;
 
@@ -217,7 +217,6 @@ export const createSandbox = async () => {
   // assign user to test group
   (global as any).addUserToGroup(testGroup.id, user.id);
   (global as any).currentUser = user;
-
 
   // create new client
   const authClientId = faker.internet.userName();

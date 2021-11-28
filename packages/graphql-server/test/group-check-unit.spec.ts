@@ -30,4 +30,3 @@ describe('isGroupNameAvailable', () => {
       .to.be.true;
   });
 });
-
