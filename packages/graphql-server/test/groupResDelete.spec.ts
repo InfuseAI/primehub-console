@@ -2,12 +2,8 @@
 import chai from 'chai';
 import chaiHttp = require('chai-http');
 import KeycloakAdminClient from 'keycloak-admin';
-import * as yaml from 'js-yaml';
-import * as fs from 'fs';
-import { resolve } from 'path';
 import { kubeConfig } from '../src/crdClient/crdClientImpl';
 import * as k8s from '@kubernetes/client-node';
-import { promisify } from 'util';
 
 chai.use(chaiHttp);
 
@@ -167,7 +163,7 @@ const expectGroupResourcesDeleted = async (
   }
 };
 
-describe.only('group graphql for group resources deletion', () => {
+describe('group graphql for group resources deletion', () => {
   before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;
