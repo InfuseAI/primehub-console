@@ -14,11 +14,7 @@ import Field from 'components/share/field';
 import Browser from 'components/Browser/Browser';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { humanFileSize } from 'utils/index';
-import {
-  GroupContext,
-  GroupContextComponentProps,
-  withGroupContext,
-} from 'context/group';
+import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import { errorHandler } from 'utils/errorHandler';
 
 import { Dataset, InputVariables } from 'components/datasets/common';
