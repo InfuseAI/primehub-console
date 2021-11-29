@@ -88,8 +88,7 @@ function CommonPageTitle() {
       title: 'Datasets',
       link: '/datasets',
       tips: 'Users can manage datasets here.',
-      // TODO: add doc link
-      tipsLink: '',
+      tipsLink: 'https://docs.primehub.io/docs/datasets',
     },
   ];
 
