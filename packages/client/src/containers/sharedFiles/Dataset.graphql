@@ -1,0 +1,18 @@
+query GetDatasets(
+  $where: DatasetV2WhereInput
+  $page: Int
+  $orderBy: DatasetV2OrderByInput
+) {
+  datasetV2Connection(
+    where: $where
+    page: $page
+    orderBy: $orderBy
+  ) {
+    edges {
+      node {
+        id
+        name
+      }
+    }
+  }
+}

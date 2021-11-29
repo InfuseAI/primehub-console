@@ -280,6 +280,10 @@ export interface BrowserProps {
   basePath?: string;
   path?: string;
   enabledPHFS?: boolean;
+  rowSelection?: {
+    selectedRowKeys: string[];
+    onChange: (rowKeys: string[]) => void;
+  };
   onPathChange?: (path: string) => void;
   uploading?: boolean;
   onUploadingChange?: (status: boolean) => void;
@@ -313,12 +317,15 @@ interface BrowseInternalProps extends GroupContextComponentProps, BrowserProps {
   }) => Promise<{ data: { deleteFiles: number } }>;
 }
 
-function Browser(props: BrowseInternalProps) {
-  const { data, enabledPHFS, title, onPathChange: onChange, uploading, onUploadingChange } = {
-    title: '<root>',
-    uploading: false,
-    ...props,
-  };
+function Browser({
+  data,
+  enabledPHFS,
+  title = '<root>',
+  onPathChange: onChange,
+  uploading = false,
+  onUploadingChange,
+  ...props
+}: BrowseInternalProps) {
   const path = joinAndNormalize(props.path);
 
   const { name: groupName } = useContext(GroupContext);
@@ -562,6 +569,7 @@ function Browser(props: BrowseInternalProps) {
 
       <Table
         rowKey={data => data?.name}
+        rowSelection={props?.rowSelection ? props.rowSelection : null}
         loading={data?.loading}
         dataSource={dataSource}
         columns={columns}
@@ -633,10 +641,10 @@ function Browser(props: BrowseInternalProps) {
 export default compose(
   withGroupContext,
   graphql(GET_FILES, {
-    options: (props: BrowseInternalProps) => ({
+    options: ({ basePath = '', ...props }: BrowseInternalProps) => ({
       variables: {
         where: {
-          phfsPrefix: joinAndNormalize(props.basePath, props.path),
+          phfsPrefix: joinAndNormalize(basePath, props.path),
           groupName: props.groupContext.name,
         },
       },
@@ -646,14 +654,14 @@ export default compose(
     skip: props => !props.enabledPHFS,
   }),
   graphql(DELETE_FILES, {
-    options: (props: BrowseInternalProps) => ({
+    options: ({ basePath = '', ...props }: BrowseInternalProps) => ({
       onError: errorHandler,
       refetchQueries: [
         {
           query: GET_FILES,
           variables: {
             where: {
-              phfsPrefix: joinAndNormalize(props.basePath, props.path),
+              phfsPrefix: joinAndNormalize(basePath, props.path),
               groupName: props.groupContext.name,
             },
           },
