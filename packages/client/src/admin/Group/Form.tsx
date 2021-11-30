@@ -339,7 +339,7 @@ function GroupForm(props: Props) {
           <Form.Item
             label={
               <span>
-                Share Volume{' '}
+                Shared Volume{' '}
                 <PHTooltip
                   tipText='The shared volume is shared storage among members in the group.'
                   tipLink='https://docs.primehub.io/docs/guide_manual/admin-group#shared-volume'

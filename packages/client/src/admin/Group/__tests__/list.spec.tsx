@@ -144,7 +144,7 @@ describe('Admin Portal - Group List', () => {
         wrapper,
       }
     );
-    expect(screen.queryByText('Share Volume Capacity')).toBeInTheDocument();
+    expect(screen.queryByText('Shared Volume Capacity')).toBeInTheDocument();
     expect(screen.queryByText('User CPU Quota')).toBeInTheDocument();
     expect(screen.queryByText('User GPU Quota')).toBeInTheDocument();
   });
@@ -158,7 +158,7 @@ describe('Admin Portal - Group List', () => {
         wrapper,
       }
     );
-    expect(screen.queryByText('Share Volume Capacity')).not.toBeInTheDocument();
+    expect(screen.queryByText('Shared Volume Capacity')).not.toBeInTheDocument();
     expect(screen.queryByText('User CPU Quota')).not.toBeInTheDocument();
     expect(screen.queryByText('User GPU Quota')).not.toBeInTheDocument();
   });
