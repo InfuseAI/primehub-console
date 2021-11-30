@@ -42,7 +42,7 @@ describe('Admin Portal - Group Update', () => {
       </MockedProvider>,
       { wrapper }
     );
-    expect(screen.queryByText('Share Volume')).toBeInTheDocument();
+    expect(screen.queryByText('Shared Volume')).toBeInTheDocument();
     expect(screen.queryByText('Model Deployment')).not.toBeInTheDocument();
   });
 
@@ -54,7 +54,7 @@ describe('Admin Portal - Group Update', () => {
       </MockedProvider>,
       { wrapper }
     );
-    expect(screen.queryByText('Share Volume')).toBeInTheDocument();
+    expect(screen.queryByText('Shared Volume')).toBeInTheDocument();
     expect(screen.queryByText('Model Deployment')).toBeInTheDocument();
   });
 
@@ -66,7 +66,7 @@ describe('Admin Portal - Group Update', () => {
       </MockedProvider>,
       { wrapper }
     );
-    expect(screen.queryByText('Share Volume')).not.toBeInTheDocument();
+    expect(screen.queryByText('Shared Volume')).not.toBeInTheDocument();
     expect(screen.queryByText('Model Deployment')).not.toBeInTheDocument();
   });
 });

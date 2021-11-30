@@ -191,7 +191,7 @@ export function GroupList(props: Props) {
       render: text => <TruncateTableField text={text} />,
     },
     {
-      title: 'Share Volume Capacity',
+      title: 'Shared Volume Capacity',
       dataIndex: 'sharedVolumeCapacity',
       sorter: true,
       sortOrder: reducedOrderBy.sharedVolumeCapacity,
