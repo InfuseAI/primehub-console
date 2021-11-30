@@ -68,7 +68,7 @@ export function DeploymentCard({ endpoint, ...props }: Props) {
     text: endpoint,
   });
 
-  const [latest] = props.history || [];
+  const [latest] = props.history;
   const isStoppted = props.status === Status.Stopped;
 
   // Imitation of loading status, because mutation didn't provide loading status.
@@ -136,8 +136,14 @@ export function DeploymentCard({ endpoint, ...props }: Props) {
               lineHeight: '20px',
             }}
           >
-            {moment(latest.time).fromNow()} by{' '}
-            <b>{latest.deployment.userName}</b>
+            {latest ? (
+              <>
+                {moment(latest.time).fromNow()} by{' '}
+                <b>{latest.deployment.userName}</b>
+              </>
+            ) : (
+              '-'
+            )}
           </div>
         </div>
       </div>
