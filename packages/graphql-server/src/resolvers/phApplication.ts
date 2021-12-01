@@ -318,7 +318,12 @@ export const update = async (root, args, context: Context) => {
 
   if (metadata && metadata.annotations) {
     metadata.annotations[ANNOTATIONS_TEMPLATE_DATA_NAME] = patchAppTemplateData(item, data);
-    metadata.annotations[ANNOTATIONS_INSTANCE_TYPE_NAME] = JSON.stringify(instanceType);
+
+    // UseCase: clients update PhApplication without setting a new InstanceType
+    // instanceType.spec become available when data.instanceType is valid
+    if (instanceType.spec) {
+      metadata.annotations[ANNOTATIONS_INSTANCE_TYPE_NAME] = JSON.stringify(instanceType);
+    }
   }
 
   const spec = item.spec;
