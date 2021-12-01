@@ -351,7 +351,7 @@ export const copyFiles = async (root, args, context: Context) => {
   const dataPath = `${toDataPath(groupName, id, false)}${path.startsWith('/') ? path.slice(1) : path}`;
   const sessionId = uuidv4();
   const sessionFilePath = `.sessions/copy-status/${sessionId}`;
-  let count = 0;
+  let itemCount = 0;
 
   async function copyFile(source: string, dest: string) {
     return new Promise((resolve, reject) => {
@@ -382,10 +382,10 @@ export const copyFiles = async (root, args, context: Context) => {
     minioClient.putObject(storeBucket, sessionFilePath, JSON.stringify(copyStatus));
   }
 
-  onProgress(count, items.length);
+  onProgress(itemCount, items.length);
 
   items.forEach(async item => {
-    const sourcePrefix = `${storeBucket}/groups/${toGroupPath(groupName)}`
+    const sourcePrefix = `${storeBucket}/groups/${toGroupPath(groupName)}`;
 
     try {
       if (item.endsWith('/')) {
@@ -410,20 +410,20 @@ export const copyFiles = async (root, args, context: Context) => {
           const dest = `${dataPath}/${filename}`;
           await copyFile(source, dest);
         }
-        onProgress(++count, items.length);
+        onProgress(++itemCount, items.length);
       } else {
         // Copy file
-        const slashIndex = item.lastIndexOf('/')
+        const slashIndex = item.lastIndexOf('/');
         if (slashIndex === -1) {
           return;
         }
-        const source = `${sourcePrefix}${item}`
+        const source = `${sourcePrefix}${item}`;
         const dest = `${dataPath}/${item.slice(slashIndex + 1)}`;
         await copyFile(source, dest);
-        onProgress(++count, items.length);
+        onProgress(++itemCount, items.length);
       }
     } catch (err) {
-      onFailed(count, items.length, err.message);
+      onFailed(itemCount, items.length, err.message);
 
       logger.error({
         component: logger.components.datasetV2,
@@ -439,7 +439,7 @@ export const copyFiles = async (root, args, context: Context) => {
   return {
     sessionId,
   };
-}
+};
 
 const getDatasetObjects = async (
   context: Context,
