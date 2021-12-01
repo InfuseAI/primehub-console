@@ -332,7 +332,7 @@ export const update = async (root, args, context: Context) => {
   spec.displayName = data.displayName;
 
   // Append env to pod template
-  if (spec.podTemplate.spec.containers && spec.podTemplate.spec.containers.length > 0) {
+  if (spec.podTemplate.spec.containers && spec.podTemplate.spec.containers.length > 0 && data.env) {
     spec.podTemplate.spec.containers[0].env = get(appTemplate.spec.template.spec.podTemplate.spec.containers[0], 'env', []).concat(data.env);
   }
 
