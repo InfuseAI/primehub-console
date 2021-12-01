@@ -16,3 +16,9 @@ query GetDatasets(
     }
   }
 }
+
+mutation CreateDatasetMutation($payload: DatasetV2CreateInput!) {
+  createDatasetV2(data: $payload) {
+    id
+  }
+}
