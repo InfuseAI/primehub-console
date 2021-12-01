@@ -72,6 +72,7 @@ export const resolvers = {
     createDatasetV2: datasetV2.create,
     updateDatasetV2: datasetV2.update,
     deleteDatasetV2: datasetV2.destroy,
+    copyFilesToDatasetV2: datasetV2.copyFiles,
     createPhApplication: phApplication.create,
     updatePhApplication: phApplication.update,
     deletePhApplication: phApplication.destroy,

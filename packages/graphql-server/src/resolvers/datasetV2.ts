@@ -1,10 +1,11 @@
 import { ApolloError } from 'apollo-server';
 import { find, isEmpty } from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Context } from './interface';
 import * as logger from '../logger';
 import { toRelay, extractPagination, filter } from './utils';
-import { isGroupBelongUser } from '../utils/groupCheck';
+import { isGroupBelongUser, toGroupPath } from '../utils/groupCheck';
 import { generatePrefixForQuery, query as queryStore } from './store';
 
 import { ErrorCodes } from '../errorCodes';
@@ -333,6 +334,112 @@ export const destroy = async (root, args, context: Context) => {
 
   return { id };
 };
+
+export const copyFiles = async (root, args, context: Context) => {
+  await checkMinioClient(context);
+  const { id, groupName } = args.where;
+  await checkPermission(context, groupName);
+
+  const metadata = await getMetadata(id, groupName, context);
+  if (isEmpty(metadata)) {
+    throw new ApolloError('failed to get dataset', RESOURCE_NOT_FOUND);
+  }
+
+  const { minioClient, storeBucket } = context;
+  const { path, items } = args;
+
+  const dataPath = `${toDataPath(groupName, id, false)}${path.startsWith('/') ? path.slice(1) : path}`;
+  const sessionId = uuidv4();
+  const sessionFilePath = `.sessions/copy-status/${sessionId}`;
+  let count = 0;
+
+  async function copyFile(source: string, dest: string) {
+    return new Promise((resolve, reject) => {
+      minioClient.copyObject(storeBucket, dest, source, null, (err, data) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve({ source, dest, ...data });
+      });
+    });
+  }
+
+  async function onProgress(count: number, total: number) {
+    const copyStatus = {
+      status: count === total ? 'completed' : 'running',
+      progress: count / total * 100,
+      failReason: '',
+    };
+    minioClient.putObject(storeBucket, sessionFilePath, JSON.stringify(copyStatus));
+  }
+
+  async function onFailed(count: number, total: number, reason: string) {
+    const copyStatus = {
+      status: 'failed',
+      progress: count / total * 100,
+      failReason: reason,
+    };
+    minioClient.putObject(storeBucket, sessionFilePath, JSON.stringify(copyStatus));
+  }
+
+  onProgress(count, items.length);
+
+  items.forEach(async item => {
+    const sourcePrefix = `${storeBucket}/groups/${toGroupPath(groupName)}`
+
+    try {
+      if (item.endsWith('/')) {
+        // Copy flolder
+        const folder = `groups/${toGroupPath(groupName)}${item}`;
+        const files = new Promise<any[]>((resolve, reject) => {
+          const arr = [];
+          const stream = minioClient.listObjectsV2(storeBucket, folder, true);
+          stream.on('data', obj => {
+            arr.push(obj);
+          });
+          stream.on('error', err => {
+            reject(err);
+          });
+          stream.on('end', () => {
+            resolve(arr);
+          });
+        });
+        const filenames = (await files).map(file => file.name.slice(folder.length));
+        for (const filename of filenames) {
+          const source = `${sourcePrefix}${item}${filename}`;
+          const dest = `${dataPath}/${filename}`;
+          await copyFile(source, dest);
+        }
+        onProgress(++count, items.length);
+      } else {
+        // Copy file
+        const slashIndex = item.lastIndexOf('/')
+        if (slashIndex === -1) {
+          return;
+        }
+        const source = `${sourcePrefix}${item}`
+        const dest = `${dataPath}/${item.slice(slashIndex + 1)}`;
+        await copyFile(source, dest);
+        onProgress(++count, items.length);
+      }
+    } catch (err) {
+      onFailed(count, items.length, err.message);
+
+      logger.error({
+        component: logger.components.datasetV2,
+        resource: dataPath,
+        type: 'DATASET_COPY_FROM_SHARED_FILES',
+        stacktrace: err.stack,
+        message: err.message,
+      });
+      throw new ApolloError('failed to add files to dataset', INTERNAL_ERROR);
+    }
+  });
+
+  return {
+    sessionId,
+  };
+}
 
 const getDatasetObjects = async (
   context: Context,

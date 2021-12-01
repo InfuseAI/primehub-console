@@ -279,6 +279,7 @@ type Mutation {
   createDatasetV2(data: DatasetV2CreateInput!): DatasetV2!
   updateDatasetV2(data: DatasetV2UpdateInput!, where: DatasetV2WhereUniqueInput!): DatasetV2
   deleteDatasetV2(where: DatasetV2WhereUniqueInput!): DatasetV2!
+  copyFilesToDatasetV2(where: DatasetV2WhereUniqueInput!, path: String!, items: [String!]): DatasetV2CopySession
 
   """PhApplication"""
   createPhApplication(data: PhApplicationCreateInput!): PhApplication!
