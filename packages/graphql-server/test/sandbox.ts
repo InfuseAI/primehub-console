@@ -20,7 +20,9 @@ const loadCrd = (name: string): any =>
 const datasetCrd = loadCrd('dataset');
 const instanceTypeCrd = loadCrd('instance-type');
 const imageCrd = loadCrd('image');
+const phApplicationCrd = loadCrd('phApplication');
 const phJobCrd = loadCrd('phJob');
+const phScheduleCrd = loadCrd('phSchedule');
 const phDeploymentCrd = loadCrd('phDeployment');
 
 const masterRealmCred = {
@@ -32,9 +34,9 @@ const masterRealmCred = {
 
 console.log('Creating minio bucket for test');
 const mClient = createMinioClient('http://127.0.0.1:9000', 'minioadmin', 'minioadmin');
-mClient.makeBucket('test', '', function(err) {
-  if (err) return console.log('Error creating bucket.', err)
-  console.log('Bucket created successfully.')
+mClient.makeBucket('test', '', err => {
+  if (err) return console.log('Error creating bucket.', err);
+  console.log('Bucket created successfully.');
 });
 (global as any).minioClient = mClient;
 
@@ -120,11 +122,20 @@ export const createSandbox = async () => {
   /**
    * k8s
    */
-  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: datasetCrd });
-  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: instanceTypeCrd });
-  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: imageCrd });
-  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phJobCrd });
-  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phDeploymentCrd });
+  try {
+    await Promise.all([
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: datasetCrd }),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: instanceTypeCrd }),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: imageCrd }),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phApplicationCrd }),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phJobCrd }),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phScheduleCrd }),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phDeploymentCrd }),
+    ]);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+  }
 
   /**
    * Keycloak
@@ -206,7 +217,6 @@ export const createSandbox = async () => {
   // assign user to test group
   (global as any).addUserToGroup(testGroup.id, user.id);
   (global as any).currentUser = user;
-
 
   // create new client
   const authClientId = faker.internet.userName();
@@ -302,11 +312,15 @@ export const destroySandbox = async () => {
   await cleaupAllCrd();
 
   try {
-    await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(datasetCrd.metadata.name);
-    await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(instanceTypeCrd.metadata.name);
-    await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(imageCrd.metadata.name);
-    await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(phJobCrd.metadata.name);
-    await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(phDeploymentCrd.metadata.name);
+    await Promise.all([
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(datasetCrd.metadata.name),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(instanceTypeCrd.metadata.name),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(imageCrd.metadata.name),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(phApplicationCrd.metadata.name),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(phJobCrd.metadata.name),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(phScheduleCrd.metadata.name),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(phDeploymentCrd.metadata.name),
+    ]);
   } catch (e) {
     // tslint:disable-next-line:no-console
     console.log(e);
