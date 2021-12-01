@@ -318,7 +318,12 @@ export const update = async (root, args, context: Context) => {
 
   if (metadata && metadata.annotations) {
     metadata.annotations[ANNOTATIONS_TEMPLATE_DATA_NAME] = patchAppTemplateData(item, data);
-    metadata.annotations[ANNOTATIONS_INSTANCE_TYPE_NAME] = JSON.stringify(instanceType);
+
+    // UseCase: clients update PhApplication without setting a new InstanceType
+    // instanceType.spec become available when data.instanceType is valid
+    if (instanceType.spec) {
+      metadata.annotations[ANNOTATIONS_INSTANCE_TYPE_NAME] = JSON.stringify(instanceType);
+    }
   }
 
   const spec = item.spec;
@@ -327,7 +332,7 @@ export const update = async (root, args, context: Context) => {
   spec.displayName = data.displayName;
 
   // Append env to pod template
-  if (spec.podTemplate.spec.containers && spec.podTemplate.spec.containers.length > 0) {
+  if (spec.podTemplate.spec.containers && spec.podTemplate.spec.containers.length > 0 && data.env) {
     spec.podTemplate.spec.containers[0].env = get(appTemplate.spec.template.spec.podTemplate.spec.containers[0], 'env', []).concat(data.env);
   }
 
