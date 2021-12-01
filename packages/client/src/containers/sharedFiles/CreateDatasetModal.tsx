@@ -4,6 +4,7 @@ import { Form, Input, Icon, Select, Modal, Progress, Typography } from 'antd';
 import { ModalProps } from 'antd/lib/modal';
 
 import DatasetTags from 'components/datasets/DatasetTags';
+import { useInterval } from 'hooks/useInterval';
 
 const CustomFormItem = styled(Form.Item)`
   margin-bottom: 8px;
@@ -36,6 +37,8 @@ interface Props extends Omit<ModalProps, 'onOk'> {
   type: 'create' | 'update';
   onOkClick: () => void;
   onFileRemove: (file: string) => void;
+  onModalClose: () => void;
+  onCreateDataset: (data: { id: string; tags: string[] }) => Promise<void>;
 }
 
 export function CreateDatasetModal({
@@ -47,6 +50,7 @@ export function CreateDatasetModal({
   ...props
 }: Props) {
   const [steps, setSteps] = React.useState(1);
+  const [fetching, setFetch] = React.useState(null);
 
   const stepOne = React.useMemo(() => {
     return (
@@ -54,7 +58,7 @@ export function CreateDatasetModal({
         {type === 'create' ? (
           <>
             <CustomFormItem label='Dataset Name'>
-              {form.getFieldDecorator('datasetName', {
+              {form.getFieldDecorator('id', {
                 initialValue: '',
                 rules: [
                   {
@@ -79,7 +83,7 @@ export function CreateDatasetModal({
           </>
         ) : (
           <CustomFormItem label='Dataset Name'>
-            {form.getFieldDecorator('datasetName', {
+            {form.getFieldDecorator('id', {
               initialValue: 'Select Dataset',
             })(
               <Select style={{ width: '100%' }}>
@@ -128,19 +132,37 @@ export function CreateDatasetModal({
     3: <UploadComplete />,
   };
 
+  useInterval(
+    () => {
+      console.log('Hi, there');
+    },
+    fetching ? 1000 : null
+  );
+
   return (
     <Modal
       maskClosable={false}
       centered
       {...props}
       onOk={() => {
-        form.validateFields(err => {
-          if (err) {
-            return;
-          }
-          props.onOkClick();
-          setSteps(n => n + 1);
-        });
+        if (type === 'create') {
+          form.validateFields((err, values) => {
+            if (err) {
+              return;
+            }
+
+            props.onCreateDataset(values).then(() => {
+              props.onOkClick();
+              setSteps(n => n + 1);
+              setFetch(true);
+            });
+          });
+        }
+      }}
+      onCancel={() => {
+        props.onModalClose();
+        // FIXME: remove demonstrate action
+        setFetch(false);
       }}
     >
       {modalContents[steps]}

@@ -12,11 +12,12 @@ import PageBody from 'components/pageBody';
 import Browser from 'components/Browser/Browser';
 import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
+import { InputVariables } from 'components/datasets/common';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
+import { errorHandler } from 'utils/errorHandler';
 
 import { CreateDatasetModal } from './CreateDatasetModal';
-import { GetDatasets } from './Dataset.graphql';
-import { errorHandler } from 'utils/errorHandler';
+import { GetDatasets, CreateDatasetMutation } from './Dataset.graphql';
 
 const AddToDataset = styled.div`
   position: fixed;
@@ -45,9 +46,16 @@ interface Props extends FormComponentProps, GroupContextComponentProps {
       }>;
     };
   };
+  createDataset: ({
+    variables,
+  }: {
+    variables: {
+      payload: InputVariables;
+    };
+  }) => Promise<void>;
 }
 
-function ShareFilesPage({ form, datasets }: Props) {
+function ShareFilesPage({ form, datasets, ...props }: Props) {
   const [enabledPHFS, setEndabledPHFS] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
@@ -172,7 +180,7 @@ function ShareFilesPage({ form, datasets }: Props) {
               display: uploadingToDataset ? 'none' : 'inline-block',
             },
           }}
-          onCancel={() => {
+          onModalClose={() => {
             setModalVisible(false);
           }}
           onOkClick={() => {
@@ -182,6 +190,20 @@ function ShareFilesPage({ form, datasets }: Props) {
           onFileRemove={file =>
             setSelectedFiles(files => files.filter(f => f !== file))
           }
+          onCreateDataset={async (data: { id: string; tags: string[] }) => {
+            try {
+              await props.createDataset({
+                variables: {
+                  payload: {
+                    ...data,
+                    groupName: props.groupContext.name,
+                  },
+                },
+              });
+            } catch (err) {
+              errorHandler(err);
+            }
+          }}
         />
       </PageBody>
     </>
@@ -203,5 +225,8 @@ export default compose(
         onError: errorHandler,
       };
     },
+  }),
+  graphql(CreateDatasetMutation, {
+    name: 'createDataset',
   })
 )(Form.create<Props>()(ShareFilesPage));
