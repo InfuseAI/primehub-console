@@ -43,11 +43,15 @@ export default class EnvFields extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps) {
     if (prevProps.defaultEnv !== this.props.defaultEnv || this.props.reloadDefault === true) {
-      const {defaultEnv} = this.props;
+      const {defaultEnv, onChange} = this.props;
       const defaultEnvs = defaultEnv ? defaultEnv.map(item => {
         return {name: item.name, value: item.defaultValue, required: !item.optional, description: item.description};
       }) : [];
-      this.setState({fields: defaultEnvs});
+      this.setState({
+        fields: defaultEnvs,
+      }, () => {
+        onChange(this.state.fields);
+      });
     }
     if (prevProps.dumbValue !== this.props.dumbValue) {
       const fields = this.props.value ? this.props.dumbValue : [];
