@@ -175,7 +175,6 @@ function _Volumes({
       title: 'Name',
       dataIndex: 'node.name',
       sorter: true,
-      width: '250px',
       render: text => <TruncateTableField text={text} />,
     },
     {
@@ -183,14 +182,12 @@ function _Volumes({
       title: 'Display Name',
       dataIndex: 'node.displayName',
       sorter: true,
-      width: '250px',
       render: text => <TruncateTableField text={text} />,
     },
     {
       key: 'description',
       title: 'Description',
       dataIndex: 'node.description',
-      width: '250px',
       sorter: true,
       render: text => <TruncateTableField text={text} />,
     },
