@@ -3,6 +3,10 @@ import Router from 'koa-router';
 import { Client } from 'minio';
 import { isEmpty } from 'lodash';
 
+export const getCopyStatusEndpoint = (sessionId: string) => {
+  return `/copy-status?sessionId=${sessionId}`;
+}
+
 export const mountCopyStatusCtrl = (router: Router,
                                     appPrefix: string,
                                     authenticateMiddleware: Middleware,

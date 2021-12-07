@@ -11,6 +11,7 @@ import { generatePrefixForQuery, query as queryStore } from './store';
 import { ErrorCodes } from '../errorCodes';
 import { Readable } from 'stream';
 import moment from 'moment';
+import { getCopyStatusEndpoint } from '../controllers/copyStatusCtrl';
 
 const {
   NOT_AUTH_ERROR,
@@ -345,7 +346,7 @@ export const copyFiles = async (root, args, context: Context) => {
     throw new ApolloError('failed to get dataset', RESOURCE_NOT_FOUND);
   }
 
-  const { minioClient, storeBucket } = context;
+  const { minioClient, storeBucket, graphqlHost, appPrefix } = context;
   const { path, items } = args;
 
   const dataPath = toDataPath(groupName, id, false);
@@ -439,6 +440,7 @@ export const copyFiles = async (root, args, context: Context) => {
 
   return {
     sessionId,
+    endpoint: `${graphqlHost}${appPrefix || ''}${getCopyStatusEndpoint(sessionId)}`,
   };
 };
 
