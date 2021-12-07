@@ -18,6 +18,7 @@ type DatasetV2CopyStatus {
 
 type DatasetV2CopySession {
   sessionId: String
+  endpoint: String
 }
 
 """An edge in a connection."""
