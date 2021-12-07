@@ -130,6 +130,9 @@ export const create = async (root, args, context: Context) => {
   // create resource
   // displayName, canUseGpu, quotaGpu in attributes
   const payload = args.data;
+  if (payload.enabledSharedVolume && isNil(payload.launchGroupOnly)) {
+    payload.launchGroupOnly = true;
+  }
 
   const attrs = new Attributes({
     data: {
@@ -246,6 +249,15 @@ export const update = async (root, args, context: Context) => {
   // if enabledSharedVolume not specified, do not update the homeSymlink field
   if (payload.enabledSharedVolume) {
     data.homeSymlink = true;
+  }
+
+  // launch group only default value is true
+  if (
+    payload.enabledSharedVolume &&
+    !attrs.getData().enabledSharedVolume &&
+    isNil(payload.launchGroupOnly)
+  ) {
+    data.launchGroupOnly = true;
   }
 
   attrs.mergeWithData(data);
