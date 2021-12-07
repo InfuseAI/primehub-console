@@ -82,7 +82,7 @@ export const queryOne = async (root, args, context: Context) => {
   return transformed;
 };
 
-const fetchPhAppTemplate = async (url) => {
+const fetchPhAppTemplate = async (url: any) => {
   if (!url) {
     throw new ApolloError('URL is required');
   }
@@ -97,12 +97,12 @@ const fetchPhAppTemplate = async (url) => {
   }
 
   throw new ApolloError('Invalid PhAppTemplate yaml');
-}
+};
 
 export const importFromURL = async (root, args, context: Context) => {
   const { crdClient } = context;
   const template = await fetchPhAppTemplate(args.url);
-  const { metadata, spec } = template
+  const { metadata, spec } = template;
 
   if (metadata && spec) {
     return crdClient.phAppTemplates.create(metadata, spec);
@@ -114,7 +114,7 @@ export const importFromURL = async (root, args, context: Context) => {
 export const updateFromURL = async (root, args, context: Context) => {
   const { crdClient } = context;
   const template = await fetchPhAppTemplate(args.url);
-  const { metadata, spec } = template
+  const { metadata, spec } = template;
 
   if (metadata && spec) {
     return crdClient.phAppTemplates.patch(args.where.id, {metadata, spec});
