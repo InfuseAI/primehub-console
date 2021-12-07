@@ -179,7 +179,6 @@ export function GroupList(props: Props) {
       key: 'name',
       sorter: true,
       sortOrder: reducedOrderBy.name,
-      width: '250px',
       render: text => <TruncateTableField text={text} />,
     },
     {
@@ -187,7 +186,6 @@ export function GroupList(props: Props) {
       dataIndex: 'displayName',
       sorter: true,
       sortOrder: reducedOrderBy.displayName,
-      width: '250px',
       render: text => <TruncateTableField text={text} />,
     },
     {

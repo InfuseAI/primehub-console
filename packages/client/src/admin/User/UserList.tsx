@@ -127,7 +127,7 @@ function List(props: Props) {
       dataIndex: 'id',
       key: 'action',
       render: renderAction,
-      width: 200,
+      width: 100,
     },
   ];
 
