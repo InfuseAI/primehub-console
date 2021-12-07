@@ -348,7 +348,8 @@ export const copyFiles = async (root, args, context: Context) => {
   const { minioClient, storeBucket } = context;
   const { path, items } = args;
 
-  const dataPath = `${toDataPath(groupName, id, false)}${path.startsWith('/') ? path.slice(1) : path}`;
+  const dataPath = toDataPath(groupName, id, false);
+  const destPrefix = `${dataPath}${path.startsWith('/') ? path.slice(1) : path}${path.endsWith('/') ? '' : '/'}`;
   const sessionId = uuidv4();
   const sessionFilePath = `.sessions/copy-status/${sessionId}`;
   let itemCount = 0;
@@ -407,7 +408,7 @@ export const copyFiles = async (root, args, context: Context) => {
         const filenames = (await files).map(file => file.name.slice(folder.length));
         for (const filename of filenames) {
           const source = `${sourcePrefix}${item}${filename}`;
-          const dest = `${dataPath}/${filename}`;
+          const dest = `${destPrefix}${filename}`;
           await copyFile(source, dest);
         }
         onProgress(++itemCount, items.length);
@@ -418,7 +419,7 @@ export const copyFiles = async (root, args, context: Context) => {
           return;
         }
         const source = `${sourcePrefix}${item}`;
-        const dest = `${dataPath}/${item.slice(slashIndex + 1)}`;
+        const dest = `${destPrefix}${item.slice(slashIndex + 1)}`;
         await copyFile(source, dest);
         onProgress(++itemCount, items.length);
       }
