@@ -22,3 +22,13 @@ mutation CreateDatasetMutation($payload: DatasetV2CreateInput!) {
     id
   }
 }
+
+mutation CopyFilesMutation(
+  $where: DatasetV2WhereUniqueInput!
+  $path: String!
+  $items: [String!]
+) {
+  copyFilesToDatasetV2(where: $where, path: $path, items: $items) {
+    endpoint
+  }
+}

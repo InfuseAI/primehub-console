@@ -1,10 +1,12 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { Form, Input, Icon, Select, Modal, Progress, Typography } from 'antd';
-import { ModalProps } from 'antd/lib/modal';
+import { useHistory } from 'react-router-dom';
+import type { ModalProps } from 'antd/lib/modal';
 
 import DatasetTags from 'components/datasets/DatasetTags';
 import { useInterval } from 'hooks/useInterval';
+import { errorHandler } from 'utils/errorHandler';
 
 const CustomFormItem = styled(Form.Item)`
   margin-bottom: 8px;
@@ -35,10 +37,31 @@ interface Props extends Omit<ModalProps, 'onOk'> {
   files: string[];
   datasetList: Array<{ id: string; name: string }>;
   type: 'create' | 'update';
+  sourePrefix: string;
   onOkClick: () => void;
   onFileRemove: (file: string) => void;
   onModalClose: () => void;
   onCreateDataset: (data: { id: string; tags: string[] }) => Promise<void>;
+  onCopyFiles: ({
+    id,
+    path,
+    items,
+  }: {
+    id: string;
+    path: string;
+    items: string[];
+  }) => Promise<{ endpoint: string }>;
+  onFetchProgress: ({
+    endpoint,
+    onError,
+  }: {
+    endpoint: string;
+    onError: () => void;
+  }) => Promise<{
+    status: 'running' | 'completed' | 'failed';
+    progress: number;
+    failReason: string;
+  }>;
 }
 
 export function CreateDatasetModal({
@@ -50,7 +73,13 @@ export function CreateDatasetModal({
   ...props
 }: Props) {
   const [steps, setSteps] = React.useState(1);
-  const [fetching, setFetch] = React.useState(null);
+  const [fetching, setFetching] = React.useState(null);
+  const [target, setTarget] =
+    React.useState<{ id: string; endpoint: string }>(null);
+  const [progress, setProgress] = React.useState(0);
+  const [uploadingToDataset, setUploadingToDataset] = React.useState(false);
+
+  const history = useHistory();
 
   const stepOne = React.useMemo(() => {
     return (
@@ -70,7 +99,7 @@ export function CreateDatasetModal({
                     message: `alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`,
                   },
                 ],
-              })(<Input data-testid='dataset-name' />)}
+              })(<Input autoFocus data-testid='dataset-name' />)}
             </CustomFormItem>
             <CustomFormItem
               label='Tags'
@@ -127,42 +156,120 @@ export function CreateDatasetModal({
 
   const modalContents = {
     1: stepOne,
-    // TODO: progress
-    2: <Progress percent={50} status='active' />,
+    2: <Progress percent={progress} status='active' />,
     3: <UploadComplete />,
   };
 
   useInterval(
-    () => {
-      console.log('Hi, there');
+    async () => {
+      if (target.endpoint && progress !== 100) {
+        const { progress } = await props.onFetchProgress({
+          endpoint: target.endpoint,
+          onError: () => setFetching(false),
+        });
+
+        setProgress(progress);
+      } else {
+        setFetching(false);
+        setUploadingToDataset(false);
+        setSteps(n => n + 1);
+      }
     },
     fetching ? 1000 : null
   );
+
+  React.useEffect(() => {
+    return () => {
+      if (steps === 3) {
+        setSteps(1);
+        setProgress(0);
+        setTarget(null);
+      }
+    };
+  });
 
   return (
     <Modal
       maskClosable={false}
       centered
       {...props}
+      okText={
+        progress === 100
+          ? 'View Dataset'
+          : type === 'create'
+          ? 'Create Dataset'
+          : 'Add files to Dataset'
+      }
+      cancelText={uploadingToDataset ? 'Keep working in background' : 'Cancel'}
+      okButtonProps={{
+        style: {
+          display: uploadingToDataset ? 'none' : 'inline-block',
+        },
+      }}
       onOk={() => {
-        if (type === 'create') {
-          form.validateFields((err, values) => {
-            if (err) {
-              return;
-            }
-
-            props.onCreateDataset(values).then(() => {
-              props.onOkClick();
-              setSteps(n => n + 1);
-              setFetch(true);
-            });
-          });
+        if (progress === 100) {
+          history.replace(`datasets/${target.id}`);
+          return;
         }
+
+        form.validateFields(async (err, values) => {
+          if (err) {
+            return;
+          }
+
+          if (type === 'create') {
+            try {
+              await props.onCreateDataset(values);
+
+              props.onOkClick();
+              setUploadingToDataset(true);
+              setSteps(n => n + 1);
+              setFetching(true);
+
+              const { endpoint } = await props.onCopyFiles({
+                id: values.id,
+                path: '/',
+                items: files.map(file => `/${props.sourePrefix}${file}`),
+              });
+
+              if (endpoint && !target) {
+                setTarget({
+                  id: values.id,
+                  endpoint,
+                });
+              }
+            } catch (err) {
+              errorHandler(err);
+            }
+          }
+
+          if (type === 'update') {
+            props.onOkClick();
+            setUploadingToDataset(true);
+            setSteps(n => n + 1);
+            setFetching(true);
+
+            try {
+              const { endpoint } = await props.onCopyFiles({
+                id: values.id,
+                path: '/',
+                items: files.map(file => `/${props.sourePrefix}${file}`),
+              });
+
+              if (endpoint && !target) {
+                setTarget({
+                  id: values.id,
+                  endpoint,
+                });
+              }
+            } catch (err) {
+              errorHandler(err);
+            }
+          }
+        });
       }}
       onCancel={() => {
         props.onModalClose();
-        // FIXME: remove demonstrate action
-        setFetch(false);
       }}
     >
       {modalContents[steps]}

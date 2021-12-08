@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Button, Form } from 'antd';
+import { Button, Form, notification } from 'antd';
 import { useHistory, useParams } from 'react-router-dom';
 import { compose } from 'recompose';
 import { graphql } from 'react-apollo';
@@ -14,10 +14,15 @@ import InfuseButton from 'components/infuseButton';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import { InputVariables } from 'components/datasets/common';
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 import { errorHandler } from 'utils/errorHandler';
 
 import { CreateDatasetModal } from './CreateDatasetModal';
-import { GetDatasets, CreateDatasetMutation } from './Dataset.graphql';
+import {
+  GetDatasets,
+  CreateDatasetMutation,
+  CopyFilesMutation,
+} from './Dataset.graphql';
 
 const AddToDataset = styled.div`
   position: fixed;
@@ -53,6 +58,20 @@ interface Props extends FormComponentProps, GroupContextComponentProps {
       payload: InputVariables;
     };
   }) => Promise<void>;
+  copyFiles: ({
+    variables,
+  }: {
+    variables: {
+      where: {
+        id: string;
+        groupName: string;
+      };
+      path: string;
+      items: string[];
+    };
+  }) => Promise<{
+    data: { copyFilesToDatasetV2: { endpoint: string } };
+  }>;
 }
 
 function ShareFilesPage({ form, datasets, ...props }: Props) {
@@ -61,9 +80,9 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [type, setType] = useState<'create' | 'update'>('create');
   const [modalVisible, setModalVisible] = useState(false);
-  const [uploadingToDataset, setUploadingToDataset] = useState(false);
 
   const history = useHistory();
+  const [token] = useLocalStorage('primehub.accessToken', []);
   const { appPrefix } = useRoutePrefix();
   const { groupName, phfsPrefix } =
     useParams<{ groupName: string; phfsPrefix: string }>();
@@ -71,6 +90,17 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
   function handlePathChange(path: string) {
     setSelectedFiles([]);
     history.push(`${appPrefix}g/${groupName}/browse${path}`);
+  }
+
+  async function fetchUploadingProgress(endpoint: string) {
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then(response => response.json());
+
+    return response;
   }
 
   useEffect(() => {
@@ -165,43 +195,80 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
           files={selectedFiles}
           type={type}
           visible={modalVisible}
+          sourePrefix={phfsPrefix ? `${phfsPrefix}/` : ''}
           datasetList={
             datasets?.datasetV2Connection?.edges.map(({ node }) => node) || []
           }
           title={
             type === 'create' ? 'Create Dataset' : 'Add to existing Dataset'
           }
-          okText={type === 'create' ? 'Create Dataset' : 'Add files to Dataset'}
-          cancelText={
-            uploadingToDataset ? 'Keep working in background' : 'Cancel'
-          }
-          okButtonProps={{
-            style: {
-              display: uploadingToDataset ? 'none' : 'inline-block',
-            },
-          }}
           onModalClose={() => {
             setModalVisible(false);
           }}
           onOkClick={() => {
-            setUploadingToDataset(true);
             setSelectedFiles([]);
           }}
           onFileRemove={file =>
             setSelectedFiles(files => files.filter(f => f !== file))
           }
           onCreateDataset={async (data: { id: string; tags: string[] }) => {
+            await props.createDataset({
+              variables: {
+                payload: {
+                  ...data,
+                  groupName: props.groupContext.name,
+                },
+              },
+            });
+          }}
+          onCopyFiles={async ({
+            id,
+            path,
+            items,
+          }: {
+            id: string;
+            path: string;
+            items: string[];
+          }) => {
             try {
-              await props.createDataset({
+              const {
+                data: {
+                  copyFilesToDatasetV2: { endpoint },
+                },
+              } = await props.copyFiles({
                 variables: {
-                  payload: {
-                    ...data,
+                  where: {
+                    id,
                     groupName: props.groupContext.name,
                   },
+                  path,
+                  items,
                 },
               });
+
+              return { endpoint };
             } catch (err) {
               errorHandler(err);
+            }
+          }}
+          onFetchProgress={async ({
+            endpoint,
+            onError,
+          }: {
+            endpoint: string;
+            onError: () => void;
+          }) => {
+            try {
+              const response = await fetchUploadingProgress(endpoint);
+              return response;
+            } catch (err) {
+              onError();
+              notification.error({
+                duration: 5,
+                placement: 'bottomRight',
+                message: 'Failure',
+                description: 'Failure to upload files, try again later.',
+              });
             }
           }}
         />
@@ -228,5 +295,20 @@ export default compose(
   }),
   graphql(CreateDatasetMutation, {
     name: 'createDataset',
+    options: ({ groupContext }: Props) => ({
+      refetchQueries: [
+        {
+          query: GetDatasets,
+          variables: {
+            where: {
+              groupName: groupContext.name,
+            },
+          },
+        },
+      ],
+    }),
+  }),
+  graphql(CopyFilesMutation, {
+    name: 'copyFiles',
   })
 )(Form.create<Props>()(ShareFilesPage));
