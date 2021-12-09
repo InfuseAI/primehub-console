@@ -5,7 +5,7 @@ import { isEmpty } from 'lodash';
 
 export const getCopyStatusEndpoint = (sessionId: string) => {
   return `/copy-status?sessionId=${sessionId}`;
-}
+};
 
 export const mountCopyStatusCtrl = (router: Router,
                                     appPrefix: string,
