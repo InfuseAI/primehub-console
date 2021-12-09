@@ -394,6 +394,70 @@ describe('group graphql', function() {
     expect(group.attributes['launch-group-only'][0]).to.be.equals('false');
   });
 
+  it('should create with default launchGroupOnly', async () => {
+    const create = await this.graphqlRequest(`
+    mutation($data: GroupCreateInput!){
+      createGroup (data: $data) { ${groupFields} }
+    }`, {
+      data: {
+        name: faker.internet.userName().toLowerCase(),
+        displayName: faker.internet.userName(),
+        enabledSharedVolume: true,
+        sharedVolumeCapacity: 1,
+      }
+    });
+    const groupId = create.createGroup.id;
+
+    // query
+    const data = await this.graphqlRequest(`
+    query ($where: GroupWhereUniqueInput!) {
+      group (where: $where) { ${groupFields} }
+    }`, {
+      where: {id: groupId}
+    });
+
+    let group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
+    expect(group.attributes['launch-group-only'][0]).to.be.equals('true');
+  });
+
+  it('should update with default launchGroupOnly', async () => {
+    const create = await this.graphqlRequest(`
+    mutation($data: GroupCreateInput!){
+      createGroup (data: $data) { ${groupFields} }
+    }`, {
+      data: {
+        name: faker.internet.userName().toLowerCase(),
+        displayName: faker.internet.userName(),
+      }
+    });
+    const groupId = create.createGroup.id;
+
+    // update
+    const updated = {
+      displayName: faker.internet.userName(),
+      enabledSharedVolume: true,
+      sharedVolumeCapacity: 1,
+    };
+    await this.graphqlRequest(`
+    mutation($where: GroupWhereUniqueInput!, $data: GroupUpdateInput!){
+      updateGroup (where: $where, data: $data) { ${groupFields} }
+    }`, {
+      where: {id: groupId},
+      data: updated
+    });
+
+    // query
+    const data = await this.graphqlRequest(`
+    query ($where: GroupWhereUniqueInput!) {
+      group (where: $where) { ${groupFields} }
+    }`, {
+      where: {id: groupId}
+    });
+
+    let group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
+    expect(group.attributes['launch-group-only'][0]).to.be.equals('true');
+  });
+
   it('should delete a group', async () => {
     await this.graphqlRequest(`
     mutation($where: GroupWhereUniqueInput!){

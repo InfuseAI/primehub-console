@@ -12,7 +12,7 @@ import {
   Card,
   InputNumber,
 } from 'antd';
-import { isArray, get, sortBy, uniqBy, pickBy } from 'lodash';
+import { isArray, get, sortBy, uniqBy, pickBy, isNil } from 'lodash';
 import { FormComponentProps } from 'antd/es/form';
 import PHTooltip from 'components/share/toolTip';
 import Feature, { FeatureEE } from 'components/share/feature';
@@ -190,6 +190,9 @@ function GroupForm(props: Props) {
   const [groupAdmins, setGroupAdmins] = useState('');
   const initialValue: GroupInput = props.initialValue || defaultGroupValue;
   const submitText = type === 'update' ? 'Update' : 'Create';
+  if (isNil(initialValue.launchGroupOnly)) {
+    initialValue.launchGroupOnly = true;
+  }
 
   useEffect(() => {
     setRelateUsers(get(initialValue, 'users', []));
