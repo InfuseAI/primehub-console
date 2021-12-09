@@ -1,5 +1,5 @@
 import { ApolloError } from 'apollo-server';
-import { find, isEmpty } from 'lodash';
+import { find, isEmpty, debounce } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Context } from './interface';
@@ -366,63 +366,82 @@ export const copyFiles = async (root, args, context: Context) => {
     });
   }
 
+  const debounceUpdateStatus = debounce(
+    copyStatus => {
+      minioClient.putObject(
+        storeBucket,
+        sessionFilePath,
+        JSON.stringify(copyStatus)
+      );
+    },
+    1000,
+    { maxWait: 1000 }
+  );
+
   async function onProgress(count: number, total: number) {
     const copyStatus = {
       status: count === total ? 'completed' : 'running',
-      progress: count / total * 100,
+      progress: Number((count / total * 100).toFixed(0)),
       failReason: '',
     };
-    minioClient.putObject(storeBucket, sessionFilePath, JSON.stringify(copyStatus));
+
+    debounceUpdateStatus(copyStatus);
   }
 
   async function onFailed(count: number, total: number, reason: string) {
     const copyStatus = {
       status: 'failed',
-      progress: count / total * 100,
+      progress: Number((count / total * 100).toFixed(0)),
       failReason: reason,
     };
-    minioClient.putObject(storeBucket, sessionFilePath, JSON.stringify(copyStatus));
+
+    debounceUpdateStatus(copyStatus);
   }
 
   onProgress(itemCount, items.length);
 
-  items.forEach(async item => {
-    const sourcePrefix = `${storeBucket}/groups/${toGroupPath(groupName)}`;
-
+  async function executeCopyFiles() {
     try {
-      if (item.endsWith('/')) {
-        // Copy flolder
-        const folder = `groups/${toGroupPath(groupName)}${item}`;
-        const files = new Promise<any[]>((resolve, reject) => {
-          const arr = [];
-          const stream = minioClient.listObjectsV2(storeBucket, folder, true);
-          stream.on('data', obj => {
-            arr.push(obj);
+      for (const item of items) {
+        const sourcePrefix = `${storeBucket}/groups/${toGroupPath(groupName)}`;
+        if (item.endsWith('/')) {
+          // Copy folder
+          const folder = `groups/${toGroupPath(groupName)}${item}`;
+          const files = new Promise<any[]>((resolve, reject) => {
+            const arr = [];
+            const stream = minioClient.listObjectsV2(storeBucket, folder, true);
+            stream.on('data', obj => {
+              arr.push(obj);
+            });
+            stream.on('error', err => {
+              reject(err);
+            });
+            stream.on('end', () => {
+              resolve(arr);
+            });
           });
-          stream.on('error', err => {
-            reject(err);
-          });
-          stream.on('end', () => {
-            resolve(arr);
-          });
-        });
-        const filenames = (await files).map(file => file.name.slice(folder.length));
-        for (const filename of filenames) {
-          const source = `${sourcePrefix}${item}${filename}`;
-          const dest = `${destPrefix}${filename}`;
+          const filenames = (await files).map(file =>
+            file.name.slice(folder.length)
+          );
+          for (const filename of filenames) {
+            const source = `${sourcePrefix}${item}${filename}`;
+            const splitBySlash = item.split('/');
+            const folderName = splitBySlash[splitBySlash.length - 2];
+            const dest = `${destPrefix}${folderName}/${filename}`;
+            await copyFile(source, dest);
+          }
+          onProgress(++itemCount, items.length);
+        } else {
+          // Copy file
+          const slashIndex = item.lastIndexOf('/');
+          if (slashIndex === -1) {
+            return;
+          }
+          const source = `${sourcePrefix}${item}`;
+          const dest = `${destPrefix}${item.slice(slashIndex + 1)}`;
           await copyFile(source, dest);
+          onProgress(++itemCount, items.length);
         }
-        onProgress(++itemCount, items.length);
-      } else {
-        // Copy file
-        const slashIndex = item.lastIndexOf('/');
-        if (slashIndex === -1) {
-          return;
-        }
-        const source = `${sourcePrefix}${item}`;
-        const dest = `${destPrefix}${item.slice(slashIndex + 1)}`;
-        await copyFile(source, dest);
-        onProgress(++itemCount, items.length);
       }
     } catch (err) {
       onFailed(itemCount, items.length, err.message);
@@ -434,9 +453,10 @@ export const copyFiles = async (root, args, context: Context) => {
         stacktrace: err.stack,
         message: err.message,
       });
-      throw new ApolloError('failed to add files to dataset', INTERNAL_ERROR);
     }
-  });
+  }
+
+  executeCopyFiles();
 
   return {
     sessionId,
