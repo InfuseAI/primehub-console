@@ -1,6 +1,15 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { Form, Input, Icon, Select, Modal, Progress, Typography } from 'antd';
+import {
+  Form,
+  Input,
+  Icon,
+  Select,
+  Modal,
+  Progress,
+  Typography,
+  notification,
+} from 'antd';
 import { useHistory } from 'react-router-dom';
 import type { ModalProps } from 'antd/lib/modal';
 
@@ -78,6 +87,8 @@ export function CreateDatasetModal({
     React.useState<{ id: string; endpoint: string }>(null);
   const [progress, setProgress] = React.useState(0);
   const [uploadingToDataset, setUploadingToDataset] = React.useState(false);
+  const [uploadedResult, setUploadResult] =
+    React.useState<'idle' | 'success' | 'failure'>('idle');
 
   const history = useHistory();
 
@@ -157,21 +168,42 @@ export function CreateDatasetModal({
   const modalContents = {
     1: stepOne,
     2: <Progress percent={progress} status='active' />,
-    3: <UploadComplete />,
+    3: <UploadComplete status={uploadedResult} />,
   };
 
   useInterval(
     async () => {
       if (target.endpoint && progress !== 100) {
-        const { progress } = await props.onFetchProgress({
+        const { status, progress } = await props.onFetchProgress({
           endpoint: target.endpoint,
-          onError: () => setFetching(false),
+          onError: () => {
+            setFetching(false);
+            setSteps(3);
+            setUploadResult('failure');
+          },
         });
 
+        if (status === 'failed') {
+          setFetching(false);
+          setSteps(3);
+          setUploadResult('failure');
+
+          notification.error({
+            duration: 5,
+            placement: 'bottomRight',
+            message: 'Failure!',
+            description: 'Failure to upload files, please try again later.',
+          });
+          return;
+        }
+
         setProgress(progress);
-      } else {
+      }
+
+      if (progress === 100) {
         setFetching(false);
         setUploadingToDataset(false);
+        setUploadResult('success');
         setSteps(n => n + 1);
       }
     },
@@ -180,7 +212,7 @@ export function CreateDatasetModal({
 
   React.useEffect(() => {
     return () => {
-      if (steps === 3) {
+      if (steps === 3 && uploadedResult === 'success') {
         setSteps(1);
         setProgress(0);
         setTarget(null);
@@ -200,7 +232,13 @@ export function CreateDatasetModal({
           ? 'Create Dataset'
           : 'Add files to Dataset'
       }
-      cancelText={uploadingToDataset ? 'Keep working in background' : 'Cancel'}
+      cancelText={
+        uploadedResult === 'failure'
+          ? 'Close'
+          : uploadingToDataset
+          ? 'Keep working in background'
+          : 'Cancel'
+      }
       okButtonProps={{
         style: {
           display: uploadingToDataset ? 'none' : 'inline-block',
@@ -269,7 +307,11 @@ export function CreateDatasetModal({
         });
       }}
       onCancel={() => {
-        props.onModalClose();
+        if (uploadedResult === 'failure') {
+          window.location.reload();
+        } else {
+          props.onModalClose();
+        }
       }}
     >
       {modalContents[steps]}
@@ -277,7 +319,13 @@ export function CreateDatasetModal({
   );
 }
 
-function UploadComplete() {
+function UploadComplete({
+  status,
+}: {
+  status: 'idle' | 'success' | 'failure';
+}) {
+  const isSuccess = status === 'success' ? true : false;
+
   return (
     <div
       style={{
@@ -294,7 +342,7 @@ function UploadComplete() {
           width: '70px',
           height: '70px',
           color: '#fff',
-          backgroundColor: '#52C41A',
+          backgroundColor: isSuccess ? '#52C41A' : '#FF4D4F',
           borderRadius: '9999px',
           display: 'flex',
           justifyContent: 'center',
@@ -304,7 +352,9 @@ function UploadComplete() {
         }}
       />
 
-      <Typography.Title level={3}>Created Successfully!</Typography.Title>
+      <Typography.Title level={3}>
+        {isSuccess ? 'Created Successfully!' : 'Dataset Creation Failed'}
+      </Typography.Title>
     </div>
   );
 }
