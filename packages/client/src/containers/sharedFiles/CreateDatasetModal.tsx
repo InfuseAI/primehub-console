@@ -50,6 +50,7 @@ interface Props extends Omit<ModalProps, 'onOk'> {
   onOkClick: () => void;
   onFileRemove: (file: string) => void;
   onModalClose: () => void;
+  onCompleteUpload: () => void;
   onCreateDataset: (data: { id: string; tags: string[] }) => Promise<void>;
   onCopyFiles: ({
     id,
@@ -201,6 +202,7 @@ export function CreateDatasetModal({
       }
 
       if (progress === 100) {
+        props.onCompleteUpload();
         setFetching(false);
         setUploadingToDataset(false);
         setUploadResult('success');
