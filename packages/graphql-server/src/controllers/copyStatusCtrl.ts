@@ -17,7 +17,7 @@ export const mountCopyStatusCtrl = (router: Router,
     const { sessionId } = ctx.query;
 
     if (isEmpty(sessionId)) {
-      ctx.body = { error: 'sessoinId is required' };
+      ctx.body = { status: 'failed', error: 'sessoinId is required' };
       return ctx.status = 200;
     }
 
@@ -25,7 +25,13 @@ export const mountCopyStatusCtrl = (router: Router,
     try {
       await minioClient.statObject(storeBucket, sessionFilePath);
     } catch (err) {
-      ctx.body = { error: 'sessionId not found' };
+      if (err.code === 'NotFound') {
+        ctx.body = { error: 'sessionId not found' };
+      } else if (err.code === 'ECONNREFUSED') {
+        ctx.body = { status: 'failed', error: 'connection refused' };
+      } else {
+        ctx.body = { status: 'failed', error: err };
+      }
       return ctx.status = 200;
     }
 
