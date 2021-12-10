@@ -117,10 +117,7 @@ export function CreateDatasetModal({
                 ],
               })(<Input autoFocus data-testid='dataset-name' />)}
             </CustomFormItem>
-            <CustomFormItem
-              label='Tags'
-              style={{ fontWeight: 700, marginBottom: '8px' }}
-            >
+            <CustomFormItem label='Tags' style={{ marginBottom: '8px' }}>
               {form.getFieldDecorator('tags', {
                 initialValue: [],
               })(<DatasetTags />)}
