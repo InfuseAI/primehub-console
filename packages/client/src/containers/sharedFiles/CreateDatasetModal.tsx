@@ -1,6 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import {
+  Button,
   Form,
   Input,
   Icon,
@@ -52,7 +53,6 @@ interface Props extends Omit<ModalProps, 'onOk'> {
   onOkClick: () => void;
   onFileRemove: (file: string) => void;
   onModalClose: () => void;
-  onCompleteUpload: () => void;
   onCreateDataset: (data: { id: string; tags: string[] }) => Promise<void>;
   onCopyFiles: ({
     id,
@@ -127,6 +127,12 @@ export function CreateDatasetModal({
           <CustomFormItem label='Dataset Name'>
             {form.getFieldDecorator('id', {
               initialValue: 'Select Dataset',
+              rules: [
+                {
+                  require: true,
+                  message: 'Please select a dataset',
+                },
+              ],
             })(
               <Select style={{ width: '100%' }}>
                 {datasetList.map(({ id, name }) => (
@@ -203,11 +209,10 @@ export function CreateDatasetModal({
       }
 
       if (progress === 100) {
-        props.onCompleteUpload();
         setFetching(false);
         setUploadingToDataset(false);
         setUploadResult('success');
-        setSteps(n => n + 1);
+        setSteps(3);
       }
     },
     fetching ? 1000 : null
@@ -215,13 +220,14 @@ export function CreateDatasetModal({
 
   React.useEffect(() => {
     return () => {
-      if (steps === 3 && uploadedResult === 'success') {
-        setSteps(1);
-        setProgress(0);
-        setTarget(null);
-      }
+      setSteps(1);
+      setProgress(0);
+      setFetching(false);
+      setUploadingToDataset(false);
+      setUploadResult('idle');
+      setTarget(null);
     };
-  });
+  }, []);
 
   return (
     <Modal
@@ -264,7 +270,7 @@ export function CreateDatasetModal({
 
               props.onOkClick();
               setUploadingToDataset(true);
-              setSteps(n => n + 1);
+              setSteps(2);
               setFetching(true);
 
               const { endpoint } = await props.onCopyFiles({
@@ -287,7 +293,7 @@ export function CreateDatasetModal({
           if (type === 'update') {
             props.onOkClick();
             setUploadingToDataset(true);
-            setSteps(n => n + 1);
+            setSteps(2);
             setFetching(true);
 
             try {
@@ -312,6 +318,46 @@ export function CreateDatasetModal({
       onCancel={() => {
         if (uploadedResult === 'failure') {
           window.location.reload();
+          return;
+        }
+
+        if (uploadingToDataset) {
+          const key = `reset-modal-${Date.now()}`;
+
+          notification.open({
+            key,
+            duration: 0,
+            message: 'Are you want to keep in the background?',
+            description: 'blah blah blah blah...',
+            placement: 'bottomRight',
+            btn: (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <Button size='small' onClick={() => notification.close(key)}>
+                  No
+                </Button>
+
+                <Button
+                  type='primary'
+                  size='small'
+                  onClick={() => {
+                    props.onModalClose();
+                    notification.close(key);
+
+                    setTimeout(() => {
+                      setSteps(1);
+                      setProgress(0);
+                      setFetching(false);
+                      setUploadingToDataset(false);
+                      setUploadResult('idle');
+                      setTarget(null);
+                    }, 200);
+                  }}
+                >
+                  Yes
+                </Button>
+              </div>
+            ),
+          });
         } else {
           props.onModalClose();
         }

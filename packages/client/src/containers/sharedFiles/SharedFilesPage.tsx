@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Button, Form, Progress, notification } from 'antd';
+import { Button, Form, notification } from 'antd';
 import { useHistory, useParams } from 'react-router-dom';
 import { compose } from 'recompose';
 import { graphql } from 'react-apollo';
@@ -80,10 +80,6 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [type, setType] = useState<'create' | 'update'>('create');
   const [modalVisible, setModalVisible] = useState(false);
-  const [backgroundUpload, setBackgroundUpload] = useState({
-    isStarting: false,
-    progress: 0,
-  });
 
   const history = useHistory();
   const [token] = useLocalStorage('primehub.accessToken', []);
@@ -168,30 +164,6 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
           onUploadingChange={uploading => setUploading(uploading)}
         />
 
-        {backgroundUpload.isStarting && !modalVisible && (
-          <StickyFooter>
-            <b>
-              Dataset creation in progress
-              <Progress
-                type='circle'
-                width={16}
-                showInfo={false}
-                strokeColor='#000'
-                style={{ marginLeft: '8px' }}
-                percent={backgroundUpload.progress}
-              />
-            </b>
-            <Button
-              type='primary'
-              onClick={() => {
-                setModalVisible(true);
-              }}
-            >
-              View Progress
-            </Button>
-          </StickyFooter>
-        )}
-
         {selectedFiles.length > 0 && (
           <StickyFooter>
             <b>{selectedFiles.length} items are selected</b>
@@ -236,10 +208,6 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
           }}
           onOkClick={() => {
             setSelectedFiles([]);
-            setBackgroundUpload(prev => ({
-              ...prev,
-              isStarting: true,
-            }));
           }}
           onFileRemove={file =>
             setSelectedFiles(files => files.filter(f => f !== file))
@@ -294,11 +262,6 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
             try {
               const response = await fetchUploadingProgress(endpoint);
 
-              setBackgroundUpload(prev => ({
-                ...prev,
-                progress: response.progress,
-              }));
-
               return response;
             } catch (err) {
               onError();
@@ -309,9 +272,6 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
                 description: 'Failure to upload files, try again later.',
               });
             }
-          }}
-          onCompleteUpload={() => {
-            setBackgroundUpload({ isStarting: false, progress: 0 });
           }}
         />
       </PageBody>
