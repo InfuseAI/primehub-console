@@ -1,13 +1,12 @@
-import * as React from 'react';
-import {notification} from 'antd';
+import React, { useEffect, useState } from 'react';
+import { notification } from 'antd';
 import gql from 'graphql-tag';
-import {graphql} from 'react-apollo';
-import {RouteComponentProps} from 'react-router-dom';
-import {compose} from 'recompose';
-import {errorHandler} from 'utils/errorHandler';
+import { graphql } from 'react-apollo';
+import { RouteComponentProps } from 'react-router-dom';
+import { compose } from 'recompose';
+import { errorHandler } from 'utils/errorHandler';
 import DeploymentDetail from 'ee/components/modelDeployment/detail';
-import {PhDeploymentFragment} from 'ee/components/modelDeployment/common';
-import {get} from 'lodash';
+import { PhDeploymentFragment } from 'ee/components/modelDeployment/common';
 
 type Props = {
   getPhDeployment: any;
@@ -33,7 +32,6 @@ export const GET_PH_DEPLOYMENT = gql`
   }
   ${PhDeploymentFragment}
 `;
-
 
 export const STOP_DEPLOYMENT = gql`
   mutation stopPhDeployment($where: PhDeploymentWhereUniqueInput!) {
@@ -80,39 +78,49 @@ export const REMOVE_CLIENT = gql`
   ${PhDeploymentFragment}
 `;
 
-export const getMessage = error => get(error, 'graphQLErrors.0.extensions.code') === 'NOT_AUTH' ? `You're not authorized to view this page.` : 'Error';
-
-class DeploymentDetailContainer extends React.Component<Props> {
-  render() {
-    const {getPhDeployment} = this.props;
-    const {stopPhDeployment, stopPhDeploymentResult} = this.props;
-    const {deletePhDeployment, deletePhDeploymentResult} = this.props;
-    const {deployPhDeployment, deployPhDeploymentResult} = this.props;
-    const {createPhDeploymentClient, createPhDeploymentClientResult} = this.props;
-    const {deletePhDeploymentClient, deletePhDeploymentClientResult} = this.props;
 
 
-    if (!getPhDeployment.phDeployment) return null;
-    if (getPhDeployment.error) {
-      return getMessage(getPhDeployment.error)
-    };
-    return (
-      <DeploymentDetail
-        refetchPhDeployment={getPhDeployment.refetch}
-        stopPhDeployment={stopPhDeployment}
-        stopPhDeploymentResult={stopPhDeploymentResult}
-        deletePhDeployment={deletePhDeployment}
-        deletePhDeploymentResult={deletePhDeploymentResult}
-        deployPhDeployment={deployPhDeployment}
-        deployPhDeploymentResult={deployPhDeploymentResult}
-        createPhDeploymentClient={createPhDeploymentClient}
-        createPhDeploymentClientResult={createPhDeploymentClientResult}
-        deletePhDeploymentClient={deletePhDeploymentClient}
-        deletePhDeploymentClientResult={deletePhDeploymentClientResult}
-        phDeployment={getPhDeployment.phDeployment || {id: 'test'}}
-      />
-    );
-  }
+const DeploymentDetailContainer = (props: Props) => {
+  const {
+    getPhDeployment,
+    stopPhDeployment,
+    stopPhDeploymentResult,
+    deletePhDeployment,
+    deletePhDeploymentResult,
+    deployPhDeployment,
+    deployPhDeploymentResult,
+    createPhDeploymentClient,
+    createPhDeploymentClientResult,
+    deletePhDeploymentClient,
+    deletePhDeploymentClientResult,
+  } = props;
+
+  const { loading, error } = getPhDeployment;
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    if (!loading) {
+      setNotFound(error ? true : false);
+    }
+  }, [loading, error]);
+
+  return (
+    <DeploymentDetail
+      refetchPhDeployment={getPhDeployment.refetch}
+      stopPhDeployment={stopPhDeployment}
+      stopPhDeploymentResult={stopPhDeploymentResult}
+      deletePhDeployment={deletePhDeployment}
+      deletePhDeploymentResult={deletePhDeploymentResult}
+      deployPhDeployment={deployPhDeployment}
+      deployPhDeploymentResult={deployPhDeploymentResult}
+      createPhDeploymentClient={createPhDeploymentClient}
+      createPhDeploymentClientResult={createPhDeploymentClientResult}
+      deletePhDeploymentClient={deletePhDeploymentClient}
+      deletePhDeploymentClientResult={deletePhDeploymentClientResult}
+      notFound={notFound}
+      phDeployment={getPhDeployment.phDeployment || {id: 'test'}}
+    />
+  );
 }
 
 export default compose(

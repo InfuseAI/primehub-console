@@ -114,7 +114,7 @@ class DeploymentCreatePage extends React.Component<Props, State> {
 
     if (getPhDeployment.loading) return null;
     if (getPhDeployment.error) {
-      return getMessage(getPhDeployment.error);
+      return 'Error';
     }
 
     const everyoneGroupId = window.EVERYONE_GROUP_ID;

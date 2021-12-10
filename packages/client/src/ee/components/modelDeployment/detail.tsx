@@ -10,6 +10,7 @@ import {
   Input,
   Button,
   notification,
+  Result,
 } from 'antd';
 import { DeploymentInfo, Status, ClientResult } from './common';
 import PageTitle from 'components/pageTitle';
@@ -41,10 +42,11 @@ interface Props {
   deletePhDeploymentClient: (variables: any) => Promise<any>;
   deletePhDeploymentClientResult: any;
   refetchPhDeployment: (variables: any) => void;
+  notFound: boolean;
   phDeployment: DeploymentInfo;
 }
 
-export default function Detail({ phDeployment, ...props }: Props) {
+export default function Detail({ phDeployment, notFound, ...props }: Props) {
   const [toggleEnvVisible, setToggleEnvVisible] = React.useState(false);
   const [deleteModal, setDeleteModal] = React.useState({
     visible: false,
@@ -152,7 +154,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
     {
       key: 'detail',
       matcher: /\/deployments\/([\w-])+/,
-      title: `Deployment: ${phDeployment.name}`,
+      title: `Deployment: ${phDeployment?.name || 'unknown'}`,
       tips: 'View the detailed information.',
       tipsLink:
         'https://docs.primehub.io/docs/model-deployment-feature#deployment-detail',
@@ -165,6 +167,16 @@ export default function Detail({ phDeployment, ...props }: Props) {
         title={`Deployment: ${phDeployment.name}`}
         breadcrumb={<Breadcrumbs pathList={breadcrumbs} />}
       />
+      {notFound && (
+        <Card style={{ margin: '16px 16px' }}>
+          <Result
+            status='error'
+            title='Not Found'
+            subTitle='The deployment may be removed or not authorized.'
+          ></Result>
+        </Card>
+      )}
+      {!notFound &&
       <Card
         style={{ margin: '16px 16px' }}
         loading={
@@ -453,6 +465,7 @@ export default function Detail({ phDeployment, ...props }: Props) {
           )}
         </Tabs>
       </Card>
+      }
     </>
   );
 }
