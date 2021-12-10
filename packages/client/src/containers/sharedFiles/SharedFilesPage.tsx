@@ -224,6 +224,7 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
           type={type}
           visible={modalVisible}
           sourePrefix={phfsPrefix ? `${phfsPrefix}/` : ''}
+          groupName={groupName}
           datasetList={
             datasets?.datasetV2Connection?.edges.map(({ node }) => node) || []
           }

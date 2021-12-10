@@ -15,6 +15,7 @@ import type { ModalProps } from 'antd/lib/modal';
 
 import DatasetTags from 'components/datasets/DatasetTags';
 import { useInterval } from 'hooks/useInterval';
+import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { errorHandler } from 'utils/errorHandler';
 
 const CustomFormItem = styled(Form.Item)`
@@ -43,6 +44,7 @@ const FileItem = styled.div`
 
 interface Props extends Omit<ModalProps, 'onOk'> {
   form: any;
+  groupName: string;
   files: string[];
   datasetList: Array<{ id: string; name: string }>;
   type: 'create' | 'update';
@@ -79,6 +81,7 @@ export function CreateDatasetModal({
   datasetList,
   type,
   form,
+  groupName,
   onFileRemove,
   ...props
 }: Props) {
@@ -92,6 +95,7 @@ export function CreateDatasetModal({
     React.useState<'idle' | 'success' | 'failure'>('idle');
 
   const history = useHistory();
+  const { appPrefix } = useRoutePrefix();
 
   const stepOne = React.useMemo(() => {
     return (
@@ -248,7 +252,7 @@ export function CreateDatasetModal({
       }}
       onOk={() => {
         if (progress === 100) {
-          history.replace(`datasets/${target.id}`);
+          history.push(`${appPrefix}g/${groupName}/datasets/${target.id}`);
           return;
         }
 
@@ -339,7 +343,7 @@ function UploadComplete({
       }}
     >
       <Icon
-        type='check'
+        type='close'
         style={{
           width: '70px',
           height: '70px',
