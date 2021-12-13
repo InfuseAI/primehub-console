@@ -204,6 +204,7 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
             type === 'create' ? 'Create Dataset' : 'Add to existing Dataset'
           }
           onModalClose={() => {
+            form.resetFields();
             setModalVisible(false);
           }}
           onOkClick={() => {
