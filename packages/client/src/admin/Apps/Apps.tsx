@@ -9,13 +9,17 @@ import Breadcrumbs from 'components/share/breadcrumb';
 import PhAppTemplate from 'interfaces/phAppTemplate';
 import { AppCard } from 'components/AppCard';
 import { GetPhAppTemplates } from 'queries/PhAppTemplate.graphql';
-
-import { ImportPhAppTemplateFromURL } from './apps.graphql';
+import {
+  ImportPhAppTemplateFromURL,
+  UpdatePhAppTemplateFromURL,
+} from './apps.graphql';
 
 const { Search } = Input;
 
 const GITHUB_REGEX =
   /^https?:\/\/github.com\/([A-Za-z0-9._-]+\/[A-Za-z0-9._-]+)\/blob\/(.+)/;
+const EXISTS_APP_REGEX =
+  /phapptemplates.primehub.io "([\w-_.]+)" already exists/;
 const GITHUB_REGEX_REPLACE_VALUE = 'https://raw.githubusercontent.com/$1/$2';
 
 interface Props {
@@ -24,6 +28,11 @@ interface Props {
     variables,
   }: {
     variables: { url: string };
+  }) => Promise<void>;
+  updatePhAppTemplateFromURL: ({
+    variables,
+  }: {
+    variables: { url: string; where: { id: string } };
   }) => Promise<void>;
 }
 
@@ -117,7 +126,29 @@ function _Apps({ getPhAppTemplates, ...props }: Props) {
               let url = importURL.current.input.value;
               if (url) {
                 url = url.replace(GITHUB_REGEX, GITHUB_REGEX_REPLACE_VALUE);
-                props.importPhAppTemplateFromURL({ variables: { url } });
+                props
+                  .importPhAppTemplateFromURL({ variables: { url } })
+                  .catch(error => {
+                    const [, appId] = error.toString().match(EXISTS_APP_REGEX);
+                    if (appId) {
+                      if (
+                        window.confirm(
+                          `"${appId}" already exists, do you want to overwrite it?`
+                        )
+                      ) {
+                        props.updatePhAppTemplateFromURL({
+                          variables: {
+                            url,
+                            where: {
+                              id: appId,
+                            },
+                          },
+                        });
+                      }
+                    } else {
+                      errorHandler(error);
+                    }
+                  });
               }
             }}
             style={{ marginLeft: '16px' }}
@@ -239,6 +270,21 @@ export const Apps = compose(
           placement: 'bottomRight',
           message: 'Successfully imported!',
           description: `PhAppTemplate '${name}' imported`,
+        });
+      },
+    }),
+  }),
+  graphql(UpdatePhAppTemplateFromURL, {
+    name: 'updatePhAppTemplateFromURL',
+    options: () => ({
+      refetchQueries: [{ query: GetPhAppTemplates }],
+      onCompleted: data => {
+        const name = get(data, 'updatePhAppTemplateFromURL.metadata.name', '');
+        notification.success({
+          duration: 5,
+          placement: 'bottomRight',
+          message: 'Successfully imported!',
+          description: `PhAppTemplate '${name}' updated`,
         });
       },
       onError: errorHandler,

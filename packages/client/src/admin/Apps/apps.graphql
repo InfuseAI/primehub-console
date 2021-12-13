@@ -1,3 +1,7 @@
 mutation ImportPhAppTemplateFromURL($url: String!) {
   importPhAppTemplateFromURL(url: $url)
 }
+
+mutation UpdatePhAppTemplateFromURL($url: String!, $where: PhAppTemplateWhereUniqueInput!) {
+  updatePhAppTemplateFromURL(url: $url, where: $where)
+}

@@ -82,9 +82,7 @@ export const queryOne = async (root, args, context: Context) => {
   return transformed;
 };
 
-export const importFromURL = async (root, args, context: Context) => {
-  const { crdClient } = context;
-  const { url } = args;
+const fetchPhAppTemplate = async (url: any) => {
   if (!url) {
     throw new ApolloError('URL is required');
   }
@@ -94,8 +92,32 @@ export const importFromURL = async (root, args, context: Context) => {
   const templates = yaml.safeLoadAll(content);
   const template = get(templates, '[0]');
 
-  if (template.kind === 'PhAppTemplate' && template.metadata && template.spec) {
-    return crdClient.phAppTemplates.create(template.metadata, template.spec);
+  if (template.kind === 'PhAppTemplate') {
+    return template;
+  }
+
+  throw new ApolloError('Invalid PhAppTemplate yaml');
+};
+
+export const importFromURL = async (root, args, context: Context) => {
+  const { crdClient } = context;
+  const template = await fetchPhAppTemplate(args.url);
+  const { metadata, spec } = template;
+
+  if (metadata && spec) {
+    return crdClient.phAppTemplates.create(metadata, spec);
+  }
+
+  throw new ApolloError('Invalid PhAppTemplate yaml');
+};
+
+export const updateFromURL = async (root, args, context: Context) => {
+  const { crdClient } = context;
+  const template = await fetchPhAppTemplate(args.url);
+  const { metadata, spec } = template;
+
+  if (metadata && spec) {
+    return crdClient.phAppTemplates.patch(args.where.id, {metadata, spec});
   }
 
   throw new ApolloError('Invalid PhAppTemplate yaml');

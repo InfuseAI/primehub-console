@@ -78,6 +78,7 @@ export const resolvers = {
     startPhApplication: phApplication.start,
     stopPhApplication: phApplication.stop,
     importPhAppTemplateFromURL: phAppTemplate.importFromURL,
+    updatePhAppTemplateFromURL: phAppTemplate.updateFromURL,
     notifyNotebookEvent: notebook.notifyNotebookEvent,
     ...instanceType.resolveInMutation(),
     ...dataset.resolveInMutation(),
