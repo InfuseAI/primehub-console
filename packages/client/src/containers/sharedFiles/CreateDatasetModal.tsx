@@ -126,15 +126,15 @@ export function CreateDatasetModal({
         ) : (
           <CustomFormItem label='Dataset Name'>
             {form.getFieldDecorator('id', {
-              initialValue: 'Select Dataset',
+              initialValue: undefined,
               rules: [
                 {
-                  require: true,
+                  required: true,
                   message: 'Please select a dataset',
                 },
               ],
             })(
-              <Select style={{ width: '100%' }}>
+              <Select placeholder='Select Dataset' style={{ width: '100%' }}>
                 {datasetList.map(({ id, name }) => (
                   <Select.Option key={id} value={name}>
                     {name}
@@ -220,14 +220,16 @@ export function CreateDatasetModal({
 
   React.useEffect(() => {
     return () => {
-      setSteps(1);
-      setProgress(0);
-      setFetching(false);
-      setUploadingToDataset(false);
-      setUploadResult('idle');
-      setTarget(null);
+      if (steps === 3 && uploadedResult === 'success') {
+        setSteps(1);
+        setProgress(0);
+        setFetching(false);
+        setUploadingToDataset(false);
+        setUploadResult('idle');
+        setTarget(null);
+      }
     };
-  }, []);
+  });
 
   return (
     <Modal
@@ -249,8 +251,13 @@ export function CreateDatasetModal({
           : 'Cancel'
       }
       okButtonProps={{
+        disabled: files.length === 0 && uploadedResult !== 'success',
         style: {
           display: uploadingToDataset ? 'none' : 'inline-block',
+          cursor:
+            files.length === 0 && uploadedResult !== 'success'
+              ? 'not-allowed'
+              : 'default',
         },
       }}
       onOk={() => {
@@ -327,8 +334,9 @@ export function CreateDatasetModal({
           notification.open({
             key,
             duration: 0,
-            message: 'Are you want to keep in the background?',
-            description: 'blah blah blah blah...',
+            message: 'Keep uploading the files in the background?',
+            description:
+              'The contents will continue to be uploaded in the background and you will no longer see the progress. ',
             placement: 'bottomRight',
             btn: (
               <div style={{ display: 'flex', gap: '8px' }}>
