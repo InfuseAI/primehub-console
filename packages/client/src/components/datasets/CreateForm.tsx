@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button, Input, Modal, Form } from 'antd';
 import { useParams } from 'react-router-dom';
-import { DatasetUploader } from 'components/Browser/DatasetUploader';
+import Uploader from 'components/Browser/Uploader';
 import { Dataset } from './common';
 import { FormComponentProps } from 'antd/lib/form';
 import DatasetTags from './DatasetTags';
@@ -118,7 +118,7 @@ export function DatasetCreateForm({
         ]}
         onCancel={() => resetAndClose(null)}
       >
-        <DatasetUploader groupName={groupName} datasetId={id} />
+        <Uploader groupName={groupName} phfsPrefix={`datasets/${id}`} />
       </Modal>
     </>
   );
