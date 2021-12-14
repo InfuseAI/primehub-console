@@ -594,7 +594,8 @@ function Browser(props: BrowseInternalProps) {
       >
         <Uploader
           key={path}
-          dirPath={get(data, 'files.prefix', '')}
+          groupName={groupName}
+          phfsPrefix={get(data, 'files.phfsPrefix', '')}
           onFileUpload={() => {
             if (props.onFileUpload) {
               props.onFileUpload();

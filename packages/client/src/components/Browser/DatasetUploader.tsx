@@ -1,5 +1,4 @@
 import React from 'react';
-import * as tus from 'tus-js-client';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
