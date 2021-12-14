@@ -7,6 +7,7 @@ import { Upload, Icon } from 'antd';
 import { errorHandler } from 'utils/errorHandler';
 import { getAccessToken } from 'utils/env';
 import { toGroupPath } from 'utils/index';
+import axios, { Canceler } from 'axios';
 
 const { Dragger } = Upload;
 
@@ -40,57 +41,43 @@ function _DatasetUploader(props: Props) {
   const graphqlEndpoint = window.absGraphqlEndpoint
     ? window.absGraphqlEndpoint
     : window.graphqlEndpoint;
-  const endpoint = graphqlEndpoint.replace('/graphql', '/tus');
-  const dirpath = `groups/${toGroupPath(groupName)}/datasets/${datasetId}/`;
-
   React.useEffect(() => {
     setFiles([]);
   }, [groupName, datasetId]);
 
-  function customRequest({ onSuccess, onProgress, onError, file }) {
-    const upload: tus.Upload = file.uploader;
-    upload.options.onError = err => {
-      console.log('Error: ', err);
-      onError(err, file);
-    };
-    upload.options.onProgress = (bytesUploaded, bytesTotal) => {
-      const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
-      onProgress({ percent: Number(percentage) }, file);
-    };
-    upload.options.onSuccess = () => {
-      file.done = true;
-      onSuccess(null, file);
-    };
-    upload.options.headers = {
+  function xhrRequest({ file, onError, onProgress, onSuccess }) {
+    const endpoint = graphqlEndpoint.replace(
+      '/graphql',
+      `/files/groups/${toGroupPath(groupName)}/datasets/${datasetId}/${file.name}`
+    );
+    const headers = {
       authorization: `Bearer ${getAccessToken()}`,
     };
+    const source = axios.CancelToken.source();
+    file.cancel = source.cancel;
 
-    upload.findPreviousUploads().then(previousUploads => {
-      // Found previous uploads so we select the first one.
-      if (previousUploads.length) {
-        upload.resumeFromPreviousUpload(previousUploads[0]);
-      }
-
-      // Start the upload
-      upload.start();
-    });
+    axios
+      .post(endpoint, file, {
+        cancelToken: source.token,
+        headers,
+        onUploadProgress: ({ total, loaded }) => {
+          onProgress(
+            { percent: Math.round((loaded / total) * 100).toFixed(2) },
+            file
+          );
+        },
+      })
+      .then(({ data: response }) => {
+        file.done = true;
+        onSuccess(response, file);
+      })
+      .catch(onError);
   }
 
-  function beforeUpload(file, FileList) {
+  function beforeUpload(file) {
     if (files.map(f => f.name).includes(file.name)) {
       return false;
     }
-
-    file.uploader = new tus.Upload(file, {
-      endpoint,
-      retryDelays: [0, 3000, 5000, 10000, 20000],
-      metadata: {
-        filename: file.name,
-        filetype: file.type,
-        dirpath,
-      },
-    });
-
     return true;
   }
 
@@ -99,7 +86,7 @@ function _DatasetUploader(props: Props) {
       <Dragger
         multiple={true}
         fileList={files}
-        customRequest={customRequest}
+        customRequest={xhrRequest}
         beforeUpload={beforeUpload}
         onChange={info => {
           setFiles(prevFiles => {
@@ -124,19 +111,16 @@ function _DatasetUploader(props: Props) {
             });
             return true;
           }
-          const upload: tus.Upload = originFile.uploader;
-          if (!upload) {
+
+          if (originFile.cancel) {
+            originFile.cancel();
+          }
+          const cancel: Canceler = originFile.cancel;
+          if (!cancel) {
             return false;
           }
-          upload
-            .abort(true)
-            .then(async () => {
-              return true;
-            })
-            .catch(err => {
-              console.log('Error: ', err);
-              return false;
-            });
+          cancel();
+          return true;
         }}
       >
         <p className='ant-upload-drag-icon'>
