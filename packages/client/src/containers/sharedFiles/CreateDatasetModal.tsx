@@ -94,6 +94,7 @@ export function CreateDatasetModal({
   const [uploadedResult, setUploadResult] =
     React.useState<'idle' | 'success' | 'failure'>('idle');
 
+  const resetModalKey = 'reset-modal-key';
   const history = useHistory();
   const { appPrefix } = useRoutePrefix();
 
@@ -213,6 +214,9 @@ export function CreateDatasetModal({
         setUploadingToDataset(false);
         setUploadResult('success');
         setSteps(3);
+
+        // If the user ever clicked *keep working in background*, close the notiification messages
+        notification.close(resetModalKey);
       }
     },
     fetching ? 1000 : null
@@ -221,12 +225,14 @@ export function CreateDatasetModal({
   React.useEffect(() => {
     return () => {
       if (steps === 3 && uploadedResult === 'success') {
-        setSteps(1);
-        setProgress(0);
-        setFetching(false);
-        setUploadingToDataset(false);
-        setUploadResult('idle');
-        setTarget(null);
+        setTimeout(() => {
+          setSteps(1);
+          setProgress(0);
+          setFetching(false);
+          setUploadingToDataset(false);
+          setUploadResult('idle');
+          setTarget(null);
+        }, 200);
       }
     };
   });
@@ -329,10 +335,8 @@ export function CreateDatasetModal({
         }
 
         if (uploadingToDataset) {
-          const key = `reset-modal-${Date.now()}`;
-
           notification.open({
-            key,
+            key: resetModalKey,
             duration: 0,
             message: 'Keep uploading the files in the background?',
             description:
@@ -340,7 +344,10 @@ export function CreateDatasetModal({
             placement: 'bottomRight',
             btn: (
               <div style={{ display: 'flex', gap: '8px' }}>
-                <Button size='small' onClick={() => notification.close(key)}>
+                <Button
+                  size='small'
+                  onClick={() => notification.close(resetModalKey)}
+                >
                   No
                 </Button>
 
@@ -349,7 +356,7 @@ export function CreateDatasetModal({
                   size='small'
                   onClick={() => {
                     props.onModalClose();
-                    notification.close(key);
+                    notification.close(resetModalKey);
 
                     setTimeout(() => {
                       setSteps(1);
