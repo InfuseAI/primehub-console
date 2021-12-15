@@ -54,7 +54,6 @@ import { Role } from './resolvers/interface';
 import Token from './oidc/token';
 import ApiTokenCache from './oidc/apiTokenCache';
 import { createMinioClient } from './utils/minioClient';
-import { mountTusCtrl } from './controllers/tusCtrl';
 import { mountStoreCtrl } from './controllers/storeCtrl';
 import { Telemetry } from './utils/telemetry';
 import { createDefaultTraitMiddleware } from './utils/telemetryTraits';
@@ -571,10 +570,6 @@ export class App {
     if (config.enableStore) {
       // store file download api
       mountStoreCtrl(rootRouter, config.appPrefix, this.authenticateMiddleware, this.mClient, this.storeBucket);
-
-      // shared space proxy to tusd
-      const tusProxyPath = `${staticPath}tus`;
-      mountTusCtrl(rootRouter, tusProxyPath, config, this.authenticateMiddleware);
     }
   }
 }
