@@ -20,7 +20,10 @@ import { graphql } from 'react-apollo';
 import { get, isEmpty } from 'lodash';
 import type { ColumnProps } from 'antd/lib/table';
 
-import Uploader from 'components/Browser/Uploader';
+import Uploader, {
+  TEXT_UPLOAD_IN_BG,
+  TEXT_UPLOAD_IN_BG_MSG,
+} from 'components/Browser/Uploader';
 import iconMore from 'images/icon-more.svg';
 import {
   GroupContext,
@@ -324,6 +327,9 @@ function Browser(props: BrowseInternalProps) {
   const { name: groupName } = useContext(GroupContext);
 
   const [isEditing, setIsEditing] = useState(false);
+  const [uploadInProgress, setUploadInProgress] = useState(false);
+  const [uploadSession, setUploadSession] = useState('uploader');
+
   const [searchText, setSearchText] = useState('');
   const [previewFilePath, setPreviewFilePath] = useState('');
   const refSearch = useRef();
@@ -474,6 +480,25 @@ function Browser(props: BrowseInternalProps) {
     }
   }
 
+  function handleCloseUpload() {
+    const action = () => {
+      onUploadingChange(false);
+      data?.refetch();
+      setUploadInProgress(false);
+      setUploadSession('uploader-' + Date.now());
+    };
+
+    if (uploadInProgress) {
+      Modal.confirm({
+        title: TEXT_UPLOAD_IN_BG,
+        content: TEXT_UPLOAD_IN_BG_MSG,
+        onOk: action,
+      });
+    } else {
+      action();
+    }
+  }
+
   if (!enabledPHFS) {
     return (
       <Alert
@@ -577,25 +602,19 @@ function Browser(props: BrowseInternalProps) {
         title='Upload'
         visible={uploading}
         footer={[
-          <Button
-            key='ok'
-            type='primary'
-            onClick={() => {
-              onUploadingChange(false);
-              data?.refetch();
-            }}
-          >
-            OK
+          <Button key='ok' type='primary' onClick={handleCloseUpload}>
+            {uploadInProgress ? TEXT_UPLOAD_IN_BG : 'OK'}
           </Button>,
         ]}
-        onCancel={() => {
-          onUploadingChange(false);
-        }}
+        onCancel={handleCloseUpload}
       >
         <Uploader
-          key={path}
+          key={uploadSession}
           groupName={groupName}
           phfsPrefix={get(data, 'files.phfsPrefix', '')}
+          onUploadStatusChange={uploading => {
+            setUploadInProgress(uploading);
+          }}
           onFileUpload={() => {
             if (props.onFileUpload) {
               props.onFileUpload();

@@ -19,10 +19,15 @@ const DELETE_FILES = gql`
   }
 `;
 
+export const TEXT_UPLOAD_IN_BG = 'Upload in Background';
+export const TEXT_UPLOAD_IN_BG_MSG =
+  'Upload is still in progress. To upload in background, you will not know the progress anymore. Are you sure to upload in background?';
+
 interface Props {
   groupName: string;
   phfsPrefix: string;
   onFileUpload?: () => void;
+  onUploadStatusChange?: (uploading: boolean) => void;
   deleteFiles: ({
     variables,
   }: {
@@ -48,16 +53,17 @@ function joinPath(...paths: string[]) {
 }
 
 function _Uploader(props: Props) {
-  const [files, setFiles] = React.useState([]);
+  const [fileList, setFileList] = React.useState([]);
+  const [, setUploading] = React.useState(false);
   const { groupName, phfsPrefix, onFileUpload, deleteFiles } = props;
   const graphqlEndpoint = window.absGraphqlEndpoint
     ? window.absGraphqlEndpoint
     : window.graphqlEndpoint;
   React.useEffect(() => {
-    setFiles([]);
+    setFileList([]);
   }, [groupName, phfsPrefix]);
 
-  function xhrRequest({ file, onError, onProgress, onSuccess }) {
+  function customRequest({ file, onError, onProgress, onSuccess }) {
     const filePath = joinPath(
       'groups',
       toGroupPath(groupName),
@@ -83,7 +89,6 @@ function _Uploader(props: Props) {
         },
       })
       .then(({ data: response }) => {
-        file.done = true;
         onSuccess(response, file);
         if (onFileUpload) {
           onFileUpload();
@@ -92,34 +97,53 @@ function _Uploader(props: Props) {
       .catch(onError);
   }
 
-  function beforeUpload(file) {
-    if (files.map(f => f.name).includes(file.name)) {
-      return false;
-    }
-    return true;
-  }
-
   return (
     <>
       <Dragger
+        fileList={fileList}
         multiple={true}
-        fileList={files}
-        customRequest={xhrRequest}
-        beforeUpload={beforeUpload}
-        onChange={info => {
-          setFiles(prevFiles => {
-            const names = prevFiles.map(f => f.name);
-            const filtered = info.fileList.filter(f => !names.includes(f.name));
-            return [...prevFiles, ...filtered];
-          });
+        customRequest={customRequest}
+        beforeUpload={file => {
+          // check if the file already in the filelist.
+          console.log('beforeUpload', file, fileList);
+          if (fileList.map(f => f.name).includes(file.name)) {
+            return false;
+          }
+          return true;
         }}
-        onRemove={file => {
-          const originFile: any = file.originFileObj;
-          setFiles(prevFiles =>
-            prevFiles.filter(f => f.name !== originFile.name)
-          );
-          if (originFile.done) {
-            const phfsPath = joinPath(phfsPrefix, originFile.name);
+        onChange={info => {
+          console.log('upload onChange', info);
+          const { onUploadStatusChange } = props;
+
+          // Add one or multiple files in the upload list.
+          setFileList(prevFileList => {
+            const names = prevFileList.map(f => f.name);
+            const filtered = info.fileList.filter(f => !names.includes(f.name));
+            return [...prevFileList, ...filtered];
+          });
+
+          // Trigger upload status change
+          if (onUploadStatusChange) {
+            let uploading = false;
+            for (const file of info.fileList) {
+              if (file.status === 'uploading') {
+                uploading = true;
+                break;
+              }
+            }
+            setUploading(prevUploading => {
+              if (prevUploading !== uploading) {
+                onUploadStatusChange(uploading);
+              }
+              return uploading;
+            });
+          }
+        }}
+        onRemove={uploadFile => {
+          const file: any = uploadFile.originFileObj;
+          if (uploadFile.status !== 'uploading') {
+            // delete the uploaded file
+            const phfsPath = joinPath(phfsPrefix, file.name);
             deleteFiles({
               variables: {
                 where: {
@@ -128,17 +152,18 @@ function _Uploader(props: Props) {
                 },
               },
             });
-            return true;
+          } else {
+            // cancle the uploading file
+            if (file.cancel) {
+              file.cancel();
+            }
+            const cancel: Canceler = file.cancel;
+            if (!cancel) {
+              return false;
+            }
+            cancel();
           }
-
-          if (originFile.cancel) {
-            originFile.cancel();
-          }
-          const cancel: Canceler = originFile.cancel;
-          if (!cancel) {
-            return false;
-          }
-          cancel();
+          setFileList(prevFiles => prevFiles.filter(f => f.name !== file.name));
           return true;
         }}
       >
