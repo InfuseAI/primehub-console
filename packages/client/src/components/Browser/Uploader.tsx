@@ -105,14 +105,12 @@ function _Uploader(props: Props) {
         customRequest={customRequest}
         beforeUpload={file => {
           // check if the file already in the filelist.
-          console.log('beforeUpload', file, fileList);
           if (fileList.map(f => f.name).includes(file.name)) {
             return false;
           }
           return true;
         }}
         onChange={info => {
-          console.log('upload onChange', info);
           const { onUploadStatusChange } = props;
 
           // Add one or multiple files in the upload list.
