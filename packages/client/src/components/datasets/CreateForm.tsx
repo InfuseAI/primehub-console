@@ -1,7 +1,10 @@
 import * as React from 'react';
 import { Button, Input, Modal, Form } from 'antd';
 import { useParams } from 'react-router-dom';
-import { DatasetUploader } from 'components/Browser/DatasetUploader';
+import Uploader, {
+  TEXT_UPLOAD_IN_BG,
+  TEXT_UPLOAD_IN_BG_MSG,
+} from 'components/Browser/Uploader';
 import { Dataset } from './common';
 import { FormComponentProps } from 'antd/lib/form';
 import DatasetTags from './DatasetTags';
@@ -24,12 +27,24 @@ export function DatasetCreateForm({
   const { groupName } = useParams<{ groupName: string }>();
   const [id, setId] = React.useState('');
   const [step, setStep] = React.useState(1);
+  const [uploadInProgress, setUploadInProgress] = React.useState(false);
   const submitDisabled =
     isEmpty(form.getFieldValue('id')) || !isEmpty(form.getFieldError('id'));
 
   function resetAndClose(datasetId: string) {
-    setStep(1);
-    onClose(datasetId);
+    if (uploadInProgress) {
+      Modal.confirm({
+        title: TEXT_UPLOAD_IN_BG,
+        content: TEXT_UPLOAD_IN_BG_MSG,
+        onOk: () => {
+          setStep(1);
+          onClose(datasetId);
+        },
+      });
+    } else {
+      setStep(1);
+      onClose(datasetId);
+    }
   }
 
   function cancelAndClose() {
@@ -113,12 +128,17 @@ export function DatasetCreateForm({
             type='primary'
             onClick={() => resetAndClose(id)}
           >
-            Done
+            {uploadInProgress ? TEXT_UPLOAD_IN_BG : 'Done'}
           </Button>,
         ]}
         onCancel={() => resetAndClose(null)}
       >
-        <DatasetUploader groupName={groupName} datasetId={id} />
+        <Uploader
+          groupName={groupName}
+          phfsPrefix={`datasets/${id}`}
+          onUploadStatusChange={uploading => {
+            setUploadInProgress(uploading);
+          }}/>
       </Modal>
     </>
   );
