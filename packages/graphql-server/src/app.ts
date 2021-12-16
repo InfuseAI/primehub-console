@@ -56,6 +56,7 @@ import ApiTokenCache from './oidc/apiTokenCache';
 import { createMinioClient } from './utils/minioClient';
 import { mountTusCtrl } from './controllers/tusCtrl';
 import { mountStoreCtrl } from './controllers/storeCtrl';
+import { mountCopyStatusCtrl } from './controllers/copyStatusCtrl';
 import { Telemetry } from './utils/telemetry';
 import { createDefaultTraitMiddleware } from './utils/telemetryTraits';
 import { registerGroupDeletionCallbacks, schema } from './resolvers';
@@ -576,5 +577,6 @@ export class App {
       const tusProxyPath = `${staticPath}tus`;
       mountTusCtrl(rootRouter, tusProxyPath, config, this.authenticateMiddleware);
     }
+    mountCopyStatusCtrl(rootRouter, config.appPrefix, (ctx, next) => next(), this.mClient, this.storeBucket);
   }
 }

@@ -47,6 +47,7 @@ export const ShieldMutation = {
   'createDatasetV2': or(isAdmin, isUser),
   'updateDatasetV2': or(isAdmin, isUser),
   'deleteDatasetV2': or(isAdmin, isUser),
+  'copyFilesToDatasetV2': or(isAdmin, isUser),
 };
 
 export const permissions = shield({

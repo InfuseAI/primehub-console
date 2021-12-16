@@ -1,15 +1,17 @@
 import { ApolloError } from 'apollo-server';
-import { find, isEmpty } from 'lodash';
+import { find, isEmpty, debounce } from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Context } from './interface';
 import * as logger from '../logger';
 import { toRelay, extractPagination, filter } from './utils';
-import { isGroupBelongUser } from '../utils/groupCheck';
+import { isGroupBelongUser, toGroupPath } from '../utils/groupCheck';
 import { generatePrefixForQuery, query as queryStore } from './store';
 
 import { ErrorCodes } from '../errorCodes';
 import { Readable } from 'stream';
 import moment from 'moment';
+import { getCopyStatusEndpoint } from '../controllers/copyStatusCtrl';
 
 const {
   NOT_AUTH_ERROR,
@@ -332,6 +334,134 @@ export const destroy = async (root, args, context: Context) => {
   }
 
   return { id };
+};
+
+export const copyFiles = async (root, args, context: Context) => {
+  await checkMinioClient(context);
+  const { id, groupName } = args.where;
+  await checkPermission(context, groupName);
+
+  const metadata = await getMetadata(id, groupName, context);
+  if (isEmpty(metadata)) {
+    throw new ApolloError('failed to get dataset', RESOURCE_NOT_FOUND);
+  }
+
+  const { minioClient, storeBucket, graphqlHost, appPrefix } = context;
+  const { path, items } = args;
+
+  const dataPath = toDataPath(groupName, id, false);
+  const destPrefix = `${dataPath}${path.startsWith('/') ? path.slice(1) : path}${path.endsWith('/') ? '' : '/'}`;
+  const sessionId = uuidv4();
+  const sessionFilePath = `.sessions/copy-status/${sessionId}`;
+  let itemCount = 0;
+
+  async function copyFile(source: string, dest: string) {
+    return new Promise((resolve, reject) => {
+      minioClient.copyObject(storeBucket, dest, source, null, (err, data) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve({ source, dest, ...data });
+      });
+    });
+  }
+
+  const debounceUpdateStatus = debounce(
+    copyStatus => {
+      minioClient.putObject(
+        storeBucket,
+        sessionFilePath,
+        JSON.stringify(copyStatus)
+      );
+    },
+    1000,
+    { maxWait: 1000 }
+  );
+
+  async function onProgress(count: number, total: number) {
+    const copyStatus = {
+      status: count === total ? 'completed' : 'running',
+      progress: Number((count / total * 100).toFixed(0)),
+      failReason: '',
+    };
+
+    debounceUpdateStatus(copyStatus);
+  }
+
+  async function onFailed(count: number, total: number, reason: string) {
+    const copyStatus = {
+      status: 'failed',
+      progress: Number((count / total * 100).toFixed(0)),
+      failReason: reason,
+    };
+
+    debounceUpdateStatus(copyStatus);
+  }
+
+  onProgress(itemCount, items.length);
+
+  async function executeCopyFiles() {
+    try {
+      for (const item of items) {
+        const sourcePrefix = `${storeBucket}/groups/${toGroupPath(groupName)}`;
+        if (item.endsWith('/')) {
+          // Copy folder
+          const folder = `groups/${toGroupPath(groupName)}${item}`;
+          const files = new Promise<any[]>((resolve, reject) => {
+            const arr = [];
+            const stream = minioClient.listObjectsV2(storeBucket, folder, true);
+            stream.on('data', obj => {
+              arr.push(obj);
+            });
+            stream.on('error', err => {
+              reject(err);
+            });
+            stream.on('end', () => {
+              resolve(arr);
+            });
+          });
+          const filenames = (await files).map(file =>
+            file.name.slice(folder.length)
+          );
+          for (const filename of filenames) {
+            const source = `${sourcePrefix}${item}${filename}`;
+            const splitBySlash = item.split('/');
+            const folderName = splitBySlash[splitBySlash.length - 2];
+            const dest = `${destPrefix}${folderName}/${filename}`;
+            await copyFile(source, dest);
+          }
+          onProgress(++itemCount, items.length);
+        } else {
+          // Copy file
+          const slashIndex = item.lastIndexOf('/');
+          if (slashIndex === -1) {
+            return;
+          }
+          const source = `${sourcePrefix}${item}`;
+          const dest = `${destPrefix}${item.slice(slashIndex + 1)}`;
+          await copyFile(source, dest);
+          onProgress(++itemCount, items.length);
+        }
+      }
+    } catch (err) {
+      onFailed(itemCount, items.length, err.message);
+
+      logger.error({
+        component: logger.components.datasetV2,
+        resource: dataPath,
+        type: 'DATASET_COPY_FROM_SHARED_FILES',
+        stacktrace: err.stack,
+        message: err.message,
+      });
+    }
+  }
+
+  executeCopyFiles();
+
+  return {
+    sessionId,
+    endpoint: `${graphqlHost}${appPrefix || ''}${getCopyStatusEndpoint(sessionId)}`,
+  };
 };
 
 const getDatasetObjects = async (

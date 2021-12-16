@@ -10,6 +10,17 @@ type DatasetV2 {
   size: Float
 }
 
+type DatasetV2CopyStatus {
+  status: String
+  progress: Int
+  failReason: String
+}
+
+type DatasetV2CopySession {
+  sessionId: String
+  endpoint: String
+}
+
 """An edge in a connection."""
 type DatasetV2Edge {
   """The item at the end of the edge."""

@@ -1,0 +1,34 @@
+query GetDatasets(
+  $where: DatasetV2WhereInput
+  $page: Int
+  $orderBy: DatasetV2OrderByInput
+) {
+  datasetV2Connection(
+    where: $where
+    page: $page
+    orderBy: $orderBy
+  ) {
+    edges {
+      node {
+        id
+        name
+      }
+    }
+  }
+}
+
+mutation CreateDatasetMutation($payload: DatasetV2CreateInput!) {
+  createDatasetV2(data: $payload) {
+    id
+  }
+}
+
+mutation CopyFilesMutation(
+  $where: DatasetV2WhereUniqueInput!
+  $path: String!
+  $items: [String!]
+) {
+  copyFilesToDatasetV2(where: $where, path: $path, items: $items) {
+    endpoint
+  }
+}
