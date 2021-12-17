@@ -232,6 +232,7 @@ export const createSandbox = async () => {
   // assign user to test group
   (global as any).addUserToGroup(testGroup.id, user.id);
   (global as any).currentUser = user;
+  (global as any).currentGroup = testGroup;
 
   // create new client
   const authClientId = faker.internet.userName();

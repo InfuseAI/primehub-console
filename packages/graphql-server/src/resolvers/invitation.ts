@@ -5,6 +5,7 @@ import { Attributes, FieldType } from './attr';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import * as user from './user';
+import { checkLicenseUserQuota } from './user';
 
 const config = createConfig();
 
@@ -54,6 +55,9 @@ export const createUserFromInvitation = async (root, args, context) => {
   const { username, invitationToken } = args.data;
   const kcAdminClient: KcAdminClient = context.kcAdminClient;
 
+  // license check
+  await checkLicenseUserQuota(kcAdminClient);
+
   // verify token
   let payload: InvitationProps;
   try {
@@ -89,6 +93,7 @@ export const createInvitation = async (root, args, context) => {
 
   const kcAdminClient: KcAdminClient = context.kcAdminClient;
   await checkGroup(kcAdminClient, groupId);
+  await checkLicenseUserQuota(kcAdminClient);
 
   const invitationToken = uuidv4();
   const expiredDate = moment.utc().add(1, 'day').toISOString();

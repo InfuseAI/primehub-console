@@ -153,10 +153,9 @@ export const create = async (root, args, context: Context) => {
   }
 
   const groups = await kcAdminClient.groups.find();
-  // max group validation need minus everyone group.
-  if (groups.length > config.maxGroup) {
-    throw new ApolloError(`Number of groups exceeds license limitation`, EXCEED_QUOTA_ERROR);
-  }
+
+  // check license
+  checkLicenseGroupQuota(groups);
 
   // check existing groups with the same name
   if (!isGroupNameAvailable(payload.name, groups)) {
@@ -573,3 +572,17 @@ export const typeResolvers = {
   ...datasetResolver.resolveInGroup(),
   ...imageResolver.resolveInGroup()
 };
+
+function checkLicenseGroupQuota(groups) {
+  const maxGroup = createConfig().maxGroup;
+  if (maxGroup >= 0) {
+    // max group validation need minus everyone group.
+    const groupCount = groups.length - 1;
+    if (groupCount >= maxGroup) {
+      throw new ApolloError(
+        'Number of groups exceeds license limitation',
+        EXCEED_QUOTA_ERROR
+      );
+    }
+  }
+}
