@@ -118,7 +118,22 @@ export const cleaupAllCrd = async () => {
   await cleanupInstanceTypes();
 };
 
+const checkNotProduction = async () => {
+  try {
+    await k8sClient.apis['apiextensions.k8s.io'].v1beta1
+      .crd('datasets.primehub.io')
+      .get();
+  } catch (e) {
+    return;
+  }
+  throw new Error(
+    "Prouction environment? The crd 'datasets.primehub.io' is found in the cluster. "
+  );
+};
+
 export const createSandbox = async () => {
+  await checkNotProduction();
+
   /**
    * k8s
    */
@@ -306,6 +321,8 @@ export const createSandbox = async () => {
 };
 
 export const destroySandbox = async () => {
+  await checkNotProduction();
+
   /**
    * k8s
    */
@@ -313,13 +330,13 @@ export const destroySandbox = async () => {
 
   try {
     await Promise.all([
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(datasetCrd.metadata.name),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(instanceTypeCrd.metadata.name),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(imageCrd.metadata.name),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(phApplicationCrd.metadata.name),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(phJobCrd.metadata.name),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(phScheduleCrd.metadata.name),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(phDeploymentCrd.metadata.name),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(datasetCrd.metadata.name).delete(),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(instanceTypeCrd.metadata.name).delete(),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(imageCrd.metadata.name).delete(),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(phApplicationCrd.metadata.name).delete(),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(phJobCrd.metadata.name).delete(),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(phScheduleCrd.metadata.name).delete(),
+      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(phDeploymentCrd.metadata.name).delete(),
     ]);
   } catch (e) {
     // tslint:disable-next-line:no-console
@@ -340,3 +357,7 @@ export const destroySandbox = async () => {
     realm: process.env.KC_REALM
   });
 };
+function async() {
+  throw new Error('Function not implemented.');
+}
+

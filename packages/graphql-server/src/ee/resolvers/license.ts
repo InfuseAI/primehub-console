@@ -5,6 +5,12 @@ import { Context } from '../../resolvers/interface';
 import { createConfig } from '../../config';
 
 const config = createConfig();
+let licenseOverride = {};
+
+// this is used for integratino test
+export function overrideLienceseConfig(license = {}) {
+  licenseOverride = license;
+}
 
 export const query = async (root, args, context: Context) => {
   const {crdClient} = context;
@@ -23,12 +29,13 @@ export const query = async (root, args, context: Context) => {
     maxGroup: config.maxGroup,
     maxNode: config.maxNode,
     maxModelDeploy: config.maxModelDeploy,
+    ...licenseOverride,
     usage: {
       // all groups minus 'everyone'
       maxGroup: groups.length - 1,
       maxNode: nodes.body.items.length,
       maxModelDeploy: deployed.length,
-    }
+    },
   };
 
   return license;
