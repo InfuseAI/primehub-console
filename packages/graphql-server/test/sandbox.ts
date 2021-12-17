@@ -127,7 +127,7 @@ const checkNotProduction = async () => {
     return;
   }
   throw new Error(
-    "Prouction environment? The crd 'datasets.primehub.io' is found in the cluster. "
+    `Prouction environment? The crd 'datasets.primehub.io' is found in the cluster. `
   );
 };
 
@@ -361,4 +361,3 @@ export const destroySandbox = async () => {
 function async() {
   throw new Error('Function not implemented.');
 }
-
