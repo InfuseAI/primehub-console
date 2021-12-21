@@ -151,12 +151,11 @@ export function CreateDatasetModal({
                   phfsPrefix: `/datasets/${eventKey}`,
                 },
               },
+              fetchPolicy: 'network-only',
             })
             .then(data => {
-              setTimeout(() => {
-                getFolderTree({ data, eventKey });
-                resolve();
-              }, 1000);
+              getFolderTree({ data, eventKey });
+              resolve();
             })
             .catch(console.error);
         }
