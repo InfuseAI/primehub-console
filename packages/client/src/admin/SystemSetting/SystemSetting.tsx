@@ -98,12 +98,14 @@ interface SystemInfo {
   license: {
     startedAt: Date;
     expiredAt: Date;
+    maxUser: number;
     maxGroup: number;
     maxNode: number;
     maxModelDeploy: number;
     licensedTo: string;
     licenseStatus: LicenseStatus;
     usage: {
+      maxUser: number;
       maxGroup: number;
       maxNode: number;
       maxModelDeploy: number;
@@ -300,6 +302,15 @@ function _SystemSetting({ form, data, ...props }: Props) {
                     <div data-testid='license-maxNode'>
                       {get(license, 'usage.maxNode', 0)}/
                       {Number(license.maxNode) === -1 ? '∞' : license.maxNode}
+                    </div>
+                  </div>
+                </Col>
+                <Col sm={5} xs={24}>
+                  <div>
+                    <CustomLabel>Users</CustomLabel>
+                    <div data-testid='license-maxUser'>
+                      {get(license, 'usage.maxUser', 0)}/
+                      {Number(license.maxUser) === -1 ? '∞' : license.maxUser}
                     </div>
                   </div>
                 </Col>

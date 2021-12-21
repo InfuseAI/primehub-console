@@ -5,11 +5,13 @@ query GetSystemSetting {
       licenseStatus
       startedAt
       expiredAt
+      maxUser
       maxGroup
       maxNode
       maxModelDeploy
 
       usage {
+        maxUser
         maxGroup
         maxNode
         maxModelDeploy
