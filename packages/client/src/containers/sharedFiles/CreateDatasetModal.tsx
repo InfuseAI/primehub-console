@@ -1,18 +1,22 @@
 import * as React from 'react';
+import gql from 'graphql-tag';
 import styled from 'styled-components';
+import { ApolloConsumer } from 'react-apollo';
 import {
   Button,
   Form,
   Input,
   Icon,
-  Select,
+  TreeSelect,
   Modal,
   Progress,
   Typography,
   notification,
 } from 'antd';
 import { useHistory } from 'react-router-dom';
+import type { ApolloClient, ApolloQueryResult } from 'apollo-client';
 import type { ModalProps } from 'antd/lib/modal';
+import type { AntTreeNode } from 'antd/lib/tree';
 
 import DatasetTags from 'components/datasets/DatasetTags';
 import { useInterval } from 'hooks/useInterval';
@@ -47,7 +51,7 @@ interface Props extends Omit<ModalProps, 'onOk'> {
   form: any;
   groupName: string;
   files: string[];
-  datasetList: Array<{ id: string; name: string }>;
+  data: TreeNode[];
   type: 'create' | 'update';
   sourePrefix: string;
   onOkClick: () => void;
@@ -74,15 +78,30 @@ interface Props extends Omit<ModalProps, 'onOk'> {
     progress: number;
     failReason: string;
   }>;
+  getFolderTree: ({
+    data,
+    eventKey,
+  }: {
+    data: ApolloQueryResult<unknown>;
+    eventKey: string;
+  }) => void;
 }
+
+export type TreeNode = {
+  key: string;
+  value: string;
+  title: string;
+  icon?: React.ReactNode;
+};
 
 export function CreateDatasetModal({
   files,
-  datasetList,
+  data,
   type,
   form,
   groupName,
   onFileRemove,
+  getFolderTree,
   ...props
 }: Props) {
   const [steps, setSteps] = React.useState(1);
@@ -99,6 +118,50 @@ export function CreateDatasetModal({
   const { appPrefix } = useRoutePrefix();
 
   const stepOne = React.useMemo(() => {
+    function onLoadTreeNodes({
+      client,
+      node,
+    }: {
+      client: ApolloClient<unknown>;
+      node: AntTreeNode;
+    }): Promise<void> {
+      return new Promise(resolve => {
+        if (node.props.children.length > 0) {
+          resolve();
+        } else {
+          const GET_FILES = gql`
+            query files($where: StoreFileWhereInput!) {
+              files(where: $where) {
+                prefix
+                phfsPrefix
+                items {
+                  name
+                }
+              }
+            }
+          `;
+
+          const { eventKey } = node.props;
+          client
+            .query({
+              query: GET_FILES,
+              variables: {
+                where: {
+                  groupName,
+                  phfsPrefix: `/datasets/${eventKey}`,
+                },
+              },
+              fetchPolicy: 'network-only',
+            })
+            .then(data => {
+              getFolderTree({ data, eventKey });
+              resolve();
+            })
+            .catch(console.error);
+        }
+      });
+    }
+
     return (
       <>
         {type === 'create' ? (
@@ -125,25 +188,28 @@ export function CreateDatasetModal({
             </CustomFormItem>
           </>
         ) : (
-          <CustomFormItem label='Dataset Name'>
-            {form.getFieldDecorator('id', {
-              initialValue: undefined,
-              rules: [
-                {
-                  required: true,
-                  message: 'Please select a dataset',
-                },
-              ],
-            })(
-              <Select placeholder='Select Dataset' style={{ width: '100%' }}>
-                {datasetList.map(({ id, name }) => (
-                  <Select.Option key={id} value={name}>
-                    {name}
-                  </Select.Option>
-                ))}
-              </Select>
+          <ApolloConsumer>
+            {client => (
+              <CustomFormItem label='Select Dataset'>
+                {form.getFieldDecorator('id', {
+                  initialValue: undefined,
+                  rules: [
+                    {
+                      required: true,
+                      message: 'Please select a dataset',
+                    },
+                  ],
+                })(
+                  <SelectTreeNode
+                    data={data}
+                    loadData={(node: AntTreeNode) =>
+                      onLoadTreeNodes({ client, node })
+                    }
+                  />
+                )}
+              </CustomFormItem>
             )}
-          </CustomFormItem>
+          </ApolloConsumer>
         )}
 
         <CustomFormItem label={`Contents (${files.length} Items)`}>
@@ -172,7 +238,7 @@ export function CreateDatasetModal({
         </CustomFormItem>
       </>
     );
-  }, [datasetList, files, form, onFileRemove, type]);
+  }, [files, data, form, groupName, type, onFileRemove, getFolderTree]);
 
   const modalContents = {
     1: stepOne,
@@ -182,7 +248,7 @@ export function CreateDatasetModal({
 
   useInterval(
     async () => {
-      if (target.endpoint && progress !== 100) {
+      if (target?.endpoint && progress !== 100) {
         const { status, progress } = await props.onFetchProgress({
           endpoint: target.endpoint,
           onError: () => {
@@ -222,6 +288,7 @@ export function CreateDatasetModal({
     fetching ? 1000 : null
   );
 
+  // cleanup modal status
   React.useEffect(() => {
     return () => {
       if (steps === 3 && uploadedResult === 'success') {
@@ -288,6 +355,7 @@ export function CreateDatasetModal({
 
               const { endpoint } = await props.onCopyFiles({
                 id: values.id,
+                // Creating a new dataset default path is `/` without any nested structure
                 path: '/',
                 items: files.map(file => `/${props.sourePrefix}${file}`),
               });
@@ -309,10 +377,20 @@ export function CreateDatasetModal({
             setSteps(2);
             setFetching(true);
 
+            // Check the folder path is nested or not, if is a nested folder path,
+            // we need to exclude the root path and put remain path to `path`.
+            const isNested = values.id.indexOf('/') === -1 ? false : true;
+            const rootFolder = isNested
+              ? values.id.slice(0, values.id.indexOf('/'))
+              : values.id;
+            const nestedFolderPath = isNested
+              ? values.id.slice(values.id.indexOf('/'))
+              : '/';
+
             try {
               const { endpoint } = await props.onCopyFiles({
-                id: values.id,
-                path: '/',
+                id: rootFolder,
+                path: nestedFolderPath,
                 items: files.map(file => `/${props.sourePrefix}${file}`),
               });
 
@@ -420,5 +498,35 @@ function UploadComplete({
         {isSuccess ? 'Created Successfully!' : 'Dataset Creation Failed'}
       </Typography.Title>
     </div>
+  );
+}
+
+function SelectTreeNode({
+  value,
+  data,
+  onChange,
+  loadData,
+}: {
+  data: TreeNode[];
+  value?: string;
+  onChange?: (value: string) => void;
+  loadData: (node: AntTreeNode) => Promise<void>;
+}) {
+  return (
+    <TreeSelect
+      treeIcon
+      placeholder='Select a dataset'
+      style={{ width: '100%' }}
+      treeData={data}
+      value={value}
+      loadData={loadData}
+      dropdownStyle={{
+        top: '330px',
+        maxHeight: '350px',
+      }}
+      onChange={value => {
+        onChange(value);
+      }}
+    />
   );
 }

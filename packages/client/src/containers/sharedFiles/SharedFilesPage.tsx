@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Button, Form, notification } from 'antd';
+import { Button, Form, Icon, notification } from 'antd';
 import { useHistory, useParams } from 'react-router-dom';
 import { compose } from 'recompose';
 import { graphql } from 'react-apollo';
+import type { ApolloQueryResult } from 'apollo-client';
 import type { FormComponentProps } from 'antd/lib/form';
 
 import Breadcrumbs from 'components/share/breadcrumb';
@@ -17,7 +18,7 @@ import { useRoutePrefix } from 'hooks/useRoutePrefix';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { errorHandler } from 'utils/errorHandler';
 
-import { CreateDatasetModal } from './CreateDatasetModal';
+import { CreateDatasetModal, TreeNode } from './CreateDatasetModal';
 import {
   GetDatasets,
   CreateDatasetMutation,
@@ -74,12 +75,37 @@ interface Props extends FormComponentProps, GroupContextComponentProps {
   }>;
 }
 
+interface Node extends TreeNode {
+  children?: Node[];
+}
+
+function updateFolderTree(nodes: Node[], key: React.Key, children: Node[]) {
+  return nodes.map(node => {
+    if (node.key === key) {
+      return {
+        ...node,
+        children,
+      };
+    }
+
+    if (node.children) {
+      return {
+        ...node,
+        children: updateFolderTree(node.children, key, children),
+      };
+    }
+
+    return node;
+  });
+}
+
 function ShareFilesPage({ form, datasets, ...props }: Props) {
   const [enabledPHFS, setEndabledPHFS] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [type, setType] = useState<'create' | 'update'>('create');
   const [modalVisible, setModalVisible] = useState(false);
+  const [folderTree, setFolderTree] = React.useState<TreeNode[]>([]);
 
   const history = useHistory();
   const [token] = useLocalStorage('primehub.accessToken', []);
@@ -103,6 +129,35 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
     return response;
   }
 
+  function getNextFolderTree({
+    data: response,
+    eventKey,
+  }: {
+    data: ApolloQueryResult<unknown>;
+    eventKey: string;
+  }) {
+    setFolderTree(prev => {
+      const filterFolder = (
+        (response.data as any).files.items as Array<{
+          name: string;
+        }>
+      )
+        .filter(file => file.name.endsWith('/'))
+        .map(folder => {
+          const folderName = folder.name.replace('/', '');
+
+          return {
+            key: `${eventKey}/${folderName}`,
+            value: `${eventKey}/${folderName}`,
+            title: folderName,
+            icon: <Icon type='folder' />,
+          };
+        });
+
+      return updateFolderTree(prev, eventKey, filterFolder);
+    });
+  }
+
   useEffect(() => {
     if (typeof window === undefined) return;
 
@@ -110,6 +165,22 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
       setEndabledPHFS(true);
     }
   }, []);
+
+  useEffect(() => {
+    const datasetList =
+      datasets?.datasetV2Connection?.edges.map(({ node }) => node) || [];
+
+    if (datasetList.length > 0) {
+      const nextFolderTree = datasetList.map(dataset => ({
+        key: dataset.id,
+        value: dataset.id,
+        title: dataset.name,
+        icon: <Icon type='database' />,
+      }));
+
+      setFolderTree(nextFolderTree);
+    }
+  }, [datasets?.datasetV2Connection?.edges]);
 
   return (
     <>
@@ -197,9 +268,8 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
           visible={modalVisible}
           sourePrefix={phfsPrefix ? `${phfsPrefix}/` : ''}
           groupName={groupName}
-          datasetList={
-            datasets?.datasetV2Connection?.edges.map(({ node }) => node) || []
-          }
+          data={folderTree}
+          getFolderTree={getNextFolderTree}
           title={
             type === 'create' ? 'Create Dataset' : 'Add to existing Dataset'
           }
