@@ -865,7 +865,7 @@ export async function checkLicenseUserQuota(kcAdminClient: KcAdminClient) {
     const userCount = await kcAdminClient.users.count();
     if (userCount >= maxUser) {
       throw new ApolloError(
-        `Number of users exceeds license limitation. ${maxUser}`,
+        `Number of users exceeds license limitation.`,
         ErrorCodes.EXCEED_QUOTA_ERROR
       );
     }
