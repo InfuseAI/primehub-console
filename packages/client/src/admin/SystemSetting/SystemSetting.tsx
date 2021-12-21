@@ -274,29 +274,27 @@ function _SystemSetting({ form, data, ...props }: Props) {
         >
           {__ENV__ !== 'ce' && (
             <Card title='PrimeHub License'>
-              <Row type='flex'>
-                <Col sm={5} xs={24}>
-                  <div>
-                    <CustomLabel>License Status</CustomLabel>
-                    <LicenseTag
-                      data-testid='license-status'
-                      status={license.licenseStatus}
-                    />
-                  </div>
-
-                  <div style={{ marginTop: '24px' }}>
-                    <CustomLabel>Expiration Date</CustomLabel>
-                    <div data-testid='license-expiredAt'>
-                      {moment(license.expiredAt).format('YYYY/MM/DD HH:mm')}
-                    </div>
-                  </div>
-
-                  <div style={{ marginTop: '24px' }}>
-                    <CustomLabel>Licensed To</CustomLabel>
-                    <div data-testid='license-to'>{license.licensedTo}</div>
+              <Row>
+                <Col sm={6} xs={24}>
+                  <CustomLabel>License Status</CustomLabel>
+                  <LicenseTag
+                    data-testid='license-status'
+                    status={license.licenseStatus}
+                  />
+                </Col>
+                <Col sm={6} xs={24}>
+                  <CustomLabel>Expiration Date</CustomLabel>
+                  <div data-testid='license-expiredAt'>
+                    {moment(license.expiredAt).format('YYYY/MM/DD HH:mm')}
                   </div>
                 </Col>
-                <Col sm={5} xs={24}>
+                <Col sm={6} xs={24}>
+                  <CustomLabel>Licensed To</CustomLabel>
+                  <div data-testid='license-to'>{license.licensedTo}</div>
+                </Col>
+              </Row>
+              <Row style={{ marginTop: 32 }}>
+                <Col sm={6} xs={24}>
                   <div>
                     <CustomLabel>Nodes</CustomLabel>
                     <div data-testid='license-maxNode'>
@@ -305,7 +303,7 @@ function _SystemSetting({ form, data, ...props }: Props) {
                     </div>
                   </div>
                 </Col>
-                <Col sm={5} xs={24}>
+                <Col sm={6} xs={24}>
                   <div>
                     <CustomLabel>Users</CustomLabel>
                     <div data-testid='license-maxUser'>
@@ -314,7 +312,7 @@ function _SystemSetting({ form, data, ...props }: Props) {
                     </div>
                   </div>
                 </Col>
-                <Col sm={5} xs={24}>
+                <Col sm={6} xs={24}>
                   <div>
                     <CustomLabel>Groups</CustomLabel>
                     <div data-testid='license-maxGroup'>
@@ -323,7 +321,7 @@ function _SystemSetting({ form, data, ...props }: Props) {
                     </div>
                   </div>
                 </Col>
-                <Col sm={5} xs={24}>
+                <Col sm={6} xs={24}>
                   <div>
                     <CustomLabel>Deployments</CustomLabel>
                     <div data-testid='license-maxDeploy'>
