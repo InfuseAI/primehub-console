@@ -358,6 +358,3 @@ export const destroySandbox = async () => {
     realm: process.env.KC_REALM
   });
 };
-function async() {
-  throw new Error('Function not implemented.');
-}

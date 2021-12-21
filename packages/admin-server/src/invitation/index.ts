@@ -67,7 +67,7 @@ export class InvitationCtrl {
     } catch (error) {
       if (error.response?.errors) {
         const code = error.response?.errors[0].extensions?.code;
-        if (code == 'EXCEED_QUOTA') {
+        if (code === 'EXCEED_QUOTA') {
           ctx.body = {
             code: 'BAD_REQUEST',
             message: error.response?.errors[0].message,
