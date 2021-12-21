@@ -48,7 +48,7 @@ export function errorHandler(e) {
       description = 'Please login again';
       break;
     case 'EXCEED_QUOTA':
-      message = 'System Error';
+      message = 'Exceed Quota';
       description = description || 'The quota exceeded';
       break;
     case 'INTERNAL_SERVER_ERROR':

@@ -95,16 +95,18 @@ const InviteButton = ({ groupId, onRequestToken }: InviteButtonProps) => {
                 onClick={async () => {
                   setIsRequesting(true);
 
-                  const {
-                    data: {
-                      createInvitation: { invitationToken },
-                    },
-                  } = await onRequestToken(groupId);
-
-                  setIsRequesting(false);
-                  setInviteLink(
-                    `${window.cmsHost}${appPrefix}invite/${invitationToken}`
-                  );
+                  try {
+                    const {
+                      data: {
+                        createInvitation: { invitationToken },
+                      },
+                    } = await onRequestToken(groupId);
+                    setInviteLink(
+                      `${window.cmsHost}${appPrefix}invite/${invitationToken}`
+                    );
+                  } finally {
+                    setIsRequesting(false);
+                  }
                 }}
               >
                 {isRequesting ? <Icon type='loading' /> : 'Request Link'}

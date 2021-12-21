@@ -128,7 +128,7 @@ describe('ErrorHandler', () => {
     };
     errorHandler(error);
     expect(spyNotification).toHaveBeenCalledWith({
-      message: 'System Error',
+      message: 'Exceed Quota',
       description: 'The quota exceeded',
       placement,
     });
@@ -147,7 +147,7 @@ describe('ErrorHandler', () => {
     };
     errorHandler(error);
     expect(spyNotification).toHaveBeenCalledWith({
-      message: 'System Error',
+      message: 'Exceed Quota',
       description: 'test message exceed quota',
       placement,
     });
