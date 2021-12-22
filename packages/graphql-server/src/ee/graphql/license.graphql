@@ -3,6 +3,7 @@ type License {
   licenseStatus: String
   startedAt: String
   expiredAt: String
+  maxUser: Int
   maxGroup: Int
   maxNode: Int
   maxModelDeploy: Int
@@ -10,6 +11,7 @@ type License {
 }
 
 type Usage {
+  maxUser: Int
   maxGroup: Int
   maxNode: Int
   maxModelDeploy: Int

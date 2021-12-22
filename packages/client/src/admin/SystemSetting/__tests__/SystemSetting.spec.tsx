@@ -30,7 +30,9 @@ function setup() {
               maxNode: 1000,
               maxModelDeploy: 1000,
               maxGroup: 9999,
+              maxUser: 9998,
               usage: {
+                maxUser: 67,
                 maxGroup: 68,
                 maxNode: 5,
                 maxModelDeploy: 109,
@@ -129,6 +131,9 @@ describe('SystemSetting', () => {
     );
     expect(await screen.findByTestId('license-maxGroup')).toHaveTextContent(
       '68/9999'
+    );
+    expect(await screen.findByTestId('license-maxUser')).toHaveTextContent(
+      '67/9998'
     );
   });
 

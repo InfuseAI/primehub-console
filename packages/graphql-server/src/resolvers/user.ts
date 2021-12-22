@@ -28,6 +28,8 @@ import { crd as annCrdResolver } from '../resolvers/announcement';
 import moment from 'moment';
 import UserRepresentation from 'keycloak-admin/lib/defs/userRepresentation';
 import { transform as transformGroup } from './groupUtils';
+import { ErrorCodes } from '../errorCodes';
+import { createConfig } from '../config';
 
 /**
  * utils
@@ -277,6 +279,8 @@ export const create = async (root, args, context: Context) => {
       volumeCapacity: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
     }
   });
+
+  await checkLicenseUserQuota(kcAdminClient);
 
   try {
     await kcAdminClient.users.create({
@@ -855,3 +859,15 @@ export const typeResolvers = {
     }
   },
 };
+export async function checkLicenseUserQuota(kcAdminClient: KcAdminClient) {
+  const maxUser = createConfig().maxUser;
+  if (maxUser >= 0) {
+    const userCount = await kcAdminClient.users.count();
+    if (userCount >= maxUser) {
+      throw new ApolloError(
+        `Number of users exceeds license limitation.`,
+        ErrorCodes.EXCEED_QUOTA_ERROR
+      );
+    }
+  }
+}

@@ -7,7 +7,9 @@ export const system = {
     maxNode: 1000,
     maxModelDeploy: 1000,
     maxGroup: 9999,
+    maxUser: 9998,
     usage: {
+      maxUser: 67,
       maxGroup: 68,
       maxNode: 5,
       maxModelDeploy: 109,

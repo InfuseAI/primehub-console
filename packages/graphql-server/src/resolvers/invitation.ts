@@ -54,6 +54,9 @@ export const createUserFromInvitation = async (root, args, context) => {
   const { username, invitationToken } = args.data;
   const kcAdminClient: KcAdminClient = context.kcAdminClient;
 
+  // license check
+  await user.checkLicenseUserQuota(kcAdminClient);
+
   // verify token
   let payload: InvitationProps;
   try {
@@ -89,6 +92,7 @@ export const createInvitation = async (root, args, context) => {
 
   const kcAdminClient: KcAdminClient = context.kcAdminClient;
   await checkGroup(kcAdminClient, groupId);
+  await user.checkLicenseUserQuota(kcAdminClient);
 
   const invitationToken = uuidv4();
   const expiredDate = moment.utc().add(1, 'day').toISOString();

@@ -61,6 +61,7 @@ export interface Config {
   graphqlHost: string;
 
   // license management stuffs
+  maxUser: number;
   maxGroup: number;
   maxNode: number;
   maxModelDeploy: number;
@@ -114,8 +115,9 @@ const defaultConfigs = {
   groupVolumeStorageClass: '',
   enableDatasetUpload: false,
   licenseStatus: 'invalid',
-  maxGroup: 99999,
-  maxNode: 99999,
+  maxUser: -1,
+  maxGroup: -1,
+  maxNode: -1,
   maxModelDeploy: 0,
   graphqlHost: 'http://localhost:3001',
   enableStore: false,
@@ -132,6 +134,8 @@ const prodConfigs = {
   env: 'production',
   graphqlPlayground: false
 };
+
+let overwriteConfigs = {};
 
 const sanitizePath = (path: string) => {
   if (isEmpty(path) || path === '/') {
@@ -198,6 +202,7 @@ export const createConfig = (): Config => {
     primehubGroupSc: process.env.PRIMEHUB_GROUP_SC,
     groupVolumeStorageClass: process.env.PRIMEHUB_GROUP_VOLUME_STORAGE_CLASS,
     graphqlHost: process.env.GRAPHQL_HOST,
+    maxUser: process.env.MAX_USER,
     maxGroup: process.env.MAX_GROUP,
     maxNode: process.env.MAX_NODE,
     maxModelDeploy: toInteger(process.env.MAX_MODEL_DEPLOY),
@@ -223,8 +228,12 @@ export const createConfig = (): Config => {
     case 'production':
       return {...defaultConfigs, ...prodConfigs, ...envConfigs};
     default:
-      return {...defaultConfigs, ...envConfigs};
+      return {...defaultConfigs, ...envConfigs, ...overwriteConfigs, };
   }
 };
+
+export function setConfigOverwrite(config = {}) {
+  overwriteConfigs = config;
+}
 
 export default createConfig();

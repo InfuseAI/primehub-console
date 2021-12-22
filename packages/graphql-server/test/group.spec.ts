@@ -416,7 +416,7 @@ describe('group graphql', function() {
       where: {id: groupId}
     });
 
-    let group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
+    const group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
     expect(group.attributes['launch-group-only'][0]).to.be.equals('true');
   });
 
@@ -454,7 +454,7 @@ describe('group graphql', function() {
       where: {id: groupId}
     });
 
-    let group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
+    const group = await this.kcAdminClient.groups.findOne({realm: process.env.KC_REALM, id: groupId});
     expect(group.attributes['launch-group-only'][0]).to.be.equals('true');
   });
 
