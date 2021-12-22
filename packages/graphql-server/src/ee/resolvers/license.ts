@@ -6,7 +6,7 @@ import { createConfig } from '../../config';
 
 let licenseOverride = {};
 
-// this is used for integratino test
+// this is used for integration test
 export function overrideLienceseConfig(license = {}) {
   licenseOverride = license;
 }
