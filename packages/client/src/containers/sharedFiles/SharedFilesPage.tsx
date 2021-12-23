@@ -142,15 +142,26 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
           name: string;
         }>
       )
-        .filter(file => file.name.endsWith('/'))
-        .map(folder => {
-          const folderName = folder.name.replace('/', '');
+        .filter(file => file.name !== '.dataset')
+        .map(file => {
+          if (file.name.endsWith('/')) {
+            const folderName = file.name.replace('/', '');
+
+            return {
+              key: `${eventKey}/${folderName}`,
+              value: `${eventKey}/${folderName}`,
+              title: folderName,
+              icon: <Icon type='folder' />,
+            };
+          }
 
           return {
-            key: `${eventKey}/${folderName}`,
-            value: `${eventKey}/${folderName}`,
-            title: folderName,
-            icon: <Icon type='folder' />,
+            key: `${eventKey}/${file.name}`,
+            value: `${eventKey}/${file.name}`,
+            title: file.name,
+            disabled: true,
+            isLeaf: true,
+            icon: <Icon type='file' />,
           };
         });
 
