@@ -141,10 +141,9 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
         (response.data as any).files.items as Array<{
           name: string;
         }>
-      )
-        .filter(file => file.name.endsWith('/'))
-        .map(folder => {
-          const folderName = folder.name.replace('/', '');
+      ).map(file => {
+        if (file.name.endsWith('/')) {
+          const folderName = file.name.replace('/', '');
 
           return {
             key: `${eventKey}/${folderName}`,
@@ -152,7 +151,17 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
             title: folderName,
             icon: <Icon type='folder' />,
           };
-        });
+        }
+
+        return {
+          key: `${eventKey}/${file.name}`,
+          value: `${eventKey}/${file.name}`,
+          title: file.name,
+          disabled: true,
+          isLeaf: true,
+          icon: <Icon type='file' />,
+        };
+      });
 
       return updateFolderTree(prev, eventKey, filterFolder);
     });
