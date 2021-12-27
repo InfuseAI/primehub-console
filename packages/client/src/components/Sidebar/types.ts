@@ -86,7 +86,6 @@ export const sidebarList: SidebarList = [
     subPath: 'models',
     icon: iconModels,
     enabledIn: [FEATURES.EE, FEATURES.DEPLOY],
-    stage: 'beta',
     style: {
       width: 'auto',
       height: 18,
