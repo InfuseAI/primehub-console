@@ -112,6 +112,13 @@ export function CreateDatasetModal({
   const [uploadingToDataset, setUploadingToDataset] = React.useState(false);
   const [uploadedResult, setUploadResult] =
     React.useState<'idle' | 'success' | 'failure'>('idle');
+  const [customFolderPath, setCustomFolderPath] = React.useState<{
+    path: string;
+    isEditing: boolean;
+  }>({
+    path: '',
+    isEditing: false,
+  });
 
   const resetModalKey = 'reset-modal-key';
   const history = useHistory();
@@ -190,7 +197,29 @@ export function CreateDatasetModal({
         ) : (
           <ApolloConsumer>
             {client => (
-              <CustomFormItem label='Select Dataset'>
+              <CustomFormItem>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <b>Select Dataset</b>
+                  {!customFolderPath.isEditing && (
+                    <Button
+                      type='link'
+                      onClick={() => {
+                        setCustomFolderPath(prev => ({
+                          ...prev,
+                          isEditing: true,
+                        }));
+                      }}
+                    >
+                      Add Folder
+                    </Button>
+                  )}
+                </div>
                 {form.getFieldDecorator('id', {
                   initialValue: undefined,
                   rules: [
@@ -200,12 +229,24 @@ export function CreateDatasetModal({
                     },
                   ],
                 })(
-                  <SelectTreeNode
-                    data={data}
-                    loadData={(node: AntTreeNode) =>
-                      onLoadTreeNodes({ client, node })
-                    }
-                  />
+                  customFolderPath.isEditing ? (
+                    <Input.Search
+                      enterButton='Confirm'
+                      onSearch={value => {
+                        setCustomFolderPath({
+                          isEditing: false,
+                          path: value,
+                        });
+                      }}
+                    />
+                  ) : (
+                    <SelectTreeNode
+                      data={data}
+                      loadData={(node: AntTreeNode) =>
+                        onLoadTreeNodes({ client, node })
+                      }
+                    />
+                  )
                 )}
               </CustomFormItem>
             )}
@@ -238,7 +279,16 @@ export function CreateDatasetModal({
         </CustomFormItem>
       </>
     );
-  }, [files, data, form, groupName, type, onFileRemove, getFolderTree]);
+  }, [
+    data,
+    type,
+    form,
+    files,
+    groupName,
+    customFolderPath.isEditing,
+    getFolderTree,
+    onFileRemove,
+  ]);
 
   const modalContents = {
     1: stepOne,
