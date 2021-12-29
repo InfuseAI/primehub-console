@@ -83,7 +83,8 @@ export const mountStoreCtrl = (router: Router,
     }
 
     try {
-      const result = await minioClient.putObject(storeBucket, objectPath, ctx.req);
+      const chunkSize = 64 * 1024 * 1024;
+      const result = await minioClient.putObject(storeBucket, objectPath, ctx.req, chunkSize);
       ctx.body = {
         success: true,
       };
