@@ -374,7 +374,9 @@ export function CreateDatasetModal({
           : 'Cancel'
       }
       okButtonProps={{
-        disabled: files.length === 0 && uploadedResult !== 'success',
+        disabled:
+          (files.length === 0 && uploadedResult !== 'success') ||
+          customFolderPath.isEditing,
         style: {
           display: uploadingToDataset ? 'none' : 'inline-block',
           cursor:
@@ -427,15 +429,9 @@ export function CreateDatasetModal({
             setSteps(2);
             setFetching(true);
 
-            // Check the folder path is nested or not, if is a nested folder path,
-            // we need to exclude the root path and put remain path to `path`.
-            const isNested = values.id.indexOf('/') === -1 ? false : true;
-            const rootFolder = isNested
-              ? values.id.slice(0, values.id.indexOf('/'))
-              : values.id;
-            const nestedFolderPath = isNested
-              ? values.id.slice(values.id.indexOf('/'))
-              : '/';
+            // Splitting the folder to root folder and nested folder paths
+            const rootFolder = values.id.slice(0, values.id.indexOf('/'));
+            const nestedFolderPath = values.id.slice(values.id.indexOf('/'));
 
             try {
               const { endpoint } = await props.onCopyFiles({
