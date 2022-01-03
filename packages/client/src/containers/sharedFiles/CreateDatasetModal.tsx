@@ -112,6 +112,13 @@ export function CreateDatasetModal({
   const [uploadingToDataset, setUploadingToDataset] = React.useState(false);
   const [uploadedResult, setUploadResult] =
     React.useState<'idle' | 'success' | 'failure'>('idle');
+  const [customFolderPath, setCustomFolderPath] = React.useState<{
+    path: string;
+    isEditing: boolean;
+  }>({
+    path: '',
+    isEditing: false,
+  });
 
   const resetModalKey = 'reset-modal-key';
   const history = useHistory();
@@ -190,7 +197,29 @@ export function CreateDatasetModal({
         ) : (
           <ApolloConsumer>
             {client => (
-              <CustomFormItem label='Select Dataset'>
+              <CustomFormItem>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <b>Select Dataset</b>
+                  {!customFolderPath.isEditing && customFolderPath.path !== '' && (
+                    <Button
+                      type='link'
+                      onClick={() => {
+                        setCustomFolderPath(prev => ({
+                          ...prev,
+                          isEditing: true,
+                        }));
+                      }}
+                    >
+                      Add Folder
+                    </Button>
+                  )}
+                </div>
                 {form.getFieldDecorator('id', {
                   initialValue: undefined,
                   rules: [
@@ -200,12 +229,30 @@ export function CreateDatasetModal({
                     },
                   ],
                 })(
-                  <SelectTreeNode
-                    data={data}
-                    loadData={(node: AntTreeNode) =>
-                      onLoadTreeNodes({ client, node })
-                    }
-                  />
+                  customFolderPath.isEditing ? (
+                    <Input.Search
+                      enterButton='Confirm'
+                      onSearch={value => {
+                        setCustomFolderPath({
+                          isEditing: false,
+                          path: value,
+                        });
+                      }}
+                    />
+                  ) : (
+                    <SelectTreeNode
+                      data={data}
+                      loadData={(node: AntTreeNode) =>
+                        onLoadTreeNodes({ client, node })
+                      }
+                      onChange={node => {
+                        setCustomFolderPath(prev => ({
+                          ...prev,
+                          path: node,
+                        }));
+                      }}
+                    />
+                  )
                 )}
               </CustomFormItem>
             )}
@@ -238,7 +285,16 @@ export function CreateDatasetModal({
         </CustomFormItem>
       </>
     );
-  }, [files, data, form, groupName, type, onFileRemove, getFolderTree]);
+  }, [
+    data,
+    type,
+    form,
+    files,
+    groupName,
+    customFolderPath,
+    getFolderTree,
+    onFileRemove,
+  ]);
 
   const modalContents = {
     1: stepOne,
@@ -299,6 +355,7 @@ export function CreateDatasetModal({
           setUploadingToDataset(false);
           setUploadResult('idle');
           setTarget(null);
+          setCustomFolderPath({ isEditing: false, path: '' });
         }, 200);
       }
     };
@@ -324,7 +381,9 @@ export function CreateDatasetModal({
           : 'Cancel'
       }
       okButtonProps={{
-        disabled: files.length === 0 && uploadedResult !== 'success',
+        disabled:
+          (files.length === 0 && uploadedResult !== 'success') ||
+          customFolderPath.isEditing,
         style: {
           display: uploadingToDataset ? 'none' : 'inline-block',
           cursor:
@@ -377,15 +436,16 @@ export function CreateDatasetModal({
             setSteps(2);
             setFetching(true);
 
-            // Check the folder path is nested or not, if is a nested folder path,
-            // we need to exclude the root path and put remain path to `path`.
-            const isNested = values.id.indexOf('/') === -1 ? false : true;
-            const rootFolder = isNested
-              ? values.id.slice(0, values.id.indexOf('/'))
-              : values.id;
-            const nestedFolderPath = isNested
-              ? values.id.slice(values.id.indexOf('/'))
-              : '/';
+            // Splitting the folder to root folder and nested folder paths
+            // User might be give root folder like `dataset` instead of `dataset/`,
+            // so need to check has slash or not.
+            const withouSlashSuffix = values.id.indexOf('/') === -1;
+            const rootFolder = withouSlashSuffix
+              ? values.id
+              : values.id.slice(0, values.id.indexOf('/'));
+            const nestedFolderPath = withouSlashSuffix
+              ? '/'
+              : values.id.slice(values.id.indexOf('/'));
 
             try {
               const { endpoint } = await props.onCopyFiles({
@@ -443,6 +503,7 @@ export function CreateDatasetModal({
                       setUploadingToDataset(false);
                       setUploadResult('idle');
                       setTarget(null);
+                      setCustomFolderPath({ isEditing: false, path: '' });
                     }, 200);
                   }}
                 >
@@ -452,6 +513,7 @@ export function CreateDatasetModal({
             ),
           });
         } else {
+          setCustomFolderPath({ isEditing: false, path: '' });
           props.onModalClose();
         }
       }}
@@ -479,7 +541,7 @@ function UploadComplete({
       }}
     >
       <Icon
-        type='close'
+        type={isSuccess ? 'check' : 'close'}
         style={{
           width: '70px',
           height: '70px',

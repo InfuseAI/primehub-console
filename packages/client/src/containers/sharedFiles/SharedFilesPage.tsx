@@ -149,8 +149,8 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
 
             return {
               key: `${eventKey}/${folderName}`,
-              value: `${eventKey}/${folderName}`,
-              title: folderName,
+              value: `${eventKey}/${folderName}/`,
+              title: `${folderName}/`,
               icon: <Icon type='folder' />,
             };
           }
@@ -184,8 +184,8 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
     if (datasetList.length > 0) {
       const nextFolderTree = datasetList.map(dataset => ({
         key: dataset.id,
-        value: dataset.id,
-        title: dataset.name,
+        value: `${dataset.name}/`,
+        title: `${dataset.name}/`,
         icon: <Icon type='database' />,
       }));
 
