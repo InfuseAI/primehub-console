@@ -19,7 +19,8 @@ export const createMinioClient = (endpoint: string, accessKey: string, secretKey
         port,
         useSSL,
         accessKey,
-        secretKey
+        secretKey,
+        partSize: 5 * 1024 * 1024   // override partSize (5MB is min size defined by Minio)
     });
     return minioClient;
 };
