@@ -6,7 +6,7 @@ import { compose } from 'recompose';
 import { Upload, Icon } from 'antd';
 import { errorHandler } from 'utils/errorHandler';
 import axios, { Canceler } from 'axios';
-import { toGroupPath } from 'utils/';
+import { toGroupPath } from 'utils/index';
 
 const { Dragger } = Upload;
 
@@ -70,7 +70,10 @@ function _Uploader(props: Props) {
       phfsPrefix,
       file.name
     );
-    const endpoint = graphqlEndpoint.replace('/graphql', `/files/${filePath}`);
+    const endpoint = graphqlEndpoint.replace(
+      '/graphql',
+      `/files/${encodeURIComponent(filePath)}`
+    );
     const headers = {
       authorization: `Bearer ${getAccessToken()}`,
     };

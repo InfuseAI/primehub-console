@@ -187,7 +187,11 @@ function ShareFileActions({
   );
   const DownloadFile = (
     <Menu.Item key='download'>
-      <a href={`${appPrefix}files/${prefix}${props.name}?download=1`}>
+      <a
+        href={`${appPrefix}files/${prefix}${encodeURIComponent(
+          props.name
+        )}?download=1`}
+      >
         Download file
       </a>
     </Menu.Item>
