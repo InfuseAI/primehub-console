@@ -108,4 +108,6 @@ export const schema: any = makeExecutableSchema({
 
 export const registerGroupDeletionCallbacks = () => {
   group.registerGroupDeletionCallback('apps', phApplication.destroyByGroup);
+  group.registerGroupDeletionCallback('datasets', datasetV2.destroyByGroup);
+  group.registerGroupDeletionCallback('sharedFiles', store.destroyByGroup);
 };

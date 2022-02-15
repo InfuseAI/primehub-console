@@ -2,7 +2,7 @@ import { ApolloError } from 'apollo-server';
 import { find, isEmpty, debounce } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Context } from './interface';
+import { Context, Role } from './interface';
 import * as logger from '../logger';
 import { toRelay, extractPagination, filter } from './utils';
 import { isGroupBelongUser, toGroupPath } from '../utils/groupCheck';
@@ -305,7 +305,10 @@ export const update = async (root, args, context: Context) => {
 export const destroy = async (root, args, context: Context) => {
   await checkMinioClient(context);
   const { id, groupName } = args.where;
-  await checkPermission(context, groupName);
+
+  if (context.role !== Role.ADMIN) {
+    await checkPermission(context, groupName);
+  }
 
   const metadataPath = toDataPath(groupName, id);
   const dataPath = toDataPath(groupName, id, false);
@@ -536,3 +539,28 @@ async function putMetaData(
     }
   }
 }
+
+export const destroyByGroup = async (
+  context: Context,
+  group: { id: string; name: string },
+  dryrun: boolean
+) => {
+  const objectPrefix = getDatasetPrefix(group.name);
+  const datasetList = await listDatasets(objectPrefix, context);
+
+  if (dryrun) {
+    return datasetList.length;
+  }
+
+  for (const dataset of datasetList) {
+    const args = {
+      where: {
+        id: dataset.id,
+        groupName: group.name,
+      },
+    };
+    destroy(null, args, context);
+  }
+
+  return datasetList.length;
+};
