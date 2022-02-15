@@ -43,6 +43,7 @@ query GroupResourcesToBeDeleted($where: GroupWhereUniqueInput!) {
     jobs
     schedules
     deployments
+    datasets
   }
 }
 

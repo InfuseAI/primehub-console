@@ -29,6 +29,16 @@ const { confirm } = Modal;
 const { Search } = Input;
 const ButtonGroup = Button.Group;
 
+const breadcrumbs = [
+  {
+    key: 'list',
+    matcher: /\/group/,
+    title: 'Groups',
+    tips: 'Admin can find and manage groups here.',
+    tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-group',
+  },
+];
+
 type Props = {
   client: ApolloClient<any>;
   dataSource: any;
@@ -41,15 +51,7 @@ export function GroupList(props: Props) {
   const history = useHistory();
   const location = useLocation();
   const DISABLE_GROUP = (window as any).disableGroup || false;
-  const breadcrumbs = [
-    {
-      key: 'list',
-      matcher: /\/group/,
-      title: 'Groups',
-      tips: 'Admin can find and manage groups here.',
-      tipsLink: 'https://docs.primehub.io/docs/guide_manual/admin-group',
-    },
-  ];
+
   const params = queryString.parse(location.search.replace(/^\?/, '')) || {};
   const [currentPage, setCurrentPage] = useState(get(params, 'page', 1));
   const [search, setSearch] = useState(get(params, 's', null));
@@ -99,6 +101,12 @@ export function GroupList(props: Props) {
             {resources.schedules ? <li>{resources.schedules} Recurring Jobs</li> : <></>}
             {resources.deployments ? <li>{resources.deployments} Deployments</li> : <></>}
             {resources.apps ? <li>{resources.apps} Apps</li> : <></>}
+            {window?.enablePhfs && (
+              <>
+                {resources.datasets ? <li>{resources.datasets} Datasets</li> : <></>}
+                <li>All Shared Files</li>
+              </>
+            )}
           </ul>
         </>
       );
