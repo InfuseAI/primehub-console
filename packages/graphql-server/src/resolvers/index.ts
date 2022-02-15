@@ -18,6 +18,7 @@ import * as GraphQLJSON from 'graphql-type-json';
 import { gql } from 'apollo-server';
 import { importSchema } from 'graphql-import';
 import { makeExecutableSchema } from 'graphql-tools';
+import { createConfig } from '../config';
 
 // A map of functions which return data for the schema.
 export const resolvers = {

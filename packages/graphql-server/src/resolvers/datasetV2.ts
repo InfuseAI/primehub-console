@@ -12,6 +12,7 @@ import { ErrorCodes } from '../errorCodes';
 import { Readable } from 'stream';
 import moment from 'moment';
 import { getCopyStatusEndpoint } from '../controllers/copyStatusCtrl';
+import { createConfig } from '../config';
 
 const {
   NOT_AUTH_ERROR,
@@ -545,6 +546,12 @@ export const destroyByGroup = async (
   group: { id: string; name: string },
   dryrun: boolean
 ) => {
+
+  const config = createConfig();
+  if (!config.enableStore) {
+    return 0;
+  }
+
   const objectPrefix = getDatasetPrefix(group.name);
   const datasetList = await listDatasets(objectPrefix, context);
 

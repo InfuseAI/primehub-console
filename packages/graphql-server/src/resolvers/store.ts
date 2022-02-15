@@ -8,6 +8,7 @@ import { ErrorCodes } from '../errorCodes';
 import { createHash } from 'crypto';
 import { Readable, Stream } from 'stream';
 import getStream from 'get-stream';
+import { createConfig } from '../config';
 const {NOT_AUTH_ERROR, INTERNAL_ERROR, RESOURCE_NOT_FOUND} = ErrorCodes;
 
 interface StoreFile {
@@ -289,6 +290,12 @@ export const destroyByGroup = async (
   group: { id: string; name: string },
   dryrun: boolean
 ) => {
+
+  const config = createConfig();
+  if (!config.enableStore) {
+    return 0;
+  }
+
   // Always report count to 1, shared files are uncountable.
   if (dryrun) {
     return 1;
