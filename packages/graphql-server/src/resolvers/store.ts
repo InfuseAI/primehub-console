@@ -1,6 +1,6 @@
 import { ApolloError } from 'apollo-server';
 
-import { Context } from './interface';
+import { Context, Role } from './interface';
 import * as logger from '../logger';
 import { toGroupPath, isGroupBelongUser } from '../utils/groupCheck';
 
@@ -8,6 +8,7 @@ import { ErrorCodes } from '../errorCodes';
 import { createHash } from 'crypto';
 import { Readable, Stream } from 'stream';
 import getStream from 'get-stream';
+import { createConfig } from '../config';
 const {NOT_AUTH_ERROR, INTERNAL_ERROR, RESOURCE_NOT_FOUND} = ErrorCodes;
 
 interface StoreFile {
@@ -124,7 +125,9 @@ export const destroy = async (root, args, context: Context) => {
   const {minioClient, storeBucket} = context;
   const {groupName, phfsPrefix} = args.where;
 
-  await checkPermission(context, groupName);
+  if (context.role !== Role.ADMIN) {
+    await checkPermission(context, groupName);
+  }
 
   let recursive = false;
   if (args.options && args.options.recursive) {
@@ -280,4 +283,29 @@ export const querySharedFile = async (root, args, context: Context) => {
     hash,
     shareLink,
   };
+};
+
+export const destroyByGroup = async (
+  context: Context,
+  group: { id: string; name: string },
+  dryrun: boolean
+) => {
+
+  const config = createConfig();
+  if (!config.enableStore) {
+    return 0;
+  }
+
+  // Always report count to 1, shared files are uncountable.
+  if (dryrun) {
+    return 1;
+  }
+
+  // inovke the destroy with empty prefix
+  const args = {
+    where: { groupName: group.name, phfsPrefix: '' },
+    options: { recursive: true },
+  };
+  destroy(null, args, context);
+  return 1;
 };

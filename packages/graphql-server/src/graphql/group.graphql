@@ -58,6 +58,8 @@ type Group {
 type GroupResourcesToBeDeleted {
   # CE
   apps: Int
+  datasets: Int
+  sharedFiles: Int
 
   # EE
   jobs: Int
