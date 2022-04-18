@@ -222,12 +222,11 @@ function GroupForm(props: Props) {
     e.preventDefault();
     form.validateFields(async (err, values) => {
       if (err) return;
-      const data = pickBy(values, (value, key) => {
-        return type === 'create' || form.isFieldTouched(key);
-      });
 
-      if (type === 'update' && data.enabledSharedVolume) {
-        data.sharedVolumeCapacity = values.sharedVolumeCapacity;
+      const data = values;
+
+      if (type === 'update') {
+        delete data.name;
       }
 
       const result: Partial<GroupInput> = {
