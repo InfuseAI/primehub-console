@@ -265,10 +265,13 @@ export const update = async (root, args, context: Context) => {
   validateSharedVolumeAttrs(attrs);
   // create pvc
   if (payload.enabledSharedVolume && payload.sharedVolumeCapacity >= 0) {
-    await context.k8sGroupPvc.create({
-      groupName: group.name,
-      volumeSize: payload.sharedVolumeCapacity
-    });
+    const pvc = await context.k8sGroupPvc.findOne(group.name);
+    if (pvc === null) {
+      await context.k8sGroupPvc.create({
+        groupName: group.name,
+        volumeSize: payload.sharedVolumeCapacity
+      });
+    }
   }
 
   // update
