@@ -4,7 +4,7 @@ import {
   Button,
   Input,
   Tooltip,
-  Table as AntTable,
+  Table,
   Icon,
   Modal,
 } from 'antd';
@@ -31,7 +31,7 @@ const breadcrumbs = [
 
 const Search = Input.Search;
 
-const Table = styled(AntTable)`
+const AntTable = styled(Table)`
   background: white;
   .ant-pagination.ant-table-pagination {
     margin-right: 16px;
@@ -246,7 +246,7 @@ function ImageList({ imagesConnection, imagesLoading, ...props }: Props) {
             </Col>
           </ButtonCol>
         </FilterRow>
-        <Table
+        <AntTable
           loading={imagesLoading}
           dataSource={imagesConnection.edges.map(edge => edge.node)}
           columns={columns}

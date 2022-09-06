@@ -44,7 +44,7 @@ export class JobLogCtrl {
 
   public streamLogs = async (ctx: ParameterizedContext) => {
     const {role} = ctx;
-    const {follow, tailLines} = ctx.query;
+    const {follow, tailLines}: {follow?: boolean; tailLines?: number} = ctx.query;
     const namespace = ctx.params.namespace || this.namespace;
     const jobId = ctx.params.jobId;
     if (role !== Role.ADMIN) {
@@ -69,7 +69,7 @@ export class JobLogCtrl {
 
   public streamPhJobLogs = async (ctx: ParameterizedContext) => {
     const {kcAdminClient, userId} = ctx;
-    const {follow, tailLines, persist} = ctx.query;
+    const {follow, tailLines, persist}: {follow?: boolean; tailLines?: number; persist?: string} = ctx.query;
     const namespace = ctx.params.namespace || this.namespace;
     const jobId = ctx.params.jobId;
     const phjob = await this.crdClient.phJobs.get(jobId, namespace);
@@ -88,7 +88,7 @@ export class JobLogCtrl {
     if (this.persistLog && persist === 'true') {
       let tail = 0;
       if (tailLines) {
-        tail = parseInt(tailLines, 10);
+        tail = parseInt(tailLines.toString(), 10);
       }
       const prefix = `logs/phjob/${jobId}`;
       stream = await this.persistLog.getStream(prefix, {tailLines: tail});
@@ -109,7 +109,7 @@ export class JobLogCtrl {
 
   public streamPhDeploymentLogs = async (ctx: ParameterizedContext) => {
     const {kcAdminClient, userId} = ctx;
-    const {follow, tailLines} = ctx.query;
+    const {follow, tailLines}: {follow?: boolean; tailLines?: number} = ctx.query;
     const namespace = ctx.params.namespace || this.namespace;
     const podName = ctx.params.podName;
     const pod = await kubeClient.api.v1.namespace(namespace).pods(podName).get();

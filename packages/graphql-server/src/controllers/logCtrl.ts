@@ -33,7 +33,7 @@ export class PodLogs {
       follow,
       tailLines,
       container
-    } = ctx.query;
+    }: {follow?: boolean; tailLines?: number; container?: string} = ctx.query;
     const podName = 'jupyter-' + escapePodName(ctx.username);
     const stream = getK8SLogStream(this.namespace, podName, {
       container: container || 'notebook',
@@ -67,7 +67,7 @@ export class PodLogs {
       throw Boom.forbidden('request not authorized');
     }
 
-    const {follow, tailLines} = ctx.query;
+    const {follow, tailLines}: {follow?: boolean; tailLines?: number} = ctx.query;
     const imageSpecJob = await this.crdClient.imageSpecJobs.get(imageId);
     const podName = imageSpecJob.status.podName;
     const stream = getK8SLogStream(this.namespace, podName, {follow, tailLines});
@@ -90,7 +90,7 @@ export class PodLogs {
 
   public streamPhApplicationPodLogs = async (ctx: ParameterizedContext) => {
     const { kcAdminClient, userId } = ctx;
-    const {follow, tailLines} = ctx.query;
+    const {follow, tailLines}: {follow?: boolean; tailLines?: number} = ctx.query;
     const namespace = this.namespace;
     const podName = ctx.params.podName;
     const pod = await kubeClient.api.v1.namespace(namespace).pods(podName).get();

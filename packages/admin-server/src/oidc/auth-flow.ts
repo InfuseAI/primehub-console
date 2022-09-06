@@ -59,7 +59,7 @@ export class OidcAuthenticationFlowCtrl {
       async (ctx: Koa.ParameterizedContext, next: any) => {
         return next();
       },
-      async ctx => {
+      async (ctx: Koa.ParameterizedContext) => {
         const querystring = encode(ctx.request.querystring);
         ctx.state.apiTokenExhangeCode = querystring;
         await ctx.render('anonymous', {
