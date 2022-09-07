@@ -47,7 +47,7 @@ setup_k3d() {
   k3d version
 
   # Create k3d
-  k3d cluster create ${CLUSTER_NAME} --image rancher/k3s:${K8S_VERSION} --k3s-arg '--disable=traefik' --k3s-arg '--disable-network-policy' --wait
+  k3d cluster create ${CLUSTER_NAME} --image rancher/k3s:${K8S_VERSION} --k3s-arg '--disable=traefik@server:0' --k3s-arg '--disable-network-policy' --wait
   mkdir -p ~/.kube
   cp $(k3d kubeconfig get ${CLUSTER_NAME}) ~/.kube/config || true
 
