@@ -48,8 +48,6 @@ setup_k3d() {
 
   # Create k3d
   k3d cluster create ${CLUSTER_NAME} --image rancher/k3s:${K8S_VERSION} --k3s-arg '--disable=traefik@server:0' --k3s-arg '--disable-network-policy@server:0' --wait
-  mkdir -p ~/.kube
-  cp $(k3d kubeconfig get ${CLUSTER_NAME}) ~/.kube/config || true
 
   echo "kube context: $(kubectl config current-context)"
   echo "waiting for nodes ready"
