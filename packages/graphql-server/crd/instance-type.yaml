@@ -23,6 +23,7 @@ spec:
           metadata:
             type: object
           spec:
+            x-kubernetes-preserve-unknown-fields: true
             properties:
               description:
                 type: string
@@ -34,7 +35,7 @@ spec:
                 type: string
               limits.nvidia.com/gpu:
                 type: integer
-              request.memory:
+              requests.memory:
                 type: string
               requests.cpu:
                 type: number

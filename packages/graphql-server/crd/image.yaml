@@ -39,6 +39,7 @@ spec:
           metadata:
             type: object
           spec:
+            x-kubernetes-preserve-unknown-fields: true
             properties:
               description:
                 type: string
