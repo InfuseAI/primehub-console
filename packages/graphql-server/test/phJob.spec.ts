@@ -177,6 +177,7 @@ describe('phJob graphql', function() {
     });
 
     const data = {
+      userId: 'user-id',
       displayName: 'job name',
       groupId: group.id,
       instanceType: instanceTypeId,
