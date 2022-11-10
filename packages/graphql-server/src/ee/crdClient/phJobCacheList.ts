@@ -61,7 +61,7 @@ export class PhJobCacheList {
 
 function createCache(namespace: string): k8s.ListWatch<k8s.KubernetesObject> {
   const group = phJobCrd.spec.group;
-  const version = phJobCrd.spec.version;
+  const version = phJobCrd.spec.versions[0].name;
   const plural = phJobCrd.spec.names.plural;
   const listFn = () => k8sClient.listNamespacedCustomObject(
     group,
