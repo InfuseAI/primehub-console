@@ -121,7 +121,7 @@ export const cleaupAllCrd = async () => {
 
 const checkNotProduction = async () => {
   try {
-    await oclient.readCustomResourceDefinition('datasets.primehub.io')
+    await k8sClient.readCustomResourceDefinition('datasets.primehub.io');
   } catch (e) {
     return;
   }
