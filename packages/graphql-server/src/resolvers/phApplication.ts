@@ -7,7 +7,7 @@ import {
 } from '../crdClient/crdClientImpl';
 import { transform as templateTransform, PhAppTemplate } from './phAppTemplate';
 import { mapping } from './instanceType';
-import CustomResource, { Item } from '../crdClient/customResource';
+import CustomResourceNG, { Item } from '../crdClient/customResourceNG';
 import { get, find, isEmpty } from 'lodash';
 import { ApolloError } from 'apollo-server';
 import KeycloakAdminClient from 'keycloak-admin';
@@ -157,7 +157,7 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
 };
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhApplicationSpec, PhApplicationStatus>, where: any, order: any, context: Context): Promise<PhApplication[]> => {
+const listQuery = async (client: CustomResourceNG<PhApplicationSpec, PhApplicationStatus>, where: any, order: any, context: Context): Promise<PhApplication[]> => {
   const {namespace, graphqlHost, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phApplication = await client.get(where.id);

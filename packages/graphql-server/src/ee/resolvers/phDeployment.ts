@@ -6,7 +6,7 @@ import { validateLicense, validateModelDeployQuota } from './utils';
 import {
   PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, client as kubeClient
 } from '../../crdClient/crdClientImpl';
-import CustomResource, { Item } from '../../crdClient/customResource';
+import CustomResourceNG, { Item } from '../../crdClient/customResourceNG';
 import { orderBy, omit, get, isUndefined, isNil, isEmpty, isNull, capitalize, intersection } from 'lodash';
 import * as moment from 'moment';
 import { ApolloError } from 'apollo-server';
@@ -346,7 +346,7 @@ const canUserMutate = async (userId: string, groupId: string, context: Context) 
 };
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhDeploymentSpec>, where: any, context: Context): Promise<PhDeployment[]> => {
+const listQuery = async (client: CustomResourceNG<PhDeploymentSpec>, where: any, context: Context): Promise<PhDeployment[]> => {
   const {namespace, graphqlHost, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phDeployment = await client.get(where.id);
