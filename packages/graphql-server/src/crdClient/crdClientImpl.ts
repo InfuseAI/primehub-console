@@ -330,10 +330,10 @@ export default class CrdClientImpl {
   public imageSpecs: CustomResource<ImageSpecSpec, ImageSpecStatus>;
   public announcements: CustomResource<AnnouncementSpec>;
   public imageSpecJobs: CustomResource<ImageSpecJobSpec, ImageSpecJobStatus>;
-  public phJobs: CustomResource<PhJobSpec, PhJobStatus>;
-  public phSchedules: CustomResource<PhScheduleSpec, PhScheduleStatus>;
-  public phDeployments: CustomResource<PhDeploymentSpec, PhDeploymentStatus>;
-  public phApplications: CustomResource<PhApplicationSpec, PhApplicationStatus>;
+  public phJobs: CustomResourceNG<PhJobSpec, PhJobStatus>;
+  public phSchedules: CustomResourceNG<PhScheduleSpec, PhScheduleStatus>;
+  public phDeployments: CustomResourceNG<PhDeploymentSpec, PhDeploymentStatus>;
+  public phApplications: CustomResourceNG<PhApplicationSpec, PhApplicationStatus>;
   public phAppTemplates: CustomResource<PhAppTemplateSpec>;
   private namespace: string;
 
@@ -369,26 +369,26 @@ export default class CrdClientImpl {
       loadCrd('imageSpecJob'),
       this.namespace
     );
-    this.phJobs = new CustomResource<PhJobSpec, PhJobStatus>(
-      client,
+    this.phJobs = new CustomResourceNG<PhJobSpec, PhJobStatus>(
+      oclient,
       watch,
       phJobCrd,
       this.namespace
     );
-    this.phSchedules = new CustomResource<PhScheduleSpec, PhScheduleStatus>(
-      client,
+    this.phSchedules = new CustomResourceNG<PhScheduleSpec, PhScheduleStatus>(
+      oclient,
       watch,
       loadCrd('phSchedule'),
       this.namespace
     );
-    this.phDeployments = new CustomResource<PhDeploymentSpec, PhDeploymentStatus>(
-      client,
+    this.phDeployments = new CustomResourceNG<PhDeploymentSpec, PhDeploymentStatus>(
+      oclient,
       watch,
       loadCrd('phDeployment'),
       this.namespace
     );
-    this.phApplications = new CustomResource<PhApplicationSpec, PhApplicationStatus>(
-      client,
+    this.phApplications = new CustomResourceNG<PhApplicationSpec, PhApplicationStatus>(
+      oclient,
       watch,
       loadCrd('phApplication'),
       this.namespace
