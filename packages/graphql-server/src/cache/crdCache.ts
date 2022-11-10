@@ -1,4 +1,4 @@
-import { Item } from '../crdClient/customResource';
+import { Item } from '../crdClient/customResourceNG';
 import * as logger from '../logger';
 const createEmptySpec = () => ({spec: {}, metadata: {name: 'empty'}});
 

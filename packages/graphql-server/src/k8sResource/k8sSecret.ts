@@ -1,4 +1,4 @@
-import { client as kubeClient } from '../crdClient/crdClientImpl';
+import { corev1KubeClient } from '../crdClient/crdClientImpl';
 import { get, isEmpty, isUndefined, isNull } from 'lodash';
 import { ApolloError } from 'apollo-server';
 
@@ -38,14 +38,17 @@ export default class K8sSecret {
   }
 
   public find = async (type?: string, namespace?: string) => {
-    const {body: {items}} = await this.resource(namespace).get();
+    const {body: {items}} = await corev1KubeClient.listNamespacedSecret(namespace || this.namespace);
     let data = items || [];
     if (type) {
       this.validateType(type);
-      data = data.filter(record => get<string>(record, 'metadata.name', '').startsWith(this.getPrefixByType(type)));
+      data = data.filter(record => {
+        const name = record.metadata?.name || '';
+        return name.startsWith(this.getPrefixByType(type));
+      });
     } else {
       data = data.filter(record => {
-        const name = get<string>(record, 'metadata.name', '');
+        const name = record.metadata?.name || '';
         return name.startsWith(GITSYNC_PREFIX) || name.startsWith(IMAGE_PREFIX);
       });
     }
@@ -55,8 +58,7 @@ export default class K8sSecret {
 
   public findOne = async (name: string, namespace?: string) => {
     try {
-      const resource = this.resource(namespace);
-      const {body} = await resource(name).get();
+      const {body} = await corev1KubeClient.readNamespacedSecret(name, namespace || this.namespace);
       return this.propsMapping(body);
     } catch (e) {
       if (e.statusCode === 404) {
@@ -81,21 +83,20 @@ export default class K8sSecret {
   }) => {
     try {
       this.validateType(type);
-      const {body} = await this.resource(namespace).post({
-        body: {
-          Kind: 'Secret',
-          apiVersion: 'v1',
-          metadata: {
-            name: this.createPrefixByType(type, name),
-            annotations: {
-              displayName
-            }
-          },
-          data: this.createDataByType(type, config),
-          type
-        }
-      });
-      return this.propsMapping(body);
+      const body = {
+        kind: 'Secret',
+        apiVersion: 'v1',
+        metadata: {
+          name: this.createPrefixByType(type, name),
+          annotations: {
+            displayName
+          }
+        },
+        data: this.createDataByType(type, config),
+        type
+      };
+      const { body: createdSecret } = await corev1KubeClient.createNamespacedSecret(namespace || this.namespace, body);
+      return this.propsMapping(createdSecret);
     } catch (e) {
       if (e.statusCode === 409) {
         throw new ApolloError(e.message, 'RESOURCE_CONFLICT');
@@ -107,25 +108,22 @@ export default class K8sSecret {
   public update = async (
     name: string, {displayName, config}: {displayName: string, config?: ConfigType}, namespace?: string) => {
     // api can only update displayName, data in config (ssh, .dockerconfigjson)
-    const resource = this.resource(namespace);
-    const {body: originalData} = await resource(name).get();
+    const {body: originalData} = await corev1KubeClient.readNamespacedSecret(name, namespace || this.namespace);
     const type: string = originalData.type;
     const data = isEmpty(config) ? {} : this.createDataByType(type, config, originalData);
     const annotations = displayName ? {displayName} : {};
-    const {body} = await resource(name).patch({
-      body: {
-        metadata: {
-          annotations
-        },
-        data
-      }
-    });
-    return this.propsMapping(body);
+    const body = {
+      metadata: {
+        annotations
+      },
+      data
+    };
+    const {body: updatedSecret} = await corev1KubeClient.patchNamespacedSecret(name, namespace || this.namespace, body);
+    return this.propsMapping(updatedSecret);
   }
 
   public async delete(name: string, namespace?: string) {
-    const resource = this.resource(namespace);
-    return resource(name).delete();
+    return corev1KubeClient.deleteNamespacedSecret(name, namespace || this.namespace);
   }
 
   private propsMapping = (response: any) => {
@@ -226,9 +224,5 @@ export default class K8sSecret {
 
   private toBase64(str: string) {
     return Buffer.from(str).toString('base64');
-  }
-
-  private resource = (namespace?: string) => {
-    return kubeClient.api.v1.namespaces(namespace || this.namespace).secrets;
   }
 }

@@ -1,28 +1,12 @@
-import kubeClient from 'kubernetes-client';
 import * as k8s from '@kubernetes/client-node';
 import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
-import CustomResource from './customResource';
 import CustomResourceNG from './customResourceNG';
 
 const inCluster = (process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT);
 
-// initialize k8s client
-const Client = (kubeClient as any).Client;
-const config = (kubeClient as any).config;
-const clusterConfig = inCluster ? config.getInCluster() : config.fromKubeconfig();
-export const client = new Client({
-  config: {
-    ...clusterConfig,
-    // k8s api timeout, related: https://github.com/godaddy/kubernetes-client/issues/367
-    // it got stuck for no reason
-    timeout: 2000
-  },
-  version: '1.10'
-});
-
-// kubernetes-client/javascript for watch
+// kubernetes-client/javascript
 export let watch: k8s.Watch;
 const kc = new k8s.KubeConfig();
 
@@ -32,7 +16,8 @@ if (inCluster) {
   kc.loadFromFile(`${process.env.HOME}/.kube/config`);
 }
 watch = new k8s.Watch(kc);
-const oclient = kc.makeApiClient(k8s.CustomObjectsApi);
+export const client = kc.makeApiClient(k8s.CustomObjectsApi);
+export const corev1KubeClient = kc.makeApiClient(k8s.CoreV1Api);
 
 export const kubeConfig = kc;
 
@@ -327,79 +312,79 @@ export default class CrdClientImpl {
   public instanceTypes: CustomResourceNG<InstanceTypeSpec>;
   public datasets: CustomResourceNG<DatasetSpec>;
   public images: CustomResourceNG<ImageSpec>;
-  public imageSpecs: CustomResource<ImageSpecSpec, ImageSpecStatus>;
-  public announcements: CustomResource<AnnouncementSpec>;
-  public imageSpecJobs: CustomResource<ImageSpecJobSpec, ImageSpecJobStatus>;
+  public imageSpecs: CustomResourceNG<ImageSpecSpec, ImageSpecStatus>;
+  public announcements: CustomResourceNG<AnnouncementSpec>;
+  public imageSpecJobs: CustomResourceNG<ImageSpecJobSpec, ImageSpecJobStatus>;
   public phJobs: CustomResourceNG<PhJobSpec, PhJobStatus>;
   public phSchedules: CustomResourceNG<PhScheduleSpec, PhScheduleStatus>;
   public phDeployments: CustomResourceNG<PhDeploymentSpec, PhDeploymentStatus>;
   public phApplications: CustomResourceNG<PhApplicationSpec, PhApplicationStatus>;
-  public phAppTemplates: CustomResource<PhAppTemplateSpec>;
+  public phAppTemplates: CustomResourceNG<PhAppTemplateSpec>;
   private namespace: string;
 
   constructor(args?: CrdArgs) {
     this.namespace = args && args.namespace || 'default';
     this.instanceTypes = new CustomResourceNG<InstanceTypeSpec>(
-      oclient,
+      client,
       watch,
       loadCrd('instance-type'),
       this.namespace
     );
     this.datasets = new CustomResourceNG<DatasetSpec>(
-      oclient,
+      client,
       watch,
       loadCrd('dataset'),
       this.namespace
     );
     this.images = new CustomResourceNG<ImageSpec>(
-      oclient,
+      client,
       watch,
       loadCrd('image'),
       this.namespace
     );
-    this.imageSpecs = new CustomResource<ImageSpecSpec, ImageSpecStatus>(
+    this.imageSpecs = new CustomResourceNG<ImageSpecSpec, ImageSpecStatus>(
       client,
       watch,
       loadCrd('imageSpec'),
       this.namespace
     );
-    this.imageSpecJobs = new CustomResource<ImageSpecJobSpec, ImageSpecJobStatus>(
+    this.imageSpecJobs = new CustomResourceNG<ImageSpecJobSpec, ImageSpecJobStatus>(
       client,
       watch,
       loadCrd('imageSpecJob'),
       this.namespace
     );
     this.phJobs = new CustomResourceNG<PhJobSpec, PhJobStatus>(
-      oclient,
+      client,
       watch,
       phJobCrd,
       this.namespace
     );
     this.phSchedules = new CustomResourceNG<PhScheduleSpec, PhScheduleStatus>(
-      oclient,
+      client,
       watch,
       loadCrd('phSchedule'),
       this.namespace
     );
     this.phDeployments = new CustomResourceNG<PhDeploymentSpec, PhDeploymentStatus>(
-      oclient,
+      client,
       watch,
       loadCrd('phDeployment'),
       this.namespace
     );
     this.phApplications = new CustomResourceNG<PhApplicationSpec, PhApplicationStatus>(
-      oclient,
+      client,
       watch,
       loadCrd('phApplication'),
       this.namespace
     );
-    this.phAppTemplates = new CustomResource<PhAppTemplateSpec>(
+    this.phAppTemplates = new CustomResourceNG<PhAppTemplateSpec>(
       client,
       watch,
       loadCrd('phAppTemplate'),
       this.namespace
     );
-    this.announcements = new CustomResource<AnnouncementSpec>(
+    this.announcements = new CustomResourceNG<AnnouncementSpec>(
       client,
       watch,
       loadCrd('announcement'),

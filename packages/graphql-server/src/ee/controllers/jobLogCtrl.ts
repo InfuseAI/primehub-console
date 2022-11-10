@@ -1,4 +1,4 @@
-import CrdClientImpl, { kubeConfig, client as kubeClient } from '../../crdClient/crdClientImpl';
+import CrdClientImpl, { corev1KubeClient } from '../../crdClient/crdClientImpl';
 import { Middleware, ParameterizedContext } from 'koa';
 import { Stream } from 'stream';
 import * as logger from '../../logger';
@@ -112,7 +112,7 @@ export class JobLogCtrl {
     const {follow, tailLines}: {follow?: boolean; tailLines?: number} = ctx.query;
     const namespace = ctx.params.namespace || this.namespace;
     const podName = ctx.params.podName;
-    const pod = await kubeClient.api.v1.namespace(namespace).pods(podName).get();
+    const pod = await corev1KubeClient.readNamespacedPod(podName, namespace);
     const phDeploymentName = pod.body.metadata.labels['primehub.io/phdeployment'] || '';
     if (phDeploymentName === '') { throw Boom.notFound(); }
     const resource = await this.crdClient.phDeployments.get(phDeploymentName, namespace);

@@ -1,5 +1,5 @@
 import { Context } from './interface';
-import { Item } from '../crdClient/customResource';
+import { Item } from '../crdClient/customResourceNG';
 import { ImageSpec, ImageType, ImageCrdImageSpec } from '../crdClient/crdClientImpl';
 import { QueryImageMode, toRelay, extractPagination, mutateRelation, isGroupAdmin, isAdmin } from './utils';
 import { ApolloError } from 'apollo-server';

@@ -1,9 +1,8 @@
 import * as k8s from '@kubernetes/client-node';
 import * as informer from '@kubernetes/client-node/dist/informer';
-import { watch, kubeConfig, phJobCrd, PhJobSpec, PhJobStatus } from '../../crdClient/crdClientImpl';
-import { Item } from '../../crdClient/customResource';
+import { watch, phJobCrd, PhJobSpec, PhJobStatus, client as k8sClient } from '../../crdClient/crdClientImpl';
+import { Item } from '../../crdClient/customResourceNG';
 import * as logger from '../../logger';
-const k8sClient = kubeConfig.makeApiClient(k8s.CustomObjectsApi);
 
 const CHECK_DURATION = 5 * 60 * 1000; // 5 minutes to check if the cache is in-sync
 

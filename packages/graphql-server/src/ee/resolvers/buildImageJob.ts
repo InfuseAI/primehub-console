@@ -1,7 +1,7 @@
 import { Context } from '../../resolvers/interface';
 import { toRelay, filter, paginate, extractPagination, stringifyPackageField } from '../../resolvers/utils';
 import { get } from 'lodash';
-import CustomResource, { Item } from '../../crdClient/customResource';
+import CustomResourceNG, { Item } from '../../crdClient/customResourceNG';
 import { ImageSpecJobSpec, ImageSpecJobStatus } from '../../crdClient/crdClientImpl';
 import { IMAGE_SPEC_JOB_HASH_ANNOTATION, IMAGE_SPEC_JOB_NAME_LABEL } from './constant';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
@@ -54,7 +54,7 @@ export const transform = (item: Item<ImageSpecJobSpec, ImageSpecJobStatus>, name
  */
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<ImageSpecJobSpec>, where: any, namespace: string, graphqlHost: string, jobLogCtrl: JobLogCtrl): Promise<BuildImageJob[]> => {
+const listQuery = async (client: CustomResourceNG<ImageSpecJobSpec>, where: any, namespace: string, graphqlHost: string, jobLogCtrl: JobLogCtrl): Promise<BuildImageJob[]> => {
   if (where.id) {
     const imageSpecJob = await client.get(where.id);
     return [transform(imageSpecJob, namespace, graphqlHost, jobLogCtrl)];

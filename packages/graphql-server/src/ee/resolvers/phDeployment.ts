@@ -4,7 +4,7 @@ import {
 } from '../../resolvers/utils';
 import { validateLicense, validateModelDeployQuota } from './utils';
 import {
-  PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, client as kubeClient
+  PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, corev1KubeClient
 } from '../../crdClient/crdClientImpl';
 import CustomResourceNG, { Item } from '../../crdClient/customResourceNG';
 import { orderBy, omit, get, isUndefined, isNil, isEmpty, isNull, capitalize, intersection } from 'lodash';
@@ -310,9 +310,14 @@ export const typeResolvers = {
       'app': 'primehub-deployment',
       'primehub.io/phdeployment': parent.id,
     });
-    const {body: {items}} = await kubeClient.api.v1.namespaces(context.crdNamespace).pods.get({
-      qs: {labelSelector}
-    });
+    const {body: {items}} = await corev1KubeClient.listNamespacedPod(
+      context.crdNamespace,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      labelSelector
+    );
     return (items || []).map(item => {
       const podName = get(item, 'metadata.name');
       const phase = get(item, 'status.phase');

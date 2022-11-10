@@ -3,7 +3,7 @@ import {
   toRelay, filter, paginate, extractPagination, isGroupMember
 } from './utils';
 import {
-  PhApplicationSpec, PhApplicationStatus, PhApplicationScope, PhApplicationPhase, InstanceTypeSpec, client as kubeClient
+  PhApplicationSpec, PhApplicationStatus, PhApplicationScope, PhApplicationPhase, InstanceTypeSpec, corev1KubeClient
 } from '../crdClient/crdClientImpl';
 import { transform as templateTransform, PhAppTemplate } from './phAppTemplate';
 import { mapping } from './instanceType';
@@ -89,9 +89,14 @@ export const typeResolvers = {
       'app': 'primehub-app',
       'primehub.io/phapplication': `app-${parent.id}`,
     });
-    const {body: {items}} = await kubeClient.api.v1.namespaces(context.crdNamespace).pods.get({
-      qs: {labelSelector}
-    });
+    const {body: {items}} = await corev1KubeClient.listNamespacedPod(
+      context.crdNamespace,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      labelSelector
+    );
     return (items || []).map(item => {
       const podName = get(item, 'metadata.name');
       return {

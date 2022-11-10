@@ -2,7 +2,7 @@ import { Middleware, ParameterizedContext } from 'koa';
 import * as logger from '../logger';
 import { escapePodName } from '../utils/escapism';
 import { getStream as getK8SLogStream } from '../utils/k8sLog';
-import CrdClientImpl, { client as kubeClient } from '../crdClient/crdClientImpl';
+import CrdClientImpl, { corev1KubeClient } from '../crdClient/crdClientImpl';
 import Router from 'koa-router';
 import { isGroupAdmin, isGroupMember } from '../resolvers/utils';
 import { Role } from '../resolvers/interface';
@@ -93,7 +93,7 @@ export class PodLogs {
     const {follow, tailLines}: {follow?: boolean; tailLines?: number} = ctx.query;
     const namespace = this.namespace;
     const podName = ctx.params.podName;
-    const pod = await kubeClient.api.v1.namespace(namespace).pods(podName).get();
+    const pod = await corev1KubeClient.readNamespacedPod(podName, namespace);
     let phApplicationName = pod.body.metadata.labels['primehub.io/phapplication'] || '';
     if (phApplicationName.startsWith('app-')) {
       phApplicationName = phApplicationName.substring(4);

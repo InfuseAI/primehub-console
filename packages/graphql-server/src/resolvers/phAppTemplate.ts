@@ -4,8 +4,8 @@ import { get } from 'lodash';
 import { ApolloError } from 'apollo-server';
 import { Context } from './interface';
 import { toRelay, filter, paginate, extractPagination } from './utils';
-import { PhAppTemplateSpec, client as kubeClient } from '../crdClient/crdClientImpl';
-import CustomResource, { Item } from '../crdClient/customResource';
+import { PhAppTemplateSpec } from '../crdClient/crdClientImpl';
+import CustomResourceNG, { Item } from '../crdClient/customResourceNG';
 
 export interface PhAppTemplate {
   id: string;
@@ -44,7 +44,7 @@ export const transform = async (item: Item<PhAppTemplateSpec>): Promise<PhAppTem
 };
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhAppTemplateSpec>, where: any, context: Context): Promise<PhAppTemplate[]> => {
+const listQuery = async (client: CustomResourceNG<PhAppTemplateSpec>, where: any, context: Context): Promise<PhAppTemplate[]> => {
   const {namespace, graphqlHost, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phAppTemplate = await client.get(where.id);

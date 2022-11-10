@@ -2,7 +2,7 @@ import KcAdminClient from 'keycloak-admin';
 import CrdClient, { InstanceTypeSpec, ImageSpec, DatasetSpec } from '../crdClient/crdClientImpl';
 import {Client as MinioClient} from 'minio';
 import K8sSecret from '../k8sResource/k8sSecret';
-import { Item } from '../crdClient/customResource';
+import { Item } from '../crdClient/customResourceNG';
 import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';
 import K8sUploadServerSecret from '../k8sResource/k8sUploadServerSecret';
 import { JobLogCtrl } from '../ee/controllers/jobLogCtrl';

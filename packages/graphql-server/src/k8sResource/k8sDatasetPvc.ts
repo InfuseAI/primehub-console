@@ -1,4 +1,4 @@
-import { client as kubeClient } from '../crdClient/crdClientImpl';
+import { corev1KubeClient } from '../crdClient/crdClientImpl';
 import { get, isEmpty, isUndefined, isNull } from 'lodash';
 import { ApolloError } from 'apollo-server';
 
@@ -12,7 +12,6 @@ export const getPvcName = (volumeName: string) => {
 
 export default class K8sDatasetPvc {
   private namespace: string;
-  private resource: any;
   private primehubGroupSc: string;
   private groupVolumeStorageClass: string;
 
@@ -28,13 +27,12 @@ export default class K8sDatasetPvc {
     this.namespace = namespace || 'default';
     this.primehubGroupSc = primehubGroupSc;
     this.groupVolumeStorageClass = groupVolumeStorageClass || '';
-    this.resource = kubeClient.api.v1.namespaces(this.namespace).persistentvolumeclaims;
   }
 
   public findOne = async (volumeName: string) => {
     try {
       const name = getPvcName(volumeName);
-      const {body} = await this.resource(name).get();
+      const {body} = await corev1KubeClient.readNamespacedPersistentVolumeClaim(name, this.namespace);
       return this.propsMapping(body);
     } catch (e) {
       if (e.statusCode === 404) {
@@ -70,28 +68,27 @@ export default class K8sDatasetPvc {
         };
       }
 
-      const {body} = await this.resource.post({
-        body: {
-          Kind: 'PersistentVolumeClaim',
-          apiVersion: 'v1',
-          metadata: {
-            name: pvcName,
-            annotations,
+      const body = {
+        Kind: 'PersistentVolumeClaim',
+        apiVersion: 'v1',
+        metadata: {
+          name: pvcName,
+          annotations,
+        },
+        spec: {
+          accessModes: ['ReadWriteMany'],
+          dataSource: null,
+          resources: {
+            requests: {
+              storage: stringifyVolumeSize(volumeSize)
+            }
           },
-          spec: {
-            accessModes: ['ReadWriteMany'],
-            dataSource: null,
-            resources: {
-              requests: {
-                storage: stringifyVolumeSize(volumeSize)
-              }
-            },
-            selector,
-            storageClassName: this.groupVolumeStorageClass
-          }
+          selector,
+          storageClassName: this.groupVolumeStorageClass
         }
-      });
-      return this.propsMapping(body);
+      };
+      const {body: createdPvc} = await corev1KubeClient.createNamespacedPersistentVolumeClaim(this.namespace, body);
+      return this.propsMapping(createdPvc);
     } catch (e) {
       if (e.statusCode === 409) {
         throw new ApolloError(e.message, 'RESOURCE_CONFLICT');
@@ -102,7 +99,7 @@ export default class K8sDatasetPvc {
 
   public async delete(volumeName: string) {
     try {
-      await this.resource(getPvcName(volumeName)).delete();
+      await corev1KubeClient.deleteNamespacedPersistentVolumeClaim(getPvcName(volumeName), this.namespace);
     } catch (err) {
       if (err.statusCode === 404) {
         return;

@@ -1,4 +1,4 @@
-import { client as kubeClient } from '../crdClient/crdClientImpl';
+import { corev1KubeClient } from '../crdClient/crdClientImpl';
 import { get, isEmpty, isUndefined, isNull } from 'lodash';
 import { ApolloError } from 'apollo-server';
 import md5 = require('apache-md5');
@@ -21,7 +21,6 @@ export const getUploadSecretName = (datasetName: string) => {
 
 export default class K8sUploadServerSecret {
   private namespace: string;
-  private resource: any;
 
   constructor({
     namespace
@@ -29,12 +28,11 @@ export default class K8sUploadServerSecret {
     namespace: string
   }) {
     this.namespace = namespace || 'default';
-    this.resource = kubeClient.api.v1.namespaces(this.namespace).secrets;
   }
 
   public findOne = async (datasetName: string) => {
     try {
-      const {body} = await this.resource(getUploadSecretName(datasetName)).get();
+      const {body} = await corev1KubeClient.readNamespacedSecret(getUploadSecretName(datasetName), this.namespace);
       const name = get(body, 'metadata.name');
       return {
         secretName: name
@@ -56,19 +54,19 @@ export default class K8sUploadServerSecret {
       const secretName = getUploadSecretName(datasetName);
       const username = secretName;
       const plainTextPassword = genRandomString();
-      const {body} = await this.resource.post({
-        body: {
-          type: 'Opaque',
-          Kind: 'Secret',
-          apiVersion: 'v1',
-          metadata: {
-            name: secretName,
-          },
-          data: {
-            auth: toBase64(htpasswd(username, plainTextPassword))
-          }
+
+      const body = {
+        type: 'Opaque',
+        Kind: 'Secret',
+        apiVersion: 'v1',
+        metadata: {
+          name: secretName,
+        },
+        data: {
+          auth: toBase64(htpasswd(username, plainTextPassword))
         }
-      });
+      };
+      await corev1KubeClient.createNamespacedSecret(this.namespace, body);
       return {
         secretName,
         username,
@@ -88,13 +86,12 @@ export default class K8sUploadServerSecret {
     const secretName = getUploadSecretName(datasetName);
     const username = secretName;
     const plainTextPassword = genRandomString();
-    await this.resource(secretName).patch({
-      body: {
-        data: {
-          auth: toBase64(htpasswd(username, plainTextPassword))
-        }
+    const body = {
+      data: {
+        auth: toBase64(htpasswd(username, plainTextPassword))
       }
-    });
+    };
+    await corev1KubeClient.patchNamespacedSecret(secretName, this.namespace, body);
     return {
       secretName,
       username,
@@ -104,7 +101,7 @@ export default class K8sUploadServerSecret {
 
   public async delete(datasetName: string) {
     try {
-      await this.resource(getUploadSecretName(datasetName)).delete();
+      await corev1KubeClient.deleteNamespacedSecret(getUploadSecretName(datasetName), this.namespace);
     } catch (err) {
       if (err.statusCode === 404) {
         return;

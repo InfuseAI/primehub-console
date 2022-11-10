@@ -1,4 +1,4 @@
-import { Item } from '../crdClient/customResource';
+import { Item } from '../crdClient/customResourceNG';
 import { DatasetSpec } from '../crdClient/crdClientImpl';
 import { Crd } from './crd';
 import { mutateRelation, mergeVariables, parseBoolean } from './utils';

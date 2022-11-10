@@ -1,5 +1,5 @@
 import { Context } from './interface';
-import { Item } from '../crdClient/customResource';
+import { Item } from '../crdClient/customResourceNG';
 import { AnnouncementSpec } from '../crdClient/crdClientImpl';
 import { mutateRelation } from './utils';
 import { Crd } from './crd';

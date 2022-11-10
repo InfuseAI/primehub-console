@@ -48,7 +48,7 @@ import K8sGroupPvc from './k8sResource/k8sGroupPvc';
 
 // logger
 import * as logger from './logger';
-import { Item } from './crdClient/customResource';
+import { Item } from './crdClient/customResourceNG';
 import K8sUploadServerSecret from './k8sResource/k8sUploadServerSecret';
 import { Role } from './resolvers/interface';
 import Token from './oidc/token';

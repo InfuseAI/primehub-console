@@ -1,6 +1,6 @@
 import KcAdminClient from 'keycloak-admin';
 import { keycloakMaxCount } from '../../resolvers/constant';
-import { client as kubeClient } from '../../crdClient/crdClientImpl';
+import { corev1KubeClient } from '../../crdClient/crdClientImpl';
 import { Context } from '../../resolvers/interface';
 import { createConfig } from '../../config';
 
@@ -11,6 +11,11 @@ export function overrideLienceseConfig(license = {}) {
   licenseOverride = license;
 }
 
+const getNodesFromApi = async () => {
+  const { body: { items } } = await corev1KubeClient.listNode();
+  return items;
+};
+
 export const query = async (root, args, context: Context) => {
   const config = createConfig();
   const {crdClient} = context;
@@ -18,7 +23,7 @@ export const query = async (root, args, context: Context) => {
 
   const users = await kcAdminClient.users.count;
   const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});
-  const nodes = await kubeClient.api.v1.nodes.get();
+  const nodes = await getNodesFromApi();
   const deploys = await crdClient.phDeployments.list();
   const deployed = deploys.filter(d => d.spec.stop === false);
 
@@ -36,7 +41,7 @@ export const query = async (root, args, context: Context) => {
       // all groups minus 'everyone'
       maxUser: users,
       maxGroup: groups.length - 1,
-      maxNode: nodes.body.items.length,
+      maxNode: nodes.length,
       maxModelDeploy: deployed.length,
     },
   };
