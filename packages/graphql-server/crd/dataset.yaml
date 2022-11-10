@@ -1,12 +1,78 @@
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: datasets.primehub.io
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
+  conversion:
+    strategy: None
   group: primehub.io
-  version: v1alpha1
   names:
     kind: Dataset
+    listKind: DatasetList
     plural: datasets
     singular: dataset
   scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.type
+      name: Type
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        x-kubernetes-preserve-unknown-fields: true
+        properties:
+          metadata:
+            type: object
+          spec:
+            properties:
+              description:
+                type: string
+              displayName:
+                type: string
+              gitsync:
+                properties:
+                  secret:
+                    type: string
+                type: object
+              hostPath:
+                properties:
+                  path:
+                    type: string
+                required:
+                - path
+                type: object
+              nfs:
+                properties:
+                  path:
+                    type: string
+                  server:
+                    type: string
+                required:
+                - server
+                - path
+                type: object
+              pv:
+                properties:
+                  provisioning:
+                    pattern: ^(auto|manual)$
+                    type: string
+                type: object
+              type:
+                pattern: ^(env|git|pv|hostPath|nfs)$
+                type: string
+              url:
+                type: string
+              variables:
+                type: object
+              volumeName:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true

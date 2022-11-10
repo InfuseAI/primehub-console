@@ -1,11 +1,11 @@
 import { Crd } from '../resolvers/crd';
-import CustomResource from '../crdClient/customResource';
+import CustomResourceNG from '../crdClient/customResourceNG';
 import { isUndefined } from 'lodash';
 import * as logger from '../logger';
 
 export default class CallbackWatcher<T> {
   private crd: Crd<T>;
-  private resource: CustomResource<T>;
+  private resource: CustomResourceNG<T>;
   private request: any;
   private dataOnChange: () => void;
 
@@ -15,7 +15,7 @@ export default class CallbackWatcher<T> {
     dataOnChange
   }: {
     crd: Crd<T>,
-    resource: CustomResource<T>,
+    resource: CustomResourceNG<T>,
     dataOnChange: () => void
   }) {
     this.crd = crd;

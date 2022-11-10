@@ -4,6 +4,7 @@ import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
 import CustomResource from './customResource';
+import CustomResourceNG from './customResourceNG';
 
 const inCluster = (process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT);
 
@@ -24,12 +25,14 @@ export const client = new Client({
 // kubernetes-client/javascript for watch
 export let watch: k8s.Watch;
 const kc = new k8s.KubeConfig();
+
 if (inCluster) {
   kc.loadFromCluster();
 } else {
   kc.loadFromFile(`${process.env.HOME}/.kube/config`);
 }
 watch = new k8s.Watch(kc);
+const oclient = kc.makeApiClient(k8s.CustomObjectsApi);
 
 export const kubeConfig = kc;
 
@@ -321,9 +324,9 @@ export interface CrdArgs {
 export const phJobCrd = loadCrd('phJob');
 
 export default class CrdClientImpl {
-  public instanceTypes: CustomResource<InstanceTypeSpec>;
-  public datasets: CustomResource<DatasetSpec>;
-  public images: CustomResource<ImageSpec>;
+  public instanceTypes: CustomResourceNG<InstanceTypeSpec>;
+  public datasets: CustomResourceNG<DatasetSpec>;
+  public images: CustomResourceNG<ImageSpec>;
   public imageSpecs: CustomResource<ImageSpecSpec, ImageSpecStatus>;
   public announcements: CustomResource<AnnouncementSpec>;
   public imageSpecJobs: CustomResource<ImageSpecJobSpec, ImageSpecJobStatus>;
@@ -336,20 +339,20 @@ export default class CrdClientImpl {
 
   constructor(args?: CrdArgs) {
     this.namespace = args && args.namespace || 'default';
-    this.instanceTypes = new CustomResource<InstanceTypeSpec>(
-      client,
+    this.instanceTypes = new CustomResourceNG<InstanceTypeSpec>(
+      oclient,
       watch,
       loadCrd('instance-type'),
       this.namespace
     );
-    this.datasets = new CustomResource<DatasetSpec>(
-      client,
+    this.datasets = new CustomResourceNG<DatasetSpec>(
+      oclient,
       watch,
       loadCrd('dataset'),
       this.namespace
     );
-    this.images = new CustomResource<ImageSpec>(
-      client,
+    this.images = new CustomResourceNG<ImageSpec>(
+      oclient,
       watch,
       loadCrd('image'),
       this.namespace

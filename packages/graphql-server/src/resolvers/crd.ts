@@ -1,6 +1,6 @@
 import { Context } from './interface';
 import { QueryImageMode, toRelay, paginate, extractPagination, filter } from './utils';
-import CustomResource, { Item } from '../crdClient/customResource';
+import CustomResourceNG, { Item } from '../crdClient/customResourceNG';
 import pluralize from 'pluralize';
 import { isEmpty, omit, mapValues, remove, find, get, isNil, unionBy } from 'lodash';
 import KeycloakAdminClient from 'keycloak-admin';
@@ -260,7 +260,7 @@ export class Crd<SpecType> {
    */
 
   private listQuery =
-    async (customResource: CustomResource<SpecType>, where: any, order: any, context: Context, mode?: QueryImageMode) => {
+    async (customResource: CustomResourceNG<SpecType>, where: any, order: any, context: Context, mode?: QueryImageMode) => {
     const rows = await customResource.list();
     let searchFields = ['name', 'displayName', 'description'];
     let mappedRows = rows.map(row => this.propMapping(row, context));
