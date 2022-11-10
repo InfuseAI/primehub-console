@@ -313,7 +313,7 @@ export interface PhAppTemplateSpec {
  */
 const inTest = process.env.TEST;
 const loadCrd = (filename: string): any =>
-  yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, `../../crd/${filename}${inTest ? '.spec' : ''}.yaml`), 'utf8'));
+  yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, `../../crd/${filename}.yaml`), 'utf8'));
 
 export interface CrdArgs {
   namespace?: string;
