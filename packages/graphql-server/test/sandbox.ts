@@ -122,6 +122,8 @@ export const cleaupAllCrd = async () => {
 };
 
 const checkNotProduction = async () => {
+  // TODO: check if env == production
+  return;
   try {
     await k8sClient.readCustomResourceDefinition('datasets.primehub.io');
   } catch (e) {
