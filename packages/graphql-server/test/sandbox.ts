@@ -50,7 +50,9 @@ if (inCluster) {
   kc.loadFromFile(`${process.env.HOME}/.kube/config`);
 }
 const k8sClient = kc.makeApiClient(k8s.ApiextensionsV1Api);
+const corev1KubeClient = kc.makeApiClient(k8s.CoreV1Api);
 (global as any).k8sClient = k8sClient;
+(global as any).corev1KubeClient = corev1KubeClient;
 
 export const assignAdmin = async (kcAdminClient: KcAdminClient, realm: string, userId: string) => {
   const clients = await kcAdminClient.clients.find({realm});

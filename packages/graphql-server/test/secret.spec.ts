@@ -45,7 +45,7 @@ describe('secret graphql', function() {
   before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;
-    this.k8sClient = (global as any).k8sClient;
+    this.k8sClient = (global as any).corev1KubeClient;
     // clean up first
     const {body: {items}} = await this.k8sClient.listNamespacedSecret('default');
     for (const secret of items) {
