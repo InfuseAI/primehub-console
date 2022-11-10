@@ -17,7 +17,7 @@ const groupFields = `
 const generateResources = (groupId: string, groupName: string) => [
   {
     apiVersion: 'primehub.io/v1alpha1',
-    kind: 'PhApplicationSpec',
+    kind: 'PhApplication',
     metadata: { name: 'app-test' },
     spec: {
       scope: 'group',
@@ -37,7 +37,7 @@ const generateResources = (groupId: string, groupName: string) => [
   },
   {
     apiVersion: 'primehub.io/v1alpha1',
-    kind: 'PhJobSpec',
+    kind: 'PhJob',
     metadata: { name: 'job-test' },
     spec: {
       command: 'x',
@@ -54,7 +54,7 @@ const generateResources = (groupId: string, groupName: string) => [
   },
   {
     apiVersion: 'primehub.io/v1alpha1',
-    kind: 'PhScheduleSpec',
+    kind: 'PhSchedule',
     metadata: { name: 'schedule-test' },
     spec: {
       jobTemplate: {
@@ -75,7 +75,7 @@ const generateResources = (groupId: string, groupName: string) => [
   },
   {
     apiVersion: 'primehub.io/v1alpha1',
-    kind: 'PhDeploymentSpec',
+    kind: 'PhDeployment',
     metadata: { name: 'deployment-test' },
     spec: {
       description: 'test',
