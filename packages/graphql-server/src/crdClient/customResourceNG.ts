@@ -1,7 +1,7 @@
-import * as k8s from "@kubernetes/client-node";
-import { pick } from "lodash";
-import * as logger from "../logger";
-import { apiUnavailable, resourceNotFound } from "../k8sResource/k8sError";
+import * as k8s from '@kubernetes/client-node';
+import { pick } from 'lodash';
+import * as logger from '../logger';
+import { apiUnavailable, resourceNotFound } from '../k8sResource/k8sError';
 
 export interface Metadata {
   clusterName?: string;
@@ -70,26 +70,26 @@ export default class CustomResourceNG<SpecType = any, StatusType = any> {
         this.plural,
         name
       );
-      return pick(res.body, ["metadata", "spec", "status"]) as Item<
+      return pick(res.body, ['metadata', 'spec', 'status']) as Item<
         SpecType,
         StatusType
       >;
     } catch (error) {
       logger.error({
         component: logger.components.internal,
-        type: "K8S_API_FAILED",
+        type: 'K8S_API_FAILED',
         resource: this.getResourcePlural(),
-        operation: "GET",
+        operation: 'GET',
         name,
         error,
       });
-      const CODE = "code";
+      const CODE = 'code';
       if (error[CODE] && error[CODE] === 404) {
         throw resourceNotFound(error);
       }
       throw apiUnavailable();
     }
-  };
+  }
 
   public list = async (
     namespace?: string,
@@ -108,20 +108,20 @@ export default class CustomResourceNG<SpecType = any, StatusType = any> {
         namespace || this.namespace,
         plural
       );
-      return (res.body as any).items.map((item) =>
-        pick(item, ["metadata", "spec", "status"])
+      return (res.body as any).items.map(item =>
+        pick(item, ['metadata', 'spec', 'status'])
       );
     } catch (error) {
       logger.error({
         component: logger.components.internal,
-        type: "K8S_API_FAILED",
+        type: 'K8S_API_FAILED',
         resource: this.getResourcePlural(),
-        operation: "LIST",
+        operation: 'LIST',
         error,
       });
       throw apiUnavailable();
     }
-  };
+  }
 
   // tslint:disable-next-line:max-line-length
   public create = async (
@@ -137,8 +137,8 @@ export default class CustomResourceNG<SpecType = any, StatusType = any> {
       this.plural,
       body
     );
-    return pick(res.body, ["metadata", "spec", "status"]) as Item<SpecType>;
-  };
+    return pick(res.body, ['metadata', 'spec', 'status']) as Item<SpecType>;
+  }
 
   public patch = async (
     name: string,
@@ -146,9 +146,9 @@ export default class CustomResourceNG<SpecType = any, StatusType = any> {
     namespace?: string
   ): Promise<Item<SpecType, StatusType>> => {
     const body = this.prepareCustomObject({ metadata, spec });
-    //body.metadata = { name: name };
+    // body.metadata = { name: name };
     const options = {
-      headers: { "Content-type": k8s.PatchUtils.PATCH_FORMAT_JSON_MERGE_PATCH },
+      headers: { 'Content-type': k8s.PatchUtils.PATCH_FORMAT_JSON_MERGE_PATCH },
     };
     const res = await this.kubeClient.patchNamespacedCustomObject(
       this.group,
@@ -162,8 +162,8 @@ export default class CustomResourceNG<SpecType = any, StatusType = any> {
       undefined,
       options
     );
-    return pick(res.body, ["metadata", "spec", "status"]) as Item<SpecType>;
-  };
+    return pick(res.body, ['metadata', 'spec', 'status']) as Item<SpecType>;
+  }
 
   public del = async (name: string, namespace?: string): Promise<void> => {
     await this.kubeClient.deleteNamespacedCustomObject(
@@ -173,7 +173,7 @@ export default class CustomResourceNG<SpecType = any, StatusType = any> {
       this.plural,
       name
     );
-  };
+  }
 
   public watch = (
     handler: (type: string, object: any) => void,
@@ -193,7 +193,7 @@ export default class CustomResourceNG<SpecType = any, StatusType = any> {
       handler,
       done
     );
-  };
+  }
 
   private prepareCustomObject = ({
     metadata,
@@ -208,5 +208,5 @@ export default class CustomResourceNG<SpecType = any, StatusType = any> {
       metadata,
       spec,
     };
-  };
+  }
 }
