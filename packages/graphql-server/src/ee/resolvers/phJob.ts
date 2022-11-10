@@ -2,7 +2,7 @@ import { Context } from '../../resolvers/interface';
 import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser } from '../../resolvers/utils';
 import { validateLicense } from './utils';
 import { PhJobPhase, PhJobSpec, PhJobStatus } from '../../crdClient/crdClientImpl';
-import CustomResource, { Item } from '../../crdClient/customResource';
+import CustomResourceNG, { Item } from '../../crdClient/customResourceNG';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
 import { orderBy, omit, get, isUndefined, isNil, isEmpty, intersection } from 'lodash';
 import moment from 'moment';
@@ -290,7 +290,7 @@ const canUserMutate = async (userId: string, groupId: string, context: Context) 
 };
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhJobSpec>, where: any = {}, order: any, context: Context): Promise<PhJob[]> => {
+const listQuery = async (client: CustomResourceNG<PhJobSpec>, where: any = {}, order: any, context: Context): Promise<PhJob[]> => {
   const {namespace, graphqlHost, jobLogCtrl, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phJob = await client.get(where.id);
