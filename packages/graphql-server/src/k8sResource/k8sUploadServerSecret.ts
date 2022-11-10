@@ -1,3 +1,4 @@
+import * as k8s from '@kubernetes/client-node';
 import { corev1KubeClient } from '../crdClient/crdClientImpl';
 import { get, isEmpty, isUndefined, isNull } from 'lodash';
 import { ApolloError } from 'apollo-server';
@@ -91,7 +92,20 @@ export default class K8sUploadServerSecret {
         auth: toBase64(htpasswd(username, plainTextPassword))
       }
     };
-    await corev1KubeClient.patchNamespacedSecret(secretName, this.namespace, body);
+    const options = {
+      headers: { 'Content-type': k8s.PatchUtils.PATCH_FORMAT_JSON_MERGE_PATCH },
+    };
+    await corev1KubeClient.patchNamespacedSecret(
+      secretName,
+      this.namespace,
+      body,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      options
+    );
     return {
       secretName,
       username,

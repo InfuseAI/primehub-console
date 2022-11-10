@@ -1,3 +1,4 @@
+import * as k8s from '@kubernetes/client-node';
 import { corev1KubeClient } from '../crdClient/crdClientImpl';
 import { get, isEmpty, isUndefined, isNull } from 'lodash';
 import { ApolloError } from 'apollo-server';
@@ -118,7 +119,20 @@ export default class K8sSecret {
       },
       data
     };
-    const {body: updatedSecret} = await corev1KubeClient.patchNamespacedSecret(name, namespace || this.namespace, body);
+    const options = {
+      headers: { 'Content-type': k8s.PatchUtils.PATCH_FORMAT_JSON_MERGE_PATCH },
+    };
+    const {body: updatedSecret} = await corev1KubeClient.patchNamespacedSecret(
+      name,
+      namespace || this.namespace,
+      body,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      options
+    );
     return this.propsMapping(updatedSecret);
   }
 
