@@ -287,8 +287,7 @@ jobs:
       - run:
           name: Integration tests
           command: |
-            #./ci/ci-test.sh
-            echo 'pass'
+            ./ci/ci-test.sh
 
 workflows:
   version: 2

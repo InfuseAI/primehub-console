@@ -3,7 +3,7 @@
  * with everyGroup and assign to env
  */
 import KcAdminClient from 'keycloak-admin';
-import kubeClient from 'kubernetes-client';
+import * as k8s from '@kubernetes/client-node';
 import faker from 'faker';
 import yaml from 'js-yaml';
 import fs from 'fs';
@@ -43,12 +43,13 @@ mClient.makeBucket('test', '', err => {
 const inCluster = (process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT);
 
 // initialize k8s client
-const Client = (kubeClient as any).Client;
-const config = (kubeClient as any).config;
-const k8sClient = new Client({
-  config: inCluster ? config.getInCluster() : config.fromKubeconfig(),
-  version: '1.10'
-});
+const kc = new k8s.KubeConfig();
+if (inCluster) {
+  kc.loadFromCluster();
+} else {
+  kc.loadFromFile(`${process.env.HOME}/.kube/config`);
+}
+const k8sClient = kc.makeApiClient(k8s.ApiextensionsV1Api);
 (global as any).k8sClient = k8sClient;
 
 export const assignAdmin = async (kcAdminClient: KcAdminClient, realm: string, userId: string) => {
@@ -120,9 +121,7 @@ export const cleaupAllCrd = async () => {
 
 const checkNotProduction = async () => {
   try {
-    await k8sClient.apis['apiextensions.k8s.io'].v1beta1
-      .crd('datasets.primehub.io')
-      .get();
+    await oclient.readCustomResourceDefinition('datasets.primehub.io')
   } catch (e) {
     return;
   }
@@ -139,13 +138,13 @@ export const createSandbox = async () => {
    */
   try {
     await Promise.all([
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: datasetCrd }),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: instanceTypeCrd }),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: imageCrd }),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phApplicationCrd }),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phJobCrd }),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phScheduleCrd }),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phDeploymentCrd }),
+      k8sClient.createCustomResourceDefinition(datasetCrd),
+      k8sClient.createCustomResourceDefinition(instanceTypeCrd),
+      k8sClient.createCustomResourceDefinition(imageCrd),
+      k8sClient.createCustomResourceDefinition(phApplicationCrd),
+      k8sClient.createCustomResourceDefinition(phJobCrd),
+      k8sClient.createCustomResourceDefinition(phScheduleCrd),
+      k8sClient.createCustomResourceDefinition(phDeploymentCrd),
     ]);
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -331,13 +330,13 @@ export const destroySandbox = async () => {
 
   try {
     await Promise.all([
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(datasetCrd.metadata.name).delete(),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(instanceTypeCrd.metadata.name).delete(),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(imageCrd.metadata.name).delete(),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(phApplicationCrd.metadata.name).delete(),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(phJobCrd.metadata.name).delete(),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(phScheduleCrd.metadata.name).delete(),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(phDeploymentCrd.metadata.name).delete(),
+      k8sClient.deleteCustomResourceDefinition(datasetCrd.metadata.name),
+      k8sClient.deleteCustomResourceDefinition(instanceTypeCrd.metadata.name),
+      k8sClient.deleteCustomResourceDefinition(imageCrd.metadata.name),
+      k8sClient.deleteCustomResourceDefinition(phApplicationCrd.metadata.name),
+      k8sClient.deleteCustomResourceDefinition(phJobCrd.metadata.name),
+      k8sClient.deleteCustomResourceDefinition(phScheduleCrd.metadata.name),
+      k8sClient.deleteCustomResourceDefinition(phDeploymentCrd.metadata.name),
     ]);
   } catch (e) {
     // tslint:disable-next-line:no-console
