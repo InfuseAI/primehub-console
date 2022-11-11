@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {
-  Checkbox, Button, Radio, Select, Form, Card, Divider, Tabs, Alert,
-  Row, Col, Input, Modal, Tooltip, Icon, InputNumber, Switch, AutoComplete} from 'antd';
+  Checkbox, Radio, Select, Form, Card, Divider, Tabs, Alert,
+  Row, Col, Input, Modal } from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
-import {flatMap, uniq, get, snakeCase, debounce, isEmpty, sortBy} from 'lodash';
+import {get, debounce, isEmpty} from 'lodash';
 import Log from 'components/share/log';
 import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';

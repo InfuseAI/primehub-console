@@ -1,12 +1,10 @@
 import * as React from 'react';
-import { Menu, Layout, Avatar, Select, Form, Tag } from 'antd';
+import { Menu, Layout, Avatar } from 'antd';
 import { LayoutProps } from 'antd/lib/layout';
 import styled from 'styled-components';
 import logo from 'images/primehub-logo-w.svg';
 import { withGroupContext, GroupContextComponentProps } from 'context/group';
 import { appPrefix } from 'utils/env';
-
-const { Option } = Select;
 
 const HEADER_HEIGHT = 64;
 

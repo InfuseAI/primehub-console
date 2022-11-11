@@ -11,12 +11,9 @@ import {
   flatten,
   isNaN,
   isNil,
-  omit,
-  sortBy,
-  filter,
 } from 'lodash';
 import {
-  mutateRelation, parseDiskQuota, stringifyDiskQuota, paginate, extractPagination, toRelay
+  mutateRelation, parseDiskQuota, stringifyDiskQuota
 } from './utils';
 import { Attributes } from './attr';
 import { Context } from './interface';
@@ -26,7 +23,6 @@ import BPromise from 'bluebird';
 import * as logger from '../logger';
 import { crd as annCrdResolver } from '../resolvers/announcement';
 import moment from 'moment';
-import UserRepresentation from 'keycloak-admin/lib/defs/userRepresentation';
 import { transform as transformGroup } from './groupUtils';
 import { ErrorCodes } from '../errorCodes';
 import { createConfig } from '../config';

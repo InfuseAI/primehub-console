@@ -1,4 +1,4 @@
-import { Transform, TransformOptions, TransformCallback } from 'stream';
+import { Transform, TransformCallback } from 'stream';
 
 export default class TailStream extends Transform {
   private lines = [];

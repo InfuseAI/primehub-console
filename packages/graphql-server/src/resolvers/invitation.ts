@@ -1,12 +1,9 @@
 import KcAdminClient from 'keycloak-admin';
-import { createConfig } from '../config';
 import { ApolloError } from 'apollo-server';
 import { Attributes, FieldType } from './attr';
 import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import * as user from './user';
-
-const config = createConfig();
 
 interface InvitationProps {
   groupId: string;

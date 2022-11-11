@@ -5,7 +5,6 @@ import { graphql } from 'react-apollo';
 import { difference } from 'lodash';
 import RelationPicker from '../share/RelationPicker';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 import { TVolumeFormGroups, TVolumeGroups } from './types';
 import { Link } from 'react-router-dom';
 import { TruncateTableField } from 'utils/TruncateTableField';

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Select, Input, Button, Form, notification} from 'antd';
+import {Select, Button, Form, notification} from 'antd';
 import {get} from 'lodash';
 import gql from "graphql-tag";
 import { Mutation } from "react-apollo";

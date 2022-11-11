@@ -1,6 +1,6 @@
-import Koa, {Context, Middleware} from 'koa';
+import { Middleware } from 'koa';
 import Router = require('koa-router');
-import {Client} from 'minio';
+import { Client } from 'minio';
 import mime from 'mime';
 
 import * as logger from '../logger';

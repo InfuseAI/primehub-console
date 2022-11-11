@@ -1,14 +1,11 @@
 import KcAdminClient from 'keycloak-admin';
-import { mapValues, isEmpty, get, isUndefined, isNil, reduce, isPlainObject, isNull } from 'lodash';
+import { mapValues, isEmpty, get, isNil, reduce, isPlainObject } from 'lodash';
 import { unflatten, flatten } from 'flat';
 import { createDefaultSystemSettings } from './constant';
 import { Context } from './interface';
 import { parseFromAttr, toAttr, parseDiskQuota, stringifyDiskQuota } from './utils';
 import { findTimezone } from '../utils/timezones';
 import * as license from '../ee/resolvers/license';
-import {createConfig} from '../config';
-
-const config = createConfig();
 
 const smtpKeyMapping = {
   enableSSL: 'ssl',

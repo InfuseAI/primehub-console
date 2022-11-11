@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Skeleton, Tooltip, Typography, Alert, Button, Table } from 'antd';
+import { Skeleton, Alert, Button, Table } from 'antd';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import { get, max } from 'lodash';

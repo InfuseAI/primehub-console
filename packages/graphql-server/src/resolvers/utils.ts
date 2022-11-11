@@ -20,7 +20,6 @@ import { EOL } from 'os';
 import { Context, Role } from './interface';
 import { keycloakMaxCount } from './constant';
 import GroupRepresentation from 'keycloak-admin/lib/defs/groupRepresentation';
-import { throws } from 'assert';
 const ITEMS_PER_PAGE = 10;
 
 export enum QueryImageMode {

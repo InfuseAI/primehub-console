@@ -15,7 +15,7 @@ import {
   extractPagination,
   findGroupByName,
   getFromAttr} from './utils';
-import { pick, isNil, omit, get, isEmpty, mapValues, find } from 'lodash';
+import { pick, isNil, get, isEmpty, find } from 'lodash';
 import { crd as instanceTypeResolver } from './instanceType';
 import { crd as datasetResolver } from './dataset';
 import { crd as imageResolver } from './image';

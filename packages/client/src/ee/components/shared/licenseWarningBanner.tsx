@@ -2,9 +2,6 @@ import * as React from 'react';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {Alert} from 'antd';
-import {errorHandler} from 'utils/errorHandler';
-import {get} from 'lodash';
-import styled from 'styled-components'
 
 type Props = {
   data?: any;

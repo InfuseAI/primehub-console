@@ -8,7 +8,7 @@ import { omit, get, isUndefined, last, isNil } from 'lodash';
 import { resolveInDataSet } from './secret';
 import KeycloakAdminClient from 'keycloak-admin';
 import { keycloakMaxCount } from './constant';
-import { ResourceRole, ResourceNamePrefix } from './resourceRole';
+import { ResourceNamePrefix } from './resourceRole';
 import {createConfig} from '../config';
 import { ApolloError } from 'apollo-server';
 import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';

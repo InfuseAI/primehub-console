@@ -2,7 +2,7 @@ import { Context } from '../../resolvers/interface';
 import { toRelay, filter, paginate, extractPagination, parsePackageField, stringifyPackageField } from '../../resolvers/utils';
 import { validateLicense } from './utils';
 import * as logger from '../../logger';
-import { get, isEmpty, isUndefined, isNil, isNull, sortBy, orderBy } from 'lodash';
+import { get, isEmpty, isUndefined, isNil, isNull, orderBy } from 'lodash';
 import CustomResourceNG, { Item } from '../../crdClient/customResourceNG';
 import { ImageSpecSpec, ImageSpecStatus } from '../../crdClient/crdClientImpl';
 import moment = require('moment');

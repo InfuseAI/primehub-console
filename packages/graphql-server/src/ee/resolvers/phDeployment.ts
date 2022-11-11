@@ -14,7 +14,6 @@ import KeycloakAdminClient from 'keycloak-admin';
 import { mapping } from '../../resolvers/instanceType';
 import * as logger from '../../logger';
 import { keycloakMaxCount } from '../../resolvers/constant';
-import { isUserAdmin } from '../../resolvers/user';
 import md5 = require('apache-md5');
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';

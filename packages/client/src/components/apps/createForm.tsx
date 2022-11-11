@@ -1,15 +1,14 @@
 import * as React from 'react';
-import {Button, Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon, InputNumber, Switch, AutoComplete} from 'antd';
+import {Radio, Select, Form, Card, Divider, Row, Col, Input, Tooltip, Icon} from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
-import {isEmpty, find, get, snakeCase, debounce} from 'lodash';
-import DynamicFields from 'components/share/dynamicFields';
+import {find, debounce} from 'lodash';
 import EnvFields from 'components/share/envFields';
 import InfuseButton from 'components/infuseButton';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
 import PhAppTemplate from 'interfaces/phAppTemplate';
 import defaultLogo from 'images/icon-apps.svg';
 import styled from 'styled-components';
-import PhApplication, {PhAppStatus, PhAppScope} from 'interfaces/phApplication';
+import PhApplication, {PhAppScope} from 'interfaces/phApplication';
 import {DefaultEnv} from 'interfaces/PhAppTemplate';
 import Env from 'interfaces/env';
 

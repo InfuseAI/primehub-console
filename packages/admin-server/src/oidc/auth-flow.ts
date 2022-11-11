@@ -3,7 +3,7 @@ import Koa from 'koa';
 import Router from 'koa-router';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import { gql, GraphQLClient } from 'graphql-request';
+import { GraphQLClient } from 'graphql-request';
 import bodyParser from 'koa-bodyparser';
 
 interface OidcAuthenticationFlow {

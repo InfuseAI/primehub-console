@@ -1,6 +1,6 @@
 import * as k8s from '@kubernetes/client-node';
 import { corev1KubeClient } from '../crdClient/crdClientImpl';
-import { get, isEmpty, isUndefined, isNull } from 'lodash';
+import { get } from 'lodash';
 import { ApolloError } from 'apollo-server';
 import md5 = require('apache-md5');
 

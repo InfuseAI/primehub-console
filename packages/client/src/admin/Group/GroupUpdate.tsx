@@ -4,7 +4,6 @@ import { compose } from 'recompose';
 import { get, omit, uniqBy } from 'lodash';
 import {
   withRouter,
-  useLocation,
   useHistory,
   useParams,
   RouteComponentProps,

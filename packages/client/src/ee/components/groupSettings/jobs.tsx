@@ -3,12 +3,8 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import {
   Form,
-  Tabs,
   Row,
   Col,
-  Select,
-  Input,
-  InputNumber,
   notification,
 } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';

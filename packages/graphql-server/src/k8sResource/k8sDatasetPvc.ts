@@ -1,5 +1,5 @@
 import { corev1KubeClient } from '../crdClient/crdClientImpl';
-import { get, isEmpty, isUndefined, isNull } from 'lodash';
+import { get } from 'lodash';
 import { ApolloError } from 'apollo-server';
 
 // utils

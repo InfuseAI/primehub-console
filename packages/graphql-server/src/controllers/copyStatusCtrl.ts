@@ -1,4 +1,4 @@
-import { Context, Middleware, ParameterizedContext } from 'koa';
+import { Middleware, ParameterizedContext } from 'koa';
 import Router from 'koa-router';
 import { Client } from 'minio';
 import { isEmpty } from 'lodash';

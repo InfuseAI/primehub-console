@@ -4,18 +4,15 @@ import { ImageSpec, ImageType, ImageCrdImageSpec } from '../crdClient/crdClientI
 import { QueryImageMode, toRelay, extractPagination, mutateRelation, isGroupAdmin, isAdmin } from './utils';
 import { ApolloError } from 'apollo-server';
 import { Crd } from './crd';
-import { isEmpty, isUndefined, isNil, isNull, get, omit, unionBy, keys, merge } from 'lodash';
+import { isEmpty, isUndefined, isNil, omit, unionBy, merge } from 'lodash';
 import moment = require('moment');
 import { ResourceNamePrefix } from './resourceRole';
-import { createConfig } from '../config';
 import * as logger from '../logger';
 import { ErrorCodes } from '../errorCodes';
 
-const {EXCEED_QUOTA_ERROR, NOT_AUTH_ERROR, INTERNAL_ERROR} = ErrorCodes;
+const {NOT_AUTH_ERROR, INTERNAL_ERROR} = ErrorCodes;
 
 import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
-
-const config = createConfig();
 
 const adminAuthorization = async ({data, context}: {data: any, context: any}): Promise<void> => {
   const {username, kcAdminClient} = context;

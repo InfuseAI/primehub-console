@@ -12,7 +12,7 @@ import { memoize } from '../../cache/memoize';
 import { query as phDeploymentQuery } from './phDeployment';
 import { Config } from '../../config';
 import AbortController from 'abort-controller';
-const { NOT_AUTH_ERROR, INTERNAL_ERROR } = ErrorCodes;
+const { INTERNAL_ERROR } = ErrorCodes;
 
 // mlflow api endpoints
 const API_ENDPOINT_MODEL_LIST = '/api/2.0/preview/mlflow/registered-models/list';
