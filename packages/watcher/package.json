@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@infuseai/graphql-server": "^1.0.0",
+    "@kubernetes/client-node": "^0.17.0",
     "agentkeepalive": "^3.5.1",
     "axios": "^0.18.0",
     "bluebird": "^3.5.1",
@@ -45,6 +46,7 @@
     "lodash": "^4.17.21",
     "minimist": "^1.2.0",
     "moment": "^2.23.0",
+    "openid-client": "^2.3.0",
     "pluralize": "^7.0.0"
   },
   "devDependencies": {
