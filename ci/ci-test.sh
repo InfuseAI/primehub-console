@@ -1,8 +1,8 @@
 #!/bin/bash
 
 export K3D_VERSION=5.4.6
-export K8S_VERSION=v1.24.3-k3s1
-export KUBECTL_VERSION=1.24.3
+export K8S_VERSION=v1.24.7-k3s1
+export KUBECTL_VERSION=1.24.7
 export KC_VERSION=8.0.1
 export NODE_VERSION=14.17.0
 export CLUSTER_NAME=primehub
@@ -73,7 +73,7 @@ setup_keycloak() {
     -p 8080:8080 \
     -e KEYCLOAK_USER=keycloak \
     -e KEYCLOAK_PASSWORD=keycloak \
-    jboss/keycloak:8.0.1
+    jboss/keycloak:$KC_VERSION
 }
 
 run_test() {
