@@ -63,7 +63,7 @@
     "debug": "^3.1.0",
     "flat": "^4.1.0",
     "get-stream": "^5.1.0",
-    "graphql": "^15.5.0",
+    "graphql": "^14.4.2",
     "graphql-import": "^0.7.1",
     "graphql-middleware": "^3.0.2",
     "graphql-shield": "^7.0.6",
