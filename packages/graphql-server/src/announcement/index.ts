@@ -1,5 +1,5 @@
 import { Context } from 'koa';
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import Boom from 'boom';
 import { isEmpty, isNumber } from 'lodash';
 import { Attributes, FieldType } from '../resolvers/attr';

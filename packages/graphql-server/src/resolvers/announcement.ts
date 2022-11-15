@@ -4,7 +4,7 @@ import { AnnouncementSpec } from '../crdClient/crdClientImpl';
 import { mutateRelation } from './utils';
 import { Crd } from './crd';
 import { isUndefined, isNil, get } from 'lodash';
-import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
+import RoleRepresentation from '@keycloak/keycloak-admin-client/lib/defs/roleRepresentation';
 import moment from 'moment';
 
 const generateName = () => {

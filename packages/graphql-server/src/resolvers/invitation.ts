@@ -1,4 +1,4 @@
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { ApolloError } from 'apollo-server';
 import { Attributes, FieldType } from './attr';
 import { v4 as uuidv4 } from 'uuid';
@@ -49,7 +49,7 @@ export const queryInvitation = async (root, args, context) => {
 
 export const createUserFromInvitation = async (root, args, context) => {
   const { username, invitationToken } = args.data;
-  const kcAdminClient: KcAdminClient = context.kcAdminClient;
+  const kcAdminClient: KeycloakAdminClient = context.kcAdminClient;
 
   // license check
   await user.checkLicenseUserQuota(kcAdminClient);
@@ -87,7 +87,7 @@ export const createInvitation = async (root, args, context) => {
   const { data } = args;
   const groupId = data.groupId;
 
-  const kcAdminClient: KcAdminClient = context.kcAdminClient;
+  const kcAdminClient: KeycloakAdminClient = context.kcAdminClient;
   await checkGroup(kcAdminClient, groupId);
   await user.checkLicenseUserQuota(kcAdminClient);
 
@@ -105,14 +105,14 @@ export const createInvitation = async (root, args, context) => {
 };
 
 const removeInvitation = async (
-  kcAdminClient: KcAdminClient,
+  kcAdminClient: KeycloakAdminClient,
   invitationToken: string
 ) => {
   await updateInvitations(kcAdminClient, invitationToken, null);
 };
 
 const updateInvitations = async (
-  kcAdminClient: KcAdminClient,
+  kcAdminClient: KeycloakAdminClient,
   invitationToken: string,
   content: InvitationProps
 ) => {
@@ -171,7 +171,7 @@ async function createUser(
   return user.create(root, userCreateInput, context);
 }
 
-async function checkGroup(kcAdminClient: KcAdminClient, groupId: any) {
+async function checkGroup(kcAdminClient: KeycloakAdminClient, groupId: any) {
   const groups = await kcAdminClient.groups.find();
   const selectedGroup = groups.filter(g => g.id === groupId);
   if (selectedGroup.length === 0) {

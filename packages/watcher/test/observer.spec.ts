@@ -5,7 +5,7 @@ import chaiHttp = require('chai-http');
 import Observer from '../src/observer';
 import CrdClient from '@infuseai/graphql-server/src/crdClient/crdClientImpl';
 import faker from 'faker';
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { cleaupAllCrd, assignAdmin } from './sandbox';
 import { pick } from 'lodash';
 import { Issuer } from 'openid-client';
@@ -17,8 +17,8 @@ const expect = chai.expect;
 declare module 'mocha' {
   // tslint:disable-next-line:interface-name
   interface ISuiteCallbackContext {
-    kcAdminClient?: KcAdminClient;
-    kcAdminClientForObserver?: KcAdminClient;
+    kcAdminClient?: KeycloakAdminClient;
+    kcAdminClientForObserver?: KeycloakAdminClient;
     mutations: any;
     crdClient: CrdClient;
     observer: Observer;
@@ -124,7 +124,7 @@ describe('observer', function() {
     oidcClient.CLOCK_TOLERANCE = 5 * 60;
 
     // assign to this scope
-    this.kcAdminClientForObserver = new KcAdminClient({
+    this.kcAdminClientForObserver = new KeycloakAdminClient({
       baseUrl: apiBaseUrl,
       realmName
     });

@@ -1,7 +1,7 @@
 // tslint:disable:no-unused-expression
 import chai from 'chai';
 import chaiHttp = require('chai-http');
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { kubeConfig } from '../src/crdClient/crdClientImpl';
 import * as k8s from '@kubernetes/client-node';
 

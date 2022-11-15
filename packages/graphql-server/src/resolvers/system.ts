@@ -1,4 +1,4 @@
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { mapValues, isEmpty, get, isNil, reduce, isPlainObject } from 'lodash';
 import { unflatten, flatten } from 'flat';
 import { createDefaultSystemSettings } from './constant';
@@ -16,7 +16,7 @@ const smtpKeyMapping = {
 
 export const query = async (root, args, context: Context) => {
   const everyoneGroupId = context.everyoneGroupId;
-  const kcAdminClient: KcAdminClient = context.kcAdminClient;
+  const kcAdminClient: KeycloakAdminClient = context.kcAdminClient;
   const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});
   const defaultSystemSettings = createDefaultSystemSettings(context.defaultUserVolumeCapacity);
 
@@ -79,7 +79,7 @@ export const queryLicense = license.query;
 export const update = async (root, args, context) => {
   const defaultSystemSettings = createDefaultSystemSettings(context.defaultUserVolumeCapacity);
   const everyoneGroupId = context.everyoneGroupId;
-  const kcAdminClient: KcAdminClient = context.kcAdminClient;
+  const kcAdminClient: KeycloakAdminClient = context.kcAdminClient;
   const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});
   const orgName = parseFromAttr('org.name', attributes);
   const orgLogoContentType = parseFromAttr('org.logo.contentType', attributes);

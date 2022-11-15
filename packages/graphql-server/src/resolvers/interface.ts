@@ -1,4 +1,4 @@
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import CrdClient, { InstanceTypeSpec, ImageSpec, DatasetSpec } from '../crdClient/crdClientImpl';
 import {Client as MinioClient} from 'minio';
 import K8sSecret from '../k8sResource/k8sSecret';
@@ -21,7 +21,7 @@ export enum Role {
 export interface Context {
   realm: string;
   everyoneGroupId: string;
-  kcAdminClient: KcAdminClient;
+  kcAdminClient: KeycloakAdminClient;
   keycloakClientId: string;
   crdClient: CrdClient;
   minioClient: MinioClient;

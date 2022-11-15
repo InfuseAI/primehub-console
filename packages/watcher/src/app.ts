@@ -1,5 +1,5 @@
 import Koa, {Context} from 'koa';
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { Issuer } from 'openid-client';
 import Router from 'koa-router';
 import morgan from 'koa-morgan';
@@ -61,7 +61,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   });
   await tokenSyncer.start();
 
-  const kcAdminClientForObserver = new KcAdminClient({
+  const kcAdminClientForObserver = new KeycloakAdminClient({
     baseUrl: config.keycloakApiBaseUrl,
     realmName: config.keycloakRealmName,
     requestConfig: {

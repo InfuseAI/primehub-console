@@ -46,6 +46,7 @@
     "watch:test": "npm run test -- --watch"
   },
   "dependencies": {
+    "@keycloak/keycloak-admin-client": "^18.0.2",
     "@koa/cors": "^2.2.1",
     "@kubernetes/client-node": "^0.17.0",
     "@types/lru-cache": "^5.1.0",
@@ -75,7 +76,6 @@
     "json-stream": "^1.0.0",
     "json-stringify-safe": "^5.0.1",
     "jsonwebtoken": "^8.3.0",
-    "keycloak-admin": "1.14.17",
     "koa": "^2.5.2",
     "koa-bodyparser": "^4.2.1",
     "koa-morgan": "^1.0.1",

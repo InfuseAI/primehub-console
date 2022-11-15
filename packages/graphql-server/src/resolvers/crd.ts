@@ -3,7 +3,7 @@ import { QueryImageMode, toRelay, paginate, extractPagination, filter } from './
 import CustomResourceNG, { Item } from '../crdClient/customResourceNG';
 import pluralize from 'pluralize';
 import { isEmpty, omit, mapValues, remove, find, get, isNil, unionBy } from 'lodash';
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { ApolloError } from 'apollo-server';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
 import {createConfig} from '../config';

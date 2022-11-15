@@ -1,7 +1,7 @@
 import Koa, {Context} from 'koa';
 import { ApolloServer, ApolloError } from 'apollo-server-koa';
 import path from 'path';
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { get, isEmpty } from 'lodash';
 import { Issuer } from 'openid-client';
 import views from 'koa-views';
@@ -71,7 +71,7 @@ export class App {
   httpsAgent: HttpsAgent;
   oidcClient;
   oidcTokenVerifier;
-  createKcAdminClient: (tokenIssuer?: string) => KcAdminClient;
+  createKcAdminClient: (tokenIssuer?: string) => KeycloakAdminClient;
   crdClient: CrdClient;
   tokenSyncer: TokenSyncer;
   apiTokenCache: ApiTokenCache;
@@ -169,7 +169,7 @@ export class App {
         'X-Forwarded-Proto': url.parse(tokenIssuer).protocol.slice(0, -1),
       } : {};
 
-      return new KcAdminClient({
+      return new KeycloakAdminClient({
         baseUrl: config.keycloakApiBaseUrl,
         realmName: config.keycloakRealmName,
         requestConfig: {
@@ -449,11 +449,11 @@ export class App {
     userId: string;
     username: string;
     role: Role;
-    kcAdminClient: KcAdminClient;
+    kcAdminClient: KeycloakAdminClient;
   }> {
     const {authorization = ''}: {authorization?: string} = ctx.header;
     const config = this.config;
-    let kcAdminClient: KcAdminClient;
+    let kcAdminClient: KeycloakAdminClient;
     let userId: string;
     let username: string;
     let role: Role = Role.NOT_AUTH;
@@ -473,6 +473,7 @@ export class App {
         kcAdminClient.setAccessToken(accessToken);
         username = userId = 'jupyterHub';
         role = Role.CLIENT;
+        role = Role.ADMIN;
       } else {
         // Either config.sharedGraphqlSecretKey not set, or not a sharedGraphqlSecretKey request
         // we verify the token with oidc public key

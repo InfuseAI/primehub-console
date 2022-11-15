@@ -1,7 +1,7 @@
 import { get, find, isEmpty } from 'lodash';
 import { ApolloError } from 'apollo-server';
 import fetch from 'node-fetch';
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { keycloakMaxCount } from '../../resolvers/constant';
 import { Context } from '../../resolvers/interface';
 import { toRelay, filter, paginate, extractPagination } from '../../resolvers/utils';
@@ -49,13 +49,13 @@ const requestApi = async (trackingUri: string, endpoint: string, auth = null, pa
   }
 };
 
-const getGroupId = async (groupName: string, kcAdminClient: KcAdminClient) => {
+const getGroupId = async (groupName: string, kcAdminClient: KeycloakAdminClient) => {
   const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});
   const groupData = find(groups, ['name', groupName]);
   return get(groupData, 'id', '');
 };
 
-const getMLflowSetting = async (groupName: string, kcAdminClient: KcAdminClient) => {
+const getMLflowSetting = async (groupName: string, kcAdminClient: KeycloakAdminClient) => {
   const group = await kcAdminClient.groups.findOne({id: await getGroupId(groupName, kcAdminClient)});
   const transformed = transformGroup(group);
   if (transformed) {
@@ -268,7 +268,7 @@ interface ModelTelemetryMetrics {
   groupsMLflowEnabled: number;
   models: number;
 }
-export const getModelsTelemetry = async (config: Config,  kcAdminClient: KcAdminClient): Promise<ModelTelemetryMetrics> => {
+export const getModelsTelemetry = async (config: Config,  kcAdminClient: KeycloakAdminClient): Promise<ModelTelemetryMetrics> => {
   let groups = await kcAdminClient.groups.find({max: 100000});
   groups = groups.filter(group => group.id !== config.keycloakEveryoneGroupId);
   const results = await Promise.all(groups.map(async group => {

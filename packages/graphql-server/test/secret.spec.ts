@@ -2,7 +2,7 @@
 import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import {GITSYNC_PREFIX, IMAGE_PREFIX, PASSWORD_HOLDER} from '../src/k8sResource/k8sSecret';
 
 chai.use(chaiHttp);

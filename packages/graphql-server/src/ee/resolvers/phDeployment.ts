@@ -10,7 +10,7 @@ import CustomResourceNG, { Item } from '../../crdClient/customResourceNG';
 import { orderBy, omit, get, isUndefined, isNil, isEmpty, isNull, capitalize, intersection } from 'lodash';
 import * as moment from 'moment';
 import { ApolloError } from 'apollo-server';
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { mapping } from '../../resolvers/instanceType';
 import * as logger from '../../logger';
 import { keycloakMaxCount } from '../../resolvers/constant';

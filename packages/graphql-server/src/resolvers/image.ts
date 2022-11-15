@@ -12,7 +12,7 @@ import { ErrorCodes } from '../errorCodes';
 
 const {NOT_AUTH_ERROR, INTERNAL_ERROR} = ErrorCodes;
 
-import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
+import RoleRepresentation from '@keycloak/keycloak-admin-client/lib/defs/roleRepresentation';
 
 const adminAuthorization = async ({data, context}: {data: any, context: any}): Promise<void> => {
   const {username, kcAdminClient} = context;

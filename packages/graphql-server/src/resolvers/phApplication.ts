@@ -10,7 +10,7 @@ import { mapping } from './instanceType';
 import CustomResourceNG, { Item } from '../crdClient/customResourceNG';
 import { get, find, isEmpty } from 'lodash';
 import { ApolloError } from 'apollo-server';
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import {createConfig} from '../config';
 import { onPhAppDeleted } from './group';
 import * as logger from '../logger';

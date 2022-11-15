@@ -1,4 +1,4 @@
-import KeycloakAdmin from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { Crd } from '@infuseai/graphql-server/lib/resolvers/crd';
 import CustomResourceNG from '@infuseai/graphql-server/lib/crdClient/customResourceNG';
 import { isUndefined } from 'lodash';
@@ -7,7 +7,7 @@ import * as logger from './logger';
 export default class Watcher<T> {
   private crd: Crd<T>;
   private resource: CustomResourceNG<T>;
-  private keycloakAdmin: KeycloakAdmin;
+  private keycloakAdmin: KeycloakAdminClient;
   private defaultCreateData: any;
   private everyoneGroupId: string;
   private request: any;
@@ -25,7 +25,7 @@ export default class Watcher<T> {
   }: {
     crd: Crd<T>,
     resource: CustomResourceNG<T>,
-    keycloakAdmin: KeycloakAdmin,
+    keycloakAdmin: KeycloakAdminClient,
     defaultCreateData: any,
     everyoneGroupId: string,
     getAccessToken: () => Promise<string>,

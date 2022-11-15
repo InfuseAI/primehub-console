@@ -1,4 +1,4 @@
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import {
   toRelay,
   mutateRelation,
@@ -465,7 +465,7 @@ const customComparators: Record<string, (group: any) => number> = {
 };
 
 const listQuery = async (
-  kcAdminClient: KcAdminClient,
+  kcAdminClient: KeycloakAdminClient,
   where: any,
   order: any,
   context: Context

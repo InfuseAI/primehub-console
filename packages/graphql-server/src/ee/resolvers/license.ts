@@ -1,4 +1,4 @@
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { keycloakMaxCount } from '../../resolvers/constant';
 import { corev1KubeClient } from '../../crdClient/crdClientImpl';
 import { Context } from '../../resolvers/interface';
@@ -19,7 +19,7 @@ const getNodesFromApi = async () => {
 export const query = async (root, args, context: Context) => {
   const config = createConfig();
   const {crdClient} = context;
-  const kcAdminClient: KcAdminClient = context.kcAdminClient;
+  const kcAdminClient: KeycloakAdminClient = context.kcAdminClient;
 
   const users = await kcAdminClient.users.count;
   const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});

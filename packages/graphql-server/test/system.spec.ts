@@ -1,7 +1,7 @@
 // tslint:disable:no-unused-expression
 import chai from 'chai';
 import chaiHttp = require('chai-http');
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 
 chai.use(chaiHttp);
 

@@ -1,4 +1,4 @@
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import {
   find,
   isUndefined,
@@ -18,7 +18,7 @@ import {
 import { Attributes } from './attr';
 import { Context } from './interface';
 import { ApolloError } from 'apollo-server';
-import { RequiredActionAlias } from 'keycloak-admin/lib/defs/requiredActionProviderRepresentation';
+import { RequiredActionAlias } from '@keycloak/keycloak-admin-client/lib/defs/requiredActionProviderRepresentation';
 import BPromise from 'bluebird';
 import * as logger from '../logger';
 import { crd as annCrdResolver } from '../resolvers/announcement';
@@ -33,7 +33,7 @@ import { createConfig } from '../config';
 
 const TWENTYFOUR_HOURS = 86400;
 
-export const assignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdminClient) => {
+export const assignAdmin = async (userId: string, realm: string, kcAdminClient: KeycloakAdminClient) => {
   if (realm === 'master') {
     // add admin role to user
     const role = await kcAdminClient.roles.findOneByName({
@@ -69,7 +69,7 @@ export const assignAdmin = async (userId: string, realm: string, kcAdminClient: 
   }
 };
 
-const deassignAdmin = async (userId: string, realm: string, kcAdminClient: KcAdminClient) => {
+const deassignAdmin = async (userId: string, realm: string, kcAdminClient: KeycloakAdminClient) => {
   if (realm === 'master') {
     // add admin role to user
     const role = await kcAdminClient.roles.findOneByName({
@@ -115,7 +115,7 @@ const emptyResponse = {
   }
 };
 
-const listQuery = async (kcAdminClient: KcAdminClient, args: any): Promise<{
+const listQuery = async (kcAdminClient: KeycloakAdminClient, args: any): Promise<{
   edges: any[],
   pageInfo: {
     hasNextPage: boolean,
@@ -671,7 +671,7 @@ export const revokeApiToken = async (root, args, context: Context) => {
  * Type
  */
 
-export const isUserAdmin = async (realm: string, userId: string, kcAdminClient: KcAdminClient) => {
+export const isUserAdmin = async (realm: string, userId: string, kcAdminClient: KeycloakAdminClient) => {
   if (realm === 'master') {
     // check if user has admin role
     const roles = await kcAdminClient.users.listRealmRoleMappings({
@@ -855,7 +855,7 @@ export const typeResolvers = {
     }
   },
 };
-export async function checkLicenseUserQuota(kcAdminClient: KcAdminClient) {
+export async function checkLicenseUserQuota(kcAdminClient: KeycloakAdminClient) {
   const maxUser = createConfig().maxUser;
   if (maxUser >= 0) {
     const userCount = await kcAdminClient.users.count();

@@ -1,4 +1,4 @@
-import KcClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import faker from 'faker';
 import minimist from 'minimist';
 const argv = minimist(process.argv.slice(2));
@@ -11,7 +11,7 @@ const pwd = argv.pwd || 'wwwy3y3';
 const clientId = argv.clientId || 'admin-cli';
 
 const main = async () => {
-  const client = new KcClient({
+  const client = new KeycloakAdminClient({
     realmName: realm,
     baseUrl
   });

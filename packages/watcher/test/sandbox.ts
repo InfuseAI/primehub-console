@@ -2,14 +2,14 @@
  * create new realm
  * with everyGroup and assign to env
  */
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import * as k8s from '@kubernetes/client-node';
 import faker from 'faker';
 import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
 import CrdClient from '@infuseai/graphql-server/src/crdClient/crdClientImpl';
-import { GrantTypes } from 'keycloak-admin/lib/utils/auth';
+import { GrantTypes } from '@keycloak/keycloak-admin-client/lib/utils/auth';
 const crdClient = new CrdClient();
 (global as any).crdClient = crdClient;
 
@@ -39,7 +39,7 @@ if (inCluster) {
 const k8sClient = kc.makeApiClient(k8s.ApiextensionsV1Api);
 (global as any).k8sClient = k8sClient;
 
-export const assignAdmin = async (kcAdminClient: KcAdminClient, realm: string, userId: string) => {
+export const assignAdmin = async (kcAdminClient: KeycloakAdminClient, realm: string, userId: string) => {
   const clients = await kcAdminClient.clients.find({realm});
   const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
 
@@ -102,7 +102,7 @@ export const createSandbox = async () => {
   /**
    * Keycloak
    */
-  const client = new KcAdminClient({
+  const client = new KeycloakAdminClient({
     baseUrl: process.env.KC_API_BASEURL || 'http://127.0.0.1:8080/auth'
   });
   (global as any).kcAdminClient = client;
@@ -263,7 +263,7 @@ export const destroySandbox = async () => {
   /**
    * Keycloak
    */
-  const client = new KcAdminClient({
+  const client = new KeycloakAdminClient({
     baseUrl: process.env.KC_API_BASEURL || 'http://127.0.0.1:8080/auth'
   });
 

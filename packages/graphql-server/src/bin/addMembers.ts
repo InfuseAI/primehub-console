@@ -1,5 +1,5 @@
 // tslint:disable:no-console
-import KcClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import minimist from 'minimist';
 import { sampleSize, random } from 'lodash';
 const argv = minimist(process.argv.slice(2));
@@ -13,7 +13,7 @@ const min = argv.min || 5;
 const max = argv.max || 10;
 
 const main = async () => {
-  const client = new KcClient({
+  const client = new KeycloakAdminClient({
     realmName: realm,
     baseUrl
   });

@@ -1,17 +1,17 @@
 import {TraitMiddleware} from './telemetry';
 import CrdClient from '../crdClient/crdClientImpl';
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { Config } from '../config';
 import { pickBy } from 'lodash';
 
-const userCount = async (kcAdminClient: KcAdminClient): Promise<number> => {
+const userCount = async (kcAdminClient: KeycloakAdminClient): Promise<number> => {
   return kcAdminClient.users.makeRequest({
     method: 'GET',
     path: '/count',
   })();
 };
 
-const groupCount = async (kcAdminClient: KcAdminClient): Promise<number> => {
+const groupCount = async (kcAdminClient: KeycloakAdminClient): Promise<number> => {
   return kcAdminClient.groups.makeRequest({
     method: 'GET',
     path: '/count',
@@ -33,7 +33,7 @@ const appTemplateCount = async (crdClient: CrdClient): Promise<number> => {
 
 interface CreateDefaultTraitMiddlewareParams {
   config: Config;
-  createKcAdminClient: () => KcAdminClient;
+  createKcAdminClient: () => KeycloakAdminClient;
   getAccessToken: () => Promise<string>;
   crdClient: CrdClient;
 }
@@ -43,7 +43,7 @@ export const createDefaultTraitMiddleware = (params: CreateDefaultTraitMiddlewar
 
   return async (traits, next) => {
     const accessToken = await getAccessToken();
-    const kcAdminClient: KcAdminClient = createKcAdminClient();
+    const kcAdminClient: KeycloakAdminClient = createKcAdminClient();
     kcAdminClient.setAccessToken(accessToken);
     const users = await userCount(kcAdminClient);
     const groups = await groupCount(kcAdminClient);

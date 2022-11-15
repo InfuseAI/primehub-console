@@ -8,7 +8,7 @@ import { omit, get, isNil, isEmpty, intersection } from 'lodash';
 import moment from 'moment';
 import { escapeToPrimehubLabel } from '../../utils/escapism';
 import { ApolloError } from 'apollo-server';
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { mapping } from '../../resolvers/instanceType';
 import * as logger from '../../logger';
 import { keycloakMaxCount } from '../../resolvers/constant';
