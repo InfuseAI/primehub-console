@@ -1,4 +1,4 @@
-import { Context } from './interface';
+import { Context, Role } from './interface';
 import { QueryImageMode, toRelay, paginate, extractPagination, filter } from './utils';
 import CustomResourceNG, { Item } from '../crdClient/customResourceNG';
 import pluralize from 'pluralize';
@@ -213,7 +213,8 @@ export class Crd<SpecType> {
     context: {
       kcAdminClient: KeycloakAdminClient,
       everyoneGroupId: string,
-      defaultNamespace: string
+      defaultNamespace: string,
+      role: Role
     }) => {
 
     if (this.beforeCreate) {

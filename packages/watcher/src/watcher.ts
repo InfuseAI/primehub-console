@@ -3,6 +3,7 @@ import { Crd } from '@infuseai/graphql-server/lib/resolvers/crd';
 import CustomResourceNG from '@infuseai/graphql-server/lib/crdClient/customResourceNG';
 import { isUndefined } from 'lodash';
 import * as logger from './logger';
+import { Role } from '@infuseai/graphql-server/lib/resolvers/interface';
 
 export default class Watcher<T> {
   private crd: Crd<T>;
@@ -76,7 +77,8 @@ export default class Watcher<T> {
             {
               kcAdminClient: this.keycloakAdmin,
               defaultNamespace: this.k8sCrdNamespace,
-              everyoneGroupId: this.everyoneGroupId
+              everyoneGroupId: this.everyoneGroupId,
+              role: Role.ADMIN
             }
           );
           logger.info({
