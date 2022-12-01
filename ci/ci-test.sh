@@ -3,7 +3,7 @@
 export K3D_VERSION=5.4.6
 export K8S_VERSION=v1.24.7-k3s1
 export KUBECTL_VERSION=1.24.7
-export KC_VERSION=8.0.1
+export KC_VERSION=19.0.3
 export NODE_VERSION=14.17.0
 export CLUSTER_NAME=primehub
 
@@ -71,9 +71,15 @@ setup_keycloak() {
   echo "└────────────────────┘"
   docker run -d --rm --name keycloak \
     -p 8080:8080 \
-    -e KEYCLOAK_USER=keycloak \
-    -e KEYCLOAK_PASSWORD=keycloak \
-    jboss/keycloak:$KC_VERSION
+    -e KEYCLOAK_ADMIN=keycloak \
+    -e KEYCLOAK_ADMIN_PASSWORD=keycloak \
+    quay.io/keycloak/keycloak:$KC_VERSION \
+    start \
+    --http-enabled=true \
+    --http-port=8080 \
+    --hostname-strict=false \
+    --hostname-strict-https=false \
+    --optimized
 }
 
 run_test() {
