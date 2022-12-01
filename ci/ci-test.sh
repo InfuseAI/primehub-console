@@ -4,6 +4,7 @@ export K3D_VERSION=5.4.6
 export K8S_VERSION=v1.24.7-k3s1
 export KUBECTL_VERSION=1.24.7
 export KC_VERSION=19.0.3
+export MINIO_VERSION=RELEASE.2022-04-16T04-26-02Z
 export NODE_VERSION=14.17.0
 export CLUSTER_NAME=primehub
 
@@ -62,7 +63,7 @@ setup_minio() {
   echo "│ Setup MinIO        │"
   echo "└────────────────────┘"
   mkdir -p minio_data
-  docker run -d --rm -p 9000:9000 -v `pwd`/minio_data:/data minio/minio server /data
+  docker run -d --rm -p 9000:9000 -v `pwd`/minio_data:/data minio/minio:$MINIO_VERSION server /data
 }
 
 setup_keycloak() {
