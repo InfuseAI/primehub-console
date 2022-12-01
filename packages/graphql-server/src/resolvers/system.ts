@@ -140,6 +140,7 @@ export const update = async (root, args, context) => {
   };
 
   await kcAdminClient.groups.update({id: everyoneGroupId}, {
+    name: 'everyone',
     attributes: attrs
   });
 
