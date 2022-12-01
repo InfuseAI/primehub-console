@@ -20,11 +20,7 @@ const fields = `
   url
   urlForGpu
   global
-  spec {
-    type
-    displayName
-    pullSecret
-  }
+  spec
   groups {
     id
     name
@@ -123,7 +119,6 @@ describe('image graphql', function() {
         type: 'both',
         displayName: data.name,
         pullSecret: '',
-        groupName: null,
       },
       groups: []
     });
@@ -176,7 +171,6 @@ describe('image graphql', function() {
         ...pick(data, ['displayName', 'description', 'url']),
         pullSecret: '',
         type: 'both',
-        groupName: null,
         urlForGpu: data.url
       },
       type: 'both',
@@ -232,7 +226,6 @@ describe('image graphql', function() {
         type: 'both',
         urlForGpu: data.url,
         pullSecret: '',
-        groupName: null,
       },
       type: 'both',
       urlForGpu: data.url,
