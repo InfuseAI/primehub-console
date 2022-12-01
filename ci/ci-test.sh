@@ -73,13 +73,13 @@ setup_keycloak() {
     -p 8080:8080 \
     -e KEYCLOAK_ADMIN=keycloak \
     -e KEYCLOAK_ADMIN_PASSWORD=keycloak \
+    -e KC_HTTP_RELATIVE_PATH=/auth \
     quay.io/keycloak/keycloak:$KC_VERSION \
     start \
     --http-enabled=true \
     --http-port=8080 \
     --hostname-strict=false \
-    --hostname-strict-https=false \
-    --optimized
+    --hostname-strict-https=false
 }
 
 run_test() {
