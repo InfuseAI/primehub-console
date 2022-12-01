@@ -20,7 +20,11 @@ const fields = `
   url
   urlForGpu
   global
-  spec
+  spec {
+    type
+    displayName
+    pullSecret
+  }
   groups {
     id
     name
