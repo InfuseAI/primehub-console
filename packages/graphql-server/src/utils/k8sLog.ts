@@ -1,4 +1,3 @@
-import { get } from 'lodash';
 import request from 'request';
 import { kubeConfig } from '../crdClient/crdClientImpl';
 import { Stream } from 'stream';

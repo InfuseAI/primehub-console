@@ -2,7 +2,7 @@
 import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import {GITSYNC_PREFIX, IMAGE_PREFIX, PASSWORD_HOLDER} from '../src/k8sResource/k8sSecret';
 
 chai.use(chaiHttp);
@@ -45,12 +45,12 @@ describe('secret graphql', function() {
   before(async () => {
     this.graphqlRequest = (global as any).graphqlRequest;
     this.kcAdminClient = (global as any).kcAdminClient;
-    this.k8sClient = (global as any).k8sClient;
+    this.k8sClient = (global as any).corev1KubeClient;
     // clean up first
-    const {body: {items}} = await this.k8sClient.api.v1.namespaces('default').secrets.get();
+    const {body: {items}} = await this.k8sClient.listNamespacedSecret('default');
     for (const secret of items) {
       if (secret.metadata.name.startsWith(GITSYNC_PREFIX) || secret.metadata.name.startsWith(IMAGE_PREFIX)) {
-        await this.k8sClient.api.v1.namespaces('default').secrets(secret.metadata.name).delete();
+        await this.k8sClient.deleteNamespacedSecret(secret.metadata.name, 'default');
       }
     }
     await (global as any).authKcAdmin();
@@ -84,7 +84,7 @@ describe('secret graphql', function() {
     this.currentOpaqueSecretName = secrets[0].id;
 
     const k8sResource =
-      await this.k8sClient.api.v1.namespaces('default').secrets(this.currentOpaqueSecretName).get();
+      await this.k8sClient.readNamespacedSecret(this.currentOpaqueSecretName, 'default');
     expect(k8sResource.body.data.ssh).to.be.equals(
       Buffer.from(data.secret).toString('base64')
     );
@@ -120,7 +120,7 @@ describe('secret graphql', function() {
 
     // test k8s
     const k8sResource =
-      await this.k8sClient.api.v1.namespaces('default').secrets(this.currentOpaqueSecretName).get();
+      await this.k8sClient.readNamespacedSecret(this.currentOpaqueSecretName, 'default');
     expect(k8sResource.body.data.ssh).to.be.equals(
       Buffer.from(newSecret).toString('base64')
     );
@@ -165,7 +165,7 @@ describe('secret graphql', function() {
     this.currentDockerSecretName = dockerConfigSecrets[0].id;
 
     const k8sResource =
-      await this.k8sClient.api.v1.namespaces('default').secrets(this.currentDockerSecretName).get();
+      await this.k8sClient.readNamespacedSecret(this.currentDockerSecretName, 'default');
     expect(k8sResource.body.data['.dockerconfigjson']).to.be.equals(
       encodeConfig(data.registryHost, data.username, data.password)
     );
@@ -207,7 +207,7 @@ describe('secret graphql', function() {
 
     // test k8s
     const k8sResource =
-      await this.k8sClient.api.v1.namespaces('default').secrets(this.currentDockerSecretName).get();
+      await this.k8sClient.readNamespacedSecret(this.currentDockerSecretName, 'default');
     expect(k8sResource.body.data['.dockerconfigjson']).to.be.equals(
       encodeConfig(oldRegistryHost, data.username, data.password)
     );

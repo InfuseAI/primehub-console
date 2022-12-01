@@ -174,6 +174,7 @@ function UserRegistration() {
 
 function AuthorizationCode() {
   const code = window.apiTokenExhangeCode;
+  const isSecureContext = window.isSecureContext;
   const [copyStatus, copy] = useClipboard({ lazy: true, timeout: 2000 });
   return (
     <div>
@@ -203,17 +204,19 @@ function AuthorizationCode() {
             style={{ marginBottom: '16px' }}
             value={code}
             addonAfter={
-              <a
-                onClick={() => {
-                  if (!code) {
-                    return;
-                  }
-                  copy(code);
-                }}
-                style={{ color: 'black' }}
-              >
-                {copyStatus === 'inactive' ? 'Copy' : 'Copied'}
-              </a>
+              isSecureContext && (
+                <a
+                  onClick={() => {
+                    if (!code) {
+                      return;
+                    }
+                    copy(code);
+                  }}
+                  style={{ color: 'black' }}
+                >
+                  {copyStatus === 'inactive' ? 'Copy' : 'Copied'}
+                </a>
+              )
             }
           />
         </div>

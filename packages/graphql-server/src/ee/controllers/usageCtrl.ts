@@ -2,7 +2,6 @@ import Boom from 'boom';
 import { Middleware, ParameterizedContext } from 'koa';
 import Router from 'koa-router';
 import request from 'request';
-import config from '../../config';
 import { Role } from '../../resolvers/interface';
 import * as logger from '../../logger';
 import { kubeConfig } from '../../crdClient/crdClientImpl';

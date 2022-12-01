@@ -1,6 +1,5 @@
 import React from 'react';
 import { Select, Input, Button, Form, notification, Alert } from 'antd';
-import { get } from 'lodash';
 import gql from 'graphql-tag';
 import { Mutation } from 'react-apollo';
 import Spin from '../cms-components/spin';

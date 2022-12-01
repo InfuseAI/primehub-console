@@ -1,5 +1,5 @@
 import { Context } from './interface';
-import { client as kubeClient } from '../crdClient/crdClientImpl';
+import { corev1KubeClient } from '../crdClient/crdClientImpl';
 import * as logger from '../logger';
 import { toPrimehubLabel } from '../utils/escapism';
 const GiB = Math.pow(1024, 3);
@@ -52,9 +52,14 @@ export const query = async (group, args, context: Context) => {
   const labelSelector = labelStringify({
     'primehub.io/group': `escaped-${groupName}`,
   });
-  const {body: {items}} = await kubeClient.api.v1.namespaces(context.crdNamespace).pods.get({
-    qs: {labelSelector}
-  });
+  const {body: {items}} = await corev1KubeClient.listNamespacedPod(
+    context.crdNamespace,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    labelSelector
+  );
   const resourceUsing = (items || []).reduce((acc, current) => {
     logger.info({
       component: logger.components.resourceStatus,
@@ -78,7 +83,7 @@ export const query = async (group, args, context: Context) => {
   });
 
   // Convert memUsage to GiB
-  resourceUsing.memUsage = (Math.round(resourceUsing.memUsage / GiB * 10) / 10).toFixed(1);
+  resourceUsing.memUsage = +(Math.round(resourceUsing.memUsage / GiB * 10) / 10).toFixed(1);
 
   return {
     groupId: group.id,

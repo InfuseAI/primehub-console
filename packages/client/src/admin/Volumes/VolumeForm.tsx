@@ -60,7 +60,7 @@ function _VolumeForm(props: Props) {
         data.type = values.type;
       if (form.isFieldTouched('enableUploadServer'))
         data.enableUploadServer = values.enableUploadServer;
-      if (form.isFieldTouched('global'))
+      if (!editMode || form.isFieldTouched('global'))
         data.global = values.global;
       if (form.isFieldTouched('groups'))
         data.groups = values.groups;

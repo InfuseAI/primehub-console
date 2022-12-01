@@ -5,7 +5,6 @@ import {errorHandler} from 'utils/errorHandler';
 import {get} from 'lodash';
 import {appPrefix} from 'utils/env';
 import { Table, Alert } from 'antd';
-import styled from 'styled-components';
 
 type Props = {
   jobId: string;

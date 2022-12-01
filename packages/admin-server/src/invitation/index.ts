@@ -72,7 +72,7 @@ export class InvitationCtrl {
             code: 'BAD_REQUEST',
             message: error.response?.errors[0].message,
           };
-          return
+          return;
         }
       }
 
@@ -125,7 +125,7 @@ export class InvitationCtrl {
       async (ctx: Koa.ParameterizedContext, next: any) => {
         return next();
       },
-      async ctx => {
+      async (ctx: Koa.ParameterizedContext) => {
         await ctx.render('anonymous', {
           title: 'PrimeHub',
           staticPath,

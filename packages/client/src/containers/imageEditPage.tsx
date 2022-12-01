@@ -1,6 +1,6 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
-import { Icon, notification, Modal, Row, Col, Skeleton, Card } from 'antd';
+import { notification, Modal } from 'antd';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import { get, unionBy, isEqual, pick, map } from 'lodash';

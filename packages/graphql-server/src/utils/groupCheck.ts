@@ -1,4 +1,4 @@
-import GroupRepresentation from 'keycloak-admin/lib/defs/groupRepresentation';
+import GroupRepresentation from '@keycloak/keycloak-admin-client/lib/defs/groupRepresentation';
 import * as logger from '../logger';
 
 export const isGroupBelongUser = async (ctx: any, userId: string, groupName: string): Promise<boolean> => {

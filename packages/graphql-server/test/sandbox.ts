@@ -2,20 +2,20 @@
  * create new realm
  * with everyGroup and assign to env
  */
-import KcAdminClient from 'keycloak-admin';
-import kubeClient from 'kubernetes-client';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
+import * as k8s from '@kubernetes/client-node';
 import faker from 'faker';
 import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
 import CrdClient from '../src/crdClient/crdClientImpl';
 import { createMinioClient } from '../src/utils/minioClient';
-import { GrantTypes } from 'keycloak-admin/lib/utils/auth';
+import { GrantTypes } from '@keycloak/keycloak-admin-client/lib/utils/auth';
 const crdClient = new CrdClient();
 (global as any).crdClient = crdClient;
 
 const loadCrd = (name: string): any =>
-  yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, `../crd/${name}.spec.yaml`), 'utf8'));
+  yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, `../crd/${name}.yaml`), 'utf8'));
 
 const datasetCrd = loadCrd('dataset');
 const instanceTypeCrd = loadCrd('instance-type');
@@ -43,15 +43,18 @@ mClient.makeBucket('test', '', err => {
 const inCluster = (process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT);
 
 // initialize k8s client
-const Client = (kubeClient as any).Client;
-const config = (kubeClient as any).config;
-const k8sClient = new Client({
-  config: inCluster ? config.getInCluster() : config.fromKubeconfig(),
-  version: '1.10'
-});
+const kc = new k8s.KubeConfig();
+if (inCluster) {
+  kc.loadFromCluster();
+} else {
+  kc.loadFromFile(`${process.env.HOME}/.kube/config`);
+}
+const k8sClient = kc.makeApiClient(k8s.ApiextensionsV1Api);
+const corev1KubeClient = kc.makeApiClient(k8s.CoreV1Api);
 (global as any).k8sClient = k8sClient;
+(global as any).corev1KubeClient = corev1KubeClient;
 
-export const assignAdmin = async (kcAdminClient: KcAdminClient, realm: string, userId: string) => {
+export const assignAdmin = async (kcAdminClient: KeycloakAdminClient, realm: string, userId: string) => {
   const clients = await kcAdminClient.clients.find({realm});
   const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
 
@@ -119,10 +122,10 @@ export const cleaupAllCrd = async () => {
 };
 
 const checkNotProduction = async () => {
+  // TODO: check if env == production
+  return;
   try {
-    await k8sClient.apis['apiextensions.k8s.io'].v1beta1
-      .crd('datasets.primehub.io')
-      .get();
+    await k8sClient.readCustomResourceDefinition('datasets.primehub.io');
   } catch (e) {
     return;
   }
@@ -139,13 +142,13 @@ export const createSandbox = async () => {
    */
   try {
     await Promise.all([
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: datasetCrd }),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: instanceTypeCrd }),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: imageCrd }),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phApplicationCrd }),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phJobCrd }),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phScheduleCrd }),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: phDeploymentCrd }),
+      k8sClient.createCustomResourceDefinition(datasetCrd),
+      k8sClient.createCustomResourceDefinition(instanceTypeCrd),
+      k8sClient.createCustomResourceDefinition(imageCrd),
+      k8sClient.createCustomResourceDefinition(phApplicationCrd),
+      k8sClient.createCustomResourceDefinition(phJobCrd),
+      k8sClient.createCustomResourceDefinition(phScheduleCrd),
+      k8sClient.createCustomResourceDefinition(phDeploymentCrd),
     ]);
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -155,7 +158,7 @@ export const createSandbox = async () => {
   /**
    * Keycloak
    */
-  const client = new KcAdminClient({
+  const client = new KeycloakAdminClient({
     baseUrl: process.env.KC_API_BASEURL || 'http://127.0.0.1:8080/auth'
   });
   (global as any).kcAdminClient = client;
@@ -331,13 +334,13 @@ export const destroySandbox = async () => {
 
   try {
     await Promise.all([
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(datasetCrd.metadata.name).delete(),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(instanceTypeCrd.metadata.name).delete(),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(imageCrd.metadata.name).delete(),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(phApplicationCrd.metadata.name).delete(),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(phJobCrd.metadata.name).delete(),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(phScheduleCrd.metadata.name).delete(),
-      k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd(phDeploymentCrd.metadata.name).delete(),
+      k8sClient.deleteCustomResourceDefinition(datasetCrd.metadata.name),
+      k8sClient.deleteCustomResourceDefinition(instanceTypeCrd.metadata.name),
+      k8sClient.deleteCustomResourceDefinition(imageCrd.metadata.name),
+      k8sClient.deleteCustomResourceDefinition(phApplicationCrd.metadata.name),
+      k8sClient.deleteCustomResourceDefinition(phJobCrd.metadata.name),
+      k8sClient.deleteCustomResourceDefinition(phScheduleCrd.metadata.name),
+      k8sClient.deleteCustomResourceDefinition(phDeploymentCrd.metadata.name),
     ]);
   } catch (e) {
     // tslint:disable-next-line:no-console
@@ -347,7 +350,7 @@ export const destroySandbox = async () => {
   /**
    * Keycloak
    */
-  const client = new KcAdminClient({
+  const client = new KeycloakAdminClient({
     baseUrl: process.env.KC_API_BASEURL || 'http://127.0.0.1:8080/auth'
   });
 

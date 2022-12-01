@@ -1,7 +1,6 @@
 import { Context } from '../../resolvers/interface';
 import { toRelay, filter, paginate, extractPagination } from '../../resolvers/utils';
 import * as logger from '../../logger';
-import { omit } from 'lodash';
 import request from 'request';
 import { kubeConfig } from '../../crdClient/crdClientImpl';
 import moment from 'moment';

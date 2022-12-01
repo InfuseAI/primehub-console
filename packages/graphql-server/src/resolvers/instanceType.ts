@@ -1,10 +1,10 @@
 import { Context } from './interface';
-import { Item } from '../crdClient/customResource';
+import { Item } from '../crdClient/customResourceNG';
 import { InstanceTypeSpec } from '../crdClient/crdClientImpl';
 import { mutateRelation, parseMemory, stringifyMemory, mergeVariables } from './utils';
 import { Crd } from './crd';
 import { isUndefined, isNil, values, isEmpty, get, omit, isArray } from 'lodash';
-import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
+import RoleRepresentation from '@keycloak/keycloak-admin-client/lib/defs/roleRepresentation';
 import Boom from 'boom';
 import { ApolloError } from 'apollo-server';
 import { ErrorCodes } from '../errorCodes';

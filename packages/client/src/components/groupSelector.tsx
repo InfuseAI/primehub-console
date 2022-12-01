@@ -1,13 +1,9 @@
 import * as React from 'react';
-import gql from 'graphql-tag';
-import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
 import {Select} from 'antd';
 import {get} from 'lodash';
-import queryString from 'querystring';
 import {withRouter} from 'react-router';
 import {RouteComponentProps} from 'react-router-dom';
-import withPath, { PathComponentProps } from 'ee/components/job/withPath';
 import {appPrefix} from 'utils/env';
 import PHTooltip from 'components/share/toolTip';
 

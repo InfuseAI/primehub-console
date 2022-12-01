@@ -2,7 +2,7 @@
 import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker = require('faker');
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { setConfigOverwrite } from '../src/config';
 import { ErrorCodes } from '../src/errorCodes';
 

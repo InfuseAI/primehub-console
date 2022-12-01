@@ -165,7 +165,7 @@ export const query = async (root, args, context: Context) => {
   const size = async () => {
     return getDatasetSize(id, groupName, context);
   };
-  return { ...metadata, id, name: id, size };
+  return { ...(typeof metadata === 'object' ? metadata : {}), id, name: id, size };
 };
 
 export const queryFile = async (root, args, context: Context): Promise<any> => {

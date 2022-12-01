@@ -2,7 +2,7 @@
 import chai from 'chai';
 import chaiHttp = require('chai-http');
 import faker from 'faker';
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { range } from 'lodash';
 import { cleaupAllCrd } from './sandbox';
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import {Input, Icon, Button} from 'antd';
-import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import {Empty} from '../empty';
 

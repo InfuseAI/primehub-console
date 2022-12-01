@@ -14,13 +14,12 @@ import {
   get,
   uniq
 } from 'lodash';
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { takeWhile, takeRightWhile, take, takeRight, flow } from 'lodash/fp';
 import { EOL } from 'os';
 import { Context, Role } from './interface';
 import { keycloakMaxCount } from './constant';
-import GroupRepresentation from 'keycloak-admin/lib/defs/groupRepresentation';
-import { throws } from 'assert';
+import GroupRepresentation from '@keycloak/keycloak-admin-client/lib/defs/groupRepresentation';
 const ITEMS_PER_PAGE = 10;
 
 export enum QueryImageMode {
@@ -49,7 +48,7 @@ export const isAdmin = (ctx: Context): boolean => {
   return ctx.role === Role.ADMIN;
 };
 
-export const isGroupAdmin = async (username: string, groupName: string, kcAdminClient: KcAdminClient): Promise<boolean> => {
+export const isGroupAdmin = async (username: string, groupName: string, kcAdminClient: KeycloakAdminClient): Promise<boolean> => {
   const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});
   const groupData = find(groups, ['name', groupName]);
   const group = await kcAdminClient.groups.findOne({id: get(groupData, 'id', '')});
@@ -58,7 +57,7 @@ export const isGroupAdmin = async (username: string, groupName: string, kcAdminC
 };
 
 // TODO: This is deprecated. Please use 'isGroupMember' in middlewares/auth.ts
-export const isGroupMember = async (userId: string, groupName: string, kcAdminClient: KcAdminClient): Promise<boolean> => {
+export const isGroupMember = async (userId: string, groupName: string, kcAdminClient: KeycloakAdminClient): Promise<boolean> => {
   const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});
   const groupData = find(groups, ['name', groupName]);
   if (!groupData) {
@@ -73,7 +72,7 @@ export const isGroupMember = async (userId: string, groupName: string, kcAdminCl
   return (memberIds.indexOf(userId) >= 0);
 };
 
-export const findGroupByName = async (groupName: string, kcAdminClient: KcAdminClient): Promise<GroupRepresentation> => {
+export const findGroupByName = async (groupName: string, kcAdminClient: KeycloakAdminClient): Promise<GroupRepresentation> => {
   const groups = await kcAdminClient.groups.find({max: keycloakMaxCount});
   const groupData = find(groups, ['name', groupName]);
   const group = await kcAdminClient.groups.findOne({id: get(groupData, 'id', '')});

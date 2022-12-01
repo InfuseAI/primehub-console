@@ -1,4 +1,4 @@
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { mapValues, get } from 'lodash';
 import { unflatten } from 'flat';
 import { DEFAULT_TIMEZONE } from './constant';
@@ -7,7 +7,7 @@ import { findTimezone } from '../utils/timezones';
 
 export const query = async (root, args, context: Context) => {
   const everyoneGroupId = context.everyoneGroupId;
-  const kcAdminClient: KcAdminClient = context.kcAdminClient;
+  const kcAdminClient: KeycloakAdminClient = context.kcAdminClient;
   const { attributes } = await kcAdminClient.groups.findOne({
     id: everyoneGroupId,
   });

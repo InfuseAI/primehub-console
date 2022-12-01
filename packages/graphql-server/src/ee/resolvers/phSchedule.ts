@@ -2,16 +2,14 @@ import { Context } from '../../resolvers/interface';
 import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser } from '../../resolvers/utils';
 import { validateLicense } from './utils';
 import { PhScheduleSpec, PhScheduleStatus } from '../../crdClient/crdClientImpl';
-import CustomResource, { Item } from '../../crdClient/customResource';
-import { orderBy, omit, get, isUndefined, isNil, isEmpty, intersection } from 'lodash';
+import CustomResourceNG, { Item } from '../../crdClient/customResourceNG';
+import { omit, get, isNil, isEmpty, intersection } from 'lodash';
 import * as moment from 'moment';
 import { escapeToPrimehubLabel } from '../../utils/escapism';
 import { ApolloError } from 'apollo-server';
-import KeycloakAdminClient from 'keycloak-admin';
 import { mapping } from '../../resolvers/instanceType';
 import * as logger from '../../logger';
 import { keycloakMaxCount } from '../../resolvers/constant';
-import { isUserAdmin } from '../../resolvers/user';
 import { createJob } from './phJob';
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
@@ -224,7 +222,7 @@ const canUserMutate = async (userId: string, groupId: string, context: Context) 
 };
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhScheduleSpec>, where: any = {}, order: any, context: Context): Promise<PhSchedule[]> => {
+const listQuery = async (client: CustomResourceNG<PhScheduleSpec>, where: any = {}, order: any, context: Context): Promise<PhSchedule[]> => {
   const {namespace, graphqlHost, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phSchedule = await client.get(where.id);

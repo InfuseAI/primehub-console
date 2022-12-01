@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { compose } from 'recompose';
 import { useHistory, withRouter, RouteComponentProps } from 'react-router-dom';
-import { notification, Skeleton } from 'antd';
+import { Skeleton } from 'antd';
 import {injectIntl} from 'react-intl';
 import { graphql } from 'react-apollo';
 
 import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 import { VolumeLayout } from './Layout';
-import { VolumeForm, initialFormState } from './VolumeForm';
+import { VolumeForm } from './VolumeForm';
 import { VolumeQuery, UpdateVolumeMutation } from 'queries/Volumes.graphql';
 import type { TVolume } from './types';
 import { pick } from 'lodash';

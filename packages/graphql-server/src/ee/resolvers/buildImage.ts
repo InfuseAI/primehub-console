@@ -2,8 +2,8 @@ import { Context } from '../../resolvers/interface';
 import { toRelay, filter, paginate, extractPagination, parsePackageField, stringifyPackageField } from '../../resolvers/utils';
 import { validateLicense } from './utils';
 import * as logger from '../../logger';
-import { get, isEmpty, isUndefined, isNil, isNull, sortBy, orderBy } from 'lodash';
-import CustomResource, { Item } from '../../crdClient/customResource';
+import { get, isEmpty, isUndefined, isNil, isNull, orderBy } from 'lodash';
+import CustomResourceNG, { Item } from '../../crdClient/customResourceNG';
 import { ImageSpecSpec, ImageSpecStatus } from '../../crdClient/crdClientImpl';
 import moment = require('moment');
 import { transform as transformJob } from './buildImageJob';
@@ -58,7 +58,7 @@ const transform = (item: Item<ImageSpecSpec, ImageSpecStatus>): BuildImage => {
  */
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (imageSpecClient: CustomResource<ImageSpecSpec, ImageSpecStatus>, where: any, order: any): Promise<BuildImage[]> => {
+const listQuery = async (imageSpecClient: CustomResourceNG<ImageSpecSpec, ImageSpecStatus>, where: any, order: any): Promise<BuildImage[]> => {
   if (where && where.id) {
     const imageSpec = await imageSpecClient.get(where.id);
     return [transform(imageSpec)];

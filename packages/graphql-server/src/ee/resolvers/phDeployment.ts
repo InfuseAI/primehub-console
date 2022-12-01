@@ -4,17 +4,16 @@ import {
 } from '../../resolvers/utils';
 import { validateLicense, validateModelDeployQuota } from './utils';
 import {
-  PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, client as kubeClient
+  PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, corev1KubeClient
 } from '../../crdClient/crdClientImpl';
-import CustomResource, { Item } from '../../crdClient/customResource';
+import CustomResourceNG, { Item } from '../../crdClient/customResourceNG';
 import { orderBy, omit, get, isUndefined, isNil, isEmpty, isNull, capitalize, intersection } from 'lodash';
 import * as moment from 'moment';
 import { ApolloError } from 'apollo-server';
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { mapping } from '../../resolvers/instanceType';
 import * as logger from '../../logger';
 import { keycloakMaxCount } from '../../resolvers/constant';
-import { isUserAdmin } from '../../resolvers/user';
 import md5 = require('apache-md5');
 
 const EXCEED_QUOTA_ERROR = 'EXCEED_QUOTA';
@@ -310,9 +309,14 @@ export const typeResolvers = {
       'app': 'primehub-deployment',
       'primehub.io/phdeployment': parent.id,
     });
-    const {body: {items}} = await kubeClient.api.v1.namespaces(context.crdNamespace).pods.get({
-      qs: {labelSelector}
-    });
+    const {body: {items}} = await corev1KubeClient.listNamespacedPod(
+      context.crdNamespace,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      labelSelector
+    );
     return (items || []).map(item => {
       const podName = get(item, 'metadata.name');
       const phase = get(item, 'status.phase');
@@ -346,7 +350,7 @@ const canUserMutate = async (userId: string, groupId: string, context: Context) 
 };
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhDeploymentSpec>, where: any, context: Context): Promise<PhDeployment[]> => {
+const listQuery = async (client: CustomResourceNG<PhDeploymentSpec>, where: any, context: Context): Promise<PhDeployment[]> => {
   const {namespace, graphqlHost, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phDeployment = await client.get(where.id);

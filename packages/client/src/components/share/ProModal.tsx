@@ -1,11 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import {
   Button,
-  Layout,
   Modal,
-  Menu,
-  Divider,
   Card,
   Row,
   Col,

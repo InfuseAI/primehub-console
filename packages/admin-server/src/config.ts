@@ -1,5 +1,4 @@
 import { pickBy, isEmpty } from 'lodash';
-import { resolve } from 'path';
 
 export interface Config {
   env: string;

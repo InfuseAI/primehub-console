@@ -1,4 +1,4 @@
-import { rule, shield, and, or, not } from 'graphql-shield';
+import { shield, or } from 'graphql-shield';
 import { ShieldMutation, ShieldQuery } from '../../middlewares/auth';
 import { isAdmin, isClient, isUser, isGroupAdmin, isGroupMember } from '../../utils/roles';
 

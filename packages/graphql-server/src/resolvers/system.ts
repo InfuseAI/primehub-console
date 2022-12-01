@@ -1,14 +1,11 @@
-import KcAdminClient from 'keycloak-admin';
-import { mapValues, isEmpty, get, isUndefined, isNil, reduce, isPlainObject, isNull } from 'lodash';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
+import { mapValues, isEmpty, get, isNil, reduce, isPlainObject } from 'lodash';
 import { unflatten, flatten } from 'flat';
 import { createDefaultSystemSettings } from './constant';
 import { Context } from './interface';
 import { parseFromAttr, toAttr, parseDiskQuota, stringifyDiskQuota } from './utils';
 import { findTimezone } from '../utils/timezones';
 import * as license from '../ee/resolvers/license';
-import {createConfig} from '../config';
-
-const config = createConfig();
 
 const smtpKeyMapping = {
   enableSSL: 'ssl',
@@ -19,7 +16,7 @@ const smtpKeyMapping = {
 
 export const query = async (root, args, context: Context) => {
   const everyoneGroupId = context.everyoneGroupId;
-  const kcAdminClient: KcAdminClient = context.kcAdminClient;
+  const kcAdminClient: KeycloakAdminClient = context.kcAdminClient;
   const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});
   const defaultSystemSettings = createDefaultSystemSettings(context.defaultUserVolumeCapacity);
 
@@ -82,7 +79,7 @@ export const queryLicense = license.query;
 export const update = async (root, args, context) => {
   const defaultSystemSettings = createDefaultSystemSettings(context.defaultUserVolumeCapacity);
   const everyoneGroupId = context.everyoneGroupId;
-  const kcAdminClient: KcAdminClient = context.kcAdminClient;
+  const kcAdminClient: KeycloakAdminClient = context.kcAdminClient;
   const {attributes} = await kcAdminClient.groups.findOne({id: everyoneGroupId});
   const orgName = parseFromAttr('org.name', attributes);
   const orgLogoContentType = parseFromAttr('org.logo.contentType', attributes);
@@ -143,6 +140,7 @@ export const update = async (root, args, context) => {
   };
 
   await kcAdminClient.groups.update({id: everyoneGroupId}, {
+    name: 'everyone',
     attributes: attrs
   });
 

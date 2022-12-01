@@ -1,6 +1,6 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
-import { Icon, notification, Modal } from 'antd';
+import { notification, Modal } from 'antd';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import { get, unionBy, isEqual, pick } from 'lodash';
@@ -10,7 +10,7 @@ import { errorHandler } from 'utils/errorHandler';
 import DeploymentCreateForm from 'ee/components/modelDeployment/createForm';
 import PageTitle from 'components/pageTitle';
 import { PhDeploymentFragment } from 'ee/components/modelDeployment/common';
-import { GET_PH_DEPLOYMENT, getMessage } from 'ee/containers/deploymentDetail';
+import { GET_PH_DEPLOYMENT } from 'ee/containers/deploymentDetail';
 import { GroupContextComponentProps, withGroupContext } from 'context/group';
 import Breadcrumbs from 'components/share/breadcrumb';
 import { sortNameByAlphaBet } from 'utils/sorting';

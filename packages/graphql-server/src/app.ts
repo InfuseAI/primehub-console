@@ -1,7 +1,7 @@
 import Koa, {Context} from 'koa';
 import { ApolloServer, ApolloError } from 'apollo-server-koa';
 import path from 'path';
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { get, isEmpty } from 'lodash';
 import { Issuer } from 'openid-client';
 import views from 'koa-views';
@@ -48,7 +48,7 @@ import K8sGroupPvc from './k8sResource/k8sGroupPvc';
 
 // logger
 import * as logger from './logger';
-import { Item } from './crdClient/customResource';
+import { Item } from './crdClient/customResourceNG';
 import K8sUploadServerSecret from './k8sResource/k8sUploadServerSecret';
 import { Role } from './resolvers/interface';
 import Token from './oidc/token';
@@ -71,7 +71,7 @@ export class App {
   httpsAgent: HttpsAgent;
   oidcClient;
   oidcTokenVerifier;
-  createKcAdminClient: (tokenIssuer?: string) => KcAdminClient;
+  createKcAdminClient: (tokenIssuer?: string) => KeycloakAdminClient;
   crdClient: CrdClient;
   tokenSyncer: TokenSyncer;
   apiTokenCache: ApiTokenCache;
@@ -169,7 +169,7 @@ export class App {
         'X-Forwarded-Proto': url.parse(tokenIssuer).protocol.slice(0, -1),
       } : {};
 
-      return new KcAdminClient({
+      return new KeycloakAdminClient({
         baseUrl: config.keycloakApiBaseUrl,
         realmName: config.keycloakRealmName,
         requestConfig: {
@@ -449,11 +449,11 @@ export class App {
     userId: string;
     username: string;
     role: Role;
-    kcAdminClient: KcAdminClient;
+    kcAdminClient: KeycloakAdminClient;
   }> {
     const {authorization = ''}: {authorization?: string} = ctx.header;
     const config = this.config;
-    let kcAdminClient: KcAdminClient;
+    let kcAdminClient: KeycloakAdminClient;
     let userId: string;
     let username: string;
     let role: Role = Role.NOT_AUTH;

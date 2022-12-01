@@ -1,4 +1,4 @@
-import Koa, { Context } from 'koa';
+import Koa from 'koa';
 import Boom from 'boom';
 import Router from 'koa-router';
 import gravatar from 'gravatar';

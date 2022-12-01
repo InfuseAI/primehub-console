@@ -3,7 +3,7 @@ import Koa from 'koa';
 import Router from 'koa-router';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import { gql, GraphQLClient } from 'graphql-request';
+import { GraphQLClient } from 'graphql-request';
 import bodyParser from 'koa-bodyparser';
 
 interface OidcAuthenticationFlow {
@@ -59,7 +59,7 @@ export class OidcAuthenticationFlowCtrl {
       async (ctx: Koa.ParameterizedContext, next: any) => {
         return next();
       },
-      async ctx => {
+      async (ctx: Koa.ParameterizedContext) => {
         const querystring = encode(ctx.request.querystring);
         ctx.state.apiTokenExhangeCode = querystring;
         await ctx.render('anonymous', {

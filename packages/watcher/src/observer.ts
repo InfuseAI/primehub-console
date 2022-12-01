@@ -1,6 +1,6 @@
 // tslint:disable-next-line:max-line-length
 import CrdClient, { InstanceTypeSpec, DatasetSpec, ImageSpec } from '@infuseai/graphql-server/lib/crdClient/crdClientImpl';
-import KeycloakAdmin from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import Watcher from './watcher';
 import { crd as instanceType} from '@infuseai/graphql-server/lib/resolvers/instanceType';
 import { crd as dataset} from '@infuseai/graphql-server/lib/resolvers/dataset';
@@ -19,7 +19,7 @@ export default class Observer {
     k8sCrdNamespace
   }: {
     crdClient: CrdClient,
-    keycloakAdmin: KeycloakAdmin,
+    keycloakAdmin: KeycloakAdminClient,
     everyoneGroupId: string,
     getAccessToken: () => Promise<string>;
     k8sCrdNamespace: string

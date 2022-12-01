@@ -1,4 +1,4 @@
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import {
   toRelay,
   mutateRelation,
@@ -15,7 +15,7 @@ import {
   extractPagination,
   findGroupByName,
   getFromAttr} from './utils';
-import { pick, isNil, omit, get, isEmpty, mapValues, find } from 'lodash';
+import { pick, isNil, get, isEmpty, find } from 'lodash';
 import { crd as instanceTypeResolver } from './instanceType';
 import { crd as datasetResolver } from './dataset';
 import { crd as imageResolver } from './image';
@@ -277,6 +277,7 @@ export const update = async (root, args, context: Context) => {
   // update
   try {
     await kcAdminClient.groups.update({id: groupId}, {
+      name: group.name,
       attributes: attrs.toKeycloakAttrs()
     });
   } catch (err) {
@@ -465,7 +466,7 @@ const customComparators: Record<string, (group: any) => number> = {
 };
 
 const listQuery = async (
-  kcAdminClient: KcAdminClient,
+  kcAdminClient: KeycloakAdminClient,
   where: any,
   order: any,
   context: Context

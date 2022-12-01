@@ -133,19 +133,19 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
   new OidcAuthenticationFlowCtrl({config}).mount(staticPath, rootRouter);
 
   // main
-  rootRouter.get('/g', oidcCtrl.loggedIn, async ctx => {
+  rootRouter.get('/g', oidcCtrl.loggedIn, async (ctx: Koa.ParameterizedContext) => {
     await ctx.render('index', {
       title: 'PrimeHub',
       staticPath,
     });
   });
 
-  rootRouter.get('/g/*', oidcCtrl.loggedIn, async ctx => {
+  rootRouter.get('/g/*', oidcCtrl.loggedIn, async (ctx: Koa.ParameterizedContext) => {
     const apiToken = ctx.cookies.get('apiToken', { signed: true });
 
     if (apiToken) {
       ctx.state.apiToken = ctx.cookies.get('apiToken', { signed: true });
-      ctx.cookies.set('apiToken', { path: staticPath });
+      ctx.cookies.set('apiToken', '', { path: staticPath });
     }
 
     await ctx.render('index', {
@@ -157,7 +157,7 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
   // public share url
   rootRouter.get('/share/*', async (ctx: Koa.ParameterizedContext, next: any) => {
     return next();
-  }, async ctx => {
+  }, async (ctx: Koa.ParameterizedContext) => {
     await ctx.render('anonymous', {
       title: 'PrimeHub',
       staticPath,
@@ -168,13 +168,13 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
   new InvitationCtrl({config}).mount(staticPath, rootRouter);
 
   // Admin Portal
-  rootRouter.get('/admin', oidcCtrl.ensureAdmin, async ctx => {
+  rootRouter.get('/admin', oidcCtrl.ensureAdmin, async (ctx: Koa.ParameterizedContext) => {
     await ctx.render('admin', {
       title: 'PrimeHub',
       staticPath,
     });
   });
-  rootRouter.get('/admin/*', oidcCtrl.ensureAdmin, async ctx => {
+  rootRouter.get('/admin/*', oidcCtrl.ensureAdmin, async (ctx: Koa.ParameterizedContext) => {
     await ctx.render('admin', {
       title: 'PrimeHub',
       staticPath,

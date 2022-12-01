@@ -1,5 +1,5 @@
-import { client as kubeClient } from '../crdClient/crdClientImpl';
-import { get, isEmpty, reduce } from 'lodash';
+import { corev1KubeClient } from '../crdClient/crdClientImpl';
+import { get } from 'lodash';
 import { ApolloError } from 'apollo-server';
 import Boom from 'boom';
 
@@ -12,7 +12,6 @@ export interface K8sNamespaceResponse {
 
 export default class K8sNamespace {
   private labels: Record<string, string>;
-  private resource: any;
 
   constructor({
     labels,
@@ -20,20 +19,23 @@ export default class K8sNamespace {
     labels: Record<string, string>
   }) {
     this.labels = labels;
-    this.resource = kubeClient.api.v1.namespaces;
   }
 
   public find = async (): Promise<K8sNamespaceResponse[]> => {
     const labelSelector = this.labelStringify(this.labels);
-    const {body: {items}} = await this.resource.get({
-      qs: {labelSelector}
-    });
+    const {body: {items}} = await corev1KubeClient.listNamespace(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      labelSelector
+    );
     return (items || []).map(this.propsMapping);
   }
 
   public findOne = async (name: string): Promise<K8sNamespaceResponse> => {
     try {
-      const {body} = await this.resource(name).get();
+      const {body} = await corev1KubeClient.readNamespace(name);
       this.validateLabels(body);
       return this.propsMapping(body);
     } catch (e) {
@@ -55,21 +57,20 @@ export default class K8sNamespace {
   }): Promise<K8sNamespaceResponse> => {
     try {
       // create
-      const {body} = await this.resource.post({
-        body: {
-          Kind: 'Namespace',
-          apiVersion: 'v1',
-          metadata: {
-            name,
-            labels: this.labels,
-            annotations: {
-              displayName,
-              kcGroupId: keycloakGroupId
-            }
+      const body = {
+        Kind: 'Namespace',
+        apiVersion: 'v1',
+        metadata: {
+          name,
+          labels: this.labels,
+          annotations: {
+            displayName,
+            kcGroupId: keycloakGroupId
           }
         }
-      });
-      return this.propsMapping(body);
+      };
+      const {body: created} = await corev1KubeClient.createNamespace(body);
+      return this.propsMapping(created);
     } catch (e) {
       if (e.statusCode === 409) {
         throw new ApolloError(e.message, 'RESOURCE_CONFLICT');
@@ -80,29 +81,28 @@ export default class K8sNamespace {
 
   public async update(name: string, data: {displayName: string}) {
     // validate first
-    const {body: queryBody} = await this.resource(name).get();
+    const {body: queryBody} = await corev1KubeClient.readNamespace(name);
     this.validateLabels(queryBody);
 
     // update
-    const {body} = await this.resource(name).patch({
-      body: {
-        metadata: {
-          annotations: {
-            displayName: data.displayName
-          }
+    const body = {
+      metadata: {
+        annotations: {
+          displayName: data.displayName
         }
       }
-    });
+    };
+    const {body: updated} = await corev1KubeClient.patchNamespace(name, body);
     return this.propsMapping(body);
   }
 
   public async delete(name: string) {
     // validate first
-    const {body: queryBody} = await this.resource(name).get();
+    const {body: queryBody} = await corev1KubeClient.readNamespace(name);
     this.validateLabels(queryBody);
 
     // delete
-    return this.resource(name).delete();
+    return corev1KubeClient.deleteNamespace(name);
   }
 
   private labelStringify = (labels: Record<string, string>) => {

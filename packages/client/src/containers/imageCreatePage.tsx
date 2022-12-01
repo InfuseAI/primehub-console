@@ -3,7 +3,7 @@ import {Card, notification, Skeleton, Row, Col} from 'antd';
 import gql from 'graphql-tag';
 import {graphql} from 'react-apollo';
 import {compose} from 'recompose';
-import {get, unionBy, isEmpty} from 'lodash';
+import {get, unionBy } from 'lodash';
 import queryString from 'querystring';
 import {RouteComponentProps} from 'react-router';
 import {errorHandler} from 'utils/errorHandler';

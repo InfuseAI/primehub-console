@@ -1,4 +1,4 @@
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import {memoize} from './memoize';
 import CrdClientImpl from '../crdClient/crdClientImpl';
 

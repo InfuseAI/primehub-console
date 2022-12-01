@@ -1,14 +1,14 @@
-import { Item } from '../crdClient/customResource';
+import { Item } from '../crdClient/customResourceNG';
 import { DatasetSpec } from '../crdClient/crdClientImpl';
 import { Crd } from './crd';
 import { mutateRelation, mergeVariables, parseBoolean } from './utils';
-import RoleRepresentation from 'keycloak-admin/lib/defs/roleRepresentation';
+import RoleRepresentation from '@keycloak/keycloak-admin-client/lib/defs/roleRepresentation';
 import { Context } from './interface';
 import { omit, get, isUndefined, last, isNil } from 'lodash';
 import { resolveInDataSet } from './secret';
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { keycloakMaxCount } from './constant';
-import { ResourceRole, ResourceNamePrefix } from './resourceRole';
+import { ResourceNamePrefix } from './resourceRole';
 import {createConfig} from '../config';
 import { ApolloError } from 'apollo-server';
 import K8sDatasetPvc from '../k8sResource/k8sDatasetPvc';

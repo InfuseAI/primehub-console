@@ -2,7 +2,7 @@ import {TraitMiddleware} from '../../utils/telemetry';
 import CrdClient from '../../crdClient/crdClientImpl';
 import { Config } from '../../config';
 import { getModelsTelemetry } from '../resolvers/model';
-import KcAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 
 const licenseStatusString = async (config: Config): Promise<string> => {
   const status = config.licenseStatus.toLowerCase();
@@ -19,7 +19,7 @@ const scheduleCount = async (crdClient: CrdClient): Promise<number> => {
 
 interface CreateEETraitMiddlewareParams {
   config: Config;
-  createKcAdminClient: () => KcAdminClient;
+  createKcAdminClient: () => KeycloakAdminClient;
   getAccessToken: () => Promise<string>;
   crdClient: CrdClient;
 }
@@ -29,7 +29,7 @@ export const createEETraitMiddleware = (params: CreateEETraitMiddlewareParams): 
 
   return async (traits, next) => {
     const accessToken = await getAccessToken();
-    const kcAdminClient: KcAdminClient = createKcAdminClient();
+    const kcAdminClient: KeycloakAdminClient = createKcAdminClient();
     kcAdminClient.setAccessToken(accessToken);
 
     const licenseStatus = await licenseStatusString(config);

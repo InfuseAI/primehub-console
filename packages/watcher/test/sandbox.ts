@@ -2,42 +2,44 @@
  * create new realm
  * with everyGroup and assign to env
  */
-import KcAdminClient from 'keycloak-admin';
-import kubeClient from 'kubernetes-client';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
+import * as k8s from '@kubernetes/client-node';
 import faker from 'faker';
 import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
 import CrdClient from '@infuseai/graphql-server/src/crdClient/crdClientImpl';
+import { GrantTypes } from '@keycloak/keycloak-admin-client/lib/utils/auth';
 const crdClient = new CrdClient();
 (global as any).crdClient = crdClient;
 
-const loadCrd = (name: string) =>
-  yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, `../../graphql-server/crd/${name}.spec.yaml`), 'utf8'));
+const loadCrd = (name: string): any =>
+  yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, `../../graphql-server/crd/${name}.yaml`), 'utf8'));
 
 const datasetCrd = loadCrd('dataset');
 const instanceTypeCrd = loadCrd('instance-type');
 const imageCrd = loadCrd('image');
 
 const masterRealmCred = {
-  username: 'wwwy3y3',
-  password: 'wwwy3y3',
-  grantType: 'password',
+  username: 'keycloak',
+  password: 'keycloak',
+  grantType: 'password' as GrantTypes,
   clientId: 'admin-cli'
 };
 
 const inCluster = (process.env.KUBERNETES_SERVICE_HOST && process.env.KUBERNETES_SERVICE_PORT);
 
 // initialize k8s client
-const Client = (kubeClient as any).Client;
-const config = (kubeClient as any).config;
-const k8sClient = new Client({
-  config: inCluster ? config.getInCluster() : config.fromKubeconfig(),
-  version: '1.10'
-});
+const kc = new k8s.KubeConfig();
+if (inCluster) {
+  kc.loadFromCluster();
+} else {
+  kc.loadFromFile(`${process.env.HOME}/.kube/config`);
+}
+const k8sClient = kc.makeApiClient(k8s.ApiextensionsV1Api);
 (global as any).k8sClient = k8sClient;
 
-export const assignAdmin = async (kcAdminClient: KcAdminClient, realm: string, userId: string) => {
+export const assignAdmin = async (kcAdminClient: KeycloakAdminClient, realm: string, userId: string) => {
   const clients = await kcAdminClient.clients.find({realm});
   const realmManagementClient = clients.find(client => client.clientId === 'realm-management');
 
@@ -93,14 +95,14 @@ export const createSandbox = async () => {
   /**
    * k8s
    */
-  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: datasetCrd });
-  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: instanceTypeCrd });
-  await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.post({ body: imageCrd });
+  await k8sClient.createCustomResourceDefinition(datasetCrd);
+  await k8sClient.createCustomResourceDefinition(instanceTypeCrd);
+  await k8sClient.createCustomResourceDefinition(imageCrd);
 
   /**
    * Keycloak
    */
-  const client = new KcAdminClient({
+  const client = new KeycloakAdminClient({
     baseUrl: process.env.KC_API_BASEURL || 'http://127.0.0.1:8080/auth'
   });
   (global as any).kcAdminClient = client;
@@ -250,9 +252,9 @@ export const destroySandbox = async () => {
   await cleaupAllCrd();
 
   try {
-    await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(datasetCrd.metadata.name);
-    await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(instanceTypeCrd.metadata.name);
-    await k8sClient.apis['apiextensions.k8s.io'].v1beta1.crd.delete(imageCrd.metadata.name);
+    await k8sClient.deleteCustomResourceDefinition(datasetCrd.metadata.name);
+    await k8sClient.deleteCustomResourceDefinition(instanceTypeCrd.metadata.name);
+    await k8sClient.deleteCustomResourceDefinition(imageCrd.metadata.name);
   } catch (e) {
     // tslint:disable-next-line:no-console
     console.log(e);
@@ -261,7 +263,7 @@ export const destroySandbox = async () => {
   /**
    * Keycloak
    */
-  const client = new KcAdminClient({
+  const client = new KeycloakAdminClient({
     baseUrl: process.env.KC_API_BASEURL || 'http://127.0.0.1:8080/auth'
   });
 

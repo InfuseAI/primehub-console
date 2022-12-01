@@ -1,9 +1,9 @@
-import { Context } from './interface';
+import { Context, Role } from './interface';
 import { QueryImageMode, toRelay, paginate, extractPagination, filter } from './utils';
-import CustomResource, { Item } from '../crdClient/customResource';
+import CustomResourceNG, { Item } from '../crdClient/customResourceNG';
 import pluralize from 'pluralize';
 import { isEmpty, omit, mapValues, remove, find, get, isNil, unionBy } from 'lodash';
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { ApolloError } from 'apollo-server';
 const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
 import {createConfig} from '../config';
@@ -213,7 +213,8 @@ export class Crd<SpecType> {
     context: {
       kcAdminClient: KeycloakAdminClient,
       everyoneGroupId: string,
-      defaultNamespace: string
+      defaultNamespace: string,
+      role: Role
     }) => {
 
     if (this.beforeCreate) {
@@ -260,7 +261,7 @@ export class Crd<SpecType> {
    */
 
   private listQuery =
-    async (customResource: CustomResource<SpecType>, where: any, order: any, context: Context, mode?: QueryImageMode) => {
+    async (customResource: CustomResourceNG<SpecType>, where: any, order: any, context: Context, mode?: QueryImageMode) => {
     const rows = await customResource.list();
     let searchFields = ['name', 'displayName', 'description'];
     let mappedRows = rows.map(row => this.propMapping(row, context));

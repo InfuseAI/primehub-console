@@ -1,9 +1,10 @@
 #!/bin/bash
 
-export K3D_VERSION=3.0.0-rc.6
-export K8S_VERSION=v1.17.7-k3s1
-export KUBECTL_VERSION=1.17.7
-export KC_VERSION=8.0.1
+export K3D_VERSION=5.4.6
+export K8S_VERSION=v1.24.7-k3s1
+export KUBECTL_VERSION=1.24.7
+export KC_VERSION=19.0.3
+export MINIO_VERSION=RELEASE.2022-04-16T04-26-02Z
 export NODE_VERSION=14.17.0
 export CLUSTER_NAME=primehub
 
@@ -40,16 +41,14 @@ setup_k3d() {
     sudo mv kubectl /usr/local/bin
 
   # Install k3d
-  curl -sLo k3d https://github.com/rancher/k3d/releases/download/v${K3D_VERSION}/k3d-linux-amd64 && \
+  curl -sLo k3d https://github.com/k3d-io/k3d/releases/download/v${K3D_VERSION}/k3d-linux-amd64 && \
     chmod +x k3d && \
     sudo mv k3d /usr/local/bin/
 
   k3d version
 
   # Create k3d
-  k3d create cluster ${CLUSTER_NAME} --image rancher/k3s:${K8S_VERSION} --k3s-server-arg '--disable=traefik' --k3s-server-arg '--disable-network-policy' --wait
-  mkdir -p ~/.kube
-  cp $(k3d get kubeconfig ${CLUSTER_NAME}) ~/.kube/config || true
+  k3d cluster create ${CLUSTER_NAME} --image rancher/k3s:${K8S_VERSION} --k3s-arg '--disable=traefik@server:0' --k3s-arg '--disable-network-policy@server:0' --wait
 
   echo "kube context: $(kubectl config current-context)"
   echo "waiting for nodes ready"
@@ -64,7 +63,7 @@ setup_minio() {
   echo "│ Setup MinIO        │"
   echo "└────────────────────┘"
   mkdir -p minio_data
-  docker run -d --rm -p 9000:9000 -v `pwd`/minio_data:/data minio/minio server /data
+  docker run -d --rm -p 9000:9000 -v `pwd`/minio_data:/data minio/minio:$MINIO_VERSION server /data
 }
 
 setup_keycloak() {
@@ -73,9 +72,15 @@ setup_keycloak() {
   echo "└────────────────────┘"
   docker run -d --rm --name keycloak \
     -p 8080:8080 \
-    -e KEYCLOAK_USER=keycloak \
-    -e KEYCLOAK_PASSWORD=keycloak \
-    jboss/keycloak:8.0.1
+    -e KEYCLOAK_ADMIN=keycloak \
+    -e KEYCLOAK_ADMIN_PASSWORD=keycloak \
+    -e KC_HTTP_RELATIVE_PATH=/auth \
+    quay.io/keycloak/keycloak:$KC_VERSION \
+    start \
+    --http-enabled=true \
+    --http-port=8080 \
+    --hostname-strict=false \
+    --hostname-strict-https=false
 }
 
 run_test() {

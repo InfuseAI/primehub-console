@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Modal, Input, Icon, Tooltip, Row } from 'antd';
+import { Modal, Input, Icon, Tooltip } from 'antd';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`

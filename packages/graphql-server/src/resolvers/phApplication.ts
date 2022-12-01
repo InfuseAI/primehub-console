@@ -3,14 +3,14 @@ import {
   toRelay, filter, paginate, extractPagination, isGroupMember
 } from './utils';
 import {
-  PhApplicationSpec, PhApplicationStatus, PhApplicationScope, PhApplicationPhase, InstanceTypeSpec, client as kubeClient
+  PhApplicationSpec, PhApplicationStatus, PhApplicationScope, PhApplicationPhase, InstanceTypeSpec, corev1KubeClient
 } from '../crdClient/crdClientImpl';
 import { transform as templateTransform, PhAppTemplate } from './phAppTemplate';
 import { mapping } from './instanceType';
-import CustomResource, { Item } from '../crdClient/customResource';
+import CustomResourceNG, { Item } from '../crdClient/customResourceNG';
 import { get, find, isEmpty } from 'lodash';
 import { ApolloError } from 'apollo-server';
-import KeycloakAdminClient from 'keycloak-admin';
+import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import {createConfig} from '../config';
 import { onPhAppDeleted } from './group';
 import * as logger from '../logger';
@@ -89,9 +89,14 @@ export const typeResolvers = {
       'app': 'primehub-app',
       'primehub.io/phapplication': `app-${parent.id}`,
     });
-    const {body: {items}} = await kubeClient.api.v1.namespaces(context.crdNamespace).pods.get({
-      qs: {labelSelector}
-    });
+    const {body: {items}} = await corev1KubeClient.listNamespacedPod(
+      context.crdNamespace,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      labelSelector
+    );
     return (items || []).map(item => {
       const podName = get(item, 'metadata.name');
       return {
@@ -157,7 +162,7 @@ export const transform = async (item: Item<PhApplicationSpec, PhApplicationStatu
 };
 
 // tslint:disable-next-line:max-line-length
-const listQuery = async (client: CustomResource<PhApplicationSpec, PhApplicationStatus>, where: any, order: any, context: Context): Promise<PhApplication[]> => {
+const listQuery = async (client: CustomResourceNG<PhApplicationSpec, PhApplicationStatus>, where: any, order: any, context: Context): Promise<PhApplication[]> => {
   const {namespace, graphqlHost, userId: currentUserId, kcAdminClient} = context;
   if (where && where.id) {
     const phApplication = await client.get(where.id);
