@@ -473,7 +473,6 @@ export class App {
         kcAdminClient.setAccessToken(accessToken);
         username = userId = 'jupyterHub';
         role = Role.CLIENT;
-        role = Role.ADMIN;
       } else {
         // Either config.sharedGraphqlSecretKey not set, or not a sharedGraphqlSecretKey request
         // we verify the token with oidc public key
