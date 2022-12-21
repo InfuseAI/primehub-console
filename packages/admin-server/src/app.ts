@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import path from 'path';
-import { Issuer } from 'openid-client';
+import { Issuer, custom } from 'openid-client';
 import views from 'koa-views';
 import serve from 'koa-static';
 import Router from 'koa-router';
@@ -38,14 +38,9 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
   });
 
   // create oidc client and controller
-  Issuer.defaultHttpOptions = {
-    agent: {
-      http: httpAgent,
-      https: httpsAgent,
-    },
-    retries: config.keycloakRetries,
+  custom.setHttpOptionsDefaults({
     timeout: config.keycloakTimeout,
-  };
+  });
 
   // tslint:disable-next-line:max-line-length
   const issuer = new Issuer({
