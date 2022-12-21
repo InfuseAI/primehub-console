@@ -5,7 +5,7 @@ export K8S_VERSION=v1.24.7-k3s1
 export KUBECTL_VERSION=1.24.7
 export KC_VERSION=19.0.3
 export MINIO_VERSION=RELEASE.2022-04-16T04-26-02Z
-export NODE_VERSION=14.17.0
+export NODE_VERSION=16.18.1
 export CLUSTER_NAME=primehub
 
 wait_for_docker() {

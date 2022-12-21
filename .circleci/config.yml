@@ -226,7 +226,7 @@ jobs:
   # Tests
   graphql-lint:
     docker:
-      - image: cimg/node:14.17.0
+      - image: cimg/node:16.18.1
     steps:
       - checkout
       - run:
@@ -237,7 +237,7 @@ jobs:
             yarn run test:build
   client-unit-test:
     docker:
-      - image: cimg/node:14.17.0
+      - image: cimg/node:16.18.1
     steps:
       - checkout
       - run:
@@ -268,7 +268,7 @@ jobs:
           file: ./packages/client/coverage/coverage-final.json
   graphql-unit-test:
     docker:
-      - image: cimg/node:14.17.0
+      - image: cimg/node:16.18.1
     steps:
       - checkout
       - run:
