@@ -138,7 +138,7 @@ export class App {
       timeout: config.keycloakTimeout,
     });
 
-    const jwks_uri = `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/certs`;
+    const jwksUri = `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/certs`;
 
     // tslint:disable-next-line:max-line-length
     const issuer = new Issuer({
@@ -146,7 +146,7 @@ export class App {
       authorization_endpoint: `${config.keycloakOidcBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/auth`,
       token_endpoint: `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/token`,
       userinfo_endpoint: `${config.keycloakApiBaseUrl}/realms/${config.keycloakRealmName}/protocol/openid-connect/userinfo`,
-      jwks_uri,
+      jwks_uri: jwksUri,
     });
     const oidcClient = this.oidcClient = new issuer.Client({
       client_id: config.keycloakClientId,
@@ -155,7 +155,7 @@ export class App {
     oidcClient.CLOCK_TOLERANCE = 5 * 60;
 
     // OidcTokenVerifier
-    const jwks = jose.createRemoteJWKSet(new URL(jwks_uri));
+    const jwks = jose.createRemoteJWKSet(new URL(jwksUri));
     const oidcTokenVerifier = this.oidcTokenVerifier = new OidcTokenVerifier({
       jwks
     });
