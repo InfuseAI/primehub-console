@@ -89,7 +89,7 @@ const fetchPhAppTemplate = async (url: any) => {
 
   const response = await fetch(url);
   const content = await response.text();
-  const templates = yaml.safeLoadAll(content);
+  const templates = yaml.loadAll(content);
   const template = get(templates, '[0]');
 
   if (template.kind === 'PhAppTemplate') {
