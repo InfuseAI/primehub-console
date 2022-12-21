@@ -21,7 +21,6 @@ export class OidcTokenVerifier {
       throw Boom.forbidden('token expired', {code: ErrorCodes.ACCESS_TOKEN_EXPIRED});
     }
 
-    //const JWKS = jose.createRemoteJWKSet(new URL(this.issuer.metadata.jwks_uri))
     const {payload} = await jose.jwtVerify(accessToken, this.jwks);
     return payload;
   }
