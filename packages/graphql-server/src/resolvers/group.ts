@@ -259,6 +259,19 @@ export const update = async (root, args, context: Context) => {
     data.launchGroupOnly = true;
   }
 
+  // Remove users from 'admins' attr if disconnect users
+  if (payload.users?.disconnect && attrs.getData().admins) {
+    const usernames = (await Promise.all(payload.users.disconnect.map(async user => {
+      try {
+        const u = await kcAdminClient.users.findOne({id: user.id});
+        return u.username;
+      } catch (err) {
+        return;
+      }
+    }))).filter(u => u !== undefined);
+    data.admins = attrs.getData().admins.split(',').filter(n => !usernames.includes(n)).join(',');
+  }
+
   attrs.mergeWithData(data);
 
   // validate if a group has sharedVolumeCapacity = null + enabledSharedVolume, it should raise an error.

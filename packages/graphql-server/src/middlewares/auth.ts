@@ -5,7 +5,7 @@ export const ShieldQuery = {
   'system': or(isAdmin, isClient),
   'timezone': or(isAdmin, isClient, isUser),
   'me': or(isAdmin, isUser),
-  'user': or(isAdmin, isClient),
+  'user': or(isAdmin, isClient, isUser),
   'group': or(isAdmin, isGroupAdmin, isClient),
   'groups': or(isAdmin, isClient),
   'datasets': or(isAdmin, isClient),
