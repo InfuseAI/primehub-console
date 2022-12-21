@@ -46,7 +46,7 @@
     "lodash": "^4.17.21",
     "minimist": "^1.2.0",
     "moment": "^2.23.0",
-    "openid-client": "^2.3.0",
+    "openid-client": "^5.3.1",
     "pluralize": "^7.0.0"
   },
   "devDependencies": {
