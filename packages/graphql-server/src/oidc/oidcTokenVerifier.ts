@@ -3,6 +3,7 @@ import { Issuer } from 'openid-client';
 import Token from './token';
 import Boom from 'boom';
 import { ErrorCodes } from '../errorCodes';
+import { GetKeyFunction } from 'jose/dist/types/types';
 
 export class OidcTokenVerifier {
   private jwks: any;
@@ -10,7 +11,7 @@ export class OidcTokenVerifier {
   constructor({
     jwks
   }: {
-    jwks: any
+    jwks: GetKeyFunction<jose.JWSHeaderParameters, jose.FlattenedJWSInput>
   }) {
     this.jwks = jwks;
   }
