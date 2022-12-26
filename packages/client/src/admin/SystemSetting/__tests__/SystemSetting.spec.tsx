@@ -213,6 +213,24 @@ describe('SystemSetting', () => {
     expect(systemNameInput).toHaveValue(newSystemName);
   });
 
+  it('should render system setting with logo image', async () => {
+    const { mockRequests } = setup();
+
+    // @ts-ignore
+    global.__ENV__ = 'ee';
+
+    render(
+      <MemoryRouter>
+        <MockedProvider mocks={mockRequests}>
+          <SystemSetting />
+        </MockedProvider>
+      </MemoryRouter>
+    );
+
+    await screen.findByTestId('remove-logo');
+    expect(screen.getByTestId('display-logo')).toHaveAttribute('src', 'https://i.imgur.com/CDz3JAY.png');
+  });
+
   it('should render system setting with visible add image button', async () => {
     const { mockRequests } = setup();
 
@@ -253,9 +271,12 @@ describe('SystemSetting', () => {
     userEvent.click(addLogoBtn);
 
     expect(await screen.findByText('Choose Image')).toBeInTheDocument();
-    expect(screen.getByTestId('settings-logo-url')).toHaveValue(
-      'https://i.imgur.com/CDz3JAY.png'
-    );
+
+    userEvent.paste(screen.getByTestId('settings-logo-url'), 'https://i.imgur.com/hAAQ6wK.png');
+    userEvent.click(screen.getByText(/OK/i));
+
+    await screen.findByTestId('remove-logo');
+    expect(screen.getByTestId('display-logo')).toHaveAttribute('src', 'https://i.imgur.com/hAAQ6wK.png');
   });
 
   it('should render system setting with invalid email message', async () => {
