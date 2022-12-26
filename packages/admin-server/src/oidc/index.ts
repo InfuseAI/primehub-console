@@ -10,6 +10,7 @@ import { get } from 'lodash';
 import { createHash } from 'crypto';
 import UUID from 'uuid';
 import { Config } from '../config';
+import { Client } from 'openid-client';
 
 const CALLBACK_PATH = '/oidc/callback';
 const REQUEST_API_TOKEN_PATH = '/oidc/request-api-token';
@@ -21,7 +22,7 @@ const ERRORS = {
 };
 
 interface OidcCtrlOptions {
-  oidcClient: any;
+  oidcClient: Client;
   config: Config;
 }
 
@@ -30,7 +31,7 @@ export class OidcCtrl {
   private cmsHost: string;
   private realm: string;
   private keycloakBaseUrl: string;
-  private oidcClient: any;
+  private oidcClient: Client;
   private redirectUri: string;
   private adminRole: string;
   private appPrefix?: string;
@@ -80,7 +81,7 @@ export class OidcCtrl {
 
       // get new access token if it's going to expire in 5 sec, or already expired
       if (accessToken.isExpiredIn(5000)) {
-        const tokenSet = await this.oidcClient.refresh(refreshToken);
+        const tokenSet = await this.oidcClient.refresh(refreshToken.toString());
         const opts = {
           signed: true,
           secure: ctx.request.secure,
@@ -137,7 +138,7 @@ export class OidcCtrl {
 
       // get new access token if it's going to expire in 5 sec, or already expired
       if (accessToken.isExpiredIn(5000)) {
-        const tokenSet = await this.oidcClient.refresh(refreshToken);
+        const tokenSet = await this.oidcClient.refresh(refreshToken.toString());
         const opts = {
           signed: true,
           secure: ctx.request.secure,
@@ -267,7 +268,7 @@ export class OidcCtrl {
       `${this.redirectUri}?backUrl=${encodeURIComponent(query.backUrl)}` : this.redirectUri;
 
     const nonce = this.createNonceFromSecret(ctx);
-    const tokenSet = await this.oidcClient.authorizationCallback(redirectUri, query, {nonce});
+    const tokenSet = await this.oidcClient.callback(redirectUri, query, {nonce});
     const accessToken = new Token(tokenSet.access_token, this.clientId);
 
     // redirect to frontend
@@ -342,7 +343,7 @@ export class OidcCtrl {
     if (query.backUrl) {
       redirectUri = `${redirectUri}?backUrl=${encodeURIComponent(query.backUrl)}`;
     }
-    const tokenSet = await this.oidcClient.authorizationCallback(redirectUri, query, {nonce});
+    const tokenSet = await this.oidcClient.callback(redirectUri, query, {nonce});
 
     // redirect to frontend
     const secureRequest = ctx.request.secure;

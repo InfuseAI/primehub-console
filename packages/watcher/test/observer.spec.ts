@@ -8,7 +8,7 @@ import faker from 'faker';
 import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
 import { cleaupAllCrd, assignAdmin } from './sandbox';
 import { pick } from 'lodash';
-import { Issuer } from 'openid-client';
+import { Issuer, custom } from 'openid-client';
 
 chai.use(chaiHttp);
 
@@ -121,7 +121,7 @@ describe('observer', function() {
       client_id: clientId,
       client_secret: clientSecret.value
     });
-    oidcClient.CLOCK_TOLERANCE = 5 * 60;
+    oidcClient[custom.clock_tolerance] = 5 * 60;
 
     // assign to this scope
     this.kcAdminClientForObserver = new KeycloakAdminClient({

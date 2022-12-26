@@ -55,7 +55,7 @@ export const createApp = async (): Promise<{ app: Koa; config: Config }> => {
     client_id: config.keycloakClientId,
     client_secret: config.keycloakClientSecret,
   });
-  oidcClient.CLOCK_TOLERANCE = 5 * 60;
+  oidcClient[custom.clock_tolerance] = 5 * 60;
   const oidcCtrl = new OidcCtrl({
     config,
     oidcClient,

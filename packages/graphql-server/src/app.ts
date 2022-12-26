@@ -152,7 +152,7 @@ export class App {
       client_id: config.keycloakClientId,
       client_secret: config.keycloakClientSecret
     });
-    oidcClient.CLOCK_TOLERANCE = 5 * 60;
+    oidcClient[custom.clock_tolerance] = 5 * 60;
 
     // OidcTokenVerifier
     const jwks = jose.createRemoteJWKSet(new URL(jwksUri));

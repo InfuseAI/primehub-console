@@ -1,12 +1,13 @@
 import Token from './token';
 import * as logger from '../logger';
+import { Client } from 'openid-client';
 
 // constants
 const ONE_MINUTE = 60;
 
 export default class TokenSyncer {
   private retryTimes: number = 0;
-  private oidcClient: any;
+  private oidcClient: Client;
   private clientId: string;
   private accessToken: Token;
   private refreshToken: Token;
@@ -16,7 +17,7 @@ export default class TokenSyncer {
     oidcClient,
     clientId
   }: {
-    oidcClient: any,
+    oidcClient: Client,
     clientId: string;
   }) {
     this.oidcClient = oidcClient;
@@ -43,7 +44,10 @@ export default class TokenSyncer {
     const tokenSet = await this.oidcClient.grant({
       grant_type: 'client_credentials'
     });
-    return tokenSet;
+    return {
+      access_token: tokenSet.access_token,
+      refresh_token: tokenSet.refresh_token,
+    };
   }
 
   private sync = async () => {
