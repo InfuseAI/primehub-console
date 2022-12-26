@@ -1,6 +1,6 @@
 import * as React from 'react';
 import moment from 'moment';
-import { get, omit } from 'lodash';
+import { get, set, omit } from 'lodash';
 import {
   Icon,
   Layout,
@@ -77,7 +77,7 @@ const LABEL_WIDTH = { width: '300px' };
 
 const initialState = {
   systemName: '',
-  logo: null,
+  logo: '',
   defaultUserVolumeCapacity: 0,
   timezone: null,
   smtpHost: '',
@@ -384,6 +384,8 @@ function _SystemSetting({ form, data, ...props }: Props) {
                     <Button
                       data-testid='remove-logo'
                       onClick={() => {
+                        form.setFieldsValue({ logo: initialState.logo });
+                        set(data, 'system.org.logo.url', initialState.logo);
                         setAddImageButtonVisible(true);
                       }}
                     >
@@ -397,16 +399,18 @@ function _SystemSetting({ form, data, ...props }: Props) {
                 visible={pasteImageModalVisible}
                 maskClosable={false}
                 onCancel={() => {
-                  setPasteImageModalVisible(false);
-                  setAddImageButtonVisible(false);
-
                   form.setFieldsValue({
                     logo: get(data, 'system.org.logo.url', initialState.logo),
                   });
+
+                  const has_url = form.getFieldValue('logo') ? true : false;
+                  setAddImageButtonVisible(!has_url);
+                  setPasteImageModalVisible(false);
                 }}
                 onOk={() => {
+                  const has_url = form.getFieldValue('logo') ? true : false;
+                  setAddImageButtonVisible(!has_url);
                   setPasteImageModalVisible(false);
-                  setAddImageButtonVisible(false);
                 }}
               >
                 <Form.Item label='Enter Image URL'>
