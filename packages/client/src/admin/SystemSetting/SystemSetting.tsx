@@ -368,6 +368,7 @@ function _SystemSetting({ form, data, ...props }: Props) {
                   <img
                     width='100%'
                     alt='Logo'
+                    data-testid='display-logo'
                     src={
                       form.getFieldValue('logo') ?? data.system.org.logo?.url
                     }
@@ -403,13 +404,13 @@ function _SystemSetting({ form, data, ...props }: Props) {
                     logo: get(data, 'system.org.logo.url', initialState.logo),
                   });
 
-                  const has_url = form.getFieldValue('logo') ? true : false;
-                  setAddImageButtonVisible(!has_url);
+                  const hasUrl = form.getFieldValue('logo') ? true : false;
+                  setAddImageButtonVisible(!hasUrl);
                   setPasteImageModalVisible(false);
                 }}
                 onOk={() => {
-                  const has_url = form.getFieldValue('logo') ? true : false;
-                  setAddImageButtonVisible(!has_url);
+                  const hasUrl = form.getFieldValue('logo') ? true : false;
+                  setAddImageButtonVisible(!hasUrl);
                   setPasteImageModalVisible(false);
                 }}
               >
