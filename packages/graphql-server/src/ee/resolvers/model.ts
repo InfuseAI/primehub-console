@@ -16,7 +16,7 @@ const { INTERNAL_ERROR } = ErrorCodes;
 
 // mlflow api endpoints
 const API_PREFIX = '/api/2.0/mlflow';
-const API_PREFIX_PREVIEW = '/api/2.0/preview/mlflow'
+const API_PREFIX_PREVIEW = '/api/2.0/preview/mlflow';
 
 const API_ENDPOINT_MODEL_LIST = '/registered-models/list';
 const API_ENDPOINT_MODEL_GET = '/registered-models/get';
@@ -43,7 +43,7 @@ const requestApi = async (trackingUri: string, endpoint: string, auth = null, pa
 
     const init: any = {
       signal: controller.signal,
-      method: method,
+      method,
     };
     if (auth) {
       init.headers = {
@@ -56,7 +56,7 @@ const requestApi = async (trackingUri: string, endpoint: string, auth = null, pa
       init.body = JSON.stringify(params);
     }
     const response = await fetch(url, init);
-    if (response.status == 404) {
+    if (response.status === 404) {
       logger.info({
         component: logger.components.model,
         type: 'MLFLOW_API_FALLBACK',
@@ -208,8 +208,8 @@ export const queryMLflowRuns = async (root, args, context: Context) => {
     });
     throw new ApolloError(expJson.message);
   }
-  const exp_id = expJson.experiment.experiment_id
-  const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_RUN_SEARCH, getAuth(mlflow), { experiment_ids: [exp_id] }, 'POST');
+  const params = { experiment_ids: [expJson.experiment.experiment_id] };
+  const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_RUN_SEARCH, getAuth(mlflow), params, 'POST');
   if (json.runs) {
     return json.runs.map(item => transformRun(item));
   } else if (json.error_code) {
