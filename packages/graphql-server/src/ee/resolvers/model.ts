@@ -27,7 +27,7 @@ const API_ENDPOINT_MODEL_VERSION_CREATE = '/model-versions/create';
 const API_ENDPOINT_RUN_GET = '/runs/get';
 const API_ENDPOINT_RUN_SEARCH = '/runs/search';
 const API_ENDPOINT_ARTIFACT_LIST = '/artifacts/list';
-const API_ENDPOINT_EXPERIMENT_GET_BY_NAME = '/experiments/get-by-name';
+const API_ENDPOINT_EXPERIMENT_LIST = '/experiments/list';
 
 const TRACKING_URI_NOT_FOUND = 'TRACKING_URI_NOT_FOUND';
 const MLFLOW_SETTING_NOT_FOUND = 'MLFLOW_SETTING_NOT_FOUND';
@@ -199,7 +199,7 @@ export const queryMLflow = async (root, args, context: Context) => {
 export const queryMLflowRuns = async (root, args, context: Context) => {
   const mlflow = await queryMLflow(root, args, context);
   const where = args && args.where;
-  const expJson = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_EXPERIMENT_GET_BY_NAME, getAuth(mlflow), { experiment_name: where.experimentName });
+  const expJson = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_EXPERIMENT_LIST, getAuth(mlflow));
   if (expJson.error_code) {
     logger.error({
       component: logger.components.model,
@@ -208,7 +208,17 @@ export const queryMLflowRuns = async (root, args, context: Context) => {
     });
     throw new ApolloError(expJson.message);
   }
-  const params = { experiment_ids: [expJson.experiment.experiment_id] };
+  const exp = expJson.experiments && expJson.experiments.find(e => e.name === where.experimentName);
+  if (!exp) {
+    logger.error({
+      component: logger.components.model,
+      type: 'MLFLOW_EXPERIMENT_NAME_NOT_FOUND',
+      message: `experiment name '${where.experimentName}' doesn't exist`,
+    });
+    throw new ApolloError(`failed to list mlflow runs. experiment name '${where.experimentName}' doesn't exist`, INTERNAL_ERROR);
+  }
+
+  const params = { experiment_ids: [exp.experiment_id] };
   const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_RUN_SEARCH, getAuth(mlflow), params, 'POST');
   if (json.runs) {
     return json.runs.map(item => transformRun(item));
@@ -218,9 +228,9 @@ export const queryMLflowRuns = async (root, args, context: Context) => {
       type: json.error_code,
       message: json.message,
     });
-    throw new ApolloError(`failed to search mlflow runs by experiment name '${where.name}'`, json.error_code);
+    throw new ApolloError(`failed to list mlflow runs by experiment name '${where.name}'`, json.error_code);
   } else {
-    throw new ApolloError('failed to get mlflow runs', INTERNAL_ERROR);
+    throw new ApolloError('failed to list mlflow runs', INTERNAL_ERROR);
   }
 };
 
