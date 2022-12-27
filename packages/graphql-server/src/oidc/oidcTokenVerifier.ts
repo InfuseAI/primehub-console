@@ -1,37 +1,28 @@
-import jose from 'node-jose';
+import * as jose from 'jose';
 import { Issuer } from 'openid-client';
 import Token from './token';
 import Boom from 'boom';
 import { ErrorCodes } from '../errorCodes';
+import { GetKeyFunction } from 'jose/dist/types/types';
 
 export class OidcTokenVerifier {
-  private keystore: any;
-  private issuer: Issuer;
+  private jwks: any;
 
   constructor({
-    issuer
+    jwks
   }: {
-    issuer: Issuer
+    jwks: GetKeyFunction<jose.JWSHeaderParameters, jose.FlattenedJWSInput>
   }) {
-    this.issuer = issuer;
-  }
-
-  public initKeystore = async () => {
-    this.keystore = await this.issuer.keystore();
+    this.jwks = jwks;
   }
 
   public verify = async (accessToken: string): Promise<any> => {
-    if (!this.keystore) {
-      throw new Error(`Call initKeystore() first to initialize the keystore`);
-    }
-
     const token = new Token(accessToken);
     if (token.isExpired()) {
       throw Boom.forbidden('token expired', {code: ErrorCodes.ACCESS_TOKEN_EXPIRED});
     }
 
-    const keystore = this.keystore;
-    const result = await jose.JWS.createVerify(keystore).verify(accessToken);
-    return JSON.parse(result.payload.toString());
+    const {payload} = await jose.jwtVerify(accessToken, this.jwks);
+    return payload;
   }
 }

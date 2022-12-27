@@ -1,15 +1,16 @@
 import LRUCache from 'lru-cache';
+import { Client } from 'openid-client';
 
 const INVALID_API_TOKEN: string = 'INVALID_API_TOKEN';
 
 export default class ApiTokenCache {
-  private oidcClient: any;
+  private oidcClient: Client;
   private cache: LRUCache<string, string>;
 
   constructor({
     oidcClient
   }: {
-    oidcClient: any,
+    oidcClient: Client,
   }) {
     this.oidcClient = oidcClient;
     this.cache = new LRUCache({ max: 1024 });

@@ -45,7 +45,7 @@
     "graphql-request": "^3.4.0",
     "gravatar": "^1.6.0",
     "http-proxy": "^1.18.1",
-    "js-yaml": "^3.12.0",
+    "js-yaml": "^4.1.0",
     "json-stream": "^1.0.0",
     "json-stringify-safe": "^5.0.1",
     "jsonwebtoken": "^8.3.0",
@@ -62,7 +62,7 @@
     "minimist": "^1.2.0",
     "moment": "^2.23.0",
     "node-cache": "^5.1.2",
-    "openid-client": "^2.3.0",
+    "openid-client": "^5.3.1",
     "p-is-promise": "^2.0.0",
     "path-match": "^1.2.4",
     "pluralize": "^7.0.0",
@@ -79,7 +79,7 @@
     "@types/faker": "^4.1.2",
     "@types/flat": "^0.0.28",
     "@types/gravatar": "^1.4.28",
-    "@types/js-yaml": "^3.11.2",
+    "@types/js-yaml": "^4.0.1",
     "@types/jsonwebtoken": "^7.2.8",
     "@types/koa": "^2.0.46",
     "@types/koa__cors": "^2.2.2",
@@ -107,7 +107,7 @@
     "rimraf": "^2.5.4",
     "ts-node": "^8.3.0",
     "tslint": "^5.18.0",
-    "typescript": "^3.5.2",
+    "typescript": "^3.9.10",
     "uuid": "^3.3.2"
   }
 }

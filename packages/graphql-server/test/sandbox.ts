@@ -15,7 +15,7 @@ const crdClient = new CrdClient();
 (global as any).crdClient = crdClient;
 
 const loadCrd = (name: string): any =>
-  yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, `../crd/${name}.yaml`), 'utf8'));
+  yaml.load(fs.readFileSync(path.resolve(__dirname, `../crd/${name}.yaml`), 'utf8'));
 
 const datasetCrd = loadCrd('dataset');
 const instanceTypeCrd = loadCrd('instance-type');

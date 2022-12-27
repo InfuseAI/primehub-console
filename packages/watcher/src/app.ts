@@ -1,6 +1,6 @@
 import Koa, {Context} from 'koa';
 import KeycloakAdminClient from '@keycloak/keycloak-admin-client';
-import { Issuer } from 'openid-client';
+import { Issuer, custom } from 'openid-client';
 import Router from 'koa-router';
 import morgan from 'koa-morgan';
 import Agent, { HttpsAgent } from 'agentkeepalive';
@@ -31,14 +31,9 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
   });
 
   // create oidc client and controller
-  Issuer.defaultHttpOptions = {
-    agent: {
-      http: httpAgent,
-      https: httpsAgent
-    },
-    retries: config.keycloakRetries,
+  custom.setHttpOptionsDefaults({
     timeout: config.keycloakTimeout,
-  };
+  });
 
   // tslint:disable-next-line:max-line-length
   const issuer =  new Issuer({
@@ -52,7 +47,7 @@ export const createApp = async (): Promise<{app: Koa, config: Config}> => {
     client_id: config.keycloakClientId,
     client_secret: config.keycloakClientSecret
   });
-  oidcClient.CLOCK_TOLERANCE = 5 * 60;
+  oidcClient[custom.clock_tolerance] = 5 * 60;
 
   // token syncer
   const tokenSyncer = new TokenSyncer({

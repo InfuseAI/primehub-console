@@ -37,7 +37,7 @@
     "bluebird": "^3.5.1",
     "boom": "^7.2.0",
     "debug": "^3.1.0",
-    "js-yaml": "^3.12.0",
+    "js-yaml": "^4.1.0",
     "koa": "^2.5.2",
     "koa-bodyparser": "^4.2.1",
     "koa-morgan": "^1.0.1",
@@ -46,7 +46,7 @@
     "lodash": "^4.17.21",
     "minimist": "^1.2.0",
     "moment": "^2.23.0",
-    "openid-client": "^2.3.0",
+    "openid-client": "^5.3.1",
     "pluralize": "^7.0.0"
   },
   "devDependencies": {
@@ -57,7 +57,7 @@
     "@types/chai-http": "^3.0.5",
     "@types/debug": "^0.0.30",
     "@types/faker": "^4.1.2",
-    "@types/js-yaml": "^3.11.2",
+    "@types/js-yaml": "^4.0.1",
     "@types/koa": "^2.0.46",
     "@types/koa-bodyparser": "^4.2.1",
     "@types/koa-morgan": "^1.0.4",
@@ -80,6 +80,6 @@
     "rimraf": "^2.5.4",
     "ts-node": "^8.3.0",
     "tslint": "^5.18.0",
-    "typescript": "^3.5.2"
+    "typescript": "^3.9.10"
   }
 }
