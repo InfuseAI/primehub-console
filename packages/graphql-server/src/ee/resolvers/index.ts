@@ -38,6 +38,8 @@ const eeResolvers = {
     usageReportsConnection: usageReport.connectionQuery,
     license: license.query,
     mlflow: model.queryMLflow,
+    mlflowRuns: model.queryMLflowRuns,
+    mlflowArtifact: model.queryMLflowArtifact,
     model: model.queryOne,
     models: model.query,
     modelVersion: model.queryVersion,
@@ -64,6 +66,7 @@ const eeResolvers = {
     stopPhDeployment: phDeployment.stop,
     createPhDeploymentClient: phDeployment.createClient,
     deletePhDeploymentClient: phDeployment.destroyClient,
+    registerModel: model.registerModel,
   },
   System: {
     smtp: system.querySmtp,

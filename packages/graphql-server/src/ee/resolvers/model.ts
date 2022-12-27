@@ -15,34 +15,57 @@ import AbortController from 'abort-controller';
 const { INTERNAL_ERROR } = ErrorCodes;
 
 // mlflow api endpoints
-const API_ENDPOINT_MODEL_LIST = '/api/2.0/preview/mlflow/registered-models/list';
-const API_ENDPOINT_MODEL_GET = '/api/2.0/preview/mlflow/registered-models/get';
-const API_ENDPOINT_MODEL_VERSION_SEARCH = '/api/2.0/preview/mlflow/model-versions/search';
-const API_ENDPOINT_MODEL_VERSION_GET = '/api/2.0/preview/mlflow/model-versions/get';
-const API_ENDPOINT_RUN_GET = '/api/2.0/preview/mlflow/runs/get';
+const API_PREFIX = '/api/2.0/mlflow';
+const API_PREFIX_PREVIEW = '/api/2.0/preview/mlflow'
+
+const API_ENDPOINT_MODEL_LIST = '/registered-models/list';
+const API_ENDPOINT_MODEL_GET = '/registered-models/get';
+const API_ENDPOINT_MODEL_CREATE = '/registered-models/create';
+const API_ENDPOINT_MODEL_VERSION_SEARCH = '/model-versions/search';
+const API_ENDPOINT_MODEL_VERSION_GET = '/model-versions/get';
+const API_ENDPOINT_MODEL_VERSION_CREATE = '/model-versions/create';
+const API_ENDPOINT_RUN_GET = '/runs/get';
+const API_ENDPOINT_RUN_SEARCH = '/runs/search';
+const API_ENDPOINT_ARTIFACT_LIST = '/artifacts/list';
+const API_ENDPOINT_EXPERIMENT_GET_BY_NAME = '/experiments/get-by-name';
 
 const TRACKING_URI_NOT_FOUND = 'TRACKING_URI_NOT_FOUND';
 const MLFLOW_SETTING_NOT_FOUND = 'MLFLOW_SETTING_NOT_FOUND';
 
-const requestApi = async (trackingUri: string, endpoint: string, auth = null, params = {}) => {
+const requestApi = async (trackingUri: string, endpoint: string, auth = null, params = {}, method = 'GET') => {
   const controller = new AbortController();
   const timeout = setTimeout(() => {
     controller.abort();
   }, 10000);
 
   try {
-    const url = new URL(`${trackingUri}${endpoint}`);
-    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+    const url = new URL(`${trackingUri}${API_PREFIX}${endpoint}`);
 
     const init: any = {
       signal: controller.signal,
+      method: method,
     };
     if (auth) {
       init.headers = {
         Authorization: auth,
       };
     }
+    if (method === 'GET') {
+      Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+    } else if (method === 'POST') {
+      init.body = JSON.stringify(params);
+    }
     const response = await fetch(url, init);
+    if (response.status == 404) {
+      logger.info({
+        component: logger.components.model,
+        type: 'MLFLOW_API_FALLBACK',
+        message: `Use ${trackingUri}${API_PREFIX_PREVIEW}${endpoint} instead of ${trackingUri}${API_PREFIX}${endpoint}`,
+      });
+      url.pathname = `${API_PREFIX_PREVIEW}${endpoint}`;
+      const responsePreview = await fetch(url, init);
+      return responsePreview.json();
+    }
     return response.json();
   } finally {
     clearTimeout(timeout);
@@ -136,6 +159,7 @@ const transformVersion = (item: any, groupId: string, context: Context, mlflow: 
     creationTimestamp: item.creation_timestamp,
     lastUpdatedTimestamp: item.last_updated_timestamp,
     description: item.description,
+    source: item.source,
     run: getRunResolver(mlflow, item.run_id),
     modelURI: getModelURI(item.name, item.version),
     deployedBy: async () => getDeployedBy(item.name, item.version, groupId, context, memGetPhDeployments),
@@ -170,6 +194,112 @@ export const queryMLflow = async (root, args, context: Context) => {
   }
 
   return mlflow;
+};
+
+export const queryMLflowRuns = async (root, args, context: Context) => {
+  const mlflow = await queryMLflow(root, args, context);
+  const where = args && args.where;
+  const expJson = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_EXPERIMENT_GET_BY_NAME, getAuth(mlflow), { experiment_name: where.experimentName });
+  if (expJson.error_code) {
+    logger.error({
+      component: logger.components.model,
+      type: expJson.error_code,
+      message: expJson.message,
+    });
+    throw new ApolloError(expJson.message);
+  }
+  const exp_id = expJson.experiment.experiment_id
+  const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_RUN_SEARCH, getAuth(mlflow), { experiment_ids: [exp_id] }, 'POST');
+  if (json.runs) {
+    return json.runs.map(item => transformRun(item));
+  } else if (json.error_code) {
+    logger.error({
+      component: logger.components.model,
+      type: json.error_code,
+      message: json.message,
+    });
+    throw new ApolloError(`failed to search mlflow runs by experiment name '${where.name}'`, json.error_code);
+  } else {
+    throw new ApolloError('failed to get mlflow runs', INTERNAL_ERROR);
+  }
+};
+
+export const queryMLflowArtifact = async (root, args, context: Context) => {
+  const mlflow = await queryMLflow(root, args, context);
+  const where = args && args.where;
+  const params: any = { run_id: where.runId };
+  if (where.path) {
+    params.path = where.path;
+  }
+  const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_ARTIFACT_LIST, getAuth(mlflow), params);
+  if (json.root_uri) {
+    return json;
+  } else if (json.error_code) {
+    logger.error({
+      component: logger.components.model,
+      type: json.error_code,
+      message: json.message,
+    });
+    throw new ApolloError(`failed to list mlflow artifact by run id '${where.runId}'`, json.error_code);
+  } else {
+    throw new ApolloError('failed to list mlflow artifact', INTERNAL_ERROR);
+  }
+};
+
+export const registerModel = async (root, args, context: Context) => {
+  const mlflow = await queryMLflow(root, args, context);
+  const where = args && args.where;
+
+  const existing = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_MODEL_GET, getAuth(mlflow), { name: where.name });
+  if (existing.error_code && existing.error_code === 'RESOURCE_DOES_NOT_EXIST') {
+    const modelJson = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_MODEL_CREATE, getAuth(mlflow), {name: where.name}, 'POST');
+    if (modelJson.error_code) {
+      logger.error({
+        component: logger.components.model,
+        type: modelJson.error_code,
+        message: modelJson.message,
+      });
+      throw new ApolloError(modelJson.message);
+    }
+  }
+  const artifactParams = { run_id: where.runId, path: where.path };
+  const artifactJson = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_ARTIFACT_LIST, getAuth(mlflow), artifactParams);
+  if (artifactJson.error_code) {
+    logger.error({
+      component: logger.components.model,
+      type: artifactJson.error_code,
+      message: artifactJson.message,
+    });
+    throw new ApolloError(artifactJson.message);
+  }
+  if (!artifactJson.files) {
+    logger.error({
+      component: logger.components.model,
+      type: 'MLFLOW_ARTIFACT_NOT_FOUND',
+      message: `failed to register mlflow modmel. artifact path '${artifactJson.root_uri}${where.path}' not found`,
+    });
+    throw new ApolloError(`failed to register mlflow model. artifact path '${where.path}' not found`, INTERNAL_ERROR);
+  }
+
+  const params: any = {
+    name: where.name,
+    run_id: where.runId,
+    source: `${artifactJson.root_uri}/${where.path}`,
+  };
+
+  const json = await requestApi(getTrackingUri(mlflow), API_ENDPOINT_MODEL_VERSION_CREATE, getAuth(mlflow), params, 'POST');
+  if (json.model_version) {
+    return json.model_version;
+  } else if (json.error_code) {
+    logger.error({
+      component: logger.components.model,
+      type: json.error_code,
+      message: json.message,
+    });
+    throw new ApolloError(`failed to register mlflow model by run id '${where.runId}'`, json.error_code);
+  } else {
+    throw new ApolloError('failed to register mlflow model', INTERNAL_ERROR);
+  }
 };
 
 export const queryOne = async (root, args, context: Context) => {

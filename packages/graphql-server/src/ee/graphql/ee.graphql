@@ -6,7 +6,7 @@
 # import PhSchedule, PhScheduleOrderByInput, PhScheduleConnection, PhScheduleWhereUniqueInput, PhScheduleWhereInput, PhScheduleCreateInput, PhScheduleUpdateInput, PhScheduleDeleteResponse, PhScheduleRunResponse from "./phSchedule.graphql"
 # import PhDeployment, PhDeploymentConnection, PhDeploymentWhereUniqueInput, PhDeploymentWhereInput, PhDeploymentCreateInput, PhDeploymentUpdateInput, PhDeploymentClientCreateInput, PhDeploymentClientCreateResponse, PhDeploymentClientWhereUniqueInput from "./phDeployment.graphql"
 # import UsageReport, UsageReportOrderByInput, UsageReportConnection, UsageReportWhereInput from "./usageReport.graphql"
-# import Model, ModelVersion, ModelWhereUniqueInput, ModelWhereInput, ModelVersionWhereUniqueInput from "./model.graphql"
+# import Model, ModelVersion, ModelWhereUniqueInput, ModelWhereInput, ModelVersionWhereUniqueInput, MLflowExperimentWhereUniqueInput, MLflowRunWhereUniqueInput from "./model.graphql"
 
 scalar JSON
 
@@ -149,6 +149,8 @@ type Query {
     where: ModelWhereUniqueInput!
     page: Int
   ): ModelVersionsConnection!
+  mlflowRuns(where: MLflowExperimentWhereUniqueInput!): [JSON]
+  mlflowArtifact(where: MLflowRunWhereUniqueInput!): JSON
 }
 
 type Mutation {
@@ -180,4 +182,7 @@ type Mutation {
   """PhDeploymentClient"""
   createPhDeploymentClient(data: PhDeploymentClientCreateInput!): PhDeploymentClientCreateResponse!
   deletePhDeploymentClient(where: PhDeploymentClientWhereUniqueInput!): PhDeployment
+
+  """Model"""
+  registerModel(where: ModelRegisterInput!): JSON
 }

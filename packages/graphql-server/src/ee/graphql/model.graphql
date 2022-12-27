@@ -14,6 +14,7 @@ type ModelVersion {
   creationTimestamp: String
   lastUpdatedTimestamp: String
   description: String
+  source: String
   run: JSON
   modelURI: String
   deployedBy: JSON
@@ -46,4 +47,24 @@ input ModelVersionWhereUniqueInput {
   group: String
   name: String
   version: String
+}
+
+"""MLflow"""
+
+input MLflowExperimentWhereUniqueInput {
+  group: String!
+  experimentName: String!
+}
+
+input MLflowRunWhereUniqueInput {
+  group: String!
+  runId: String!
+  path: String
+}
+
+input ModelRegisterInput {
+  group: String!
+  name: String!
+  runId: String!
+  path: String!
 }

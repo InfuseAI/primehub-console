@@ -18,6 +18,8 @@ export const permissions = shield({
     license: or(isAdmin, isUser),
     files: or(isAdmin, isUser),
     mlflow: or(isAdmin, isGroupMember),
+    mlflowRuns: or(isAdmin, isGroupMember),
+    mlflowArtifact: or(isAdmin, isGroupMember),
     model: or(isAdmin, isGroupMember),
     models: or(isAdmin, isGroupMember),
     modelVersion: or(isAdmin, isGroupMember),
@@ -40,6 +42,7 @@ export const permissions = shield({
     deletePhDeployment: or(isAdmin, isUser),
     stopPhDeployment: or(isAdmin, isUser),
     deployPhDeployment: or(isAdmin, isUser),
+    registerModel: or(isAdmin, isGroupMember),
   },
 }, {
   allowExternalErrors: true
