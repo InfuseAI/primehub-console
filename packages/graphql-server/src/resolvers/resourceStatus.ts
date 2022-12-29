@@ -6,6 +6,9 @@ const GiB = Math.pow(1024, 3);
 const MiB = Math.pow(1024, 2);
 const KiB = 1024;
 
+const PENDING = 'Pending';
+const RUNNING = 'Running';
+
 const converCpuValueToFloat = (value = '0') => {
   const regex = /\d+m$/;
   if (regex.test(value)) {
@@ -40,8 +43,6 @@ const labelStringify = (labels: Record<string, string>) => {
 };
 
 export const query = async (group, args, context: Context) => {
-  const PENDING = 'Pending';
-  const RUNNING = 'Running';
   const groupName = toPrimehubLabel(group.name);
   logger.info({
     component: logger.components.resourceStatus,
@@ -88,5 +89,69 @@ export const query = async (group, args, context: Context) => {
   return {
     groupId: group.id,
     ...resourceUsing
+  };
+};
+
+export const queryDetails = async (group, args, context: Context) => {
+  const groupName = toPrimehubLabel(group.name);
+  logger.info({
+    component: logger.components.resourceStatus,
+    type: 'QUERY',
+    message: 'Query resource details of group',
+    groupName
+  });
+  const labelSelector = labelStringify({
+    'primehub.io/group': `escaped-${groupName}`,
+  });
+  const {body: {items}} = await corev1KubeClient.listNamespacedPod(
+    context.crdNamespace,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    labelSelector
+  );
+  const details = (items || [])
+  .filter(item => item.status.phase === PENDING || item.status.phase === RUNNING)
+  .map(item => {
+    const info = {
+      name: item.metadata?.name,
+      type: '',
+      user: '',
+      instanceType: '',
+      cpu: 0,
+      mem: 0,
+      gpu: 0,
+    };
+    (item.spec.containers || []).forEach(container => {
+      info.cpu += converCpuValueToFloat(container.resources.limits.cpu);
+      info.gpu += converCpuValueToFloat(container.resources.limits['nvidia.com/gpu']);
+      info.mem += converMemResourceToBytes(container.resources.limits.memory);
+    });
+    info.mem = +(Math.round(info.mem / GiB * 10) / 10).toFixed(1);
+
+    if (item.metadata?.annotations && item.metadata.annotations['primehub.io/usage']) {
+      try {
+        const usage = JSON.parse(item.metadata.annotations['primehub.io/usage']);
+        info.name = usage.component_name;
+        info.type = usage.component;
+        info.instanceType = usage.instance_type;
+        info.user = usage.user || '';
+      } catch {
+        logger.error({
+          component: logger.components.resourceStatus,
+          type: 'QUERY',
+          message: `Failed to parse 'primehub.io/usage' annotation in pod '${item.metadata?.name}'`,
+          groupName,
+          podName: item.metadata?.name,
+        });
+      }
+    }
+    return info;
+  });
+
+  return {
+    groupId: group.id,
+    details,
   };
 };
