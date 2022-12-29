@@ -3,7 +3,7 @@
 # import InstanceType from "instanceType.graphql"
 # import Image, QueryImageMode from "image.graphql"
 # import Dataset from "dataset.graphql"
-# import ResourceStatus from "resourceStatus.graphql"
+# import ResourceStatus, ResourceDetails from "resourceStatus.graphql"
 
 type EnvVar {
   name: String
@@ -38,6 +38,7 @@ type Group {
   groupImages: [Image]
   datasets: [Dataset]
   resourceStatus: ResourceStatus
+  resourceDetails: ResourceDetails
   # for relation with dataset
   writable: Boolean
   # shared volume

@@ -4,3 +4,8 @@ type ResourceStatus {
   memUsage: String
   gpuUsage: String
 }
+
+type ResourceDetails {
+  groupId: String
+  details: [JSON]
+}
