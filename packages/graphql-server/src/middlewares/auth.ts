@@ -1,12 +1,12 @@
 import { shield, or } from 'graphql-shield';
-import { isAdmin, isClient, isUser, isGroupAdmin } from '../utils/roles';
+import { isAdmin, isClient, isUser, isGroupAdmin, isGroupMemberByGroupId } from '../utils/roles';
 export const ShieldQuery = {
   '*': isAdmin,
   'system': or(isAdmin, isClient),
   'timezone': or(isAdmin, isClient, isUser),
   'me': or(isAdmin, isUser),
   'user': or(isAdmin, isClient, isUser),
-  'group': or(isAdmin, isGroupAdmin, isClient),
+  'group': or(isAdmin, isGroupAdmin, isGroupMemberByGroupId, isClient),
   'groups': or(isAdmin, isClient),
   'datasets': or(isAdmin, isClient),
   'instanceType': or(isAdmin, isClient),

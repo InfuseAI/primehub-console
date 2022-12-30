@@ -25,6 +25,21 @@ export const isGroupAdmin = rule({ cache: 'contextual' })(
   },
 );
 
+export const isGroupMemberByGroupId = rule({ cache: 'contextual' })(
+  async (parent, args, ctx, info) => {
+    const groupId = args.where && args.where.id;
+    if (!groupId) return false;
+    const group = await ctx.kcAdminClient.groups.findOne({id: groupId});
+    if (!group) return false;
+    const members = await ctx.kcAdminClient.groups.listMembers({
+      id: get(group, 'id', ''),
+      max: keycloakMaxCount
+    });
+    const memberIds = members.map(user => user.id);
+    return (memberIds.indexOf(ctx.userId) >= 0);
+  },
+);
+
 export const isGroupMember = rule({ cache: 'contextual' })(
   async (parent, args, ctx, info) => {
     const groupName = args.where && (args.where.group || args.where.groupName);
