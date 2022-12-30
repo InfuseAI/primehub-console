@@ -120,14 +120,10 @@ function ResourceDashboard({ getGroupUsages }: Props) {
 
   return (
     <>
-      {group && (
-        <>
-          <ThinTitle level={2}>Resource Usage</ThinTitle>
-          <SubContent>
-            <DashboardTable group={group} />
-          </SubContent>
-        </>
-      )}
+      <ThinTitle level={2}>Resource Usage</ThinTitle>
+      <SubContent>
+        <DashboardTable group={group} />
+      </SubContent>
     </>
   );
 }
