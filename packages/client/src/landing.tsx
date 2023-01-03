@@ -15,6 +15,7 @@ import RecentTasks, {
   Content,
   SubContent,
 } from 'components/landing/recentTasks';
+import ResourceDashboard from 'components/landing/resourceDashboard';
 import InviteButton from 'components/InviteButton';
 import { errorHandler } from 'utils/errorHandler';
 
@@ -228,6 +229,8 @@ function Landing({ groupContext, currentUser, ...props }: Props) {
                 <></>
               ) : (
                 <div>
+                  <Divider></Divider>
+                  <ResourceDashboard />
                   <Divider></Divider>
                   <RecentTasks />
                 </div>

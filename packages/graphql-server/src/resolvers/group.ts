@@ -585,6 +585,7 @@ export const typeResolvers = {
     }
   },
   resourceStatus: resourceStatusResolver.query,
+  resourceDetails: resourceStatusResolver.queryDetails,
   ...instanceTypeResolver.resolveInGroup(),
   ...datasetResolver.resolveInGroup(),
   ...imageResolver.resolveInGroup()

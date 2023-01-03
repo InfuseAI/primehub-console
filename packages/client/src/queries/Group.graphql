@@ -73,3 +73,17 @@ query Group($where: GroupWhereUniqueInput!, $everyoneGroupWhere: GroupWhereUniqu
     ...GroupResourceInfo
   }
 }
+
+query GroupUsages($where: GroupWhereUniqueInput!) {
+  group (where: $where) {
+    name
+    resourceStatus {
+      cpuUsage
+      memUsage
+      gpuUsage
+    }
+    resourceDetails {
+      details
+    }
+  }
+}
