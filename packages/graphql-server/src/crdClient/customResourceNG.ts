@@ -83,8 +83,7 @@ export default class CustomResourceNG<SpecType = any, StatusType = any> {
         name,
         error,
       });
-      const CODE = 'code';
-      if (error[CODE] && error[CODE] === 404) {
+      if (error.response?.statusCode === 404) {
         throw resourceNotFound(error);
       }
       throw apiUnavailable();
