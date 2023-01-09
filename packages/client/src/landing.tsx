@@ -223,14 +223,16 @@ function Landing({ groupContext, currentUser, ...props }: Props) {
                 }
               </Col>
             </Row>
+            <div>
+              <Divider></Divider>
+              <ResourceDashboard />
+            </div>
             {
               // @ts-ignore
               primehubCE ? (
                 <></>
               ) : (
                 <div>
-                  <Divider></Divider>
-                  <ResourceDashboard />
                   <Divider></Divider>
                   <RecentTasks />
                 </div>
