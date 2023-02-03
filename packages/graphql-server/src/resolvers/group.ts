@@ -260,7 +260,7 @@ export const update = async (root, args, context: Context) => {
   }
 
   // Remove users from 'admins' attr if disconnect users
-  if (payload.users?.disconnect && attrs.getData().admins) {
+  if (payload.users?.disconnect && payload.users?.disconnect.length) {
     const usernames = (await Promise.all(payload.users.disconnect.map(async user => {
       try {
         const u = await kcAdminClient.users.findOne({id: user.id});
@@ -269,7 +269,7 @@ export const update = async (root, args, context: Context) => {
         return;
       }
     }))).filter(u => u !== undefined);
-    data.admins = attrs.getData().admins.split(',').filter(n => !usernames.includes(n)).join(',');
+    data.admins = data.admins.split(',').filter(n => !usernames.includes(n)).join(',');
   }
 
   attrs.mergeWithData(data);
