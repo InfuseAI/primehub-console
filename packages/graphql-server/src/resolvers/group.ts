@@ -269,7 +269,10 @@ export const update = async (root, args, context: Context) => {
         return;
       }
     }))).filter(u => u !== undefined);
-    data.admins = data.admins.split(',').filter(n => !usernames.includes(n)).join(',');
+    const admins = data.admins || attrs.getData().admins;
+    if (admins) {
+      data.admins = admins.split(',').filter(n => !usernames.includes(n)).join(',');
+    }
   }
 
   attrs.mergeWithData(data);
