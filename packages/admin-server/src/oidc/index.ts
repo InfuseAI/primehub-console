@@ -375,6 +375,9 @@ export class OidcCtrl {
 
   private createNonceFromSecret = (ctx: Koa.ParameterizedContext) => {
     const secret = ctx.cookies.get(NONCE_COOKIE, {signed: true});
+    if (secret === undefined) {
+      return this.saveNonceSecret(ctx);
+    }
     const hash = createHash('sha256').update(secret).digest('hex');
     return hash;
   }
