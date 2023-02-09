@@ -300,6 +300,10 @@ export class OidcCtrl {
         type: 'CALLBACK',
         message: err.message,
       });
+      const opts = {
+        path: this.cookiePath,
+      };
+      ctx.cookies.set('apiToken', null, opts);
       return this.logout(ctx);
     }
   }
