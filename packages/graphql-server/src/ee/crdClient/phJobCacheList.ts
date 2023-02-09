@@ -26,7 +26,7 @@ export class PhJobCacheList {
   // For issue: [ch10219] job list is out of sync
   private checkCacheConsistent = async () => {
     const group = phJobCrd.spec.group;
-    const version = phJobCrd.spec.version;
+    const version = phJobCrd.spec.versions[0].name;
     const plural = phJobCrd.spec.names.plural;
 
     try {
