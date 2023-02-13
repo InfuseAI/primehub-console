@@ -7,10 +7,8 @@ import Token from './token';
 import { URL } from 'url';
 import * as logger from '../logger';
 import { get } from 'lodash';
-import { createHash } from 'crypto';
-import UUID from 'uuid';
 import { Config } from '../config';
-import { Client } from 'openid-client';
+import { Client, generators } from 'openid-client';
 
 const CALLBACK_PATH = '/oidc/callback';
 const REQUEST_API_TOKEN_PATH = '/oidc/request-api-token';
@@ -263,38 +261,51 @@ export class OidcCtrl {
   }
 
   public callback = async (ctx: any) => {
-    const query = ctx.query;
-    const redirectUri = query.backUrl ?
-      `${this.redirectUri}?backUrl=${encodeURIComponent(query.backUrl)}` : this.redirectUri;
+    try {
+      const query = ctx.query;
+      const redirectUri = query.backUrl ?
+        `${this.redirectUri}?backUrl=${encodeURIComponent(query.backUrl)}` : this.redirectUri;
 
-    const nonce = this.createNonceFromSecret(ctx);
-    const tokenSet = await this.oidcClient.callback(redirectUri, query, {nonce});
-    const accessToken = new Token(tokenSet.access_token, this.clientId);
+      const nonce = this.createNonceFromSecret(ctx);
+      const tokenSet = await this.oidcClient.callback(redirectUri, query, {nonce});
+      const accessToken = new Token(tokenSet.access_token, this.clientId);
 
-    // redirect to frontend
-    const opts = {
-      signed: true,
-      secure: ctx.request.secure,
-      path: this.cookiePath,
-    };
-    ctx.cookies.set('accessToken', tokenSet.access_token, opts);
-    ctx.cookies.set('refreshToken', tokenSet.refresh_token, opts);
-    ctx.cookies.set('username', accessToken.getContent().preferred_username, opts);
-    ctx.cookies.set('thumbnail',
-      accessToken.getContent().email ?
-      gravatar.url(accessToken.getContent().email)
-      : '', opts);
+      // redirect to frontend
+      const opts = {
+        signed: true,
+        secure: ctx.request.secure,
+        path: this.cookiePath,
+      };
+      ctx.cookies.set('accessToken', tokenSet.access_token, opts);
+      ctx.cookies.set('refreshToken', tokenSet.refresh_token, opts);
+      ctx.cookies.set('username', accessToken.getContent().preferred_username, opts);
+      ctx.cookies.set('thumbnail',
+        accessToken.getContent().email ?
+        gravatar.url(accessToken.getContent().email)
+        : '', opts);
 
-    const backUrl = query.backUrl || this.defaultReturnPath;
+      const backUrl = query.backUrl || this.defaultReturnPath;
 
-    logger.info({
-      component: logger.components.user,
-      type: 'LOGIN',
-      userId: accessToken.getContent().sub,
-      username: accessToken.getContent().preferred_username,
-      email: accessToken.getContent().email
-    });
-    return ctx.render('login', {accessToken: tokenSet.access_token, redirectUrl: backUrl});
+      logger.info({
+        component: logger.components.user,
+        type: 'LOGIN',
+        userId: accessToken.getContent().sub,
+        username: accessToken.getContent().preferred_username,
+        email: accessToken.getContent().email
+      });
+      return ctx.render('login', {accessToken: tokenSet.access_token, redirectUrl: backUrl});
+    } catch (err) {
+      logger.error({
+        component: logger.components.user,
+        type: 'CALLBACK',
+        message: err.message,
+      });
+      const opts = {
+        path: this.cookiePath,
+      };
+      ctx.cookies.set('apiToken', null, opts);
+      return this.logout(ctx);
+    }
   }
 
   public logout = async (ctx: any) => {
@@ -374,16 +385,15 @@ export class OidcCtrl {
   }
 
   private createNonceFromSecret = (ctx: Koa.ParameterizedContext) => {
-    const secret = ctx.cookies.get(NONCE_COOKIE, {signed: true});
-    const hash = createHash('sha256').update(secret).digest('hex');
-    return hash;
+    const nonce = ctx.cookies.get(NONCE_COOKIE, {signed: true});
+    return nonce;
   }
 
   private saveNonceSecret = (ctx: Koa.ParameterizedContext) => {
-    const secret = UUID.v1();
+    const nonce = generators.nonce();
     const secureRequest = ctx.request.secure;
-    ctx.cookies.set(NONCE_COOKIE, secret, {signed: true, secure: secureRequest, path: this.cookiePath});
-    return createHash('sha256').update(secret).digest('hex');
+    ctx.cookies.set(NONCE_COOKIE, nonce, {signed: true, secure: secureRequest, path: this.cookiePath});
+    return nonce;
   }
 
   private isForceLoginError = (err: any) => {
