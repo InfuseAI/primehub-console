@@ -1,8 +1,8 @@
 #!/bin/bash
 
-export K3D_VERSION=3.0.0-rc.6
-export K8S_VERSION=v1.17.7-k3s1
-export KUBECTL_VERSION=1.17.7
+export K3D_VERSION=3.4.0
+export K8S_VERSION=v1.21.14-k3s1
+export KUBECTL_VERSION=1.21.14
 export KC_VERSION=8.0.1
 export NODE_VERSION=14.17.0
 export CLUSTER_NAME=primehub
@@ -47,9 +47,7 @@ setup_k3d() {
   k3d version
 
   # Create k3d
-  k3d create cluster ${CLUSTER_NAME} --image rancher/k3s:${K8S_VERSION} --k3s-server-arg '--disable=traefik' --k3s-server-arg '--disable-network-policy' --wait
-  mkdir -p ~/.kube
-  cp $(k3d get kubeconfig ${CLUSTER_NAME}) ~/.kube/config || true
+  k3d cluster create ${CLUSTER_NAME} --image rancher/k3s:${K8S_VERSION} --k3s-server-arg '--disable=traefik' --k3s-server-arg '--disable-network-policy' --wait
 
   echo "kube context: $(kubectl config current-context)"
   echo "waiting for nodes ready"
