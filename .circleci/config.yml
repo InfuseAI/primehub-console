@@ -281,7 +281,7 @@ jobs:
   graphql-integration-test:
     machine:
       #image: infuseai/primehub-ci:0.7.0-e2e
-      image: ubuntu-1604:202007-01
+      image: ubuntu-2004:2022.07.1
     steps:
       - checkout
       - run:
