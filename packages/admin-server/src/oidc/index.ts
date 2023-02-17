@@ -262,38 +262,51 @@ export class OidcCtrl {
   }
 
   public callback = async (ctx: any) => {
-    const query = ctx.query;
-    const redirectUri = query.backUrl ?
-      `${this.redirectUri}?backUrl=${encodeURIComponent(query.backUrl)}` : this.redirectUri;
+    try {
+      const query = ctx.query;
+      const redirectUri = query.backUrl ?
+        `${this.redirectUri}?backUrl=${encodeURIComponent(query.backUrl)}` : this.redirectUri;
 
-    const nonce = this.createNonceFromSecret(ctx);
-    const tokenSet = await this.oidcClient.authorizationCallback(redirectUri, query, {nonce});
-    const accessToken = new Token(tokenSet.access_token, this.clientId);
+      const nonce = this.createNonceFromSecret(ctx);
+      const tokenSet = await this.oidcClient.authorizationCallback(redirectUri, query, {nonce});
+      const accessToken = new Token(tokenSet.access_token, this.clientId);
 
-    // redirect to frontend
-    const opts = {
-      signed: true,
-      secure: ctx.request.secure,
-      path: this.cookiePath,
-    };
-    ctx.cookies.set('accessToken', tokenSet.access_token, opts);
-    ctx.cookies.set('refreshToken', tokenSet.refresh_token, opts);
-    ctx.cookies.set('username', accessToken.getContent().preferred_username, opts);
-    ctx.cookies.set('thumbnail',
-      accessToken.getContent().email ?
-      gravatar.url(accessToken.getContent().email)
-      : '', opts);
+      // redirect to frontend
+      const opts = {
+        signed: true,
+        secure: ctx.request.secure,
+        path: this.cookiePath,
+      };
+      ctx.cookies.set('accessToken', tokenSet.access_token, opts);
+      ctx.cookies.set('refreshToken', tokenSet.refresh_token, opts);
+      ctx.cookies.set('username', accessToken.getContent().preferred_username, opts);
+      ctx.cookies.set('thumbnail',
+        accessToken.getContent().email ?
+        gravatar.url(accessToken.getContent().email)
+        : '', opts);
 
-    const backUrl = query.backUrl || this.defaultReturnPath;
+      const backUrl = query.backUrl || this.defaultReturnPath;
 
-    logger.info({
-      component: logger.components.user,
-      type: 'LOGIN',
-      userId: accessToken.getContent().sub,
-      username: accessToken.getContent().preferred_username,
-      email: accessToken.getContent().email
-    });
-    return ctx.render('login', {accessToken: tokenSet.access_token, redirectUrl: backUrl});
+      logger.info({
+        component: logger.components.user,
+        type: 'LOGIN',
+        userId: accessToken.getContent().sub,
+        username: accessToken.getContent().preferred_username,
+        email: accessToken.getContent().email
+      });
+      return ctx.render('login', {accessToken: tokenSet.access_token, redirectUrl: backUrl});
+    } catch (err) {
+      logger.error({
+        component: logger.components.user,
+        type: 'CALLBACK',
+        message: err.message,
+      });
+      const opts = {
+        path: this.cookiePath,
+      };
+      ctx.cookies.set('apiToken', null, opts);
+      return this.logout(ctx);
+    }
   }
 
   public logout = async (ctx: any) => {
