@@ -570,6 +570,18 @@ export const typeResolvers = {
       return [];
     }
   },
+  deploymentsUsage: async (parent, args, context: Context) => {
+    try {
+      const deployments = (await context.crdClient.phDeployments.list()) || [];
+      const deploymentsUsage = deployments.filter(deployment =>
+        deployment.spec.groupId === parent.id &&
+        deployment.spec.stop === false
+      ).length;
+      return deploymentsUsage;
+    } catch {
+      return null;
+    }
+  },
   resourceStatus: resourceStatusResolver.query,
   ...instanceTypeResolver.resolveInGroup(),
   ...datasetResolver.resolveInGroup(),
