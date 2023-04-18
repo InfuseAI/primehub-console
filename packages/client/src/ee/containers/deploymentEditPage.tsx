@@ -165,10 +165,14 @@ class DeploymentCreatePage extends React.Component<Props, State> {
     } catch (e) {}
 
     const isReachedGroupDeploymentsLimit =
-      group?.deployments >= group?.maxpGroup;
+      group?.maxDeploy === null
+        ? false
+        : group?.deploymentsUsage >= group?.maxDeploy;
+    const license = this.props.licenseQuery?.license;
     const isReachedSystemDeploymentsLimit =
-      this.props.licenseQuery?.license.usage.maxModelDeploy >=
-      this.props.licenseQuery?.license.maxModelDeploy;
+      license?.maxModelDeploy === -1
+        ? false
+        : license?.usage.maxModelDeploy >= license?.maxModelDeploy;
 
     return (
       <React.Fragment>
