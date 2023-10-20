@@ -13,9 +13,9 @@ import {
   isNil,
 } from 'lodash';
 import {
-  mutateRelation, parseDiskQuota, stringifyDiskQuota
+  mutateRelation, parseBoolean, parseDiskQuota, stringifyDiskQuota
 } from './utils';
-import { Attributes } from './attr';
+import { Attributes, FieldType } from './attr';
 import { Context } from './interface';
 import { ApolloError } from 'apollo-server';
 import { RequiredActionAlias } from '@keycloak/keycloak-admin-client/lib/defs/requiredActionProviderRepresentation';
@@ -419,11 +419,13 @@ export const update = async (root, args, context: Context) => {
   const attrs = new Attributes({
     keycloakAttr: user.attributes,
     schema: {
-      volumeCapacity: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota}
+      volumeCapacity: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota},
+      enableInviteUsers: {type: FieldType.boolean}
     }
   });
   attrs.mergeWithData({
-    volumeCapacity: payload.volumeCapacity
+    volumeCapacity: payload.volumeCapacity,
+    enableInviteUsers: payload.enableInviteUsers
   });
 
   // update
@@ -762,10 +764,19 @@ export const typeResolvers = {
     return isUserAdmin(realm, userId, kcAdminClient);
   },
 
-  volumeCapacity: async (parent, args, context: Context) => {
-    const everyoneGroupId = context.everyoneGroupId;
+  enableInviteUsers: async (parent) => {
+    const enableInviteUsers =
+      parent.attributes &&
+      parent.attributes.enableInviteUsers &&
+      parent.attributes.enableInviteUsers[0];
+    return parseBoolean(enableInviteUsers);
+  },
+
+  volumeCapacity: async (parent) => {
     const volumeCapacity =
-      parent.attributes && parent.attributes.volumeCapacity && parent.attributes.volumeCapacity[0];
+      parent.attributes &&
+      parent.attributes.volumeCapacity &&
+      parent.attributes.volumeCapacity[0];
 
     return parseDiskQuota(volumeCapacity);
   },

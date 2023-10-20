@@ -4,6 +4,7 @@ query CurrentUser {
     id
     username
     isAdmin
+    enableInviteUsers
     groups {
       ...GroupInfo
       instanceTypes {
