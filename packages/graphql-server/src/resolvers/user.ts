@@ -764,7 +764,7 @@ export const typeResolvers = {
     return isUserAdmin(realm, userId, kcAdminClient);
   },
 
-  enableInviteUsers: async (parent) => {
+  enableInviteUsers: async parent => {
     const enableInviteUsers =
       parent.attributes &&
       parent.attributes.enableInviteUsers &&
@@ -772,7 +772,7 @@ export const typeResolvers = {
     return parseBoolean(enableInviteUsers);
   },
 
-  volumeCapacity: async (parent) => {
+  volumeCapacity: async parent => {
     const volumeCapacity =
       parent.attributes &&
       parent.attributes.volumeCapacity &&
