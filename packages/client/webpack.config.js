@@ -46,13 +46,11 @@ function getPlugins(env) {
       filename: 'login.ejs',
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    // FIXME: can consider using `.env` file
     new webpack.DefinePlugin({
       modelDeploymentOnly: schema === 'modelDeploy',
       primehubCE: schema === 'ce',
       __ENV__: JSON.stringify(schema),
     }),
-    new webpack.EnvironmentPlugin({ ...process.env }),
     new MiniCssExtractPlugin({
       filename: isDev ? '[name].css' : '[name].[contenthash].css',
       chunkFilename: isDev ? '[id].css' : '[id].[contenthash].css',

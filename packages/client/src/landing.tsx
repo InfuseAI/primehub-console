@@ -75,8 +75,7 @@ function Landing({ groupContext, currentUser, ...props }: Props) {
               <InviteButton
                 groupId={groupContext.id}
                 enabled={
-                  process.env.ENABLE_INVITE_USERS === 'true' &&
-                  currentUser.me.enableInviteUsers
+                  window?.enableInviteUsers && currentUser.me.enableInviteUsers
                 }
                 onRequestToken={onRequestInvitation}
               />
