@@ -301,7 +301,7 @@ function DetailPage(props: any) {
                   })(
                     <Switch
                     disabled={
-                      window?.enableInviteUsers ||
+                      !window?.enableInviteUsers ||
                       currentUser?.me?.id === user.id
                     }
                       data-testid='enableInviteUsers'
