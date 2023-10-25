@@ -133,7 +133,7 @@ export const GroupsRelationTable = compose(
 });
 
 function DetailPage(props: any) {
-  const { form, queryUser, queryUserGroups } = props;
+  const { form, queryUser, queryUserGroups, currentUser } = props;
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const history = useHistory();
