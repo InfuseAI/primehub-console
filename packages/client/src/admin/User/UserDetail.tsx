@@ -302,7 +302,6 @@ function DetailPage(props: any) {
                     <Switch
                     disabled={
                       !window?.enableInviteUsers ||
-                      currentUser?.me?.id === user.id
                     }
                       data-testid='enableInviteUsers'
                       checkedChildren={<Icon type='check' />}
