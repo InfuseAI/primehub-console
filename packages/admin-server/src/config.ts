@@ -192,7 +192,7 @@ export const createConfig = (): Config => {
     enableApp: getEnvBoolean('PRIMEHUB_FEATURE_APP', true),
     enableTelemetry: getEnvBoolean('PRIMEHUB_FEATURE_TELEMETRY', false),
     enableNPSSurvey: getEnvBoolean('ENABLE_NPS_SURVEY', false),
-    enableInviteUsers: getEnvBoolean('ENABLE_INVITE_USERS', true),
+    enableInviteUsers: getEnvBoolean('ENABLE_INVITE_USERS', false),
   });
 
   const env = process.env.NODE_ENV || 'development';
