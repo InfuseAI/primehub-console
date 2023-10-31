@@ -1,6 +1,8 @@
 import * as React from 'react';
 import GroupSettingsMembers from '../members';
 import { render, screen } from 'test/test-utils';
+import { MockedProvider } from 'react-apollo/test-utils';
+import { GetGroupUsers } from 'queries/Group.graphql';
 
 function setup() {
   const group = {
@@ -14,21 +16,47 @@ function setup() {
     ],
   };
 
+  const mocks = [
+    {
+      request: {
+        query: GetGroupUsers,
+        variables: {
+          where: {
+            id: group.id,
+          },
+        },
+      },
+      result: {
+        data: {
+          group,
+        },
+      },
+    },
+  ];
+
   return {
     group,
+    mocks,
   };
 }
 
 describe('GroupSettingsMembers Component', () => {
   it('should render group settings members with loading status', () => {
-    const { group } = setup();
-    render(<GroupSettingsMembers />);
+    render(
+      <MockedProvider mocks={[]}>
+        <GroupSettingsMembers />
+      </MockedProvider>
+    );
     expect(screen.getByText('loading...'));
   });
 
   it('Should render group settings members', async () => {
-    const { group } = setup();
-    render(<GroupSettingsMembers group={group} />);
+    const { group, mocks } = setup();
+    render(
+      <MockedProvider mocks={mocks} addTypename={false}>
+        <GroupSettingsMembers group={group} />
+      </MockedProvider>
+    );
 
     expect(await screen.findByText('Group Admin')).toBeInTheDocument();
     expect(await screen.findByText('user1')).toBeInTheDocument();

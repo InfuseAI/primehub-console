@@ -1,22 +1,26 @@
 import React from 'react';
 import { get } from 'lodash';
 import { Checkbox, Table } from 'antd';
+import { compose } from 'recompose';
+import { graphql } from 'react-apollo';
 import { TruncateTableField } from 'utils/TruncateTableField';
+import { GetGroupUsers } from 'queries/Group.graphql';
 
 interface Props {
   group: any;
+  getGroupUsers: any;
 }
 
 class GroupSettingsMembers extends React.Component<Props> {
   render() {
-    const { group } = this.props;
+    const { group, getGroupUsers } = this.props;
 
-    if (!group) {
+    if (!group || (getGroupUsers && getGroupUsers.loading)) {
       return <div>loading...</div>;
     }
 
     const admins = get(group, 'admins', []).split(',');
-    const users = get(group, 'users', []).map(user => {
+    const users = get(getGroupUsers, 'group.users', []).map(user => {
       return {
         id: user.id,
         username: user.username,
@@ -52,4 +56,15 @@ class GroupSettingsMembers extends React.Component<Props> {
   }
 }
 
-export default GroupSettingsMembers;
+export default compose(
+  graphql(GetGroupUsers, {
+    options: (props: Props) => ({
+      variables: {
+        where: {
+          id: props.group?.id,
+        },
+      },
+    }),
+    name: 'getGroupUsers',
+  })
+)(GroupSettingsMembers);
