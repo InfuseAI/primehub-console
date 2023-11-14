@@ -71,12 +71,13 @@ function Landing({ groupContext, currentUser, ...props }: Props) {
             }}
           >
             <Breadcrumbs pathList={breadcrumbs} />
-            {currentUser?.me?.isAdmin && (
               <InviteButton
                 groupId={groupContext.id}
+                enabled={
+                  window?.enableInviteUsers && currentUser.me.enableInviteUsers
+                }
                 onRequestToken={onRequestInvitation}
               />
-            )}
           </div>
         }
         title={'Home'}

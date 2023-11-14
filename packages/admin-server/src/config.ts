@@ -77,6 +77,8 @@ export interface Config {
 
   isUserAdmin: boolean;
   newAccessToken: string;
+
+  enableInviteUsers: boolean;
 }
 
 const defaultConfigs = {
@@ -120,6 +122,7 @@ const defaultConfigs = {
   primehubVersion: 'development',
   isUserAdmin: false,
   newAccessToken: '',
+  enableInviteUsers: false,
 };
 
 const prodConfigs = {
@@ -189,6 +192,7 @@ export const createConfig = (): Config => {
     enableApp: getEnvBoolean('PRIMEHUB_FEATURE_APP', true),
     enableTelemetry: getEnvBoolean('PRIMEHUB_FEATURE_TELEMETRY', false),
     enableNPSSurvey: getEnvBoolean('ENABLE_NPS_SURVEY', false),
+    enableInviteUsers: getEnvBoolean('ENABLE_INVITE_USERS', false),
   });
 
   const env = process.env.NODE_ENV || 'development';

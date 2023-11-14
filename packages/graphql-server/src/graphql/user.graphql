@@ -16,6 +16,7 @@ type User {
   totp: Boolean
   isAdmin: Boolean
   enabled: Boolean
+  enableInviteUsers: Boolean
   createdTimestamp: Float
   volumeCapacity: Int
   federated: Boolean
@@ -99,6 +100,7 @@ input UserUpdateInput {
   totp: Boolean
   isAdmin: Boolean
   enabled: Boolean
+  enableInviteUsers: Boolean
   createdTimestamp: Float
   volumeCapacity: Int
   federated: Boolean

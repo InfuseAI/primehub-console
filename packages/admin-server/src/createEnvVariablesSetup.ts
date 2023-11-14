@@ -41,6 +41,8 @@ const createEnvVariablesSetup = () => (ctx: Context, next: Next) => {
   ctx.state.enableNPSSurvey = config.enableNPSSurvey;
   ctx.state.primehubAnonymousId = md5(config.keycloakClientSecret);
 
+  ctx.state.enableInviteUsers = config.enableInviteUsers;
+
   // referrer
   const referrer = `${config.cmsHost}${ctx.path}`;
   ctx.state.links = JSON.stringify({

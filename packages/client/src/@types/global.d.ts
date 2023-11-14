@@ -40,5 +40,6 @@ declare global {
     SS_SURVEY_NAME?: string;
     SparrowLauncher?: any;
     analytics?: any;
+    enableInviteUsers?: any;
   }
 }

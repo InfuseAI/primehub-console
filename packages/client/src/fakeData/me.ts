@@ -2,6 +2,7 @@ export const me = {
   id: 'test-user',
   username: 'test-user',
   isAdmin: true,
+  enableInviteUsers: true,
   groups: [
     {
       id: 'groupId1',

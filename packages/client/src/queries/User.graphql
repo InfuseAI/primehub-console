@@ -4,6 +4,7 @@ query CurrentUser {
     id
     username
     isAdmin
+    enableInviteUsers
     groups {
       ...GroupInfo
       instanceTypes {
@@ -46,6 +47,7 @@ query User($where: UserWhereUniqueInput!) {
     totp
     isAdmin
     volumeCapacity
+    enableInviteUsers
     groups {
       id
       name

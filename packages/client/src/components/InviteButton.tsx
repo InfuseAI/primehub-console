@@ -5,12 +5,17 @@ import { useRoutePrefix } from 'hooks/useRoutePrefix/useRoutePrefix';
 
 interface InviteButtonProps {
   groupId: string;
+  enabled: boolean;
   onRequestToken: (
     id: string
   ) => Promise<{ data: { createInvitation: { invitationToken: string } } }>;
 }
 
-const InviteButton = ({ groupId, onRequestToken }: InviteButtonProps) => {
+const InviteButton = ({
+  groupId,
+  enabled,
+  onRequestToken,
+}: InviteButtonProps) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [visible, setVisible] = useState(false);
   const [inviteLink, setInviteLink] = useState('');
@@ -30,6 +35,7 @@ const InviteButton = ({ groupId, onRequestToken }: InviteButtonProps) => {
         onClick={() => {
           setVisible(true);
         }}
+        disabled={!enabled}
       >
         Invite Users
       </Button>

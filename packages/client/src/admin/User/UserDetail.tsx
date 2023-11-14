@@ -28,7 +28,12 @@ import SendEmail from 'cms-components/customize-object-email_form';
 import ResetPassword from 'cms-components/customize-object-password_form';
 import CheckableInputNumber from 'cms-components/customize-number-checkbox';
 import CustomRelationTable from '../share/RelationTable';
-import { User, UpdateUser, UserGroups } from 'queries/User.graphql';
+import {
+  User,
+  UpdateUser,
+  UserGroups,
+  CurrentUser,
+} from 'queries/User.graphql';
 import { errorHandler } from 'utils/errorHandler';
 import { TruncateTableField } from 'utils/TruncateTableField';
 
@@ -128,7 +133,7 @@ export const GroupsRelationTable = compose(
 });
 
 function DetailPage(props: any) {
-  const { form, queryUser, queryUserGroups } = props;
+  const { form, queryUser, queryUserGroups, currentUser } = props;
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const history = useHistory();
@@ -197,7 +202,7 @@ function DetailPage(props: any) {
     e.preventDefault();
     form.validateFields(async (err, values) => {
       if (err) return;
-      const data = pickBy(values, (value, key) => {
+      const data = pickBy(values, (_value, key) => {
         return form.isFieldTouched(key);
       });
       updateUser({
@@ -284,6 +289,21 @@ function DetailPage(props: any) {
                   })(
                     <Switch
                       data-testid='isAdmin'
+                      checkedChildren={<Icon type='check' />}
+                      unCheckedChildren={<Icon type='close' />}
+                    />
+                  )}
+                </Form.Item>
+                <Form.Item label={'Allow Invite Users'}>
+                  {form.getFieldDecorator('enableInviteUsers', {
+                    initialValue: get(user, 'enableInviteUsers', false),
+                    valuePropName: 'checked',
+                  })(
+                    <Switch
+                    disabled={
+                      !window?.enableInviteUsers
+                    }
+                      data-testid='enableInviteUsers'
                       checkedChildren={<Icon type='check' />}
                       unCheckedChildren={<Icon type='close' />}
                     />
@@ -398,5 +418,9 @@ export const UserDetail = compose(
         fetchPolicy: 'cache-and-network',
       };
     },
+  }),
+  graphql(CurrentUser, {
+    alias: 'withCurrentUser',
+    name: 'currentUser',
   })
 )(DetailPage);
