@@ -1,6 +1,6 @@
 type StoreFile {
   name: String
-  size: Int
+  size: Float
   lastModified: String
 }
 
