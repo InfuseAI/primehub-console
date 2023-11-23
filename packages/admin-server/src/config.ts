@@ -79,6 +79,7 @@ export interface Config {
   newAccessToken: string;
 
   enableInviteUsers: boolean;
+  mlflowVersion: string;
 }
 
 const defaultConfigs = {
@@ -123,6 +124,7 @@ const defaultConfigs = {
   isUserAdmin: false,
   newAccessToken: '',
   enableInviteUsers: false,
+  mlflowVersion: '2',
 };
 
 const prodConfigs = {
@@ -193,6 +195,7 @@ export const createConfig = (): Config => {
     enableTelemetry: getEnvBoolean('PRIMEHUB_FEATURE_TELEMETRY', false),
     enableNPSSurvey: getEnvBoolean('ENABLE_NPS_SURVEY', false),
     enableInviteUsers: getEnvBoolean('ENABLE_INVITE_USERS', false),
+    mlflowVersion: process.env.MLFLOW_VERSION,
   });
 
   const env = process.env.NODE_ENV || 'development';

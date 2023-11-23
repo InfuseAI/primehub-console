@@ -41,5 +41,6 @@ declare global {
     SparrowLauncher?: any;
     analytics?: any;
     enableInviteUsers?: any;
+    mlflowVersion?: string;
   }
 }

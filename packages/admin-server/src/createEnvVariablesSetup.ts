@@ -42,6 +42,7 @@ const createEnvVariablesSetup = () => (ctx: Context, next: Next) => {
   ctx.state.primehubAnonymousId = md5(config.keycloakClientSecret);
 
   ctx.state.enableInviteUsers = config.enableInviteUsers;
+  ctx.state.mlflowVersion = config.mlflowVersion;
 
   // referrer
   const referrer = `${config.cmsHost}${ctx.path}`;
