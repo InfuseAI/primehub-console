@@ -402,7 +402,7 @@ function Browser({
       align: 'right',
       width: 120,
       render: (size, record) => {
-        return !record.name.endsWith('/') ? humanFileSize(size, true, 1) : null;
+        return !record.name.endsWith('/') ? humanFileSize(size, false, 1) : null;
       },
       sorter: (left, right) => {
         const leftSize = left.size || 0;
