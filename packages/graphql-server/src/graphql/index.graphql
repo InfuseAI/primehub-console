@@ -7,7 +7,7 @@
 # import Dataset, DatasetOrderByInput, DatasetMutationResponse, DatasetConnection, DatasetWhereInput, DatasetWhereUniqueInput, DatasetCreateInput, DatasetUpdateInput from "./dataset.graphql"
 # import Secret, SecretOrderByInput, SecretConnection, SecretWhereInput, SecretWhereUniqueInput, SecretCreateInput, SecretUpdateInput from "./secret.graphql"
 # import StoreFileList, StoreFileWhereInput, StoreFileListOptionInput, StoreFileDeleteOptionInput from "./store.graphql"
-# import DatasetV2 from "./datasetV2.graphql"
+# import DatasetV2, MultipleDownloadInput, JobQueueStatusResult from "./datasetV2.graphql"
 # import PhApplication, PhApplicationWhereInput, PhApplicationWhereUniqueInput, PhApplicationCreateInput, PhApplicationUpdateInput, PhApplicationOrderBy from "./phApplication.graphql"
 # import PhAppTemplate, PhAppTemplateWhereInput, PhAppTemplateWhereUniqueInput from "./phAppTemplate.graphql"
 # import NotebookNotifyEventInput from "./notebook.graphql"
@@ -225,6 +225,8 @@ type Query {
 
   """Invitation"""
   invitation(data: InvitationQueryInput!): InvitationQueryResult
+
+  jobQueueStatus: JobQueueStatusResult
 }
 
 type Mutation {
@@ -296,4 +298,6 @@ type Mutation {
   """Invitation"""
   createInvitation(data: InvitationCreateInput!): Invitation!
   createUserFromInvitation(data: InvitationApplyInput!): InvitationResult!
+
+  zipFiles(data: MultipleDownloadInput!): Boolean
 }

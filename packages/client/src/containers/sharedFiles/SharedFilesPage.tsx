@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Button, Form, Icon, notification } from 'antd';
 import { useHistory, useParams } from 'react-router-dom';
 import { compose } from 'recompose';
-import { graphql } from 'react-apollo';
+import { graphql, withApollo } from 'react-apollo';
 import type { ApolloQueryResult } from 'apollo-client';
 import type { FormComponentProps } from 'antd/lib/form';
 
@@ -23,6 +23,8 @@ import {
   GetDatasets,
   CreateDatasetMutation,
   CopyFilesMutation,
+  ZipFiles,
+  JobQueueStatus,
 } from './Dataset.graphql';
 
 const StickyFooter = styled.div`
@@ -73,6 +75,18 @@ interface Props extends FormComponentProps, GroupContextComponentProps {
   }) => Promise<{
     data: { copyFilesToDatasetV2: { endpoint: string } };
   }>;
+  zipFiles: ({
+    variables,
+  }: {
+    variables: {
+      payload: {
+        groupName: string;
+        phfsPrefix: string;
+        files: string[];
+      };
+    };
+  }) => Promise<void>;
+  client: any;
 }
 
 interface Node extends TreeNode {
@@ -127,6 +141,33 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
     }).then(response => response.json());
 
     return response;
+  }
+
+  async function downloadMultiple(selectedFiles: string[]) {
+    props.zipFiles({
+      variables: {
+        payload: {
+          groupName,
+          phfsPrefix: phfsPrefix || '',
+          files: selectedFiles
+        },
+      },
+    }).then( _result => {
+      notification.success({
+        duration: 5,
+        placement: 'bottomRight',
+        message: 'Zipping is in progress...',
+      });
+      const interval = setInterval(async () => {
+        const result = await props.client.query({
+          query: JobQueueStatus,
+          fetchPolicy: 'no-cache',
+        });
+        // TODO: show downloadable link
+        clearInterval(interval);
+      }, 1000);
+    });
+    setSelectedFiles([]);
   }
 
   function getNextFolderTree({
@@ -268,6 +309,18 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
               >
                 Create New Dataset
               </Button>
+              <Button
+                type='primary'
+                style={{ marginLeft: 16 }}
+                onClick={() => {
+                  downloadMultiple(selectedFiles);
+                }}
+              >
+                Download
+              </Button>
+              <Button type='primary' style={{ marginLeft: 16 }}>
+                Delete
+              </Button>
             </Button.Group>
           </StickyFooter>
         )}
@@ -363,6 +416,7 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
 
 export default compose(
   withGroupContext,
+  withApollo,
   graphql(GetDatasets, {
     name: 'datasets',
     options: ({ groupContext }: Props) => {
@@ -394,5 +448,8 @@ export default compose(
   }),
   graphql(CopyFilesMutation, {
     name: 'copyFiles',
+  }),
+  graphql(ZipFiles, {
+    name: 'zipFiles',
   })
 )(Form.create<Props>()(ShareFilesPage));

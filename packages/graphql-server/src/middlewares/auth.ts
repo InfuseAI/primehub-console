@@ -24,6 +24,7 @@ export const ShieldQuery = {
   'sharedFile': or(isAdmin, isUser),
   'datasetV2': or(isAdmin, isUser),
   'datasetV2Connection': or(isAdmin, isUser),
+  'jobQueueStatus': or(isAdmin, isUser),
 };
 
 export const ShieldMutation = {
@@ -50,6 +51,7 @@ export const ShieldMutation = {
   'deleteDatasetV2': or(isAdmin, isUser),
   'copyFilesToDatasetV2': or(isAdmin, isUser),
   'createInvitation': or(isAdmin, isUser),
+  'zipFiles': or(isAdmin, isUser),
 };
 
 export const permissions = shield({
