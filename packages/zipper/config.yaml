@@ -1,4 +1,5 @@
 minio_config:
+  bucket: !ENV ${MINIO_BUCKET}
   end_point: !ENV ${MINIO_END_POINT}
   access_key: !ENV ${MINIO_ACCESS_KEY}
   secret_key: !ENV ${MINIO_SECRET_KEY}

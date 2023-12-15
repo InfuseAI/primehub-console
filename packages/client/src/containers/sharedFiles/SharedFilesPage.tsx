@@ -154,7 +154,7 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
       },
     }).then( _result => {
       notification.success({
-        duration: 5,
+        duration: 3,
         placement: 'bottomRight',
         message: 'Zipping is in progress...',
       });
@@ -163,9 +163,15 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
           query: JobQueueStatus,
           fetchPolicy: 'no-cache',
         });
-        // TODO: show downloadable link
-        clearInterval(interval);
-      }, 1000);
+        if (result.data.jobQueueStatus.completed) {
+          notification.success({
+            duration: 5,
+            placement: 'bottomRight',
+            message: `Your zip file ${result.data.jobQueueStatus.file} is ready for download`,
+          });
+          clearInterval(interval);
+        }
+      }, 2000);
     });
     setSelectedFiles([]);
   }
@@ -310,6 +316,7 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
                 Create New Dataset
               </Button>
               <Button
+                disabled={selectedFiles.length < 2}
                 type='primary'
                 style={{ marginLeft: 16 }}
                 onClick={() => {
@@ -318,7 +325,11 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
               >
                 Download
               </Button>
-              <Button type='primary' style={{ marginLeft: 16 }}>
+              <Button
+                disabled={selectedFiles.length < 2}
+                type='primary'
+                style={{ marginLeft: 16 }}
+              >
                 Delete
               </Button>
             </Button.Group>

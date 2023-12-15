@@ -47,6 +47,7 @@ export const resolvers = {
     phAppTemplates: phAppTemplate.query,
     invitation: invitation.queryInvitation,
     jobQueueStatus: store.jobQueueStatus,
+    downloadableFiles: store.downloadableFiles,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),

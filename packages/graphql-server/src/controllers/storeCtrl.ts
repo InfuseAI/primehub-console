@@ -15,7 +15,7 @@ export const mountStoreCtrl = (router: Router,
                                authenticateMiddleware: Middleware,
                                minioClient: Client,
                                storeBucket: string) => {
-  const downloadFile = async (ctx, path) => {
+  const downloadFile = async (ctx, path, bucketName=storeBucket) => {
     let download = false;
     if ('download' in ctx.request.query && ctx.request.query.download === '1') {
       download = true;
@@ -23,7 +23,7 @@ export const mountStoreCtrl = (router: Router,
 
     let req;
     try {
-      req = await minioClient.getObject(storeBucket, path);
+      req = await minioClient.getObject(bucketName, path);
     } catch (error) {
       if (error.code === 'NoSuchKey') {
         return ctx.status = 404;
@@ -59,16 +59,21 @@ export const mountStoreCtrl = (router: Router,
 
   router.get('/files/(.*)', authenticateMiddleware, async (ctx: any) => {
     const objectPath = ctx.params[0];
-    const [first, groupName] = objectPath.split('/');
-    if (first !== 'groups' || !groupName) {
-      throw Boom.forbidden('request not authorized');
-    }
 
-    if (await isGroupBelongUser(ctx, ctx.userId, groupName) === false) {
-      throw Boom.forbidden('request not authorized');
+    if (objectPath.endsWith('.zip') && objectPath.split('/')[0] === 'tmp') {
+      await downloadFile(ctx, objectPath.split('/')[1], `downloadable-${ctx.userId}`);
+    } else {
+      const [first, groupName] = objectPath.split('/');
+      if (first !== 'groups' || !groupName) {
+        throw Boom.forbidden('request not authorized');
+      }
+  
+      if (await isGroupBelongUser(ctx, ctx.userId, groupName) === false) {
+        throw Boom.forbidden('request not authorized');
+      }
+  
+      await downloadFile(ctx, objectPath);
     }
-
-    await downloadFile(ctx, objectPath);
   });
 
   router.post('/files/(.*)', authenticateMiddleware, async (ctx: any) => {

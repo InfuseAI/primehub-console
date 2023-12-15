@@ -1,23 +1,17 @@
-from collections import OrderedDict
 import os
-from typing import Dict, Literal
 import uuid
+from collections import OrderedDict
+from typing import Dict, Literal
 from uuid import UUID
 from zipfile import ZipFile
+
 from fastapi import FastAPI
-from config import MinIOConfig
 from minio import Minio
-
 from models.zip_model import ZipModel
+from utils.minio_util import get_objects_list
 
 
-def register_zipping_api(app: FastAPI, minio_config: MinIOConfig):
-    minio_client = Minio(
-        minio_config.end_point,
-        access_key=minio_config.access_key,
-        secret_key=minio_config.secret_key,
-        secure=False,
-    )
+def register_zipping_api(app: FastAPI, minio_client: Minio, minio_bucket: str):
 
     job_queue: Dict[UUID, OrderedDict[str, Dict[Literal["completed"], bool]]] = {}
 
@@ -30,12 +24,9 @@ def register_zipping_api(app: FastAPI, minio_config: MinIOConfig):
         objects = []
         for file in zip_model.files:
             if file.endswith("/"):
-                for obj in minio_client.list_objects(
-                    minio_config.bucket,
-                    prefix=zip_model.get_full_path(file),
-                    recursive=True,
-                ):
-                    objects.append(obj.object_name)
+                objects += get_objects_list(
+                    minio_client, minio_bucket, zip_model.get_full_path(file)
+                )
             else:
                 objects.append(zip_model.get_full_path(file))
 
@@ -46,7 +37,7 @@ def register_zipping_api(app: FastAPI, minio_config: MinIOConfig):
 
         with ZipFile(zip_file_name, "w") as zip_file:
             for obj_name in objects:
-                object_data = minio_client.get_object(minio_config.bucket, obj_name)
+                object_data = minio_client.get_object(minio_bucket, obj_name)
                 zip_file.writestr(obj_name, object_data.read())
 
         with open(zip_file_name, "rb") as file_data:

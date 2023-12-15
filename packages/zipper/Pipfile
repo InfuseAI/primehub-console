@@ -9,6 +9,7 @@ pydantic = "*"
 pyyaml = "*"
 uvicorn = "*"
 minio = "*"
+apscheduler = "*"
 
 [dev-packages]
 black = "*"

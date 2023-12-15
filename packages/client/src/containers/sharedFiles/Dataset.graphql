@@ -24,6 +24,10 @@ query JobQueueStatus {
   }
 }
 
+query GetDownloadableFiles {
+  downloadableFiles
+}
+
 mutation CreateDatasetMutation($payload: DatasetV2CreateInput!) {
   createDatasetV2(data: $payload) {
     id

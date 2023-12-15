@@ -227,6 +227,8 @@ type Query {
   invitation(data: InvitationQueryInput!): InvitationQueryResult
 
   jobQueueStatus: JobQueueStatusResult
+
+  downloadableFiles: [String]
 }
 
 type Mutation {
