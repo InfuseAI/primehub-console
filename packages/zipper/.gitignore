@@ -23,7 +23,6 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-requirements.txt
 .DS_Store
 
 # PyInstaller
