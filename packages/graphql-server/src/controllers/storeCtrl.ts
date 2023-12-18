@@ -16,7 +16,7 @@ export const mountStoreCtrl = (router: Router,
                                minioClient: Client,
                                storeBucket: string) => {
 
-  const downloadFile = async (ctx, path, bucketName=storeBucket) => {
+  const downloadFile = async (ctx, path, bucketName = storeBucket) => {
     let download = false;
     if ('download' in ctx.request.query && ctx.request.query.download === '1') {
       download = true;

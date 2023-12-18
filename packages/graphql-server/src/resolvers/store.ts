@@ -318,7 +318,7 @@ export const zipFiles = async (root, args, context: Context) => {
     ...args.data,
   };
   // disk space validate
-  const rs = await axios.post(`${config.zippingEndpoint}/disk-space-check`, data)
+  const rs = await axios.post(`${config.zippingEndpoint}/disk-space-check`, data);
   if (!rs.data) {
     throw new ApolloError('Disk space capacity error');
   }
