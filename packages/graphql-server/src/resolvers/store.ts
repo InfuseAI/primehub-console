@@ -1,5 +1,5 @@
 import { ApolloError } from 'apollo-server';
-import axios from "axios";
+import axios from 'axios';
 
 import { Context, Role } from './interface';
 import * as logger from '../logger';
@@ -311,7 +311,7 @@ export const destroyByGroup = async (
   return 1;
 };
 
-export const zipFiles = async (_root, args, context: Context) => {
+export const zipFiles = async (root, args, context: Context) => {
   const config = createConfig();
   const data = {
     user_id: context.userId,
@@ -325,7 +325,7 @@ export const zipFiles = async (_root, args, context: Context) => {
   axios.post(`${config.zippingEndpoint}/zipping`, data);
 };
 
-export const jobQueueStatus = async (_root, _args, context: Context) => {
+export const jobQueueStatus = async (root, args, context: Context) => {
   const config = createConfig();
   const result = await axios.get(
     `${config.zippingEndpoint}/job-queue/${context.userId}`
@@ -333,7 +333,7 @@ export const jobQueueStatus = async (_root, _args, context: Context) => {
   return result.data;
 };
 
-export const downloadableFiles = async (_root, _args, context: Context) => {
+export const downloadableFiles = async (root, args, context: Context) => {
   const config = createConfig();
   const result = await axios.get(
     `${config.zippingEndpoint}/downloadable/${context.userId}`

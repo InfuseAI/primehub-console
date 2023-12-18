@@ -15,6 +15,7 @@ export const mountStoreCtrl = (router: Router,
                                authenticateMiddleware: Middleware,
                                minioClient: Client,
                                storeBucket: string) => {
+
   const downloadFile = async (ctx, path, bucketName=storeBucket) => {
     let download = false;
     if ('download' in ctx.request.query && ctx.request.query.download === '1') {
@@ -67,11 +68,9 @@ export const mountStoreCtrl = (router: Router,
       if (first !== 'groups' || !groupName) {
         throw Boom.forbidden('request not authorized');
       }
-  
       if (await isGroupBelongUser(ctx, ctx.userId, groupName) === false) {
         throw Boom.forbidden('request not authorized');
       }
-  
       await downloadFile(ctx, objectPath);
     }
   });
