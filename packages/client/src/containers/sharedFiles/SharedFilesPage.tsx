@@ -172,6 +172,12 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
           clearInterval(interval);
         }
       }, 2000);
+    }).catch((error) => {
+      notification.error({
+        duration: 3,
+        placement: 'bottomRight',
+        message: error.message,
+      })
     });
     setSelectedFiles([]);
   }

@@ -15,4 +15,4 @@ ENV PYTHONPATH=./
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
 CMD [ "python", "main.py", "config.yaml"]
 
-EXPOSE 8080
+EXPOSE 4000

@@ -1,4 +1,5 @@
 import os
+import shutil
 import uuid
 from collections import OrderedDict
 from typing import Dict, Literal
@@ -14,6 +15,25 @@ from utils.minio_util import get_objects_list
 def register_zipping_api(app: FastAPI, minio_client: Minio, minio_bucket: str):
 
     job_queue: Dict[UUID, OrderedDict[str, Dict[Literal["completed"], bool]]] = {}
+
+    @app.post("/disk-space-check")
+    async def disk_space_check(zip_model: ZipModel):
+        _, _, free = shutil.disk_usage("/")
+
+        objects = []
+        for file in zip_model.files:
+            if file.endswith("/"):
+                objects += get_objects_list(
+                    minio_client, minio_bucket, zip_model.get_full_path(file)
+                )
+            else:
+                objects.append(zip_model.get_full_path(file))
+        total_objects_size = 0
+        for obj_path in objects:
+            total_objects_size += minio_client.stat_object(minio_bucket, obj_path).size  # type: ignore
+        if total_objects_size > free:
+            return False
+        return True
 
     @app.post("/zipping")
     async def zipping(zip_model: ZipModel):
@@ -59,11 +79,9 @@ def register_zipping_api(app: FastAPI, minio_client: Minio, minio_bucket: str):
 
     @app.get("/job-queue/{user_id}")
     async def get_job_queue(user_id: UUID):
-        # TODO: if one job done, remove it from queue status
         if (user_id not in job_queue) or (not job_queue.get(user_id)):
             return {}
         (f_name, first_item) = next(iter(job_queue[user_id].items()))
         if first_item.get("completed"):
             del job_queue[user_id][f_name]
-        # TODO: get and return downloadable path
         return {"file": f_name, "completed": first_item["completed"]}
