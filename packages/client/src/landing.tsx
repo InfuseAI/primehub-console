@@ -20,6 +20,7 @@ import InviteButton from 'components/InviteButton';
 import { errorHandler } from 'utils/errorHandler';
 import { GetDownloadableFiles } from "containers/sharedFiles/Dataset.graphql";
 import { get } from 'lodash';
+import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 const breadcrumbs: BreadcrumbItemSetup[] = [
   {
@@ -38,6 +39,7 @@ type Props = {
 } & GroupContextComponentProps;
 
 function Landing({ groupContext, currentUser, downloadableFiles, ...props }: Props) {
+  const { appPrefix } = useRoutePrefix();
   const fileToDownloads = get(downloadableFiles, 'downloadableFiles', []);
   const qsLink = modelDeploymentOnly
     ? 'https://docs.primehub.io/docs/quickstart/qs-primehub-deploy'
@@ -269,7 +271,7 @@ function Landing({ groupContext, currentUser, downloadableFiles, ...props }: Pro
               style={{ marginTop: 16, marginRight: 24 }}
             >
               {fileToDownloads.map(item => (
-                <a href={`/files/tmp/${item}?download=1`}>
+                <a href={`${appPrefix}files/tmp/${item}?download=1`}>
                   <p>{item}</p>
                 </a>
               ))}
