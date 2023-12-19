@@ -20,6 +20,15 @@ def get_objects_list(
 
 
 def delete_old_objects(minio_client: Minio, bucket_name: str, day_frame=2):
+    """
+    Delete old objects in a bucket.
+
+    :param minio_client: MinIO client.
+    :param bucket_name: Name of the bucket.
+    :param day_frame: Delete objects existing more than this time (by day).
+
+    :return: `None`.
+    """
     objects = minio_client.list_objects(bucket_name)
     for obj in objects:
         last_modified = obj.last_modified

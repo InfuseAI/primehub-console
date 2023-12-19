@@ -1,3 +1,4 @@
+from operator import attrgetter
 import os
 import shutil
 import uuid
@@ -75,7 +76,8 @@ def register_zipping_api(app: FastAPI, minio_client: Minio, minio_bucket: str):
     @app.get("/downloadable/{user_id}")
     async def get_downloadable_list(user_id: UUID):
         objects = minio_client.list_objects(f"downloadable-{user_id}", recursive=True)
-        return [obj.object_name for obj in objects]
+        sorted_objects = sorted(objects, key=attrgetter('last_modified'), reverse=True)
+        return [obj.object_name for obj in sorted_objects]
 
     @app.get("/job-queue/{user_id}")
     async def get_job_queue(user_id: UUID):

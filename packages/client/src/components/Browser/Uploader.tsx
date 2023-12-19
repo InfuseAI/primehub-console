@@ -26,6 +26,7 @@ export const TEXT_UPLOAD_IN_BG_MSG =
 interface Props {
   groupName: string;
   phfsPrefix: string;
+  folderUpload: boolean;
   onFileUpload?: () => void;
   onUploadStatusChange?: (uploading: boolean) => void;
   deleteFiles: ({
@@ -55,7 +56,7 @@ function joinPath(...paths: string[]) {
 function _Uploader(props: Props) {
   const [fileList, setFileList] = React.useState([]);
   const [, setUploading] = React.useState(false);
-  const { groupName, phfsPrefix, onFileUpload, deleteFiles } = props;
+  const { groupName, phfsPrefix, folderUpload, onFileUpload, deleteFiles } = props;
   const graphqlEndpoint = window.absGraphqlEndpoint
     ? window.absGraphqlEndpoint
     : window.graphqlEndpoint;
@@ -105,6 +106,7 @@ function _Uploader(props: Props) {
       <Dragger
         fileList={fileList}
         multiple={true}
+        directory={folderUpload ? true : false}
         customRequest={customRequest}
         beforeUpload={file => {
           // check if the file already in the filelist.

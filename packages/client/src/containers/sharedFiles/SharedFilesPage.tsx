@@ -116,6 +116,7 @@ function updateFolderTree(nodes: Node[], key: React.Key, children: Node[]) {
 function ShareFilesPage({ form, datasets, ...props }: Props) {
   const [enabledPHFS, setEndabledPHFS] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [folderUpload, setFolderUpload] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [type, setType] = useState<'create' | 'update'>('create');
   const [modalVisible, setModalVisible] = useState(false);
@@ -144,41 +145,47 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
   }
 
   async function downloadMultiple(selectedFiles: string[]) {
-    props.zipFiles({
-      variables: {
-        payload: {
-          groupName,
-          phfsPrefix: phfsPrefix || '',
-          files: selectedFiles
+    if (selectedFiles.length === 1 && !selectedFiles[0].endsWith('/')) {
+      window.location.href = `${appPrefix}files/groups/${groupName}/${encodeURIComponent(
+        selectedFiles[0]
+      )}?download=1`;
+    } else {
+      props.zipFiles({
+        variables: {
+          payload: {
+            groupName,
+            phfsPrefix: phfsPrefix || '',
+            files: selectedFiles
+          },
         },
-      },
-    }).then( _result => {
-      notification.success({
-        duration: 3,
-        placement: 'bottomRight',
-        message: 'Zipping is in progress...',
-      });
-      const interval = setInterval(async () => {
-        const result = await props.client.query({
-          query: JobQueueStatus,
-          fetchPolicy: 'no-cache',
+      }).then( _result => {
+        notification.success({
+          duration: 3,
+          placement: 'bottomRight',
+          message: 'Zipping is in progress...',
         });
-        if (result.data.jobQueueStatus.completed) {
-          notification.success({
-            duration: 5,
-            placement: 'bottomRight',
-            message: `Your zip file ${result.data.jobQueueStatus.file} is ready for download`,
+        const interval = setInterval(async () => {
+          const result = await props.client.query({
+            query: JobQueueStatus,
+            fetchPolicy: 'no-cache',
           });
-          clearInterval(interval);
-        }
-      }, 2000);
-    }).catch((error) => {
-      notification.error({
-        duration: 3,
-        placement: 'bottomRight',
-        message: error.message,
-      })
-    });
+          if (result.data.jobQueueStatus.completed) {
+            notification.success({
+              duration: 5,
+              placement: 'bottomRight',
+              message: `Your zip file ${result.data.jobQueueStatus.file} is ready for download`,
+            });
+            clearInterval(interval);
+          }
+        }, 2000);
+      }).catch((error) => {
+        notification.error({
+          duration: 3,
+          placement: 'bottomRight',
+          message: error.message,
+        })
+      });
+    }
     setSelectedFiles([]);
   }
 
@@ -280,6 +287,18 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
             style={{ marginLeft: 16 }}
             onClick={() => {
               setUploading(true);
+              setFolderUpload(true);
+            }}
+          >
+            Upload Folder
+          </InfuseButton>
+          <InfuseButton
+            icon='upload'
+            type='primary'
+            style={{ marginLeft: 16 }}
+            onClick={() => {
+              setUploading(true);
+              setFolderUpload(false);
             }}
           >
             Upload Files
@@ -296,6 +315,7 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
           enabledPHFS={enabledPHFS}
           onPathChange={handlePathChange}
           uploading={uploading}
+          folderUpload={folderUpload}
           onUploadingChange={uploading => setUploading(uploading)}
         />
 
@@ -322,20 +342,15 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
                 Create New Dataset
               </Button>
               <Button
-                disabled={selectedFiles.length < 2}
                 type='primary'
-                style={{ marginLeft: 16 }}
+                style={{ marginLeft: 16, width: '100px' }}
                 onClick={() => {
                   downloadMultiple(selectedFiles);
                 }}
               >
                 Download
               </Button>
-              <Button
-                disabled={selectedFiles.length < 2}
-                type='primary'
-                style={{ marginLeft: 16 }}
-              >
+              <Button type='primary' style={{ marginLeft: 16, width: '100px' }}>
                 Delete
               </Button>
             </Button.Group>

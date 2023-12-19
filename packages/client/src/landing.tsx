@@ -267,7 +267,7 @@ function Landing({ groupContext, currentUser, downloadableFiles, ...props }: Pro
           />
           {fileToDownloads ? (
             <Card
-              title='Downloadable zip files'
+              title='Downloadable zip files (from newest to oldest)'
               style={{ marginTop: 16, marginRight: 24 }}
             >
               {fileToDownloads.map(item => (

@@ -322,6 +322,7 @@ interface BrowseInternalProps extends GroupContextComponentProps, BrowserProps {
       };
     };
   }) => Promise<{ data: { deleteFiles: number } }>;
+  folderUpload: boolean;
 }
 
 function Browser({
@@ -331,6 +332,7 @@ function Browser({
   onPathChange: onChange,
   uploading = false,
   onUploadingChange,
+  folderUpload,
   ...props
 }: BrowseInternalProps) {
   const path = joinAndNormalize(props.path);
@@ -624,6 +626,7 @@ function Browser({
           key={uploadSession}
           groupName={groupName}
           phfsPrefix={get(data, 'files.phfsPrefix', '')}
+          folderUpload={folderUpload}
           onUploadStatusChange={uploading => {
             setUploadInProgress(uploading);
           }}
