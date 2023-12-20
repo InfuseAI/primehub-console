@@ -5,6 +5,7 @@ query GetGroupUsers($where: GroupWhereUniqueInput!) {
     name
     admins
     users {
+      id
       username
     }
   }
