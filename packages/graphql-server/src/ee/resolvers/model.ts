@@ -18,7 +18,7 @@ const { INTERNAL_ERROR } = ErrorCodes;
 const API_PREFIX = '/api/2.0/mlflow';
 const API_PREFIX_PREVIEW = '/api/2.0/preview/mlflow';
 
-const API_ENDPOINT_MODEL_LIST = '/registered-models/list';
+const API_ENDPOINT_MODEL_LIST = '/registered-models/search';
 const API_ENDPOINT_MODEL_GET = '/registered-models/get';
 const API_ENDPOINT_MODEL_CREATE = '/registered-models/create';
 const API_ENDPOINT_MODEL_VERSION_SEARCH = '/model-versions/search';

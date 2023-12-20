@@ -123,14 +123,14 @@ function ModelDetail({
       const data = getModel.modelVersions.map(m => get(m, 'run.data'));
 
       const modelParameters: string[] = uniqBy(
-        data.map(d => get(d, 'params')).flat(),
+        data.map(d => get(d, 'params', [])).flat(),
         'key'
       )
         .map(({ key }) => key)
         .sort((a, b) => (a > b ? 1 : -1));
 
       const modelMetrics: string[] = uniqBy(
-        data.map(d => get(d, 'metrics')).flat(),
+        data.map(d => get(d, 'metrics', [])).flat(),
         'key'
       )
         .map(({ key }) => key)

@@ -516,7 +516,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                 </Col>
               </Row>
 
-              <Form.Item label={(<span>Model URI <PHTooltip tipText='The location where the trained model is stored; based on this model file to deploy a model image.' tipLink='https://docs.primehub.io/docs/model-deployment-model-uri' placement='right' style={{margintLeft: 8}}/></span>)}>
+              <Form.Item label={(<span>Model URI (You can only use MLflow {window?.mlflowVersion} Model URI here) <PHTooltip tipText='The location where the trained model is stored; based on this model file to deploy a model image.' tipLink='https://docs.primehub.io/docs/model-deployment-model-uri' placement='right' style={{margintLeft: 8}}/></span>)}>
                 {form.getFieldDecorator('modelURI', {
                   initialValue: modelURI,
                   rules: [
