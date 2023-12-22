@@ -75,3 +75,14 @@ input DatasetV2FileListOptionInput {
   limit: Int
   recursive: Boolean
 }
+
+input MultipleDownloadInput {
+  groupName: String!
+  phfsPrefix: String!
+  files: [String]
+}
+
+type JobQueueStatusResult {
+  file: String
+  completed: Boolean
+}

@@ -46,6 +46,8 @@ export const resolvers = {
     phAppTemplate: phAppTemplate.queryOne,
     phAppTemplates: phAppTemplate.query,
     invitation: invitation.queryInvitation,
+    jobQueueStatus: store.jobQueueStatus,
+    downloadableFiles: store.downloadableFiles,
     ...instanceType.resolvers(),
     ...dataset.resolvers(),
     ...image.resolvers(),
@@ -86,6 +88,7 @@ export const resolvers = {
     ...image.resolveInMutation(),
     createInvitation: invitation.createInvitation,
     createUserFromInvitation: invitation.createUserFromInvitation,
+    zipFiles: store.zipFiles,
   },
   System: {
     smtp: system.querySmtp,

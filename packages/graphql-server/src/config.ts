@@ -78,6 +78,7 @@ export interface Config {
   storeSecretKey?: string;
   storeBucket?: string;
   storeEndpoint?: string;
+  zippingEndpoint?: string;
 
   // log persistence
   enableLogPersistence: boolean;
@@ -128,6 +129,7 @@ const defaultConfigs = {
   storeSecretKey: 'minioadmin',
   storeBucket: 'test',
   storeEndpoint: 'http://127.0.0.1:9000',
+  zippingEndpoint: 'http://localhost:4000',
 };
 
 const prodConfigs = {
@@ -215,6 +217,7 @@ export const createConfig = (): Config => {
     storeSecretKey: process.env.PRIMEHUB_STORE_SECRET_KEY,
     storeBucket: process.env.PRIMEHUB_STORE_BUCKET,
     storeEndpoint: process.env.PRIMEHUB_STORE_ENDPOINT,
+    zippingEndpoint: process.env.ZIPPING_ENDPOINT,
     usageReportAPIHost: process.env.PRIMEHUB_USAGE_REPORT_API_HOST,
     // Feature flags
     enableDatasetUpload: getEnvBoolean('PRIMEHUB_FEATURE_DATASET_UPLOAD', false),

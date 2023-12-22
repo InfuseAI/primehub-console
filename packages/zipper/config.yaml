@@ -1,0 +1,5 @@
+minio_config:
+  bucket: !ENV ${PRIMEHUB_STORE_BUCKET}
+  end_point: !ENV ${PRIMEHUB_STORE_ENDPOINT}
+  access_key: !ENV ${PRIMEHUB_STORE_ACCESS_KEY}
+  secret_key: !ENV ${PRIMEHUB_STORE_SECRET_KEY}

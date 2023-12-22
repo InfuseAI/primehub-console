@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Divider, Layout, Row, Col } from 'antd';
+import { Divider, Layout, Row, Col, Card } from 'antd';
 import { Link } from 'react-router-dom';
 import PageTitle from 'components/pageTitle';
 import ResourceMonitor from 'ee/components/shared/resourceMonitor';
@@ -18,6 +18,9 @@ import RecentTasks, {
 import ResourceDashboard from 'components/landing/resourceDashboard';
 import InviteButton from 'components/InviteButton';
 import { errorHandler } from 'utils/errorHandler';
+import { GetDownloadableFiles } from "containers/sharedFiles/Dataset.graphql";
+import { get } from 'lodash';
+import { useRoutePrefix } from 'hooks/useRoutePrefix';
 
 const breadcrumbs: BreadcrumbItemSetup[] = [
   {
@@ -32,9 +35,12 @@ const breadcrumbs: BreadcrumbItemSetup[] = [
 type Props = {
   currentUser: any;
   createInvitationMutation: any;
+  downloadableFiles: any;
 } & GroupContextComponentProps;
 
-function Landing({ groupContext, currentUser, ...props }: Props) {
+function Landing({ groupContext, currentUser, downloadableFiles, ...props }: Props) {
+  const { appPrefix } = useRoutePrefix();
+  const fileToDownloads = get(downloadableFiles, 'downloadableFiles', []);
   const qsLink = modelDeploymentOnly
     ? 'https://docs.primehub.io/docs/quickstart/qs-primehub-deploy'
     : 'https://docs.primehub.io/docs/quickstart/qs-primehub';
@@ -259,6 +265,20 @@ function Landing({ groupContext, currentUser, ...props }: Props) {
             refetchGroup={currentUser.refetch}
             selectedGroup={groupContext.id}
           />
+          {fileToDownloads ? (
+            <Card
+              title='Downloadable zip files (from newest to oldest)'
+              style={{ marginTop: 16, marginRight: 24 }}
+            >
+              {fileToDownloads.map(item => (
+                <a href={`${appPrefix}files/tmp/${item}?download=1`}>
+                  <p>{item}</p>
+                </a>
+              ))}
+            </Card>
+          ) : (
+            <></>
+          )}
         </Col>
       </Row>
     </Layout>
@@ -273,5 +293,8 @@ export default compose(
   }),
   graphql(CreateInvitation, {
     name: 'createInvitationMutation',
+  }),
+  graphql(GetDownloadableFiles, {
+    name: 'downloadableFiles',
   })
 )(Landing);
