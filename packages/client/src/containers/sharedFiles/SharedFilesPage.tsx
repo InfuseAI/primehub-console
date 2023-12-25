@@ -224,15 +224,29 @@ function ShareFilesPage({ form, datasets, deleteFiles, ...props }: Props) {
               },
             });
           }
+  
+          notification.success({
+            message: 'Selected files and folders have been deleted',
+            duration: 5,
+            placement: 'bottomRight',
+          });
+  
           setSelectedFiles([]);
         } catch (err) {
           console.error(err);
+          notification.error({
+            message: 'Error deleting files',
+            description: err.message,
+            duration: 5,
+            placement: 'bottomRight',
+          });
         } finally {
           setBrowserKey(browserKey + 1);
         }
       },
     });
   }
+  
 
   function getNextFolderTree({
     data: response,
