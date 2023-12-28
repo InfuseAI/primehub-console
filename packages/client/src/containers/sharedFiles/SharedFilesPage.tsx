@@ -161,9 +161,14 @@ function ShareFilesPage({ form, datasets, deleteFiles, ...props }: Props) {
 
   async function downloadMultiple(selectedFiles: string[]) {
     if (selectedFiles.length === 1 && !selectedFiles[0].endsWith('/')) {
-      window.location.href = `${appPrefix}files/groups/${groupName}/${encodeURIComponent(
-        selectedFiles[0]
-      )}?download=1`;
+      // Ensure that there's a forward slash at the end of phfsPrefix
+      const prefix = phfsPrefix.endsWith('/') ? phfsPrefix : `${phfsPrefix}/`;
+  
+      // Construct the complete file path
+      const filePath = `${prefix}${selectedFiles[0]}`;
+  
+      // Construct the full URL for downloading the file
+      window.location.href = `${appPrefix}files/groups/${groupName}/${encodeURIComponent(filePath)}?download=1`;
     } else {
       props.zipFiles({
         variables: {
@@ -203,6 +208,7 @@ function ShareFilesPage({ form, datasets, deleteFiles, ...props }: Props) {
     }
     setSelectedFiles([]);
   }
+  
 
   async function handleDelete() {
     Modal.confirm({
