@@ -420,13 +420,19 @@ export const update = async (root, args, context: Context) => {
     keycloakAttr: user.attributes,
     schema: {
       volumeCapacity: {serialize: stringifyDiskQuota, deserialize: parseDiskQuota},
-      enableInviteUsers: {type: FieldType.boolean}
+      enableInviteUsers: {type: FieldType.boolean},
+      predefinedEnvs: {type: FieldType.string},
     }
   });
-  attrs.mergeWithData({
-    volumeCapacity: payload.volumeCapacity,
-    enableInviteUsers: payload.enableInviteUsers
-  });
+  if (payload.volumeCapacity) {
+    attrs.mergeWithData({ volumeCapacity: payload.volumeCapacity });
+  }
+  if (payload.enableInviteUsers) {
+    attrs.mergeWithData({ enableInviteUsers: payload.enableInviteUsers });
+  }
+  if (payload.predefinedEnvs) {
+    attrs.mergeWithData({ predefinedEnvs: payload.predefinedEnvs });
+  }
 
   // update
   try {
@@ -779,6 +785,15 @@ export const typeResolvers = {
       parent.attributes.volumeCapacity[0];
 
     return parseDiskQuota(volumeCapacity);
+  },
+
+  predefinedEnvs: async parent => {
+    const predefinedEnvs =
+      parent.attributes &&
+      parent.attributes.predefinedEnvs &&
+      parent.attributes.predefinedEnvs[0];
+
+    return predefinedEnvs;
   },
 
   groups: queryGroupsByUser(false),
