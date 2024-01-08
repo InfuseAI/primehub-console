@@ -232,10 +232,9 @@ export function _InstanceTypeForm({
 
   React.useEffect(() => {
     if (data) {
-      if (data?.tolerations.length > 0) {
-        const tolerations = data.tolerations.map(t => omit(t, ['__typename']));
-        setTolerations(tolerations);
-      }
+      
+      const tolerations = data.tolerations.map(t => omit(t, ['__typename']));
+      setTolerations(tolerations);
 
       if (data?.groups.length > 0) {
         dispatchUserGroups({ type: 'GROUPS', groups: data.groups });
