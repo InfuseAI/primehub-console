@@ -69,7 +69,7 @@ function _Uploader(props: Props) {
       'groups',
       toGroupPath(groupName),
       phfsPrefix,
-      file.name
+      folderUpload ? file.webkitRelativePath : file.name
     );
     const endpoint = graphqlEndpoint.replace(
       '/graphql',
@@ -120,9 +120,18 @@ function _Uploader(props: Props) {
 
           // Add one or multiple files in the upload list.
           setFileList(prevFileList => {
-            const names = prevFileList.map(f => f.name);
-            const filtered = info.fileList.filter(f => !names.includes(f.name));
-            return [...prevFileList, ...filtered];
+            if (folderUpload) {
+              const uids = prevFileList.map(f => f.uid);
+              const filtered = info.fileList.filter(f => !uids.includes(f.uid));
+              return [...prevFileList, ...filtered].map(file => ({
+                ...file,
+                name: file.originFileObj.webkitRelativePath,
+              }));
+            } else {
+              const names = prevFileList.map(f => f.name);
+              const filtered = info.fileList.filter(f => !names.includes(f.name));
+              return [...prevFileList, ...filtered];
+            }
           });
 
           // Trigger upload status change
@@ -144,9 +153,10 @@ function _Uploader(props: Props) {
         }}
         onRemove={uploadFile => {
           const file: any = uploadFile.originFileObj;
+          const fileName = folderUpload ? file.webkitRelativePath : file.name;
           if (uploadFile.status !== 'uploading') {
             // delete the uploaded file
-            const phfsPath = joinPath(phfsPrefix, file.name);
+            const phfsPath = joinPath(phfsPrefix, fileName);
             deleteFiles({
               variables: {
                 where: {
@@ -166,7 +176,7 @@ function _Uploader(props: Props) {
             }
             cancel();
           }
-          setFileList(prevFiles => prevFiles.filter(f => f.name !== file.name));
+          setFileList(prevFiles => prevFiles.filter(f => f.name !== fileName));
           return true;
         }}
       >
