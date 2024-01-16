@@ -53,6 +53,7 @@ export interface ImageSpec {
   groupName?: string;
   imageSpec?: ImageCrdImageSpec;
   logEndpoint?: string;
+  usage?: string;
 }
 
 export interface DatasetSpec {

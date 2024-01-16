@@ -24,6 +24,7 @@ type Image {
   logEndpoint: String
   imageSpec: ImageSpec
   jobStatus: JobStatus
+  usage: String
 }
 
 type ImageSpec {
