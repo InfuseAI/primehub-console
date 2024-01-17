@@ -38,29 +38,31 @@ function getImageOptions({
           urlForGpu,
           groupName,
           useImagePullSecret,
+          usage,
         }) => {
           const scopeType = groupName ? 'Group' : 'System';
+          const usageDisplay = usage ? ` / ${usage}` : ''; // Change here
 
           if (type === ImageType.ALL && url !== urlForGpu) {
-            urlDict[`${displayName} (${scopeType} / CPU)`] = url;
-            urlDict[`${displayName} (${scopeType} / GPU)`] = urlForGpu || url;
+            urlDict[`${displayName} (${scopeType} / CPU${usageDisplay})`] = url;
+            urlDict[`${displayName} (${scopeType} / GPU${usageDisplay})`] = urlForGpu || url;
             secretDict[url] = useImagePullSecret;
             secretDict[urlForGpu] = useImagePullSecret;
 
             return [
-              `${displayName} (${scopeType} / CPU)`,
-              `${displayName} (${scopeType} / GPU)`,
+              `${displayName} (${scopeType} / CPU${usageDisplay})`,
+              `${displayName} (${scopeType} / GPU${usageDisplay})`,
             ];
           } else if (type === ImageType.GPU) {
-            urlDict[`${displayName} (${scopeType} / GPU)`] = url;
+            urlDict[`${displayName} (${scopeType} / GPU${usageDisplay})`] = url;
             secretDict[url] = useImagePullSecret;
 
-            return `${displayName} (${scopeType} / GPU)`;
+            return `${displayName} (${scopeType} / GPU${usageDisplay})`;
           } else {
-            urlDict[`${displayName} (${scopeType} / CPU)`] = url;
+            urlDict[`${displayName} (${scopeType} / CPU${usageDisplay})`] = url;
             secretDict[url] = useImagePullSecret;
 
-            return `${displayName} (${scopeType} / CPU)`;
+            return `${displayName} (${scopeType} / CPU${usageDisplay})`;
           }
         }
       )
