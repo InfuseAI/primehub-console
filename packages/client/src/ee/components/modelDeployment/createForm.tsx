@@ -414,17 +414,31 @@ class DeploymentCreateForm extends React.Component<Props, State> {
     );
 
     const deploymentImages = [];
-    for (const image of images.filter(image => image.usage === 'deployment')){
-      deploymentImages.push({
-        title: `${image.displayName} (CPU)`,
-        url: image.url,
-        docLink: "",
-      });
-      deploymentImages.push({
-        title: `${image.displayName} (GPU)`,
-        url: image.urlForGpu,
-        docLink: "",
-      });
+    for (const image of images.filter(image => image.usage === 'deployment')) {
+      if (image.spec.type === 'both') {
+        deploymentImages.push({
+          title: `${image.displayName} (CPU)`,
+          url: image.url,
+          docLink: "",
+        });
+        deploymentImages.push({
+          title: `${image.displayName} (GPU)`,
+          url: image.urlForGpu,
+          docLink: "",
+        });
+      } else if (image.spec.type === 'cpu') {
+        deploymentImages.push({
+          title: `${image.displayName} (CPU)`,
+          url: image.url,
+          docLink: "",
+        });
+      } else if (image.spec.type === 'gpu') {
+        deploymentImages.push({
+          title: `${image.displayName} (GPU)`,
+          url: image.urlForGpu,
+          docLink: "",
+        });
+      }
     }
     const dataSource = [...PrePackagedServers, ...deploymentImages]
     .filter(image => image.title.indexOf(modelImageSearchText) > -1)
