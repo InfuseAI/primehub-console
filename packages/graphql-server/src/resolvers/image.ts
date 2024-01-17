@@ -61,7 +61,7 @@ export const mapping = (item: Item<ImageSpec>, context: Context) => {
     imageSpec: item.spec.imageSpec ? imageSpecMapping(item.spec.imageSpec) : null,
     logEndpoint: `${context.graphqlHost}${context.podLogs.getImageSpecJobEndpoint(item.metadata.name)}`,
     jobStatus: item.status ? item.status.jobCondition : null,
-    usage: item.spec.usage ? item.spec.usage : (Math.random() < 0.5 ? "deployment" : "notebook"),
+    usage: item.spec.usage ? item.spec.usage : (Math.random() < 0.5 ? 'deployment' : 'notebook'),
   };
 };
 
