@@ -179,6 +179,7 @@ export const updateMapping = (data: any) => {
   expectInputLargerThanZero(data.memoryLimit, 'memoryLimit');
 
   const tolerations = validateAndMapTolerations(get(data, 'tolerations.set'), 'update');
+  const nodeSelector = (data.nodeSelector && isEmpty(data.nodeSelector)) ? null : data.nodeSelector;
 
   return {
     metadata: {
@@ -192,7 +193,7 @@ export const updateMapping = (data: any) => {
       'limits.nvidia.com/gpu': data.gpuLimit,
       'requests.cpu': data.cpuRequest,
       'requests.memory': parseRequestField(data.memoryRequest, stringifyMemory),
-      'nodeSelector': data.nodeSelector,
+      'nodeSelector': nodeSelector,
       tolerations,
     }
   };
