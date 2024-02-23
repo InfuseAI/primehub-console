@@ -17,6 +17,17 @@ query GetDatasets(
   }
 }
 
+query JobQueueStatus {
+  jobQueueStatus {
+    file
+    completed
+  }
+}
+
+query GetDownloadableFiles {
+  downloadableFiles
+}
+
 mutation CreateDatasetMutation($payload: DatasetV2CreateInput!) {
   createDatasetV2(data: $payload) {
     id
@@ -31,4 +42,15 @@ mutation CopyFilesMutation(
   copyFilesToDatasetV2(where: $where, path: $path, items: $items) {
     endpoint
   }
+}
+
+mutation ZipFiles($payload: MultipleDownloadInput!) {
+  zipFiles(data: $payload)
+}
+
+mutation DeleteFilesMutation(
+  $where: StoreFileWhereInput!
+  $options: StoreFileDeleteOptionInput
+) {
+  deleteFiles(where: $where, options: $options)
 }

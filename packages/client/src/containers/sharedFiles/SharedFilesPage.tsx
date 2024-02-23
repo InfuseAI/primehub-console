@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Button, Form, Icon, notification } from 'antd';
+import { Button, Form, Icon, Modal, notification } from 'antd';
 import { useHistory, useParams } from 'react-router-dom';
 import { compose } from 'recompose';
-import { graphql } from 'react-apollo';
+import { graphql, withApollo } from 'react-apollo';
 import type { ApolloQueryResult } from 'apollo-client';
 import type { FormComponentProps } from 'antd/lib/form';
 
@@ -23,6 +23,9 @@ import {
   GetDatasets,
   CreateDatasetMutation,
   CopyFilesMutation,
+  ZipFiles,
+  JobQueueStatus,
+  DeleteFilesMutation,
 } from './Dataset.graphql';
 
 const StickyFooter = styled.div`
@@ -73,6 +76,31 @@ interface Props extends FormComponentProps, GroupContextComponentProps {
   }) => Promise<{
     data: { copyFilesToDatasetV2: { endpoint: string } };
   }>;
+  zipFiles: ({
+    variables,
+  }: {
+    variables: {
+      payload: {
+        groupName: string;
+        phfsPrefix: string;
+        files: string[];
+      };
+    };
+  }) => Promise<void>;
+  client: any;
+  deleteFiles: ({
+    variables,
+  }: {
+    variables: {
+      where: {
+        groupName: string;
+        phfsPrefix: string;
+      };
+      options: {
+        recursive: boolean;
+      };
+    };
+  }) => Promise<{ data: { deleteFiles: number } }>;
 }
 
 interface Node extends TreeNode {
@@ -99,9 +127,10 @@ function updateFolderTree(nodes: Node[], key: React.Key, children: Node[]) {
   });
 }
 
-function ShareFilesPage({ form, datasets, ...props }: Props) {
+function ShareFilesPage({ form, datasets, deleteFiles, ...props }: Props) {
   const [enabledPHFS, setEndabledPHFS] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [folderUpload, setFolderUpload] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [type, setType] = useState<'create' | 'update'>('create');
   const [modalVisible, setModalVisible] = useState(false);
@@ -112,6 +141,7 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
   const { appPrefix } = useRoutePrefix();
   const { groupName, phfsPrefix } =
     useParams<{ groupName: string; phfsPrefix: string }>();
+  const [browserKey, setBrowserKey] = useState(1);
 
   function handlePathChange(path: string) {
     setSelectedFiles([]);
@@ -128,6 +158,101 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
 
     return response;
   }
+
+  async function downloadMultiple(selectedFiles: string[]) {
+    if (selectedFiles.length === 1 && !selectedFiles[0].endsWith('/')) {
+      // Ensure that there's a forward slash at the end of phfsPrefix
+      const prefix = phfsPrefix.endsWith('/') ? phfsPrefix : `${phfsPrefix}/`;
+  
+      // Construct the complete file path
+      const filePath = `${prefix}${selectedFiles[0]}`;
+  
+      // Construct the full URL for downloading the file
+      window.location.href = `${appPrefix}files/groups/${groupName}/${encodeURIComponent(filePath)}?download=1`;
+    } else {
+      props.zipFiles({
+        variables: {
+          payload: {
+            groupName,
+            phfsPrefix: phfsPrefix || '',
+            files: selectedFiles
+          },
+        },
+      }).then( _result => {
+        notification.success({
+          duration: 3,
+          placement: 'bottomRight',
+          message: 'Zipping is in progress...',
+        });
+        const interval = setInterval(async () => {
+          const result = await props.client.query({
+            query: JobQueueStatus,
+            fetchPolicy: 'no-cache',
+          });
+          if (result.data.jobQueueStatus.completed) {
+            notification.success({
+              duration: 5,
+              placement: 'bottomRight',
+              message: `Your zip file ${result.data.jobQueueStatus.file} is ready for download`,
+            });
+            clearInterval(interval);
+          }
+        }, 2000);
+      }).catch((error) => {
+        notification.error({
+          duration: 3,
+          placement: 'bottomRight',
+          message: error.message,
+        })
+      });
+    }
+    setSelectedFiles([]);
+  }
+  
+
+  async function handleDelete() {
+    Modal.confirm({
+      title: `Are you sure you want to delete these files?`,
+      maskClosable: true,
+      onOk: async () => {
+        try {
+          for (const file of selectedFiles) {
+            const isFolder = file.endsWith('/');
+            await deleteFiles({
+              variables: {
+                where: {
+                  groupName,
+                  phfsPrefix: `${phfsPrefix ? phfsPrefix + '/' : ''}${file}`,
+                },
+                options: {
+                  recursive: isFolder,
+                },
+              },
+            });
+          }
+  
+          notification.success({
+            message: 'Selected files and folders have been deleted',
+            duration: 5,
+            placement: 'bottomRight',
+          });
+  
+          setSelectedFiles([]);
+        } catch (err) {
+          console.error(err);
+          notification.error({
+            message: 'Error deleting files',
+            description: err.message,
+            duration: 5,
+            placement: 'bottomRight',
+          });
+        } finally {
+          setBrowserKey(browserKey + 1);
+        }
+      },
+    });
+  }
+  
 
   function getNextFolderTree({
     data: response,
@@ -227,6 +352,18 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
             style={{ marginLeft: 16 }}
             onClick={() => {
               setUploading(true);
+              setFolderUpload(true);
+            }}
+          >
+            Upload Folder
+          </InfuseButton>
+          <InfuseButton
+            icon='upload'
+            type='primary'
+            style={{ marginLeft: 16 }}
+            onClick={() => {
+              setUploading(true);
+              setFolderUpload(false);
             }}
           >
             Upload Files
@@ -234,6 +371,7 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
         </div>
 
         <Browser
+          key={browserKey}
           title={groupName}
           rowSelection={{
             selectedRowKeys: selectedFiles,
@@ -243,6 +381,7 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
           enabledPHFS={enabledPHFS}
           onPathChange={handlePathChange}
           uploading={uploading}
+          folderUpload={folderUpload}
           onUploadingChange={uploading => setUploading(uploading)}
         />
 
@@ -267,6 +406,24 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
                 }}
               >
                 Create New Dataset
+              </Button>
+              <Button
+                type='primary'
+                style={{ marginLeft: 16, width: '100px' }}
+                onClick={() => {
+                  downloadMultiple(selectedFiles);
+                }}
+              >
+                Download
+              </Button>
+              <Button
+                type='primary'
+                style={{ marginLeft: 16, width: '100px' }}
+                onClick={() => {
+                  handleDelete();
+                }}
+              >
+                Delete
               </Button>
             </Button.Group>
           </StickyFooter>
@@ -363,6 +520,7 @@ function ShareFilesPage({ form, datasets, ...props }: Props) {
 
 export default compose(
   withGroupContext,
+  withApollo,
   graphql(GetDatasets, {
     name: 'datasets',
     options: ({ groupContext }: Props) => {
@@ -394,5 +552,11 @@ export default compose(
   }),
   graphql(CopyFilesMutation, {
     name: 'copyFiles',
+  }),
+  graphql(ZipFiles, {
+    name: 'zipFiles',
+  }),
+  graphql(DeleteFilesMutation, {
+    name: 'deleteFiles',
   })
 )(Form.create<Props>()(ShareFilesPage));
