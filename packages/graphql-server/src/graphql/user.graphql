@@ -24,6 +24,7 @@ type User {
   effectiveGroups: [Group]
   announcements: [UserAnnouncement]
   apiTokenCount: Int
+  predefinedEnvs: String
 
   """todo: take following properties out when leo has time to implement customize component"""
   sendEmail: Boolean
@@ -105,6 +106,7 @@ input UserUpdateInput {
   volumeCapacity: Int
   federated: Boolean
   groups: GroupUpdateManyInput
+  predefinedEnvs: String
 }
 
 """Relation input"""
