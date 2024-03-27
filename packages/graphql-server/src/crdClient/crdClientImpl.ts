@@ -16,7 +16,7 @@ export const client = new Client({
     ...clusterConfig,
     // k8s api timeout, related: https://github.com/godaddy/kubernetes-client/issues/367
     // it got stuck for no reason
-    timeout: 5000
+    timeout: 10000
   },
   version: '1.10'
 });
