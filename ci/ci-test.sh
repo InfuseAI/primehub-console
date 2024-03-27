@@ -73,7 +73,7 @@ setup_keycloak() {
     -p 8080:8080 \
     -e KEYCLOAK_USER=keycloak \
     -e KEYCLOAK_PASSWORD=keycloak \
-    jboss/keycloak:8.0.1
+    infuseaidev/jboss-keycloak:8.0.1
 }
 
 run_test() {

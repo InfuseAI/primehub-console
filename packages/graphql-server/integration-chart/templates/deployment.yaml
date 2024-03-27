@@ -15,7 +15,7 @@ spec:
         app: primehub-console-test-keycloak
     spec:
       containers:
-      - image: jboss/keycloak:8.0.1
+      - image: infuseaidev/jboss-keycloak:8.0.1
         imagePullPolicy: IfNotPresent
         name: keycloak
         ports:
