@@ -1,10 +1,10 @@
 #!/bin/bash
 
-export K3D_VERSION=5.4.6
-export K8S_VERSION=v1.24.7-k3s1
-export KUBECTL_VERSION=1.24.7
+export K3D_VERSION=5.7.4
+export K8S_VERSION=v1.30.6-k3s1
+export KUBECTL_VERSION=1.30.6
 export KC_VERSION=19.0.3
-export MINIO_VERSION=RELEASE.2022-04-16T04-26-02Z
+export MINIO_VERSION=RELEASE.2024-11-07T00-52-20Z
 export NODE_VERSION=14.17.0
 export CLUSTER_NAME=primehub
 
@@ -36,7 +36,7 @@ setup_k3d() {
   echo "└──────────────────────┘"
 
   # Install kubectl
-  curl -sLO https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl && \
+  curl -sLO https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl && \
     chmod a+x kubectl && \
     sudo mv kubectl /usr/local/bin
 
@@ -48,7 +48,7 @@ setup_k3d() {
   k3d version
 
   # Create k3d
-  k3d cluster create ${CLUSTER_NAME} --image rancher/k3s:${K8S_VERSION} --k3s-arg '--disable=traefik@server:0' --k3s-arg '--disable-network-policy@server:0' --wait
+  k3d cluster create ${CLUSTER_NAME} --image rancher/k3s:${K8S_VERSION} --k3s-arg "--disable=traefik@server:0" --k3s-arg "--disable=network-policy@server:0" --wait
 
   echo "kube context: $(kubectl config current-context)"
   echo "waiting for nodes ready"
