@@ -113,7 +113,7 @@ function Landing({ groupContext, currentUser, downloadableFiles, ...props }: Pro
                         target='_blank'
                         rel='noreferrer'
                       >
-                        User Guide
+                        PrimeHub User Guide
                       </a>
                     </li>
                     <li>
@@ -122,7 +122,7 @@ function Landing({ groupContext, currentUser, downloadableFiles, ...props }: Pro
                         target='_blank'
                         rel='noreferrer'
                       >
-                        Administrator Guide
+                        PrimeHub Administrator Guide
                       </a>
                     </li>
                     <li>
