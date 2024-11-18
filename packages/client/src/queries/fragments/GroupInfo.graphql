@@ -41,6 +41,36 @@ fragment GroupInfo on Group {
   displayName
   name
   admins
+  users {
+    id
+    username
+  }
+  quotaCpu
+  quotaGpu
+  quotaMemory
+  projectQuotaCpu
+  projectQuotaGpu
+  projectQuotaMemory
+  resourceStatus {
+    cpuUsage
+    memUsage
+    gpuUsage
+  }
+  enabledDeployment
+  maxDeploy
+  deploymentsUsage
+  enabledSharedVolume
+  jobDefaultActiveDeadlineSeconds
+  sharedVolumeCapacity
+  launchGroupOnly
+  ...GroupResourceInfo
+}
+
+fragment GroupInfoWithoutUsers on Group {
+  id
+  displayName
+  name
+  admins
   quotaCpu
   quotaGpu
   quotaMemory

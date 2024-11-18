@@ -6,7 +6,7 @@ query CurrentUser {
     isAdmin
     enableInviteUsers
     groups {
-      ...GroupInfo
+      ...GroupInfoWithoutUsers
       instanceTypes {
         id
         name
