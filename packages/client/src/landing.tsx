@@ -28,7 +28,7 @@ const breadcrumbs: BreadcrumbItemSetup[] = [
     matcher: /\/home/,
     title: 'Home',
     tips: 'Home is the landing page of User Portal where it has a group-related dashboard.',
-    tipsLink: 'https://docs.primehub.io/docs/quickstart/login-portal-user',
+    tipsLink: 'https://docs-v4.primehub.io/user-guide/user-portal',
   },
 ];
 
@@ -42,8 +42,8 @@ function Landing({ groupContext, currentUser, downloadableFiles, ...props }: Pro
   const { appPrefix } = useRoutePrefix();
   const fileToDownloads = get(downloadableFiles, 'downloadableFiles', []);
   const qsLink = modelDeploymentOnly
-    ? 'https://docs.primehub.io/docs/quickstart/qs-primehub-deploy'
-    : 'https://docs.primehub.io/docs/quickstart/qs-primehub';
+    ? 'https://docs-v4.primehub.io/user-guide/deployments'
+    : 'https://docs-v4.primehub.io';
 
   async function onRequestInvitation(groupId: string) {
     try {
@@ -104,12 +104,12 @@ function Landing({ groupContext, currentUser, downloadableFiles, ...props }: Pro
                   <GuideList>
                     <li>
                       <a href={qsLink} target='_blank' rel='noreferrer'>
-                        Learn How To Use PrimeHub Platform
+                        PrimeHub Platform Introduction
                       </a>
                     </li>
                     <li>
                       <a
-                        href='https://docs.primehub.io/docs/introduction#user-portal'
+                        href='https://docs-v4.primehub.io/user-guide/user-portal'
                         target='_blank'
                         rel='noreferrer'
                       >
@@ -118,20 +118,20 @@ function Landing({ groupContext, currentUser, downloadableFiles, ...props }: Pro
                     </li>
                     <li>
                       <a
-                        href='https://docs.primehub.io/docs/introduction#admin-portal'
+                        href='https://docs-v4.primehub.io/administrator-guide/admin-portal'
                         target='_blank'
                         rel='noreferrer'
                       >
-                        Administration Guide
+                        PrimeHub Administrator Guide
                       </a>
                     </li>
                     <li>
                       <a
-                        href='https://docs.primehub.io/docs/release-note'
+                        href='https://docs-v4.primehub.io/end-to-end-tutorial/1-mlops-introduction-and-scoping-the-project'
                         target='_blank'
                         rel='noreferrer'
                       >
-                        Release Notes
+                        End-to-End Tutorial
                       </a>
                     </li>
                   </GuideList>
