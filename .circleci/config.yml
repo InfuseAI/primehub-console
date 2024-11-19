@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  docker: circleci/docker@2.8.1
+  docker: circleci/docker@1.7.0
   codecov: codecov/codecov@4.2.0
 commands:
   build_console:
@@ -155,8 +155,7 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 27.3.1
+      - setup_remote_docker
       - build_console:
           tag: latest
   latest-console-others:
@@ -164,8 +163,7 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 27.3.1
+      - setup_remote_docker
       - build_console_others:
           tag: latest
   latest-graphql:
@@ -173,8 +171,7 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 27.3.1
+      - setup_remote_docker
       - build_graphql:
           tag: latest
   latest-watcher:
@@ -182,8 +179,7 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 27.3.1
+      - setup_remote_docker
       - build_watcher:
           tag: latest
   # Release
@@ -192,8 +188,7 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 27.3.1
+      - setup_remote_docker
       - build_console:
           tag: $CIRCLE_TAG
   release-console-others:
@@ -201,8 +196,7 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 27.3.1
+      - setup_remote_docker
       - build_console_others:
           tag: $CIRCLE_TAG
   release-graphql:
@@ -210,8 +204,7 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 27.3.1
+      - setup_remote_docker
       - build_graphql:
           tag: $CIRCLE_TAG
   release-watcher:
@@ -219,8 +212,7 @@ jobs:
       - image: circleci/node:lts
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 27.3.1
+      - setup_remote_docker
       - build_watcher:
           tag: $CIRCLE_TAG
   # Tests
