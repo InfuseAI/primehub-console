@@ -32,6 +32,10 @@ spec:
                 type: string
               limits.nvidia.com/gpu:
                 type: integer
+              limits.gpu:
+                type: integer
+              gpuResourceName:
+                type: string
               requests.memory:
                 type: string
               requests.cpu:

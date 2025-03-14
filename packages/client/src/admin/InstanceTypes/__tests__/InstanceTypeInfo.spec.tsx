@@ -58,6 +58,7 @@ function setup() {
             cpuLimit: 1.5,
             memoryLimit: 2,
             gpuLimit: 0,
+            gpuResourceName: 'nvidia.com/gpu',
             __typename: 'InstanceType',
           },
         },
