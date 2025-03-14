@@ -20,6 +20,7 @@ const fields = `
   cpuLimit
   memoryLimit
   gpuLimit
+  gpuResourceName
   cpuRequest
   memoryRequest
   global
@@ -54,7 +55,8 @@ const pickSpec = (data: any) => {
     'description': data.description,
     'limits.cpu': data.cpuLimit,
     'limits.memory': data.memoryLimit ? stringifyMemory(data.memoryLimit) : undefined,
-    'limits.nvidia.com/gpu': data.gpuLimit,
+    'limits.gpu': data.gpuLimit,
+    'gpuResourceName': data.gpuResourceName,
     'requests.cpu': data.cpuRequest,
     'requests.memory': data.memoryRequest ? stringifyMemory(data.memoryRequest) : undefined
   }, e => !isUndefined(e));
@@ -102,6 +104,7 @@ describe('instanceType graphql', function() {
       nodeSelector: null,
       tolerations: [],
       gpuLimit: 0,
+      gpuResourceName: '',
       global: false,
       spec: pickSpec({
         ...data,
@@ -129,6 +132,7 @@ describe('instanceType graphql', function() {
       nodeSelector: null,
       tolerations: [],
       gpuLimit: 0,
+      gpuResourceName: '',
       global: false,
       spec: pickSpec({
         ...data,
@@ -155,6 +159,7 @@ describe('instanceType graphql', function() {
       cpuLimit: 2.5,
       cpuRequest: 2.5,
       gpuLimit: 2,
+      gpuResourceName: 'nvidia.com/gpu',
       memoryLimit: 25,
       memoryRequest: 20,
       global: false
@@ -202,6 +207,7 @@ describe('instanceType graphql', function() {
       cpuLimit: 2.5,
       cpuRequest: 2.5,
       gpuLimit: 2,
+      gpuResourceName: 'nvidia.com/gpu',
       memoryLimit: 25,
       memoryRequest: 20,
       global: true
@@ -274,6 +280,7 @@ describe('instanceType graphql', function() {
       description: faker.lorem.sentence(),
       cpuLimit: 2.5,
       gpuLimit: 2,
+      gpuResourceName: 'nvidia.com/gpu',
       memoryLimit: 25,
       memoryRequest: 20
     };
@@ -311,6 +318,7 @@ describe('instanceType graphql', function() {
       cpuLimit: 2.5,
       cpuRequest: 2.5,
       gpuLimit: 2,
+      gpuResourceName: 'nvidia.com/gpu',
       memoryLimit: 25,
       memoryRequest: 20
     };
@@ -697,6 +705,7 @@ describe('instanceType graphql', function() {
       cpuLimit: 2.5,
       cpuRequest: 2.5,
       gpuLimit: 2,
+      gpuResourceName: 'nvidia.com/gpu',
       memoryLimit: 25,
       memoryRequest: 20
     };
@@ -747,6 +756,7 @@ describe('instanceType graphql', function() {
       description: faker.lorem.sentence(),
       cpuLimit: 2.5,
       gpuLimit: 2,
+      gpuResourceName: 'nvidia.com/gpu',
       memoryLimit: 25,
     };
     const createMutation = await this.graphqlRequest(`
@@ -797,6 +807,7 @@ describe('instanceType graphql', function() {
       cpuLimit: 2.5,
       cpuRequest: 2.5,
       gpuLimit: 2,
+      gpuResourceName: 'nvidia.com/gpu',
       memoryLimit: 25,
       memoryRequest: 20
     };
