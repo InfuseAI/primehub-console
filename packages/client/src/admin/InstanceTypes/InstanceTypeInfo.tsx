@@ -39,7 +39,7 @@ function _InstanceTypeInfo({ data, ...props }: Props) {
   async function onSubmit(
     formData: InstanceTypeFormState & { nodeList?: string[][] }
   ) {
-    const { id, tolerations, ...rest } = formData;
+    const { id, tolerations, gpuLimit, gpuResourceName, ...rest } = formData;
 
     const nextTolerations =
       tolerations.length === 0
@@ -74,6 +74,8 @@ function _InstanceTypeInfo({ data, ...props }: Props) {
               set: nextTolerations,
             },
             nodeSelector: nextNodeSelector,
+            gpuLimit: gpuLimit,
+            gpuResourceName: gpuLimit > 0 ? gpuResourceName : '',
           },
           where: {
             id,
