@@ -6,6 +6,7 @@ fragment InstanceTypeInfo on InstanceType {
   cpuLimit
   memoryLimit
   gpuLimit
+  gpuResourceName
 }
 
 query InstanceTypesQuery(

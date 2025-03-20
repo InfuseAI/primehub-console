@@ -33,6 +33,8 @@ export interface InstanceTypeSpec {
   'requests.cpu'?: number;
   'requests.memory'?: string;
   'limits.nvidia.com/gpu'?: number;
+  'limits.gpu'?: number;
+  'gpuResourceName'?: string;
   tolerations?: Array<{operator: string, effect?: string, key?: string, value?: string}>;
   nodeSelector?: Record<string, any>;
 }

@@ -42,6 +42,21 @@ const labelStringify = (labels: Record<string, string>) => {
   }).join(',');
 };
 
+const getGpuLimit = (limits: any) => {
+  if ('nvidia.com/gpu' in limits) {
+    return limits['nvidia.com/gpu'];
+  }
+  if ('amd.com/gpu' in limits) {
+    return limits['amd.com/gpu'];
+  }
+  for (const key in limits) {
+    if (key.startsWith('gpu.intel.com/')) {
+      return limits[key];
+    }
+  }
+  return 0;
+};
+
 export const query = async (group, args, context: Context) => {
   const groupName = toPrimehubLabel(group.name);
   logger.info({
@@ -72,7 +87,7 @@ export const query = async (group, args, context: Context) => {
     if (current.status.phase === PENDING || current.status.phase === RUNNING) {
       (current.spec.containers || []).forEach(container => {
         acc.cpuUsage += converCpuValueToFloat(container.resources.limits.cpu);
-        acc.gpuUsage += converCpuValueToFloat(container.resources.limits['nvidia.com/gpu']);
+        acc.gpuUsage += converCpuValueToFloat(getGpuLimit(container.resources.limits));
         acc.memUsage += converMemResourceToBytes(container.resources.limits.memory);
       });
     }
@@ -125,7 +140,7 @@ export const queryDetails = async (group, args, context: Context) => {
     };
     (item.spec.containers || []).forEach(container => {
       info.cpu += converCpuValueToFloat(container.resources.limits.cpu);
-      info.gpu += converCpuValueToFloat(container.resources.limits['nvidia.com/gpu']);
+      info.gpu += converCpuValueToFloat(getGpuLimit(container.resources.limits));
       info.mem += converMemResourceToBytes(container.resources.limits.memory);
     });
     info.mem = +(Math.round(info.mem / GiB * 10) / 10).toFixed(1);

@@ -76,15 +76,28 @@ const requestFieldTransform = (value: any, parseFunction?: (v: any) => any) => {
   return parseFunction ? parseFunction(value) : value;
 };
 
+const getGpuResource = (spec: any) => {
+  if ('limits.gpu' in spec && 'gpuResourceName' in spec) {
+    return {gpu: spec['limits.gpu'], name: spec.gpuResourceName};
+  }
+  if ('limits.nvidia.com/gpu' in spec) {
+    return {gpu: spec['limits.nvidia.com/gpu'], name: 'nvidia.com/gpu'};
+  }
+  return {gpu: 0, name: ''};
+};
+
 // graphql business logics
 export const mapping = (item: Item<InstanceTypeSpec>) => {
+  const gpuResource = getGpuResource(item.spec);
+
   return {
     id: item.metadata.name,
     name: item.metadata.name,
     description: item.spec.description,
     displayName: item.spec.displayName || item.metadata.name,
     cpuLimit: item.spec['limits.cpu'] || 0,
-    gpuLimit: item.spec['limits.nvidia.com/gpu'] || 0,
+    gpuLimit: gpuResource.gpu,
+    gpuResourceName: gpuResource.name,
     memoryLimit: item.spec['limits.memory'] ? parseMemory(item.spec['limits.memory']) : null,
 
     // request attributes and be null (disabled field), or number
@@ -152,7 +165,8 @@ export const createMapping = (data: any) => {
       'description': data.description,
       'limits.cpu': data.cpuLimit,
       'limits.memory': data.memoryLimit ? stringifyMemory(data.memoryLimit) : undefined,
-      'limits.nvidia.com/gpu': data.gpuLimit,
+      'limits.gpu': data.gpuLimit,
+      'gpuResourceName': data.gpuResourceName,
 
       // requests fields should be left empty if not defined by user
       'requests.cpu': cpuRequest,
@@ -190,7 +204,8 @@ export const updateMapping = (data: any) => {
       'description': data.description,
       'limits.cpu': data.cpuLimit,
       'limits.memory': data.memoryLimit ? stringifyMemory(data.memoryLimit) : undefined,
-      'limits.nvidia.com/gpu': data.gpuLimit,
+      'limits.gpu': data.gpuLimit,
+      'gpuResourceName': data.gpuResourceName,
       'requests.cpu': data.cpuRequest,
       'requests.memory': parseRequestField(data.memoryRequest, stringifyMemory),
       'nodeSelector': nodeSelector,

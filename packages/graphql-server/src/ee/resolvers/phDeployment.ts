@@ -2,7 +2,7 @@ import { Context } from '../../resolvers/interface';
 import {
   toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, mergeVariables, getGroupIdsByUser
 } from '../../resolvers/utils';
-import { validateLicense, validateModelDeployQuota } from './utils';
+import { validateLicense, validateModelDeployQuota, getGpuLimit } from './utils';
 import {
   PhDeploymentSpec, PhDeploymentStatus, PhDeploymentPhase, corev1KubeClient
 } from '../../crdClient/crdClientImpl';
@@ -230,7 +230,7 @@ const validateQuota = async (context: Context, groupId: string, instanceTypeId: 
   // validate
   const instanceType = await context.getInstanceType(instanceTypeId);
   const instanceTypeCpuLimit = instanceType.spec['limits.cpu'];
-  const instanceTypeGpuLimit = instanceType.spec['limits.nvidia.com/gpu'];
+  const instanceTypeGpuLimit = getGpuLimit(instanceType);
   const instanceTypeMemoryLimit =
     instanceType.spec['limits.memory'] ? parseMemory(instanceType.spec['limits.memory']) : null;
 

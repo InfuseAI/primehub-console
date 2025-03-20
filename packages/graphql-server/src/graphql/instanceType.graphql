@@ -9,6 +9,7 @@ type InstanceType {
   cpuLimit: Float
   memoryLimit: Float
   gpuLimit: Int
+  gpuResourceName: String
   cpuRequest: Float
   memoryRequest: Float
   global: Boolean
@@ -82,6 +83,7 @@ input InstanceTypeCreateInput {
   cpuLimit: Float
   memoryLimit: Float
   gpuLimit: Int
+  gpuResourceName: String
   cpuRequest: Float
   memoryRequest: Float
   global: Boolean
@@ -97,6 +99,7 @@ input InstanceTypeUpdateInput {
   cpuLimit: Float
   memoryLimit: Float
   gpuLimit: Int
+  gpuResourceName: String
   cpuRequest: Float
   memoryRequest: Float
   global: Boolean

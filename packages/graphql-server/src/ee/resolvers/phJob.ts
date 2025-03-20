@@ -1,6 +1,6 @@
 import { Context } from '../../resolvers/interface';
 import { toRelay, filter, paginate, extractPagination, getFromAttr, parseMemory, getGroupIdsByUser } from '../../resolvers/utils';
-import { validateLicense } from './utils';
+import { validateLicense, getGpuLimit } from './utils';
 import { PhJobPhase, PhJobSpec, PhJobStatus } from '../../crdClient/crdClientImpl';
 import CustomResourceNG, { Item } from '../../crdClient/customResourceNG';
 import { JobLogCtrl } from '../controllers/jobLogCtrl';
@@ -125,7 +125,7 @@ const validateQuota = async (context: Context, data: PhJobCreateInput) => {
   // validate
   const instanceType = await context.getInstanceType(instanceTypeId);
   const instanceTypeCpuLimit = instanceType.spec['limits.cpu'];
-  const instanceTypeGpuLimit = instanceType.spec['limits.nvidia.com/gpu'];
+  const instanceTypeGpuLimit = getGpuLimit(instanceType);
   const instanceTypeMemoryLimit =
     instanceType.spec['limits.memory'] ? parseMemory(instanceType.spec['limits.memory']) : null;
 
