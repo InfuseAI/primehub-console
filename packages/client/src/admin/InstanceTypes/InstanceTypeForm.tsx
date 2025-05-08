@@ -6,6 +6,7 @@ import {
   Input,
   InputNumber,
   Popconfirm,
+  Select,
   Spin,
   Switch,
   Table,
@@ -26,6 +27,7 @@ import { NodeSelectorList } from './NodeSelectorList';
 import { TolerationModalForm } from './TolerationModalForm';
 import type { TInstanceType, TToleration, Groups } from './types';
 import PHTooltip from 'components/share/toolTip';
+import { initialFormState } from 'admin/Secrets/SecretForm';
 
 function Tips({
   type,
@@ -83,6 +85,7 @@ export type InstanceTypeFormState = Pick<
   | 'description'
   | 'cpuLimit'
   | 'gpuLimit'
+  | 'gpuResourceName'
   | 'memoryLimit'
   | 'cpuRequest'
   | 'memoryRequest'
@@ -168,6 +171,7 @@ export function _InstanceTypeForm({
   const [editToleration, setEditToleration] = React.useState<TToleration>(null);
   const [tolerModalFormAction, setTolerModalFormAction] =
     React.useState<'create' | 'update'>(null);
+  const [gpuEnabled, setGpuEnabled] = React.useState(false);
 
   const [advanceFeature, dispatchAdanceFeature] = React.useReducer(
     (state: AdvanceFeatureState, action: AdvanceFeatureAction) => {
@@ -232,7 +236,6 @@ export function _InstanceTypeForm({
 
   React.useEffect(() => {
     if (data) {
-      
       const tolerations = data.tolerations.map(t => omit(t, ['__typename']));
       setTolerations(tolerations);
 
@@ -252,6 +255,7 @@ export function _InstanceTypeForm({
         setNodeList(Object.entries(data.nodeSelector));
       }
 
+      setGpuEnabled(data.gpuLimit > 0);
       setGlobalStatus(data.global);
     }
   }, [data]);
@@ -493,7 +497,39 @@ export function _InstanceTypeForm({
                       min={0}
                       step={1}
                       style={{ width: '105px' }}
+                      onChange={value => {
+                        setGpuEnabled(value > 0);
+                      }}
                     />
+                  )}
+                </Form.Item>
+
+                <Form.Item>
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    GPU Resource Name
+                  </label>
+
+                  {form.getFieldDecorator('gpuResourceName', {
+                    initialValue: data?.gpuResourceName || 'nvidia.com/gpu',
+                  })(
+                    <Select
+                      disabled={!gpuEnabled || form.getFieldValue('gpuLimit') === 0}
+                      style={{ width: '200px' }}
+                      placeholder='Select an item'
+                    >
+                      <Select.Option value='nvidia.com/gpu'>
+                        nvidia.com/gpu
+                      </Select.Option>
+                      <Select.Option value='amd.com/gpu'>
+                        amd.com/gpu
+                      </Select.Option>
+                    </Select>
                   )}
                 </Form.Item>
 
