@@ -33,3 +33,16 @@ export const validateModelDeployQuota = async (context: Context, excludeId = '')
     throw new ApolloError('Number of running model deployments exceeds license limitation', EXCEED_QUOTA_ERROR);
   }
 };
+
+export const getGpuLimit = (instanceType: any) => {
+  const spec = instanceType.spec;
+  if (!spec) {
+    return 0;
+  }
+  if ('limits.gpu' in spec) {
+    return spec['limits.gpu'];
+  }
+  if ('limits.nvidia.com/gpu' in spec) {
+    return spec['limits.nvidia.com/gpu'];
+  }
+};

@@ -14,6 +14,7 @@ export type TInstanceType = {
   cpuLimit: number;
   memoryLimit: number;
   gpuLimit: number;
+  gpuResourceName: string;
   cpuRequest: number;
   memoryRequest: number;
   global: boolean;
