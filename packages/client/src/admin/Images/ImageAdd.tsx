@@ -26,6 +26,12 @@ interface Props {
 function _ImageAdd({ createImageMutation }: Props) {
   const history = useHistory();
   const { appPrefix } = useRoutePrefix();
+  const fieldsToTrim = [
+    'displayName',
+    'description',
+    'url',
+    'urlForGpu',
+  ];
 
   async function onSubmit({
     isBuildByCustomImage,
@@ -43,7 +49,7 @@ function _ImageAdd({ createImageMutation }: Props) {
 
     if (isBuildByCustomImage) {
       const imageSpec: ImageSpec = {
-        baseImage: restData.imageSpec.baseImage,
+        baseImage: restData.imageSpec.baseImage.trim(),
         pullSecret: restData.imageSpec.pullSecret,
         // @ts-ignore
         packages: {},
@@ -68,6 +74,10 @@ function _ImageAdd({ createImageMutation }: Props) {
         ]),
         imageSpec,
       };
+    }
+
+    for (const field of fieldsToTrim) {
+      formData[field] = formData[field].trim()
     }
 
     try {

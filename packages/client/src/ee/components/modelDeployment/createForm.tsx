@@ -190,6 +190,8 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       if (err) return;
       if (customizeIdValidateStatus === 'error') return;
       if (!values.metadata) values.metadata = {}
+      values.modelImage = values.modelImage.trim();
+      values.modelURI= values.modelURI.trim();
       values.endpointAccessType = values.privateAccess ? 'private' : 'public';
       delete values.privateAccess;
       onSubmit(values);
@@ -477,7 +479,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
                   initialValue: name,
                   rules: [
                     { whitespace: true, required: true, message: 'Please input a name!' },
-                    { pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*/, message: `alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`}
+                    { pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*[a-zA-Z0-9]$/, message: `alphanumeric characters, '-' or '_' , and must start and end with an alphanumeric character.`}
                   ],
                 })(
                   <Input disabled={type === 'edit'} onChange={this.handleNameChange} />

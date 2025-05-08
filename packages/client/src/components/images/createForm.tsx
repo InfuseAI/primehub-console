@@ -148,6 +148,9 @@ class ImageCreateForm extends React.Component<Props, State> {
     }
     form.validateFields(async (err, values: FormValue) => {
       if (err || !validPackagesfilled) return;
+      values.description = values.description?.trim();
+      values.url = values.url?.trim();
+      values.urlForGpu = values.urlForGpu?.trim();
       onSubmit(values);
     });
   }
@@ -332,8 +335,8 @@ class ImageCreateForm extends React.Component<Props, State> {
                       message: 'Please input a name!'
                     },
                     {
-                      pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*/,
-                      message: `alphanumeric characters, '-' or '_' , and must start with an alphanumeric character.`
+                      pattern: /^[a-zA-Z0-9][a-zA-Z0-9\s-_]*[a-zA-Z0-9]$/,
+                      message: `alphanumeric characters, '-' or '_' , and must start and end with an alphanumeric character.`
                     }
                   ],
                 })(

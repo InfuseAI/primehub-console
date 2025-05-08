@@ -208,6 +208,7 @@ function UpdatePage(props: any) {
         }),
       },
     };
+    payload['displayName'] = payload['displayName'].trim();
     updateGroup({
       variables: {
         data: payload,
