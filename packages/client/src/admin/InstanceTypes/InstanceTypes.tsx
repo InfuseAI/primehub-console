@@ -260,6 +260,9 @@ export function _InstanceTypes({
         'tolerations', // using `nextTolerations` to replace tolerations field
         'groups.disconnect', // when creating instance type, groups' s field `disconnect` is not allowed
       ]);
+      for (const field of ['displayName', 'description']) {
+        fields[field] = fields[field].trim();
+      }
 
       if (!rest.cpuRequest) {
         // when creating instance type, if cpuRequest is `null` not allowed
