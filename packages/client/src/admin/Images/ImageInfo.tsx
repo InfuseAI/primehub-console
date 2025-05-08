@@ -101,7 +101,9 @@ function _ImageInfo({
     }
 
     for (const field of fieldsToTrim) {
-      formData[field] = formData[field].trim()
+      if (field in formData && typeof formData[field] === 'string') {
+        formData[field] = formData[field].trim();
+      }
     }
 
     try {
