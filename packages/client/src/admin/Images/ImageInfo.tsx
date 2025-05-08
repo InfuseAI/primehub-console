@@ -74,6 +74,12 @@ function _ImageInfo({
   const history = useHistory();
 
   const { appPrefix } = useRoutePrefix();
+  const fieldsToTrim = [
+    'displayName',
+    'description',
+    'url',
+    'urlForGpu',
+  ];
 
   async function onSubmit({
     isBuildByCustomImage,
@@ -92,6 +98,10 @@ function _ImageInfo({
           'imageSpec', // `imageSpec` can be edited by rebuild image mutation
         ]),
       };
+    }
+
+    for (const field of fieldsToTrim) {
+      formData[field] = formData[field].trim()
     }
 
     try {

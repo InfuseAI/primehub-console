@@ -58,6 +58,10 @@ function _InstanceTypeInfo({ data, ...props }: Props) {
       }, {});
     }
 
+    for (const field of ['displayName', 'description']) {
+      rest[field] = rest[field].trim();
+    }
+
     try {
       await props.updateInstanceTypeMutation({
         variables: {

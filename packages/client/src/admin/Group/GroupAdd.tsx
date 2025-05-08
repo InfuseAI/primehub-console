@@ -44,6 +44,7 @@ function AddPage(props: any) {
         }),
       },
     };
+    payload['displayName'] = payload['displayName'].trim();
     createGroup({
       variables: {
         data: payload,
