@@ -17,7 +17,7 @@ import {
 import { useHistory } from 'react-router-dom';
 import { compose } from 'recompose';
 import { graphql } from 'react-apollo';
-import { get } from 'lodash';
+import { get, filter, isEmpty } from 'lodash';
 import type { FormComponentProps } from 'antd/lib/form';
 
 import BaseImageRow from 'components/images/baseImageRow';
@@ -268,6 +268,11 @@ function _ImageForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const trimPackages = (label: string | undefined) => {
+    if (!label) { return "" }
+    return filter(label.split('\n').map(e => e.trim().split(' ')).flat(), p => !isEmpty(p)).join('\n');
+  }
+
   return (
     <>
       <Button
@@ -290,6 +295,11 @@ function _ImageForm({
           form.validateFields((err, values: ImageFormState) => {
             if (err || (isBuildByCustomImage && invalidatePackages({ form }))) {
               return;
+            }
+            if (isBuildByCustomImage) {
+              values.apt = trimPackages(values.apt);
+              values.conda = trimPackages(values.conda);
+              values.pip = trimPackages(values.pip);
             }
 
             if (props?.onSubmit) {

@@ -3,7 +3,7 @@ import {
   Checkbox, Radio, Select, Form, Card, Divider, Tabs, Alert,
   Row, Col, Input, Modal } from 'antd';
 import {FormComponentProps} from 'antd/lib/form';
-import {get, debounce, isEmpty} from 'lodash';
+import {get, debounce, isEmpty, filter} from 'lodash';
 import Log from 'components/share/log';
 import InfuseButton from 'components/infuseButton';
 import ImagePullSecret from 'components/share/ImagePullSecret';
@@ -139,6 +139,11 @@ class ImageCreateForm extends React.Component<Props, State> {
     return true;
   }
 
+  trimPackages(label: string | undefined) {
+    if (label === undefined) { return label; }
+    return filter(label.split('\n').map(e => e.trim().split(' ')).flat(), p => !isEmpty(p)).join('\n');
+  }
+
   submit = e => {
     const {form, onSubmit} = this.props;
     e.preventDefault();
@@ -151,6 +156,12 @@ class ImageCreateForm extends React.Component<Props, State> {
       values.description = values.description?.trim();
       values.url = values.url?.trim();
       values.urlForGpu = values.urlForGpu?.trim();
+      if (values.imageSpec?.packages) {
+        const packages = values.imageSpec.packages;
+        packages.apt = this.trimPackages(packages.apt);
+        packages.conda = this.trimPackages(packages.conda);
+        packages.pip = this.trimPackages(packages.pip);
+      }
       onSubmit(values);
     });
   }
