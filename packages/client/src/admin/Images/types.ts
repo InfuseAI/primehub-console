@@ -23,6 +23,7 @@ export interface Image {
   logEndpoint: string;
   imageSpec: ImageSpec;
   jobStatus: JobStatus;
+  usage: string;
 }
 
 export interface ImageSpec {

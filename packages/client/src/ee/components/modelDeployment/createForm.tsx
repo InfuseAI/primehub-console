@@ -45,6 +45,7 @@ type Props = FormComponentProps & {
   type?: 'edit' | 'create';
   isReachedGroupDeploymentsLimit: boolean;
   isReachedSystemDeploymentsLimit: boolean;
+  images: any[];
 };
 
 type State = {
@@ -371,6 +372,7 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       type,
       isReachedGroupDeploymentsLimit,
       isReachedSystemDeploymentsLimit,
+      images,
     } = this.props;
     const {
       groupId,
@@ -413,7 +415,34 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       </span>
     );
 
-    const dataSource = PrePackagedServers
+    const deploymentImages = [];
+    for (const image of images.filter(image => image.usage === 'deployment')) {
+      if (image.spec.type === 'both') {
+        deploymentImages.push({
+          title: `${image.displayName} (CPU)`,
+          url: image.url,
+          docLink: "",
+        });
+        deploymentImages.push({
+          title: `${image.displayName} (GPU)`,
+          url: image.urlForGpu,
+          docLink: "",
+        });
+      } else if (image.spec.type === 'cpu') {
+        deploymentImages.push({
+          title: `${image.displayName} (CPU)`,
+          url: image.url,
+          docLink: "",
+        });
+      } else if (image.spec.type === 'gpu') {
+        deploymentImages.push({
+          title: `${image.displayName} (GPU)`,
+          url: image.urlForGpu,
+          docLink: "",
+        });
+      }
+    }
+    const dataSource = [...PrePackagedServers, ...deploymentImages]
     .filter(image => image.title.indexOf(modelImageSearchText) > -1)
     .map((image, i) => {
       const title = image.title;
