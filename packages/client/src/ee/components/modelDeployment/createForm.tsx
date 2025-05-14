@@ -190,8 +190,8 @@ class DeploymentCreateForm extends React.Component<Props, State> {
       if (err) return;
       if (customizeIdValidateStatus === 'error') return;
       if (!values.metadata) values.metadata = {}
-      values.modelImage = values.modelImage.trim();
-      values.modelURI= values.modelURI.trim();
+      values.modelImage = values.modelImage?.trim();
+      values.modelURI = values.modelURI?.trim();
       values.endpointAccessType = values.privateAccess ? 'private' : 'public';
       delete values.privateAccess;
       onSubmit(values);
