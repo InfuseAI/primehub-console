@@ -14,6 +14,7 @@ const CALLBACK_PATH = '/oidc/callback';
 const REQUEST_API_TOKEN_PATH = '/oidc/request-api-token';
 const REQUEST_API_TOKEN_CALLBACK_PATH = '/oidc/request-api-token-callback';
 const NONCE_COOKIE = 'oidc.nonce';
+const STATE_COOKIE = 'oidc.state';
 
 const ERRORS = {
   FORCE_LOGIN: 'FORCE_LOGIN'
@@ -110,8 +111,9 @@ export class OidcCtrl {
 
         // require to login
         const nonce = this.saveNonceSecret(ctx);
+        const state = this.saveStateSecret(ctx);
         const backUrl = this.buildBackUrl(ctx.href);
-        const loginUrl = this.getLoginUrl(nonce, backUrl);
+        const loginUrl = this.getLoginUrl(nonce, state, backUrl);
         return ctx.redirect(loginUrl);
       }
       throw err;
@@ -169,8 +171,9 @@ export class OidcCtrl {
 
         // require to login
         const nonce = this.saveNonceSecret(ctx);
+        const state = this.saveStateSecret(ctx);
         const backUrl = this.buildBackUrl(ctx.href);
-        const loginUrl = this.getLoginUrl(nonce, backUrl);
+        const loginUrl = this.getLoginUrl(nonce, state, backUrl);
         return ctx.redirect(loginUrl);
       }
       throw err;
@@ -180,7 +183,8 @@ export class OidcCtrl {
   public refreshTokenSet = async (ctx: any) => {
     const backUrl = this.buildBackUrl(ctx.header.referer);
     const nonce = this.createNonceFromSecret(ctx);
-    const redirectUrl = this.getLoginUrl(nonce, backUrl);
+    const state = this.createStateFromSecret(ctx);
+    const redirectUrl = this.getLoginUrl(nonce, state, backUrl);
 
     // get refresh token
     try {
@@ -241,13 +245,14 @@ export class OidcCtrl {
     }
   }
 
-  public getLoginUrl = (nonce: string, backUrl?: string) => {
+  public getLoginUrl = (nonce: string, state: string, backUrl?: string) => {
     let redirectUri = this.redirectUri;
     if (backUrl) {
       redirectUri += `?backUrl=${backUrl}`;
     }
     const loginUrl = this.oidcClient.authorizationUrl({
       redirect_uri: redirectUri,
+      state,
       nonce
     });
     return loginUrl;
@@ -267,7 +272,8 @@ export class OidcCtrl {
         `${this.redirectUri}?backUrl=${encodeURIComponent(query.backUrl)}` : this.redirectUri;
 
       const nonce = this.createNonceFromSecret(ctx);
-      const tokenSet = await this.oidcClient.callback(redirectUri, query, {nonce});
+      const state = this.createStateFromSecret(ctx);
+      const tokenSet = await this.oidcClient.callback(redirectUri, query, {nonce, state});
       const accessToken = new Token(tokenSet.access_token, this.clientId);
 
       // redirect to frontend
@@ -331,6 +337,7 @@ export class OidcCtrl {
 
   public requestApiToken = async (ctx: any) => {
     const nonce = this.saveNonceSecret(ctx);
+    const state = this.saveStateSecret(ctx);
     const prefix = this.appPrefix ? this.appPrefix : '';
     const query = ctx.query;
     let redirectUri = `${this.cmsHost}${prefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`;
@@ -341,6 +348,7 @@ export class OidcCtrl {
     const apiTokenUrl = this.oidcClient.authorizationUrl({
       redirect_uri: redirectUri,
       scope: 'openid offline_access',
+      state,
       nonce
     });
     return ctx.redirect(apiTokenUrl);
@@ -348,13 +356,14 @@ export class OidcCtrl {
 
   public requestApiTokenCallback = async (ctx: any) => {
     const nonce = this.createNonceFromSecret(ctx);
+    const state = this.createStateFromSecret(ctx);
     const prefix = this.appPrefix ? this.appPrefix : '';
     const query = ctx.query;
     let redirectUri = `${this.cmsHost}${prefix}${REQUEST_API_TOKEN_CALLBACK_PATH}`;
     if (query.backUrl) {
       redirectUri = `${redirectUri}?backUrl=${encodeURIComponent(query.backUrl)}`;
     }
-    const tokenSet = await this.oidcClient.callback(redirectUri, query, {nonce});
+    const tokenSet = await this.oidcClient.callback(redirectUri, query, {nonce, state});
 
     // redirect to frontend
     const secureRequest = ctx.request.secure;
@@ -394,6 +403,18 @@ export class OidcCtrl {
     const secureRequest = ctx.request.secure;
     ctx.cookies.set(NONCE_COOKIE, nonce, {signed: true, secure: secureRequest, path: this.cookiePath});
     return nonce;
+  }
+
+  private createStateFromSecret = (ctx: Koa.ParameterizedContext) => {
+    const state = ctx.cookies.get(STATE_COOKIE, {signed: true});
+    return state;
+  }
+
+  private saveStateSecret = (ctx: Koa.ParameterizedContext) => {
+    const state = generators.state();
+    const secureRequest = ctx.request.secure;
+    ctx.cookies.set(STATE_COOKIE, state, {signed: true, secure: secureRequest, path: this.cookiePath});
+    return state;
   }
 
   private isForceLoginError = (err: any) => {
